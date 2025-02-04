@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,55 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.macro.perfetto
+@file:OptIn(ExperimentalInsightApi::class)
 
-import androidx.benchmark.Insight
-import androidx.benchmark.TraceDeepLink
-import androidx.benchmark.TraceDeepLink.StartupSelectionParams
-import androidx.benchmark.inMemoryTrace
-import androidx.benchmark.traceprocessor.TraceProcessor
+package androidx.benchmark.traceprocessor
+
+import androidx.annotation.RestrictTo
+import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
 import perfetto.protos.AndroidStartupMetric.SlowStartReason
 import perfetto.protos.AndroidStartupMetric.ThresholdValue.ThresholdUnit
 import perfetto.protos.TraceMetrics
-
-private fun SlowStartReason.getStudioSelectionParams(): TraceDeepLink.StudioSelectionParams? {
-    trace_slice_sections?.apply {
-        val start = start_timestamp
-        val end = end_timestamp
-        return TraceDeepLink.StudioSelectionParams(
-            ts = if (start != null && end != null) start else null,
-            dur = if (start != null && end != null) end - start else null,
-            tid = slice_section.firstOrNull()?.thread_tid
-        )
-    }
-    trace_thread_sections?.apply {
-        val start = start_timestamp
-        val end = end_timestamp
-        return TraceDeepLink.StudioSelectionParams(
-            ts = if (start != null && end != null) start else null,
-            dur = if (start != null && end != null) end - start else null,
-            tid = thread_section.firstOrNull()?.thread_tid
-        )
-    }
-    // no thread sections or slices
-    return null
-}
-
-private fun getDeepLink(
-    traceOutputRelativePath: String,
-    packageName: String,
-    slowStartReason: SlowStartReason,
-): TraceDeepLink {
-    return TraceDeepLink(
-        outputRelativePath = traceOutputRelativePath,
-        perfettoUiParams =
-            StartupSelectionParams(
-                packageName = packageName,
-                reasonId = slowStartReason.reason_id?.name
-            ),
-        studioParams = slowStartReason.getStudioSelectionParams()
-    )
-}
 
 /**
  * Convert the SlowStartReason concept from Perfetto's android_startup metric to the Macrobenchmark
@@ -71,8 +31,8 @@ private fun getDeepLink(
 private fun SlowStartReason.toInsight(
     packageName: String,
     helpUrlBase: String?,
-    traceOutputRelativePath: String,
-    iterationIndex: Int,
+    traceLinkTitle: String,
+    traceLinkPath: String,
 ): Insight {
     val thresholdUnit = expected_value!!.unit!!
     val unitSuffix =
@@ -84,7 +44,7 @@ private fun SlowStartReason.toInsight(
             else -> " ${thresholdUnit.toString().lowercase()}"
         }
 
-    val thresholdValue = expected_value!!.value_!!
+    val thresholdValue = expected_value.value_!!
 
     val thresholdString =
         StringBuilder()
@@ -100,8 +60,8 @@ private fun SlowStartReason.toInsight(
                             )
                     }
                 } else {
-                    if (expected_value!!.higher_expected == true) append("> ")
-                    if (expected_value!!.higher_expected == false) append("< ")
+                    if (expected_value.higher_expected == true) append("> ")
+                    if (expected_value.higher_expected == false) append("< ")
                     append(thresholdValue)
                     append(unitSuffix)
                 }
@@ -125,25 +85,35 @@ private fun SlowStartReason.toInsight(
             } else {
                 "$observedValue$unitSuffix"
             },
-        deepLink =
-            getDeepLink(
-                traceOutputRelativePath = traceOutputRelativePath,
-                packageName = packageName,
-                slowStartReason = this
+        traceLink =
+            PerfettoTrace.Link(
+                path = traceLinkPath,
+                title = traceLinkTitle,
+                urlParamMap =
+                    mapOf(
+                        "AndroidStartup:packageName" to packageName,
+                        "AndroidStartup:slowStartReasonId" to reason_id!!.name
+                    ),
             ),
-        iterationIndex = iterationIndex,
         category = category,
     )
 }
 
-internal fun TraceProcessor.Session.queryStartupInsights(
-    helpUrlBase: String?,
-    traceOutputRelativePath: String,
-    iteration: Int,
-    packageName: String
-): List<Insight> =
-    inMemoryTrace("extract insights") {
-        TraceMetrics.ADAPTER.decode(queryMetricsProtoBinary(listOf("android_startup")))
+@ExperimentalInsightApi
+public class StartupInsights
+@RestrictTo(LIBRARY_GROUP)
+constructor(private val helpUrlBase: String?) : Insight.Provider {
+    public constructor() : this(null)
+
+    override fun queryInsights(
+        session: TraceProcessor.Session,
+        packageName: String,
+        traceLinkTitle: String,
+        traceLinkPath: String,
+    ): List<Insight> {
+        return TraceMetrics.ADAPTER.decode(
+                session.queryMetricsProtoBinary(listOf("android_startup"))
+            )
             .android_startup
             ?.startup
             ?.filter { it.package_name == packageName } // TODO: fuzzy match?
@@ -152,8 +122,9 @@ internal fun TraceProcessor.Session.queryStartupInsights(
                 it.toInsight(
                     packageName = packageName,
                     helpUrlBase = helpUrlBase,
-                    traceOutputRelativePath = traceOutputRelativePath,
-                    iterationIndex = iteration
+                    traceLinkTitle = traceLinkTitle,
+                    traceLinkPath = traceLinkPath
                 )
             } ?: emptyList()
     }
+}

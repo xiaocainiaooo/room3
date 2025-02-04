@@ -16,46 +16,43 @@
 
 package androidx.benchmark.macro
 
-import androidx.benchmark.Insight
 import androidx.benchmark.InsightSummary
-import androidx.benchmark.TraceDeepLink
-import androidx.benchmark.TraceDeepLink.StudioSelectionParams
 import androidx.benchmark.createInsightSummaries
-import androidx.benchmark.macro.perfetto.queryStartupInsights
+import androidx.benchmark.traceprocessor.Insight
+import androidx.benchmark.traceprocessor.PerfettoTrace
+import androidx.benchmark.traceprocessor.StartupInsights
 import androidx.benchmark.traceprocessor.TraceProcessor
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class InsightTest {
+class StartupInsightsTest {
     private val api35ColdStart =
         createTempFileFromAsset(prefix = "api35_startup_cold_classinit", suffix = ".perfetto-trace")
             .absolutePath
 
     private val targetPackage = "androidx.compose.integration.hero.macrobenchmark.target"
 
+    val insights = StartupInsights(helpUrlBase = "https://d.android.com/test#")
+
     // TODO (b/377581661) take time ranges from SlowStartReason
-    private fun startupDeepLinkOf(reasonId: String, studioSelectionParams: StudioSelectionParams) =
-        TraceDeepLink(
-            outputRelativePath = "/fake/output/relative/path.perfetto-trace",
-            perfettoUiParams =
-                TraceDeepLink.StartupSelectionParams(
-                    packageName = targetPackage,
-                    reasonId = reasonId,
-                ),
-            studioParams = studioSelectionParams
+    private fun startupTraceLinkOf(title: String, reasonId: String) =
+        PerfettoTrace.Link(
+            title = title,
+            path = "/fake/output/relative/path.perfetto-trace",
+            urlParamMap =
+                mapOf(
+                    "AndroidStartup:packageName" to targetPackage,
+                    "AndroidStartup:slowStartReasonId" to reasonId
+                )
         )
 
     private val canonicalTraceInsights =
         listOf(
             Insight(
                 observedLabel = "123305107ns",
-                deepLink =
-                    startupDeepLinkOf(
-                        "POTENTIAL_CPU_CONTENTION_WITH_ANOTHER_PROCESS",
-                        StudioSelectionParams(ts = 351868274168786, dur = 108779088, tid = 27246)
-                    ),
-                iterationIndex = 6,
+                traceLink =
+                    startupTraceLinkOf("6", "POTENTIAL_CPU_CONTENTION_WITH_ANOTHER_PROCESS"),
                 category =
                     Insight.Category(
                         titleUrl =
@@ -66,12 +63,7 @@ class InsightTest {
             ),
             Insight(
                 observedLabel = "328462261ns",
-                deepLink =
-                    startupDeepLinkOf(
-                        "JIT_ACTIVITY",
-                        StudioSelectionParams(ts = 351868810086686, dur = 641537910, tid = 27251)
-                    ),
-                iterationIndex = 6,
+                traceLink = startupTraceLinkOf("6", "JIT_ACTIVITY"),
                 category =
                     Insight.Category(
                         titleUrl = "https://d.android.com/test#JIT_ACTIVITY",
@@ -81,12 +73,7 @@ class InsightTest {
             ),
             Insight(
                 observedLabel = "150 count",
-                deepLink =
-                    startupDeepLinkOf(
-                        "JIT_COMPILED_METHODS",
-                        StudioSelectionParams(ts = 351868803870454, dur = 619263677, tid = 27251)
-                    ),
-                iterationIndex = 6,
+                traceLink = startupTraceLinkOf("6", "JIT_COMPILED_METHODS"),
                 category =
                     Insight.Category(
                         titleUrl = "https://d.android.com/test#JIT_COMPILED_METHODS",
@@ -104,7 +91,7 @@ class InsightTest {
                 observedV2 =
                     "seen in iterations: [6](file:///fake/output/relative/path.perfetto-trace)(123305107ns)",
                 observedV3 =
-                    "seen in iterations: [6](uri:///fake/output/relative/path.perfetto-trace?enablePlugins=android_startup&android_startup:selectionParams=eNodx8EKwyAMANC_2dE_6KGI0MIw0jp2DJkGK0VTUg_7_MHe7V2UTirsqfFEPavU_DVJ2iU3m9oHF6VRpZuDVUyjpPLhno5GeppBWng8lOmWjjVPAaLzcZ2faMMLLfh_weN7jQvOHuLiNgwbWLfvP03rLE0=&selectionParams=eNoFwbEBACAIA7BvnAGV1oFvWFwV_zepG30qnYahTtBbvhMqBJaQrXaGwYZ_46oKfA==)(123305107ns)"
+                    "seen in iterations: [6](uri:///fake/output/relative/path.perfetto-trace?AndroidStartup%3ApackageName=androidx.compose.integration.hero.macrobenchmark.target&AndroidStartup%3AslowStartReasonId=POTENTIAL_CPU_CONTENTION_WITH_ANOTHER_PROCESS)(123305107ns)"
             ),
             InsightSummary(
                 category =
@@ -112,7 +99,7 @@ class InsightTest {
                 observedV2 =
                     "seen in iterations: [6](file:///fake/output/relative/path.perfetto-trace)(328462261ns)",
                 observedV3 =
-                    "seen in iterations: [6](uri:///fake/output/relative/path.perfetto-trace?enablePlugins=android_startup&android_startup:selectionParams=eNoFwTEKgDAMBdDbOOYGDuJUB6ciOMm3DW0pTSRm8Pi-9yB1FN4xeIZk05Y_SjoefZmaOBeDNxWqbEoDyfRmSXXAOjmssE_GeFWuluctxGtZYzhCPH86oCIg&selectionParams=eNoFwTECABAMA8DfmBs0YuhvLFbq_-7yRnOIEsxEimW9E-zwNias5F5RR3V84nsKZg==)(328462261ns)"
+                    "seen in iterations: [6](uri:///fake/output/relative/path.perfetto-trace?AndroidStartup%3ApackageName=androidx.compose.integration.hero.macrobenchmark.target&AndroidStartup%3AslowStartReasonId=JIT_ACTIVITY)(328462261ns)"
             ),
             InsightSummary(
                 category =
@@ -120,30 +107,31 @@ class InsightTest {
                 observedV2 =
                     "seen in iterations: [6](file:///fake/output/relative/path.perfetto-trace)(150 count)",
                 observedV3 =
-                    "seen in iterations: [6](uri:///fake/output/relative/path.perfetto-trace?enablePlugins=android_startup&android_startup:selectionParams=eNoFwUsKgDAMBcDbuMwNXKmg4g90X55tqEWaSOzC4zvzwN-IvCBzDQmmKXzkNT_6MiUpHA0lqdDFppThTU8Wf2XYTQUWuVTGeFVcCvU4HK5Z522YutbN3dGv7f4DVeskcw==&selectionParams=eNoFwakBACAIAMBtyPxgYBuKVXF_7-aWGKVnomSgmkK_U06LXTwCZndxsNEH4rIKbQ==)(150 count)"
+                    "seen in iterations: [6](uri:///fake/output/relative/path.perfetto-trace?AndroidStartup%3ApackageName=androidx.compose.integration.hero.macrobenchmark.target&AndroidStartup%3AslowStartReasonId=JIT_COMPILED_METHODS)(150 count)"
             ),
         )
 
     @MediumTest
     @Test
-    fun queryStartupInsights() {
+    fun queryInsights() {
         TraceProcessor.runSingleSessionServer(api35ColdStart) {
             assertThat(
-                    queryStartupInsights(
-                        helpUrlBase = "https://d.android.com/test#",
-                        traceOutputRelativePath = "/fake/output/relative/path.perfetto-trace",
-                        iteration = 6,
-                        packageName = Packages.MISSING
+                insights
+                    .queryInsights(
+                        session = this,
+                        packageName = Packages.MISSING,
+                        traceLinkTitle = "6",
+                        traceLinkPath = "/fake/output/relative/path.perfetto-trace"
                     )
-                )
-                .isEmpty()
+                    .isEmpty()
+            )
 
             assertThat(
-                    queryStartupInsights(
-                        helpUrlBase = "https://d.android.com/test#",
-                        traceOutputRelativePath = "/fake/output/relative/path.perfetto-trace",
-                        iteration = 6,
-                        packageName = targetPackage
+                    insights.queryInsights(
+                        session = this,
+                        packageName = targetPackage,
+                        traceLinkTitle = "6",
+                        traceLinkPath = "/fake/output/relative/path.perfetto-trace"
                     )
                 )
                 .isEqualTo(canonicalTraceInsights)
@@ -152,7 +140,14 @@ class InsightTest {
 
     @MediumTest
     @Test
-    fun createInsightSummaries() {
+    fun createInsightSummaries_v2() {
+        assertThat(canonicalTraceInsights.createInsightSummaries().map { it.observedV2 })
+            .isEqualTo(canonicalTraceInsightSummary.map { it.observedV2 })
+    }
+
+    @MediumTest
+    @Test
+    fun createInsightSummaries_v3() {
         assertThat(canonicalTraceInsights.createInsightSummaries().map { it.observedV3 })
             .isEqualTo(canonicalTraceInsightSummary.map { it.observedV3 })
     }
