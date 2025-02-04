@@ -75,7 +75,10 @@ fun Project.configureErrorProneForAndroid() {
                 .extendsFrom(errorProneConfiguration)
 
             log.info("Configuring error-prone for ${variant.name}'s java compile")
-            makeErrorProneTask("compile${variant.name.camelCase()}JavaWithJavac") { javaCompile ->
+            makeErrorProneTask(
+                compileTaskName = "compile${variant.name.camelCase()}JavaWithJavac",
+                taskSuffix = variant.name.camelCase(),
+            ) { javaCompile ->
                 @Suppress("UnstableApiUsage")
                 val annotationArgs = variant.javaCompilation.annotationProcessor.arguments
                 javaCompile.options.compilerArgumentProviders.add(
@@ -132,6 +135,9 @@ private fun JavaCompile.configureWithErrorProne() {
             "-XDcompilePolicy=simple", // Workaround for b/36098770
             listOf(
                     "-Xplugin:ErrorProne",
+
+                    // : Disables warnings in classes annotated with @Generated
+                    "-XepDisableWarningsInGeneratedCode",
 
                     // Ignore intermediate build output, generated files, and external sources. Also
                     // sources
@@ -294,8 +300,7 @@ private fun Project.makeKmpErrorProneTask(
                 // flatMap src dirs into src files so we can read the extensions.
                 .asFileTree
                 // ErrorProne normally skips non-java source, but we need to explicitly filter for
-                // it
-                // since non-empty list with no java source will throw an exception.
+                // it since non-empty list with no java source will throw an exception.
                 .filter { it.extension.equals("java", ignoreCase = true) }
                 .asFileTree
     }
@@ -310,28 +315,25 @@ private fun Project.makeKmpErrorProneTask(
  */
 private fun Project.makeErrorProneTask(
     compileTaskName: String,
+    taskSuffix: String = "",
     onConfigure: (errorProneTask: JavaCompile) -> Unit = {}
 ) = afterEvaluate {
     val errorProneTaskProvider =
-        maybeRegister<JavaCompile>(
-            name = ERROR_PRONE_TASK,
-            onConfigure = {
-                val compileTask =
-                    tasks.withType(JavaCompile::class.java).named(compileTaskName).get()
-                it.classpath = compileTask.classpath
-                it.source = compileTask.source
-                it.destinationDirectory.set(layout.buildDirectory.dir("errorProne"))
-                it.options.compilerArgs = compileTask.options.compilerArgs.toMutableList()
-                it.options.annotationProcessorPath = compileTask.options.annotationProcessorPath
-                it.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
-                it.sourceCompatibility = compileTask.sourceCompatibility
-                it.targetCompatibility = compileTask.targetCompatibility
-                it.configureWithErrorProne()
-                it.dependsOn(compileTask.dependsOn)
+        tasks.register("$ERROR_PRONE_TASK$taskSuffix", JavaCompile::class.java) {
+            val compileTask = tasks.withType(JavaCompile::class.java).named(compileTaskName).get()
+            it.classpath = compileTask.classpath
+            it.source = compileTask.source
+            it.destinationDirectory.set(layout.buildDirectory.dir("errorProne/$taskSuffix"))
+            it.options.compilerArgs = compileTask.options.compilerArgs.toMutableList()
+            it.options.annotationProcessorPath = compileTask.options.annotationProcessorPath
+            it.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
+            it.sourceCompatibility = compileTask.sourceCompatibility
+            it.targetCompatibility = compileTask.targetCompatibility
+            it.configureWithErrorProne()
+            it.dependsOn(compileTask.dependsOn)
 
-                onConfigure(it)
-            },
-            onRegister = { errorProneProvider -> project.addToCheckTask(errorProneProvider) }
-        )
+            onConfigure(it)
+        }
+    addToCheckTask(errorProneTaskProvider)
     addToBuildOnServer(errorProneTaskProvider)
 }
