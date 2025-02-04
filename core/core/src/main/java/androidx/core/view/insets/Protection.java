@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.core.view.insetscontrast;
+package androidx.core.view.insets;
 
 import android.animation.ValueAnimator;
 import android.graphics.drawable.Drawable;
@@ -37,14 +37,14 @@ import org.jspecify.annotations.Nullable;
  * <p>Concrete derived classes would describe how the protection should be drawn by supplying the
  * {@link Drawable}.
  *
- * <p>The object of this class is stateful, and can only be used by one {@link ProtectionView} at a
- * time.
+ * <p>The object of this class is stateful, and can only be used by one {@link ProtectionLayout} at
+ * a time.
  *
  * @see ColorProtection
  * @see GradientProtection
- * @see ProtectionView
+ * @see ProtectionLayout
  */
-public abstract class ContrastProtection {
+public abstract class Protection {
 
     private static final Interpolator DEFAULT_INTERPOLATOR_MOVE_IN =
             new PathInterpolator(0f, 0f, 0f, 1f);
@@ -82,7 +82,7 @@ public abstract class ContrastProtection {
      * @param side the given {@link WindowInsetsCompat.Side}.
      * @throws IllegalArgumentException if the given side is not one of the four sides.
      */
-    public ContrastProtection(@InsetsSide int side) {
+    public Protection(@InsetsSide int side) {
         switch (side) {
             case WindowInsetsCompat.Side.LEFT:
             case WindowInsetsCompat.Side.TOP:
@@ -110,7 +110,8 @@ public abstract class ContrastProtection {
      *
      * @return the attributes this protection is associated with.
      */
-    @NonNull Attributes getAttributes() {
+    @NonNull
+    Attributes getAttributes() {
         return mAttributes;
     }
 
@@ -572,7 +573,7 @@ public abstract class ContrastProtection {
         void setCallback(@Nullable Callback callback) {
             if (mCallback != null && callback != null) {
                 throw new IllegalStateException("Trying to overwrite the existing callback."
-                        + " Did you use one protection to create multiple ProtectionViews?");
+                        + " Did you send one protection to multiple ProtectionLayouts?");
             }
             mCallback = callback;
         }
