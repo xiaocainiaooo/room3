@@ -36,6 +36,7 @@ androidx.configureAarAsJarForConfiguration("implementation")
 
 dependencies {
     api(libs.kotlinStdlib)
+    implementation("androidx.annotation:annotation:1.7.0")
     implementation(libs.kspApi)
     implementation(libs.kotlinPoet)
     implementation(libs.kotlinReflect, {
