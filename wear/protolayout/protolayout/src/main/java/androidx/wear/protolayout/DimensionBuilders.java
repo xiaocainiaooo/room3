@@ -1390,7 +1390,7 @@ public final class DimensionBuilders {
 
         /**
          * Gets the ratio proportional to the bounding box width/height. Value 0 represents the
-         * location at the top / left of the bounding box, value 1 represents the location at the
+         * location at the top / start of the bounding box, value 1 represents the location at the
          * bottom / end of the bounding box, and value 0.5 represents the middle of the bounding
          *  box. Values outside [0, 1] are also valid. Dynamic value is supported.
          */
@@ -1449,10 +1449,10 @@ public final class DimensionBuilders {
              * Creates an instance of {@link Builder}.
              *
              * @param ratio the ratio proportional to the bounding box width/height. Value 0
-             *     represents the location at the top / left of the bounding box, value 1 represents
-             *     the location at the bottom / end of the bounding box, and value 0.5 represents
-             *     the middle of the bounding box. Values outside [0, 1] are also valid. Dynamic
-             *     value is supported.
+             *     represents the location at the top / start of the bounding box, value 1
+             *     represents the location at the bottom / end of the bounding box, and value 0.5
+             *     represents the middle of the bounding box. Values outside [0, 1] are also valid.
+             *     Dynamic value is supported.
              */
             @RequiresSchemaVersion(major = 1, minor = 400)
             public Builder(@NonNull FloatProp ratio) {
@@ -1464,7 +1464,7 @@ public final class DimensionBuilders {
 
             /**
              * Sets the ratio proportional to the bounding box width/height. Value 0 represents the
-             * location at the top / left of the bounding box, value 1 represents the location at
+             * location at the top / start of the bounding box, value 1 represents the location at
              * the bottom / end of the bounding box, and value 0.5 represents the middle of the
              * bounding box. Values outside [0, 1] are also valid. Dynamic value is supported.
              */
