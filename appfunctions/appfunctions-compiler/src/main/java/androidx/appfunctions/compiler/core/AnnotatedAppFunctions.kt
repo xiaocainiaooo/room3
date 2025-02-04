@@ -31,6 +31,7 @@ import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.TypeName
 
 /**
  * Represents a collection of functions within a specific class that are annotated as app functions.
@@ -229,8 +230,17 @@ data class AnnotatedAppFunctions(
         )
     }
 
-    private fun KSTypeReference.toAppFunctionDataType(): Int =
-        when (this.resolve().declaration.qualifiedName?.asString()) {
+    private fun KSTypeReference.toAppFunctionDataType(): Int {
+        val resolvedTypeName = this.toTypeName().ignoreNullable().toString()
+
+        if (
+            SUPPORTED_ARRAY_PRIMITIVE_TYPES.contains(resolvedTypeName) ||
+                SUPPORTED_COLLECTION_TYPES.contains(resolvedTypeName)
+        ) {
+            return AppFunctionDataTypeMetadata.TYPE_ARRAY
+        }
+
+        return when (resolvedTypeName) {
             "kotlin.String" -> AppFunctionDataTypeMetadata.TYPE_STRING
             "kotlin.Int" -> AppFunctionDataTypeMetadata.TYPE_INT
             "kotlin.Long" -> AppFunctionDataTypeMetadata.TYPE_LONG
@@ -239,9 +249,9 @@ data class AnnotatedAppFunctions(
             "kotlin.Boolean" -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
             "kotlin.Byte" -> AppFunctionDataTypeMetadata.TYPE_BYTES
             "kotlin.Unit" -> AppFunctionDataTypeMetadata.TYPE_UNIT
-            // TODO: Support converting other types.
             else -> AppFunctionDataTypeMetadata.TYPE_OBJECT
         }
+    }
 
     private fun computeAppFunctionAnnotationProperties(
         functionDeclaration: KSFunctionDeclaration
@@ -345,8 +355,9 @@ data class AnnotatedAppFunctions(
          * list of a supported type.
          */
         fun isSupportedType(typeReferenceArgument: KSTypeReference): Boolean {
-            return SUPPORTED_TYPES.contains(typeReferenceArgument.getTypeNameAsString()) ||
-                isAppFunctionSerializableType(typeReferenceArgument)
+            return SUPPORTED_TYPES.contains(
+                typeReferenceArgument.toTypeName().ignoreNullable().toString()
+            ) || isAppFunctionSerializableType(typeReferenceArgument)
         }
 
         /**
@@ -367,40 +378,12 @@ data class AnnotatedAppFunctions(
                 null
         }
 
-        /**
-         * Gets the type name of the type reference as a string.
-         *
-         * If the type reference is a list, it will resolve the type reference of the list element.
-         */
-        // TODO(b/392587953): Use toTypeName instead and remove redundant util functions
-        fun KSTypeReference.getTypeNameAsString(): String {
-            if (isOfType(LIST)) {
-                return getListTypeNameAsString()
-            }
-            return ensureQualifiedTypeName().asString()
+        private fun TypeName.ignoreNullable(): TypeName {
+            return copy(nullable = false)
         }
 
-        private fun KSTypeReference.getListTypeNameAsString(): String {
-            if (!isOfType(LIST)) {
-                throw ProcessingException(
-                    "Unable to resolve list parameterized type for non list type",
-                    this
-                )
-            }
-            val parametrizedType =
-                resolve().arguments.firstOrNull()?.type
-                    ?: throw ProcessingException(
-                        "Unable to resolve the parameterized type for the list",
-                        this
-                    )
-            return this.ensureQualifiedTypeName().asString() +
-                "<" +
-                parametrizedType.ensureQualifiedTypeName().asString() +
-                ">"
-        }
-
-        internal val SUPPORTED_ARRAY_TYPES =
-            listOf(
+        internal val SUPPORTED_ARRAY_PRIMITIVE_TYPES =
+            setOf(
                 IntArray::class.qualifiedName!!,
                 LongArray::class.qualifiedName!!,
                 FloatArray::class.qualifiedName!!,
@@ -408,14 +391,21 @@ data class AnnotatedAppFunctions(
                 BooleanArray::class.qualifiedName!!
             )
 
-        internal val SUPPORTED_TYPES =
-            listOf(
+        internal val SUPPORTED_SINGLE_PRIMITIVE_TYPES =
+            setOf(
                 Int::class.qualifiedName!!,
                 Long::class.qualifiedName!!,
                 Float::class.qualifiedName!!,
                 Double::class.qualifiedName!!,
                 Boolean::class.qualifiedName!!,
                 String::class.qualifiedName!!,
-            ) + SUPPORTED_ARRAY_TYPES + listOf("kotlin.collections.List<kotlin.String>")
+            )
+
+        internal val SUPPORTED_COLLECTION_TYPES = setOf("kotlin.collections.List<kotlin.String>")
+
+        internal val SUPPORTED_TYPES =
+            SUPPORTED_SINGLE_PRIMITIVE_TYPES +
+                SUPPORTED_ARRAY_PRIMITIVE_TYPES +
+                SUPPORTED_COLLECTION_TYPES
     }
 }
