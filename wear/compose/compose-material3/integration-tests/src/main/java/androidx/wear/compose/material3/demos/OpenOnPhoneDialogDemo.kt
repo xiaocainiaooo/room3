@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.wear.compose.integration.demos.common.ComposableDemo
+import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.OpenOnPhoneDialog
@@ -45,48 +46,56 @@ val OpenOnPhoneDialogDemos =
 fun OpenOnPhoneDialogWithCustomText() {
     var visible by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
-        FilledTonalButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { visible = true },
-            label = { Text("Open on phone") }
+    // Use AppScaffold to improve OpenOnPhoneDialog's Performance
+    AppScaffold {
+        Box(Modifier.fillMaxSize()) {
+            FilledTonalButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { visible = true },
+                label = { Text("Open on phone") }
+            )
+        }
+
+        val curvedTextStyle = OpenOnPhoneDialogDefaults.curvedTextStyle
+        OpenOnPhoneDialog(
+            visible = visible,
+            onDismissRequest = { visible = false },
+            curvedText = {
+                openOnPhoneDialogCurvedText(text = "Custom text", style = curvedTextStyle)
+            }
         )
     }
-
-    val curvedTextStyle = OpenOnPhoneDialogDefaults.curvedTextStyle
-    OpenOnPhoneDialog(
-        visible = visible,
-        onDismissRequest = { visible = false },
-        curvedText = { openOnPhoneDialogCurvedText(text = "Custom text", style = curvedTextStyle) }
-    )
 }
 
 @Composable
 fun OpenOnPhoneDialogWithCustomColors() {
     var visible by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
-        FilledTonalButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { visible = true },
-            label = { Text("Open on phone") }
+    // Use AppScaffold to improve OpenOnPhoneDialog's Performance
+    AppScaffold {
+        Box(Modifier.fillMaxSize()) {
+            FilledTonalButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { visible = true },
+                label = { Text("Open on phone") }
+            )
+        }
+
+        val curvedTextStyle = OpenOnPhoneDialogDefaults.curvedTextStyle
+        OpenOnPhoneDialog(
+            visible = visible,
+            onDismissRequest = { visible = false },
+            colors =
+                OpenOnPhoneDialogDefaults.colors(
+                    iconColor = MaterialTheme.colorScheme.tertiary,
+                    iconContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    progressIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    progressTrackColor = MaterialTheme.colorScheme.onTertiary,
+                    textColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+            curvedText = {
+                openOnPhoneDialogCurvedText(text = "Custom colors", style = curvedTextStyle)
+            }
         )
     }
-
-    val curvedTextStyle = OpenOnPhoneDialogDefaults.curvedTextStyle
-    OpenOnPhoneDialog(
-        visible = visible,
-        onDismissRequest = { visible = false },
-        colors =
-            OpenOnPhoneDialogDefaults.colors(
-                iconColor = MaterialTheme.colorScheme.tertiary,
-                iconContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                progressIndicatorColor = MaterialTheme.colorScheme.tertiary,
-                progressTrackColor = MaterialTheme.colorScheme.onTertiary,
-                textColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-        curvedText = {
-            openOnPhoneDialogCurvedText(text = "Custom colors", style = curvedTextStyle)
-        }
-    )
 }
