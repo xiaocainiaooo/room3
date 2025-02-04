@@ -23,8 +23,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -34,12 +37,16 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewRootForTest
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import kotlin.test.Test
 import kotlin.test.assertNull
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Assume.assumeFalse
 import org.junit.Before
@@ -56,7 +63,14 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
         fun init() = listOf(false, true)
     }
 
-    @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+    private var exceptionHandler: ((Throwable) -> Unit)? = null
+
+    @OptIn(ExperimentalTestApi::class)
+    @get:Rule
+    val rule =
+        createAndroidComposeRule<ComponentActivity>(
+            CoroutineExceptionHandler { _, e -> exceptionHandler?.invoke(e) }
+        )
 
     @Before
     fun setUp() {
@@ -346,6 +360,53 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
         }
     }
 
+    @Test()
+    fun launchedEffect() {
+        val traceContext = rule.testContent { LaunchedEffect(Unit) { throwTestException() } }
+
+        assertTrace(traceContext) {
+            it[0].name == "remember" &&
+                it[0].line == "<unknown line>" &&
+                it[1].name == "LaunchedEffect" &&
+                it[2].name == "<lambda>" &&
+                it[2].file == CurrentTestFile
+        }
+    }
+
+    @Test()
+    fun launchedEffectLaunch() {
+        val traceContext =
+            rule.testContent { LaunchedEffect(Unit) { launch { throwTestException() } } }
+
+        assertTrace(traceContext) {
+            it[0].name == "remember" &&
+                it[0].line == "<unknown line>" &&
+                it[1].name == "LaunchedEffect" &&
+                it[2].name == "<lambda>" &&
+                it[2].file == CurrentTestFile
+        }
+    }
+
+    @Test
+    fun rememberCoroutine() {
+        val traceContext =
+            rule.testContent {
+                val scope = rememberCoroutineScope()
+                DisposableEffect(Unit) {
+                    scope.launch { throwTestException() }
+                    onDispose { scope.cancel() }
+                }
+            }
+
+        assertTrace(traceContext) {
+            it[0].name == "remember" &&
+                it[0].line == "<unknown line>" &&
+                it[1].name == "rememberCoroutineScope" &&
+                it[2].name == "<lambda>" &&
+                it[2].file == CurrentTestFile
+        }
+    }
+
     private fun AndroidComposeTestRule<*, *>.testContent(
         content: @Composable () -> Unit
     ): TestTraceContext {
@@ -354,11 +415,19 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
         setContent {}
         val view =
             activity.findViewById<ViewGroup>(android.R.id.content).getChildAt(0) as ComposeView
-        findViewRootForTest(view)!!.setExceptionHandler { e ->
+        exceptionHandler = { e: Throwable ->
             if (traceContext.trace == null && e is TestException) {
                 traceContext.trace = e.compositionTrace()
-                true
             } else {
+                throw e
+            }
+        }
+
+        findViewRootForTest(view)!!.setExceptionHandler { e ->
+            try {
+                exceptionHandler?.invoke(e)
+                true
+            } catch (_: Throwable) {
                 false
             }
         }
