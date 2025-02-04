@@ -65,6 +65,7 @@ tasks.withType(KotlinCompile).configureEach {
         // Enable using experimental APIs from within same version group
         freeCompilerArgs += [
                 "-opt-in=androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi",
+                "-opt-in=androidx.benchmark.traceprocessor.ExperimentalInsightApi",
         ]
     }
 }
