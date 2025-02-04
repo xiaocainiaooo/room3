@@ -53,9 +53,7 @@ dependencies {
 
 android {
     defaultConfig {
-        // TODO: This should be lower, possibly 21.
-        //       Address API calls that require higher versions.
-        minSdkVersion 34
+        minSdkVersion 24
     }
     namespace = "androidx.xr.compose.testing"
 }
