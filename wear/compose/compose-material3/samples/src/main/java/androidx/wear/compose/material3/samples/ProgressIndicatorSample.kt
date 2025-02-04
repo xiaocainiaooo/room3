@@ -171,6 +171,8 @@ fun SmallValuesProgressIndicatorSample() {
 fun CircularProgressIndicatorCustomAnimationSample() {
     val progress = remember { mutableFloatStateOf(0f) }
     val animatedProgress = remember { Animatable(0f) }
+    val colors =
+        ProgressIndicatorDefaults.colors(indicatorColor = Color.Green, trackColor = Color.White)
 
     LaunchedEffect(Unit) {
         snapshotFlow(progress::value).collectLatest {
@@ -190,7 +192,18 @@ fun CircularProgressIndicatorCustomAnimationSample() {
             label = { Text("Animate") },
         )
 
-        CircularProgressIndicatorWithCustomAnimation(progress = animatedProgress::value)
+        // Draw the circular progress indicator with custom animation
+        Spacer(
+            Modifier.fillMaxSize().focusable().drawBehind {
+                drawCircularProgressIndicator(
+                    progress = animatedProgress.value,
+                    strokeWidth = 10.dp,
+                    colors = colors,
+                    startAngle = 120f,
+                    endAngle = 60f
+                )
+            }
+        )
     }
 }
 
@@ -268,22 +281,4 @@ fun SmallSegmentedProgressIndicatorBinarySample() {
             modifier = Modifier.align(Alignment.Center).size(80.dp)
         )
     }
-}
-
-@Composable
-private fun CircularProgressIndicatorWithCustomAnimation(progress: () -> Float) {
-    val colors =
-        ProgressIndicatorDefaults.colors(indicatorColor = Color.Green, trackColor = Color.White)
-
-    Spacer(
-        Modifier.fillMaxSize().focusable().drawBehind {
-            drawCircularProgressIndicator(
-                progress = progress(),
-                strokeWidth = 10.dp,
-                colors = colors,
-                startAngle = 120f,
-                endAngle = 60f
-            )
-        }
-    )
 }
