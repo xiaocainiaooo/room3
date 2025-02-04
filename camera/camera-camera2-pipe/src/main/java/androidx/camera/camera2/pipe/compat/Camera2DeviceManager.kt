@@ -162,6 +162,9 @@ internal class ActiveCamera(
     suspend fun awaitClosed() {
         androidCameraState.awaitClosed()
     }
+
+    override fun toString(): String =
+        "ActiveCamera(cameraId=$cameraId)@${super.hashCode().toString(16)}"
 }
 
 /**

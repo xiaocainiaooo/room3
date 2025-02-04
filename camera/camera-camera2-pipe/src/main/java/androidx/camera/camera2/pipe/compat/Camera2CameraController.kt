@@ -170,7 +170,7 @@ constructor(
                             controllerState != ControllerState.STOPPING &&
                             controllerState != ControllerState.STOPPED
                     ) {
-                        Log.debug { "$this: Restarting Camera2CameraController..." }
+                        Log.debug { "Restarting $this..." }
                         surfaceTracker.registerAllSurfaces()
                         stopLocked()
                         startLocked()
@@ -182,10 +182,10 @@ constructor(
     @GuardedBy("lock")
     private fun startLocked() {
         if (controllerState == ControllerState.CLOSED) {
-            Log.info { "Ignoring start(): Camera2CameraController is already closed" }
+            Log.info { "Ignoring start(): $this is already closed" }
             return
         } else if (controllerState == ControllerState.STARTED) {
-            Log.warn { "Ignoring start(): Camera2CameraController is already started" }
+            Log.warn { "Ignoring start(): $this is already started" }
             return
         }
         lastCameraError = null
@@ -199,7 +199,7 @@ constructor(
                 isForeground
             }
         if (camera == null) {
-            Log.error { "Failed to start Camera2CameraController: Open request submission failed" }
+            Log.error { "Failed to start $this: Open request submission failed" }
             return
         }
 
@@ -227,7 +227,7 @@ constructor(
         }
 
         controllerState = ControllerState.STARTED
-        Log.debug { "Started Camera2CameraController" }
+        Log.debug { "Started $this" }
         currentCameraStateJob?.cancel()
         currentCameraStateJob = scope.launch { bindSessionToCamera() }
     }
@@ -235,13 +235,13 @@ constructor(
     @GuardedBy("lock")
     private fun stopLocked() {
         if (controllerState == ControllerState.CLOSED) {
-            Log.warn { "Ignoring stop(): Camera2CameraController is already closed" }
+            Log.warn { "Ignoring stop(): $this is already closed" }
             return
         } else if (
             controllerState == ControllerState.STOPPING ||
                 controllerState == ControllerState.STOPPED
         ) {
-            Log.warn { "Ignoring stop(): CameraController already stopping or stopped" }
+            Log.warn { "Ignoring stop(): $this already stopping or stopped" }
             return
         }
 
@@ -252,7 +252,7 @@ constructor(
         currentSession = null
 
         controllerState = ControllerState.STOPPING
-        Log.debug { "Stopping Camera2CameraController" }
+        Log.debug { "Stopping $this" }
         detachSessionAndCamera(session, camera)
     }
 
@@ -278,7 +278,7 @@ constructor(
                 return
             }
             controllerState = ControllerState.CLOSED
-            Log.debug { "Closed Camera2CameraController" }
+            Log.debug { "Closed $this" }
 
             val camera = currentCamera
             val session = currentSession
@@ -300,7 +300,7 @@ constructor(
                 graphConfig.flags.closeCameraDeviceOnClose ||
                     camera2Quirks.shouldCloseCameraBeforeCreatingCaptureSession(cameraId)
             ) {
-                Log.debug { "Quirk: Closing $cameraId on camera controller close" }
+                Log.debug { "Quirk: Closing $cameraId during $this#close" }
                 camera2DeviceManager.close(cameraId)
             }
         }
@@ -328,6 +328,8 @@ constructor(
         }
         return null
     }
+
+    override fun toString(): String = "Camera2CameraController($cameraGraphId)"
 
     private suspend fun bindSessionToCamera() {
         val camera: VirtualCamera?
