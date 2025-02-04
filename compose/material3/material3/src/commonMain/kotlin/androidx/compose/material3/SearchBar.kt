@@ -43,7 +43,9 @@ import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -113,6 +115,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -131,6 +134,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.Layout
@@ -143,6 +150,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -182,6 +190,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sign
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -1314,9 +1323,18 @@ object SearchBarDefaults {
         @Suppress("NAME_SHADOWING")
         val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
 
-        val focused = interactionSource.collectIsFocusedAsState().value
+        /*
+        Relationship between focus and expansion state:
+            * In touch mode, the two are coupled:
+                * Text field gains focus => search bar expands
+                * Search bar collapses => text field loses focus
+            * In non-touch/keyboard mode, they are independent. Instead, expansion triggers when:
+                * the user starts typing
+                * the user presses the down direction key
+         */
+        val focused by interactionSource.collectIsFocusedAsState()
         val focusManager = LocalFocusManager.current
-        val focusRequester = remember { FocusRequester() }
+        val isInTouchMode = LocalInputModeManager.current.inputMode == InputMode.Touch
 
         val searchSemantics = getString(Strings.SearchBarSearch)
         val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
@@ -1333,14 +1351,21 @@ object SearchBarDefaults {
             state = textFieldState,
             modifier =
                 modifier
+                    .onPreviewKeyEvent {
+                        val expandOnDownKey = !isInTouchMode && !searchBarState.isExpanded
+                        if (expandOnDownKey && it.key == Key.DirectionDown) {
+                            coroutineScope.launch { searchBarState.animateToExpanded() }
+                            return@onPreviewKeyEvent true
+                        }
+                        false
+                    }
                     .sizeIn(
                         minWidth = SearchBarMinWidth,
                         maxWidth = SearchBarMaxWidth,
                         minHeight = InputFieldHeight,
                     )
-                    .focusRequester(focusRequester)
                     .onFocusChanged {
-                        if (it.isFocused) {
+                        if (it.isFocused && isInTouchMode) {
                             coroutineScope.launch { searchBarState.animateToExpanded() }
                         }
                     }
@@ -1397,9 +1422,36 @@ object SearchBarDefaults {
                 )
         )
 
-        val shouldClearFocus = !searchBarState.isExpanded && focused
+        // Most expansions from touch happen via `onFocusChanged` above, but in a mixed
+        // keyboard-touch flow, the user can focus via keyboard (with no expansion),
+        // and subsequent touches won't change focus state. So this effect is needed as well.
+        DetectClickFromInteractionSource(interactionSource) {
+            if (!searchBarState.isExpanded) {
+                coroutineScope.launch { searchBarState.animateToExpanded() }
+            }
+        }
+
+        // Expand search bar if the user starts typing
+        LaunchedEffect(searchBarState, textFieldState) {
+            if (!searchBarState.isExpanded) {
+                var prevLength = textFieldState.text.length
+                snapshotFlow { textFieldState.text }
+                    .onEach {
+                        val currLength = it.length
+                        if (currLength > prevLength && focused && !searchBarState.isExpanded) {
+                            // Don't use LaunchedEffect's coroutine because
+                            // cancelling the animation shouldn't cancel the Flow
+                            coroutineScope.launch { searchBarState.animateToExpanded() }
+                        }
+                        prevLength = currLength
+                    }
+                    .collect {}
+            }
+        }
+
+        val shouldClearFocusOnCollapse = !searchBarState.isExpanded && focused && isInTouchMode
         LaunchedEffect(searchBarState.isExpanded) {
-            if (shouldClearFocus) {
+            if (shouldClearFocusOnCollapse) {
                 focusManager.clearFocus()
             }
         }
@@ -2563,6 +2615,18 @@ private val SearchBarState.collapsedBounds: IntRect
     get() =
         collapsedCoords?.let { IntRect(offset = it.positionInWindow().round(), size = it.size) }
             ?: IntRect.Zero
+
+@Composable
+private fun DetectClickFromInteractionSource(
+    interactionSource: InteractionSource,
+    onClick: () -> Unit,
+) {
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Release) onClick()
+        }
+    }
+}
 
 private fun calculatePredictiveBackMultiplier(
     currentBackEvent: BackEventCompat?,

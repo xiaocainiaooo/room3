@@ -30,6 +30,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -37,11 +38,13 @@ import androidx.compose.material3.ExpandedDockedSearchBar
 import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopSearchBar
 import androidx.compose.material3.rememberSearchBarState
@@ -70,7 +73,17 @@ fun SimpleSearchBarSample() {
                 textFieldState = textFieldState,
                 onSearch = { scope.launch { searchBarState.animateToCollapsed() } },
                 placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                leadingIcon = {
+                    if (searchBarState.currentValue == SearchBarValue.Expanded) {
+                        IconButton(
+                            onClick = { scope.launch { searchBarState.animateToCollapsed() } }
+                        ) {
+                            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    } else {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    }
+                },
                 trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
             )
         }
@@ -109,7 +122,17 @@ fun FullScreenSearchBarScaffoldSample() {
                 textFieldState = textFieldState,
                 onSearch = { scope.launch { searchBarState.animateToCollapsed() } },
                 placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                leadingIcon = {
+                    if (searchBarState.currentValue == SearchBarValue.Expanded) {
+                        IconButton(
+                            onClick = { scope.launch { searchBarState.animateToCollapsed() } }
+                        ) {
+                            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    } else {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    }
+                },
                 trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
             )
         }
@@ -167,7 +190,17 @@ fun DockedSearchBarScaffoldSample() {
                 textFieldState = textFieldState,
                 onSearch = { scope.launch { searchBarState.animateToCollapsed() } },
                 placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                leadingIcon = {
+                    if (searchBarState.currentValue == SearchBarValue.Expanded) {
+                        IconButton(
+                            onClick = { scope.launch { searchBarState.animateToCollapsed() } }
+                        ) {
+                            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    } else {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    }
+                },
                 trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
             )
         }
