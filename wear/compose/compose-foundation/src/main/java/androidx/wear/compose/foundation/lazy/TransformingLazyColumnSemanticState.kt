@@ -75,16 +75,21 @@ internal fun TransformingLazyColumnSemanticState(
             get() =
                 state.layoutInfoState.value.let { it.beforeContentPadding + it.afterContentPadding }
 
-        override val scrollOffset: Float =
-            with(state.layoutInfoState.value) {
-                    if (anchorItemIndex == 0) {
-                        return@with anchorItemScrollOffset
+        override val scrollOffset: Float
+            get() =
+                with(state.layoutInfoState.value) {
+                        if (anchorItemIndex == 0) {
+                            return@with anchorItemScrollOffset
+                        }
+                        if (!canScrollForward) {
+                            return@with maxScrollOffset
+                        }
+                        visibleItemsAverageHeight * anchorItemIndex +
+                            anchorItemScrollOffset +
+                            itemSpacing * (anchorItemIndex - 1)
                     }
-                    visibleItemsAverageHeight * anchorItemIndex +
-                        anchorItemScrollOffset +
-                        itemSpacing * (anchorItemIndex - 1)
-                }
-                .toFloat()
+                    .toFloat()
+                    .coerceAtLeast(0f)
 
         override val maxScrollOffset: Float
             get() =
