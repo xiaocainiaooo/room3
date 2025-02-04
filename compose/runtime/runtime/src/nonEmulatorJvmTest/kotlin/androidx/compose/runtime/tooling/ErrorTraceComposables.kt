@@ -17,6 +17,7 @@
 package androidx.compose.runtime.tooling
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.NonRestartableComposable
@@ -30,10 +31,29 @@ import androidx.compose.runtime.rememberUpdatedState
 
 /**
  * These composables are kept in a separate file to test line offsets in traces. When adding new
- * composables, add to the end of the file to avoid breaking existing expectations
+ * composables, add to the end of the file to avoid breaking existing expectations.
  */
+
+/*
+┌─ reserved in case more imports will be added (╯°□°）╯︵ ┻━┻
+│
+│
+│
+│
+│
+│
+│
+│
+│
+│
+│
+│
+│
+└─
+*/
+
 @Composable
-inline fun Wrapper(block: @Composable () -> Unit) {
+inline fun InlineWrapper(block: @Composable () -> Unit) {
     block()
 }
 
@@ -87,4 +107,44 @@ fun Text(value: String) {
 @Composable
 fun ComposableWithDefaults(value: String = remember { "" }, block: @Composable (String) -> Unit) {
     block(value)
+}
+
+@Composable
+fun NodeWithCallbacks(
+    onAttach: () -> Unit = {},
+    onDetach: () -> Unit = {},
+    onUpdate: () -> Unit = {},
+    onReuse: () -> Unit = {},
+    onDeactivate: () -> Unit = {},
+    onRelease: () -> Unit = {}
+) {
+    ReusableComposeNode<View, ViewApplier>(
+        factory = {
+            object : View(), ComposeNodeLifecycleCallback {
+                init {
+                    this.name = "node_w_callbacks"
+                    this.onAttach = onAttach
+                    this.onDetach = onDetach
+                }
+
+                override fun onReuse() {
+                    onReuse()
+                }
+
+                override fun onDeactivate() {
+                    onDeactivate()
+                }
+
+                override fun onRelease() {
+                    onRelease()
+                }
+            }
+        },
+        update = { onUpdate() }
+    )
+}
+
+@Composable
+fun Wrapper(content: @Composable () -> Unit) {
+    content()
 }
