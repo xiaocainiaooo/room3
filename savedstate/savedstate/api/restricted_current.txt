@@ -183,14 +183,37 @@ package androidx.savedstate {
 
 package androidx.savedstate.serialization {
 
+  public final class SavedStateConfig {
+    method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
+    property public final kotlinx.serialization.modules.SerializersModule serializersModule;
+    field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
+    field public static final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
+  }
+
+  public static final class SavedStateConfig.Builder {
+    method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
+    method public void setSerializersModule(kotlinx.serialization.modules.SerializersModule);
+    property public final kotlinx.serialization.modules.SerializersModule serializersModule;
+  }
+
+  public static final class SavedStateConfig.Companion {
+    property public final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
+  }
+
+  public final class SavedStateConfigKt {
+    method public static androidx.savedstate.serialization.SavedStateConfig SavedStateConfig(kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfig.Builder,kotlin.Unit> builderAction);
+  }
+
   public final class SavedStateDecoderKt {
-    method public static inline <reified T> T decodeFromSavedState(android.os.Bundle savedState);
+    method public static inline <reified T> T decodeFromSavedState(android.os.Bundle savedState, optional androidx.savedstate.serialization.SavedStateConfig config);
     method public static <T> T decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<? extends T> deserializer, android.os.Bundle savedState);
+    method public static <T> T decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<? extends T> deserializer, android.os.Bundle savedState, androidx.savedstate.serialization.SavedStateConfig config);
   }
 
   public final class SavedStateEncoderKt {
     method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value);
-    method public static inline <reified T> android.os.Bundle encodeToSavedState(T value);
+    method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value, androidx.savedstate.serialization.SavedStateConfig config);
+    method public static inline <reified T> android.os.Bundle encodeToSavedState(T value, optional androidx.savedstate.serialization.SavedStateConfig config);
   }
 
   public final class SavedStateRegistryOwnerDelegatesKt {
