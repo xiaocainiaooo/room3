@@ -64,7 +64,8 @@ class AppFunctionCompiler(
             val legacyIndexXmlProcessor =
                 AppFunctionLegacyIndexXmlProcessor(environment.codeGenerator)
             val indexXmlProcessor = AppFunctionIndexXmlProcessor(environment.codeGenerator)
-            val entityProcessor = AppFunctionSerializableProcessor(environment.codeGenerator)
+            val entityProcessor =
+                AppFunctionSerializableProcessor(environment.codeGenerator, environment.logger)
             return AppFunctionCompiler(
                 listOf(
                     idProcessor,
