@@ -546,7 +546,7 @@ package androidx.xr.extensions.subspace {
 
 }
 
-package androidx.xr.scenecore {
+package @RequiresApi(34) androidx.xr.scenecore {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class ActivityPanelEntity extends androidx.xr.scenecore.PanelEntity {
     method public static androidx.xr.scenecore.ActivityPanelEntity create(androidx.xr.scenecore.Session session, android.graphics.Rect windowBoundsPx, String name);
@@ -1783,7 +1783,7 @@ package androidx.xr.scenecore {
 
 }
 
-package androidx.xr.scenecore.common {
+package @RequiresApi(34) androidx.xr.scenecore.common {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public abstract class BaseActivityPose implements androidx.xr.scenecore.JxrPlatformAdapter.ActivityPose {
     ctor public BaseActivityPose();
@@ -1822,7 +1822,7 @@ package androidx.xr.scenecore.common {
 
 }
 
-package androidx.xr.scenecore.impl {
+package @RequiresApi(34) androidx.xr.scenecore.impl {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class JxrPlatformAdapterAxr implements androidx.xr.scenecore.JxrPlatformAdapter {
     method public void addSpatialCapabilitiesChangedListener(java.util.concurrent.Executor, java.util.function.Consumer<androidx.xr.scenecore.JxrPlatformAdapter.SpatialCapabilities!>);

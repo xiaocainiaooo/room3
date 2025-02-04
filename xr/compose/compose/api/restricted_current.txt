@@ -1,5 +1,5 @@
 // Signature format: 4.0
-package androidx.xr.compose.platform {
+package @RequiresApi(34) androidx.xr.compose.platform {
 
   public final class ActivityKt {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @VisibleForTesting public static void setSubspaceContent(androidx.activity.ComponentActivity, androidx.xr.scenecore.Session session, kotlin.jvm.functions.Function0<kotlin.Unit> content);
@@ -107,7 +107,7 @@ package androidx.xr.compose.platform {
 
 }
 
-package androidx.xr.compose.spatial {
+package @RequiresApi(34) androidx.xr.compose.spatial {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class EdgeOffset {
     method public androidx.xr.compose.spatial.EdgeOffset copy(optional float amount, optional int type);
@@ -267,7 +267,7 @@ package androidx.xr.compose.spatial {
 
 }
 
-package androidx.xr.compose.subspace {
+package @RequiresApi(34) androidx.xr.compose.subspace {
 
   public final class SpatialBoxKt {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable @androidx.xr.compose.subspace.SubspaceComposable public static void SpatialBox(optional androidx.xr.compose.subspace.layout.SubspaceModifier modifier, optional androidx.xr.compose.subspace.layout.SpatialAlignment alignment, optional boolean propagateMinConstraints, optional String name, kotlin.jvm.functions.Function1<? super androidx.xr.compose.subspace.SpatialBoxScope,kotlin.Unit> content);
@@ -324,7 +324,7 @@ package androidx.xr.compose.subspace {
 
 }
 
-package androidx.xr.compose.subspace.layout {
+package @RequiresApi(34) androidx.xr.compose.subspace.layout {
 
   public final class AlphaKt {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier alpha(androidx.xr.compose.subspace.layout.SubspaceModifier, @FloatRange(from=0.0, to=1.0) float alpha);
@@ -659,7 +659,7 @@ package androidx.xr.compose.subspace.layout {
 
 }
 
-package androidx.xr.compose.subspace.node {
+package @RequiresApi(34) androidx.xr.compose.subspace.node {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface LayoutCoordinatesAwareModifierNode {
     method public void onLayoutCoordinates(androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates coordinates);
@@ -712,7 +712,7 @@ package androidx.xr.compose.subspace.node {
 
 }
 
-package androidx.xr.compose.unit {
+package @RequiresApi(34) androidx.xr.compose.unit {
 
   public final class DpVolumeSize {
     ctor public DpVolumeSize(float width, float height, float depth);
