@@ -2507,7 +2507,6 @@ public final class MediaRouter {
          *
          * @see #updateRoutes(List)
          */
-        @RestrictTo(LIBRARY)
         /* package */ static final int UPDATE_ROUTES_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION =
                 4;
 
