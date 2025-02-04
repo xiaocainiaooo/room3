@@ -26,8 +26,10 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,12 +45,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -229,7 +233,7 @@ public fun OpenOnPhoneDialogContent(
                 Modifier.padding(top = topPadding.dp).size(size.dp).align(Alignment.TopCenter),
             contentAlignment = Alignment.Center
         ) {
-            iconContainer(
+            iconAndProgressContainer(
                 iconContainerColor = iconContainerColor.value,
                 progressIndicatorColors =
                     ProgressIndicatorDefaults.colors(
@@ -436,7 +440,7 @@ public class OpenOnPhoneDialogColors(
     }
 }
 
-private fun iconContainer(
+private fun iconAndProgressContainer(
     iconContainerColor: Color,
     progressIndicatorColors: ProgressIndicatorColors,
     sizeAnimationFraction: State<Float>,
@@ -461,11 +465,32 @@ private fun iconContainer(
             .align(Alignment.Center)
     )
 
-    CircularProgressIndicatorStatic(
-        modifier = Modifier.graphicsLayer { alpha = progressAlphaAnimationFraction.value },
+    IconContainerProgressIndicator(
         progress = progress,
+        progressAlpha = progressAlphaAnimationFraction.value,
         strokeWidth = strokeWidth,
         colors = progressIndicatorColors
+    )
+}
+
+@Composable
+private fun IconContainerProgressIndicator(
+    progress: () -> Float,
+    progressAlpha: Float,
+    colors: ProgressIndicatorColors,
+    strokeWidth: Dp,
+) {
+    Spacer(
+        Modifier.fillMaxSize()
+            .focusable()
+            .graphicsLayer { alpha = progressAlpha }
+            .drawBehind {
+                drawCircularProgressIndicator(
+                    progress = progress(),
+                    strokeWidth = strokeWidth,
+                    colors = colors,
+                )
+            }
     )
 }
 
