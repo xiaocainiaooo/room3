@@ -349,3 +349,18 @@ fun OversizeComposable() {
         }
     }
 }
+
+@Composable
+fun CurvedLineHeight() {
+    val baseStyle = CurvedTextStyle(color = Color.White, background = Color.Gray, fontSize = 16.sp)
+    CurvedLayout(
+        modifier = Modifier.fillMaxSize(),
+        radialAlignment = CurvedAlignment.Radial.Center,
+    ) {
+        basicCurvedText("Line Height 10.sp", style = baseStyle.copy(lineHeight = 10.sp))
+        curvedBox(CurvedModifier.angularSizeDp(1.dp)) {}
+        basicCurvedText("Base", style = baseStyle)
+        curvedBox(CurvedModifier.angularSizeDp(1.dp)) {}
+        basicCurvedText("Line Height 24.sp", style = baseStyle.copy(lineHeight = 24.sp))
+    }
+}
