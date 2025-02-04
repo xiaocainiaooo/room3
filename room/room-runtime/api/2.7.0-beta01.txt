@@ -117,7 +117,7 @@ package androidx.room {
     method @Deprecated public void setTransactionSuccessful();
     property public androidx.room.InvalidationTracker invalidationTracker;
     property public boolean isOpen;
-    property @Deprecated @kotlin.jvm.Volatile protected androidx.sqlite.db.SupportSQLiteDatabase? mDatabase;
+    property @Deprecated @kotlin.jvm.Volatile protected final androidx.sqlite.db.SupportSQLiteDatabase? mDatabase;
     property public androidx.sqlite.db.SupportSQLiteOpenHelper openHelper;
     property public java.util.concurrent.Executor queryExecutor;
     property public java.util.concurrent.Executor transactionExecutor;

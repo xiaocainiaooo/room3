@@ -501,24 +501,24 @@ package @RequiresApi(34) androidx.xr.compose.subspace.layout {
     method public androidx.xr.compose.subspace.layout.SpatialAlignment getTopCenter();
     method public androidx.xr.compose.subspace.layout.SpatialAlignment getTopLeft();
     method public androidx.xr.compose.subspace.layout.SpatialAlignment getTopRight();
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Depth Back;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Vertical Bottom;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment BottomCenter;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment BottomLeft;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment BottomRight;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment Center;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Depth CenterDepthwise;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Horizontal CenterHorizontally;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment CenterLeft;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment CenterRight;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Vertical CenterVertically;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Depth Front;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Horizontal Left;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Horizontal Right;
-    property public androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Vertical Top;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment TopCenter;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment TopLeft;
-    property public androidx.xr.compose.subspace.layout.SpatialAlignment TopRight;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Depth Back;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Vertical Bottom;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment BottomCenter;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment BottomLeft;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment BottomRight;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment Center;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Depth CenterDepthwise;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Horizontal CenterHorizontally;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment CenterLeft;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment CenterRight;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Vertical CenterVertically;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Depth Front;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Horizontal Left;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Horizontal Right;
+    property public static androidx.xr.compose.subspace.layout.SpatialBiasAlignment.Vertical Top;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment TopCenter;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment TopLeft;
+    property public static androidx.xr.compose.subspace.layout.SpatialAlignment TopRight;
   }
 
   public static interface SpatialAlignment.Depth {

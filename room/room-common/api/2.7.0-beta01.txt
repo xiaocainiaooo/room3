@@ -314,11 +314,11 @@ package androidx.room {
     method @Deprecated public int getFAIL();
     method @Deprecated public int getROLLBACK();
     property public static int ABORT;
-    property @Deprecated public int FAIL;
+    property @Deprecated public static int FAIL;
     property public static int IGNORE;
     property public static int NONE;
     property public static int REPLACE;
-    property @Deprecated public int ROLLBACK;
+    property @Deprecated public static int ROLLBACK;
     field public static final int ABORT = 3; // 0x3
     field @Deprecated public static final int FAIL = 4; // 0x4
     field public static final int IGNORE = 5; // 0x5
@@ -419,7 +419,7 @@ package androidx.room {
     method @Deprecated public String getCURSOR_MISMATCH();
     property public static String AMBIGUOUS_COLUMN_IN_RESULT;
     property public static String CANNOT_CREATE_VERIFICATION_DATABASE;
-    property @Deprecated public String CURSOR_MISMATCH;
+    property @Deprecated public static String CURSOR_MISMATCH;
     property public static String DEFAULT_CONSTRUCTOR;
     property public static String DOES_NOT_IMPLEMENT_EQUALS_HASHCODE;
     property public static String INDEX_FROM_EMBEDDED_ENTITY_IS_DROPPED;

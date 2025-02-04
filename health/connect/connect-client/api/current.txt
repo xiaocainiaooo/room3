@@ -38,7 +38,7 @@ package androidx.health.connect.client {
     method public androidx.health.connect.client.HealthConnectClient getOrCreate(android.content.Context context, optional String providerPackageName);
     method public int getSdkStatus(android.content.Context context);
     method public int getSdkStatus(android.content.Context context, optional String providerPackageName);
-    property public String ACTION_HEALTH_CONNECT_SETTINGS;
+    property public static String ACTION_HEALTH_CONNECT_SETTINGS;
     property public static int SDK_AVAILABLE;
     property public static int SDK_UNAVAILABLE;
     property public static int SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED;
