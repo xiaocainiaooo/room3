@@ -123,7 +123,7 @@ internal class LayoutNode(
                     // This can happen when lookaheadScope is removed in one of the parents, or
                     // more likely when movableContent moves from a parent in a LookaheadScope to
                     // a parent not in a LookaheadScope.
-                    layoutDelegate.clearLookaheadDelegate()
+                    layoutDelegate.onRemovedFromLookaheadScope()
                 }
                 invalidateMeasurements()
             }
@@ -1109,7 +1109,7 @@ internal class LayoutNode(
         invalidateIntrinsics: Boolean = true
     ) {
         checkPrecondition(lookaheadRoot != null) {
-            "Lookahead measure cannot be requested on a node that is not a part of the" +
+            "Lookahead measure cannot be requested on a node that is not a part of the " +
                 "LookaheadScope"
         }
         val owner = owner ?: return
