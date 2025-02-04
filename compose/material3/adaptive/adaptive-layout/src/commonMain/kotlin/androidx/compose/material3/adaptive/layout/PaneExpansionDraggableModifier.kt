@@ -16,20 +16,27 @@
 
 package androidx.compose.material3.adaptive.layout
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ParentDataModifierNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import kotlinx.coroutines.launch
 
 /**
  * This function sets up the default semantics of pane expansion drag handles with the given
@@ -42,6 +49,7 @@ import androidx.compose.ui.unit.Dp
 @ExperimentalMaterial3AdaptiveApi
 @Composable
 fun PaneExpansionState.defaultDragHandleSemantics(): SemanticsPropertyReceiver.() -> Unit {
+    val coroutineScope = rememberCoroutineScope()
     val contentDesc = getString(Strings.defaultPaneExpansionDragHandleContentDescription)
     val currentAnchor = currentAnchor
     val stateDesc =
@@ -73,7 +81,7 @@ fun PaneExpansionState.defaultDragHandleSemantics(): SemanticsPropertyReceiver.(
             return@semantics
         }
         onClick(label = actionLabel) {
-            snapToAnchor(nextAnchor)
+            coroutineScope.launch { animateTo(nextAnchor) }
             return@onClick true
         }
     }
@@ -106,4 +114,16 @@ internal class MinTouchTargetSizeNode(var size: Dp) : ParentDataModifierNode, Mo
         ((parentData as? PaneScaffoldParentDataImpl) ?: PaneScaffoldParentDataImpl()).also {
             it.minTouchTargetSize = size
         }
+}
+
+internal fun Modifier.semanticsAction(
+    semanticsProperties: (SemanticsPropertyReceiver.() -> Unit),
+    interactionSource: MutableInteractionSource
+): Modifier {
+    val semanticsConfiguration = SemanticsConfiguration().also { it.semanticsProperties() }
+    return this.then(
+        semanticsConfiguration.getOrNull(SemanticsActions.OnClick)?.action?.let {
+            Modifier.clickable(interactionSource = interactionSource, indication = null) { it() }
+        } ?: Modifier
+    )
 }
