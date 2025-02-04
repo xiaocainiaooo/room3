@@ -23,22 +23,16 @@ import androidx.test.filters.SdkSuppress
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-/**
- * Tests video recording.
- *
- * StreamSharing is not within the scope of this test.
- *
- * @see [VideoRecordingStreamSharingTest] for video recording with StreamSharing enabled.
- */
+/** Tests video recording with StreamSharing enabled. */
 @LargeTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = 21)
-class VideoRecordingTest(
+class VideoRecordingStreamSharingTest(
     private val implName: String,
     private var cameraSelector: CameraSelector,
     private val cameraConfig: CameraXConfig,
 ) : VideoRecordingTestBase(implName, cameraSelector, cameraConfig) {
 
-    override val testTag: String = "VideoRecordingTest"
-    override val enableStreamSharing: Boolean = false
+    override val testTag: String = "VideoRecordingStreamSharingTest"
+    override val enableStreamSharing: Boolean = true
 }
