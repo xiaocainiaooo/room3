@@ -156,22 +156,18 @@ public object GraphicDataCardDefaults {
      * @throws IllegalArgumentException When the mainContent has size of [WrappedDimensionProp].
      */
     public fun MaterialScope.constructGraphic(
-        mainContent: (MaterialScope.() -> LayoutElement),
+        mainContent: (MaterialScope.() -> Box),
         iconContent: (MaterialScope.() -> LayoutElement),
         iconSizeRatio: Float = CENTER_ICON_SIZE_RATIO_IN_GRAPHIC
     ): LayoutElement {
-        // Recreate the ColorProp to avoid null fingerprint.
         val contentMain = mainContent()
-        require(contentMain is Box) {
-            "The main content passed to constructGraphic helper requires to be wrapped in a box."
-        }
         val size: ContainerDimension =
             when (val width = contentMain.width) {
                 is DpProp -> width.value.dp
                 is ExpandedDimensionProp ->
                     width.layoutWeight?.let { weightAsExpand(it.value) } ?: expand()
                 is WrappedDimensionProp -> {
-                    throw IllegalArgumentException("main content with wrap size is not supported.")
+                    throw IllegalArgumentException("Main content with wrap size is not supported.")
                 }
                 else -> {
                     throw IllegalArgumentException("Unknown dimension type of ContainerDimension.")
