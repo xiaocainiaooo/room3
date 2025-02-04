@@ -234,7 +234,7 @@ class FakeHealthConnectClientRecordsTest {
     }
 
     @Test
-    fun insertMultipleRecords_DeleteDifferentPackageRecordIds_throws() = runTest {
+    fun insertMultipleRecords_DeleteDifferentPackageRecordIds_noop() = runTest {
         val fake = FakeHealthConnectClient()
         val records = generateRunningRecords(5) // Uses default package name
         fake.insertRecords(records)
@@ -253,17 +253,36 @@ class FakeHealthConnectClientRecordsTest {
             )
 
         val recordIds = recordsResponse.records.map { it.metadata.id }
+        fake.setPackageName("com.other.package")
+        fake.deleteRecords(
+            recordType = records.first()::class,
+            recordIdsList = recordIds,
+            clientRecordIdsList = emptyList()
+        )
+
+        val response =
+            fake.readRecords(
+                ReadRecordsRequest(records.first()::class, TimeRangeFilter.after(EPOCH)),
+            )
+        assertThat(response.records).hasSize(5)
+    }
+
+    @Test
+    fun insertMultipleRecords_DeleteDifferentPackageClientRecords_noop() = runTest {
+        val fake = FakeHealthConnectClient()
+        val records = generateRunningRecords(5)
+        fake.insertRecords(records)
+
+        val clientRecordIds = records.map { it.metadata.clientRecordId!! }
 
         fake.setPackageName("com.other.package")
-        assertThrows(SecurityException::class.java) {
-            runBlocking {
-                fake.deleteRecords(
-                    recordType = records.first()::class,
-                    recordIdsList = recordIds,
-                    clientRecordIdsList = emptyList()
-                )
-            }
-        }
+        fake.deleteRecords(records.first()::class, emptyList(), clientRecordIds)
+
+        val response =
+            fake.readRecords(
+                ReadRecordsRequest(ExerciseSessionRecord::class, TimeRangeFilter.after(EPOCH)),
+            )
+        assertThat(response.records).hasSize(5)
     }
 
     @Test
