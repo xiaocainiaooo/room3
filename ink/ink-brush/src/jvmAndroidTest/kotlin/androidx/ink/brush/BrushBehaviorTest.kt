@@ -244,6 +244,7 @@ class BrushBehaviorTest {
                 BrushBehavior.Target.POSITION_OFFSET_Y_IN_MULTIPLES_OF_BRUSH_SIZE,
                 BrushBehavior.Target.POSITION_OFFSET_FORWARD_IN_MULTIPLES_OF_BRUSH_SIZE,
                 BrushBehavior.Target.POSITION_OFFSET_LATERAL_IN_MULTIPLES_OF_BRUSH_SIZE,
+                BrushBehavior.Target.TEXTURE_ANIMATION_PROGRESS_OFFSET,
                 BrushBehavior.Target.HUE_OFFSET_IN_RADIANS,
                 BrushBehavior.Target.SATURATION_MULTIPLIER,
                 BrushBehavior.Target.LUMINOSITY,
@@ -299,6 +300,8 @@ class BrushBehaviorTest {
                 BrushBehavior.Target.POSITION_OFFSET_LATERAL_IN_MULTIPLES_OF_BRUSH_SIZE.toString()
             )
             .isEqualTo("BrushBehavior.Target.POSITION_OFFSET_LATERAL_IN_MULTIPLES_OF_BRUSH_SIZE")
+        assertThat(BrushBehavior.Target.TEXTURE_ANIMATION_PROGRESS_OFFSET.toString())
+            .isEqualTo("BrushBehavior.Target.TEXTURE_ANIMATION_PROGRESS_OFFSET")
         assertThat(BrushBehavior.Target.HUE_OFFSET_IN_RADIANS.toString())
             .isEqualTo("BrushBehavior.Target.HUE_OFFSET_IN_RADIANS")
         assertThat(BrushBehavior.Target.SATURATION_MULTIPLIER.toString())

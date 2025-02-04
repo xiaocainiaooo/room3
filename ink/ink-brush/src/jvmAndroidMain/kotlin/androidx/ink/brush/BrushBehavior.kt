@@ -610,6 +610,7 @@ public class BrushBehavior(
                     "POSITION_OFFSET_FORWARD_IN_MULTIPLES_OF_BRUSH_SIZE"
                 POSITION_OFFSET_LATERAL_IN_MULTIPLES_OF_BRUSH_SIZE ->
                     "POSITION_OFFSET_LATERAL_IN_MULTIPLES_OF_BRUSH_SIZE"
+                TEXTURE_ANIMATION_PROGRESS_OFFSET -> "TEXTURE_ANIMATION_PROGRESS_OFFSET"
                 HUE_OFFSET_IN_RADIANS -> "HUE_OFFSET_IN_RADIANS"
                 SATURATION_MULTIPLIER -> "SATURATION_MULTIPLIER"
                 LUMINOSITY -> "LUMINOSITY"
@@ -693,6 +694,13 @@ public class BrushBehavior(
              */
             @JvmField
             public val POSITION_OFFSET_LATERAL_IN_MULTIPLES_OF_BRUSH_SIZE: Target = Target(10)
+            /**
+             * Adds the target modifier to the initial texture animation progress value of the
+             * current particle (which is relevant only for strokes with an animated texture). The
+             * final progress offset is not clamped, but is effectively normalized (mod 1). If
+             * multiple behaviors have this target, they stack additively.
+             */
+            @JvmField public val TEXTURE_ANIMATION_PROGRESS_OFFSET: Target = Target(11)
 
             // The following are targets for tip color adjustments, including opacity. Renderers can
             // apply
@@ -705,24 +713,24 @@ public class BrushBehavior(
              * towards violet. The final hue offset is not clamped, but is effectively normalized
              * (mod 2π). If multiple behaviors have this target, they stack additively.
              */
-            @JvmField public val HUE_OFFSET_IN_RADIANS: Target = Target(11)
+            @JvmField public val HUE_OFFSET_IN_RADIANS: Target = Target(12)
             /**
              * Scales the saturation of the base brush color. If multiple behaviors have one of
              * these targets, they stack multiplicatively. The final saturation multiplier is
              * clamped to [0, 2].
              */
-            @JvmField public val SATURATION_MULTIPLIER: Target = Target(12)
+            @JvmField public val SATURATION_MULTIPLIER: Target = Target(13)
             /**
              * Target the luminosity of the color. An offset of +/-100% corresponds to changing the
              * luminosity by up to +/-100%.
              */
-            @JvmField public val LUMINOSITY: Target = Target(13)
+            @JvmField public val LUMINOSITY: Target = Target(14)
             /**
              * Scales the opacity of the base brush color. If multiple behaviors have one of these
              * targets, they stack multiplicatively. The final opacity multiplier is clamped to
              * [0, 2].
              */
-            @JvmField public val OPACITY_MULTIPLIER: Target = Target(14)
+            @JvmField public val OPACITY_MULTIPLIER: Target = Target(15)
 
             private const val PREFIX = "BrushBehavior.Target."
         }
