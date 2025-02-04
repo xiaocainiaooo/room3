@@ -19,6 +19,7 @@ package androidx.compose.runtime.tooling
 import androidx.compose.runtime.ComposerImpl
 import androidx.compose.runtime.changelist.OperationErrorContext
 import androidx.compose.runtime.staticCompositionLocalOf
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Used to attach a compose stack trace to a throwable based on a location of compose node in
@@ -56,7 +57,7 @@ sealed interface CompositionErrorContext {
 }
 
 internal class CompositionErrorContextImpl(private val composer: ComposerImpl) :
-    CompositionErrorContext, OperationErrorContext {
+    CompositionErrorContext, OperationErrorContext, CoroutineContext.Element {
     override fun Throwable.attachComposeStackTrace(composeNode: Any): Boolean =
         tryAttachComposeTrace {
             composer.compositionTraceForValue(composeNode)
@@ -64,4 +65,11 @@ internal class CompositionErrorContextImpl(private val composer: ComposerImpl) :
 
     override fun buildStackTrace(currentOffset: Int?): List<ComposeTraceFrame> =
         composer.parentCompositionTrace()
+
+    companion object Key : CoroutineContext.Key<CompositionErrorContextImpl> {
+        override fun toString(): String = "CompositionErrorContext"
+    }
+
+    override val key: CoroutineContext.Key<*>
+        get() = Key
 }
