@@ -2764,13 +2764,13 @@ public open class NavController(
             backStackStates.clear()
             if (contains(KEY_BACK_STACK_DEST_IDS) && contains(KEY_BACK_STACK_IDS)) {
                 val backStackDestIds = getIntArray(KEY_BACK_STACK_DEST_IDS)
-                val backStackIds = getStringArray(KEY_BACK_STACK_IDS)
+                val backStackIds = getStringList(KEY_BACK_STACK_IDS)
                 backStackDestIds.forEachIndexed { index, id ->
                     backStackMap[id] = backStackIds[index]
                 }
             }
             if (contains(KEY_BACK_STACK_STATES_IDS)) {
-                val backStackStateIds = getStringArray(KEY_BACK_STACK_STATES_IDS)
+                val backStackStateIds = getStringList(KEY_BACK_STACK_STATES_IDS)
                 backStackStateIds.forEach { id ->
                     if (contains(KEY_BACK_STACK_STATES_PREFIX + id)) {
                         val backStackState =
