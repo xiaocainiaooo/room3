@@ -179,41 +179,23 @@ public class FakeHealthConnectClient(
         // Stubs
         overrides.deleteRecords?.next(Unit)
 
-        // TODO(b/394051445): remove security exception and make this no-op
-        // This is because in real impl, we simply do nothing
-        // Check if all records belong to the package
-        if (
-            recordIdsList
-                .asSequence()
-                .mapNotNull { idsToRecords[it]?.packageName }
-                .any { it != packageName }
-        ) {
-            throw SecurityException("Trying to delete records owned by another package")
-        }
-
-        // Check if all records belong to the package in clientRecordIdsList
-        if (
-            clientRecordIdsList
-                .asSequence()
-                .mapNotNull { idsToRecords[it.toRecordId(packageName)]?.packageName }
-                .any { it != packageName }
-        ) {
-            throw SecurityException("Trying to delete records owned by another package")
-        }
-
         // Fake implementation
-        recordIdsList.forEach { recordId ->
-            idsToRecords[recordId]?.let { deletedIdsToRecords[recordId] = it }
-            idsToRecords.remove(recordId)
-            removeUpsertion(recordId)
-            addDeletionChange(recordId)
-        }
-        clientRecordIdsList.forEach {
-            val recordId = it.toRecordId(packageName)
-            idsToRecords[recordId]?.let { deletedIdsToRecords[recordId] = it }
-            idsToRecords.remove(recordId)
-            addDeletionChange(recordId)
-        }
+        recordIdsList
+            .filter { idsToRecords[it]?.packageName == packageName }
+            .forEach { recordId ->
+                idsToRecords[recordId]?.let { deletedIdsToRecords[recordId] = it }
+                idsToRecords.remove(recordId)
+                removeUpsertion(recordId)
+                addDeletionChange(recordId)
+            }
+        clientRecordIdsList
+            .filter { idsToRecords[it.toRecordId(packageName)]?.packageName == packageName }
+            .forEach {
+                val recordId = it.toRecordId(packageName)
+                idsToRecords[recordId]?.let { deletedIdsToRecords[recordId] = it }
+                idsToRecords.remove(recordId)
+                addDeletionChange(recordId)
+            }
     }
 
     override suspend fun deleteRecords(
