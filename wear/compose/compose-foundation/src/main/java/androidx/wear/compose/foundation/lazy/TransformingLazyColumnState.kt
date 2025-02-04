@@ -20,6 +20,7 @@ import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,24 +40,48 @@ import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-/** Creates a [TransformingLazyColumnState] that is remembered across compositions. */
+/**
+ * Creates a [TransformingLazyColumnState] that is remembered across compositions.
+ *
+ * @param initialAnchorItemIndex the index of an item that is going to be placed in the center of
+ *   the screen (if possible). This correlates with [TransformingLazyColumnState.anchorItemIndex].
+ * @param initialAnchorItemScrollOffset the offset of an item to be used when placing the item in
+ *   the center of the screen (if possible). This correlates with
+ *   [TransformingLazyColumnState.anchorItemScrollOffset].
+ */
 @Composable
-public fun rememberTransformingLazyColumnState(): TransformingLazyColumnState =
-    rememberSaveable(saver = TransformingLazyColumnState.Saver) { TransformingLazyColumnState() }
+public fun rememberTransformingLazyColumnState(
+    initialAnchorItemIndex: Int = 0,
+    initialAnchorItemScrollOffset: Int = 0
+): TransformingLazyColumnState =
+    rememberSaveable(saver = TransformingLazyColumnState.Saver) {
+        TransformingLazyColumnState(
+            initialAnchorItemIndex = initialAnchorItemIndex,
+            initialAnchorItemScrollOffset = initialAnchorItemScrollOffset,
+        )
+    }
 
 /**
  * A state object that can be hoisted to control and observe scrolling.
  *
  * In most cases, this will be created via [rememberTransformingLazyColumnState].
  */
-public class TransformingLazyColumnState() : ScrollableState {
+@Stable
+public class TransformingLazyColumnState
+/**
+ * @param initialAnchorItemIndex the index of an item that is going to be placed in the center of
+ *   the screen (if possible). This correlates with [TransformingLazyColumnState.anchorItemIndex].
+ * @param initialAnchorItemScrollOffset the offset of an item to be used when placing the item in
+ *   the center of the screen (if possible). This correlates with
+ *   [TransformingLazyColumnState.anchorItemScrollOffset].
+ */
+public constructor(
+    initialAnchorItemIndex: Int = 0,
+    initialAnchorItemScrollOffset: Int = 0,
+) : ScrollableState {
+
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
-
-    internal constructor(initialAnchorItemIndex: Int, initialAnchorItemScrollOffset: Int) : this() {
-        anchorItemIndex = initialAnchorItemIndex
-        anchorItemScrollOffset = initialAnchorItemScrollOffset
-    }
 
     override fun dispatchRawDelta(delta: Float): Float = scrollableState.dispatchRawDelta(delta)
 
@@ -110,7 +135,7 @@ public class TransformingLazyColumnState() : ScrollableState {
      *
      * @sample androidx.wear.compose.foundation.samples.UsingListAnchorItemPositionInCompositionSample
      */
-    public var anchorItemIndex: Int by mutableIntStateOf(0)
+    public var anchorItemIndex: Int by mutableIntStateOf(initialAnchorItemIndex)
         private set
 
     /**
@@ -122,11 +147,14 @@ public class TransformingLazyColumnState() : ScrollableState {
      *
      * @see anchorItemIndex for samples with the recommended usage patterns.
      */
-    public var anchorItemScrollOffset: Int by mutableIntStateOf(0)
+    public var anchorItemScrollOffset: Int by mutableIntStateOf(initialAnchorItemScrollOffset)
         private set
 
     internal var nearestRange: IntRange by
-        mutableStateOf(calculateNearestItemsRange(0), structuralEqualityPolicy())
+        mutableStateOf(
+            calculateNearestItemsRange(initialAnchorItemIndex),
+            structuralEqualityPolicy()
+        )
         private set
 
     internal var lastMeasuredAnchorItemHeight: Int = Int.MIN_VALUE
@@ -190,10 +218,10 @@ public class TransformingLazyColumnState() : ScrollableState {
                     )
                 },
                 restore = {
-                    val scalingLazyColumnState = TransformingLazyColumnState()
-                    scalingLazyColumnState.anchorItemIndex = it[0]
-                    scalingLazyColumnState.anchorItemScrollOffset = it[1]
-                    scalingLazyColumnState
+                    TransformingLazyColumnState(
+                        initialAnchorItemIndex = it[0],
+                        initialAnchorItemScrollOffset = it[1]
+                    )
                 }
             )
     }
