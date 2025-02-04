@@ -205,24 +205,23 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
 
 /** Returns the args needed to generate a version history JSON from the previous API files. */
 internal fun getGenerateApiLevelsArgs(
+    apiDir: File,
     apiFiles: List<File>,
     currentVersion: Version,
     outputLocation: File
 ): List<String> {
-    val versions = getVersionsForApiLevels(apiFiles)
-
     return buildList {
         add("--generate-api-version-history")
         add(outputLocation.absolutePath)
-        if (versions.isNotEmpty()) {
-            add("--api-version-names")
-            add(versions.joinToString(" "))
-        }
         add("--current-version")
         add(currentVersion.toString())
         if (apiFiles.isNotEmpty()) {
             add("--api-version-signature-files")
             add(apiFiles.joinToString(":"))
+            add("--api-version-signature-pattern")
+            // Select the version from the files. The `*` wildcard matches and ignores any
+            // pre-release suffix.
+            add("$apiDir/{version:major.minor.patch}*.txt")
         }
     }
 }
