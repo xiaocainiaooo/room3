@@ -23,22 +23,16 @@ import androidx.test.filters.SdkSuppress
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-/**
- * Tests persistent recording.
- *
- * StreamSharing is not within the scope of this test.
- *
- * @see [PersistentRecordingStreamSharingTest] for persistent recording with StreamSharing enabled.
- */
+/** Tests persistent recording with StreamSharing enabled. */
 @LargeTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = 21)
-class PersistentRecordingTest(
+class PersistentRecordingStreamSharingTest(
     private val implName: String,
     private var cameraSelector: CameraSelector,
     private val cameraConfig: CameraXConfig,
 ) : PersistentRecordingTestBase(implName, cameraSelector, cameraConfig) {
 
-    override val testTag: String = "PersistentRecordingTest"
-    override val enableStreamSharing: Boolean = false
+    override val testTag: String = "PersistentRecordingStreamSharingTest"
+    override val enableStreamSharing: Boolean = true
 }
