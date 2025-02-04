@@ -32,9 +32,11 @@ import androidx.wear.protolayout.types.LayoutColor
  * @param secondaryIconColor the color used for icon in the data card type.
  * @param secondaryTextColor the color used for secondary label for the data card type.
  * @param graphicProgressIndicatorColors the color used for the progress indicator set as graphic of
- *   the card.
+ *   the card. If null, uses the default color defined in [circularProgressIndicator] and
+ *   [segmentedCircularProgressIndicator], which is [filledProgressIndicatorColors].
  * @param graphicIconColor the color used for the icon to be put at the center of the progress
- *   indicator to compose the graphic.
+ *   indicator to compose the graphic. If null, uses the default icon color, which is
+ *   [ColorScheme.primary].
  */
 public class CardColors(
     public val backgroundColor: LayoutColor,
