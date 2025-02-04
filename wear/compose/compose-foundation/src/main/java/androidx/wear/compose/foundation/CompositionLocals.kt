@@ -36,7 +36,7 @@ import androidx.core.os.HandlerCompat
 
 /**
  * CompositionLocal for global reduce-motion setting, which turns off animations and screen
- * movements. To use, call LocalReduceMotion.current.enabled(), which returns a Boolean.
+ * movements. To use, call LocalReduceMotion.current, which returns a Boolean.
  */
 public val LocalReduceMotion: ProvidableCompositionLocal<Boolean> =
     compositionLocalWithComputedDefaultOf {
