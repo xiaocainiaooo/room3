@@ -13,7 +13,7 @@ analysing traces.
 ## Usage
 
 To start recording traces, you need to create an instance of a
-`TraceDriver`(src/commonMain/kotlin/androidx/tracing/driver/TraceDriver.kt).
+[`TraceDriver`](src/commonMain/kotlin/androidx/tracing/driver/TraceDriver.kt).
 
 ```kotlin
 val driver = TraceDriver(
@@ -44,7 +44,8 @@ To create a [ProcessTrack](src/commonMain/kotlin/androidx/tracing/driver/Process
 use the following API:
 
 ```kotlin
-val process = driver.ProcessTrack(
+// driver.ProcessTrack(...) is an alias for driver.context.ProcessTrack(...)
+val process = driver.context.ProcessTrack(
     // The process id
     id = 1,
     // The name of the process
