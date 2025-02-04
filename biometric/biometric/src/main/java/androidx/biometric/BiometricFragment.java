@@ -51,7 +51,6 @@ import java.util.concurrent.Executor;
 /**
  * A fragment that hosts the system-dependent UI for {@link BiometricPrompt} and coordinates logic
  * for the ongoing authentication session across device configuration changes.
- *
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class BiometricFragment extends Fragment {
@@ -93,14 +92,15 @@ public class BiometricFragment extends Fragment {
      * Where authentication was canceled from.
      */
     @IntDef({
-        CANCELED_FROM_INTERNAL,
-        CANCELED_FROM_USER,
-        CANCELED_FROM_NEGATIVE_BUTTON,
-        CANCELED_FROM_CLIENT,
-        CANCELED_FROM_MORE_OPTIONS_BUTTON
+            CANCELED_FROM_INTERNAL,
+            CANCELED_FROM_USER,
+            CANCELED_FROM_NEGATIVE_BUTTON,
+            CANCELED_FROM_CLIENT,
+            CANCELED_FROM_MORE_OPTIONS_BUTTON
     })
     @Retention(RetentionPolicy.SOURCE)
-    @interface CanceledFrom {}
+    @interface CanceledFrom {
+    }
 
     /**
      * Tag used to identify the {@link FingerprintDialogFragment} attached to the client
@@ -141,7 +141,8 @@ public class BiometricFragment extends Fragment {
         private final Handler mPromptHandler = new Handler(Looper.getMainLooper());
 
         @SuppressWarnings("WeakerAccess") /* synthetic access */
-        PromptExecutor() {}
+        PromptExecutor() {
+        }
 
         @Override
         public void execute(@NonNull Runnable runnable) {
@@ -902,7 +903,6 @@ public class BiometricFragment extends Fragment {
      * Sends a successful authentication result to the client and dismisses the prompt.
      *
      * @param result An object containing authentication-related data.
-     *
      * @see #sendSuccessToClient(BiometricPrompt.AuthenticationResult)
      */
     private void sendSuccessAndDismiss(BiometricPrompt.@NonNull AuthenticationResult result) {
@@ -913,15 +913,52 @@ public class BiometricFragment extends Fragment {
     /**
      * Sends an unrecoverable error result to the client and dismisses the prompt.
      *
-     * @param errorCode An integer ID associated with the error.
+     * @param errorCode   An integer ID associated with the error.
      * @param errorString A human-readable string that describes the error.
-     *
      * @see #sendErrorToClient(int, CharSequence)
      */
     @SuppressWarnings("WeakerAccess") /* synthetic access */
     void sendErrorAndDismiss(int errorCode, @NonNull CharSequence errorString) {
+        showErrorDialogsForIdentityCheck(errorCode);
+
         sendErrorToClient(errorCode, errorString);
+
         dismiss();
+    }
+
+    private void showErrorDialogsForIdentityCheck(int errorCode) {
+        // TODO(b/375693808): Add a build check in the future
+        // Show error dialogs for lockout errors (with identity check enabled only for now)
+        final Context context = getContext();
+        // |mViewModel.getAllowedAuthenticators()| ignores IDENTITY_CHECK if it's not available
+        // by checking [BiometricManager.isIdentityCheckAvailable()]. So as long as
+        // IDENTITY_CHECK is one of the [mViewModel.getAllowedAuthenticators()], it's both
+        // allowed and available.
+        final boolean isIdentityCheckAllowedAndAvailable = context != null
+                && (mViewModel.getAllowedAuthenticators() & Authenticators.IDENTITY_CHECK)
+                == Authenticators.IDENTITY_CHECK;
+        // If IDENTITY_CHECK is not active, [BiometricManager
+        // .BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE] will be returned.
+        @SuppressLint("WrongConstant") final boolean isIdentityCheckActive =
+                isIdentityCheckAllowedAndAvailable && BiometricManager.from(
+                        context).isIdentityCheckActive();
+        if (isIdentityCheckActive) {
+            switch (errorCode) {
+                case BiometricPrompt.ERROR_HW_UNAVAILABLE:
+                case BiometricPrompt.ERROR_NO_BIOMETRICS:
+                case BiometricPrompt.ERROR_HW_NOT_PRESENT:
+                case BiometricPrompt.ERROR_SECURITY_UPDATE_REQUIRED:
+                    IdentityCheckErrorDialog.createDialog(context, false /*isLockoutError*/);
+                    break;
+
+                case BiometricPrompt.ERROR_LOCKOUT:
+                case BiometricPrompt.ERROR_LOCKOUT_PERMANENT:
+                    IdentityCheckErrorDialog.createDialog(context, true /*isLockoutError*/);
+                    break;
+                default:
+                    // do nothing
+            }
+        }
     }
 
 
@@ -929,10 +966,9 @@ public class BiometricFragment extends Fragment {
      * Sends a successful authentication result to the client callback.
      *
      * @param result An object containing authentication-related data.
-     *
      * @see #sendSuccessAndDismiss(BiometricPrompt.AuthenticationResult)
      * @see BiometricPrompt.AuthenticationCallback#onAuthenticationSucceeded(
-     *      BiometricPrompt.AuthenticationResult)
+     *BiometricPrompt.AuthenticationResult)
      */
     private void sendSuccessToClient(final BiometricPrompt.@NonNull AuthenticationResult result) {
         if (!mViewModel.isAwaitingResult()) {
@@ -950,7 +986,6 @@ public class BiometricFragment extends Fragment {
      *
      * @param errorCode   An integer ID associated with the error.
      * @param errorString A human-readable string that describes the error.
-     *
      * @see #sendErrorAndDismiss(int, CharSequence)
      * @see BiometricPrompt.AuthenticationCallback#onAuthenticationError(int, CharSequence)
      */
@@ -1011,7 +1046,7 @@ public class BiometricFragment extends Fragment {
     boolean isManagingDeviceCredentialButton() {
         return Build.VERSION.SDK_INT <= Build.VERSION_CODES.P
                 && AuthenticatorUtils.isDeviceCredentialAllowed(
-                    mViewModel.getAllowedAuthenticators());
+                mViewModel.getAllowedAuthenticators());
     }
 
     /**
@@ -1031,7 +1066,6 @@ public class BiometricFragment extends Fragment {
      * ongoing crypto-based authentication attempt.
      *
      * @return Whether this fragment should display the fingerprint dialog UI.
-     *
      * @see DeviceUtils#shouldUseFingerprintForCrypto(Context, String, String)
      */
     private boolean isFingerprintDialogNeededForCrypto() {
@@ -1039,7 +1073,7 @@ public class BiometricFragment extends Fragment {
         return context != null
                 && mViewModel.getCryptoObject() != null
                 && DeviceUtils.shouldUseFingerprintForCrypto(
-                    context, Build.MANUFACTURER, Build.MODEL);
+                context, Build.MANUFACTURER, Build.MODEL);
     }
 
     /**
@@ -1199,7 +1233,8 @@ public class BiometricFragment extends Fragment {
     @RequiresApi(Build.VERSION_CODES.R)
     private static class Api30Impl {
         // Prevent instantiation.
-        private Api30Impl() {}
+        private Api30Impl() {
+        }
 
         /**
          * Sets the allowed authenticator type(s) for the given framework prompt builder.
@@ -1222,7 +1257,8 @@ public class BiometricFragment extends Fragment {
     @RequiresApi(Build.VERSION_CODES.Q)
     private static class Api29Impl {
         // Prevent instantiation.
-        private Api29Impl() {}
+        private Api29Impl() {
+        }
 
         /**
          * Sets the "confirmation required" option for the given framework prompt builder.
@@ -1260,7 +1296,8 @@ public class BiometricFragment extends Fragment {
     @RequiresApi(Build.VERSION_CODES.P)
     private static class Api28Impl {
         // Prevent instantiation.
-        private Api28Impl() {}
+        private Api28Impl() {
+        }
 
         /**
          * Creates an instance of the framework class
@@ -1394,7 +1431,8 @@ public class BiometricFragment extends Fragment {
      */
     private static class Api21Impl {
         // Prevent instantiation.
-        private Api21Impl() {}
+        private Api21Impl() {
+        }
 
         /**
          * Calls
