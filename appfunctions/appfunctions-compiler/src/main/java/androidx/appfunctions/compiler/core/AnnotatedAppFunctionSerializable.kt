@@ -17,7 +17,6 @@
 package androidx.appfunctions.compiler.core
 
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPORTED_TYPES
-import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.getTypeNameAsString
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isAppFunctionSerializableType
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isSupportedType
 import com.google.devtools.ksp.getVisibility
@@ -73,7 +72,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                     "AppFunctionSerializable properties must be one of the following types:\n" +
                         SUPPORTED_TYPES.joinToString(",") +
                         ", an @AppFunctionSerializable or a list of @AppFunctionSerializable\nbut found " +
-                        ksValueParameter.type.getTypeNameAsString(),
+                        ksValueParameter.type.toTypeName(),
                     ksValueParameter
                 )
             }
