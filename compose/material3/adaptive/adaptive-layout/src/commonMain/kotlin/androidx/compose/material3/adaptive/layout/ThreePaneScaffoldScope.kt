@@ -66,6 +66,7 @@ internal class ThreePaneScaffoldScopeImpl(
                 interactionSource = interactionSource,
                 onDragStopped = { velocity -> state.settleToAnchorIfNeeded(velocity) }
             )
+            .semanticsAction(semanticsProperties, interactionSource)
             .systemGestureExclusion()
             .animateWithFading(
                 enabled = true,
