@@ -160,7 +160,9 @@ internal class TextElementStyle(
     val color: LayoutColor = ColorTokens.PRIMARY.argb,
     val italic: Boolean = false,
     val underline: Boolean = false,
-    val scalable: Boolean = TypographyFontSelection.getFontScalability(typography),
+    // Don't set the default here, but in text, as it's typography dependent. We need this for
+    // components like edgeButton that override the default.
+    val scalable: Boolean? = null,
     val maxLines: Int = 1,
     @TextAlignment val alignment: Int = TEXT_ALIGN_CENTER,
     @TextOverflow val overflow: Int = TEXT_OVERFLOW_ELLIPSIZE,

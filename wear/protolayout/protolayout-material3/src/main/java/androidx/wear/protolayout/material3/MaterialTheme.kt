@@ -21,8 +21,10 @@ import androidx.annotation.OptIn
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.SpProp
 import androidx.wear.protolayout.DimensionBuilders.sp
+import androidx.wear.protolayout.LayoutElementBuilders.FontSetting
 import androidx.wear.protolayout.LayoutElementBuilders.FontStyle
 import androidx.wear.protolayout.expression.ProtoLayoutExperimental
+import androidx.wear.protolayout.expression.RequiresSchemaVersion
 import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.material3.tokens.TextStyle
 
@@ -66,7 +68,8 @@ internal class MaterialTheme(
 internal fun createFontStyleBuilder(
     @TypographyToken typographyToken: Int,
     deviceConfiguration: DeviceParameters? = null,
-    isScalable: Boolean = true
+    isScalable: Boolean = true,
+    @RequiresSchemaVersion(major = 1, minor = 400) settings: List<FontSetting> = listOf()
 ): FontStyle.Builder {
     val textStyle: TextStyle = Typography.fromToken(typographyToken)
     val sizeSp: SpProp = textStyle.size
@@ -79,7 +82,8 @@ internal fun createFontStyleBuilder(
             }
         )
         .setLetterSpacing(textStyle.letterSpacing)
-        .setSettings(*textStyle.fontSettings.toTypedArray())
+        // Apply newly provided settings first so that they will override theme ones if set.
+        .setSettings(*(settings + textStyle.fontSettings).toTypedArray())
         .setVariant(TypographyFontSelection.getFontVariant(typographyToken))
         .setWeight(TypographyFontSelection.getFontWeight(typographyToken))
 }
