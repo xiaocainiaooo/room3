@@ -26,6 +26,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Display
+import android.view.MotionEvent
 import android.view.SurfaceControlViewHost
 import android.view.View
 import androidx.annotation.RequiresApi
@@ -243,7 +244,7 @@ private class BinderAdapterDelegate(
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private class SessionClientProxy(
-        private val touchTransferringView: TouchFocusTransferringView,
+        private val providerViewWrapper: ProviderViewWrapper,
         private val surfaceControlViewHost: SurfaceControlViewHost,
         private val isZOrderOnTop: Boolean,
         private val remoteSessionClient: IRemoteSessionClient
@@ -254,16 +255,16 @@ private class BinderAdapterDelegate(
          * step duration and interference with actual openSession() logic (reduce potential delays).
          */
         fun initialize(initialWidth: Int, initialHeight: Int) {
-            surfaceControlViewHost.setView(touchTransferringView, initialWidth, initialHeight)
+            surfaceControlViewHost.setView(providerViewWrapper, initialWidth, initialHeight)
         }
 
         override fun onSessionOpened(session: SandboxedUiAdapter.Session) {
             val view = session.view
 
-            if (touchTransferringView.childCount > 0) {
-                touchTransferringView.removeAllViews()
+            if (providerViewWrapper.childCount > 0) {
+                providerViewWrapper.removeAllViews()
             }
-            touchTransferringView.addView(view)
+            providerViewWrapper.addView(view)
 
             // This var is not locked as it will be set to false by the first event that can trigger
             // sending the remote session opened callback.
@@ -353,6 +354,10 @@ private class BinderAdapterDelegate(
                 session.notifySessionRendered(supportedSignalOptions.toSet())
             }
 
+            override fun notifyMotionEvent(motionEvent: MotionEvent, eventTargetFrameTime: Long) {
+                providerViewWrapper.scheduleMotionEventProcessing(motionEvent, eventTargetFrameTime)
+            }
+
             override fun close() {
                 val mHandler = Handler(Looper.getMainLooper())
                 mHandler.post {
@@ -432,10 +437,8 @@ private class BinderAdapterDelegate(
                 checkNotNull(createSurfaceControlViewHost(displayContext, display, sessionData)) {
                     "Failed to create SurfaceControlViewHost"
                 }
-            val touchTransferringView =
-                TouchFocusTransferringView(displayContext, surfaceControlViewHost)
             return SessionClientProxy(
-                touchTransferringView,
+                ProviderViewWrapper(displayContext),
                 surfaceControlViewHost,
                 isZOrderOnTop,
                 remoteSessionClient
