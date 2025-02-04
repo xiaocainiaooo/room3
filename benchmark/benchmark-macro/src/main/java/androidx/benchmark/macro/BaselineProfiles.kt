@@ -164,7 +164,7 @@ private fun reportResults(
     includeInStartupProfile: Boolean
 ): BaselineProfileResult {
     val (fileName, tsFileName) =
-        if (includeInStartupProfile && Arguments.enableStartupProfiles) {
+        if (includeInStartupProfile) {
             arrayOf(
                 "$uniqueFilePrefix-startup-prof.txt",
                 "$uniqueFilePrefix-startup-prof-${Outputs.dateToFileName()}.txt"
@@ -184,7 +184,7 @@ private fun reportResults(
         }
 
     val resultsContainer =
-        if (includeInStartupProfile && Arguments.enableStartupProfiles) {
+        if (includeInStartupProfile) {
             BaselineProfileResult(startupProfiles = listOf(tsAbsolutePath))
         } else {
             BaselineProfileResult(baselineProfiles = listOf(tsAbsolutePath))
