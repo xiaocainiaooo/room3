@@ -638,6 +638,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.runtime.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, optional kotlin.coroutines.CoroutineContext context);
     method @androidx.compose.runtime.snapshots.StateFactoryMarker public static <T> androidx.compose.runtime.State<T> derivedStateOf(androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.snapshots.StateFactoryMarker public static <T> androidx.compose.runtime.State<T> derivedStateOf(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<kotlin.coroutines.CoroutineContext> getLocalCollectAsStateCoroutineContext();
     method public static inline operator <T> T getValue(androidx.compose.runtime.State<? extends T>, Object? thisObj, kotlin.reflect.KProperty<? extends java.lang.Object?> property);
     method @androidx.compose.runtime.snapshots.StateFactoryMarker public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf();
     method @androidx.compose.runtime.snapshots.StateFactoryMarker public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> mutableStateListOf(T... elements);
@@ -659,6 +660,7 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.SnapshotMutationPolicy<T> structuralEqualityPolicy();
     method public static <T> androidx.compose.runtime.snapshots.SnapshotStateList<T> toMutableStateList(java.util.Collection<? extends T>);
     method public static <K, V> androidx.compose.runtime.snapshots.SnapshotStateMap<K,V> toMutableStateMap(Iterable<? extends kotlin.Pair<? extends K,? extends V>>);
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<kotlin.coroutines.CoroutineContext> LocalCollectAsStateCoroutineContext;
   }
 
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY}) public @interface Stable {
