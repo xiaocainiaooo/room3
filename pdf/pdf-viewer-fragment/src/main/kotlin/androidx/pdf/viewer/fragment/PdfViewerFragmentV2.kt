@@ -341,6 +341,11 @@ public open class PdfViewerFragmentV2 : Fragment() {
 
                 /** Clear selection when we start a search session. */
                 if (uiState !is SearchViewUiState.Closed) pdfView.clearSelection()
+
+                /**
+                 * Dynamically control the fast scroller visibility based on the search UI state.
+                 */
+                pdfView.overrideFastScrollerVisibility(uiState is SearchViewUiState.Closed)
             }
         }
 
