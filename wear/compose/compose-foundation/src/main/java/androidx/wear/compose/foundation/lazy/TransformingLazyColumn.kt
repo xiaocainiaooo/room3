@@ -229,7 +229,9 @@ internal fun TransformingLazyColumnImpl(
             Orientation.Vertical,
             reverseScrolling = false
         )
-    val semanticState = remember(state) { TransformingLazyColumnSemanticState(state = state) }
+
+    val semanticState = remember(state) { TransformingLazyColumnSemanticState(state) }
+
     // TODO: b/388191915 - Migrate to use rememberOverscrollEffect when updated to 1.8.0.
     @Suppress("DEPRECATION") val overscrollEffect = ScrollableDefaults.overscrollEffect()
 
@@ -237,6 +239,7 @@ internal fun TransformingLazyColumnImpl(
         itemProvider = itemProviderLambda,
         modifier =
             modifier
+                .then(state.remeasurementModifier)
                 .then(state.animator.modifier)
                 .then(
                     if (rotaryScrollableBehavior != null && userScrollEnabled)
@@ -246,7 +249,6 @@ internal fun TransformingLazyColumnImpl(
                         )
                     else Modifier
                 )
-                .then(state.remeasurementModifier)
                 .lazyLayoutSemantics(
                     itemProviderLambda = itemProviderLambda,
                     state = semanticState,
@@ -263,7 +265,8 @@ internal fun TransformingLazyColumnImpl(
                     flingBehavior = flingBehavior,
                     overscrollEffect = overscrollEffect,
                 ),
-        measurePolicy = measurePolicy
+        measurePolicy = measurePolicy,
+        prefetchState = state.prefetchState,
     )
 }
 

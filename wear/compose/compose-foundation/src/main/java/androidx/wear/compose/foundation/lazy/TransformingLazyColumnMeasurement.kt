@@ -52,6 +52,7 @@ internal fun rememberTransformingLazyColumnMeasurePolicy(
     remember(
         itemProviderLambda,
         state,
+        coroutineScope,
         horizontalAlignment,
         verticalArrangement,
         measurementStrategy
