@@ -157,7 +157,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
         PdfDocumentViewModel.Factory
     }
 
-    private lateinit var pdfView: PdfView
+    @RestrictTo(RestrictTo.Scope.LIBRARY) protected lateinit var pdfView: PdfView
     private lateinit var toolboxView: ToolBoxView
     private lateinit var errorView: TextView
     private lateinit var loadingView: ProgressBar
@@ -463,7 +463,10 @@ public open class PdfViewerFragmentV2 : Fragment() {
 
     private fun handleDocumentError(uiState: DocumentError) {
         dismissPasswordDialog()
-        onLoadDocumentError(uiState.exception)
+        val errorMessage =
+            context?.resources?.getString(androidx.pdf.R.string.pdf_error)
+                ?: uiState.exception.message
+        onLoadDocumentError(RuntimeException(errorMessage, uiState.exception))
         setViewVisibility(
             pdfView = GONE,
             loadingView = GONE,
