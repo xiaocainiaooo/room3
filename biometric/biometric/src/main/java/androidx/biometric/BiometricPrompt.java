@@ -189,6 +189,20 @@ public class BiometricPrompt {
     public static final int ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON = 22;
 
     /**
+     * The error code returned after lock out error happens, the error dialog shows, and the
+     * users dismisses the dialog.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int ERROR_LOCK_OUT_ERROR_DIALOG_DISMISSED = 23;
+
+    /**
+     * The error code returned after biometric hardware error happens, the error dialog shows,
+     * and the users dismisses the dialog.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int ERROR_BIOMETRIC_HARDWARE_ERROR_DIALOG_DISMISSED = 24;
+
+    /**
      * An error code that may be returned during authentication.
      */
     @IntDef({
@@ -207,7 +221,9 @@ public class BiometricPrompt {
         ERROR_NO_DEVICE_CREDENTIAL,
         ERROR_IDENTITY_CHECK_NOT_ACTIVE,
         ERROR_NOT_ENABLED_FOR_APPS,
-        ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON
+        ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON,
+        ERROR_LOCK_OUT_ERROR_DIALOG_DISMISSED,
+        ERROR_BIOMETRIC_HARDWARE_ERROR_DIALOG_DISMISSED,
     })
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Retention(RetentionPolicy.SOURCE)
@@ -240,12 +256,13 @@ public class BiometricPrompt {
      * The authentication type that was used, as reported by {@link AuthenticationResult}.
      */
     @IntDef({
-        AUTHENTICATION_RESULT_TYPE_UNKNOWN,
-        AUTHENTICATION_RESULT_TYPE_DEVICE_CREDENTIAL,
-        AUTHENTICATION_RESULT_TYPE_BIOMETRIC
+            AUTHENTICATION_RESULT_TYPE_UNKNOWN,
+            AUTHENTICATION_RESULT_TYPE_DEVICE_CREDENTIAL,
+            AUTHENTICATION_RESULT_TYPE_BIOMETRIC
     })
     @Retention(RetentionPolicy.SOURCE)
-    @interface AuthenticationResultType {}
+    @interface AuthenticationResultType {
+    }
 
     /**
      * Tag used to identify the {@link BiometricFragment} attached to the client activity/fragment.
@@ -329,7 +346,7 @@ public class BiometricPrompt {
          * Creates a crypto object that wraps the given presentation session object.
          *
          * @param presentationSession The presentation session to be associated with this crypto
-         *                           object.
+         *                            object.
          */
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         public CryptoObject(
@@ -344,9 +361,9 @@ public class BiometricPrompt {
 
         /**
          * Create from an operation handle.
-         * @see CryptoObject#getOperationHandle()
          *
          * @param operationHandle the operation handle associated with this object.
+         * @see CryptoObject#getOperationHandle()
          */
         @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
         public CryptoObject(long operationHandle) {
@@ -439,11 +456,12 @@ public class BiometricPrompt {
 
     /**
      * A container for data passed to {@link AuthenticationCallback#onAuthenticationSucceeded(
-     * AuthenticationResult)} when the user has successfully authenticated.
+     *AuthenticationResult)} when the user has successfully authenticated.
      */
     public static class AuthenticationResult {
         private final CryptoObject mCryptoObject;
-        @AuthenticationResultType private final int mAuthenticationType;
+        @AuthenticationResultType
+        private final int mAuthenticationType;
 
         AuthenticationResult(
                 CryptoObject crypto, @AuthenticationResultType int authenticationType) {
@@ -465,7 +483,6 @@ public class BiometricPrompt {
          * requested from and successfully provided by the user.
          *
          * @return An integer representing the type of authentication that was used.
-         *
          * @see #AUTHENTICATION_RESULT_TYPE_UNKNOWN
          * @see #AUTHENTICATION_RESULT_TYPE_DEVICE_CREDENTIAL
          * @see #AUTHENTICATION_RESULT_TYPE_BIOMETRIC
@@ -490,7 +507,8 @@ public class BiometricPrompt {
          * @param errString A human-readable string that describes the error.
          */
         public void onAuthenticationError(
-                @AuthenticationError int errorCode, @NonNull CharSequence errString) {}
+                @AuthenticationError int errorCode, @NonNull CharSequence errString) {
+        }
 
         /**
          * Called when a biometric (e.g. fingerprint, face, etc.) is recognized, indicating that the
@@ -501,13 +519,15 @@ public class BiometricPrompt {
          *
          * @param result An object containing authentication-related data.
          */
-        public void onAuthenticationSucceeded(@NonNull AuthenticationResult result) {}
+        public void onAuthenticationSucceeded(@NonNull AuthenticationResult result) {
+        }
 
         /**
          * Called when a biometric (e.g. fingerprint, face, etc.) is presented but not recognized as
          * belonging to the user.
          */
-        public void onAuthenticationFailed() {}
+        public void onAuthenticationFailed() {
+        }
     }
 
     /**
@@ -519,7 +539,8 @@ public class BiometricPrompt {
          */
         public static class Builder {
             // Mutable options to be set on the builder.
-            @DrawableRes private int mLogoRes = -1;
+            @DrawableRes
+            private int mLogoRes = -1;
             private @Nullable Bitmap mLogoBitmap = null;
             private @Nullable String mLogoDescription = null;
             private @Nullable CharSequence mTitle = null;
@@ -529,7 +550,8 @@ public class BiometricPrompt {
             private @Nullable CharSequence mNegativeButtonText = null;
             private boolean mIsConfirmationRequired = true;
             private boolean mIsDeviceCredentialAllowed = false;
-            @BiometricManager.AuthenticatorTypes private int mAllowedAuthenticators = 0;
+            @BiometricManager.AuthenticatorTypes
+            private int mAllowedAuthenticators = 0;
 
             /**
              * Optional: Sets the drawable resource of the logo that will be shown on the prompt.
@@ -701,7 +723,6 @@ public class BiometricPrompt {
              *
              * @param deviceCredentialAllowed Whether this option should be enabled.
              * @return This builder.
-             *
              * @deprecated Use {@link #setAllowedAuthenticators(int)} instead.
              */
             @SuppressWarnings("deprecation")
@@ -751,7 +772,6 @@ public class BiometricPrompt {
              * Creates a {@link PromptInfo} object with the specified options.
              *
              * @return The {@link PromptInfo} object.
-             *
              * @throws IllegalArgumentException If any required option is not set, or if any
              *                                  illegal combination of options is present.
              */
@@ -792,7 +812,8 @@ public class BiometricPrompt {
         }
 
         // Immutable fields for the prompt info object.
-        @DrawableRes private int mLogoRes;
+        @DrawableRes
+        private int mLogoRes;
         private @Nullable Bitmap mLogoBitmap;
         private @Nullable String mLogoDescription;
         private final @NonNull CharSequence mTitle;
@@ -802,7 +823,8 @@ public class BiometricPrompt {
         private final @Nullable CharSequence mNegativeButtonText;
         private final boolean mIsConfirmationRequired;
         private final boolean mIsDeviceCredentialAllowed;
-        @BiometricManager.AuthenticatorTypes private final int mAllowedAuthenticators;
+        @BiometricManager.AuthenticatorTypes
+        private final int mAllowedAuthenticators;
 
         // Prevent direct instantiation.
         @SuppressWarnings("WeakerAccess") /* synthetic access */
@@ -871,7 +893,6 @@ public class BiometricPrompt {
          * Gets the title for the prompt.
          *
          * @return The title to be displayed on the prompt.
-         *
          * @see Builder#setTitle(CharSequence)
          */
         public @NonNull CharSequence getTitle() {
@@ -882,7 +903,6 @@ public class BiometricPrompt {
          * Gets the subtitle for the prompt.
          *
          * @return The subtitle to be displayed on the prompt.
-         *
          * @see Builder#setSubtitle(CharSequence)
          */
         public @Nullable CharSequence getSubtitle() {
@@ -893,7 +913,6 @@ public class BiometricPrompt {
          * Gets the description for the prompt.
          *
          * @return The description to be displayed on the prompt.
-         *
          * @see Builder#setDescription(CharSequence)
          */
         public @Nullable CharSequence getDescription() {
@@ -915,7 +934,6 @@ public class BiometricPrompt {
          *
          * @return The label to be used for the negative button on the prompt, or an empty string if
          * not set.
-         *
          * @see Builder#setNegativeButtonText(CharSequence)
          */
         public @NonNull CharSequence getNegativeButtonText() {
@@ -926,7 +944,6 @@ public class BiometricPrompt {
          * Checks if the confirmation required option is enabled for the prompt.
          *
          * @return Whether this option is enabled.
-         *
          * @see Builder#setConfirmationRequired(boolean)
          */
         public boolean isConfirmationRequired() {
@@ -937,9 +954,7 @@ public class BiometricPrompt {
          * Checks if the device credential allowed option is enabled for the prompt.
          *
          * @return Whether this option is enabled.
-         *
          * @see Builder#setDeviceCredentialAllowed(boolean)
-         *
          * @deprecated Will be removed with {@link Builder#setDeviceCredentialAllowed(boolean)}.
          */
         @SuppressWarnings({"deprecation", "DeprecatedIsStillUsed"})
@@ -953,7 +968,6 @@ public class BiometricPrompt {
          *
          * @return A bit field representing all valid authenticator types that may be invoked by
          * the prompt, or 0 if not set.
-         *
          * @see Builder#setAllowedAuthenticators(int)
          */
         @BiometricManager.AuthenticatorTypes
@@ -999,7 +1013,6 @@ public class BiometricPrompt {
      *
      * @param activity The activity of the client application that will host the prompt.
      * @param callback The object that will receive and process authentication events.
-     *
      * @see #BiometricPrompt(Fragment, AuthenticationCallback)
      * @see #BiometricPrompt(FragmentActivity, Executor, AuthenticationCallback)
      * @see #BiometricPrompt(Fragment, Executor, AuthenticationCallback)
@@ -1034,7 +1047,6 @@ public class BiometricPrompt {
      *
      * @param fragment The fragment of the client application that will host the prompt.
      * @param callback The object that will receive and process authentication events.
-     *
      * @see #BiometricPrompt(FragmentActivity, AuthenticationCallback)
      * @see #BiometricPrompt(FragmentActivity, Executor, AuthenticationCallback)
      * @see #BiometricPrompt(Fragment, Executor, AuthenticationCallback)
@@ -1070,7 +1082,6 @@ public class BiometricPrompt {
      * @param activity The activity of the client application that will host the prompt.
      * @param executor The executor that will be used to run {@link AuthenticationCallback} methods.
      * @param callback The object that will receive and process authentication events.
-     *
      * @see #BiometricPrompt(FragmentActivity, AuthenticationCallback)
      * @see #BiometricPrompt(Fragment, AuthenticationCallback)
      * @see #BiometricPrompt(Fragment, Executor, AuthenticationCallback)
@@ -1111,7 +1122,6 @@ public class BiometricPrompt {
      * @param fragment The fragment of the client application that will host the prompt.
      * @param executor The executor that will be used to run {@link AuthenticationCallback} methods.
      * @param callback The object that will receive and process authentication events.
-     *
      * @see #BiometricPrompt(FragmentActivity, AuthenticationCallback)
      * @see #BiometricPrompt(Fragment, AuthenticationCallback)
      * @see #BiometricPrompt(FragmentActivity, Executor, AuthenticationCallback)
@@ -1175,10 +1185,8 @@ public class BiometricPrompt {
      *
      * @param info   An object describing the appearance and behavior of the prompt.
      * @param crypto A crypto object to be associated with this authentication.
-     *
      * @throws IllegalArgumentException If any of the allowed authenticator types specified by
      *                                  {@code info} do not support crypto-based authentication.
-     *
      * @see #authenticate(PromptInfo)
      * @see PromptInfo.Builder#setAllowedAuthenticators(int)
      */
@@ -1214,7 +1222,6 @@ public class BiometricPrompt {
      * cancel authentication and dismiss the prompt, use {@link #cancelAuthentication()}.
      *
      * @param info An object describing the appearance and behavior of the prompt.
-     *
      * @see #authenticate(PromptInfo, CryptoObject)
      */
     @SuppressWarnings("ConstantConditions")
@@ -1272,7 +1279,7 @@ public class BiometricPrompt {
      * Gets the biometric view model instance using the host activity or fragment that was
      * given in the constructor.
      *
-     * @param fragment The fragment hosting the prompt.
+     * @param fragment         The fragment hosting the prompt.
      * @param hostedInActivity If one of the activity-based constructors was used.
      * @return A biometric view model tied to the lifecycle owner of the fragment.
      */

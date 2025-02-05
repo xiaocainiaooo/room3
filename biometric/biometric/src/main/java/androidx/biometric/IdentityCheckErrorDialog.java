@@ -47,7 +47,12 @@ class IdentityCheckErrorDialog {
     private IdentityCheckErrorDialog() {
     }
 
-    public static void createDialog(Context context, boolean isLockoutError) {
+    interface IdentityCheckErrorDialogListener {
+        void onDismissed();
+    }
+
+    static void createDialog(Context context, boolean isLockoutError,
+            IdentityCheckErrorDialogListener listener) {
         // TODO(b/375693808): support dark theme and rounded corner
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(
@@ -72,7 +77,10 @@ class IdentityCheckErrorDialog {
                 }
             };
             context.registerReceiver(broadcastReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-            dialog.setOnDismissListener(d -> context.unregisterReceiver(broadcastReceiver));
+            dialog.setOnDismissListener(d -> {
+                listener.onDismissed();
+                context.unregisterReceiver(broadcastReceiver);
+            });
         }
 
         dialog.show();
