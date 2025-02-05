@@ -56,10 +56,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealActionType
+import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealScope
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
-import androidx.wear.compose.foundation.SwipeDirection
 import androidx.wear.compose.foundation.SwipeToReveal
 import androidx.wear.compose.foundation.createAnchors
 import androidx.wear.compose.material3.ButtonDefaults.buttonColors
@@ -364,14 +364,14 @@ public class SwipeToRevealScope {
  * @param useAnchoredActions Whether the actions should stay revealed, or bounce back to hidden when
  *   the user stops swiping. This is relevant for SwipeToReveal components with a single action. If
  *   the developer wants a swipe to clear behaviour, this should be set to false.
- * @param swipeDirection Direction of the swipe to reveal the actions.
+ * @param revealDirection Direction of the swipe to reveal the actions.
  */
 @Composable
 public fun rememberRevealState(
     initialValue: RevealValue = RevealValue.Covered,
     anchorWidth: Dp = SwipeToRevealDefaults.SingleActionAnchorWidth,
     useAnchoredActions: Boolean = true,
-    swipeDirection: SwipeDirection = SwipeDirection.RightToLeft,
+    revealDirection: RevealDirection = RevealDirection.RightToLeft,
 ): RevealState {
     val anchorFraction = anchorWidth.value / screenWidthDp()
     return androidx.wear.compose.foundation.rememberRevealState(
@@ -380,7 +380,7 @@ public fun rememberRevealState(
         anchors =
             createAnchors(
                 revealingAnchor = if (useAnchoredActions) anchorFraction else 0f,
-                swipeDirection = swipeDirection,
+                revealDirection = revealDirection,
             ),
     )
 }

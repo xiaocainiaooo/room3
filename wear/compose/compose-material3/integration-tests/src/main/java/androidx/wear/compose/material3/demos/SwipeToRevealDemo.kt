@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
@@ -38,8 +37,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealActionType
+import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealValue
-import androidx.wear.compose.foundation.SwipeDirection
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.Icon
@@ -59,7 +58,7 @@ fun SwipeToRevealBothDirectionsNonAnchoring() {
             SwipeToReveal(
                 revealState =
                     rememberRevealState(
-                        swipeDirection = SwipeDirection.Both,
+                        revealDirection = RevealDirection.Both,
                         useAnchoredActions = false,
                     ),
                 actions = {
@@ -94,7 +93,7 @@ fun SwipeToRevealBothDirections() {
                     rememberRevealState(
                         // Use the double action anchor width when revealing two actions
                         anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
-                        swipeDirection = SwipeDirection.Both
+                        revealDirection = RevealDirection.Both
                     ),
                 actions = {
                     primaryAction(
@@ -229,7 +228,7 @@ fun SwipeToRevealInList() {
         items(namesList.size, key = { namesList[it] }) {
             val revealState =
                 rememberRevealState(
-                    swipeDirection = SwipeDirection.Both,
+                    revealDirection = RevealDirection.Both,
                     anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth
                 )
             val name = remember { namesList[it] }
@@ -280,7 +279,7 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
             SwipeToReveal(
                 revealState =
                     rememberRevealState(
-                        swipeDirection = SwipeDirection.RightToLeft,
+                        revealDirection = RevealDirection.RightToLeft,
                         anchorWidth = SwipeToRevealDefaults.SingleActionAnchorWidth,
                     ),
                 actions = {

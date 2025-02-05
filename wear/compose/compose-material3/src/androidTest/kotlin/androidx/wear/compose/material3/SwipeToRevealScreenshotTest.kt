@@ -38,8 +38,8 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.wear.compose.foundation.RevealActionType
+import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealValue
-import androidx.wear.compose.foundation.SwipeDirection
 import androidx.wear.compose.materialcore.screenWidthDp
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -331,7 +331,7 @@ class SwipeToRevealScreenshotTest {
                         rememberRevealState(
                             initialValue = RevealValue.LeftRevealing,
                             anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
-                            swipeDirection = SwipeDirection.Both
+                            revealDirection = RevealDirection.Both
                         ),
                     actions = {
                         primaryAction(
