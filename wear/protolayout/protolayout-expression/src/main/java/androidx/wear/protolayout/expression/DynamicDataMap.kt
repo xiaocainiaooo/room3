@@ -264,26 +264,6 @@ public class MutableDynamicDataMap(vararg pairs: DynamicDataPair<*>) : DynamicDa
         map[key] = value
     }
 
-    /**
-     * Associates [pair]s value with [pair]s key in this map.
-     *
-     * @param pair is a key/value tuple that represents a referencable key the static value to use
-     *   for resolving references to that key.
-     */
-    public fun <T : DynamicType> put(pair: DynamicDataPair<T>) {
-        map[pair.key] = pair.value
-    }
-
-    /**
-     * Associates [value] with [key] in this map.
-     *
-     * @param key represent a key that other APIs can use to reference [value]s value.
-     * @param value is the static value to use for resolving references to [key].
-     */
-    public fun <T : DynamicType> put(key: DynamicDataKey<T>, value: DynamicDataValue<T>) {
-        map[key] = value
-    }
-
     /** Adds all key/values from [other] to this map. Potentially overwriting any common key. */
     public fun putAll(other: DynamicDataMap) {
         map.putAll(other.map)

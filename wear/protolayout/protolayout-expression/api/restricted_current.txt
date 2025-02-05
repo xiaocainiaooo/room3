@@ -395,8 +395,6 @@ package androidx.wear.protolayout.expression {
 
   public final class MutableDynamicDataMap extends androidx.wear.protolayout.expression.DynamicDataMap {
     ctor public MutableDynamicDataMap(androidx.wear.protolayout.expression.DynamicDataPair<? extends java.lang.Object?>... pairs);
-    method public <T extends androidx.wear.protolayout.expression.DynamicBuilders.DynamicType> void put(androidx.wear.protolayout.expression.DynamicDataKey<T> key, androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue<T> value);
-    method public <T extends androidx.wear.protolayout.expression.DynamicBuilders.DynamicType> void put(androidx.wear.protolayout.expression.DynamicDataPair<T> pair);
     method public void putAll(androidx.wear.protolayout.expression.DynamicDataMap other);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public operator void set(androidx.wear.protolayout.expression.DynamicDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool> key, boolean value);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public operator void set(androidx.wear.protolayout.expression.DynamicDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor> key, android.graphics.Color value);

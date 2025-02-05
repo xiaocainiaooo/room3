@@ -61,7 +61,7 @@ class StateBuildersTest {
 
         val state =
             StateBuilders.State.Builder()
-                .addKeyToValueMapping(boolKey mapTo false, stringKey mapTo "---")
+                .addToStateMap(boolKey mapTo false, stringKey mapTo "---")
                 .setStateMap(dynamicDataMapOf(boolKey mapTo true, stringKey mapTo "string"))
                 .build()
         assertThat(state.stateMap.size).isEqualTo(2)
@@ -76,7 +76,7 @@ class StateBuildersTest {
 
         val state =
             StateBuilders.State.Builder()
-                .addKeyToValueMapping(boolKey mapTo false, stringKey mapTo "---")
+                .addToStateMap(boolKey mapTo false, stringKey mapTo "---")
                 .setStateMap(boolKey mapTo true, stringKey mapTo "string")
                 .build()
         assertThat(state.stateMap.size).isEqualTo(2)
