@@ -20,9 +20,12 @@ import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources.ID_NULL
+import android.graphics.drawable.StateListDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -172,6 +175,8 @@ public open class PdfViewerFragment constructor() : Fragment() {
     private var isAnnotationIntentResolvable = false
     private var documentLoaded = false
 
+    private var pdfStylingOptions: PdfStylingOptions? = null
+
     /**
      * Specify whether [documentUri] is updated before fragment went in STARTED state.
      *
@@ -307,6 +312,35 @@ public open class PdfViewerFragment constructor() : Fragment() {
         fetcher = Fetcher.build(requireContext(), 1)
     }
 
+    override fun onInflate(context: Context, attrs: AttributeSet, savedInstanceState: Bundle?) {
+        super.onInflate(context, attrs, savedInstanceState)
+        val typedArray =
+            context.obtainStyledAttributes(
+                attrs,
+                androidx.pdf.viewer.fragment.R.styleable.PdfViewerFragment
+            )
+        try {
+            val pdfViewStyleFromAttrs =
+                typedArray.getInt(
+                    androidx.pdf.viewer.fragment.R.styleable.PdfViewerFragment_containerStyle,
+                    ID_NULL
+                )
+
+            if (pdfViewStyleFromAttrs != ID_NULL) {
+                /**
+                 * [Fragment.onInflate] will only be called on fragment instantiation; therefore
+                 * save it in [androidx.pdf.viewer.fragment.PdfViewerFragment]'s arguments for
+                 * fragment restoring scenarios.
+                 */
+                (arguments ?: Bundle()).also { args ->
+                    args.putInt(KEY_PDF_VIEW_STYLE, pdfViewStyleFromAttrs)
+                }
+            }
+        } finally {
+            typedArray.recycle()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -343,6 +377,9 @@ public open class PdfViewerFragment constructor() : Fragment() {
         documentLoaded = savedInstanceState?.getBoolean(KEY_DOCUMENT_LOADED) ?: false
 
         arguments?.let { args ->
+            val containerStyleResId = args.getInt(KEY_PDF_VIEW_STYLE, ID_NULL)
+            if (containerStyleResId != ID_NULL)
+                pdfStylingOptions = PdfStylingOptions(containerStyleResId = containerStyleResId)
             documentUri = BundleCompat.getParcelable(args, KEY_DOCUMENT_URI, Uri::class.java)
             isTextSearchActive = args.getBoolean(KEY_TEXT_SEARCH_ACTIVE)
             isToolboxVisible = args.getBoolean(KEY_TOOLBOX_VISIBILITY)
@@ -427,6 +464,32 @@ public open class PdfViewerFragment constructor() : Fragment() {
         }
 
         loadPendingDocumentIfRequired()
+        pdfStylingOptions?.let { stylePdfView(it.containerStyleResId) }
+    }
+
+    private fun stylePdfView(pdfViewStyle: Int) {
+        val pdfViewStyledAttrs =
+            requireContext()
+                .obtainStyledAttributes(
+                    /* set = */ null,
+                    /* attrs = */ R.styleable.PdfView,
+                    /* defStyleAttr = */ NO_DEFAULT_ATTR,
+                    /* defStyleRes = */ pdfViewStyle
+                )
+
+        for (i in 0 until pdfViewStyledAttrs.indexCount) {
+            val attr = pdfViewStyledAttrs.getIndex(i)
+            when (attr) {
+                R.styleable.PdfView_fastScrollVerticalThumbDrawable -> {
+                    val thumbDrawable = pdfViewStyledAttrs.getDrawable(attr) as StateListDrawable
+                    fastScrollView?.setFastScrollVerticalThumbDrawable(thumbDrawable)
+                }
+                R.styleable.PdfView_fastScrollPageIndicatorBackgroundDrawable -> {
+                    val pageIndicatorDrawable = pdfViewStyledAttrs.getDrawable(attr)
+                    fastScrollView?.setPageIndicatorBackgroundDrawable(pageIndicatorDrawable)
+                }
+            }
+        }
     }
 
     private fun loadPendingDocumentIfRequired() {
@@ -885,7 +948,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
         pendingDocumentLoad = false
 
         arguments =
-            Bundle().apply {
+            (arguments ?: Bundle()).apply {
                 putParcelable(KEY_DOCUMENT_URI, fileUri)
                 putBoolean(KEY_TEXT_SEARCH_ACTIVE, false)
             }
@@ -1069,6 +1132,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
         private const val EXTRA_STARTING_PAGE: String =
             "androidx.pdf.viewer.fragment.extra.STARTING_PAGE"
         private const val KEY_PDF_VIEW_STYLE = "keyPdfViewStyle"
+        private const val NO_DEFAULT_ATTR = 0
 
         /**
          * Creates a new instance of [PdfViewerFragment] with the specified styling options.

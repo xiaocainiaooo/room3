@@ -18,6 +18,7 @@ package androidx.pdf.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -29,6 +30,7 @@ import androidx.pdf.data.Range;
 import androidx.pdf.util.Accessibility;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -168,5 +170,14 @@ public class PageIndicator extends ReusableToast {
 
         // Clear the text content of the TextView
         mPageNumberView.setText(DEFAULT_PAGE_TEXT);
+    }
+
+    /**
+     * Set the background to a given Drawable, or remove the background.
+     *
+     * @param drawable The Drawable to use as the background, or null to remove the background.
+     */
+    public void setBackground(@Nullable Drawable drawable) {
+        mPageNumberView.setBackground(drawable);
     }
 }
