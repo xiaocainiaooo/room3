@@ -16,13 +16,11 @@
 
 package androidx.xr.runtime.openxr
 
-import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.Hand
 import androidx.xr.runtime.internal.HandJointType
 import androidx.xr.runtime.math.Pose
 
 /** Wraps the native [XrHandJointLocationsEXT] with the [Hand] interface. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrHand internal constructor(private val isLeftHand: Boolean) : Hand, Updatable {
 
     override var isActive: Boolean = false

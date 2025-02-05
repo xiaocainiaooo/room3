@@ -21,7 +21,6 @@ package androidx.xr.scenecore
 
 import android.app.Activity
 import android.os.Bundle
-import androidx.annotation.RestrictTo
 import androidx.xr.scenecore.JxrPlatformAdapter.Entity as RtEntity
 import androidx.xr.scenecore.JxrPlatformAdapter.SpatialCapabilities as RtSpatialCapabilities
 import java.util.concurrent.ConcurrentHashMap
@@ -38,7 +37,6 @@ private val spatialCapabilitiesListeners:
  * within a session. The returned object will not update if the capabilities change; this method
  * should be called again to get the latest set of capabilities.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.getSpatialCapabilities(): SpatialCapabilities =
     this.platformAdapter.spatialCapabilities.toSpatialCapabilities()
 
@@ -47,7 +45,6 @@ public fun Session.getSpatialCapabilities(): SpatialCapabilities =
  * [SpatialCapabilities] change. [Consumer#accept(SpatialCapabilities)] will be invoked on the main
  * thread.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.addSpatialCapabilitiesChangedListener(
     listener: Consumer<SpatialCapabilities>
 ): Unit = addSpatialCapabilitiesChangedListener(HandlerExecutor.mainThreadExecutor, listener)
@@ -57,7 +54,6 @@ public fun Session.addSpatialCapabilitiesChangedListener(
  * [SpatialCapabilities] change. [Consumer#accept(SpatialCapabilities)] will be invoked on the given
  * callbackExecutor, or the main thread if the callbackExecutor is null (default).
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.addSpatialCapabilitiesChangedListener(
     callbackExecutor: Executor,
     listener: Consumer<SpatialCapabilities>,
@@ -82,7 +78,6 @@ public fun Session.addSpatialCapabilitiesChangedListener(
  * change.
  */
 @Suppress("PairedRegistration") // The corresponding remove method does not accept an Executor
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.removeSpatialCapabilitiesChangedListener(
     listener: Consumer<SpatialCapabilities>
 ): Unit {
@@ -114,7 +109,6 @@ public fun Session.removeSpatialCapabilitiesChangedListener(
  * @param bundle the input bundle to set with the full space mode flag.
  * @return the input bundle with the full space mode flag set.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.setFullSpaceMode(bundle: Bundle): Bundle =
     platformAdapter.setFullSpaceMode(bundle)
 
@@ -149,7 +143,6 @@ public fun Session.setFullSpaceMode(bundle: Bundle): Bundle =
  * @param bundle the input bundle to set with the inherit full space mode environment flag.
  * @return the input bundle with the inherit full space mode flag set.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.setFullSpaceModeWithEnvironmentInherited(bundle: Bundle): Bundle =
     platformAdapter.setFullSpaceModeWithEnvironmentInherited(bundle)
 
@@ -169,7 +162,6 @@ public fun Session.setFullSpaceModeWithEnvironmentInherited(bundle: Bundle): Bun
  * @param preferredRatio the aspect ratio determined by taking the panel's width over its height. A
  *   value <= 0.0f means there are no preferences.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Session.setPreferredAspectRatio(activity: Activity, preferredRatio: Float): Unit =
     platformAdapter.setPreferredAspectRatio(activity, preferredRatio)
 
@@ -179,7 +171,6 @@ public fun Session.setPreferredAspectRatio(activity: Activity, preferredRatio: F
  * @param type the type of [Entity] to return.
  * @return a list of all [Entity]s of the given type.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun <T : Entity> Session.getEntitiesOfType(type: Class<out T>): List<T> =
     entityManager.getEntitiesOfType(type)
 
