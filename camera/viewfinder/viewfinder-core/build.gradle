@@ -43,6 +43,14 @@ dependencies {
     implementation(libs.kotlinCoroutinesAndroid)
     implementation(libs.atomicFu)
 
+    testImplementation(libs.testRunner)
+    testImplementation(libs.mockitoCore4)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.truth)
+    testImplementation(libs.testRules)
+    testImplementation(libs.testCore)
+
     annotationProcessor(libs.autoValue)
 }
 

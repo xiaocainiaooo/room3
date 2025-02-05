@@ -19,13 +19,13 @@ package androidx.camera.viewfinder.compose
 import android.graphics.RectF
 import android.util.Size
 import android.view.Surface
-import androidx.camera.viewfinder.compose.internal.SurfaceTransformationUtil
-import androidx.camera.viewfinder.compose.internal.TransformUtil.surfaceRotationToRotationDegrees
 import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.camera.viewfinder.core.ScaleType
 import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.camera.viewfinder.core.ViewfinderSurfaceSessionScope
 import androidx.camera.viewfinder.core.impl.RefCounted
+import androidx.camera.viewfinder.core.impl.Transformations
 import androidx.camera.viewfinder.core.impl.ViewfinderSurfaceSessionImpl
 import androidx.compose.foundation.AndroidEmbeddedExternalSurface
 import androidx.compose.foundation.AndroidExternalSurface
@@ -128,6 +128,7 @@ private fun TransformedSurface(
     coordinateTransformer: MutableCoordinateTransformer?,
     onInit: AndroidExternalSurfaceScope.() -> Unit
 ) {
+    val layoutDirection = LocalConfiguration.current.layoutDirection
     val surfaceModifier =
         Modifier.layout { measurable, constraints ->
             val placeable = measurable.measure(Constraints.fixed(surfaceWidth, surfaceHeight))
@@ -143,9 +144,11 @@ private fun TransformedSurface(
             layout(placeable.width, placeable.height) {
                 placeable.placeWithLayer(widthOffset, heightOffset) {
                     val surfaceToViewFinderMatrix =
-                        SurfaceTransformationUtil.getTransformedSurfaceMatrix(
+                        Transformations.getSurfaceToViewfinderMatrix(
+                            Size(constraints.maxWidth, constraints.maxHeight),
                             transformationInfo,
-                            Size(constraints.maxWidth, constraints.maxHeight)
+                            layoutDirection,
+                            ScaleType.FILL_CENTER
                         )
 
                     coordinateTransformer?.transformMatrix =
@@ -156,7 +159,7 @@ private fun TransformedSurface(
 
                     val surfaceRectInViewfinder =
                         RectF(0f, 0f, surfaceWidth.toFloat(), surfaceHeight.toFloat())
-                    surfaceToViewFinderMatrix.mapRect(surfaceRectInViewfinder)
+                            .also(surfaceToViewFinderMatrix::mapRect)
 
                     transformOrigin = TransformOrigin(0f, 0f)
                     scaleX = surfaceRectInViewfinder.width() / surfaceWidth
@@ -175,7 +178,9 @@ private fun TransformedSurface(
         ImplementationMode.EMBEDDED -> {
             val displayRotationDegrees =
                 key(LocalConfiguration.current) {
-                    surfaceRotationToRotationDegrees(LocalView.current.display.rotation)
+                    Transformations.surfaceRotationToRotationDegrees(
+                        LocalView.current.display.rotation
+                    )
                 }
 
             // For TextureView, correct the orientation to match the display rotation.
@@ -183,7 +188,7 @@ private fun TransformedSurface(
 
             transformationInfo.let {
                 correctionMatrix.setFrom(
-                    SurfaceTransformationUtil.getTextureViewCorrectionMatrix(
+                    Transformations.getTextureViewCorrectionMatrix(
                         displayRotationDegrees = displayRotationDegrees,
                         width = surfaceWidth,
                         height = surfaceHeight
