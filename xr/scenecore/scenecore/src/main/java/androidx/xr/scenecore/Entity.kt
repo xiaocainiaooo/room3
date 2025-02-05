@@ -856,13 +856,18 @@ private constructor(
     /**
      * Returns the dimensions of the Entity.
      *
-     * This is the size of the canvas in the local spatial coordinate system of the entity. Updating
-     * the canvas
+     * This is the size of the canvas in the local spatial coordinate system of the entity. This
+     * field cannot be directly set - to update the dimensions of the canvas, update the value of
+     * [canvasShape].
      */
     public val dimensions: Dimensions
         get() = rtEntity.dimensions.toDimensions()
 
-    /** Allows for updating the canvas shape for the Entity after creation. */
+    /**
+     * The shape of the canvas that backs the Entity.
+     *
+     * Updating this value will alter the dimensions of the Entity.
+     */
     public var canvasShape: CanvasShape = canvasShape
         @MainThread
         set(value) {

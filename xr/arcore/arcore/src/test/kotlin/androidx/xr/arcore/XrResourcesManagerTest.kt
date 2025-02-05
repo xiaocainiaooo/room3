@@ -22,6 +22,7 @@ import androidx.xr.runtime.testing.FakeRuntimeAnchor
 import androidx.xr.runtime.testing.FakeRuntimeHand
 import androidx.xr.runtime.testing.FakeRuntimePlane
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +36,7 @@ class XrResourcesManagerTest {
     @Before
     fun setUp() {
         underTest = XrResourcesManager()
+        FakeRuntimeAnchor.anchorsCreated = 0
     }
 
     @After
@@ -123,5 +125,19 @@ class XrResourcesManagerTest {
         underTest.clear()
 
         assertThat(underTest.trackablesMap).isEmpty()
+    }
+
+    @Test
+    fun update_anchorDetached_andNotUpdated() = runTest {
+        val runtimeAnchor = FakeRuntimePlane().createAnchor(Pose()) as FakeRuntimeAnchor
+        check(runtimeAnchor.isAttached)
+        val anchor = Anchor(runtimeAnchor, underTest)
+        anchor.detach()
+        check(underTest.anchorsToDetachQueue.contains(anchor))
+
+        underTest.update()
+
+        assertThat(underTest.anchorsToDetachQueue).isEmpty()
+        assertThat(runtimeAnchor.isAttached).isFalse()
     }
 }
