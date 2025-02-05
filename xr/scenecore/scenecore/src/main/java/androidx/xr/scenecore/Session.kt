@@ -22,7 +22,6 @@ import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
 import android.util.Log
-import androidx.annotation.RestrictTo
 import androidx.xr.scenecore.impl.JxrPlatformAdapterAxr
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -37,7 +36,6 @@ import java.util.concurrent.ThreadFactory
  * real world.
  */
 // TODO: Make this class thread safe.
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Session(
     public val activity: Activity,
     public val platformAdapter: JxrPlatformAdapter,

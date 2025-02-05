@@ -16,11 +16,10 @@
 
 package androidx.xr.scenecore
 
-import androidx.annotation.RestrictTo
 import androidx.xr.scenecore.JxrPlatformAdapter.ExrImageResource as RtExrImage
 
 /** Interface for image formats in SceneCore. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface Image
+public interface Image
 
 /**
  * ExrImage represents an EXR Image resource in SceneCore. EXR images are used by the [Environment]
@@ -28,7 +27,6 @@ import androidx.xr.scenecore.JxrPlatformAdapter.ExrImageResource as RtExrImage
  */
 // TODO(b/319269278): Make this and GltfModel derive from a common Resource base class which has
 //                    async helpers.
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ExrImage internal constructor(public val image: RtExrImage) : Image {
 
     public companion object {

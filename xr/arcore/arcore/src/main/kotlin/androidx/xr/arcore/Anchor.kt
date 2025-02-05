@@ -16,7 +16,6 @@
 
 package androidx.xr.arcore
 
-import androidx.annotation.RestrictTo
 import androidx.xr.runtime.Session
 import androidx.xr.runtime.internal.Anchor as RuntimeAnchor
 import androidx.xr.runtime.internal.AnchorResourcesExhaustedException
@@ -35,7 +34,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * location in physical space, the numerical description of this position may update as ARCore for
  * XR updates its understanding of the physical world.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Anchor
 internal constructor(
     public val runtimeAnchor: RuntimeAnchor,
