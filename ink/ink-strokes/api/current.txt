@@ -44,6 +44,10 @@ package androidx.ink.strokes {
   public static final class InProgressStroke.Companion {
   }
 
+  public final class MeshCreation {
+    method public static androidx.ink.geometry.PartitionedMesh createClosedShape(androidx.ink.strokes.StrokeInputBatch);
+  }
+
   public final class MutableStrokeInputBatch extends androidx.ink.strokes.StrokeInputBatch {
     ctor public MutableStrokeInputBatch();
     method public androidx.ink.strokes.MutableStrokeInputBatch addOrIgnore(androidx.ink.brush.InputToolType type, float x, float y, long elapsedTimeMillis);
