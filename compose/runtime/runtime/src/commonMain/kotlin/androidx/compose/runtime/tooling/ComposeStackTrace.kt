@@ -24,10 +24,10 @@ import androidx.compose.runtime.snapshots.fastForEach
  * flag is set to true.
  */
 internal expect class DiagnosticComposeException(
-    trace: List<ComposeTraceFrame>,
+    trace: List<ComposeStackTraceFrame>,
 ) : RuntimeException
 
-internal data class ComposeTraceFrame(
+internal data class ComposeStackTraceFrame(
     val sourceInfo: ParsedSourceInformation,
     val groupOffset: Int?
 )
@@ -41,7 +41,9 @@ internal class ParsedSourceInformation(
     val dataString: String
 )
 
-internal fun Throwable.tryAttachComposeTrace(trace: () -> List<ComposeTraceFrame>): Boolean {
+internal fun Throwable.tryAttachComposeStackTrace(
+    trace: () -> List<ComposeStackTraceFrame>
+): Boolean {
     var result = false
     if (suppressedExceptions.none { it is DiagnosticComposeException }) {
         val traceException =
@@ -61,11 +63,11 @@ internal fun Throwable.tryAttachComposeTrace(trace: () -> List<ComposeTraceFrame
     return result
 }
 
-internal fun Throwable.attachComposeTrace(trace: () -> List<ComposeTraceFrame>): Throwable = apply {
-    tryAttachComposeTrace(trace)
-}
+internal fun Throwable.attachComposeStackTrace(
+    trace: () -> List<ComposeStackTraceFrame>
+): Throwable = apply { tryAttachComposeStackTrace(trace) }
 
-internal fun StringBuilder.appendStackTrace(trace: List<ComposeTraceFrame>) {
+internal fun StringBuilder.appendStackTrace(trace: List<ComposeStackTraceFrame>) {
     var currentFunction: String? = null
     var currentFile: String? = null
     val lines = buildList {

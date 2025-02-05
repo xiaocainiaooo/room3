@@ -794,7 +794,7 @@ internal class LayoutNode(
     private val traceContext: CompositionErrorContext?
         get() = compositionLocalMap[LocalCompositionErrorContext]
 
-    fun rethrowWithCompositionTrace(e: Throwable): Nothing =
+    fun rethrowWithComposeStackTrace(e: Throwable): Nothing =
         throw e.also { traceContext?.apply { e.attachComposeStackTrace(this@LayoutNode) } }
 
     private fun onDensityOrLayoutDirectionChanged() {
@@ -1019,7 +1019,7 @@ internal class LayoutNode(
     }
 
     internal fun draw(canvas: Canvas, graphicsLayer: GraphicsLayer?) =
-        withCompositionTrace(this) { outerCoordinator.draw(canvas, graphicsLayer) }
+        withComposeStackTrace(this) { outerCoordinator.draw(canvas, graphicsLayer) }
 
     /**
      * Carries out a hit test on the [PointerInputModifier]s associated with this [LayoutNode] and
@@ -1506,11 +1506,11 @@ internal class LayoutNode(
     }
 }
 
-internal inline fun <T> withCompositionTrace(layoutNode: LayoutNode, block: () -> T): T =
+internal inline fun <T> withComposeStackTrace(layoutNode: LayoutNode, block: () -> T): T =
     try {
         block()
     } catch (e: Throwable) {
-        layoutNode.rethrowWithCompositionTrace(e)
+        layoutNode.rethrowWithComposeStackTrace(e)
     }
 
 /** Returns [LayoutNode.owner] or throws if it is null. */

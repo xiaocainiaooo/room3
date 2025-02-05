@@ -27,24 +27,24 @@ import androidx.compose.runtime.reference
 import androidx.compose.runtime.referenceKey
 import androidx.compose.runtime.snapshots.fastForEach
 
-internal class WriterTraceBuilder(private val writer: SlotWriter) : ComposeTraceBuilder() {
+internal class WriterTraceBuilder(private val writer: SlotWriter) : ComposeStackTraceBuilder() {
     override fun sourceInformationOf(anchor: Anchor): GroupSourceInformation? =
         writer.sourceInformationOf(writer.anchorIndex(anchor))
 
     override fun groupKeyOf(anchor: Anchor): Int = writer.groupKey(writer.anchorIndex(anchor))
 }
 
-internal class ReaderTraceBuilder(private val reader: SlotReader) : ComposeTraceBuilder() {
+internal class ReaderTraceBuilder(private val reader: SlotReader) : ComposeStackTraceBuilder() {
     override fun sourceInformationOf(anchor: Anchor): GroupSourceInformation? =
         reader.table.sourceInformationOf(reader.table.anchorIndex(anchor))
 
     override fun groupKeyOf(anchor: Anchor): Int = reader.groupKey(reader.table.anchorIndex(anchor))
 }
 
-internal abstract class ComposeTraceBuilder {
-    private val trace = mutableListOf<ComposeTraceFrame>()
+internal abstract class ComposeStackTraceBuilder {
+    private val trace = mutableListOf<ComposeStackTraceFrame>()
 
-    fun trace(): List<ComposeTraceFrame> = trace
+    fun trace(): List<ComposeStackTraceFrame> = trace
 
     private fun appendTraceFrame(groupSourceInformation: GroupSourceInformation, child: Any?) {
         val frame = extractTraceFrame(groupSourceInformation, child)
@@ -56,12 +56,12 @@ internal abstract class ComposeTraceBuilder {
     private fun extractTraceFrame(
         groupSourceInformation: GroupSourceInformation,
         targetChild: Any?
-    ): ComposeTraceFrame? {
+    ): ComposeStackTraceFrame? {
         val parsed = groupSourceInformation.sourceInformation?.let { parseSourceInfo(it) }
         if (parsed != null) {
             if (targetChild == null) {
                 // no child specified
-                return ComposeTraceFrame(parsed, null)
+                return ComposeStackTraceFrame(parsed, null)
             }
             // calculate the call offset by checking source information of the children
             var callCount = 0
@@ -98,7 +98,7 @@ internal abstract class ComposeTraceBuilder {
                     }
                 }
             }
-            return ComposeTraceFrame(parsed, callCount)
+            return ComposeStackTraceFrame(parsed, callCount)
         }
         return null
     }
@@ -262,7 +262,7 @@ internal fun SlotWriter.buildTrace(
     child: Any? = null,
     group: Int = currentGroup,
     parent: Int? = null
-): List<ComposeTraceFrame> {
+): List<ComposeStackTraceFrame> {
     val writer = this
     if (!writer.closed && writer.size != 0) {
         val traceBuilder = WriterTraceBuilder(writer)
@@ -286,7 +286,7 @@ internal fun SlotWriter.buildTrace(
     return emptyList()
 }
 
-internal fun SlotReader.buildTrace(): List<ComposeTraceFrame> {
+internal fun SlotReader.buildTrace(): List<ComposeStackTraceFrame> {
     val reader = this
     if (!reader.closed && reader.size != 0) {
         val traceBuilder = ReaderTraceBuilder(reader)
@@ -306,7 +306,7 @@ internal fun SlotReader.buildTrace(): List<ComposeTraceFrame> {
 internal fun SlotReader.traceForGroup(
     group: Int,
     child: Any? /* Anchor | Int | null */
-): List<ComposeTraceFrame> {
+): List<ComposeStackTraceFrame> {
     val reader = this
     val traceBuilder = ReaderTraceBuilder(reader)
     var currentGroup = group

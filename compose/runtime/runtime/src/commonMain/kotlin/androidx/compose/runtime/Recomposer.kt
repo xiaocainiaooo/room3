@@ -1502,7 +1502,7 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
         get() = false
 
     internal override val collectingSourceInformation: Boolean
-        get() = compositionStackTraceEnabled
+        get() = composeStackTraceEnabled
 
     internal override fun recordInspectionTable(table: MutableSet<CompositionData>) {
         // TODO: The root recomposer might be a better place to set up inspection

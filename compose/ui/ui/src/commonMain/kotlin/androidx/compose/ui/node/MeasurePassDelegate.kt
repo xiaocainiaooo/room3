@@ -453,7 +453,7 @@ internal class MeasurePassDelegate(private val layoutNodeLayoutDelegate: LayoutN
 
     /** Return true if the measured size has been changed */
     fun remeasure(constraints: Constraints): Boolean {
-        withCompositionTrace(layoutNode) {
+        withComposeStackTrace(layoutNode) {
             requirePrecondition(!layoutNode.isDeactivated) {
                 "measure is called on a deactivated node"
             }
@@ -580,7 +580,7 @@ internal class MeasurePassDelegate(private val layoutNodeLayoutDelegate: LayoutN
         layerBlock: (GraphicsLayerScope.() -> Unit)?,
         layer: GraphicsLayer?
     ) {
-        withCompositionTrace(layoutNode) {
+        withComposeStackTrace(layoutNode) {
             isPlacedByParent = true
             if (position != lastPosition || needsCoordinatesUpdate) {
                 if (
@@ -680,7 +680,7 @@ internal class MeasurePassDelegate(private val layoutNodeLayoutDelegate: LayoutN
                 layoutNode.parent?.requestRelayout()
             }
         } catch (e: Exception) {
-            layoutNode.rethrowWithCompositionTrace(e)
+            layoutNode.rethrowWithComposeStackTrace(e)
         } finally {
             relayoutWithoutParentInProgress = false
         }
