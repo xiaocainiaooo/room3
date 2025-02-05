@@ -138,7 +138,7 @@ fun SwipeToRevealWithDelayedText() {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete")
-                if (abs(state.offset) > revealOffset) {
+                if (abs(state.offset) > state.revealThreshold) {
                     // Delay the text appearance so that it has enough space to be displayed
                     val textAlpha =
                         animateFloatAsState(

@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealActionType
 import androidx.wear.compose.foundation.RevealDirection
-import androidx.wear.compose.foundation.RevealScope
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
 import androidx.wear.compose.foundation.SwipeToReveal
@@ -403,7 +402,7 @@ public object SwipeToRevealDefaults {
 }
 
 @Composable
-internal fun RevealScope.ActionButton(
+internal fun ActionButton(
     revealState: RevealState,
     action: SwipeToRevealAction,
     revealActionType: RevealActionType,
@@ -534,7 +533,7 @@ internal fun RevealScope.ActionButton(
 
                     LaunchedEffect(revealState.offset) {
                         primaryActionTextRevealed.value =
-                            abs(revealState.offset) > revealOffset &&
+                            abs(revealState.offset) > revealState.revealThreshold &&
                                 (revealState.targetValue == RevealValue.RightRevealed ||
                                     revealState.targetValue == RevealValue.LeftRevealed)
                     }

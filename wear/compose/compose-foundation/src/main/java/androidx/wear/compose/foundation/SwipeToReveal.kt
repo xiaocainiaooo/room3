@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -335,6 +336,22 @@ internal constructor(
         get() = anchors
 
     /**
+     * The threshold, in pixels, where the revealed actions are fully visible but the existing
+     * content would be left in place if the reveal action was stopped. This threshold is used to
+     * create the anchor for [RevealValue.RightRevealing]. If there is no such anchor defined for
+     * [RevealValue.RightRevealing], it returns 0.0f.
+     */
+    /* @FloatRange(from = 0.0) */
+    public val revealThreshold: Float
+        get() = width.floatValue * (swipeAnchors[RevealValue.RightRevealing] ?: 0.0f)
+
+    /**
+     * The total width of the component in pixels. Initialise to zero, updated when the width
+     * changes.
+     */
+    public val width: MutableFloatState = mutableFloatStateOf(0.0f)
+
+    /**
      * Snaps to the [targetValue] without any animation.
      *
      * @param targetValue The target [RevealValue] where the [currentValue] will be changed to.
@@ -462,7 +479,7 @@ public fun rememberRevealState(
  *
  * @sample androidx.wear.compose.foundation.samples.SwipeToRevealSample
  *
- * Example of SwipeToReveal using [RevealScope] to delay the appearance of primary action text
+ * Example of SwipeToReveal using [RevealState] to delay the appearance of primary action text
  *
  * @sample androidx.wear.compose.foundation.samples.SwipeToRevealWithDelayedText
  *
@@ -485,15 +502,14 @@ public fun rememberRevealState(
 @OptIn(ExperimentalWearFoundationApi::class)
 @Composable
 public fun SwipeToReveal(
-    primaryAction: @Composable RevealScope.() -> Unit,
+    primaryAction: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onFullSwipe: () -> Unit = {},
     state: RevealState = rememberRevealState(),
-    secondaryAction: (@Composable RevealScope.() -> Unit)? = null,
-    undoAction: (@Composable RevealScope.() -> Unit)? = null,
+    secondaryAction: (@Composable () -> Unit)? = null,
+    undoAction: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    val revealScope = remember(state) { RevealScopeImpl(state) }
     // A no-op NestedScrollConnection which does not consume scroll/fling events
     val noOpNestedScrollConnection = remember { object : NestedScrollConnection {} }
 
@@ -521,7 +537,7 @@ public fun SwipeToReveal(
                     ) { value, layoutSize ->
                         val swipeableWidth = layoutSize.width.toFloat()
                         // Update the total width which will be used to calculate the anchors
-                        revealScope.width.floatValue = swipeableWidth
+                        state.width.floatValue = swipeableWidth
                         // Multiply the anchor with -1f to get the actual swipeable anchor
                         -state.swipeAnchors[value]!! * swipeableWidth
                     }
@@ -537,7 +553,7 @@ public fun SwipeToReveal(
                     state.currentValue == RevealValue.LeftRevealed
             val lastActionIsSecondary = state.lastActionType == RevealActionType.SecondaryAction
             val isWithinRevealOffset by remember {
-                derivedStateOf { abs(state.offset) <= revealScope.revealOffset }
+                derivedStateOf { abs(state.offset) <= state.revealThreshold }
             }
             val canSwipeRight =
                 (state.swipeAnchors.minOfOrNull { (_, offset) -> offset } ?: 0f) < 0f
@@ -596,7 +612,7 @@ public fun SwipeToReveal(
                                         .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                ActionSlot(revealScope, content = undoAction)
+                                ActionSlot(content = undoAction)
                             }
                         } else {
                             // Animate weight for secondary action slot.
@@ -645,7 +661,7 @@ public fun SwipeToReveal(
                                                     constraints.copy(
                                                         maxWidth =
                                                             if (hideActions) {
-                                                                    revealScope.revealOffset
+                                                                    state.revealThreshold
                                                                 } else {
                                                                     abs(state.offset)
                                                                 }
@@ -672,7 +688,6 @@ public fun SwipeToReveal(
                                     ) {
                                         Spacer(Modifier.size(SwipeToRevealDefaults.padding))
                                         ActionSlot(
-                                            revealScope,
                                             weight = secondaryActionWeight.value,
                                             opacity = secondaryActionAlpha,
                                             content = secondaryAction,
@@ -680,13 +695,11 @@ public fun SwipeToReveal(
                                     }
                                     Spacer(Modifier.size(SwipeToRevealDefaults.padding))
                                     ActionSlot(
-                                        revealScope,
                                         content = primaryAction,
                                         opacity = primaryActionAlpha
                                     )
                                 } else {
                                     ActionSlot(
-                                        revealScope,
                                         content = primaryAction,
                                         opacity = primaryActionAlpha
                                     )
@@ -697,7 +710,6 @@ public fun SwipeToReveal(
                                         secondaryAction != null && secondaryActionWeight.value > 0
                                     ) {
                                         ActionSlot(
-                                            revealScope,
                                             weight = secondaryActionWeight.value,
                                             opacity = secondaryActionAlpha,
                                             content = secondaryAction,
@@ -735,42 +747,6 @@ public fun SwipeToReveal(
     }
 }
 
-public interface RevealScope {
-
-    /**
-     * The offset, in pixels, where the revealed actions are fully visible but the existing content
-     * would be left in place if the reveal action was stopped. This offset is used to create the
-     * anchor for [RevealValue.RightRevealing]. If there is no such anchor defined for
-     * [RevealValue.RightRevealing], it returns 0.0f.
-     */
-    /* @FloatRange(from = 0.0) */
-    public val revealOffset: Float
-
-    /**
-     * The last [RevealActionType] that was set in [RevealState]. This may not be set if the state
-     * changed via interaction and not through API call.
-     */
-    public val lastActionType: RevealActionType
-}
-
-private class RevealScopeImpl
-constructor(
-    val revealState: RevealState,
-) : RevealScope {
-
-    /**
-     * The total width of the overlay content in pixels. Initialise to zero, updated when the width
-     * changes.
-     */
-    val width = mutableFloatStateOf(0.0f)
-
-    override val revealOffset: Float
-        get() = width.floatValue * (revealState.swipeAnchors[RevealValue.RightRevealing] ?: 0.0f)
-
-    override val lastActionType: RevealActionType
-        get() = revealState.lastActionType
-}
-
 /** An internal object containing some defaults used across the Swipe to reveal component. */
 @OptIn(ExperimentalWearFoundationApi::class)
 internal object SwipeToRevealDefaults {
@@ -800,17 +776,16 @@ internal object SwipeToRevealDefaults {
 
 @Composable
 private fun RowScope.ActionSlot(
-    revealScope: RevealScope,
     modifier: Modifier = Modifier,
     weight: Float = 1f,
     opacity: State<Float> = mutableFloatStateOf(1f),
-    content: @Composable RevealScope.() -> Unit
+    content: @Composable () -> Unit
 ) {
     Box(
         modifier = modifier.weight(weight).graphicsLayer { alpha = opacity.value },
         contentAlignment = Alignment.Center
     ) {
-        with(revealScope) { content() }
+        content()
     }
 }
 
