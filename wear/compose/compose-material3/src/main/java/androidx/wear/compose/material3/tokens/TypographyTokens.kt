@@ -42,8 +42,7 @@ internal object TypographyTokens {
                     .toFontFamily(),
             fontWeight = FontWeight(TypeScaleTokens.ArcLargeWeight.toInt()),
             fontSize = TypeScaleTokens.ArcLargeSize,
-            // TODO: http://b/392091195
-            // lineHeight = TypeScaleTokens.ArcLargeLineHeight,
+            lineHeight = TypeScaleTokens.ArcLargeLineHeight,
             letterSpacing = TypeScaleTokens.ArcLargeTrackingTop,
             letterSpacingCounterClockwise = TypeScaleTokens.ArcLargeTrackingBottom,
         )
@@ -59,8 +58,7 @@ internal object TypographyTokens {
                     .toFontFamily(),
             fontWeight = FontWeight(TypeScaleTokens.ArcMediumWeight.toInt()),
             fontSize = TypeScaleTokens.ArcMediumSize,
-            // TODO: http://b/392091195
-            // lineHeight = TypeScaleTokens.ArcMediumLineHeight,
+            lineHeight = TypeScaleTokens.ArcMediumLineHeight,
             letterSpacing = TypeScaleTokens.ArcMediumTrackingTop,
             letterSpacingCounterClockwise = TypeScaleTokens.ArcMediumTrackingBottom,
         )
@@ -75,8 +73,7 @@ internal object TypographyTokens {
                     .toFontFamily(),
             fontWeight = FontWeight(TypeScaleTokens.ArcSmallWeight.toInt()),
             fontSize = TypeScaleTokens.ArcSmallSize,
-            // TODO: http://b/392091195
-            // lineHeight = TypeScaleTokens.ArcSmallLineHeight,
+            lineHeight = TypeScaleTokens.ArcSmallLineHeight,
             letterSpacing = TypeScaleTokens.ArcSmallTrackingTop,
             letterSpacingCounterClockwise = TypeScaleTokens.ArcSmallTrackingBottom,
         )
