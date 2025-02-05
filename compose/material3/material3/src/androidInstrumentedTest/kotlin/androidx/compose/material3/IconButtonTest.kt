@@ -1440,7 +1440,7 @@ class IconButtonTest {
                 .isEqualTo(
                     BorderStroke(
                         SmallIconButtonTokens.OutlinedOutlineWidth,
-                        outlineColor.copy(alpha = OutlinedIconButtonTokens.DisabledContainerOpacity)
+                        outlineColor.copy(alpha = OutlinedIconButtonTokens.DisabledOpacity)
                     )
                 )
         }
