@@ -72,7 +72,6 @@ androidx {
     inceptionYear = "2022"
     description = "build TV applications using controls that adhere to Material Design Language."
     legacyDisableKotlinStrictApiMode = true
-    metalavaK2UastEnabled = false
     samples(project(":tv:tv-material-samples"))
     addGoldenImageAssets()
 }
