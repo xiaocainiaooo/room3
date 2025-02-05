@@ -48,6 +48,10 @@ public class ErrorUtilsTest {
         assertThat(ErrorUtils.isKnownError(BiometricPrompt.ERROR_NOT_ENABLED_FOR_APPS)).isTrue();
         assertThat(ErrorUtils.isKnownError(
                 BiometricPrompt.ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON)).isTrue();
+        assertThat(ErrorUtils.isKnownError(
+                BiometricPrompt.ERROR_LOCK_OUT_ERROR_DIALOG_DISMISSED)).isTrue();
+        assertThat(ErrorUtils.isKnownError(
+                BiometricPrompt.ERROR_BIOMETRIC_HARDWARE_ERROR_DIALOG_DISMISSED)).isTrue();
     }
 
     @Test
@@ -85,6 +89,10 @@ public class ErrorUtilsTest {
         assertThat(ErrorUtils.isLockoutError(BiometricPrompt.ERROR_NOT_ENABLED_FOR_APPS)).isFalse();
         assertThat(ErrorUtils.isLockoutError(
                 BiometricPrompt.ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON)).isFalse();
+        assertThat(ErrorUtils.isLockoutError(
+                BiometricPrompt.ERROR_LOCK_OUT_ERROR_DIALOG_DISMISSED)).isFalse();
+        assertThat(ErrorUtils.isLockoutError(
+                BiometricPrompt.ERROR_BIOMETRIC_HARDWARE_ERROR_DIALOG_DISMISSED)).isFalse();
     }
 
     @Test
