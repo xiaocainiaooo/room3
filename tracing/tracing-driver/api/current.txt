@@ -42,7 +42,7 @@ package androidx.tracing.driver {
   public final class PooledTracePacketArray extends androidx.tracing.driver.Poolable<androidx.tracing.driver.PooledTracePacketArray> {
     method public androidx.tracing.driver.PooledTracePacket?[] getPooledTracePacketArray();
     method public void recycle();
-    property public final androidx.tracing.driver.PooledTracePacket?[] pooledTracePacketArray;
+    property public androidx.tracing.driver.PooledTracePacket?[] pooledTracePacketArray;
   }
 
   public class ProcessTrack extends androidx.tracing.driver.EventTrack {
@@ -73,7 +73,7 @@ package androidx.tracing.driver {
     ctor public TraceDriver(int sequenceId, androidx.tracing.driver.TraceSink sink, optional boolean isEnabled);
     method public androidx.tracing.driver.ProcessTrack ProcessTrack(int id, String name);
     method public androidx.tracing.driver.TraceContext getContext();
-    property public final androidx.tracing.driver.TraceContext context;
+    property public androidx.tracing.driver.TraceContext context;
   }
 
   public abstract class TraceSink implements java.io.Closeable {
