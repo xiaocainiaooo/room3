@@ -21,7 +21,6 @@ import android.view.Surface;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
 import androidx.concurrent.futures.ResolvableFuture;
 
 import com.google.ar.imp.apibindings.ImpressApi;
@@ -37,7 +36,6 @@ import java.util.Map;
  * Fake implementation of the JNI API for communicating with the Impress Split Engine instance for
  * testing purposes.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeImpressApi implements ImpressApi {
 
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
@@ -50,9 +48,8 @@ public class FakeImpressApi implements ImpressApi {
     }
 
     /** Test bookkeeping data for a Android Surface */
+    @SuppressWarnings({"ParcelCreator", "ParcelNotFinal"})
     public static class TestSurface extends Surface {
-        public int id;
-
         public TestSurface(int id) {
             super(new SurfaceTexture(id));
         }
@@ -67,15 +64,42 @@ public class FakeImpressApi implements ImpressApi {
             VR_180_HEMISPHERE
         }
 
-        public int impressNode;
-        @Nullable public Surface surface;
-        @StereoMode public int stereoMode;
+        int mImpressNode;
+        Surface mSurface;
+        @StereoMode int mStereoMode;
 
         // This is a union of the CanvasShape parameters
-        public float width;
-        public float height;
-        public float radius;
-        @Nullable public CanvasShape canvasShape;
+        float mWidth;
+        float mHeight;
+        float mRadius;
+        CanvasShape mCanvasShape;
+
+        @Nullable
+        public Surface getSurface() {
+            return mSurface;
+        }
+
+        @StereoMode
+        public int getStereoMode() {
+            return mStereoMode;
+        }
+
+        public float getWidth() {
+            return mWidth;
+        }
+
+        public float getHeight() {
+            return mHeight;
+        }
+
+        public float getRadius() {
+            return mRadius;
+        }
+
+        @Nullable
+        public CanvasShape getCanvasShape() {
+            return mCanvasShape;
+        }
     }
 
     // Map of model tokens to the list of impress nodes that are instances of that model.
@@ -90,10 +114,15 @@ public class FakeImpressApi implements ImpressApi {
     final Map<Integer, AnimationInProgress> mImpressLoopAnimatedNodes = new HashMap<>();
 
     // Map of impress entity nodes to their associated StereoSurfaceEntityData
-    public final Map<Integer, StereoSurfaceEntityData> mStereoSurfaceEntities = new HashMap<>();
+    final Map<Integer, StereoSurfaceEntityData> mStereoSurfaceEntities = new HashMap<>();
 
     private int mNextModelId = 1;
     private int mNextNodeId = 1;
+
+    @NonNull
+    public Map<Integer, StereoSurfaceEntityData> getStereoSurfaceEntities() {
+        return mStereoSurfaceEntities;
+    }
 
     @Override
     public void setup(@NonNull View view) {}
@@ -249,12 +278,12 @@ public class FakeImpressApi implements ImpressApi {
     @Override
     public int createStereoSurface(@StereoMode int stereoMode) {
         StereoSurfaceEntityData data = new StereoSurfaceEntityData();
-        data.impressNode = createImpressNode();
-        data.surface = new TestSurface(data.impressNode);
-        data.stereoMode = stereoMode;
-        data.canvasShape = null;
-        mStereoSurfaceEntities.put(data.impressNode, data);
-        return data.impressNode;
+        data.mImpressNode = createImpressNode();
+        data.mSurface = new TestSurface(data.mImpressNode);
+        data.mStereoMode = stereoMode;
+        data.mCanvasShape = null;
+        mStereoSurfaceEntities.put(data.mImpressNode, data);
+        return data.mImpressNode;
     }
 
     /**
@@ -270,9 +299,9 @@ public class FakeImpressApi implements ImpressApi {
             throw new IllegalArgumentException("Couldn't find stereo surface entity!");
         }
         StereoSurfaceEntityData data = mStereoSurfaceEntities.get(impressNode);
-        data.canvasShape = StereoSurfaceEntityData.CanvasShape.QUAD;
-        data.width = width;
-        data.height = height;
+        data.mCanvasShape = StereoSurfaceEntityData.CanvasShape.QUAD;
+        data.mWidth = width;
+        data.mHeight = height;
     }
 
     /**
@@ -287,8 +316,8 @@ public class FakeImpressApi implements ImpressApi {
             throw new IllegalArgumentException("Couldn't find stereo surface entity!");
         }
         StereoSurfaceEntityData data = mStereoSurfaceEntities.get(impressNode);
-        data.canvasShape = StereoSurfaceEntityData.CanvasShape.VR_360_SPHERE;
-        data.radius = radius;
+        data.mCanvasShape = StereoSurfaceEntityData.CanvasShape.VR_360_SPHERE;
+        data.mRadius = radius;
     }
 
     /**
@@ -300,8 +329,8 @@ public class FakeImpressApi implements ImpressApi {
     @Override
     public void setStereoSurfaceEntityCanvasShapeHemisphere(int impressNode, float radius) {
         StereoSurfaceEntityData data = mStereoSurfaceEntities.get(impressNode);
-        data.canvasShape = StereoSurfaceEntityData.CanvasShape.VR_180_HEMISPHERE;
-        data.radius = radius;
+        data.mCanvasShape = StereoSurfaceEntityData.CanvasShape.VR_180_HEMISPHERE;
+        data.mRadius = radius;
     }
 
     @Override
@@ -311,7 +340,7 @@ public class FakeImpressApi implements ImpressApi {
             // TODO: b/387323937 - the Native code currently CHECK fails in this case
             throw new IllegalArgumentException("Couldn't find stereo surface entity!");
         }
-        return mStereoSurfaceEntities.get(panelImpressNode).surface;
+        return mStereoSurfaceEntities.get(panelImpressNode).mSurface;
     }
 
     @Override
@@ -320,6 +349,6 @@ public class FakeImpressApi implements ImpressApi {
             // TODO: b/387323937 - the Native code currently CHECK fails in this case
             throw new IllegalArgumentException("Couldn't find stereo surface entity!");
         }
-        mStereoSurfaceEntities.get(panelImpressNode).stereoMode = mode;
+        mStereoSurfaceEntities.get(panelImpressNode).mStereoMode = mode;
     }
 }

@@ -28,7 +28,6 @@ import android.view.Surface
 import android.view.View
 import androidx.annotation.IntDef
 import androidx.annotation.MainThread
-import androidx.annotation.RestrictTo
 import androidx.xr.arcore.Anchor
 import androidx.xr.runtime.Session as PerceptionSession
 import androidx.xr.runtime.math.Pose
@@ -47,7 +46,6 @@ import java.util.function.Consumer
  * Interface for a spatial Entity. An Entity's [Pose]s are represented as being relative to their
  * parent. Applications create and manage Entity instances to construct spatial scenes.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface Entity : ActivityPose {
 
     /**
@@ -228,7 +226,6 @@ public interface Entity : ActivityPose {
  * but the system might update it in response to the User moving it or entering or exiting FullSpace
  * mode.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ActivitySpace
 private constructor(
     rtActivitySpace: JxrPlatformAdapter.ActivitySpace,
@@ -360,7 +357,6 @@ private constructor(
 }
 
 /** The BaseEntity is an implementation of Entity interface that wraps a platform entity. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public sealed class BaseEntity<out RtEntityType : RtEntity>(
     internal val rtEntity: RtEntityType,
     internal val entityManager: EntityManager,
@@ -484,7 +480,6 @@ public sealed class BaseEntity<out RtEntityType : RtEntity>(
  * An Entity that itself has no content. ContentlessEntity is useful for organizing the placement,
  * movement of a group of SceneCore Entities.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ContentlessEntity
 private constructor(rtEntity: RtEntity, entityManager: EntityManager) :
     BaseEntity<RtEntity>(rtEntity, entityManager) {
@@ -518,7 +513,6 @@ private constructor(rtEntity: RtEntity, entityManager: EntityManager) :
 }
 
 /** Provides implementations for common Panel functionality. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public sealed class BasePanelEntity<out RtPanelEntityType : RtPanelEntity>(
     private val rtPanelEntity: RtPanelEntityType,
     entityManager: EntityManager,
@@ -586,7 +580,6 @@ public sealed class BasePanelEntity<out RtPanelEntityType : RtPanelEntity>(
  * Note: The size property of this Entity is always reported as {0, 0, 0}, regardless of the actual
  * size of the model.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class GltfModelEntity
 private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: EntityManager) :
     BaseEntity<JxrPlatformAdapter.GltfEntity>(rtEntity, entityManager) {
@@ -697,7 +690,6 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
  * @property dimensions The dimensions of the canvas in the local spatial coordinate system of the
  *   entity.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class StereoSurfaceEntity
 private constructor(
     rtEntity: JxrPlatformAdapter.StereoSurfaceEntity,
@@ -831,6 +823,7 @@ private constructor(
          */
         @MainThread
         @JvmOverloads
+        @JvmStatic
         public fun create(
             session: Session,
             stereoMode: Int = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE,
@@ -905,7 +898,6 @@ private constructor(
 }
 
 /** PanelEntity creates a spatial panel in Android XR. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public open class PanelEntity
 internal constructor(
     rtEntity: JxrPlatformAdapter.PanelEntity,
@@ -1000,7 +992,6 @@ internal constructor(
  * either use an intent to launch an activity in the given panel or provide an instance of activity
  * to move into this panel. Calling dispose() on this entity will destroy the underlying activity.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ActivityPanelEntity
 private constructor(
     private val rtActivityPanelEntity: JxrPlatformAdapter.ActivityPanelEntity,
@@ -1102,7 +1093,6 @@ private constructor(
  * calling setParent() on an AnchorEntity has no effect, as the parenting of an Anchor is controlled
  * by the system.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class AnchorEntity
 private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: EntityManager) :
     BaseEntity<JxrPlatformAdapter.AnchorEntity>(rtEntity, entityManager) {
@@ -1418,17 +1408,14 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
 
 // TODO: b/370538244 - remove with deprecated spatial state callbacks
 @Deprecated(message = "Use addBoundsChangedListener(Consumer<Dimensions>)")
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun interface OnBoundsChangeListener {
     public fun onBoundsChanged(bounds: Dimensions) // Dimensions are in meters.
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun interface OnStateChangedListener {
     public fun onStateChanged(newState: @AnchorEntity.StateValue Int)
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun interface OnSpaceUpdatedListener {
     public fun onSpaceUpdated()
 }
