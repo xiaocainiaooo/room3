@@ -33,6 +33,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,6 +41,177 @@ import org.junit.runner.RunWith
 @SuppressLint("NewApi")
 @RunWith(AndroidJUnit4::class)
 class ResultGroupByDurationAggregatorTest {
+
+    @Test
+    fun getResult_localTimeRange_filterRecordsBasedOnLocalTime() {
+        val aggregator =
+            ResultGroupedByDurationAggregator(
+                LocalTimeRange(
+                    startTime = LocalDateTime.parse("2025-02-03T00:00:00"),
+                    endTime = LocalDateTime.parse("2025-02-03T02:00:00")
+                ),
+                bucketDuration = Duration.ofHours(1)
+            ) {
+                TransFatTotalAggregationProcessor(it)
+            }
+
+        aggregator.filterAndAggregate(
+            NutritionRecord(
+                startTime =
+                    LocalDateTime.parse("2025-02-03T00:10:00").toInstant(ZoneOffset.ofHours(10)),
+                endTime =
+                    LocalDateTime.parse("2025-02-03T00:15:00").toInstant(ZoneOffset.ofHours(10)),
+                startZoneOffset = ZoneOffset.ofHours(10),
+                endZoneOffset = ZoneOffset.ofHours(10),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("within.range")
+                    ),
+                transFat = 5.grams
+            )
+        )
+
+        aggregator.filterAndAggregate(
+            NutritionRecord(
+                startTime =
+                    LocalDateTime.parse("2025-02-03T00:20:00").toInstant(ZoneOffset.ofHours(10)),
+                endTime =
+                    LocalDateTime.parse("2025-02-03T00:25:00").toInstant(ZoneOffset.ofHours(10)),
+                startZoneOffset = ZoneOffset.UTC,
+                endZoneOffset = ZoneOffset.UTC,
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("out.of.range")
+                    ),
+                transFat = 15.grams
+            )
+        )
+
+        assertThat(aggregator.getResult())
+            .containsExactly(
+                AggregationResultGroupedByDurationWithMinTime(
+                    aggregationResultGroupedByDuration =
+                        AggregationResultGroupedByDuration(
+                            result = aggregationResult(5.grams, "within.range"),
+                            startTime =
+                                LocalDateTime.parse("2025-02-03T00:00:00")
+                                    .toInstant(ZoneOffset.ofHours(10)),
+                            endTime =
+                                LocalDateTime.parse("2025-02-03T01:00:00")
+                                    .toInstant(ZoneOffset.ofHours(10)),
+                            zoneOffset = ZoneOffset.ofHours(10)
+                        ),
+                    minTime =
+                        LocalDateTime.parse("2025-02-03T00:10:00").toInstant(ZoneOffset.ofHours(10))
+                )
+            )
+    }
+
+    @Test
+    fun getResult_localTimeRange_bucketsAreCalculatedUsingInstantTime() {
+        val aggregator =
+            ResultGroupedByDurationAggregator(
+                LocalTimeRange(
+                    startTime = LocalDateTime.parse("2025-02-03T00:00:00"),
+                    endTime = LocalDateTime.parse("2025-02-03T02:00:00")
+                ),
+                bucketDuration = Duration.ofHours(1)
+            ) {
+                TransFatTotalAggregationProcessor(it)
+            }
+
+        aggregator.filterAndAggregate(
+            NutritionRecord(
+                startTime =
+                    LocalDateTime.parse("2025-02-03T00:30:00").toInstant(ZoneOffset.ofHours(1)),
+                endTime =
+                    LocalDateTime.parse("2025-02-03T00:35:00").toInstant(ZoneOffset.ofHours(1)),
+                startZoneOffset = ZoneOffset.ofHours(1),
+                endZoneOffset = ZoneOffset.ofHours(1),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("first.hour.offset1")
+                    ),
+                transFat = 5.grams
+            )
+        )
+
+        aggregator.filterAndAggregate(
+            NutritionRecord(
+                startTime =
+                    LocalDateTime.parse("2025-02-03T01:20:00").toInstant(ZoneOffset.ofHours(2)),
+                endTime =
+                    LocalDateTime.parse("2025-02-03T01:25:00").toInstant(ZoneOffset.ofHours(2)),
+                startZoneOffset = ZoneOffset.ofHours(2),
+                endZoneOffset = ZoneOffset.ofHours(2),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("second.hour.offset2")
+                    ),
+                transFat = 50.grams
+            )
+        )
+
+        aggregator.filterAndAggregate(
+            NutritionRecord(
+                startTime =
+                    LocalDateTime.parse("2025-02-03T01:10:00").toInstant(ZoneOffset.ofHours(3)),
+                endTime =
+                    LocalDateTime.parse("2025-02-03T01:15:00").toInstant(ZoneOffset.ofHours(3)),
+                startZoneOffset = ZoneOffset.ofHours(3),
+                endZoneOffset = ZoneOffset.ofHours(3),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("second.hour.offset3")
+                    ),
+                transFat = 500.grams
+            )
+        )
+
+        assertThat(aggregator.getResult())
+            .containsExactly(
+                AggregationResultGroupedByDurationWithMinTime(
+                    aggregationResultGroupedByDuration =
+                        AggregationResultGroupedByDuration(
+                            result = aggregationResult(500.grams, "second.hour.offset3"),
+                            startTime =
+                                LocalDateTime.parse("2025-02-03T01:00:00")
+                                    .toInstant(ZoneOffset.ofHours(3)),
+                            endTime =
+                                LocalDateTime.parse("2025-02-03T02:00:00")
+                                    .toInstant(ZoneOffset.ofHours(3)),
+                            zoneOffset = ZoneOffset.ofHours(3)
+                        ),
+                    minTime =
+                        LocalDateTime.parse("2025-02-03T01:10:00").toInstant(ZoneOffset.ofHours(3))
+                ),
+                AggregationResultGroupedByDurationWithMinTime(
+                    aggregationResultGroupedByDuration =
+                        AggregationResultGroupedByDuration(
+                            result =
+                                aggregationResult(
+                                    55.grams,
+                                    "first.hour.offset1",
+                                    "second.hour.offset2"
+                                ),
+                            startTime =
+                                LocalDateTime.parse("2025-02-03T01:00:00")
+                                    .toInstant(ZoneOffset.ofHours(2)),
+                            endTime =
+                                LocalDateTime.parse("2025-02-03T02:00:00")
+                                    .toInstant(ZoneOffset.ofHours(2)),
+                            zoneOffset = ZoneOffset.ofHours(2)
+                        ),
+                    minTime =
+                        LocalDateTime.parse("2025-02-03T01:20:00").toInstant(ZoneOffset.ofHours(2))
+                )
+            )
+    }
 
     @Test
     fun getResult_filterShorterThanDuration_singleBucket() {
