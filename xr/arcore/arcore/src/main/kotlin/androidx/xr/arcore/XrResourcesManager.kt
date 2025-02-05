@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import androidx.xr.runtime.internal.Hand as RuntimeHand
 import androidx.xr.runtime.internal.Plane as RuntimePlane
 import androidx.xr.runtime.internal.Trackable as RuntimeTrackable
+import java.util.Queue
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** Manages all XR resources that are used by the ARCore for XR API. */
@@ -28,6 +30,10 @@ internal class XrResourcesManager {
     /** List of [Updatable]s that are updated every frame. */
     private val _updatables = CopyOnWriteArrayList<Updatable>()
     val updatables: List<Updatable> = _updatables
+
+    /** Queue of [Anchor]s that will be detached on the next frame update. */
+    private val _anchorsToDetachQueue = ConcurrentLinkedQueue<Anchor>()
+    val anchorsToDetachQueue: Queue<Anchor> = _anchorsToDetachQueue
 
     /** Map of runtime trackable pointer to [Trackable]. */
     @SuppressLint("BanConcurrentHashMap")
@@ -54,7 +60,15 @@ internal class XrResourcesManager {
         _updatables.remove(updatable)
     }
 
+    internal fun queueAnchorToDetach(anchor: Anchor) {
+        _anchorsToDetachQueue.add(anchor)
+    }
+
     internal suspend fun update() {
+        while (!_anchorsToDetachQueue.isEmpty()) {
+            _anchorsToDetachQueue.poll()?.runtimeAnchor?.detach()
+        }
+
         for (updatable in updatables) {
             updatable.update()
         }
