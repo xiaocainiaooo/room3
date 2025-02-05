@@ -39,6 +39,7 @@ import androidx.wear.compose.integration.demos.common.ComposableDemo
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.OutlinedButton
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
@@ -127,7 +128,7 @@ fun TimeTextOnScreen() {
     // It's preferable to use the ScreenScaffold, this is a demo of the simplest usage.
     Box(Modifier.fillMaxSize()) {
         ScalingLazyColumn(Modifier.fillMaxSize(), contentPadding = padding) {
-            item { Text("Buttons") }
+            item { ListHeader { Text("Buttons") } }
             item {
                 OutlinedButton(onClick = {}) {
                     Text("Outlined Button", Modifier.align(Alignment.CenterVertically))
