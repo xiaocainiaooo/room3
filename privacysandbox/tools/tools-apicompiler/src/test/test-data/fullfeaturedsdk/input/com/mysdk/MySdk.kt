@@ -6,6 +6,7 @@ import androidx.privacysandbox.tools.PrivacySandboxInterface
 import androidx.privacysandbox.tools.PrivacySandboxService
 import androidx.privacysandbox.tools.PrivacySandboxValue
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.core.SharedUiAdapter
 import androidx.privacysandbox.activity.core.SdkActivityLauncher
 
 @PrivacySandboxService
@@ -52,6 +53,11 @@ interface MyInterface {
 
 @PrivacySandboxInterface
 interface MyUiInterface : SandboxedUiAdapter {
+    fun doSomethingForUi(x: Int, y: Int)
+}
+
+@PrivacySandboxInterface
+interface MySharedUiInterface : SharedUiAdapter {
     fun doSomethingForUi(x: Int, y: Int)
 }
 

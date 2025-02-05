@@ -138,6 +138,7 @@ fun CodeBlock.Builder.addStatement(builderBlock: CodeBlock.Builder.() -> Unit) {
 
 object SpecNames {
     const val contextPropertyName = "context"
+    const val uiCoreLibInfoPropertyName = "coreLibInfo"
 
     // Kotlin coroutines
     val resumeMethod = MemberName("kotlin.coroutines", "resume", isExtension = true)
