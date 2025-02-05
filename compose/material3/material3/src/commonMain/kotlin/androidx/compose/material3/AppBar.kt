@@ -54,6 +54,7 @@ import androidx.compose.material3.tokens.AppBarMediumTokens
 import androidx.compose.material3.tokens.AppBarSmallTokens
 import androidx.compose.material3.tokens.AppBarTokens
 import androidx.compose.material3.tokens.BottomAppBarTokens
+import androidx.compose.material3.tokens.DockedToolbarTokens
 import androidx.compose.material3.tokens.FabSecondaryContainerTokens
 import androidx.compose.material3.tokens.MotionSchemeKeyTokens
 import androidx.compose.runtime.Composable
@@ -2211,7 +2212,11 @@ object BottomAppBarDefaults {
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
     /** Default padding used for [FlexibleBottomAppBar]. */
-    val FlexibleContentPadding = PaddingValues(horizontal = 16.dp) // TODO tokens
+    val FlexibleContentPadding =
+        PaddingValues(
+            start = DockedToolbarTokens.ContainerLeadingSpace,
+            end = DockedToolbarTokens.ContainerTrailingSpace
+        )
 
     /**
      * Default height of a flexible [FlexibleBottomAppBar]. The height here represents the height of
@@ -2220,7 +2225,7 @@ object BottomAppBarDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val FlexibleBottomAppBarHeight = AppBarSmallTokens.ContainerHeight
+    val FlexibleBottomAppBarHeight = DockedToolbarTokens.ContainerHeight
 
     /** A default [Arrangement] that will be used to space a [FlexibleBottomAppBar]'s content. */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
@@ -2235,7 +2240,7 @@ object BottomAppBarDefaults {
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
     val FlexibleFixedHorizontalArrangement: Arrangement.Horizontal =
-        Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally) // TODO tokens
+        Arrangement.spacedBy(DockedToolbarTokens.ContainerMaxSpacing, Alignment.CenterHorizontally)
 
     // TODO: note that this scroll behavior may impact assistive technologies making the component
     //  inaccessible. See @sample androidx.compose.material3.samples.ExitAlwaysBottomAppBar on how
