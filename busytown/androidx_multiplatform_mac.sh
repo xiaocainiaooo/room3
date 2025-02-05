@@ -9,7 +9,9 @@ export ANDROIDX_PROJECTS=KMP
 # This target is for testing that clean builds work correctly
 export USE_ANDROIDX_REMOTE_BUILD_CACHE=false
 
-impl/build.sh createAllArchives
+# createAllArchives generates all the artifacts to publish
+# createAggregateBuildInfoFiles is needed for JetPad to know what can be published
+impl/build.sh createAllArchives createAggregateBuildInfoFiles
 
 # run a separate createAllArchives task to prepare a repository
 # folder in DIST.
