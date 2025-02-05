@@ -123,7 +123,8 @@ object TestCasesGenerator {
                     mainSlot = {
                         graphicDataCard(
                             onClick = clickable,
-                            modifier = LayoutModifier.contentDescription("Graphic Data Card"),
+                            modifier =
+                                LayoutModifier.contentDescription("Graphic Data Card with CPI"),
                             height = expand(),
                             horizontalAlignment = LayoutElementBuilders.HORIZONTAL_ALIGN_START,
                             title = {
@@ -144,6 +145,49 @@ object TestCasesGenerator {
                                     iconContent = { icon(ICON_ID) }
                                 )
                             }
+                        )
+                    },
+                    margins = MIN_PRIMARY_LAYOUT_MARGIN
+                )
+            }
+        testCases["primarylayout_graphcard_filledVariant_golden$goldenSuffix"] =
+            materialScope(
+                ApplicationProvider.getApplicationContext(),
+                deviceParameters,
+                allowDynamicTheme = false
+            ) {
+                primaryLayout(
+                    mainSlot = {
+                        graphicDataCard(
+                            onClick = clickable,
+                            modifier =
+                                LayoutModifier.contentDescription(
+                                    "Graphic Data Card with segmented CPI"
+                                ),
+                            height = expand(),
+                            horizontalAlignment = LayoutElementBuilders.HORIZONTAL_ALIGN_START,
+                            title = {
+                                text(
+                                    "1234".layoutString,
+                                )
+                            },
+                            content = {
+                                text(
+                                    "steps".layoutString,
+                                )
+                            },
+                            graphic = {
+                                constructGraphic(
+                                    mainContent = {
+                                        segmentedCircularProgressIndicator(
+                                            segmentCount = 5,
+                                            staticProgress = 0.5F,
+                                        )
+                                    },
+                                    iconContent = { icon(ICON_ID) }
+                                )
+                            },
+                            colors = filledVariantCardColors(),
                         )
                     },
                     margins = MIN_PRIMARY_LAYOUT_MARGIN
