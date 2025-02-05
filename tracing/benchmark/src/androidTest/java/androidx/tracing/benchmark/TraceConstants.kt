@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.benchmark
 
-import android.content.Context
-import okio.blackholeSink
-import okio.buffer
+import java.util.UUID
 
-internal fun buildInMemorySink(context: Context): AndroidTraceSink {
-    val buffer = blackholeSink().buffer()
-    return AndroidTraceSink(context, buffer)
-}
+const val BASIC_STRING = "work"
+const val PROCESS_NAME = "process"
+
+val LARGE_STRING_POOL = Array(50_000) { UUID.randomUUID().toString() }
