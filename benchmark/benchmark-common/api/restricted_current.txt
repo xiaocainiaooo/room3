@@ -146,5 +146,10 @@ package androidx.benchmark.traceprocessor {
     method @SuppressCompatibility @RequiresApi(23) @androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi public static void record(androidx.benchmark.traceprocessor.PerfettoTrace.Companion, String fileLabel, optional java.util.List<java.lang.String> appTagPackages, optional String? userspaceTracingPackage, optional kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.PerfettoTrace,kotlin.Unit>? traceCallback, kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
+  public final class TraceProcessorExtensionsKt {
+    method @SuppressCompatibility @RequiresApi(23) @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public static <T> T runServer(androidx.benchmark.traceprocessor.TraceProcessor.Companion, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor,? extends T> block);
+    method @SuppressCompatibility @RequiresApi(23) @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public static <T> T runServer(androidx.benchmark.traceprocessor.TraceProcessor.Companion, long timeout, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor,? extends T> block);
+  }
+
 }
 
