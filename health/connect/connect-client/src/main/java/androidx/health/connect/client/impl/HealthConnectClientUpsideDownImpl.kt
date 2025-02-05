@@ -22,6 +22,7 @@ import android.content.pm.PackageManager.GET_PERMISSIONS
 import android.content.pm.PackageManager.PackageInfoFlags
 import android.health.connect.HealthConnectException
 import android.health.connect.HealthConnectManager
+import android.health.connect.LocalTimeRangeFilter
 import android.health.connect.ReadRecordsRequestUsingIds
 import android.health.connect.RecordIdFilter
 import android.health.connect.changelog.ChangeLogsRequest
@@ -48,7 +49,6 @@ import androidx.health.connect.client.impl.platform.aggregate.isPlatformSupporte
 import androidx.health.connect.client.impl.platform.records.toPlatformRecord
 import androidx.health.connect.client.impl.platform.records.toPlatformRecordClass
 import androidx.health.connect.client.impl.platform.records.toSdkRecord
-import androidx.health.connect.client.impl.platform.request.toPlatformLocalTimeRangeFilter
 import androidx.health.connect.client.impl.platform.request.toPlatformRequest
 import androidx.health.connect.client.impl.platform.request.toPlatformTimeRangeFilter
 import androidx.health.connect.client.impl.platform.response.toKtResponse
@@ -278,23 +278,24 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 ) {
                     platformResponse.toSdkResponse(request.metrics)
                 } else {
-                    // Handle bug in the Platform for versions of module before SDK extensions 10
+                    // Handle bug in the Platform for versions of module before SDK extensions 10,
+                    // where bucket endTime < bucket startTime (b/298290400)
                     val requestTimeRangeFilter =
-                        request.timeRangeFilter.toPlatformLocalTimeRangeFilter()
+                        LocalTimeRangeFilter.Builder()
+                            .setStartTime(request.timeRangeFilter.localStartTime)
+                            .setEndTime(request.timeRangeFilter.localEndTime)
+                            .build()
                     val bucketStartTime =
-                        requestTimeRangeFilter.startTime!!.plus(
+                        requestTimeRangeFilter.startTime!! +
                             request.timeRangeSlicer.multipliedBy(index)
-                        )
-                    val bucketEndTime = bucketStartTime.plus(request.timeRangeSlicer)
                     platformResponse.toSdkResponse(
                         metrics = request.metrics,
                         bucketStartTime = bucketStartTime,
                         bucketEndTime =
-                            if (requestTimeRangeFilter.endTime!!.isBefore(bucketEndTime)) {
+                            minOf(
+                                bucketStartTime + request.timeRangeSlicer,
                                 requestTimeRangeFilter.endTime!!
-                            } else {
-                                bucketEndTime
-                            }
+                            )
                     )
                 }
             }

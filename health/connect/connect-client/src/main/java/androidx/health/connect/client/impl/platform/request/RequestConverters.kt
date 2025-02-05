@@ -52,9 +52,6 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 fun ReadRecordsRequest<out Record>.toPlatformRequest():
     ReadRecordsRequestUsingFilters<out PlatformRecord> {
@@ -73,35 +70,11 @@ fun ReadRecordsRequest<out Record>.toPlatformRequest():
 }
 
 fun TimeRangeFilter.toPlatformTimeRangeFilter(): PlatformTimeRangeFilter {
-    return if (startTime != null || endTime != null) {
-        TimeInstantRangeFilter.Builder().setStartTime(startTime).setEndTime(endTime).build()
-    } else if (localStartTime != null || localEndTime != null) {
-        LocalTimeRangeFilter.Builder().setStartTime(localStartTime).setEndTime(localEndTime).build()
-    } else {
-        // Platform doesn't allow both startTime and endTime to be null
-        TimeInstantRangeFilter.Builder().setStartTime(Instant.EPOCH).build()
-    }
-}
-
-fun TimeRangeFilter.toPlatformLocalTimeRangeFilter(): LocalTimeRangeFilter {
     return when {
-        localStartTime != null || localEndTime != null ->
-            LocalTimeRangeFilter.Builder()
-                .setStartTime(localStartTime)
-                .setEndTime(localEndTime)
-                .build()
-        startTime != null || endTime != null ->
-            LocalTimeRangeFilter.Builder()
-                .setStartTime(startTime?.toLocalDateTime())
-                .setEndTime(endTime?.toLocalDateTime())
-                .build()
-        else ->
-            // Platform doesn't allow both startTime and endTime to be null
-            LocalTimeRangeFilter.Builder().setStartTime(Instant.EPOCH.toLocalDateTime()).build()
+        isBasedOnLocalTime() -> toPlatformLocalTimeRangeFilter()
+        else -> TimeInstantRangeFilter.Builder().setStartTime(startTime).setEndTime(endTime).build()
     }
 }
-
-private fun Instant.toLocalDateTime() = LocalDateTime.ofInstant(this, ZoneOffset.UTC)
 
 fun ChangesTokenRequest.toPlatformRequest(): ChangeLogTokenRequest {
     return ChangeLogTokenRequest.Builder()
@@ -156,4 +129,11 @@ fun AggregateMetric<Any>.toAggregationType(): AggregationType<Any> {
         ?: VELOCITY_AGGREGATION_METRIC_TYPE_MAP[this] as AggregationType<Any>?
         ?: VOLUME_AGGREGATION_METRIC_TYPE_MAP[this] as AggregationType<Any>?
         ?: throw IllegalArgumentException("Unsupported aggregation type $metricKey")
+}
+
+private fun TimeRangeFilter.toPlatformLocalTimeRangeFilter(): LocalTimeRangeFilter {
+    return LocalTimeRangeFilter.Builder()
+        .setStartTime(localStartTime)
+        .setEndTime(localEndTime)
+        .build()
 }
