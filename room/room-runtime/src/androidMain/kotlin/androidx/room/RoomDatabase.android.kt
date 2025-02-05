@@ -767,7 +767,7 @@ actual abstract class RoomDatabase {
      * @see SupportSQLiteDatabase.inTransaction
      */
     open fun inTransaction(): Boolean {
-        return openHelper.writableDatabase.inTransaction()
+        return isOpenInternal && openHelper.writableDatabase.inTransaction()
     }
 
     /**
