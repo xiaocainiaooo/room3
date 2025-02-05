@@ -732,7 +732,6 @@ package androidx.wear.compose.material3 {
 
   public final class LinearProgressIndicatorKt {
     method @androidx.compose.runtime.Composable public static void LinearProgressIndicator(kotlin.jvm.functions.Function0<java.lang.Float> progress, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.ProgressIndicatorColors colors, optional float strokeWidth, optional boolean enabled);
-    method @androidx.compose.runtime.Composable public static void LinearProgressIndicatorContent(kotlin.jvm.functions.Function0<java.lang.Float> progress, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.ProgressIndicatorColors colors, optional float strokeWidth, optional boolean enabled);
   }
 
   public final class ListHeaderDefaults {
