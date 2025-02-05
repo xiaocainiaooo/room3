@@ -195,6 +195,9 @@ val WearFoundationDemos =
                     ComposableDemo("S2R With Expandables") {
                         Centralize { SwipeToRevealWithExpandables() }
                     },
+                    ComposableDemo("Bi-directional") {
+                        Centralize { SwipeToRevealDemoBothDirections() }
+                    },
                 )
             ),
             DemoCategory(
