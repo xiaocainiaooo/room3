@@ -166,8 +166,8 @@ internal constructor(
 
     /** Detaches this anchor. This anchor will no longer be updated or tracked. */
     public fun detach() {
-        runtimeAnchor.detach()
         xrResourceManager.removeUpdatable(this)
+        xrResourceManager.queueAnchorToDetach(this)
     }
 
     override fun equals(other: Any?): Boolean {

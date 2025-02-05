@@ -88,6 +88,21 @@ class AnchorTest {
     }
 
     @Test
+    fun detach_stopsUpdateAndQueuesAnchorToBeDetached() {
+        val runtimeAnchor = FakeRuntimePlane().createAnchor(Pose()) as FakeRuntimeAnchor
+        check(runtimeAnchor.isAttached)
+        val underTest = Anchor(runtimeAnchor, xrResourcesManager)
+        xrResourcesManager.addUpdatable(underTest)
+        check(xrResourcesManager.updatables.contains(underTest))
+        check(xrResourcesManager.updatables.size == 1)
+
+        underTest.detach()
+
+        assertThat(xrResourcesManager.updatables).isEmpty()
+        assertThat(xrResourcesManager.anchorsToDetachQueue.toList()).containsExactly(underTest)
+    }
+
+    @Test
     fun update_trackingStateMatchesRuntimeTrackingState() = runBlocking {
         val runtimeAnchor = FakeRuntimeAnchor(Pose())
         runtimeAnchor.trackingState = TrackingState.Paused
@@ -219,17 +234,6 @@ class AnchorTest {
 
             assertThat(Anchor.getPersistedAnchorUuids(session)).doesNotContain(uuid)
         }
-    }
-
-    @Test
-    fun detach_removesRuntimeAnchor() {
-        val runtimeAnchor = FakeRuntimePlane().createAnchor(Pose()) as FakeRuntimeAnchor
-        check(runtimeAnchor.isAttached)
-        val underTest = Anchor(runtimeAnchor, xrResourcesManager)
-
-        underTest.detach()
-
-        assertThat(runtimeAnchor.isAttached).isFalse()
     }
 
     @Test
