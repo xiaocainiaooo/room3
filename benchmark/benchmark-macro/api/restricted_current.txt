@@ -240,11 +240,6 @@ package androidx.benchmark.macro {
     method public abstract java.util.List<androidx.benchmark.macro.Metric.Measurement> getMeasurements(androidx.benchmark.macro.Metric.CaptureInfo captureInfo, androidx.benchmark.traceprocessor.TraceProcessor.Session traceSession);
   }
 
-  public final class TraceProcessorExtensionsKt {
-    method public static <T> T runServer(androidx.benchmark.traceprocessor.TraceProcessor.Companion, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor,? extends T> block);
-    method public static <T> T runServer(androidx.benchmark.traceprocessor.TraceProcessor.Companion, long timeout, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor,? extends T> block);
-  }
-
   @SuppressCompatibility @androidx.benchmark.macro.ExperimentalMetricApi public final class TraceSectionMetric extends androidx.benchmark.macro.Metric {
     ctor public TraceSectionMetric(String sectionName);
     ctor public TraceSectionMetric(String sectionName, optional androidx.benchmark.macro.TraceSectionMetric.Mode mode);
