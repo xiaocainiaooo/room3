@@ -86,7 +86,7 @@ public final class StateBuilders {
             MutableDynamicDataMap map = new MutableDynamicDataMap();
             for (Entry<String, DynamicDataProto.DynamicDataValue> entry :
                     mImpl.getIdToValueMap().entrySet()) {
-                map.put(
+                map.set(
                         new AppDataKey<>(entry.getKey()),
                         DynamicDataBuilders.dynamicDataValueFromProto(entry.getValue()));
             }
@@ -205,7 +205,7 @@ public final class StateBuilders {
              */
             @RequiresSchemaVersion(major = 1, minor = 200)
             @SuppressLint("MissingGetterMatchingBuilder")
-            public @NonNull Builder addKeyToValueMapping(@NonNull DynamicDataPair<?>... entries) {
+            public @NonNull Builder addToStateMap(@NonNull DynamicDataPair<?>... entries) {
                 if (mImpl.getIdToValueMap().size() + entries.length > getMaxStateEntryCount()) {
                     throw new IllegalArgumentException(
                             String.format(
