@@ -18,6 +18,7 @@ package androidx.room.processor
 
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
+import androidx.room.ext.isNotError
 import androidx.room.ext.isNotNone
 import androidx.room.parser.SQLTypeAffinity
 import androidx.room.parser.SqlParser
@@ -434,7 +435,7 @@ internal constructor(
         // checks supers.
         val mySuper = typeElement.superClass
         val superPKeys =
-            if (mySuper != null && mySuper.isNotNone()) {
+            if (mySuper != null && mySuper.isNotNone() && mySuper.isNotError()) {
                 // my super cannot see my properties so remove them.
                 val remainingProperties =
                     availableProperties.filterNot { it.element.enclosingElement == typeElement }
@@ -489,7 +490,7 @@ internal constructor(
         } else if (myPKeys.isEmpty()) {
             // i have not declared anything, delegate to super
             val mySuper = typeElement.superClass
-            if (mySuper != null && mySuper.isNotNone()) {
+            if (mySuper != null && mySuper.isNotNone() && mySuper.isNotError()) {
                 return choosePrimaryKey(candidates, mySuper.typeElement!!)
             }
             PrimaryKey.MISSING
@@ -581,7 +582,7 @@ internal constructor(
         tableName: String,
         inherit: Boolean
     ): List<IndexInput> {
-        if (typeMirror == null || typeMirror.isNone()) {
+        if (typeMirror == null || typeMirror.isNone() || typeMirror.isError()) {
             return emptyList()
         }
         val parentTypeElement = typeMirror.typeElement
