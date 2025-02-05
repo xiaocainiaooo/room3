@@ -107,7 +107,7 @@ internal suspend inline fun <reified T : SeriesRecord<*>> HealthConnectClient.ag
             aggregateRequest.dataOriginFilter
         ),
         ResultGroupedByDurationAggregator(
-            createInstantTimeRange(aggregateRequest.timeRangeFilter),
+            createTimeRange(aggregateRequest.timeRangeFilter),
             aggregateRequest.timeRangeSlicer
         ) {
             SeriesAggregationProcessor(T::class, aggregateRequest.metrics, it)
