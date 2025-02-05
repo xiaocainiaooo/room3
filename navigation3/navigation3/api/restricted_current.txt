@@ -10,9 +10,9 @@ package androidx.navigation3 {
     method public kotlin.reflect.KClass<T> getClazz();
     method public kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
     method public java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
-    property public final kotlin.reflect.KClass<T> clazz;
-    property public final kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
-    property public final java.util.Map<java.lang.String,java.lang.Object> featureMap;
+    property public kotlin.reflect.KClass<T> clazz;
+    property public kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
+    property public java.util.Map<java.lang.String,java.lang.Object> featureMap;
   }
 
   @kotlin.DslMarker public @interface EntryDsl {
@@ -27,9 +27,9 @@ package androidx.navigation3 {
     method public kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
     method public java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
     method public T getKey();
-    property public final kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
-    property public final java.util.Map<java.lang.String,java.lang.Object> featureMap;
-    property public final T key;
+    property public kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
+    property public java.util.Map<java.lang.String,java.lang.Object> featureMap;
+    property public T key;
   }
 
   @androidx.navigation3.EntryDsl public final class EntryProviderBuilder {
@@ -47,7 +47,7 @@ package androidx.navigation3 {
 
   public final class LocalNavAnimatedContentScope_androidKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.AnimatedContentScope> getLocalNavAnimatedContentScope();
-    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.AnimatedContentScope> LocalNavAnimatedContentScope;
+    property public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.animation.AnimatedContentScope> LocalNavAnimatedContentScope;
   }
 
   public final class NavBackStackProviderKt {

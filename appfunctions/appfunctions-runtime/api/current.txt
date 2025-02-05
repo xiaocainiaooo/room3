@@ -8,7 +8,7 @@ package androidx.appfunctions {
 
   public final class AppFunctionConfiguration {
     method public java.util.Map<java.lang.Class<? extends java.lang.Object?>,kotlin.jvm.functions.Function0<java.lang.Object>> getEnclosingClassFactories();
-    property public final java.util.Map<java.lang.Class<? extends java.lang.Object?>,kotlin.jvm.functions.Function0<java.lang.Object>> enclosingClassFactories;
+    property public java.util.Map<java.lang.Class<? extends java.lang.Object?>,kotlin.jvm.functions.Function0<java.lang.Object>> enclosingClassFactories;
   }
 
   public static final class AppFunctionConfiguration.Builder {

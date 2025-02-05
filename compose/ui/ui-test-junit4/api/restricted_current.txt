@@ -26,9 +26,9 @@ package androidx.compose.ui.test.junit4 {
     method @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilDoesNotExist(androidx.compose.ui.test.SemanticsMatcher matcher, long timeoutMillis);
     method @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilExactlyOneExists(androidx.compose.ui.test.SemanticsMatcher matcher, long timeoutMillis);
     method @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public void waitUntilNodeCount(androidx.compose.ui.test.SemanticsMatcher matcher, int count, long timeoutMillis);
-    property @RequiresApi(34) public final com.google.android.apps.common.testing.accessibility.framework.integrations.espresso.AccessibilityValidator? accessibilityValidator;
-    property public final A activity;
-    property public final R activityRule;
+    property @RequiresApi(34) public com.google.android.apps.common.testing.accessibility.framework.integrations.espresso.AccessibilityValidator? accessibilityValidator;
+    property public A activity;
+    property public R activityRule;
     property public androidx.compose.ui.unit.Density density;
     property public androidx.compose.ui.test.MainTestClock mainClock;
   }

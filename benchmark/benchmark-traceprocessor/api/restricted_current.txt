@@ -12,9 +12,9 @@ package androidx.benchmark.traceprocessor {
     method public androidx.benchmark.traceprocessor.Insight.Category getCategory();
     method public String getObservedLabel();
     method public androidx.benchmark.traceprocessor.PerfettoTrace.Link getTraceLink();
-    property public final androidx.benchmark.traceprocessor.Insight.Category category;
-    property public final String observedLabel;
-    property public final androidx.benchmark.traceprocessor.PerfettoTrace.Link traceLink;
+    property public androidx.benchmark.traceprocessor.Insight.Category category;
+    property public String observedLabel;
+    property public androidx.benchmark.traceprocessor.PerfettoTrace.Link traceLink;
   }
 
   @SuppressCompatibility @androidx.benchmark.traceprocessor.ExperimentalInsightApi public static final class Insight.Category {
@@ -22,9 +22,9 @@ package androidx.benchmark.traceprocessor {
     method public String getPostTitleLabel();
     method public String getTitle();
     method public String? getTitleUrl();
-    property public final String postTitleLabel;
-    property public final String title;
-    property public final String? titleUrl;
+    property public String postTitleLabel;
+    property public String title;
+    property public String? titleUrl;
   }
 
   @SuppressCompatibility @androidx.benchmark.traceprocessor.ExperimentalInsightApi public static interface Insight.Provider {
@@ -47,11 +47,11 @@ package androidx.benchmark.traceprocessor {
     method public String getTitle();
     method public String getUri();
     method public String getUrlParamsEncoded();
-    property public final String markdownUriLink;
-    property public final String path;
-    property public final String title;
-    property public final String uri;
-    property public final String urlParamsEncoded;
+    property public String markdownUriLink;
+    property public String path;
+    property public String title;
+    property public String uri;
+    property public String urlParamsEncoded;
   }
 
   public final class Row implements kotlin.jvm.internal.markers.KMappedMarker java.util.Map<java.lang.String,java.lang.Object?> {
