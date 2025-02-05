@@ -51,7 +51,7 @@ class MedicalResourceId(
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check
     internal val platformMedicalResourceId: PlatformMedicalResourceId =
-        withPhrFeatureCheck(MedicalResourceId::class) {
+        withPhrFeatureCheck(this::class) {
             PlatformMedicalResourceId(
                 dataSourceId,
                 fhirResourceType.toPlatformFhirResourceType(),
@@ -110,7 +110,7 @@ class MedicalResourceId(
          */
         @SuppressLint("NewApi") // checked with feature availability
         fun fromFhirReference(dataSourceId: String, fhirReference: String): MedicalResourceId =
-            withPhrFeatureCheck(MedicalResourceId::class, "fromFhirReference") {
+            withPhrFeatureCheck(this::class, "fromFhirReference") {
                 PlatformMedicalResourceId.fromFhirReference(dataSourceId, fhirReference)
                     .toSdkMedicalResourceId()
             }

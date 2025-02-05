@@ -16,7 +16,6 @@
 
 package androidx.health.connect.client.impl
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageInfo.REQUESTED_PERMISSION_GRANTED
 import android.content.pm.PackageManager.GET_PERMISSIONS
@@ -30,6 +29,7 @@ import android.os.Build
 import android.os.RemoteException
 import android.os.ext.SdkExtensions
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RequiresPermission
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.asOutcomeReceiver
@@ -391,11 +391,11 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
     }
 
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
-    @SuppressLint("NewApi") // already checked with a feature availability check
+    @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
     override suspend fun upsertMedicalResources(
         requests: List<UpsertMedicalResourceRequest>
     ): List<MedicalResource> =
-        withPhrFeatureCheckSuspend("HealthConnectClient#upsertMedicalResources()") {
+        withPhrFeatureCheckSuspend(this::class, "upsertMedicalResources()") {
             wrapPlatformException {
                     suspendCancellableCoroutine { continuation ->
                         healthConnectManager.upsertMedicalResources(
@@ -408,9 +408,23 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .map { it.toSdkMedicalResource() }
         }
 
-    override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> {
-        TODO("b/382680487 Not yet implemented")
-    }
+    @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
+    override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
+        withPhrFeatureCheckSuspend(
+            this::class,
+            "readMedicalResources(ids: List<MedicalResourceId>)"
+        ) {
+            wrapPlatformException {
+                    suspendCancellableCoroutine { continuation ->
+                        healthConnectManager.readMedicalResources(
+                            ids.map { it.platformMedicalResourceId },
+                            executor,
+                            continuation.asOutcomeReceiver()
+                        )
+                    }
+                }
+                .map { it.toSdkMedicalResource() }
+        }
 
     private suspend fun <T> wrapPlatformException(function: suspend () -> T): T {
         return try {

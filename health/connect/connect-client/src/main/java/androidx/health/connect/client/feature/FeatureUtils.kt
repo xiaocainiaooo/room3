@@ -71,6 +71,18 @@ internal fun <T> withPhrFeatureCheck(apiName: String, block: () -> T): T {
  * Similar to [with], this method executes `block` if PHR feature is available, otherwise throwing
  * an [UnsupportedOperationException] pointing to `apiName`.
  */
+internal suspend fun <T> withPhrFeatureCheckSuspend(
+    kClass: KClass<*>,
+    methodName: String,
+    block: suspend () -> T
+): T {
+    return withPhrFeatureCheckSuspend("${kClass.simpleName}#$methodName", block)
+}
+
+/**
+ * Similar to [with], this method executes `block` if PHR feature is available, otherwise throwing
+ * an [UnsupportedOperationException] pointing to `apiName`.
+ */
 internal suspend fun <T> withPhrFeatureCheckSuspend(apiName: String, block: suspend () -> T): T {
     if (isPersonalHealthRecordFeatureAvailableInPlatform()) {
         return block()

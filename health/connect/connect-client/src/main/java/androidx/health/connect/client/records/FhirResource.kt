@@ -50,7 +50,7 @@ class FhirResource(
     @FhirResourceType val type: Int,
 
     /**
-     * Returns the FHIR resource ID. This is extracted from the "id" field in `data`. More about
+     * Returns the FHIR resource ID. This is extracted from the `id` field in [data]. More about
      * FHIR resource ID in
      * [https://www.hl7.org/fhir/resource.html#id](https://www.hl7.org/fhir/resource.html#id).
      */
@@ -61,7 +61,7 @@ class FhirResource(
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check
     internal val platformFhirResource: PlatformFhirResource =
-        withPhrFeatureCheck(FhirResource::class) {
+        withPhrFeatureCheck(this::class) {
             PlatformFhirResourceBuilder(type.toPlatformFhirResourceType(), id, data).build()
         }
 
