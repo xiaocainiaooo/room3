@@ -87,12 +87,16 @@ package androidx.ink.brush {
   }
 
   public final class StockBrushes {
+    method public static androidx.ink.brush.BrushFamily getDashedLineLatest();
+    method public static androidx.ink.brush.BrushFamily getDashedLineV1();
     method public static androidx.ink.brush.BrushFamily getHighlighterLatest();
     method public static androidx.ink.brush.BrushFamily getHighlighterV1();
     method public static androidx.ink.brush.BrushFamily getMarkerLatest();
     method public static androidx.ink.brush.BrushFamily getMarkerV1();
     method public static androidx.ink.brush.BrushFamily getPressurePenLatest();
     method public static androidx.ink.brush.BrushFamily getPressurePenV1();
+    property public static androidx.ink.brush.BrushFamily dashedLineLatest;
+    property public static androidx.ink.brush.BrushFamily dashedLineV1;
     property public static androidx.ink.brush.BrushFamily highlighterLatest;
     property public static androidx.ink.brush.BrushFamily highlighterV1;
     property public static androidx.ink.brush.BrushFamily markerLatest;

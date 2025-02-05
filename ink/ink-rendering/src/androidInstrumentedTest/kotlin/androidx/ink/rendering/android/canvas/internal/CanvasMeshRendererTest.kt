@@ -169,7 +169,7 @@ class CanvasMeshRendererTest {
     @Test
     @SdkSuppress(
         minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE,
-        maxSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+        maxSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE,
     )
     fun drawStroke_whenAndroidU_shouldSaveRecentlyDrawnMesh() {
         val renderNode = RenderNode("test")
