@@ -357,6 +357,7 @@ fun CallCard(caller: CallUiState, defaultExpandedState: Boolean = false) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
                     ExtensionsContent(
                         ExtensionUiState(
+                            caller.meetingSummaryUiState,
                             caller.localCallSilenceUiState,
                             caller.participantUiState,
                             caller.callIconUiState

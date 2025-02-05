@@ -71,7 +71,8 @@ internal class ExtensionInitializationScopeImpl(
         initialActiveParticipant: Participant?
     ): ParticipantExtension {
         val participant = ParticipantExtensionImpl(initialParticipants, initialActiveParticipant)
-        registerExtension(onExchangeStarted = participant::onExchangeStarted)
+        registerExtension(onExchangeStarted = participant::onParticipantExchangeStarted)
+        registerExtension(onExchangeStarted = participant::onMeetingSummaryExchangeStarted)
         return participant
     }
 

@@ -165,6 +165,12 @@ class InCallServiceImpl : LocalIcsBinder, InCallServiceCompat() {
                             onParticipantsUpdated = participantsEmitter::onParticipantsChanged
                         )
 
+                    val meetingSummaryEmitter = MeetingSummaryExtensionDataEmitter()
+                    addMeetingSummaryExtension(
+                        onCurrentSpeakerChanged = meetingSummaryEmitter::onCurrentSpeakerChanged,
+                        onParticipantCountChanged = meetingSummaryEmitter::onParticipantCountChanged
+                    )
+
                     val kickParticipantDataEmitter = KickParticipantDataEmitter()
                     val kickParticipantAction = participantExtension.addKickParticipantAction()
 
@@ -215,6 +221,8 @@ class InCallServiceImpl : LocalIcsBinder, InCallServiceCompat() {
                     onConnected {
                         val callData = CallDataEmitter(IcsCall(currId.getAndAdd(1), call)).collect()
 
+                        val meetingSummaryData = meetingSummaryEmitter.collect()
+
                         val participantData =
                             participantsEmitter.collect(
                                 participantExtension.isSupported,
@@ -230,11 +238,12 @@ class InCallServiceImpl : LocalIcsBinder, InCallServiceCompat() {
                         val fullData =
                             combine(
                                 callData,
+                                meetingSummaryData,
                                 participantData,
                                 localCallSilenceData,
                                 callIconData
-                            ) { cd, partData, silenceData, iconData ->
-                                CallData(cd, partData, silenceData, iconData)
+                            ) { cd, summary, partData, silenceData, iconData ->
+                                CallData(cd, summary, partData, silenceData, iconData)
                             }
                         mCallDataAggregator.watch(this@launch, fullData)
                     }
