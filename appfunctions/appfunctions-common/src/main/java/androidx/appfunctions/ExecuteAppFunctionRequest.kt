@@ -16,6 +16,7 @@
 
 package androidx.appfunctions
 
+import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 
@@ -35,9 +36,9 @@ public class ExecuteAppFunctionRequest(
     public val functionParameters: AppFunctionData,
 ) {
 
-    @RequiresApi(36)
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun toPlatformClass(): com.android.extensions.appfunctions.ExecuteAppFunctionRequest {
+    public fun toPlatformExtensionClass():
+        com.android.extensions.appfunctions.ExecuteAppFunctionRequest {
         return com.android.extensions.appfunctions.ExecuteAppFunctionRequest.Builder(
                 targetPackageName,
                 functionIdentifier,
@@ -53,9 +54,10 @@ public class ExecuteAppFunctionRequest(
     }
 
     public companion object {
-        @RequiresApi(36)
+        // TODO: Update this API requirement once AppFunctionData requirement updated.
+        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-        public fun fromPlatformClass(
+        public fun fromPlatformExtensionClass(
             request: com.android.extensions.appfunctions.ExecuteAppFunctionRequest
         ): ExecuteAppFunctionRequest {
             return ExecuteAppFunctionRequest(

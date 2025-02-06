@@ -105,22 +105,34 @@ private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionDat
     val builder = AppFunctionData.Builder("")
     when (type) {
         TYPE_LONG -> {
-            builder.setLong(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE, result as Long)
+            builder.setLong(
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
+                result as Long
+            )
         }
         TYPE_INT -> {
             TODO("Not implemented yet - clarify AppFunctionData.Builder#setInt API")
         }
         TYPE_DOUBLE -> {
-            builder.setDouble(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE, result as Double)
+            builder.setDouble(
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
+                result as Double
+            )
         }
         TYPE_FLOAT -> {
             TODO("Not implemented yet - clarify AppFunctionData.Builder#setFloat API")
         }
         TYPE_BOOLEAN -> {
-            builder.setBoolean(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE, result as Boolean)
+            builder.setBoolean(
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
+                result as Boolean
+            )
         }
         TYPE_STRING -> {
-            builder.setString(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE, result as String)
+            builder.setString(
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
+                result as String
+            )
         }
         TYPE_BYTES -> {
             TODO("Not implemented yet - clarify AppFunctionData.Builder#setBytes API")
@@ -141,7 +153,7 @@ private fun unsafeBuildCollectionReturnValue(type: Int, result: Any): AppFunctio
     when (type) {
         TYPE_LONG -> {
             builder.setLongArray(
-                ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE,
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
                 result as LongArray
             )
         }
@@ -150,7 +162,7 @@ private fun unsafeBuildCollectionReturnValue(type: Int, result: Any): AppFunctio
         }
         TYPE_DOUBLE -> {
             builder.setDoubleArray(
-                ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE,
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
                 result as DoubleArray
             )
         }
@@ -159,14 +171,14 @@ private fun unsafeBuildCollectionReturnValue(type: Int, result: Any): AppFunctio
         }
         TYPE_BOOLEAN -> {
             builder.setBooleanArray(
-                ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE,
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
                 result as BooleanArray
             )
         }
         TYPE_STRING -> {
             @Suppress("UNCHECKED_CAST")
             builder.setStringList(
-                ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE,
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
                 result as List<String>
             )
         }

@@ -28,8 +28,8 @@ import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 class AppFunctionManagerCompatTest {
 
     private lateinit var context: Context
