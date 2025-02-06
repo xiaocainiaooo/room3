@@ -512,7 +512,7 @@ internal class PrefetchHandleProvider(
 }
 
 private const val TraversablePrefetchStateNodeKey =
-    "androidx.compose.foundation.lazy.layout.TraversablePrefetchStateNode"
+    "androidx.wear.compose.foundation.lazy.layout.TraversablePrefetchStateNode"
 
 /**
  * A modifier which lets the [LazyLayoutPrefetchState] for a [LazyLayout] to be discoverable via
