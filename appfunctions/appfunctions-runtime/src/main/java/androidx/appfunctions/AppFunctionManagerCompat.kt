@@ -18,6 +18,7 @@ package androidx.appfunctions
 
 import android.content.Context
 import android.os.Build
+import android.os.CancellationSignal
 import android.os.OutcomeReceiver
 import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
@@ -138,6 +139,74 @@ public class AppFunctionManagerCompat(private val context: Context) {
                 }
             )
         }
+    }
+
+    /**
+     * Execute the app function.
+     *
+     * This method matches the platform behavior defined in
+     * [android.app.appfunctions.AppFunctionManager.executeAppFunction].
+     *
+     * @param request the app function details and the arguments.
+     * @return the result of the attempt to execute the function.
+     * @throws UnsupportedOperationException if AppFunction is not supported on this device.
+     */
+    @RequiresPermission(value = "android.permission.EXECUTE_APP_FUNCTIONS", conditional = true)
+    public suspend fun executeAppFunction(
+        request: ExecuteAppFunctionRequest,
+    ): ExecuteAppFunctionResponse {
+        checkAppFunctionsFeatureSupported()
+        return suspendCancellableCoroutine { cont ->
+            val cancellationSignal = CancellationSignal()
+            cont.invokeOnCancellation { cancellationSignal.cancel() }
+
+            appFunctionManager.executeAppFunction(
+                request.toPlatformExtensionClass(),
+                Runnable::run,
+                cancellationSignal,
+                object :
+                    OutcomeReceiver<
+                        com.android.extensions.appfunctions.ExecuteAppFunctionResponse,
+                        com.android.extensions.appfunctions.AppFunctionException
+                    > {
+                    // TODO: Remove this API requirement once AppFunctionData requirement updated.
+                    @RequiresApi(36)
+                    override fun onResult(
+                        result: com.android.extensions.appfunctions.ExecuteAppFunctionResponse
+                    ) {
+                        cont.resume(
+                            ExecuteAppFunctionResponse.Success.fromPlatformExtensionClass(result)
+                        )
+                    }
+
+                    override fun onError(
+                        error: com.android.extensions.appfunctions.AppFunctionException
+                    ) {
+                        val exception =
+                            fixAppFunctionExceptionErrorType(
+                                AppFunctionException.fromPlatformExtensionsClass(error)
+                            )
+                        cont.resume(ExecuteAppFunctionResponse.Error(exception))
+                    }
+                }
+            )
+        }
+    }
+
+    private fun fixAppFunctionExceptionErrorType(
+        exception: AppFunctionException
+    ): AppFunctionException {
+        // TODO: Once fixed on the platform side, this behaviour should be done based on the SDK.
+        // Platform throws IllegalArgumentException when function not found during function
+        // execution and ends up being AppFunctionSystemUnknownException instead of
+        // AppFunctionFunctionNotFoundException.
+        if (
+            exception is AppFunctionSystemUnknownException &&
+                exception.errorMessage == "IllegalArgumentException: App function not found."
+        ) {
+            return AppFunctionFunctionNotFoundException("App function not found.")
+        }
+        return exception
     }
 
     private fun checkAppFunctionsFeatureSupported() {
