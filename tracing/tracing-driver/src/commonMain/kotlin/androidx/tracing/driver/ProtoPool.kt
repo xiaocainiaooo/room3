@@ -16,6 +16,7 @@
 
 package androidx.tracing.driver
 
+import androidx.annotation.RestrictTo
 import perfetto.protos.MutableCounterDescriptor
 import perfetto.protos.MutableProcessDescriptor
 import perfetto.protos.MutableThreadDescriptor
@@ -32,7 +33,8 @@ private const val THREAD_DESCRIPTOR_POOL_SIZE = 4
 private const val COUNTER_DESCRIPTOR_POOL_SIZE = 4
 // The size of the array
 // This would mean that each pool can queue up to 32 * 32 trace packets
-internal const val TRACE_PACKET_BUFFER_SIZE = 32
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACE_PACKET_BUFFER_SIZE: Int = 32
 // The size of the pool
 private const val TRACE_PACKET_POOL_ARRAY_POOL_SIZE = 32
 

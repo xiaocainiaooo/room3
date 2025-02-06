@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.benchmark
+package androidx.tracing.benchmark.perfetto
 
 import android.os.Build
 import androidx.benchmark.ExperimentalBenchmarkConfigApi
@@ -29,7 +29,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import java.util.UUID
+import androidx.tracing.benchmark.BASIC_STRING
+import androidx.tracing.benchmark.LARGE_STRING_POOL
+import androidx.tracing.perfetto.PerfettoSdkTrace
 import junit.framework.TestCase.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -44,33 +46,18 @@ import org.junit.runner.RunWith
 /**
  * Measures overhead of Perfetto SDK tracing [androidx.tracing.perfetto].
  *
- * @see [PerfettoOverheadBenchmark]
+ * NOTE: benchmark behavior isn't consistent with other tracing benchmarks, this should be addressed
  */
-class PerfettoSdkOverheadBenchmark {
+class PerfettoSdkBenchmark {
     private val targetPackage =
         InstrumentationRegistry.getInstrumentation().targetContext.packageName
 
     @get:Rule val benchmarkRule = BenchmarkRule(MicrobenchmarkConfig(traceAppTagEnabled = true))
 
-    private val testData = Array(50_000) { UUID.randomUUID().toString() }
-
     @Before
     fun setUp() = assumeTrue(isAbiSupported()) // We need all tests to work to compare their results
 
-    /** Empty baseline, no tracing. Expect similar results to [TrivialJavaBenchmark.nothing]. */
-    @Test fun empty() = benchmarkRule.measureRepeated { /* nothing */ }
-
-    /**
-     * The trace section within runWithMeasurementDisabled, even though not measured, can impact the
-     * results of a small benchmark significantly.
-     */
-    @Test
-    fun runWithMeasurementDisabled() =
-        benchmarkRule.measureRepeated { runWithMeasurementDisabled { /* nothing */ } }
-
-    /** Measuring overhead of [androidx.tracing.perfetto.PerfettoSdkTrace]. */
-    @Test
-    fun traceBeginEnd_perfettoSdkTrace() {
+    private fun enablePerfettoSdk() {
         PerfettoCapture()
             .enableAndroidxTracingPerfetto(
                 PerfettoSdkConfig(targetPackage, InitialProcessState.Alive)
@@ -81,20 +68,26 @@ class PerfettoSdkOverheadBenchmark {
                     resultCode in arrayOf(1, 2) // 1 = success, 2 = already enabled
                 )
             }
-        var ix = 0
+    }
+
+    /** Measuring overhead of [androidx.tracing.perfetto.PerfettoSdkTrace]. */
+    @Test
+    fun beginEnd_basic() {
+        enablePerfettoSdk()
         benchmarkRule.measureRepeated {
-            androidx.tracing.perfetto.PerfettoSdkTrace.beginSection(testData[ix++ % testData.size])
-            androidx.tracing.perfetto.PerfettoSdkTrace.endSection()
+            PerfettoSdkTrace.beginSection(BASIC_STRING)
+            PerfettoSdkTrace.endSection()
         }
     }
 
-    /** Measuring overhead of [android.os.Trace] as a reference point. */
+    /** Measuring overhead of [androidx.tracing.perfetto.PerfettoSdkTrace]. */
     @Test
-    fun traceBeginEnd_androidOsTrace() {
+    fun beginEnd_largeStringPool() {
+        enablePerfettoSdk()
         var ix = 0
         benchmarkRule.measureRepeated {
-            android.os.Trace.beginSection(testData[ix++ % testData.size])
-            android.os.Trace.endSection()
+            PerfettoSdkTrace.beginSection(LARGE_STRING_POOL[ix++ % LARGE_STRING_POOL.size])
+            PerfettoSdkTrace.endSection()
         }
     }
 }
