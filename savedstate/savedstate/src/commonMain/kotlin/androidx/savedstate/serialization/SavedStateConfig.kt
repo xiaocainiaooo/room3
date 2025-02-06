@@ -44,9 +44,7 @@ private constructor(
      * Builder of the [SavedStateConfig] instance provided by `SavedStateConfig { ... }` factory
      * function.
      */
-    @Suppress(
-        "MissingBuildMethod", // We do have an internal `build()` and the class is internal as well.
-    )
+    @Suppress("MissingBuildMethod") // `build()` is internal, only used by the DSL.
     public class Builder internal constructor(config: SavedStateConfig) {
 
         /**
@@ -57,9 +55,8 @@ private constructor(
          * @see Contextual
          * @see Polymorphic
          */
-        @get:Suppress("GetterOnBuilder") // Kotlin doesn't support `public set` with `private get`:
-        // https://youtrack.jetbrains.com/issue/KT-3110
-        @set:Suppress("SetterReturnsThis")
+        @get:Suppress("GetterOnBuilder") // Kotlin issue: KT-3110 (private get with public set).
+        @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
         public var serializersModule: SerializersModule = config.serializersModule
 
         internal fun build(): SavedStateConfig {
