@@ -64,7 +64,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
             "-${relation.createLoadAllSql()}"
     }
 
-    override fun prepare(methodName: String, writer: TypeWriter, builder: XFunSpec.Builder) {
+    override fun prepare(functionName: String, writer: TypeWriter, builder: XFunSpec.Builder) {
         val scope = CodeGenScope(writer = writer)
         scope.builder.apply {
             // Check the input map key set for emptiness, returning early as no fetching is needed.
@@ -82,7 +82,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
                     "999"
                 )
                 .apply {
-                    addRecursiveFetchCall(scope, methodName)
+                    addRecursiveFetchCall(scope, functionName)
                     addStatement("return")
                 }
                 .endControlFlow()
