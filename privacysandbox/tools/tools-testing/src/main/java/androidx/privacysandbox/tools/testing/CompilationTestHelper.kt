@@ -33,7 +33,7 @@ import javax.tools.Diagnostic
 object CompilationTestHelper {
     fun assertCompiles(sources: List<Source>): TestCompilationResult {
         val result = compileAll(sources)
-        assertThat(result).succeeds()
+        assertThat(result).succeedsExcludingOptInWarnings()
         return result
     }
 

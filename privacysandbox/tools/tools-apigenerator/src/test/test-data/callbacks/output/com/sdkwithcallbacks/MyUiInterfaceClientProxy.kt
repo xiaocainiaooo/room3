@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
-import androidx.privacysandbox.ui.core.SandboxedUiAdapter.SessionClient
 import androidx.privacysandbox.ui.core.SessionConstants
 import java.util.concurrent.Executor
 
