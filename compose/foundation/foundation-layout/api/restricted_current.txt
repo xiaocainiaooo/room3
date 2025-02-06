@@ -292,6 +292,7 @@ package androidx.compose.foundation.layout {
     method public float calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method public float calculateRightPadding(androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method public float calculateTopPadding();
+    field public static final androidx.compose.foundation.layout.PaddingValues.Companion Companion;
   }
 
   @androidx.compose.runtime.Immutable public static final class PaddingValues.Absolute implements androidx.compose.foundation.layout.PaddingValues {
@@ -301,6 +302,11 @@ package androidx.compose.foundation.layout {
     method public float calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method public float calculateRightPadding(androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method public float calculateTopPadding();
+  }
+
+  public static final class PaddingValues.Companion {
+    method @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.PaddingValues getZero();
+    property @androidx.compose.runtime.Stable public androidx.compose.foundation.layout.PaddingValues Zero;
   }
 
   public final class RowKt {
