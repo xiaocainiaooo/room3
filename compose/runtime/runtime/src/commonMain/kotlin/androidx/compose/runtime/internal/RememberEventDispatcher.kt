@@ -155,7 +155,7 @@ internal class RememberEventDispatcher(
                 val releasing = releasing
                 for (i in leaving.size - 1 downTo 0) {
                     val instance = leaving[i]
-                    withCompositionTrace(instance) {
+                    withComposeStackTrace(instance) {
                         if (instance is RememberObserverHolder) {
                             val wrapped = instance.wrapped
                             abandoning.remove(wrapped)
@@ -184,7 +184,7 @@ internal class RememberEventDispatcher(
         list.forEach { instance ->
             val wrapped = instance.wrapped
             abandoning.remove(wrapped)
-            withCompositionTrace(instance) { wrapped.onRemembered() }
+            withComposeStackTrace(instance) { wrapped.onRemembered() }
         }
     }
 
@@ -299,7 +299,7 @@ internal class RememberEventDispatcher(
         }
     }
 
-    private inline fun <T> withCompositionTrace(instance: Any, block: () -> T): T =
+    private inline fun <T> withComposeStackTrace(instance: Any, block: () -> T): T =
         try {
             block()
         } catch (e: Throwable) {

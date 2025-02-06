@@ -59,12 +59,12 @@ sealed interface CompositionErrorContext {
 internal class CompositionErrorContextImpl(private val composer: ComposerImpl) :
     CompositionErrorContext, OperationErrorContext, CoroutineContext.Element {
     override fun Throwable.attachComposeStackTrace(composeNode: Any): Boolean =
-        tryAttachComposeTrace {
-            composer.compositionTraceForValue(composeNode)
+        tryAttachComposeStackTrace {
+            composer.stackTraceForValue(composeNode)
         }
 
-    override fun buildStackTrace(currentOffset: Int?): List<ComposeTraceFrame> =
-        composer.parentCompositionTrace()
+    override fun buildStackTrace(currentOffset: Int?): List<ComposeStackTraceFrame> =
+        composer.parentStackTrace()
 
     companion object Key : CoroutineContext.Key<CompositionErrorContextImpl> {
         override fun toString(): String = "CompositionErrorContext"

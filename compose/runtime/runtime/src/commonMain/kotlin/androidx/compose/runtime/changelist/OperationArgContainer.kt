@@ -16,7 +16,7 @@
 
 package androidx.compose.runtime.changelist
 
-import androidx.compose.runtime.tooling.ComposeTraceFrame
+import androidx.compose.runtime.tooling.ComposeStackTraceFrame
 
 /** A container of parameters assigned to the arguments of an [Operation]. */
 internal interface OperationArgContainer {
@@ -34,5 +34,5 @@ internal interface OperationErrorContext {
      * child of the current group that is located at the slot specified by [currentOffset]. Current
      * group and context root are defined by the operation that is executed during a crash.
      */
-    fun buildStackTrace(currentOffset: Int?): List<ComposeTraceFrame>
+    fun buildStackTrace(currentOffset: Int?): List<ComposeStackTraceFrame>
 }

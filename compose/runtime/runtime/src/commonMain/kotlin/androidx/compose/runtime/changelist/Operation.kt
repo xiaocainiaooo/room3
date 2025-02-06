@@ -40,8 +40,8 @@ import androidx.compose.runtime.internal.identityHashCode
 import androidx.compose.runtime.removeCurrentGroup
 import androidx.compose.runtime.runtimeCheck
 import androidx.compose.runtime.snapshots.fastForEachIndexed
-import androidx.compose.runtime.tooling.ComposeTraceFrame
-import androidx.compose.runtime.tooling.attachComposeTrace
+import androidx.compose.runtime.tooling.ComposeStackTraceFrame
+import androidx.compose.runtime.tooling.attachComposeStackTrace
 import androidx.compose.runtime.tooling.buildTrace
 import androidx.compose.runtime.withAfterAnchorInfo
 import kotlin.jvm.JvmInline
@@ -52,13 +52,13 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
     val name: String
         get() = this::class.simpleName.orEmpty()
 
-    fun OperationArgContainer.executeWithCompositionTrace(
+    fun OperationArgContainer.executeWithComposeStackTrace(
         applier: Applier<*>,
         slots: SlotWriter,
         rememberManager: RememberManager,
         errorContext: OperationErrorContext?
     ) {
-        withCompositionTrace(errorContext, slots, getGroupAnchor(slots)) {
+        withCurrentStackTrace(errorContext, slots, getGroupAnchor(slots)) {
             execute(applier, slots, rememberManager, errorContext)
         }
     }
@@ -709,7 +709,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
                     applier,
                     writer,
                     rememberManager,
-                    errorContext?.withCurrentTrace(slots)
+                    errorContext?.withCurrentStackTrace(slots)
                 )
             }
             slots.beginInsert()
@@ -1034,7 +1034,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
                         },
                     slots = slots,
                     rememberManager = rememberManager,
-                    errorContext = errorContext?.withCurrentTrace(slots)
+                    errorContext = errorContext?.withCurrentStackTrace(slots)
                 )
         }
     }
@@ -1121,7 +1121,7 @@ private fun positionToInsert(slots: SlotWriter, anchor: Anchor, applier: Applier
     return nodeIndex
 }
 
-private inline fun withCompositionTrace(
+private inline fun withCurrentStackTrace(
     errorContext: OperationErrorContext?,
     writer: SlotWriter,
     location: Anchor?,
@@ -1130,17 +1130,17 @@ private inline fun withCompositionTrace(
     try {
         block()
     } catch (e: Throwable) {
-        throw e.attachComposeTrace(errorContext, writer, location)
+        throw e.attachComposeStackTrace(errorContext, writer, location)
     }
 }
 
-private fun Throwable.attachComposeTrace(
+private fun Throwable.attachComposeStackTrace(
     errorContext: OperationErrorContext?,
     writer: SlotWriter,
     anchor: Anchor?
 ): Throwable {
     if (errorContext == null) return this
-    return attachComposeTrace {
+    return attachComposeStackTrace {
         if (anchor != null) {
             writer.seek(anchor)
         }
@@ -1160,10 +1160,10 @@ private fun Throwable.attachComposeTrace(
     }
 }
 
-private fun OperationErrorContext.withCurrentTrace(slots: SlotWriter): OperationErrorContext {
+private fun OperationErrorContext.withCurrentStackTrace(slots: SlotWriter): OperationErrorContext {
     val parent = this
     return object : OperationErrorContext {
-        override fun buildStackTrace(currentOffset: Int?): List<ComposeTraceFrame> {
+        override fun buildStackTrace(currentOffset: Int?): List<ComposeStackTraceFrame> {
             val parentTrace = parent.buildStackTrace(null)
             // Slots are positioned at the start of the next group when insertion happens
             val currentGroup = slots.parent
