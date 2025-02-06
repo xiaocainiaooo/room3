@@ -19,12 +19,13 @@ package androidx.compose.runtime
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.snapshots.Snapshot
-import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -138,17 +139,8 @@ class SnapshotFlowTests {
         val stateFlow = MutableStateFlow(1)
         val flow =
             stateFlow.map { value ->
-                val context = currentCoroutineContext()
-                "$value on " +
-                    when (val dispatcher = context[CoroutineDispatcher.Key]) {
-                        Dispatchers.Main -> "Dispatchers.Main"
-                        Dispatchers.IO -> "Dispatchers.IO"
-                        Dispatchers.Default -> "Dispatchers.Default"
-                        Dispatchers.Unconfined -> "Dispatchers.Unconfined"
-                        is TestDispatcher -> "TestDispatcher"
-                        null -> "Unspecified Dispatcher"
-                        else -> dispatcher.toString()
-                    }
+                val dispatcher = currentCoroutineContext()[CoroutineDispatcher.Key]
+                "$value on ${if (dispatcher is TestDispatcher) "Test" else "$dispatcher"}"
             }
 
         var lastOuterSeen: String? = null
@@ -158,13 +150,16 @@ class SnapshotFlowTests {
 
         compose {
             lastOuterSeen = flow.collectAsState("").value
-            CompositionLocalProvider(LocalCollectAsStateCoroutineContext provides Dispatchers.IO) {
+            CompositionLocalProvider(
+                LocalCollectAsStateCoroutineContext provides rememberFakeDispatcher("Outer")
+            ) {
                 lastInnerSeen = flow.collectAsState("").value
                 CompositionLocalProvider(
-                    LocalCollectAsStateCoroutineContext provides EmptyCoroutineContext
+                    LocalCollectAsStateCoroutineContext provides rememberFakeDispatcher("Inner")
                 ) {
                     lastNestedSeen = flow.collectAsState("").value
-                    lastExplicitSeen = flow.collectAsState("", Dispatchers.Unconfined).value
+                    lastExplicitSeen =
+                        flow.collectAsState("", rememberFakeDispatcher("Explicit")).value
                 }
             }
         }
@@ -172,18 +167,31 @@ class SnapshotFlowTests {
         advanceTimeBy(1)
         expectNoChanges()
 
-        assertEquals("1 on TestDispatcher", lastOuterSeen)
-        assertEquals("1 on Dispatchers.IO", lastInnerSeen)
-        assertEquals("1 on TestDispatcher", lastNestedSeen)
-        assertEquals("1 on Dispatchers.Unconfined", lastExplicitSeen)
+        assertEquals("1 on Test", lastOuterSeen)
+        assertEquals("1 on Outer", lastInnerSeen)
+        assertEquals("1 on Inner", lastNestedSeen)
+        assertEquals("1 on Explicit", lastExplicitSeen)
 
         stateFlow.value++
         advanceTimeBy(1)
         expectNoChanges()
 
-        assertEquals("2 on TestDispatcher", lastOuterSeen)
-        assertEquals("2 on Dispatchers.IO", lastInnerSeen)
-        assertEquals("2 on TestDispatcher", lastNestedSeen)
-        assertEquals("2 on Dispatchers.Unconfined", lastExplicitSeen)
+        assertEquals("2 on Test", lastOuterSeen)
+        assertEquals("2 on Outer", lastInnerSeen)
+        assertEquals("2 on Inner", lastNestedSeen)
+        assertEquals("2 on Explicit", lastExplicitSeen)
+    }
+
+    @Composable
+    private fun rememberFakeDispatcher(name: String) = remember { NamedUnconfinedDispatcher(name) }
+
+    class NamedUnconfinedDispatcher(val name: String) : CoroutineDispatcher() {
+        override fun isDispatchNeeded(context: CoroutineContext) = false
+
+        override fun dispatch(context: CoroutineContext, block: Runnable) {
+            block.run()
+        }
+
+        override fun toString() = name
     }
 }
