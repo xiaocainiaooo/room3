@@ -1139,6 +1139,12 @@ internal class LayoutNode(
      * measurement need to be re-done. Such events include modifier change, attach/detach, etc.
      */
     internal fun invalidateMeasurements() {
+        if (isVirtual) {
+            // If the node is virtual, we need to invalidate the parent node (as it is non-virtual)
+            // instead so that children get properly invalidated.
+            parent?.invalidateMeasurements()
+            return
+        }
         outerToInnerOffsetDirty = true
         if (lookaheadRoot != null) {
             requestLookaheadRemeasure()
