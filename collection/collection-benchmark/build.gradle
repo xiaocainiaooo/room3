@@ -37,7 +37,7 @@ plugins {
 }
 
 androidXMultiplatform {
-    android()
+    androidTarget()
 
     // XCFrameworkConfig must always be called AndroidXDarwinBenchmarks
     def xcf = new XCFrameworkConfig(project, "AndroidXDarwinBenchmarks")

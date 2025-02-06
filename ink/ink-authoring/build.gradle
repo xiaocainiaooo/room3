@@ -23,7 +23,7 @@ plugins {
 }
 
 androidXMultiplatform {
-    android()
+    androidTarget()
 
     defaultPlatform(PlatformIdentifier.ANDROID)
 
