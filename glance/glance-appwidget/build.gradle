@@ -111,7 +111,6 @@ androidx {
     description = "Glance-appwidgets allows developers to build layouts for Android AppWidgets " +
             "using a Jetpack Compose-style API."
     legacyDisableKotlinStrictApiMode = true
-    metalavaK2UastEnabled = false
     samples(project(":glance:glance-appwidget:glance-appwidget-samples"))
     addGoldenImageAssets()
 }
