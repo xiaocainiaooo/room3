@@ -23,6 +23,22 @@ import kotlin.test.Test
 internal class SavedStateTest : RobolectricTest() {
 
     @Test
+    fun factory_withMap_hasInitialState() {
+        val oldState = createDefaultSavedState().read { toMap() }
+        val newState = savedState(oldState).read { toMap() }
+
+        assertThat(newState).isEqualTo(oldState)
+    }
+
+    @Test
+    fun factory_withSavedState_hasInitialState() {
+        val oldState = createDefaultSavedState()
+        val newState = savedState(oldState)
+
+        assertThat(oldState.read { contentDeepEquals(newState) }).isTrue()
+    }
+
+    @Test
     fun contains_whenHasKey_returnsTrue() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
