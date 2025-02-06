@@ -16,28 +16,47 @@
 
 package androidx.savedstate.serialization
 
-import androidx.savedstate.SavedState
 import androidx.savedstate.serialization.SavedStateConfig.Builder
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmOverloads
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 
 /**
- * Configuration for [SavedState] encoding and decoding. Use the factory function with the same name
- * to create instances of this class.
+ * Configuration of the current [SavedStateConfig] configured with [SavedStateConfig.Builder].
+ *
+ * Can be used via [encodeToSavedState] and [decodeFromSavedState].
+ *
+ * Standalone configuration object cannot be used outside the encode and decode functions provided
+ * by SavedState.
+ *
+ * Detailed description of each property is available in [SavedStateConfig.Builder] class.
  *
  * @see SavedStateConfig.Builder
  */
-public class SavedStateConfig private constructor(
+public class SavedStateConfig
+private constructor(
     @PublishedApi internal val serializersModule: SerializersModule = EmptySerializersModule(),
 ) {
-    /** Builder for [SavedStateConfig]. Used by `SavedStateCodecConfig` factory function. */
+    /**
+     * Builder of the [SavedStateConfig] instance provided by `SavedStateConfig { ... }` factory
+     * function.
+     */
     @Suppress(
         "MissingBuildMethod", // We do have an internal `build()` and the class is internal as well.
     )
     public class Builder internal constructor(config: SavedStateConfig) {
 
+        /**
+         * Module with contextual and polymorphic serializers to be used in the resulting
+         * [SavedStateConfig] instance.
+         *
+         * @see SerializersModule
+         * @see Contextual
+         * @see Polymorphic
+         */
         @get:Suppress("GetterOnBuilder") // Kotlin doesn't support `public set` with `private get`:
         // https://youtrack.jetbrains.com/issue/KT-3110
         @set:Suppress("SetterReturnsThis")
@@ -49,18 +68,28 @@ public class SavedStateConfig private constructor(
     }
 
     public companion object {
-        /** An instance of [SavedStateConfig] with default configuration. */
+        /**
+         * The default instance of [SavedStateConfig] with default configuration.
+         *
+         * This configuration is used by [encodeToSavedState] and [decodeFromSavedState] unless an
+         * alternative configuration is explicitly provided.
+         *
+         * @see encodeToSavedState
+         * @see decodeFromSavedState
+         */
         @JvmField public val DEFAULT: SavedStateConfig = SavedStateConfig()
     }
 }
 
 /**
- * Factory function for creating instances of [SavedStateConfig].
- *
- * Example usage:
+ * Creates an instance of [SavedStateConfig] configured from the optionally given [from] and
+ * adjusted with [builderAction].
  *
  * @sample androidx.savedstate.config
- * @param builderAction The function to configure the builder.
+ * @param from An optional initial [SavedStateConfig] to start with. Defaults to
+ *   [SavedStateConfig.DEFAULT].
+ * @param builderAction A lambda function to configure the [Builder] for additional customization.
+ * @return A new [SavedStateConfig] instance configured based on the provided parameters.
  */
 @JvmOverloads
 public fun SavedStateConfig(
