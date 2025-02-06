@@ -7,74 +7,72 @@
         <id>com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveParams</id>
         <enabledByDefault>true</enabledByDefault>
         <parameters>
+            <dataTypeMetadata>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>7</type>
+            </dataTypeMetadata>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <properties>
-                <dataTypeMetadata>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>7</type>
-                </dataTypeMetadata>
+            <isRequired>true</isRequired>
+            <name>arg1</name>
+        </parameters>
+        <parameters>
+            <dataTypeMetadata>
                 <id>unused</id>
-                <name>arg1</name>
-            </properties>
-            <properties>
-                <dataTypeMetadata>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>6</type>
-                </dataTypeMetadata>
+                <isNullable>false</isNullable>
+                <type>6</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg2</name>
+        </parameters>
+        <parameters>
+            <dataTypeMetadata>
                 <id>unused</id>
-                <name>arg2</name>
-            </properties>
-            <properties>
-                <dataTypeMetadata>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>5</type>
-                </dataTypeMetadata>
+                <isNullable>false</isNullable>
+                <type>5</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg3</name>
+        </parameters>
+        <parameters>
+            <dataTypeMetadata>
                 <id>unused</id>
-                <name>arg3</name>
-            </properties>
-            <properties>
-                <dataTypeMetadata>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>4</type>
-                </dataTypeMetadata>
+                <isNullable>false</isNullable>
+                <type>4</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg4</name>
+        </parameters>
+        <parameters>
+            <dataTypeMetadata>
                 <id>unused</id>
-                <name>arg4</name>
-            </properties>
-            <properties>
-                <dataTypeMetadata>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>8</type>
-                </dataTypeMetadata>
+                <isNullable>false</isNullable>
+                <type>8</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg5</name>
+        </parameters>
+        <parameters>
+            <dataTypeMetadata>
                 <id>unused</id>
-                <name>arg5</name>
-            </properties>
-            <properties>
-                <dataTypeMetadata>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>1</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>arg6</name>
-            </properties>
-            <required>arg1</required>
-            <required>arg2</required>
-            <required>arg3</required>
-            <required>arg4</required>
-            <required>arg5</required>
-            <required>arg6</required>
-            <type>3</type>
+                <isNullable>false</isNullable>
+                <type>1</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg6</name>
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>0</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>0</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>

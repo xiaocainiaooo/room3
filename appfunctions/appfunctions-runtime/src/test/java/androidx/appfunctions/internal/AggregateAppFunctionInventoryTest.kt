@@ -19,8 +19,8 @@ package androidx.appfunctions.internal
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
-import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -75,16 +75,14 @@ class AggregateAppFunctionInventoryTest {
                         id = "androix.appfunctions.internal#test1",
                         isEnabledByDefault = false,
                         schema = null,
-                        parameters =
-                            AppFunctionObjectTypeMetadata(
-                                properties = emptyMap(),
-                                required = emptyList(),
-                                isNullable = false
-                            ),
+                        parameters = emptyList(),
                         response =
-                            AppFunctionPrimitiveTypeMetadata(
-                                type = AppFunctionDataTypeMetadata.TYPE_UNIT,
-                                isNullable = false
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionDataTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    ),
                             ),
                         components = AppFunctionComponentsMetadata()
                     )
@@ -99,16 +97,14 @@ class AggregateAppFunctionInventoryTest {
                         id = "androix.appfunctions.internal#test2",
                         isEnabledByDefault = false,
                         schema = null,
-                        parameters =
-                            AppFunctionObjectTypeMetadata(
-                                properties = emptyMap(),
-                                required = emptyList(),
-                                isNullable = false
-                            ),
+                        parameters = emptyList(),
                         response =
-                            AppFunctionPrimitiveTypeMetadata(
-                                type = AppFunctionDataTypeMetadata.TYPE_UNIT,
-                                isNullable = false
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionDataTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    ),
                             ),
                         components = AppFunctionComponentsMetadata()
                     )

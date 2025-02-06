@@ -27,13 +27,11 @@ class AppFunctionMetadataTest {
     fun appFunctionMetadata_equalsAndHashCode() {
         val schema =
             AppFunctionSchemaMetadata(category = "testCategory", name = "testName", version = 1L)
-        val parameters =
-            AppFunctionObjectTypeMetadata(
-                properties = emptyMap(),
-                required = emptyList(),
-                isNullable = false
+        val parameters = emptyList<AppFunctionParameterMetadata>()
+        val response =
+            AppFunctionResponseMetadata(
+                valueType = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
             )
-        val response = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
 
         val metadata1 =
             AppFunctionMetadata(
@@ -74,18 +72,32 @@ class AppFunctionMetadataTest {
             AppFunctionSchemaMetadata(category = "testCategory", name = "testName", version = 1L)
         val primitiveTypeInt = AppFunctionPrimitiveTypeMetadata(TYPE_INT, true)
         val primitiveTypeLong = AppFunctionPrimitiveTypeMetadata(TYPE_LONG, true)
-        val properties =
-            mapOf(
-                "prop1" to primitiveTypeInt,
-                "prop2" to primitiveTypeLong,
+        val parameters =
+            listOf<AppFunctionParameterMetadata>(
+                AppFunctionParameterMetadata(
+                    name = "prop1",
+                    isRequired = false,
+                    dataType = primitiveTypeInt
+                ),
+                AppFunctionParameterMetadata(
+                    name = "prop2",
+                    isRequired = true,
+                    dataType = primitiveTypeLong
+                ),
             )
-        val isNullable = false
-        val requiredProperties = listOf("prop1", "prop2")
-        val parameters = AppFunctionObjectTypeMetadata(properties, requiredProperties, isNullable)
-        val response = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
+        val response =
+            AppFunctionResponseMetadata(
+                valueType = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
+            )
         val primitiveType1 = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false)
         val primitiveType2 = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true)
-        val components = AppFunctionComponentsMetadata(listOf(primitiveType1, primitiveType2))
+        val components =
+            AppFunctionComponentsMetadata(
+                mapOf(
+                    "dataType1" to primitiveType1,
+                    "dataType2" to primitiveType2,
+                )
+            )
         val appFunctionMetadata =
             AppFunctionMetadata(
                 id = id,
@@ -95,18 +107,18 @@ class AppFunctionMetadataTest {
                 response = response,
                 components = components
             )
+
+        val actualAppFunctionMetadataDocument = appFunctionMetadata.toAppFunctionMetadataDocument()
+
         val expectedAppFunctionMetadataDocument =
             AppFunctionMetadataDocument(
                 id = id,
                 isEnabledByDefault = isEnabledByDefault,
                 schema = schemaMetadata.toAppFunctionSchemaMetadataDocument(),
-                parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
-                response = response.toAppFunctionDataTypeMetadataDocument(),
+                parameters = parameters.map { it.toAppFunctionParameterMetadataDocument() },
+                response = response.toAppFunctionResponseMetadataDocument(),
                 components = components.toAppFunctionComponentsMetadataDocument()
             )
-
-        val actualAppFunctionMetadataDocument = appFunctionMetadata.toAppFunctionMetadataDocument()
-
         assertThat(actualAppFunctionMetadataDocument).isEqualTo(expectedAppFunctionMetadataDocument)
     }
 }
