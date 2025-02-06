@@ -69,7 +69,7 @@ class TracingDemoTest {
     }
 
     internal suspend fun ProcessTrack.computeHistogram(list: List<Int>): Map<Int, Int> {
-        val counter = CounterTrack("Batches Completed")
+        val counter = getOrCreateCounterTrack("Batches Completed")
         val frequency = mutableMapOf<Int, Int>()
         for (element in list) {
             val count = frequency[element] ?: 0

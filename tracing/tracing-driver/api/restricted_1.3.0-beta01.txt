@@ -47,8 +47,8 @@ package androidx.tracing.driver {
 
   public class ProcessTrack extends androidx.tracing.driver.EventTrack {
     ctor public ProcessTrack(androidx.tracing.driver.TraceContext context, int id, String name, optional boolean hasPreamble);
-    method public androidx.tracing.driver.CounterTrack CounterTrack(String name);
-    method public androidx.tracing.driver.ThreadTrack ThreadTrack(int id, String name);
+    method public androidx.tracing.driver.CounterTrack getOrCreateCounterTrack(String name);
+    method public androidx.tracing.driver.ThreadTrack getOrCreateThreadTrack(int id, String name);
     method public androidx.tracing.driver.PooledTracePacket? preamblePacket();
   }
 
@@ -61,6 +61,7 @@ package androidx.tracing.driver {
     ctor public TraceContext(int sequenceId, androidx.tracing.driver.TraceSink sink, boolean isEnabled);
     method public void close();
     method public final void flush();
+    method public androidx.tracing.driver.ProcessTrack getOrCreateProcessTrack(int id, String name);
     method public final int getSequenceId();
     method public final androidx.tracing.driver.TraceSink getSink();
     method public final boolean isEnabled();

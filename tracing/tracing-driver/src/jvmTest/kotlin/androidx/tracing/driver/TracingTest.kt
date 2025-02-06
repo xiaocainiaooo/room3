@@ -62,8 +62,8 @@ class TracingTest {
     @Test
     internal fun testProcessTrackEvents() {
         context.use {
-            val process = context.ProcessTrack(id = 1, name = "process")
-            val thread = process.ThreadTrack(1, "thread")
+            val process = context.getOrCreateProcessTrack(id = 1, name = "process")
+            val thread = process.getOrCreateThreadTrack(1, "thread")
             thread.trace("section") {}
         }
         assertTrue(sink.packets.size == 4)
@@ -81,8 +81,8 @@ class TracingTest {
     @Test
     internal fun testCounterTrackEvents() {
         context.use {
-            val process = context.ProcessTrack(id = 1, name = "process")
-            val counter = process.CounterTrack("counter")
+            val process = context.getOrCreateProcessTrack(id = 1, name = "process")
+            val counter = process.getOrCreateCounterTrack("counter")
             counter.emitLongCounterPacket(10L)
         }
         assertTrue(sink.packets.size == 3)
@@ -91,7 +91,7 @@ class TracingTest {
     @Test
     internal fun testAsyncEventsInProcess() {
         context.use {
-            val process = context.ProcessTrack(id = 1, name = "process")
+            val process = context.getOrCreateProcessTrack(id = 1, name = "process")
             process.trace("section") {}
             process.trace("section2") {}
         }
@@ -109,7 +109,7 @@ class TracingTest {
     internal fun testAsyncEventsWithFlows() = runTest {
         context.use {
             with(context) {
-                val process = ProcessTrack(id = 1, name = "process")
+                val process = getOrCreateProcessTrack(id = 1, name = "process")
                 with(process) {
                     traceFlow("service") {
                         coroutineScope {

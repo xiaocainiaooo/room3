@@ -45,7 +45,7 @@ use the following API:
 
 ```kotlin
 // driver.ProcessTrack(...) is an alias for driver.context.ProcessTrack(...)
-val process = driver.context.ProcessTrack(
+val process = driver.context.getOrCreateProcessTrack(
     // The process id
     id = 1,
     // The name of the process
@@ -59,7 +59,7 @@ To create a [ThreadTrack](src/commonMain/kotlin/androidx/tracing/driver/ThreadTr
 use a `ProcessTrack` instance :
 
 ```kotlin
-val threadTrack = process.ThreadTrack(
+val threadTrack = process.getOrCreateThreadTrack(
     // The thread id
     id = 10,
     // The name of the thread
@@ -120,7 +120,7 @@ You can also create tracks that emit counters as metrics. To create a counter yo
 
 ```kotlin
 // The name of the counter.
-val counter = process.CounterTrack("MemoryUsage")
+val counter = process.getOrCreateCounterTrack("MemoryUsage")
 ```
 
 To emit metrics you can:
