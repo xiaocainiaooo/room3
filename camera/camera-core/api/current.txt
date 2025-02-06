@@ -61,6 +61,7 @@ package androidx.camera.core {
     method public default boolean isFocusMeteringSupported(androidx.camera.core.FocusMeteringAction);
     method public default boolean isLogicalMultiCameraSupported();
     method public default boolean isLowLightBoostSupported();
+    method public default boolean isTorchStrengthSupported();
     method @SuppressCompatibility @androidx.camera.core.ExperimentalZeroShutterLag public default boolean isZslSupported();
     method public static boolean mustPlayShutterSound();
     method public default java.util.Set<androidx.camera.core.DynamicRange!> querySupportedDynamicRanges(java.util.Set<androidx.camera.core.DynamicRange!>);
