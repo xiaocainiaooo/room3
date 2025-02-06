@@ -192,8 +192,7 @@ package androidx.savedstate {
 package androidx.savedstate.serialization {
 
   public final class SavedStateConfig {
-    method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
-    property public kotlinx.serialization.modules.SerializersModule serializersModule;
+    property @kotlin.PublishedApi internal kotlinx.serialization.modules.SerializersModule serializersModule;
     field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
     field public static final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
   }

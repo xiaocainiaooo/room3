@@ -26,15 +26,17 @@ import kotlinx.serialization.modules.SerializersModule
  * Configuration for [SavedState] encoding and decoding. Use the factory function with the same name
  * to create instances of this class.
  *
- * @property serializersModule The [SerializersModule] to use for encoding or decoding.
  * @see SavedStateConfig.Builder
  */
-public class SavedStateConfig private constructor(public val serializersModule: SerializersModule) {
+public class SavedStateConfig private constructor(
+    @PublishedApi internal val serializersModule: SerializersModule,
+) {
     /** Builder for [SavedStateConfig]. Used by `SavedStateCodecConfig` factory function. */
     @Suppress(
         "MissingBuildMethod", // We do have an internal `build()` and the class is internal as well.
     )
     public class Builder internal constructor() {
+
         /** The [SerializersModule] to use. */
         @get:Suppress("GetterOnBuilder") // Kotlin doesn't support `public set` with `private get`:
         // https://youtrack.jetbrains.com/issue/KT-3110
