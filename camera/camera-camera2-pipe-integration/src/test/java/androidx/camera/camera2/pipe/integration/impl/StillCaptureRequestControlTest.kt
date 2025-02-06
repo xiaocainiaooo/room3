@@ -33,6 +33,7 @@ import androidx.camera.camera2.pipe.integration.testing.FakeCameraProperties
 import androidx.camera.camera2.pipe.integration.testing.FakeState3AControlCreator
 import androidx.camera.camera2.pipe.integration.testing.FakeSurface
 import androidx.camera.camera2.pipe.integration.testing.FakeUseCaseCameraRequestControl
+import androidx.camera.camera2.pipe.integration.testing.FakeUseCaseSurfaceManager
 import androidx.camera.camera2.pipe.testing.FakeFrameInfo
 import androidx.camera.camera2.pipe.testing.FakeRequestFailure
 import androidx.camera.camera2.pipe.testing.FakeRequestMetadata
@@ -46,6 +47,8 @@ import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -65,7 +68,7 @@ import org.robolectric.annotation.internal.DoNotInstrument
 @RunWith(RobolectricCameraPipeTestRunner::class)
 @DoNotInstrument
 @Config(minSdk = Build.VERSION_CODES.LOLLIPOP)
-class StillCaptureRequestTest {
+class StillCaptureRequestControlTest {
     private val testScope = TestScope()
     private val testDispatcher = StandardTestDispatcher(testScope.testScheduler)
 
@@ -118,9 +121,42 @@ class StillCaptureRequestTest {
     }
 
     @Test
-    fun captureRequestsSubmitted_whenCameraIsSet() =
+    fun captureRequestsNotSubmitted_whenCameraIsSetButSurfaceSetupIncomplete() =
+        runTest(testDispatcher) {
+            stillCaptureRequestControl.setNewRequestControl(CompletableDeferred())
+            stillCaptureRequestControl.issueCaptureRequests()
+
+            advanceUntilIdle()
+            assertThat(fakeCameraGraphSession.submittedRequests.size).isEqualTo(0)
+        }
+
+    @Test
+    fun captureRequestsNotSubmitted_whenCameraIsSetButSurfaceSetupUnsuccessful() =
+        runTest(testDispatcher) {
+            stillCaptureRequestControl.setNewRequestControl(CompletableDeferred(false))
+            stillCaptureRequestControl.issueCaptureRequests()
+
+            advanceUntilIdle()
+            assertThat(fakeCameraGraphSession.submittedRequests.size).isEqualTo(0)
+        }
+
+    @Test
+    fun captureRequestsSubmitted_whenCameraIsSetAndSurfaceSetupSuccessful() =
         runTest(testDispatcher) {
             stillCaptureRequestControl.issueCaptureRequests()
+
+            advanceUntilIdle()
+            assertThat(fakeCameraGraphSession.submittedRequests.size)
+                .isEqualTo(captureConfigList.size)
+        }
+
+    @Test
+    fun captureRequestsSubmitted_whenSurfaceSetupCompletedAfterCaptureRequest() =
+        runTest(testDispatcher) {
+            val isSurfaceSetupSuccessful = CompletableDeferred<Boolean>()
+            stillCaptureRequestControl.setNewRequestControl(isSurfaceSetupSuccessful)
+            stillCaptureRequestControl.issueCaptureRequests()
+            isSurfaceSetupSuccessful.complete(true)
 
             advanceUntilIdle()
             assertThat(fakeCameraGraphSession.submittedRequests.size)
@@ -394,7 +430,7 @@ class StillCaptureRequestTest {
             }
     }
 
-    private fun initUseCaseCameraScopeObjects() {
+    private fun initUseCaseCameraScopeObjects(isSurfaceSetupSuccessful: Deferred<Boolean>) {
         fakeCameraGraphSession = FakeCameraGraphSession()
         fakeCameraGraph =
             FakeCameraGraph(
@@ -423,6 +459,11 @@ class StillCaptureRequestTest {
             )
         val torchControl =
             TorchControl(fakeCameraProperties, fakeState3AControl, fakeUseCaseThreads)
+        val useCaseSurfaceManager =
+            FakeUseCaseSurfaceManager(
+                threads = fakeUseCaseThreads,
+                isSurfaceSetupSuccessful = isSurfaceSetupSuccessful,
+            )
         useCaseCameraRequestControl =
             UseCaseCameraRequestControlImpl(
                 capturePipeline =
@@ -448,12 +489,15 @@ class StillCaptureRequestTest {
                     ),
                 state = fakeUseCaseCameraState,
                 useCaseGraphConfig = fakeUseCaseGraphConfig,
+                useCaseSurfaceManager = useCaseSurfaceManager,
                 threads = fakeUseCaseThreads,
             )
     }
 
-    private fun StillCaptureRequestControl.setNewRequestControl() {
-        initUseCaseCameraScopeObjects()
+    private fun StillCaptureRequestControl.setNewRequestControl(
+        isSurfaceSetupSuccessful: Deferred<Boolean> = CompletableDeferred(true)
+    ) {
+        initUseCaseCameraScopeObjects(isSurfaceSetupSuccessful)
         requestControl = useCaseCameraRequestControl
     }
 }
