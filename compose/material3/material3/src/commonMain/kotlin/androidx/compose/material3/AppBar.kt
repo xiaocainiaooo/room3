@@ -975,13 +975,18 @@ fun LargeFlexibleTopAppBar(
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  *   [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param titleHorizontalAlignment the horizontal alignment of the title and subtitle
- * @param height a lambda that provides the app bar's height in collapsed or expanded states. When a
- *   [scrollBehavior] causes the app bar to collapse or expand, the expanded `height` represents the
- *   _total_ height the app-bar will expand to. In case the provided height values are
- *   [Dp.Unspecified] or [Dp.Infinity], the height will fallback to the [MediumFlexibleTopAppBar]
- *   defaults. Note that the height values may be adjusted to support displaying larger fonts and
- *   that the expanded height is expected to be greater or equal to the collapsed height, and the
- *   function will throw an [IllegalArgumentException] otherwise.
+ * @param collapsedHeight the app bar's height in its collapsed state. Note that this value might be
+ *   adjusted to support displaying larger fonts. In case the provided value is [Dp.Unspecified] or
+ *   [Dp.Infinity], the height will default to [TopAppBarDefaults.MediumAppBarCollapsedHeight].
+ * @param expandedHeight this app bar's height in its expanded state. When a specified
+ *   [scrollBehavior] causes the app bar to collapse or expand, this value will represent the total
+ *   height that the app-bar will expand to. The expanded height is expected to be greater or equal
+ *   to the [collapsedHeight], and the function will throw an [IllegalArgumentException] otherwise.
+ *   Note that this value might be adjusted to support displaying larger fonts. In case the provided
+ *   value is [Dp.Unspecified] or [Dp.Infinity], the height will default to
+ *   [TopAppBarDefaults.MediumFlexibleAppBarWithSubtitleExpandedHeight] when an [expandedSubtitle]
+ *   is provided, or to [TopAppBarDefaults.MediumFlexibleAppBarWithoutSubtitleExpandedHeight] when
+ *   it's not.
  * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app bar
  *   in different states. See [TopAppBarDefaults.topAppBarColors].
@@ -989,8 +994,8 @@ fun LargeFlexibleTopAppBar(
  *   applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  *   work in conjunction with a scrolled content to change the top app bar appearance as the content
  *   scrolls. See [TopAppBarScrollBehavior.nestedScrollConnection].
- * @throws IllegalArgumentException if the [height] lambda returns a smaller value when `expanded`
- *   is true than when it is false.
+ * @throws IllegalArgumentException if the provided [expandedHeight] is smaller to the
+ *   [collapsedHeight]
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalMaterial3ExpressiveApi
@@ -998,33 +1003,16 @@ fun LargeFlexibleTopAppBar(
 fun TwoRowsTopAppBar(
     title: @Composable (expanded: Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    subtitle: (@Composable (expanded: Boolean) -> Unit?) = { null },
+    subtitle: (@Composable (expanded: Boolean) -> Unit)? = null,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    height: (expanded: Boolean) -> Dp = { Dp.Unspecified },
+    collapsedHeight: Dp = Dp.Unspecified,
+    expandedHeight: Dp = Dp.Unspecified,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
-    var expandedHeight = height(true)
-    var collapsedHeight = height(false)
-
-    if (expandedHeight == Dp.Unspecified || expandedHeight == Dp.Infinity) {
-        // Default to the medium app-bar expanded height
-        expandedHeight =
-            if (subtitle(true) != null) {
-                TopAppBarDefaults.MediumFlexibleAppBarWithSubtitleExpandedHeight
-            } else {
-                TopAppBarDefaults.MediumFlexibleAppBarWithoutSubtitleExpandedHeight
-            }
-    }
-
-    if (collapsedHeight == Dp.Unspecified || collapsedHeight == Dp.Infinity) {
-        // Default to the medium app-bar collapsed height
-        collapsedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight
-    }
-
     TwoRowsTopAppBar(
         title = { title(true) },
         titleTextStyle = AppBarMediumFlexibleTokens.TitleFont.value,
@@ -1032,15 +1020,31 @@ fun TwoRowsTopAppBar(
         titleBottomPadding = 0.dp,
         smallTitle = { title(false) },
         modifier = modifier,
-        subtitle = { subtitle.invoke(true) },
+        subtitle = { subtitle?.invoke(true) },
         subtitleTextStyle = AppBarMediumFlexibleTokens.SubtitleFont.value,
-        smallSubtitle = { subtitle.invoke(false) },
+        smallSubtitle = { subtitle?.invoke(false) },
         smallSubtitleTextStyle = AppBarSmallTokens.SubtitleFont.value,
         titleHorizontalAlignment = titleHorizontalAlignment,
         navigationIcon = navigationIcon,
         actions = actions,
-        collapsedHeight = collapsedHeight,
-        expandedHeight = expandedHeight,
+        collapsedHeight =
+            if (collapsedHeight == Dp.Unspecified || collapsedHeight == Dp.Infinity) {
+                // Default to the medium app-bar collapsed height
+                TopAppBarDefaults.MediumAppBarCollapsedHeight
+            } else {
+                collapsedHeight
+            },
+        expandedHeight =
+            if (expandedHeight == Dp.Unspecified || expandedHeight == Dp.Infinity) {
+                // Default to the medium app-bar expanded height
+                if (subtitle != null) {
+                    TopAppBarDefaults.MediumFlexibleAppBarWithSubtitleExpandedHeight
+                } else {
+                    TopAppBarDefaults.MediumFlexibleAppBarWithoutSubtitleExpandedHeight
+                }
+            } else {
+                expandedHeight
+            },
         windowInsets = windowInsets,
         colors = colors,
         scrollBehavior = scrollBehavior

@@ -652,13 +652,8 @@ fun CustomTwoRowsTopAppBar() {
                         Text("Collapsed Subtitle", maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 },
-                height = { expanded ->
-                    if (expanded) {
-                        156.dp
-                    } else {
-                        64.dp
-                    }
-                },
+                collapsedHeight = 64.dp,
+                expandedHeight = 156.dp,
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
