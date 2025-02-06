@@ -29,7 +29,7 @@ plugins {
 
 androidXMultiplatform {
     jvm()
-    android()
+    androidTarget()
     defaultPlatform(PlatformIdentifier.ANDROID)
 
     sourceSets {

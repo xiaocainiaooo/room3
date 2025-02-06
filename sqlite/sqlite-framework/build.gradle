@@ -55,7 +55,7 @@ configurations {
 }
 
 androidXMultiplatform {
-    android()
+    androidTarget()
     ios() {
         // Link to sqlite3 available in iOS
         binaries.configureEach {

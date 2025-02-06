@@ -25,7 +25,7 @@ plugins {
 }
 
 androidXMultiplatform {
-    android()
+    androidTarget()
     jvm()
     mac()
     linux()

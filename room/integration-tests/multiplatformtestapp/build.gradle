@@ -30,7 +30,7 @@ plugins {
 }
 
 androidXMultiplatform {
-    android()
+    androidTarget()
     ios()
     jvm()
     linux()

@@ -49,7 +49,7 @@ androidXMultiplatform {
     ios()
     watchos()
     tvos()
-    android()
+    androidTarget()
 
     defaultPlatform(PlatformIdentifier.ANDROID)
 
