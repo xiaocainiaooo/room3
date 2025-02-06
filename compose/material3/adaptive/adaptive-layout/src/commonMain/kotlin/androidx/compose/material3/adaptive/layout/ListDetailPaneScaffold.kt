@@ -58,14 +58,18 @@ import androidx.compose.ui.Modifier
  *   scaffold is adapted.
  * @param listPane the list pane of the scaffold, which is supposed to hold a list of item summaries
  *   that can be selected from, for example, the inbox mail list of a mail app. See
- *   [ListDetailPaneScaffoldRole.List].
+ *   [ListDetailPaneScaffoldRole.List]. Note that we suggest you to use [AnimatedPane] as the root
+ *   layout of panes, which supports default pane behaviors like enter/exit transitions.
  * @param detailPane the detail pane of the scaffold, which is supposed to hold the detailed info of
  *   a selected item, for example, the mail content currently being viewed. See
- *   [ListDetailPaneScaffoldRole.Detail].
+ *   [ListDetailPaneScaffoldRole.Detail]. Note that we suggest you to use [AnimatedPane] as the root
+ *   layout of panes, which supports default pane behaviors like enter/exit transitions.
  * @param modifier [Modifier] of the scaffold layout.
  * @param extraPane the extra pane of the scaffold, which is supposed to hold any supplementary info
  *   besides the list and the detail panes, for example, a task list or a mini-calendar view of a
- *   mail app. See [ListDetailPaneScaffoldRole.Extra].
+ *   mail app. See [ListDetailPaneScaffoldRole.Extra]. Note that we suggest you to use
+ *   [AnimatedPane] as the root layout of panes, which supports default pane behaviors like
+ *   enter/exit transitions.
  * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
  *   pane expansion state, `null` by default.
  * @param paneExpansionState the state object of pane expansion; when no value is provided but
@@ -141,14 +145,18 @@ fun ListDetailPaneScaffold(
  *   value of each pane of the scaffold and the transitions/animations in progress.
  * @param listPane the list pane of the scaffold, which is supposed to hold a list of item summaries
  *   that can be selected from, for example, the inbox mail list of a mail app. See
- *   [ListDetailPaneScaffoldRole.List].
+ *   [ListDetailPaneScaffoldRole.List]. Note that we suggest you to use [AnimatedPane] as the root
+ *   layout of panes, which supports default pane behaviors like enter/exit transitions.
  * @param detailPane the detail pane of the scaffold, which is supposed to hold the detailed info of
  *   a selected item, for example, the mail content currently being viewed. See
- *   [ListDetailPaneScaffoldRole.Detail].
+ *   [ListDetailPaneScaffoldRole.Detail]. Note that we suggest you to use [AnimatedPane] as the root
+ *   layout of panes, which supports default pane behaviors like enter/exit transitions.
  * @param modifier [Modifier] of the scaffold layout.
  * @param extraPane the extra pane of the scaffold, which is supposed to hold any supplementary info
  *   besides the list and the detail panes, for example, a task list or a mini-calendar view of a
- *   mail app. See [ListDetailPaneScaffoldRole.Extra].
+ *   mail app. See [ListDetailPaneScaffoldRole.Extra]. Note that we suggest you to use
+ *   [AnimatedPane] as the root layout of panes, which supports default pane behaviors like
+ *   enter/exit transitions.
  * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
  *   pane expansion state, `null` by default.
  * @param paneExpansionState the state object of pane expansion; when no value is provided but
