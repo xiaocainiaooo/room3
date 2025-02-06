@@ -56,7 +56,12 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.max
 import kotlin.math.min
 
-/** Interface that allows libraries to override the behavior of [ThreePaneScaffold]. */
+/**
+ * Interface that allows libraries to override the behavior of [ThreePaneScaffold].
+ *
+ * To override this component, implement the member function of this interface, then provide the
+ * implementation to [LocalThreePaneScaffoldOverride] in the Compose hierarchy.
+ */
 @ExperimentalMaterial3AdaptiveComponentOverrideApi
 interface ThreePaneScaffoldOverride {
     /** Behavior function that is called by the [ThreePaneScaffold] composable. */
@@ -251,7 +256,11 @@ internal fun ThreePaneScaffold(
     }
 }
 
-/** [ThreePaneScaffoldOverride] used when no override is specified. */
+/**
+ * [ThreePaneScaffoldOverride] used when no override is specified.
+ *
+ * This override provides the default behavior of the [ThreePaneScaffold] component.
+ */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @ExperimentalMaterial3AdaptiveComponentOverrideApi
 private object DefaultThreePaneScaffoldOverride : ThreePaneScaffoldOverride {
