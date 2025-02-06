@@ -37,17 +37,36 @@ class AppFunctionSerializableProcessorTest {
 
     // TODO(b/392587953): break down test by parameter types (e.g. EntityWithPrimitive,
     //  EntityWithNullablePrimitive) when all types are supported.
+    // TODO(b/392587953): test recursive type properties
     @Test
     fun testProcessor_validProperties_success() {
         val report =
             compilationTestHelper.compileAll(
-                sourceFileNames = listOf("EntityWithValidProperties.KT")
+                sourceFileNames = listOf("EntityWithValidProperties.KT", "InputSerializable.KT")
             )
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "EntityWithValidPropertiesFactory.kt",
+            expectGeneratedSourceFileName = "\$EntityWithValidPropertiesFactory.kt",
             goldenFileName = "\$EntityWithValidPropertiesFactory.KT"
+        )
+    }
+
+    @Test
+    fun testProcessor_differentPackageSerializableProperty_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "EntityWithDiffPackageSerializableProperty.KT",
+                        "DiffPackageInputSerializable.KT"
+                    )
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$EntityWithDiffPackageSerializablePropertyFactory.kt",
+            goldenFileName = "\$EntityWithDiffPackageSerializablePropertyFactory.KT"
         )
     }
 

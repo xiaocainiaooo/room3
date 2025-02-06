@@ -22,11 +22,11 @@ import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isSup
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ClassName
-
-/** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
+import com.squareup.kotlinpoet.LIST
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
 data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KSClassDeclaration) {
@@ -80,10 +80,25 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
         return this
     }
 
+    /** Returns the annotated class's properties as defined in its primary constructor. */
+    fun getProperties(): List<KSValueParameter> {
+        return checkNotNull(appFunctionSerializableClass.primaryConstructor).parameters
+    }
+
+    /** Returns the properties that have @AppFunctionSerializable class types. */
+    fun getSerializablePropertyTypes(): Set<KSTypeReference> {
+        return getProperties()
+            .map { property -> property.type }
+            .filter { type -> isAppFunctionSerializableType(type) }
+            .map { type -> if (type.isOfType(LIST)) type.resolveListParameterizedType() else type }
+            .toSet()
+    }
+
     /**
      * Returns the set of source files that contain the definition of the
      * [appFunctionSerializableClass] and all the @AppFunctionSerializable classes that it contains.
      */
+    // TODO(b/392587953): include sources of serializable properties
     fun getSourceFiles(): Set<KSFile> {
         val sourceFileSet: MutableSet<KSFile> = mutableSetOf()
         val visitedSerializableSet: MutableSet<ClassName> = mutableSetOf()
