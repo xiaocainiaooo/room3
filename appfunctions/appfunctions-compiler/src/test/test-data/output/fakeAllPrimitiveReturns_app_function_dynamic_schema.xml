@@ -6,15 +6,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#unitReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>0</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>0</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -30,15 +28,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#intReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>7</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>7</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -54,15 +50,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#longReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>6</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>6</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -78,15 +72,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#floatReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>5</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>5</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -102,15 +94,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#doubleReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>4</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>4</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -126,15 +116,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#stringReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>8</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>8</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -150,15 +138,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#booleanReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>1</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>1</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -174,15 +160,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>7</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>7</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -198,15 +182,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>6</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>6</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -222,15 +204,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>5</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>5</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -246,15 +226,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>4</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>4</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -270,15 +248,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>8</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>8</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -294,15 +270,13 @@
         </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanReturn</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>1</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>1</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>

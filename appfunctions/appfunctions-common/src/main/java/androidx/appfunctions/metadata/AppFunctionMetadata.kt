@@ -56,10 +56,10 @@ constructor(
      * implement a particular predefined schema.
      */
     public val schema: AppFunctionSchemaMetadata?,
-    /** The parameters of the AppFunction. Parameters are stored as properties in the object. */
-    public val parameters: AppFunctionObjectTypeMetadata,
+    /** The parameters of the AppFunction. */
+    public val parameters: List<AppFunctionParameterMetadata>,
     /** The response of the AppFunction. */
-    public val response: AppFunctionDataTypeMetadata,
+    public val response: AppFunctionResponseMetadata,
     /** Reusable components that could be shared within the function specification. */
     public val components: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(),
 ) {
@@ -91,7 +91,6 @@ constructor(
      *
      * This method is used to persist the [AppFunctionMetadata] in a database.
      */
-    // TODO: Add test for converter
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionMetadataDocument(): AppFunctionMetadataDocument {
         return AppFunctionMetadataDocument(
@@ -104,13 +103,8 @@ constructor(
                 } else {
                     null
                 },
-            parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
-            response =
-                // TODO: Handle non-primitive and collections.
-                AppFunctionDataTypeMetadataDocument(
-                    type = (response as AppFunctionPrimitiveTypeMetadata).type,
-                    isNullable = response.isNullable,
-                ),
+            parameters = parameters.map { it.toAppFunctionParameterMetadataDocument() },
+            response = response.toAppFunctionResponseMetadataDocument(),
             components = components.toAppFunctionComponentsMetadataDocument()
         )
     }
@@ -132,10 +126,10 @@ public data class AppFunctionMetadataDocument(
     @Document.BooleanProperty public val isEnabledByDefault: Boolean,
     /** The predefined schema of the AppFunction. */
     @Document.DocumentProperty public val schema: AppFunctionSchemaMetadataDocument?,
-    /** The parameters of the AppFunction. Parameters are stored as properties in the object. */
-    @Document.DocumentProperty public val parameters: AppFunctionDataTypeMetadataDocument,
+    /** The parameters of the AppFunction. */
+    @Document.DocumentProperty public val parameters: List<AppFunctionParameterMetadataDocument>,
     /** The response of the AppFunction. */
-    @Document.DocumentProperty public val response: AppFunctionDataTypeMetadataDocument,
+    @Document.DocumentProperty public val response: AppFunctionResponseMetadataDocument,
     /** The reusable components for the AppFunction. */
     @Document.DocumentProperty public val components: AppFunctionComponentsMetadataDocument,
 )

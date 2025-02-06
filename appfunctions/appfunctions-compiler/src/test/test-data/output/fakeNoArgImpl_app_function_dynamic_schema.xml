@@ -6,15 +6,13 @@
         </components>
         <id>com.testdata.FakeNoArgImpl#noArg</id>
         <enabledByDefault>true</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>0</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>0</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>

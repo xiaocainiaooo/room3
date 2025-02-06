@@ -21,8 +21,9 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContex
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
-import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
@@ -168,7 +169,7 @@ data class AnnotatedAppFunctions(
         appFunctionDeclarations.map { functionDeclaration ->
             val appFunctionAnnotationProperties =
                 computeAppFunctionAnnotationProperties(functionDeclaration)
-            val parameterObjectTypeMetadata = functionDeclaration.buildParameterObjectTypeMetadata()
+            val parameterObjectTypeMetadata = functionDeclaration.buildParameterTypeMetadata()
             val responseObjectTypeMetadata =
                 checkNotNull(functionDeclaration.returnType).buildResponseObjectTypeMetadata()
 
@@ -177,7 +178,7 @@ data class AnnotatedAppFunctions(
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
                 schema = appFunctionAnnotationProperties.toAppFunctionSchemaMetadata(),
                 parameters = parameterObjectTypeMetadata,
-                response = responseObjectTypeMetadata
+                response = AppFunctionResponseMetadata(valueType = responseObjectTypeMetadata)
             )
         }
 
@@ -195,39 +196,38 @@ data class AnnotatedAppFunctions(
     }
 
     /**
-     * Builds an [AppFunctionObjectTypeMetadata] instance for the parameters of an app function.
+     * Builds a list of [AppFunctionParameterMetadata] for the parameters of an app function.
      *
      * Currently, only primitive parameters are supported.
      */
-    private fun KSFunctionDeclaration.buildParameterObjectTypeMetadata():
-        AppFunctionObjectTypeMetadata {
-        val properties: MutableMap<String, AppFunctionDataTypeMetadata> = mutableMapOf()
-        val requiredProperties: MutableList<String> = mutableListOf()
-        for (ksValueParameter in parameters) {
-            if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
-                // Skip the first parameter which is always the `AppFunctionContext`.
-                continue
-            }
+    private fun KSFunctionDeclaration.buildParameterTypeMetadata():
+        List<AppFunctionParameterMetadata> {
+        return buildList {
+            for (ksValueParameter in parameters) {
+                if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
+                    // Skip the first parameter which is always the `AppFunctionContext`.
+                    continue
+                }
 
-            // TODO: Support serializable and collections
-            val isPropertyNullable = ksValueParameter.type.resolve().isMarkedNullable
-            val propertyName = checkNotNull(ksValueParameter.name).asString()
-            val propertyMetadata =
-                AppFunctionPrimitiveTypeMetadata(
-                    type = ksValueParameter.type.toAppFunctionDataType(),
-                    isNullable = isPropertyNullable
+                // TODO: Support serializable and collections
+                val isPropertyNullable = ksValueParameter.type.resolve().isMarkedNullable
+                val parameterName = checkNotNull(ksValueParameter.name).asString()
+                val dataTypeMetadata =
+                    AppFunctionPrimitiveTypeMetadata(
+                        type = ksValueParameter.type.toAppFunctionDataType(),
+                        isNullable = isPropertyNullable
+                    )
+
+                add(
+                    AppFunctionParameterMetadata(
+                        name = parameterName,
+                        // TODO(b/394553462): Parse required state from annotation.
+                        isRequired = true,
+                        dataType = dataTypeMetadata
+                    )
                 )
-            properties[propertyName] = propertyMetadata
-
-            if (!isPropertyNullable) {
-                requiredProperties.add(propertyName)
             }
         }
-        return AppFunctionObjectTypeMetadata(
-            properties = properties,
-            required = requiredProperties,
-            isNullable = false
-        )
     }
 
     private fun KSTypeReference.toAppFunctionDataType(): Int {
