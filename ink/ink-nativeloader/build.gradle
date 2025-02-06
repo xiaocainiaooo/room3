@@ -25,7 +25,7 @@ plugins {
 
 androidXMultiplatform {
   jvm()
-  android()
+  androidTarget()
 
   defaultPlatform(PlatformIdentifier.JVM)
 

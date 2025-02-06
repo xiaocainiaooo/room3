@@ -16,7 +16,7 @@ plugins {
     id("androidx.baselineprofile")
 }
 androidXMultiplatform {
-    android()
+    androidTarget()
     desktop()
     mac()
     linux()

@@ -178,7 +178,7 @@ androidXMultiplatform {
         configureTargets(requiredNativeTargets)
     }
 
-    android() {
+    androidTarget() {
         addNativeLibrariesToJniLibs(it, jvmArtJniImplementation)
     }
     ios()
