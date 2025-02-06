@@ -83,6 +83,7 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -90,6 +91,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -3302,6 +3304,37 @@ class LookaheadScopeTest {
             assertTrue(lookaheadMeasured)
             assertTrue(lookaheadPlaced)
         }
+    }
+
+    @Test
+    fun lookaheadRecomposesLayoutOnStaticLocalChange() {
+        val local = staticCompositionLocalOf { -1 }
+
+        var current = -1
+        var value by mutableIntStateOf(0)
+
+        val measurePolicy: SubcomposeMeasureScope.(Constraints) -> MeasureResult = { c ->
+            subcompose(Unit) {
+                    current = local.current
+                    Box(Modifier.size(100.dp, 100.dp))
+                }
+                .forEach { it.measure(c) }
+            layout(0, 0) {}
+        }
+        rule.setContent {
+            LookaheadScope {
+                CompositionLocalProvider(local provides value) {
+                    SubcomposeLayout(measurePolicy = measurePolicy)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(0, current)
+            value = 1
+        }
+
+        rule.runOnIdle { assertEquals(1, current) }
     }
 
     @Composable
