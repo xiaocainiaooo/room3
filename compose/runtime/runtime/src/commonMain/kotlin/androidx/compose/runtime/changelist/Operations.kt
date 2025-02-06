@@ -347,7 +347,7 @@ internal class Operations : OperationsDebugStringFormattable() {
     ) {
         drain {
             with(operation) {
-                executeWithCompositionTrace(applier, slots, rememberManager, errorContext)
+                executeWithComposeStackTrace(applier, slots, rememberManager, errorContext)
             }
         }
     }

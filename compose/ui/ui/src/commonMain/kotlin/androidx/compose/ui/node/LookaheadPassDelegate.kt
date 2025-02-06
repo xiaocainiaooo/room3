@@ -452,7 +452,7 @@ internal class LookaheadPassDelegate(
 
     // Lookahead remeasurement with the given constraints.
     fun remeasure(constraints: Constraints): Boolean {
-        withCompositionTrace(layoutNode) {
+        withComposeStackTrace(layoutNode) {
             requirePrecondition(!layoutNode.isDeactivated) {
                 "measure is called on a deactivated node"
             }
@@ -527,7 +527,7 @@ internal class LookaheadPassDelegate(
         layerBlock: (GraphicsLayerScope.() -> Unit)?,
         layer: GraphicsLayer?
     ) {
-        withCompositionTrace(layoutNode) {
+        withComposeStackTrace(layoutNode) {
             if (layoutNode.parent?.layoutState == LayoutState.LookaheadLayingOut) {
                 // This placement call comes from parent
                 layoutNodeLayoutDelegate.detachedFromParentLookaheadPlacement = false

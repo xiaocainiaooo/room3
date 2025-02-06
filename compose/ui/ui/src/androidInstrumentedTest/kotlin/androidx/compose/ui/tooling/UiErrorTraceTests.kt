@@ -417,7 +417,7 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
             activity.findViewById<ViewGroup>(android.R.id.content).getChildAt(0) as ComposeView
         exceptionHandler = { e: Throwable ->
             if (traceContext.trace == null && e is TestException) {
-                traceContext.trace = e.compositionTrace()
+                traceContext.trace = e.composeStackTrace()
             } else {
                 throw e
             }
@@ -478,7 +478,7 @@ private fun throwTestException(): Nothing = throw TestException()
 
 private class TestException : RuntimeException("Expected test error")
 
-private fun TestException.compositionTrace(): List<TraceFrame>? =
+private fun TestException.composeStackTrace(): List<TraceFrame>? =
     suppressedExceptions
         .singleOrNull { it.javaClass.simpleName == "DiagnosticComposeException" }
         ?.message
