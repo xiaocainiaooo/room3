@@ -16,6 +16,7 @@
 
 package androidx.tracing.driver
 
+import androidx.annotation.RestrictTo
 import androidx.collection.mutableIntObjectMapOf
 import okio.Closeable
 
@@ -46,7 +47,8 @@ internal constructor(
     internal val processes = mutableIntObjectMapOf<ProcessTrack>()
 
     /** @return A [ProcessTrack] using the unique process [id] using the provided [TraceContext]. */
-    internal open fun ProcessTrack(id: Int, name: String): ProcessTrack {
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) // TODO: Make public
+    public open fun ProcessTrack(id: Int, name: String): ProcessTrack {
         val track = processes[id]
         return track
             ?: lock.withLock {
