@@ -18,13 +18,17 @@ package androidx.benchmark
 
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.benchmark.BenchmarkState.Companion.enableMethodTracingAffectsMeasurementError
+import androidx.benchmark.json.BenchmarkData.TestResult.ProfilerOutput
 import androidx.benchmark.perfetto.PerfettoCapture
 import androidx.benchmark.perfetto.PerfettoCaptureWrapper
 import androidx.benchmark.perfetto.PerfettoConfig
 import androidx.benchmark.perfetto.UiState
 import androidx.benchmark.perfetto.appendUiState
+import androidx.benchmark.traceprocessor.TraceProcessor
+import androidx.benchmark.traceprocessor.runSingleSessionServer
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.tracing.Trace
 import androidx.tracing.trace
@@ -319,17 +323,45 @@ internal class Microbenchmark(
         }
     }
 
-    fun output(perfettoTracePath: String?): MicrobenchmarkOutput {
+    /** Register a PerfettoTrace to be added to outputs, and used to extract metrics. */
+    @RequiresApi(23)
+    fun processPerfettoTrace(perfettoTracePath: String) {
+        // trace completed, and copied into shell writeable dir
+        val file = File(perfettoTracePath)
+        file.appendUiState(
+            UiState(
+                timelineStart = null,
+                timelineEnd = null,
+                highlightPackage = InstrumentationRegistry.getInstrumentation().context.packageName
+            )
+        )
+        state.profilerResults.forEach { it.embedInPerfettoTrace(perfettoTracePath) }
+        if (state.profilerResults.any { it.type == ProfilerOutput.Type.MethodTrace }) {
+            TraceProcessor.runSingleSessionServer(absoluteTracePath = perfettoTracePath) {
+                // NOTE: this query assumes that method trace only occurs once
+                state.metricResults.addAll(MethodTracing.queryMetrics(this))
+            }
+        }
+
+        // add at front since this affects output order
+        state.profilerResults.add(
+            0,
+            Profiler.ResultFile.ofPerfettoTrace(label = "Trace", absolutePath = perfettoTracePath)
+        )
+    }
+
+    fun output(): MicrobenchmarkOutput {
         Log.i(
             BenchmarkState.TAG,
             definition.outputTestName +
                 state.metricResults.map { it.getSummary() } +
                 "count=${state.maxIterationsPerRepeat}"
         )
+        state.profilerResults.forEach { it.convertBeforeSync?.invoke() }
         return MicrobenchmarkOutput(
                 definition = definition,
                 metricResults = state.metricResults,
-                profilerResults = processProfilerResults(perfettoTracePath),
+                profilerResults = state.profilerResults,
                 totalRunTimeNs = System.nanoTime() - startTimeNs,
                 warmupIterations = state.warmupIterations,
                 repeatIterations = state.maxIterationsPerRepeat,
@@ -344,35 +376,6 @@ internal class Microbenchmark(
 
     fun getMinTimeNanos(): Double {
         return state.metricResults.first { it.name == "timeNs" }.min
-    }
-
-    private fun processProfilerResults(perfettoTracePath: String?): List<Profiler.ResultFile> {
-        // prepare profiling result files
-        perfettoTracePath?.apply {
-            // trace completed, and copied into shell writeable dir
-            val file = File(this)
-            file.appendUiState(
-                UiState(
-                    timelineStart = null,
-                    timelineEnd = null,
-                    highlightPackage =
-                        InstrumentationRegistry.getInstrumentation().context.packageName
-                )
-            )
-        }
-        state.profilerResults.forEach {
-            it.convertBeforeSync?.invoke()
-            if (perfettoTracePath != null) {
-                it.embedInPerfettoTrace(perfettoTracePath)
-            }
-        }
-        val profilerResults =
-            listOfNotNull(
-                perfettoTracePath?.let {
-                    Profiler.ResultFile.ofPerfettoTrace(label = "Trace", absolutePath = it)
-                }
-            ) + state.profilerResults
-        return profilerResults
     }
 
     companion object {
@@ -424,7 +427,7 @@ internal suspend fun measureRepeatedImplNoTracing(
         )
         .apply {
             executePhases()
-            output(perfettoTracePath = null)
+            output()
         }
 }
 
@@ -453,7 +456,10 @@ fun measureRepeatedImplWithTracing(
                 }
             }
         }
-    microbenchmark.output(perfettoTracePath)
+    if (perfettoTracePath != null && Build.VERSION.SDK_INT > 23) {
+        microbenchmark.processPerfettoTrace(perfettoTracePath)
+    }
+    microbenchmark.output()
 }
 
 /**
