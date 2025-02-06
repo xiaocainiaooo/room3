@@ -208,6 +208,7 @@ package androidx.savedstate.serialization {
   }
 
   public final class SavedStateConfigKt {
+    method public static androidx.savedstate.serialization.SavedStateConfig SavedStateConfig(optional androidx.savedstate.serialization.SavedStateConfig from, kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfig.Builder,kotlin.Unit> builderAction);
     method public static androidx.savedstate.serialization.SavedStateConfig SavedStateConfig(kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfig.Builder,kotlin.Unit> builderAction);
   }
 

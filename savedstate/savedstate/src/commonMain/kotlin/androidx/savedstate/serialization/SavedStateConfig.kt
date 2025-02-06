@@ -19,6 +19,7 @@ package androidx.savedstate.serialization
 import androidx.savedstate.SavedState
 import androidx.savedstate.serialization.SavedStateConfig.Builder
 import kotlin.jvm.JvmField
+import kotlin.jvm.JvmOverloads
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 
@@ -29,19 +30,18 @@ import kotlinx.serialization.modules.SerializersModule
  * @see SavedStateConfig.Builder
  */
 public class SavedStateConfig private constructor(
-    @PublishedApi internal val serializersModule: SerializersModule,
+    @PublishedApi internal val serializersModule: SerializersModule = EmptySerializersModule(),
 ) {
     /** Builder for [SavedStateConfig]. Used by `SavedStateCodecConfig` factory function. */
     @Suppress(
         "MissingBuildMethod", // We do have an internal `build()` and the class is internal as well.
     )
-    public class Builder internal constructor() {
+    public class Builder internal constructor(config: SavedStateConfig) {
 
-        /** The [SerializersModule] to use. */
         @get:Suppress("GetterOnBuilder") // Kotlin doesn't support `public set` with `private get`:
         // https://youtrack.jetbrains.com/issue/KT-3110
         @set:Suppress("SetterReturnsThis")
-        public var serializersModule: SerializersModule = EmptySerializersModule()
+        public var serializersModule: SerializersModule = config.serializersModule
 
         internal fun build(): SavedStateConfig {
             return SavedStateConfig(serializersModule = serializersModule)
@@ -50,7 +50,7 @@ public class SavedStateConfig private constructor(
 
     public companion object {
         /** An instance of [SavedStateConfig] with default configuration. */
-        @JvmField public val DEFAULT: SavedStateConfig = SavedStateConfig {}
+        @JvmField public val DEFAULT: SavedStateConfig = SavedStateConfig()
     }
 }
 
@@ -62,6 +62,10 @@ public class SavedStateConfig private constructor(
  * @sample androidx.savedstate.config
  * @param builderAction The function to configure the builder.
  */
-public fun SavedStateConfig(builderAction: Builder.() -> Unit): SavedStateConfig {
-    return Builder().apply { builderAction() }.build()
+@JvmOverloads
+public fun SavedStateConfig(
+    from: SavedStateConfig = SavedStateConfig.DEFAULT,
+    builderAction: Builder.() -> Unit,
+): SavedStateConfig {
+    return Builder(from).apply(builderAction).build()
 }
