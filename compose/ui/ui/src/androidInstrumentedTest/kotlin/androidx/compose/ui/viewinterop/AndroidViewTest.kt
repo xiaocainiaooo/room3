@@ -39,6 +39,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -2135,6 +2136,69 @@ class AndroidViewTest {
                     .isGreaterThan(0)
             }
         }
+    }
+
+    @Test
+    fun asNestedMovableContentChild() {
+        var useRowContainer by mutableStateOf(false)
+
+        @Composable
+        fun MovableContentContainer(content: @Composable () -> Unit) {
+            val movableContent = remember(content) { movableContentOf(content) }
+            if (useRowContainer) {
+                Row { movableContent() }
+            } else {
+                Column { movableContent() }
+            }
+        }
+
+        rule.setContent {
+            MovableContentContainer {
+                MovableContentContainer {
+                    AndroidView(
+                        factory = { context ->
+                            View(context).apply { layoutParams = ViewGroup.LayoutParams(100, 100) }
+                        }
+                    )
+                }
+            }
+        }
+
+        rule.waitForIdle()
+        useRowContainer = true
+        rule.waitForIdle()
+    }
+
+    @Test
+    fun asNestedMovableContentChildWithReuse() {
+        var useRowContainer by mutableStateOf(false)
+
+        @Composable
+        fun MovableContentContainer(content: @Composable () -> Unit) {
+            val movableContent = remember(content) { movableContentOf(content) }
+            if (useRowContainer) {
+                Row { movableContent() }
+            } else {
+                Column { movableContent() }
+            }
+        }
+
+        rule.setContent {
+            MovableContentContainer {
+                MovableContentContainer {
+                    AndroidView(
+                        factory = { context ->
+                            View(context).apply { layoutParams = ViewGroup.LayoutParams(100, 100) }
+                        },
+                        onReset = { _ -> }
+                    )
+                }
+            }
+        }
+
+        rule.waitForIdle()
+        useRowContainer = true
+        rule.waitForIdle()
     }
 
     @Composable
