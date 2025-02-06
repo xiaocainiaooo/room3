@@ -354,9 +354,9 @@ private fun MaterialScope.multipleSegmentsImpl(
             .setGapInterval(sweepAngle / segmentCount)
             .build()
 
-    // We need to make the indicator arc a bit wider than the indicator arc to make sure the top
+    // We need to make the indicator arc a bit wider than the track arc to make sure the top
     // arc covers the bottom one completely in the overlapped area.
-    val insetPadding = INDICATOR_STROKE_WIDTH_INCREMENT_PX / deviceConfiguration.screenWidthDp / 2F
+    val insetPadding = INDICATOR_STROKE_WIDTH_INCREMENT_PX / deviceConfiguration.screenDensity / 2F
     return Box.Builder()
         .addContent(
             // the track
