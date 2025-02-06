@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.javapoet)
     implementation(libs.kotlinPoet)
 
+    implementation("androidx.annotation:annotation:1.9.1")
+
     testImplementation(libs.googleCompileTesting)
     testImplementation(libs.guava)
     testImplementation(libs.hamcrestCore)
