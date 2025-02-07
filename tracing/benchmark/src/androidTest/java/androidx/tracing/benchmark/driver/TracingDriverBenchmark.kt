@@ -29,7 +29,9 @@ import androidx.tracing.driver.AndroidTraceSink
 import androidx.tracing.driver.TRACE_PACKET_BUFFER_SIZE
 import androidx.tracing.driver.TraceContext
 import androidx.tracing.driver.TraceSink
+import kotlin.coroutines.CoroutineContext
 import kotlin.test.assertEquals
+import kotlinx.coroutines.test.StandardTestDispatcher
 import okio.blackholeSink
 import okio.buffer
 import org.junit.Rule
@@ -46,9 +48,13 @@ class TracingDriverBenchmark {
         return TraceContext(sequenceId = 1, sink = sink, isEnabled = isEnabled)
     }
 
-    fun buildInMemorySink(context: Context): AndroidTraceSink {
+    fun buildInMemorySink(context: Context, coroutineContext: CoroutineContext): AndroidTraceSink {
         val buffer = blackholeSink().buffer()
-        return AndroidTraceSink(context, buffer)
+        return AndroidTraceSink(
+            context = context,
+            bufferedSink = buffer,
+            coroutineContext = coroutineContext
+        )
     }
 
     @Test
@@ -65,14 +71,6 @@ class TracingDriverBenchmark {
         context.use { benchmarkRule.measureRepeated { process.trace(BASIC_STRING) {} } }
     }
 
-    @Suppress("SameParameterValue")
-    private fun spinLoopNs(waitNs: Long) {
-        val init = System.nanoTime()
-        while (System.nanoTime() - init < waitNs) {
-            //
-        }
-    }
-
     /**
      * This benchmark runs the measurement 32 times to ensure emitting the packet is captured once
      * per measurement
@@ -80,23 +78,26 @@ class TracingDriverBenchmark {
     @Test
     fun beginEnd_basic32() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val sink = buildInMemorySink(context)
+        val dispatcher = StandardTestDispatcher()
+        val sink = buildInMemorySink(context, dispatcher)
+        // This test intentionally does not close the TraceContext instance. The reason is
+        // when we call close() we end up blocking the Thread on which close() was called.
+        // Also given the fact that we are using a TestDispatcher here, that blocks forever because
+        // there is no good way to advance the TestScheduler by calling advanceUntilIdle().
+        // Not calling close() here is okay, given we drain all trace packets before the next
+        // measurement loop.
         val traceContext = buildTraceContext(sink, true)
-        traceContext.use {
-            val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
-
-            // we assert this value at runtime and build the number into the method name so it's
-            // clear how many begin/ends it is measuring. test needs to be renamed if const changes.
-            assertEquals(32, TRACE_PACKET_BUFFER_SIZE)
-
-            benchmarkRule.measureRepeated {
-                repeat(32) { process.trace(BASIC_STRING) {} }
-                // The benchmark measurement loop creates packets extremely quickly. To avoid
-                // running OOM (when the consumer can't keep up) we wait for the packets to flush.
-                // Note that we attempt to wait a consistent amount of time to ensure consistent
-                // measurements.
-                runWithMeasurementDisabled { spinLoopNs(2_000_000) }
-            }
+        val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
+        // we assert this value at runtime and build the number into the method name so it's
+        // clear how many begin/ends it is measuring. test needs to be renamed if const changes.
+        assertEquals(32, TRACE_PACKET_BUFFER_SIZE)
+        benchmarkRule.measureRepeated {
+            repeat(32) { process.trace(BASIC_STRING) {} }
+            // The benchmark measurement loop creates packets extremely quickly. To avoid
+            // running OOM (when the consumer can't keep up) we wait for the packets to flush.
+            // Note that we attempt to wait a consistent amount of time to ensure consistent
+            // measurements.
+            runWithMeasurementDisabled { dispatcher.scheduler.advanceUntilIdle() }
         }
     }
 }
