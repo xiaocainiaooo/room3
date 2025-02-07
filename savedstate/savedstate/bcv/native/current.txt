@@ -36,6 +36,9 @@ final class androidx.savedstate.serialization/SavedStateConfig { // androidx.sav
         final fun <get-serializersModule>(): kotlinx.serialization.modules/SerializersModule // androidx.savedstate.serialization/SavedStateConfig.serializersModule.<get-serializersModule>|<get-serializersModule>(){}[0]
 
     final class Builder { // androidx.savedstate.serialization/SavedStateConfig.Builder|null[0]
+        final var classDiscriminatorMode // androidx.savedstate.serialization/SavedStateConfig.Builder.classDiscriminatorMode|{}classDiscriminatorMode[0]
+            final fun <get-classDiscriminatorMode>(): kotlin/Int // androidx.savedstate.serialization/SavedStateConfig.Builder.classDiscriminatorMode.<get-classDiscriminatorMode>|<get-classDiscriminatorMode>(){}[0]
+            final fun <set-classDiscriminatorMode>(kotlin/Int) // androidx.savedstate.serialization/SavedStateConfig.Builder.classDiscriminatorMode.<set-classDiscriminatorMode>|<set-classDiscriminatorMode>(kotlin.Int){}[0]
         final var serializersModule // androidx.savedstate.serialization/SavedStateConfig.Builder.serializersModule|{}serializersModule[0]
             final fun <get-serializersModule>(): kotlinx.serialization.modules/SerializersModule // androidx.savedstate.serialization/SavedStateConfig.Builder.serializersModule.<get-serializersModule>|<get-serializersModule>(){}[0]
             final fun <set-serializersModule>(kotlinx.serialization.modules/SerializersModule) // androidx.savedstate.serialization/SavedStateConfig.Builder.serializersModule.<set-serializersModule>|<set-serializersModule>(kotlinx.serialization.modules.SerializersModule){}[0]
@@ -179,6 +182,13 @@ final value class androidx.savedstate/SavedStateWriter { // androidx.savedstate/
     final inline fun putStringArray(kotlin/String, kotlin/Array<kotlin/String>) // androidx.savedstate/SavedStateWriter.putStringArray|putStringArray(kotlin.String;kotlin.Array<kotlin.String>){}[0]
     final inline fun putStringList(kotlin/String, kotlin.collections/List<kotlin/String>) // androidx.savedstate/SavedStateWriter.putStringList|putStringList(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
     final inline fun remove(kotlin/String) // androidx.savedstate/SavedStateWriter.remove|remove(kotlin.String){}[0]
+}
+
+final object androidx.savedstate.serialization/ClassDiscriminatorMode { // androidx.savedstate.serialization/ClassDiscriminatorMode|null[0]
+    final const val ALL_OBJECTS // androidx.savedstate.serialization/ClassDiscriminatorMode.ALL_OBJECTS|{}ALL_OBJECTS[0]
+        final fun <get-ALL_OBJECTS>(): kotlin/Int // androidx.savedstate.serialization/ClassDiscriminatorMode.ALL_OBJECTS.<get-ALL_OBJECTS>|<get-ALL_OBJECTS>(){}[0]
+    final const val POLYMORPHIC // androidx.savedstate.serialization/ClassDiscriminatorMode.POLYMORPHIC|{}POLYMORPHIC[0]
+        final fun <get-POLYMORPHIC>(): kotlin/Int // androidx.savedstate.serialization/ClassDiscriminatorMode.POLYMORPHIC.<get-POLYMORPHIC>|<get-POLYMORPHIC>(){}[0]
 }
 
 final const val androidx.savedstate/DEFAULT_BOOLEAN // androidx.savedstate/DEFAULT_BOOLEAN|{}DEFAULT_BOOLEAN[0]

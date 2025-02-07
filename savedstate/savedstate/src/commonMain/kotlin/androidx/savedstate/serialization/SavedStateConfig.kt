@@ -39,6 +39,8 @@ import kotlinx.serialization.modules.SerializersModule
 public class SavedStateConfig
 private constructor(
     @PublishedApi internal val serializersModule: SerializersModule = EmptySerializersModule(),
+    @ClassDiscriminatorMode.Definition
+    internal val classDiscriminatorMode: Int = ClassDiscriminatorMode.POLYMORPHIC,
 ) {
     /**
      * Builder of the [SavedStateConfig] instance provided by `SavedStateConfig { ... }` factory
@@ -59,8 +61,22 @@ private constructor(
         @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
         public var serializersModule: SerializersModule = config.serializersModule
 
+        /**
+         * Defines which classes and objects should have class discriminator added to the output.
+         * [ClassDiscriminatorMode.POLYMORPHIC] by default.
+         *
+         * @see ClassDiscriminatorMode
+         */
+        @get:Suppress("GetterOnBuilder") // Kotlin issue: KT-3110 (private get with public set).
+        @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
+        @ClassDiscriminatorMode.Definition
+        public var classDiscriminatorMode: Int = config.classDiscriminatorMode
+
         internal fun build(): SavedStateConfig {
-            return SavedStateConfig(serializersModule = serializersModule)
+            return SavedStateConfig(
+                serializersModule = serializersModule,
+                classDiscriminatorMode = classDiscriminatorMode,
+            )
         }
     }
 
