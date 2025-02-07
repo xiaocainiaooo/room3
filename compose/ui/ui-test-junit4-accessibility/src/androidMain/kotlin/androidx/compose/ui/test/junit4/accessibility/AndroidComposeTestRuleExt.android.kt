@@ -53,7 +53,6 @@ public fun <R : TestRule, A : ComponentActivity> AndroidComposeTestRule<R, A>
             "AndroidComposeTestRule",
             "Accessibility checks are currently not supported by Robolectric"
         )
-        return
     }
     setComposeAccessibilityValidator(
         object : ComposeAccessibilityValidator {
