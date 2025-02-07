@@ -53,6 +53,8 @@ import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
+import androidx.health.connect.client.request.CreateMedicalDataSourceRequest
+import androidx.health.connect.client.request.GetMedicalDataSourcesRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesInitialRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesRequest
@@ -499,6 +501,141 @@ interface HealthConnectClient {
             FEATURE_CONSTANT_NAME_PHR,
             "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"
         )
+
+    /**
+     * Creates a [MedicalDataSource] using a [CreateMedicalDataSourceRequest].
+     *
+     * A [MedicalDataSource] needs to be created before any [MedicalResource]s for that source can
+     * be inserted.
+     *
+     * Regarding permissions:
+     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
+     *   [SecurityException] will be thrown.
+     * - With [PERMISSION_WRITE_MEDICAL_DATA] granted, caller is permitted to call this API in
+     *   either foreground or background.
+     *
+     * Medical data is represented using the
+     * [Fast Healthcare Interoperability Resources (FHIR)](https://hl7.org/fhir/) standard.
+     *
+     * The [CreateMedicalDataSourceRequest.fhirBaseUri] must be unique across all medical data
+     * sources created by an app. The FHIR base uri cannot be updated after creating the data
+     * source.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param request request containing details of the [MedicalDataSource] to be created
+     * @return the created [MedicalDataSource]
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun createMedicalDataSource(
+        request: CreateMedicalDataSourceRequest
+    ): MedicalDataSource {
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#createMedicalDataSource()"
+        )
+    }
+
+    /**
+     * Gets the requested [MedicalDataSource]s using [GetMedicalDataSourcesRequest]. Number of data
+     * sources returned by this API will depend based on below factors:
+     * - If an empty [GetMedicalDataSourcesRequest] is passed, all data sources for all apps are
+     *   requested, and all which the caller is permitted to get will be returned. See below.
+     * - If [GetMedicalDataSourcesRequest.packageNames] is not empty, then only the data sources
+     *   created by those packages is being requested. All data sources created by those packages
+     *   which the caller is permitted to get will be returned. See below.
+     *
+     * There is no specific read permission for getting data sources. Instead, permission to read
+     * data sources is based on whether the caller has permission to read the data currently
+     * contained in that data source. Specifically:
+     * - A caller without any read medical permissions such as
+     *   [PERMISSION_READ_MEDICAL_DATA_VACCINES] or the write permission
+     *   [PERMISSION_WRITE_MEDICAL_DATA] is not permitted get any [MedicalDataSource]s, including
+     *   ones that it created.
+     * - A caller with the write permission is permitted to read its own [MedicalDataSource]s
+     *   regardless whether it's in foreground or background.
+     * - A caller with only a read permission, when in background, is only permitted to read its own
+     *   [MedicalDataSource]s that contains at least one [MedicalResource] with the type that the
+     *   read permission covers. However, when the caller is in foreground or if it holds
+     *   [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it can also read other apps'
+     *   [MedicalDataSource]s as long as each of those [MedicalDataSource] contains at least one
+     *   [MedicalResource] with the corresponding type.
+     *     - For example, if a caller `A` created a [MedicalDataSource] `DS1`, then used `DS1` to
+     *       insert a [MedicalResource] `MR1` with type
+     *       [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES], and another caller `B` created `DS2`.
+     *       If `A` holds [PERMISSION_READ_MEDICAL_DATA_VACCINES], it can only read `DS1` in
+     *       background. However, if it is in foreground or holds
+     *       [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it can read both `DS1` and `DS2`.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param request containing details of the [MedicalDataSource]s to retrieve
+     * @return [MedicalDataSource]s matching the provided request
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun getMedicalDataSources(
+        request: GetMedicalDataSourcesRequest
+    ): List<MedicalDataSource> {
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#getMedicalDataSources()"
+        )
+    }
+
+    /**
+     * Gets [MedicalDataSource]s for the provided list of [ids][MedicalDataSource.id].
+     *
+     * The returned list of data sources will be in the same order as the [ids].
+     *
+     * Number of data sources returned by this API will depend based on below factors:
+     * - If an empty list of [ids] is provided, no data sources will be returned.
+     * - If an id is invalid or non-existent, no data source will be returned for that id.
+     * - Callers will only get data sources they are permitted to get. See below.
+     *
+     * There is no specific read permission for getting data sources. Instead, permission to read
+     * data sources is based on whether the caller has permission to read the data currently
+     * contained in that data source. Being permitted to get data sources is dependent on the
+     * following logic, in priority order, earlier statements take precedence.
+     * - A caller without any read medical permissions such as
+     *   [PERMISSION_READ_MEDICAL_DATA_VACCINES] or the write permission
+     *   [PERMISSION_WRITE_MEDICAL_DATA] is not permitted get any [MedicalDataSource]s, including
+     *   ones that it created.
+     * - A caller with the write permission is permitted to read its own [MedicalDataSource]s
+     *   regardless whether it's in foreground or background.
+     * - A caller with only a read permission, when in background, is only permitted to read its own
+     *   [MedicalDataSource]s that contains at least one [MedicalResource] with the type that the
+     *   read permission covers. However, when the caller is in foreground or if it holds
+     *   [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it can also read other apps'
+     *   [MedicalDataSource]s as long as each of those [MedicalDataSource] contains at least one
+     *   [MedicalResource] with the corresponding type.
+     *     - For example, if a caller `A` created a [MedicalDataSource] `DS1`, then used `DS1` to
+     *       insert a [MedicalResource] `MR1` with type
+     *       [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES], and another caller `B` created `DS2`.
+     *       If `A` holds [PERMISSION_READ_MEDICAL_DATA_VACCINES], it can only read `DS1` in
+     *       background. However, if it is in foreground or holds
+     *       [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it can read both `DS1` and `DS2`.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param ids ids of the [MedicalDataSource]s to retrieve
+     * @return [MedicalDataSource]s matching the provided [ids]
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun getMedicalDataSources(ids: List<String>): List<MedicalDataSource> {
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#getMedicalDataSources()"
+        )
+    }
 
     companion object {
         @RestrictTo(RestrictTo.Scope.LIBRARY)
