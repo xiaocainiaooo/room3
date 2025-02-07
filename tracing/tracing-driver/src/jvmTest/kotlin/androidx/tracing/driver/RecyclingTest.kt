@@ -30,8 +30,8 @@ class RecyclingTest {
     @Test
     internal fun testProcessTrackEvents() {
         context.use {
-            val process = context.ProcessTrack(id = 1, name = "process")
-            val thread = process.ThreadTrack(1, "thread")
+            val process = context.getOrCreateProcessTrack(id = 1, name = "process")
+            val thread = process.getOrCreateThreadTrack(1, "thread")
             thread.trace("section") {}
         }
         assertTrue(context.isDebug)
@@ -41,8 +41,8 @@ class RecyclingTest {
     @Test
     internal fun testProcessTrackFlows() = runTest {
         context.use {
-            val process = context.ProcessTrack(id = 1, name = "process")
-            val thread = process.ThreadTrack(1, "thread")
+            val process = context.getOrCreateProcessTrack(id = 1, name = "process")
+            val thread = process.getOrCreateThreadTrack(1, "thread")
             thread.traceFlow("section") {}
         }
         assertTrue(context.isDebug)

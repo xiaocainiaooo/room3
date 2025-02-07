@@ -50,8 +50,11 @@ public open class ProcessTrack(
         return packet
     }
 
-    /** @return A [ThreadTrack] for a given [ProcessTrack] using the unique thread [id]. */
-    public open fun ThreadTrack(id: Int, name: String): ThreadTrack {
+    /**
+     * @return A [ThreadTrack] for a given [ProcessTrack] using the unique thread [id] and a thread
+     *   [name].
+     */
+    public open fun getOrCreateThreadTrack(id: Int, name: String): ThreadTrack {
         // Thread ids are only unique for lifetime of the thread and can be potentially reused.
         // Therefore we end up combining the `name` of the thread and its `id` as a key.
         val key = "$id/$name"
@@ -64,8 +67,8 @@ public open class ProcessTrack(
             }
     }
 
-    /** @return A [CounterTrack] for a given [ProcessTrack] with the provided [name]. */
-    public open fun CounterTrack(name: String): CounterTrack {
+    /** @return A [CounterTrack] for a given [ProcessTrack] and the provided counter [name]. */
+    public open fun getOrCreateCounterTrack(name: String): CounterTrack {
         return counters[name]
             ?: lock.withLock {
                 counters.getOrPut(name) { CounterTrack(name = name, parent = this) }
@@ -90,7 +93,7 @@ internal class EmptyProcessTrack(context: EmptyTraceContext) :
 
     override fun preamblePacket(): PooledTracePacket? = null
 
-    override fun ThreadTrack(id: Int, name: String): ThreadTrack = emptyContext.thread
+    override fun getOrCreateThreadTrack(id: Int, name: String): ThreadTrack = emptyContext.thread
 
-    override fun CounterTrack(name: String): CounterTrack = emptyContext.counter
+    override fun getOrCreateCounterTrack(name: String): CounterTrack = emptyContext.counter
 }

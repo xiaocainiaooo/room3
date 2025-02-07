@@ -54,14 +54,14 @@ class TracingDriverBenchmark {
     @Test
     fun beginEnd_basic_noSink() {
         val traceContext = buildTraceContext(NoOpSink(), true)
-        val process = traceContext.ProcessTrack(id = 10, name = PROCESS_NAME)
+        val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
         traceContext.use { benchmarkRule.measureRepeated { process.trace(BASIC_STRING) {} } }
     }
 
     @Test
     fun beginEnd_basic_disabled() {
         val context = buildTraceContext(NoOpSink(), false)
-        val process = context.ProcessTrack(id = 10, name = PROCESS_NAME)
+        val process = context.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
         context.use { benchmarkRule.measureRepeated { process.trace(BASIC_STRING) {} } }
     }
 
@@ -83,7 +83,7 @@ class TracingDriverBenchmark {
         val sink = buildInMemorySink(context)
         val traceContext = buildTraceContext(sink, true)
         traceContext.use {
-            val process = traceContext.ProcessTrack(id = 10, name = PROCESS_NAME)
+            val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
 
             // we assert this value at runtime and build the number into the method name so it's
             // clear how many begin/ends it is measuring. test needs to be renamed if const changes.

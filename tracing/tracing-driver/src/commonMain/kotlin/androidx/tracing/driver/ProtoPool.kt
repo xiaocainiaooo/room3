@@ -31,9 +31,9 @@ private const val TRACK_DESCRIPTOR_POOL_SIZE = 256
 private const val PROCESS_DESCRIPTOR_POOL_SIZE = 2
 private const val THREAD_DESCRIPTOR_POOL_SIZE = 4
 private const val COUNTER_DESCRIPTOR_POOL_SIZE = 4
+
 // The size of the array
 // This would mean that each pool can queue up to 32 * 32 trace packets
-
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACE_PACKET_BUFFER_SIZE: Int = 32
 // The size of the pool
 private const val TRACE_PACKET_POOL_ARRAY_POOL_SIZE = 32
