@@ -128,15 +128,8 @@ data class AndroidXDependency(
 }
 
 internal fun Project.createVerifyDependencyVersionsTask():
-    TaskProvider<VerifyDependencyVersionsTask>? {
-    /**
-     * Ignore -Pandroidx.useMaxDepVersions when verifying dependency versions because it is a
-     * hypothetical build which is only intended to check for forward compatibility.
-     */
-    if (project.usingMaxDepVersions()) {
-        return null
-    }
-
+    TaskProvider<VerifyDependencyVersionsTask> {
+    val usingMaxDepsVersions = project.usingMaxDepVersions()
     val taskProvider =
         tasks.register("verifyDependencyVersions", VerifyDependencyVersionsTask::class.java) { task
             ->
@@ -161,6 +154,14 @@ internal fun Project.createVerifyDependencyVersionsTask():
                     dependencies
                 }
             )
+            task.onlyIf {
+                /**
+                 * Ignore -Pandroidx.useMaxDepVersions when verifying dependency versions because it
+                 * is a hypothetical build which is only intended to check for forward
+                 * compatibility.
+                 */
+                !usingMaxDepsVersions.get()
+            }
             task.cacheEvenIfNoOutputs()
         }
 

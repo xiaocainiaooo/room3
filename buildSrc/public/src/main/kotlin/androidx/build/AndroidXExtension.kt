@@ -316,8 +316,10 @@ abstract class AndroidXExtension(
 
     var type: SoftwareType = SoftwareType.UNSET
 
+    val failOnDeprecationWarnings = project.objects.property(Boolean::class.java).convention(true)
+
     /** Whether this project should fail on javac compilation warnings */
-    var failOnDeprecationWarnings = true
+    fun failOnDeprecationWarnings(enabled: Boolean) = failOnDeprecationWarnings.set(enabled)
 
     /**
      * Whether Kotlin Strict API mode is enabled, see
