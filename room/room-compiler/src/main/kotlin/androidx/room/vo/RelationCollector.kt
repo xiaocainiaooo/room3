@@ -132,7 +132,9 @@ data class RelationCollector(
                             when (language) {
                                 CodeLanguage.JAVA -> add("new %T()", relationTypeName)
                                 CodeLanguage.KOTLIN ->
-                                    if (relationTypeName == CommonTypeNames.MUTABLE_SET) {
+                                    if (
+                                        relationTypeName.rawTypeName == CommonTypeNames.MUTABLE_SET
+                                    ) {
                                         add("%M()", MUTABLE_SET_OF)
                                     } else {
                                         add("%M()", MUTABLE_LIST_OF)
@@ -231,7 +233,9 @@ data class RelationCollector(
                             when (language) {
                                 CodeLanguage.JAVA -> add("new %T()", relationTypeName)
                                 CodeLanguage.KOTLIN ->
-                                    if (relationTypeName == CommonTypeNames.MUTABLE_SET) {
+                                    if (
+                                        relationTypeName.rawTypeName == CommonTypeNames.MUTABLE_SET
+                                    ) {
                                         add("%M()", MUTABLE_SET_OF)
                                     } else {
                                         add("%M()", MUTABLE_LIST_OF)
@@ -572,7 +576,7 @@ data class RelationCollector(
                     val rawType = fieldType.rawType
                     val setType = context.processingEnv.requireType(CommonTypeNames.MUTABLE_SET)
                     val paramTypeName =
-                        if (setType.rawType.isAssignableFrom(rawType)) {
+                        if (rawType.isAssignableFrom(setType.rawType)) {
                             when (context.codeLanguage) {
                                 CodeLanguage.KOTLIN ->
                                     CommonTypeNames.MUTABLE_SET.parametrizedBy(
