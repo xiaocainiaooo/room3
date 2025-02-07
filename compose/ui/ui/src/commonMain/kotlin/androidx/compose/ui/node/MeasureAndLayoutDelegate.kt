@@ -27,6 +27,7 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadMeasuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InLayoutBlock
 import androidx.compose.ui.node.LayoutNode.UsageByParent.InMeasureBlock
+import androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -87,6 +88,8 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
 
     private var rootConstraints: Constraints? = null
 
+    internal var uncaughtExceptionHandler: UncaughtExceptionHandler? = null
+
     /** @param constraints The constraints to measure the root [LayoutNode] with */
     fun updateRootConstraints(constraints: Constraints) {
         if (rootConstraints != constraints) {
@@ -112,8 +115,6 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         } else {
             null
         }
-
-    var testExceptionHandler: RootForTest.ExceptionHandler? = null
 
     /**
      * Requests lookahead remeasure for this [layoutNode] and nodes affected by its measure result
@@ -499,8 +500,8 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             duringFullMeasureLayoutPass = fullPass
             try {
                 block()
-            } catch (e: Throwable) {
-                testExceptionHandler.handleOrThrow(e)
+            } catch (t: Throwable) {
+                uncaughtExceptionHandler?.onUncaughtLayoutException(t) ?: throw t
             } finally {
                 duringMeasureLayout = false
                 duringFullMeasureLayoutPass = false

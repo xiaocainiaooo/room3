@@ -289,10 +289,31 @@ private constructor(
         get() = checkNotNull(composeTest.activity) { "Host activity not found" }
 
     override fun apply(base: Statement, description: Description): Statement {
-        val testStatement = activityRule.apply(base, description)
+        val testWithDisposal =
+            object : Statement() {
+                override fun evaluate() {
+                    var blockException: Throwable? = null
+                    try {
+                        // Run the test
+                        base.evaluate()
+                    } catch (t: Throwable) {
+                        blockException = t
+                    } finally {
+                        // Remove all compose content in a controlled environment. Content may or
+                        // may not dispose cleanly. The Activity teardown is going to dispose all
+                        // of the compositions anyway, so we need to preemptively try now where we
+                        // can catch any exceptions.
+                        runOnUiThread { environment.tryDiscardAllCompositions() }
+                    }
+
+                    // Throw the aggregate exception. May be from the test body or from the cleanup.
+                    blockException?.let { throw it }
+                }
+            }
+
         return object : Statement() {
             override fun evaluate() {
-                environment.runTest { testStatement.evaluate() }
+                environment.runTest { activityRule.apply(testWithDisposal, description).evaluate() }
             }
         }
     }

@@ -40,6 +40,7 @@ package androidx.compose.ui.test {
     method protected abstract A? getActivity();
     method public final androidx.compose.ui.test.AndroidComposeUiTest<A> getTest();
     method public final <R> R runTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends R> block);
+    method public final void tryDiscardAllCompositions();
     property protected abstract A? activity;
     property public final androidx.compose.ui.test.AndroidComposeUiTest<A> test;
   }
