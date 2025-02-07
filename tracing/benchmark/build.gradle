@@ -42,6 +42,7 @@ dependencies {
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.kotlinTest)
+    androidTestImplementation(libs.kotlinCoroutinesTest)
 }
 
 android {
