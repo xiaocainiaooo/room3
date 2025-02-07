@@ -16,10 +16,9 @@
 
 package androidx.camera.viewfinder.impl
 
-import android.graphics.Rect
 import android.util.Size
+import android.util.SizeF
 import android.view.Surface
-import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.camera.viewfinder.core.impl.RotationValue
 import androidx.camera.viewfinder.core.impl.Transformations
 import com.google.common.truth.Truth.assertThat
@@ -43,8 +42,12 @@ class TransformationsTest {
     @Test
     fun cropRectWidthOffByOnePixel_match() {
         assertThat(
-                isCropRectAspectRatioMatchPreviewView(
-                    Rect(0, 0, VIEWFINDER_SIZE.height + 1, VIEWFINDER_SIZE.width - 1)
+                Transformations.isViewportAspectRatioMatchViewfinder(
+                    SizeF(
+                        (VIEWFINDER_SIZE.width + 1).toFloat(),
+                        (VIEWFINDER_SIZE.height - 1).toFloat()
+                    ),
+                    VIEWFINDER_SIZE
                 )
             )
             .isTrue()
@@ -53,26 +56,16 @@ class TransformationsTest {
     @Test
     fun cropRectWidthOffByTwoPixels_mismatch() {
         assertThat(
-                isCropRectAspectRatioMatchPreviewView(
-                    Rect(0, 0, VIEWFINDER_SIZE.height + 2, VIEWFINDER_SIZE.width - 2)
+                Transformations.isViewportAspectRatioMatchViewfinder(
+                    SizeF(
+                        (VIEWFINDER_SIZE.width + 2).toFloat(),
+                        (VIEWFINDER_SIZE.height - 2).toFloat()
+                    ),
+                    VIEWFINDER_SIZE
                 )
             )
             .isFalse()
     }
-
-    private fun isCropRectAspectRatioMatchPreviewView(cropRect: Rect): Boolean =
-        Transformations.isViewportAspectRatioMatchViewfinder(
-            TransformationInfo(
-                sourceRotation = 90,
-                isSourceMirroredHorizontally = false,
-                isSourceMirroredVertically = false,
-                cropRectLeft = cropRect.left,
-                cropRectTop = cropRect.top,
-                cropRectRight = cropRect.right,
-                cropRectBottom = cropRect.bottom
-            ),
-            VIEWFINDER_SIZE
-        )
 
     @Test
     fun correctTextureViewWith0Rotation() {

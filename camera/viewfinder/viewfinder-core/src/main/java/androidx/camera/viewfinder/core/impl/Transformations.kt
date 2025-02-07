@@ -20,6 +20,7 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.util.LayoutDirection
 import android.util.Size
+import android.util.SizeF
 import android.view.Surface
 import android.view.TextureView
 import androidx.camera.viewfinder.core.ScaleType
@@ -59,13 +60,15 @@ object Transformations {
     @JvmStatic
     fun getSurfaceToViewfinderMatrix(
         viewfinderSize: Size,
+        surfaceResolution: Size,
         transformationInfo: TransformationInfo,
         layoutDirection: Int,
         scaleType: ScaleType
     ): Matrix {
+        val rotatedViewportSize = transformationInfo.rotatedViewportFor(surfaceResolution)
         // Get the target of the mapping, the coordinates of the crop rect in view finder.
         val viewfinderCropRect: RectF =
-            if (isViewportAspectRatioMatchViewfinder(transformationInfo, viewfinderSize)) {
+            if (isViewportAspectRatioMatchViewfinder(rotatedViewportSize, viewfinderSize)) {
                 // If crop rect has the same aspect ratio as view finder, scale the crop rect to
                 // fill the entire view finder. This happens if the scale type is FILL_* AND a
                 // view-finder-based viewport is used.
@@ -74,20 +77,14 @@ object Transformations {
                 // If the aspect ratios don't match, it could be 1) scale type is FIT_*, 2) the
                 // Viewport is not based on the view finder or 3) both.
                 getViewfinderViewportRectForMismatchedAspectRatios(
-                    transformationInfo = transformationInfo,
+                    rotatedViewportSize = rotatedViewportSize,
                     viewfinderSize = viewfinderSize,
                     layoutDirection = layoutDirection,
                     scaleType = scaleType
                 )
             }
 
-        val surfaceCropRect =
-            RectF(
-                transformationInfo.cropRectLeft.toFloat(),
-                transformationInfo.cropRectTop.toFloat(),
-                transformationInfo.cropRectRight.toFloat(),
-                transformationInfo.cropRectBottom.toFloat()
-            )
+        val surfaceCropRect = transformationInfo.cropRectFor(surfaceResolution)
 
         val matrix =
             getRectToRect(surfaceCropRect, viewfinderCropRect, transformationInfo.sourceRotation)
@@ -103,16 +100,15 @@ object Transformations {
     }
 
     private fun getViewfinderViewportRectForMismatchedAspectRatios(
-        transformationInfo: TransformationInfo,
+        rotatedViewportSize: SizeF,
         viewfinderSize: Size,
         layoutDirection: Int,
         scaleType: ScaleType
     ): RectF {
         val viewfinderRect =
             RectF(0f, 0f, viewfinderSize.width.toFloat(), viewfinderSize.height.toFloat())
-        val rotatedViewportSize = getRotatedViewportSize(transformationInfo)
         val rotatedViewportRect =
-            RectF(0f, 0f, rotatedViewportSize.width.toFloat(), rotatedViewportSize.height.toFloat())
+            RectF(0f, 0f, rotatedViewportSize.width, rotatedViewportSize.height)
         val matrix = Matrix()
         setMatrixRectToRect(matrix, rotatedViewportRect, viewfinderRect, scaleType)
         matrix.mapRect(rotatedViewportRect)
@@ -123,33 +119,16 @@ object Transformations {
         }
     }
 
-    private fun getRotatedViewportSize(transformationInfo: TransformationInfo): Size {
-        return if (is90or270(transformationInfo.sourceRotation)) {
-            Size(
-                transformationInfo.cropRectBottom - transformationInfo.cropRectTop,
-                transformationInfo.cropRectRight - transformationInfo.cropRectLeft
-            )
-        } else {
-            Size(
-                transformationInfo.cropRectRight - transformationInfo.cropRectLeft,
-                transformationInfo.cropRectBottom - transformationInfo.cropRectTop
-            )
-        }
-    }
-
     internal fun isViewportAspectRatioMatchViewfinder(
-        transformationInfo: TransformationInfo,
+        rotatedViewportSize: SizeF,
         viewfinderSize: Size
-    ): Boolean {
-        // Using viewport rect to check if the viewport is based on the view finder.
-        val rotatedViewportSize: Size = getRotatedViewportSize(transformationInfo)
-        return isAspectRatioMatchingWithRoundingError(
-            viewfinderSize,
+    ): Boolean =
+        isAspectRatioMatchingWithRoundingError(
+            viewfinderSize.toSizeF(),
             true,
             rotatedViewportSize,
             false
         )
-    }
 
     /**
      * Gets the transform from one {@link Rect} to another with rotation degrees.
@@ -237,9 +216,9 @@ object Transformations {
      * @param isAccurate2 if size2 is accurate.
      */
     private fun isAspectRatioMatchingWithRoundingError(
-        size1: Size,
+        size1: SizeF,
         isAccurate1: Boolean,
-        size2: Size,
+        size2: SizeF,
         isAccurate2: Boolean
     ): Boolean {
         // The crop rect coordinates are rounded values. Each value is at most .5 away from their
@@ -249,7 +228,7 @@ object Transformations {
         val ratio1UpperBound: Float
         val ratio1LowerBound: Float
         if (isAccurate1) {
-            ratio1UpperBound = size1.width.toFloat() / size1.height
+            ratio1UpperBound = size1.width / size1.height
             ratio1LowerBound = ratio1UpperBound
         } else {
             ratio1UpperBound = (size1.width + 1f) / (size1.height - 1f)
@@ -258,7 +237,7 @@ object Transformations {
         val ratio2UpperBound: Float
         val ratio2LowerBound: Float
         if (isAccurate2) {
-            ratio2UpperBound = size2.width.toFloat() / size2.height
+            ratio2UpperBound = size2.width / size2.height
             ratio2LowerBound = ratio2UpperBound
         } else {
             ratio2UpperBound = (size2.width + 1f) / (size2.height - 1f)
@@ -271,4 +250,24 @@ object Transformations {
     /** Gets the transform from a normalized space (-1, -1) - (1, 1) to the given rect. */
     private fun getNormalizedToBuffer(viewPortRect: RectF): Matrix =
         Matrix().apply { setRectToRect(NORMALIZED_RECT, viewPortRect, Matrix.ScaleToFit.FILL) }
+
+    private fun Size.toSizeF(): SizeF = SizeF(width.toFloat(), height.toFloat())
+
+    /** Transforms the resolution into a crop rect, replacing any NaN values with real values. */
+    private fun TransformationInfo.cropRectFor(resolution: Size): RectF =
+        RectF(
+            cropRectLeft.let { if (it.isNaN()) 0f else it },
+            cropRectTop.let { if (it.isNaN()) 0f else it },
+            cropRectRight.let { if (it.isNaN()) resolution.width.toFloat() else it },
+            cropRectBottom.let { if (it.isNaN()) resolution.height.toFloat() else it }
+        )
+
+    private fun TransformationInfo.rotatedViewportFor(resolution: Size): SizeF =
+        cropRectFor(resolution).let {
+            if (is90or270(sourceRotation)) {
+                SizeF(it.height(), it.width())
+            } else {
+                SizeF(it.width(), it.height())
+            }
+        }
 }

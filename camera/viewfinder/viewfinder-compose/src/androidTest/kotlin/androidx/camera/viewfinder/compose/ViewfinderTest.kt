@@ -108,10 +108,10 @@ class ViewfinderTest {
                             sourceRotation = 0,
                             isSourceMirroredHorizontally = false,
                             isSourceMirroredVertically = false,
-                            cropRectLeft = 0,
-                            cropRectTop = 0,
-                            cropRectRight = 270,
-                            cropRectBottom = 480
+                            cropRectLeft = 0f,
+                            cropRectTop = 0f,
+                            cropRectRight = 270f,
+                            cropRectBottom = 480f
                         ),
                     coordinateTransformer = coordinateTransformer
                 ) {}

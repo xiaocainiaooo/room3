@@ -170,7 +170,7 @@ final class ViewfinderTransformation {
      *
      * @param original a snapshot of the untransformed inner view.
      */
-    Bitmap createTransformedBitmap(@NonNull Bitmap original, Size previewViewSize,
+    Bitmap createTransformedBitmap(@NonNull Bitmap original, Size viewfinderSize,
             int layoutDirection, int displayRotation) {
         if (!isTransformationInfoReady()) {
             return original;
@@ -181,11 +181,11 @@ final class ViewfinderTransformation {
                         mResolution.getWidth(),
                         mResolution.getHeight()
                 );
-        RectF surfaceRectInPreviewView = getTransformedSurfaceRect(previewViewSize,
+        RectF surfaceRectInPreviewView = getTransformedSurfaceRect(viewfinderSize,
                 layoutDirection);
 
         Bitmap transformed = Bitmap.createBitmap(
-                previewViewSize.getWidth(), previewViewSize.getHeight(), original.getConfig());
+                viewfinderSize.getWidth(), viewfinderSize.getHeight(), original.getConfig());
         Canvas canvas = new Canvas(transformed);
 
         Matrix canvasTransform = new Matrix();
@@ -208,6 +208,7 @@ final class ViewfinderTransformation {
         Matrix surfaceToViewfinder =
                 Transformations.getSurfaceToViewfinderMatrix(
                         viewfinderSize,
+                        mResolution,
                         mTransformationInfo,
                         layoutDirection,
                         mScaleType

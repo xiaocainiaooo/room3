@@ -80,10 +80,10 @@ class ViewfinderTransformationsTest {
                 sourceRotation = 90,
                 isSourceMirroredHorizontally = false,
                 isSourceMirroredVertically = false,
-                cropRectLeft = CROP_RECT.left,
-                cropRectTop = CROP_RECT.top,
-                cropRectRight = CROP_RECT.right,
-                cropRectBottom = CROP_RECT.bottom
+                cropRectLeft = CROP_RECT.left.toFloat(),
+                cropRectTop = CROP_RECT.top.toFloat(),
+                cropRectRight = CROP_RECT.right.toFloat(),
+                cropRectBottom = CROP_RECT.bottom.toFloat()
             ),
             SURFACE_SIZE
         )
@@ -222,10 +222,10 @@ class ViewfinderTransformationsTest {
                 isSourceMirroredHorizontally = false,
                 // 90 degree rotation would have a vertical flip for a front camera
                 isSourceMirroredVertically = isFrontCamera,
-                cropRectLeft = MISMATCHED_CROP_RECT.left,
-                cropRectTop = MISMATCHED_CROP_RECT.top,
-                cropRectRight = MISMATCHED_CROP_RECT.right,
-                cropRectBottom = MISMATCHED_CROP_RECT.bottom
+                cropRectLeft = MISMATCHED_CROP_RECT.left.toFloat(),
+                cropRectTop = MISMATCHED_CROP_RECT.top.toFloat(),
+                cropRectRight = MISMATCHED_CROP_RECT.right.toFloat(),
+                cropRectBottom = MISMATCHED_CROP_RECT.bottom.toFloat()
             ),
             FIT_SURFACE_SIZE
         )
@@ -312,10 +312,10 @@ class ViewfinderTransformationsTest {
                 sourceRotation = rotationDegrees,
                 isSourceMirroredHorizontally = isFrontCamera && rotationDegrees in setOf(0, 180),
                 isSourceMirroredVertically = isFrontCamera && rotationDegrees in setOf(90, 270),
-                cropRectLeft = cropRect.left,
-                cropRectTop = cropRect.top,
-                cropRectRight = cropRect.right,
-                cropRectBottom = cropRect.bottom
+                cropRectLeft = cropRect.left.toFloat(),
+                cropRectTop = cropRect.top.toFloat(),
+                cropRectRight = cropRect.right.toFloat(),
+                cropRectBottom = cropRect.bottom.toFloat()
             ),
             SURFACE_SIZE
         )

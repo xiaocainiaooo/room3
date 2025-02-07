@@ -24,21 +24,36 @@ package androidx.camera.viewfinder.core {
   }
 
   public final class TransformationInfo {
-    ctor public TransformationInfo(int sourceRotation, boolean isSourceMirroredHorizontally, boolean isSourceMirroredVertically, int cropRectLeft, int cropRectTop, int cropRectRight, int cropRectBottom);
-    method public int getCropRectBottom();
-    method public int getCropRectLeft();
-    method public int getCropRectRight();
-    method public int getCropRectTop();
+    ctor public TransformationInfo();
+    ctor public TransformationInfo(optional int sourceRotation);
+    ctor public TransformationInfo(optional int sourceRotation, optional boolean isSourceMirroredHorizontally);
+    ctor public TransformationInfo(optional int sourceRotation, optional boolean isSourceMirroredHorizontally, optional boolean isSourceMirroredVertically);
+    ctor public TransformationInfo(optional int sourceRotation, optional boolean isSourceMirroredHorizontally, optional boolean isSourceMirroredVertically, optional float cropRectLeft);
+    ctor public TransformationInfo(optional int sourceRotation, optional boolean isSourceMirroredHorizontally, optional boolean isSourceMirroredVertically, optional float cropRectLeft, optional float cropRectTop);
+    ctor public TransformationInfo(optional int sourceRotation, optional boolean isSourceMirroredHorizontally, optional boolean isSourceMirroredVertically, optional float cropRectLeft, optional float cropRectTop, optional float cropRectRight);
+    ctor public TransformationInfo(optional int sourceRotation, optional boolean isSourceMirroredHorizontally, optional boolean isSourceMirroredVertically, optional float cropRectLeft, optional float cropRectTop, optional float cropRectRight, optional float cropRectBottom);
+    method public float getCropRectBottom();
+    method public float getCropRectLeft();
+    method public float getCropRectRight();
+    method public float getCropRectTop();
     method public int getSourceRotation();
     method public boolean isSourceMirroredHorizontally();
     method public boolean isSourceMirroredVertically();
-    property public int cropRectBottom;
-    property public int cropRectLeft;
-    property public int cropRectRight;
-    property public int cropRectTop;
+    property public float cropRectBottom;
+    property public float cropRectLeft;
+    property public float cropRectRight;
+    property public float cropRectTop;
     property public boolean isSourceMirroredHorizontally;
     property public boolean isSourceMirroredVertically;
     property public int sourceRotation;
+    field public static final float CROP_NONE = (0.0f/0.0f);
+    field public static final androidx.camera.viewfinder.core.TransformationInfo.Companion Companion;
+    field public static final androidx.camera.viewfinder.core.TransformationInfo DEFAULT;
+  }
+
+  public static final class TransformationInfo.Companion {
+    property public static float CROP_NONE;
+    property public androidx.camera.viewfinder.core.TransformationInfo DEFAULT;
   }
 
   public final class ViewfinderSurfaceRequest {

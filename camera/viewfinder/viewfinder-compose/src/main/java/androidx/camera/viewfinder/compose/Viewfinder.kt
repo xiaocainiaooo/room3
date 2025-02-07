@@ -22,6 +22,7 @@ import android.view.Surface
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.ScaleType
 import androidx.camera.viewfinder.core.TransformationInfo
+import androidx.camera.viewfinder.core.TransformationInfo.Companion.DEFAULT
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.camera.viewfinder.core.ViewfinderSurfaceSessionScope
 import androidx.camera.viewfinder.core.impl.RefCounted
@@ -80,8 +81,8 @@ import kotlinx.coroutines.coroutineScope
 @Composable
 fun Viewfinder(
     surfaceRequest: ViewfinderSurfaceRequest,
-    transformationInfo: TransformationInfo,
     modifier: Modifier = Modifier,
+    transformationInfo: TransformationInfo = DEFAULT,
     coordinateTransformer: MutableCoordinateTransformer? = null,
     onInit: ViewfinderInitScope.() -> Unit
 ) {
@@ -145,10 +146,11 @@ private fun TransformedSurface(
                 placeable.placeWithLayer(widthOffset, heightOffset) {
                     val surfaceToViewFinderMatrix =
                         Transformations.getSurfaceToViewfinderMatrix(
-                            Size(constraints.maxWidth, constraints.maxHeight),
-                            transformationInfo,
-                            layoutDirection,
-                            ScaleType.FILL_CENTER
+                            viewfinderSize = Size(constraints.maxWidth, constraints.maxHeight),
+                            surfaceResolution = Size(surfaceWidth, surfaceHeight),
+                            transformationInfo = transformationInfo,
+                            layoutDirection = layoutDirection,
+                            scaleType = ScaleType.FILL_CENTER
                         )
 
                     coordinateTransformer?.transformMatrix =

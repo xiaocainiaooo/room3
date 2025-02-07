@@ -134,10 +134,10 @@ public fun CameraXViewfinder(
                                 sourceRotation = transformInfo.rotationDegrees,
                                 isSourceMirroredHorizontally = transformInfo.isMirroring,
                                 isSourceMirroredVertically = false,
-                                cropRectLeft = transformInfo.cropRect.left,
-                                cropRectTop = transformInfo.cropRect.top,
-                                cropRectRight = transformInfo.cropRect.right,
-                                cropRectBottom = transformInfo.cropRect.bottom
+                                cropRectLeft = transformInfo.cropRect.left.toFloat(),
+                                cropRectTop = transformInfo.cropRect.top.toFloat(),
+                                cropRectRight = transformInfo.cropRect.right.toFloat(),
+                                cropRectBottom = transformInfo.cropRect.bottom.toFloat()
                             )
                         )
                 }
