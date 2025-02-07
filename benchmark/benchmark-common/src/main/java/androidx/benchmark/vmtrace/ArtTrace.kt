@@ -17,6 +17,7 @@
 package androidx.benchmark.vmtrace
 
 import androidx.annotation.VisibleForTesting
+import androidx.benchmark.MicrobenchmarkScope
 import java.io.File
 import java.io.OutputStream
 import java.util.UUID
@@ -293,12 +294,15 @@ internal class ArtTrace(
          */
         private const val internOffset = 100L
 
-        private const val PAUSE_MEASUREMENT_FULLNAME =
-            "androidx.benchmark.MicrobenchmarkScope.pauseMeasurement: ()V"
-        private const val RESUME_MEASUREMENT_FULLNAME =
-            "androidx.benchmark.MicrobenchmarkScope.resumeMeasurement: ()V"
-        private const val RUN_WITH_MEASUREMENT_DISABLED_FULLNAME =
-            "androidx.benchmark.MicrobenchmarkScope.runWithMeasurementDisabled: (Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;"
+        // Derive constant strings dynamically to account for identifier minification
+        private val PAUSE_MEASUREMENT_FULLNAME =
+            "${MicrobenchmarkScope::class.qualifiedName}.${MicrobenchmarkScope::pauseMeasurement.name}: ()V"
+        private val RESUME_MEASUREMENT_FULLNAME =
+            "${MicrobenchmarkScope::class.qualifiedName}.${MicrobenchmarkScope::resumeMeasurement.name}: ()V"
+        val RUN_WITH_MEASUREMENT_DISABLED_FULLNAME =
+            "${MicrobenchmarkScope::class.qualifiedName}.runWithMeasurementDisabled: (Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;"
+
+        /** Unique ID used by the injected runWithMeasurementDisabled entry */
         private const val RUN_WITH_MEASUREMENT_DISABLED_INTERNID = internOffset - 1
 
         private val SequenceDataInitial =
