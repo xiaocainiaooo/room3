@@ -356,7 +356,10 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames =
-                    listOf("FakeAllNullablePrimitiveParamsWithDefaultImpl.KT", "FakeSchemas.KT")
+                    listOf(
+                        "FakeAllNullablePrimitiveParamsWithDefaultValuesImpl.KT",
+                        "FakeSchemas.KT"
+                    )
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(

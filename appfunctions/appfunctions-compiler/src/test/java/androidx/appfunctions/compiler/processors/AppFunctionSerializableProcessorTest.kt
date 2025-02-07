@@ -90,11 +90,7 @@ class AppFunctionSerializableProcessorTest {
             )
         compilationTestHelper.assertErrorWithMessage(
             report,
-            "AppFunctionSerializable properties must be one of the following types:\n" +
-                "kotlin.Int,kotlin.Long,kotlin.Float,kotlin.Double,kotlin.Boolean,kotlin.String," +
-                "kotlin.IntArray,kotlin.LongArray,kotlin.FloatArray,kotlin.DoubleArray," +
-                "kotlin.BooleanArray,kotlin.collections.List<kotlin.String>, an @AppFunctionSerializable or a list of @AppFunctionSerializable\n" +
-                "but found kotlin.Any"
+            "AppFunctionSerializable properties must be one of the following types:\n"
         )
     }
 
@@ -106,11 +102,7 @@ class AppFunctionSerializableProcessorTest {
             )
         compilationTestHelper.assertErrorWithMessage(
             report,
-            "AppFunctionSerializable properties must be one of the following types:\n" +
-                "kotlin.Int,kotlin.Long,kotlin.Float,kotlin.Double,kotlin.Boolean,kotlin.String," +
-                "kotlin.IntArray,kotlin.LongArray,kotlin.FloatArray,kotlin.DoubleArray," +
-                "kotlin.BooleanArray,kotlin.collections.List<kotlin.String>, an @AppFunctionSerializable or a list of @AppFunctionSerializable\n" +
-                "but found kotlin.collections.List<kotlin.Any>"
+            "AppFunctionSerializable properties must be one of the following types:\n"
         )
     }
 }

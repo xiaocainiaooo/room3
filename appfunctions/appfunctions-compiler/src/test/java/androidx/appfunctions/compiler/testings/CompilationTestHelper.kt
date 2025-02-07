@@ -22,7 +22,7 @@ import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.compiler.TestCompilationArguments
 import androidx.room.compiler.processing.util.compiler.TestCompilationResult
 import androidx.room.compiler.processing.util.compiler.compile
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import java.io.File
 import java.nio.file.Files
@@ -100,16 +100,15 @@ class CompilationTestHelper(
         report: CompilationReport,
         expectGeneratedFileName: String,
         goldenFileName: String,
-        getGeneratedFileContent: () -> String
+        generatedFileContent: String?
     ) {
-        val generatedContent = getGeneratedFileContent()
-        Truth.assertWithMessage(
+        assertWithMessage(
                 """
             Compile failed with error:
             ${report.printDiagnostics(Diagnostic.Kind.ERROR)}
 
             Generated content:
-            $generatedContent
+            $generatedFileContent
             """
                     .trimIndent()
             )
@@ -117,13 +116,17 @@ class CompilationTestHelper(
             .isTrue()
 
         val goldenFile = getGoldenFile(goldenFileName)
-
         val updateGoldenFiles = System.getProperty("update_golden_files")?.toBoolean() == true
+        assertWithMessage(
+                "Generated file [$expectGeneratedFileName] does not exist or had multiple matches"
+            )
+            .that(generatedFileContent)
+            .isNotNull()
         if (updateGoldenFiles) {
             println("Updating golden file: ${goldenFile.path}")
-            goldenFile.writeText(generatedContent)
+            goldenFile.writeText(checkNotNull(generatedFileContent))
         } else {
-            Truth.assertWithMessage(
+            assertWithMessage(
                     """
                 Content of generated file [$expectGeneratedFileName] does not match
                 the content of golden file [${goldenFile.path}].
@@ -134,7 +137,7 @@ class CompilationTestHelper(
                 """
                         .trimIndent()
                 )
-                .that(generatedContent)
+                .that(generatedFileContent)
                 .isEqualTo(goldenFile.readText())
         }
     }
@@ -148,14 +151,17 @@ class CompilationTestHelper(
         expectGeneratedSourceFileName: String,
         goldenFileName: String,
     ) {
-        assertSuccessWithGeneratedContent(report, expectGeneratedSourceFileName, goldenFileName) {
+        assertSuccessWithGeneratedContent(
+            report,
+            expectGeneratedSourceFileName,
+            goldenFileName,
             report.generatedSourceFiles
-                .single { sourceFile ->
+                .singleOrNull { sourceFile ->
                     sourceFile.source.relativePath.contains(expectGeneratedSourceFileName)
                 }
-                .source
-                .contents
-        }
+                ?.source
+                ?.contents
+        )
     }
 
     /**
@@ -167,18 +173,21 @@ class CompilationTestHelper(
         expectGeneratedResourceFileName: String,
         goldenFileName: String,
     ) {
-        assertSuccessWithGeneratedContent(report, expectGeneratedResourceFileName, goldenFileName) {
+        assertSuccessWithGeneratedContent(
+            report,
+            expectGeneratedResourceFileName,
+            goldenFileName,
             report.generatedResourceFiles
-                .single { resourceFile ->
+                .singleOrNull { resourceFile ->
                     resourceFile.resource.relativePath.contains(expectGeneratedResourceFileName)
                 }
-                .resource
-                .getContents()
-        }
+                ?.resource
+                ?.getContents()
+        )
     }
 
     fun assertErrorWithMessage(report: CompilationReport, expectedErrorMessage: String) {
-        Truth.assertWithMessage("Compile succeed").that(report.isSuccess).isFalse()
+        assertWithMessage("Compile succeed").that(report.isSuccess).isFalse()
 
         val errorDiagnostics = report.diagnostics[Diagnostic.Kind.ERROR] ?: emptyList()
         var foundError = false
@@ -188,7 +197,7 @@ class CompilationTestHelper(
                 break
             }
         }
-        Truth.assertWithMessage(
+        assertWithMessage(
                 """
                 Unable to find the expected error message [$expectedErrorMessage] from the
                 diagnostics results:
