@@ -78,6 +78,52 @@ class AppFunctionDataTest {
     }
 
     @Test
+    fun getSinglePropertyOrNull_shouldReturnResult_ifExist() {
+        val appFunctionData =
+            AppFunctionData.Builder("type")
+                .setLong("testLong", 2L)
+                .setDouble("testDouble", 4.0)
+                .setBoolean("testBoolean", true)
+                .setString("testString", "test")
+                .setAppFunctionData(
+                    "testData",
+                    AppFunctionData.Builder("type").setLong("nestedInt", 10).build(),
+                )
+                .build()
+
+        val longProperty = appFunctionData.getLongOrNull("testLong")
+        val doubleProperty = appFunctionData.getDoubleOrNull("testDouble")
+        val booleanProperty = appFunctionData.getBooleanOrNull("testBoolean")
+        val stringProperty = appFunctionData.getStringOrNull("testString")
+        val dataProperty = appFunctionData.getAppFunctionDataOrNull("testData")
+
+        Truth.assertThat(longProperty).isEqualTo(2L)
+        Truth.assertThat(doubleProperty).isEqualTo(4.0)
+        Truth.assertThat(booleanProperty).isEqualTo(true)
+        Truth.assertThat(stringProperty).isEqualTo("test")
+        Truth.assertThat(dataProperty?.qualifiedName).isEqualTo("type")
+        Truth.assertThat(dataProperty?.genericDocument?.schemaType).isEqualTo("type")
+        Truth.assertThat(dataProperty?.getLong("nestedInt")).isEqualTo(10)
+    }
+
+    @Test
+    fun getSinglePropertyOrNull_shouldReturnNull_ifNotExist() {
+        val appFunctionData = AppFunctionData.EMPTY
+
+        val longProperty = appFunctionData.getLongOrNull("testLong")
+        val doubleProperty = appFunctionData.getDoubleOrNull("testDouble")
+        val booleanProperty = appFunctionData.getBooleanOrNull("testBoolean")
+        val stringProperty = appFunctionData.getStringOrNull("testString")
+        val dataProperty = appFunctionData.getAppFunctionDataOrNull("testData")
+
+        Truth.assertThat(longProperty).isEqualTo(null)
+        Truth.assertThat(doubleProperty).isEqualTo(null)
+        Truth.assertThat(booleanProperty).isEqualTo(null)
+        Truth.assertThat(stringProperty).isEqualTo(null)
+        Truth.assertThat(dataProperty).isEqualTo(null)
+    }
+
+    @Test
     fun getSingleProperty_shouldReturnResult_ifExist() {
         val appFunctionData =
             AppFunctionData.Builder("type")
