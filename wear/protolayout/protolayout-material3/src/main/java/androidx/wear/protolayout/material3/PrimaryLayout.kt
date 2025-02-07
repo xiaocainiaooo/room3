@@ -206,7 +206,17 @@ public fun MaterialScope.primaryLayoutWithOverrideIcon(
                 )
             )
 
-    val bottomSlotValue = bottomSlot?.let { bottomSlot() }
+    val bottomSlotValue =
+        bottomSlot?.let {
+            withStyle(
+                    defaultTextElementStyle =
+                        TextElementStyle(
+                            typography = Typography.TITLE_MEDIUM,
+                            color = theme.colorScheme.onBackground,
+                        )
+                )
+                .bottomSlot()
+        }
 
     val marginsValues: Padding =
         withStyle(

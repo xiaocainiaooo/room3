@@ -89,7 +89,7 @@ public object GraphicDataCardDefaults {
         val wrapGraphic =
             Box.Builder()
                 .setWidth(deviceConfiguration.weightForContainer(GRAPHIC_SPACE_PERCENTAGE))
-                .setHeight(height)
+                .setHeight(expand())
                 .addContent(graphic)
                 .build()
 

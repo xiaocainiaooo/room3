@@ -22,12 +22,12 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
 import androidx.annotation.FloatRange
+import androidx.core.graphics.ColorUtils
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
-import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.DimensionBuilders.wrap
@@ -129,13 +129,10 @@ internal fun wrapWithMinTapTargetDimension(): WrappedDimensionProp =
  * ignored.
  */
 internal fun LayoutColor.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float): LayoutColor {
-    // From androidx.core.graphics.ColorUtils
     require(ratio in 0.0..1.0) { "withOpacity ratio must be between 0 and 1." }
     val fullyOpaque = 255
-    val alphaMask = 0x00ffffff
     val alpha = (ratio * fullyOpaque).toInt()
-    val alphaPosition = 24
-    return ((this.staticArgb and alphaMask) or (alpha shl alphaPosition)).argb
+    return ColorUtils.setAlphaComponent(this.staticArgb, alpha).argb
 }
 
 /** Returns corresponding text alignment based on the given horizontal alignment. */
@@ -199,7 +196,7 @@ internal fun MaterialScope.componentContainer(
                         BackgroundImageStyle(
                             width = expand(),
                             height = expand(),
-                            overlayColor = colorScheme.primary.withOpacity(0.6f),
+                            overlayColor = colorScheme.background.withOpacity(0.6f),
                             overlayWidth = width,
                             overlayHeight = height,
                             shape = protoLayoutModifiers.background?.corner ?: shapes.large,

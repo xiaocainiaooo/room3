@@ -20,7 +20,6 @@ import android.graphics.Color
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.FloatRange
-import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders.Box
@@ -137,7 +136,7 @@ public object ButtonDefaults {
             Row.Builder().setWidth(expand()).setHeight(height)
 
         ContainerWithSpacersBuilder<LayoutElement>(
-                { it: LayoutElement? -> verticalElementBuilder.addContent(it!!) },
+                { element: LayoutElement? -> verticalElementBuilder.addContent(element!!) },
                 label
             )
             .addElement(secondaryLabel, horizontalSpacer(style.labelsSpaceDp))
@@ -218,7 +217,6 @@ public object ButtonDefaults {
         label: LayoutElement?,
         icon: LayoutElement?,
         @HorizontalAlignment horizontalAlignment: Int,
-        width: DimensionBuilders.ContainerDimension
     ): LayoutElement {
         val row: Row.Builder = Row.Builder()
 
@@ -231,9 +229,6 @@ public object ButtonDefaults {
             .addElement(secondElement, verticalSpacer(COMPACT_BUTTON_ICON_LABEL_SPACE_DP))
 
         return Box.Builder()
-            // No need to set height specifically as that is done by the container that has it
-            // fixed.
-            .setWidth(width)
             .addContent(row.build())
             .setHorizontalAlignment(horizontalAlignment)
             .build()
