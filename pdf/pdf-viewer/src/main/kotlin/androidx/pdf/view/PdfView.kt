@@ -43,6 +43,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.MainThread
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
+import androidx.core.animation.addListener
 import androidx.core.graphics.toRectF
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
@@ -248,6 +249,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** Whether we are in a fling movement. This is used to detect the end of that movement */
     private var isFling = false
 
+    private var doubleTapAnimator: ValueAnimator? = null
+
     /**
      * Returns true if neither zoom nor scroll are actively changing. Does not account for
      * externally-driven changes in position (e.g. a animating scrollY or zoom)
@@ -260,7 +263,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     GestureTracker.Gesture.DRAG,
                     GestureTracker.Gesture.DRAG_X,
                     GestureTracker.Gesture.DRAG_Y
-                ) || isFling
+                ) || isFling || doubleTapAnimator?.isRunning == true
             return !zoomIsChanging && !scrollIsChanging
         }
 
@@ -1350,16 +1353,23 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 // viewport not initialized yet maybe?
                 return false
             }
+            doubleTapAnimator?.cancel()
 
-            ValueAnimator.ofFloat(0f, 1f).apply {
-                duration = 200 // Slightly shorter duration for snappier feel
-                addUpdateListener { animator ->
-                    val animatedValue = animator.animatedValue as Float
-                    val value = currentZoom + (newZoom - currentZoom) * animatedValue
-                    zoomTo(value, e.x, e.y)
+            doubleTapAnimator =
+                ValueAnimator.ofFloat(0f, 1f).apply {
+                    // Slightly shorter duration for snappier feel
+                    duration = DOUBLE_TAP_ANIMATION_DURATION_MS
+                    addUpdateListener { animator ->
+                        val animatedValue = animator.animatedValue as Float
+                        val value = currentZoom + (newZoom - currentZoom) * animatedValue
+                        zoomTo(value, e.x, e.y)
+                    }
+                    // We avoid pinging pages with new zoom states and fetching new bitmaps during
+                    // animations. Update pages with the final zoom state when the animation ends
+                    addListener(onEnd = { maybeUpdatePageVisibility() })
+
+                    start()
                 }
-                start()
-            }
 
             return true
         }
@@ -1446,6 +1456,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
         /** The smallest scroll distance that can switch mode to "free scrolling" */
         private const val MIN_SCROLL_TO_SWITCH_DP = 30
+
+        /** The duration of the double tap to zoom animation, in milliseconds */
+        private const val DOUBLE_TAP_ANIMATION_DURATION_MS = 200L
 
         private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
 
