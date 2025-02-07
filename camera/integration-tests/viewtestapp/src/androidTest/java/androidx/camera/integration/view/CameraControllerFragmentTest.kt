@@ -170,6 +170,10 @@ class CameraControllerFragmentTest(
             }
         }
 
+        // Disables auto-cancellation as that would reset the focus state and interfere with the
+        // the test in timeout cases.
+        fragment.cameraController.setTapToFocusAutoCancelDuration(0, TimeUnit.SECONDS)
+
         // Act: click PreviewView.
         val previewViewId = "androidx.camera.integration.view:id/preview_view"
         assumeObjectCanBeFound(UiSelector().resourceId(previewViewId)).click()
