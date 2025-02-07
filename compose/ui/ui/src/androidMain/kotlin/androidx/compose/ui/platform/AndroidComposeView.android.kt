@@ -127,6 +127,8 @@ import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.InputModeManagerImpl
+import androidx.compose.ui.input.indirect.IndirectTouchEvent
+import androidx.compose.ui.input.indirect.IndirectTouchEventType
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
@@ -207,6 +209,7 @@ import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.compose.ui.viewinterop.InteropView
 import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.InputDeviceCompat.SOURCE_CLASS_POINTER
 import androidx.core.view.InputDeviceCompat.SOURCE_ROTARY_ENCODER
 import androidx.core.view.MotionEventCompat.AXIS_SCROLL
 import androidx.core.view.ViewCompat
@@ -1162,6 +1165,12 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
             // Finally, dispatch the key event to onPreKeyEvent/onKeyEvent listeners.
             focusOwner.dispatchKeyEvent(keyEvent)
+
+    /** This function is used by the testing framework to send indirect touch events. */
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun sendIndirectTouchEvent(indirectTouchEvent: IndirectTouchEvent): Boolean {
+        return focusOwner.dispatchIndirectTouchEvent(indirectTouchEvent)
+    }
 
     override fun dispatchKeyEvent(event: AndroidKeyEvent): Boolean =
         if (isFocused) {
@@ -2124,17 +2133,47 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                 sendHoverExitEvent.run()
             }
         }
+        if (isBadMotionEvent(motionEvent) || !isAttachedToWindow) {
+            return super.dispatchGenericMotionEvent(motionEvent)
+        }
 
         return when (motionEvent.actionMasked) {
             ACTION_SCROLL ->
-                when {
-                    isBadMotionEvent(motionEvent) || !isAttachedToWindow ->
-                        super.dispatchGenericMotionEvent(motionEvent)
-                    motionEvent.isFromSource(SOURCE_ROTARY_ENCODER) ->
-                        handleRotaryEvent(motionEvent)
-                    else -> handleMotionEvent(motionEvent).dispatchedToAPointerInputModifier
+                if (motionEvent.isFromSource(SOURCE_ROTARY_ENCODER)) {
+                    handleRotaryEvent(motionEvent)
+                } else {
+                    handleMotionEvent(motionEvent).dispatchedToAPointerInputModifier
                 }
-            else -> super.dispatchGenericMotionEvent(motionEvent)
+            else -> {
+                @OptIn(ExperimentalComposeUiApi::class)
+                if (!motionEvent.isFromSource(SOURCE_CLASS_POINTER)) {
+                    val indirectTouchEvent =
+                        IndirectTouchEvent(
+                            position = Offset(motionEvent.x, motionEvent.y),
+                            eventTimeMillis = motionEvent.eventTime,
+                            type = convertActionToIndirectTouchEventType(motionEvent.actionMasked),
+                        )
+                    val handled =
+                        focusOwner.dispatchIndirectTouchEvent(indirectTouchEvent) {
+                            super.dispatchGenericMotionEvent(motionEvent)
+                        }
+
+                    if (handled) return true
+                }
+
+                // If focus owner did not handle, rely on ViewGroup to handle.
+                super.dispatchGenericMotionEvent(motionEvent)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun convertActionToIndirectTouchEventType(actionMasked: Int): IndirectTouchEventType {
+        return when (actionMasked) {
+            ACTION_UP -> IndirectTouchEventType.Release
+            ACTION_DOWN -> IndirectTouchEventType.Press
+            ACTION_MOVE -> IndirectTouchEventType.Move
+            else -> IndirectTouchEventType.Unknown
         }
     }
 
