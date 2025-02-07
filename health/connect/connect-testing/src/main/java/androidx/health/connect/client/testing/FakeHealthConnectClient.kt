@@ -38,10 +38,12 @@ import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
+import androidx.health.connect.client.response.ReadMedicalResourcesResponse
 import androidx.health.connect.client.response.ReadRecordResponse
 import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -427,6 +429,14 @@ public class FakeHealthConnectClient(
         requests: List<UpsertMedicalResourceRequest>
     ): List<MedicalResource> {
         TODO("b/382680786 Not yet implemented")
+    }
+
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    override suspend fun readMedicalResources(
+        request: ReadMedicalResourcesRequest
+    ): ReadMedicalResourcesResponse {
+        TODO("b/382680487 Not yet implemented")
     }
 
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
