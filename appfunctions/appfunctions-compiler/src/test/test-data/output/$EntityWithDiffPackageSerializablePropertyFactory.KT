@@ -34,6 +34,7 @@ public class `$EntityWithDiffPackageSerializablePropertyFactory` :
         entityWithDiffPackageSerializableProperty.serializableList.map{
         diffPackageInputSerializable ->
         diffPackageInputSerializableFactory.toAppFunctionData(diffPackageInputSerializable) })
+
     return builder.build()
   }
 }
