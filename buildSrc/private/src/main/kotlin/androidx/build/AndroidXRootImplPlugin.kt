@@ -148,7 +148,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
          * Add dependency analysis plugin and add buildHealth task to buildOnServer when
          * maxDepVersions is not enabled
          */
-        if (!project.usingMaxDepVersions()) {
+        if (!project.usingMaxDepVersions().get()) {
             project.plugins.apply("com.autonomousapps.dependency-analysis")
 
             // Ignore advice regarding ktx dependencies

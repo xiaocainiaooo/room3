@@ -120,6 +120,7 @@ import org.gradle.kotlin.dsl.withModule
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.plugin.devel.tasks.ValidatePlugins
+import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -655,6 +656,10 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             }
         }
 
+        project.configureJavaCompilationWarnings(
+            androidXExtension = androidXExtension,
+            isTestApp = true
+        )
         project.buildOnServerDependsOnAssembleRelease()
         project.buildOnServerDependsOnLint()
     }
@@ -846,7 +851,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
     }
 
     private fun Project.buildOnServerDependsOnLint() {
-        if (!project.usingMaxDepVersions()) {
+        if (!project.usingMaxDepVersions().get()) {
             project.addToBuildOnServer("lint")
         }
     }
@@ -1019,7 +1024,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                     getDefaultTargetJavaVersion(androidXExtension.type, project.name)
                 sourceCompatibility = defaultTargetJavaVersion
                 targetCompatibility = defaultTargetJavaVersion
-                project.disableJava8TargetObsoleteWarnings()
             }
             if (!project.plugins.hasPlugin(KotlinBasePluginWrapper::class.java)) {
                 project.configureSourceJarForJava(androidXExtension.samplesProjects)
@@ -1094,7 +1098,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             sourceCompatibility = VERSION_1_8
             targetCompatibility = VERSION_1_8
         }
-        project.disableJava8TargetObsoleteWarnings()
 
         val defaultMinSdk = project.defaultAndroidConfig.minSdk
         val defaultCompileSdk = project.defaultAndroidConfig.compileSdk
@@ -1320,10 +1323,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         if (buildFeatures.isIsolatedProjectsEnabled()) return
         afterEvaluate {
             if (androidXExtension.type.requiresDependencyVerification()) {
-                val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                if (verifyDependencyVersionsTask != null) {
-                    taskConfigurator(verifyDependencyVersionsTask)
-                }
+                taskConfigurator(project.createVerifyDependencyVersionsTask())
             }
         }
     }
@@ -1560,27 +1560,38 @@ internal fun Project.configureTaskTimeouts() {
     }
 }
 
-private fun Project.disableJava8TargetObsoleteWarnings() {
-    afterEvaluate {
-        project.tasks.withType(JavaCompile::class.java).configureEach { task ->
-            // JDK 21 considers Java 8 an obsolete source and target value. Disable this warning.
-            task.options.compilerArgs.add("-Xlint:-options")
+private class JavaCompileArgumentProvider(
+    private val isTestApp: Boolean,
+    private val failOnDeprecationWarnings: Provider<Boolean>,
+    private val usingMaxDepVersions: Provider<Boolean>,
+) : CommandLineArgumentProvider {
+    override fun asArguments(): List<String> {
+        // JDK 21 considers Java 8 an obsolete source and target value. Disable this warning.
+        val args = mutableListOf("-Xlint:-options")
+        // If we're running a hypothetical test build confirming that tip-of-tree versions
+        // are compatible, then we're not concerned about warnings
+        if (!usingMaxDepVersions.get() && !isTestApp) {
+            args.add("-Xlint:unchecked")
+            if (failOnDeprecationWarnings.get()) {
+                args.add("-Xlint:deprecation")
+            }
         }
+        return args
     }
 }
 
-private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidXExtension) {
-    afterEvaluate {
-        project.tasks.withType(JavaCompile::class.java).configureEach { task ->
-            // If we're running a hypothetical test build confirming that tip-of-tree versions
-            // are compatible, then we're not concerned about warnings
-            if (!project.usingMaxDepVersions()) {
-                task.options.compilerArgs.add("-Xlint:unchecked")
-                if (androidXExtension.failOnDeprecationWarnings) {
-                    task.options.compilerArgs.add("-Xlint:deprecation")
-                }
-            }
-        }
+private fun Project.configureJavaCompilationWarnings(
+    androidXExtension: AndroidXExtension,
+    isTestApp: Boolean = false,
+) {
+    project.tasks.withType(JavaCompile::class.java).configureEach { task ->
+        task.options.compilerArgumentProviders.add(
+            JavaCompileArgumentProvider(
+                isTestApp = isTestApp,
+                failOnDeprecationWarnings = androidXExtension.failOnDeprecationWarnings,
+                usingMaxDepVersions = usingMaxDepVersions()
+            )
+        )
     }
 }
 
