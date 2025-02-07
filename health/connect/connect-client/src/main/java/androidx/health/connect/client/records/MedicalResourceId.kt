@@ -27,8 +27,8 @@ import androidx.health.connect.client.records.FhirResource.Companion.FhirResourc
 /**
  * A class to represent a unique identifier of a medical resource.
  *
- * This class contains a set of properties that together represent a unique identifier of a medical
- * resource.
+ * This class contains a set of properties that together represent a unique identifier of a
+ * [MedicalResource].
  *
  * The medical resource data representation follows the
  * [Fast Healthcare Interoperability Resources (FHIR)](https://hl7.org/fhir/) standard.
@@ -36,17 +36,18 @@ import androidx.health.connect.client.records.FhirResource.Companion.FhirResourc
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
  * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ *
+ * @property dataSourceId The ID of the [MedicalDataSource] where the data comes from.
+ * @property fhirResourceType The type of the FHIR resource. It should be one of the values in
+ *   [FhirResourceType].
+ * @property fhirResourceId The ID of the FHIR resource. This must be unique per
+ *   [MedicalDataSource].
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class MedicalResourceId(
-    /** Represents ID of a medical data source where the data comes from. */
     val dataSourceId: String,
-
-    /** A [FhirResourceType] indicating the type of the FHIR resource. */
     @FhirResourceType val fhirResourceType: Int,
-
-    /** Represents ID of the FHIR resource. This must be unique per medical data source. */
     val fhirResourceId: String
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check

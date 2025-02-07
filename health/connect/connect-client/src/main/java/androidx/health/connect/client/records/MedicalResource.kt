@@ -32,9 +32,9 @@ import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_
  * Unlike FHIR resource which is represented in Health Connect with [FhirResource],
  * `MedicalResource` is a Health Connect specific concept. A `MedicalResource` contains more than
  * just a [FhirResource], notably, it also contains:
- * * A [dataSourceId] representing ID of a [MedicalDataSource] where data of this `MedicalResource`
+ * - A [dataSourceId] representing ID of a [MedicalDataSource] where data of this `MedicalResource`
  *   come from.
- * * A [MedicalResourceType] indicating how HealthConnect categorizes the [FhirResource]. Each
+ * - A [MedicalResourceType] indicating how HealthConnect categorizes the [FhirResource]. Each
  *   [MedicalResourceType] is tied to a read permission. For example, a client can only read
  *   `MedicalResource`s with [MEDICAL_RESOURCE_TYPE_VACCINES] if it holds
  *   [PERMISSION_READ_MEDICAL_DATA_VACCINES].
@@ -45,29 +45,22 @@ import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
  * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ *
+ * @property type The [MedicalResourceType] of this `MedicalResource`, this is assigned by Health
+ *   Connect at insertion time. Clients should be aware that this list is non exhaustive and may
+ *   increase in future releases when additional types will need to be handled.
+ * @property id The unique ID of this `MedicalResource` represented by a [MedicalResourceId].
+ * @property dataSourceId The ID of the [MedicalDataSource] where this `MedicalResource` comes from.
+ * @property fhirVersion The FHIR version of [fhirResource].
+ * @property fhirResource The [FhirResource] that this `MedicalResource` represents.
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class MedicalResource(
-    /**
-     * Returns the medical resource type, assigned by Health Connect at insertion time.
-     *
-     * For a list of supported types, see the `MedicalResource` type constants, such as
-     * [MEDICAL_RESOURCE_TYPE_VACCINES]. Clients should be aware that this list is non exhaustive
-     * and may increase in future releases when additional types will need to be handled.
-     */
     @MedicalResourceType val type: Int,
-
-    /** A [MedicalResourceId] to represent a unique ID of this `MedicalResource`. */
     val id: MedicalResourceId,
-
-    /** Represents ID of a medical data source where the data comes from. */
     val dataSourceId: String,
-
-    /** FHIR version of [fhirResource]. */
     val fhirVersion: FhirVersion,
-
-    /** Returns the [FhirResource] that this `MedicalResource` represents. */
     val fhirResource: FhirResource,
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check

@@ -23,6 +23,7 @@ import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.request.PlatformUpsertMedicalResourceRequest
 import androidx.health.connect.client.impl.platform.request.PlatformUpsertMedicalResourceRequestBuilder
 import androidx.health.connect.client.records.FhirVersion
+import androidx.health.connect.client.records.MedicalDataSource
 import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.toString
@@ -41,23 +42,18 @@ import androidx.health.connect.client.records.toString
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
  * [HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ *
+ * @property dataSourceId The ID of an **existing** [MedicalDataSource] where the data being
+ *   inserted comes from.
+ * @property fhirVersion The FHIR version being used for [data]. This must match [dataSourceId]'s
+ *   [MedicalDataSource.fhirVersion].
+ * @property data The FHIR resource data in JSON representation.
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class UpsertMedicalResourceRequest(
-    // TODO(b/382680786): When MedicalDataSource class has been added,
-    // add `import androidx.health.connect.client.records.MedicalDataSource` to the top of this
-    // file to fix unresolved symbols in KDoc
-    /** Represents ID of an **existing** [MedicalDataSource] where the data comes from. */
     val dataSourceId: String,
-
-    /**
-     * Represents the FHIR version being used for [data]. This has to match
-     * [MedicalDataSource.fhirVersion].
-     */
     val fhirVersion: FhirVersion,
-
-    /** The FHIR resource data in JSON representation. */
     val data: String
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check

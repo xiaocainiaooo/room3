@@ -35,30 +35,19 @@ import androidx.health.connect.client.impl.platform.records.toPlatformFhirResour
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
  * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ *
+ * @property type The type of this FHIR resource. This is extracted from the `resourceType` field in
+ *   [data]. The list of supported types is a subset of the resource list on
+ *   [the official FHIR website](https://build.fhir.org/resourcelist.html) and might expand in the
+ *   future.
+ * @property id The FHIR resource ID. This is extracted from the `id` field in [data]. More about
+ *   FHIR resource ID in
+ *   [https://www.hl7.org/fhir/resource.html#id](https://www.hl7.org/fhir/resource.html#id).
+ * @property data The FHIR resource data in JSON representation.
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class FhirResource(
-    /**
-     * Represents the type of this FHIR resource. This is extracted from the `resourceType` field in
-     * [data].
-     *
-     * The list of supported types is a subset of the resource list on
-     * [the official FHIR website](https://build.fhir.org/resourcelist.html) and might expand in the
-     * future.
-     */
-    @FhirResourceType val type: Int,
-
-    /**
-     * Returns the FHIR resource ID. This is extracted from the `id` field in [data]. More about
-     * FHIR resource ID in
-     * [https://www.hl7.org/fhir/resource.html#id](https://www.hl7.org/fhir/resource.html#id).
-     */
-    val id: String,
-
-    /** Returns the FHIR resource data in JSON representation. */
-    val data: String
-) {
+class FhirResource(@FhirResourceType val type: Int, val id: String, val data: String) {
     @SuppressLint("NewApi") // already checked with a feature availability check
     internal val platformFhirResource: PlatformFhirResource =
         withPhrFeatureCheck(this::class) {

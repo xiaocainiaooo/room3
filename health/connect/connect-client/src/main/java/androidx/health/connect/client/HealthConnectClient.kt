@@ -45,6 +45,7 @@ import androidx.health.connect.client.permission.HealthPermission.Companion.PERM
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_MEDICAL_DATA_VACCINES
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_WRITE_MEDICAL_DATA
 import androidx.health.connect.client.records.FhirResource
+import androidx.health.connect.client.records.MedicalDataSource
 import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.Record
@@ -409,7 +410,7 @@ interface HealthConnectClient {
      *   [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it is permitted to read all vaccines
      *   [MedicalResource]s, including ones that were written by other apps.
      *
-     * Each returned [MedicalResource] s not guaranteed to meet all requirements of the <a
+     * Each returned [MedicalResource] is not guaranteed to meet all requirements of the <a
      * href="https://hl7.org/fhir/resourcelist.html">Fast Healthcare Interoperability Resources
      * (FHIR) spec</a>. If required, clients should perform their own validations.
      *
@@ -451,7 +452,7 @@ interface HealthConnectClient {
      *       if it holds [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it is permitted to read all
      *       vaccines [MedicalResource]s, including ones that were written by other apps.
      *
-     * Each returned [MedicalResource] s not guaranteed to meet all requirements of the <a
+     * Each returned [MedicalResource] is not guaranteed to meet all requirements of the <a
      * href="https://hl7.org/fhir/resourcelist.html">Fast Healthcare Interoperability Resources
      * (FHIR) spec</a>. If required, clients should perform their own validations.
      *
