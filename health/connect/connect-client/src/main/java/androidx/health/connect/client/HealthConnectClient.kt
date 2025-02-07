@@ -41,6 +41,8 @@ import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableIm
 import androidx.health.connect.client.feature.createExceptionDueToFeatureUnavailable
 import androidx.health.connect.client.impl.HealthConnectClientImpl
 import androidx.health.connect.client.impl.HealthConnectClientUpsideDownImpl
+import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
+import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_MEDICAL_DATA_VACCINES
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_WRITE_MEDICAL_DATA
 import androidx.health.connect.client.records.FhirResource
 import androidx.health.connect.client.records.MedicalResource
@@ -51,10 +53,14 @@ import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesInitialRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
+import androidx.health.connect.client.response.ReadMedicalResourcesResponse
 import androidx.health.connect.client.response.ReadRecordResponse
 import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -329,9 +335,9 @@ interface HealthConnectClient {
      * will be the same as their corresponding [UpsertMedicalResourceRequest]s in the input list.
      *
      * Regarding permissions:
-     * * Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
+     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
      *   [SecurityException] will be thrown.
-     * * With [PERMISSION_WRITE_MEDICAL_DATA] granted, caller is permitted to call this API in
+     * - With [PERMISSION_WRITE_MEDICAL_DATA] granted, caller is permitted to call this API in
      *   either foreground or background.
      *
      * Medical data is represented using the
@@ -341,11 +347,11 @@ interface HealthConnectClient {
      * [FHIR spec](https://hl7.org/fhir/resourcelist.html).
      *
      * Each [UpsertMedicalResourceRequest] also has to meet the following requirements:
-     * * [UpsertMedicalResourceRequest.data] must contain an "id" field and a "resourceType" field.
+     * - [UpsertMedicalResourceRequest.data] must contain an "id" field and a "resourceType" field.
      *   The "resource type" must be one of the items in the accepted list of resource types in
      *   [FhirResource].
-     * * The FHIR resource does not contain any "contained" resources.
-     * * [FHIR version][UpsertMedicalResourceRequest.fhirVersion] of each request must match
+     * - The FHIR resource does not contain any "contained" resources.
+     * - [FHIR version][UpsertMedicalResourceRequest.fhirVersion] of each request must match
      *   [MedicalDataSource.fhirVersion] of [UpsertMedicalResourceRequest.dataSourceId]'s
      *   corresponding [MedicalDataSource].
      *
@@ -364,6 +370,7 @@ interface HealthConnectClient {
      * @throws IllegalArgumentException if any request is failed to be processed for any reason such
      *   as invalid [UpsertMedicalResourceRequest.dataSourceId]
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     * @sample //TODO: b/394856391 - add sample
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -376,20 +383,67 @@ interface HealthConnectClient {
         )
 
     /**
-     * Retrieves a collection of [MedicalResource]s given a list of [MedicalResourceId]s.
+     * Reads [MedicalResource]s by request, either [ReadMedicalResourcesInitialRequest] or
+     * [ReadMedicalResourcesPageRequest].
+     *
+     * A typical flow to read all [MedicalResource]s that satisfy a certain criteria would be:
+     * 1. Create a [ReadMedicalResourcesInitialRequest] with desired criteria, and make a request.
+     *    If successful, a [ReadMedicalResourcesResponse] should be returned.
+     * 2. Use returned [ReadMedicalResourcesResponse.nextPageToken] to create a
+     *    [ReadMedicalResourcesPageRequest] and make another request. Again, if successful, a
+     *    [ReadMedicalResourcesResponse] should be returned.
+     * 3. Repeat step 2 until [ReadMedicalResourcesResponse.nextPageToken] is null.
+     *
+     * Regarding permissions, only permitted [MedicalResource]s are returned. Specifically:
+     * - A caller without any read medical permissions such as
+     *   [PERMISSION_READ_MEDICAL_DATA_VACCINES], or the write medical permission
+     *   [PERMISSION_WRITE_MEDICAL_DATA] is not permitted to read any [MedicalResource], including
+     *   ones that it created.
+     * - A caller with the write permission is permitted to read its own [MedicalResource]s of any
+     *   type regardless whether it's in foreground or background.
+     * - A caller with only a read permission, when in background, is only permitted to read its own
+     *   [MedicalResource]s of the corresponding type. For example, if a caller only holds
+     *   [PERMISSION_READ_MEDICAL_DATA_VACCINES], then when in background it is only permitted to
+     *   read its own [MedicalResource]s with [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES].
+     *   However, when it is in foreground or if it holds
+     *   [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it is permitted to read all vaccines
+     *   [MedicalResource]s, including ones that were written by other apps.
+     *
+     * Each returned [MedicalResource] s not guaranteed to meet all requirements of the <a
+     * href="https://hl7.org/fhir/resourcelist.html">Fast Healthcare Interoperability Resources
+     * (FHIR) spec</a>. If required, clients should perform their own validations.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @sample // TODO: b/394856391 - add sample
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun readMedicalResources(
+        request: ReadMedicalResourcesRequest
+    ): ReadMedicalResourcesResponse =
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#readMedicalResources(request: ReadMedicalResourcesRequest)"
+        )
+
+    /**
+     * Reads a collection of [MedicalResource]s given a list of [MedicalResourceId]s.
      *
      * The number and order of medical resources returned by this API is not guaranteed, depending
      * on a number of factors:
-     * * If an empty list of IDs is provided, an empty list will be returned.
-     * * If any ID does not exist, no medical resource will be returned for that ID.
-     * * Only permitted [MedicalResource]s are returned. Specifically:
-     *     * A caller without any read medical permissions such as
+     * - If an empty list of IDs is provided, an empty list will be returned.
+     * - If any ID does not exist, no medical resource will be returned for that ID.
+     * - Only permitted [MedicalResource]s are returned. Specifically:
+     *     - A caller without any read medical permissions such as
      *       [PERMISSION_READ_MEDICAL_DATA_VACCINES], or the write medical permission
      *       [PERMISSION_WRITE_MEDICAL_DATA] is not permitted to read any [MedicalResource],
      *       including ones that it created.
-     *     * A caller with the write permission is permitted to read its own [MedicalResource]s of
+     *     - A caller with the write permission is permitted to read its own [MedicalResource]s of
      *       any type regardless whether it's in foreground or background.
-     *     * A caller with only a read permission, when in background, is only permitted to read its
+     *     - A caller with only a read permission, when in background, is only permitted to read its
      *       own [MedicalResource]s of the corresponding type. For example, if a caller only holds
      *       [PERMISSION_READ_MEDICAL_DATA_VACCINES], then when in background it is only permitted
      *       to read its own [MedicalResource]s with
@@ -407,6 +461,7 @@ interface HealthConnectClient {
      *
      * @throws IllegalArgumentException if the size of [ids] is too large or any ID is deemed as
      *   invalid.
+     * @sample // TODO: b/394856391 - add sample
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -418,17 +473,17 @@ interface HealthConnectClient {
 
     /**
      * Deletes a list of [MedicalResource]s by the provided list of [MedicalResourceId]s.
-     * * If any ID in [ids] is invalid, the API will throw an [IllegalArgumentException], and
+     * - If any ID in [ids] is invalid, the API will throw an [IllegalArgumentException], and
      *   nothing will be deleted.
-     * * If any ID in [ids] does not exist, that ID will be ignored, while deletion on other IDs
+     * - If any ID in [ids] does not exist, that ID will be ignored, while deletion on other IDs
      *   will be performed.
      *
      * Regarding permissions:
-     * * Only apps with the system permission can delete data written by apps other than themselves.
-     * * Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, even then, it
+     * - Only apps with the system permission can delete data written by apps other than themselves.
+     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, even then, it
      *   can only delete its own data. If any of the items in [ids] belongs to another app, they
      *   will be ignored.
-     * * Deletes are permitted in the foreground or background.
+     * - Deletes are permitted in the foreground or background.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
@@ -436,6 +491,7 @@ interface HealthConnectClient {
      *
      * @param ids The ids to delete.
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     * @sample // TODO: b/394856391 - add sample
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
