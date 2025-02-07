@@ -113,7 +113,6 @@ class AppFunctionSerializableProcessor(
             .toList()
     }
 
-    // TODO(b/392587953): handle nullable types
     private fun buildAppFunctionSerializableFactoryClass(
         annotatedClass: AnnotatedAppFunctionSerializable
     ) {
