@@ -2,12 +2,7 @@ package com.testdata
 
 import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.`internal`.AppFunctionSerializableFactory
-import java.util.NoSuchElementException
 import javax.`annotation`.processing.Generated
-import kotlin.Boolean
-import kotlin.Double
-import kotlin.Long
-import kotlin.String
 
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$EntityWithValidNullablePropertiesFactory` :
@@ -16,44 +11,23 @@ public class `$EntityWithValidNullablePropertiesFactory` :
       EntityWithValidNullableProperties {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
-    var longParam: Long?
-    try {
-      longParam = appFunctionData.getLong("longParam")
-    } catch (e: NoSuchElementException) {
-      longParam = null
-    }
-    var doubleParam: Double?
-    try {
-      doubleParam = appFunctionData.getDouble("doubleParam")
-    } catch (e: NoSuchElementException) {
-      doubleParam = null
-    }
-    var boolParam: Boolean?
-    try {
-      boolParam = appFunctionData.getBoolean("boolParam")
-    } catch (e: NoSuchElementException) {
-      boolParam = null
-    }
-    var stringParam: String?
-    try {
-      stringParam = appFunctionData.getString("stringParam")
-    } catch (e: NoSuchElementException) {
-      stringParam = null
-    }
+    val longParam = appFunctionData.getLongOrNull("longParam")
+    val doubleParam = appFunctionData.getDoubleOrNull("doubleParam")
+    val boolParam = appFunctionData.getBooleanOrNull("boolParam")
+    val stringParam = appFunctionData.getStringOrNull("stringParam")
     val longArray = appFunctionData.getLongArray("longArray")
     val doubleArray = appFunctionData.getDoubleArray("doubleArray")
     val boolArray = appFunctionData.getBooleanArray("boolArray")
     val stringList = appFunctionData.getStringList("stringList")
-    var inputSerializable: InputSerializable?
-    try {
-      inputSerializable =
-          inputSerializableFactory.fromAppFunctionData(appFunctionData.getAppFunctionData("inputSerializable"))
-    } catch (e: NoSuchElementException) {
-      inputSerializable = null
+    val inputSerializableData = appFunctionData.getAppFunctionDataOrNull("inputSerializable")
+    var inputSerializable: InputSerializable? = null
+    if (inputSerializableData != null) {
+      inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData)
     }
     val serializableListData = appFunctionData.getAppFunctionDataList("serializableList")
-    val serializableList = serializableListData?.map {data ->
-        inputSerializableFactory.fromAppFunctionData(data)}
+    val serializableList = serializableListData?.map { data ->
+      inputSerializableFactory.fromAppFunctionData(data)
+    }
 
     return EntityWithValidNullableProperties(longParam, doubleParam, boolParam, stringParam,
         longArray, doubleArray, boolArray, stringList, inputSerializable, serializableList)
@@ -96,7 +70,8 @@ public class `$EntityWithValidNullablePropertiesFactory` :
     if (entityWithValidNullableProperties.serializableList != null) {
       builder.setAppFunctionDataList("serializableList",
           entityWithValidNullableProperties.serializableList.map{ inputSerializable ->
-          inputSerializableFactory.toAppFunctionData(inputSerializable) })
+        inputSerializableFactory.toAppFunctionData(inputSerializable)
+      })
     }
 
     return builder.build()
