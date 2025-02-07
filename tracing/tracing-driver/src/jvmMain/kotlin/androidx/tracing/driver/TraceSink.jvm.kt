@@ -54,7 +54,7 @@ public class JvmTraceSink(
     private val queue = Queue<PooledTracePacketArray>()
     private val drainRequested = AtomicBoolean(false)
 
-    @Volatile private var resumeDrain: Continuation<Unit>
+    @Volatile private var resumeDrain: Continuation<Unit>? = null
 
     init {
         resumeDrain =
@@ -90,7 +90,7 @@ public class JvmTraceSink(
     private fun makeDrainRequest() {
         // Only make a request if one is not already ongoing
         if (drainRequested.compareAndSet(false, true)) {
-            resumeDrain.resume(Unit)
+            resumeDrain?.resume(Unit)
         }
     }
 
@@ -108,6 +108,10 @@ public class JvmTraceSink(
             }
         }
         drainRequested.set(false)
+        // Mark resumeDrain as consumed because the Coroutines Machinery might still consider
+        // the Continuation as resumed after drainQueue() completes. This was the Atomics
+        // drainRequested, and the Continuation resumeDrain are in sync.
+        resumeDrain = null
     }
 
     override fun close() {

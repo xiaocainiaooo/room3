@@ -34,5 +34,6 @@ public class TraceDriver(
      * @param name is the name of the Process.
      * @return a [ProcessTrack] instance that we can associate trace packets to.
      */
-    public fun ProcessTrack(id: Int, name: String): ProcessTrack = context.ProcessTrack(id, name)
+    public fun ProcessTrack(id: Int, name: String): ProcessTrack =
+        context.getOrCreateProcessTrack(id, name)
 }
