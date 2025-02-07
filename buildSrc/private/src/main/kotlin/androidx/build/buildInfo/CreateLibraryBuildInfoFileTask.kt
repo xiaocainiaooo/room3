@@ -136,7 +136,9 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
         }
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
-                throw RuntimeException("Failed to create output dependency dump file: $outputFile")
+                throw RuntimeException(
+                    "Failed to create output dependency dump file: $resolvedOutputFile"
+                )
             }
         }
 
