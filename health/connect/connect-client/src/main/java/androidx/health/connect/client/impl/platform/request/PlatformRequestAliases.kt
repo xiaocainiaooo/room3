@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 @file:RestrictTo(RestrictTo.Scope.LIBRARY)
 @file:RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 
@@ -22,6 +21,12 @@ package androidx.health.connect.client.impl.platform.request
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
+
+internal typealias PlatformCreateMedicalDataSourceRequest =
+    android.health.connect.CreateMedicalDataSourceRequest
+
+internal typealias PlatformCreateMedicalDataSourceRequestBuilder =
+    android.health.connect.CreateMedicalDataSourceRequest.Builder
 
 internal typealias PlatformUpsertMedicalResourceRequest =
     android.health.connect.UpsertMedicalResourceRequest

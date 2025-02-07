@@ -1,0 +1,197 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.health.connect.client.impl.platform.records
+
+import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
+import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
+import androidx.health.connect.client.records.FhirVersion
+import androidx.health.connect.client.records.MedicalDataSource
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
+import com.google.common.testing.EqualsTester
+import com.google.common.truth.Truth.assertThat
+import java.time.Instant
+import org.junit.Assume
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+@SmallTest
+class MedicalDataSourceTest {
+
+    @Before
+    fun setup() {
+        Assume.assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+    }
+
+    @Test
+    fun validMedicalDataSource_equals() {
+        EqualsTester()
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime = lastDataUpdateTime
+                ),
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime = lastDataUpdateTime
+                )
+            )
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID + "2",
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime = lastDataUpdateTime
+                )
+            )
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME + "two",
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime = lastDataUpdateTime
+                )
+            )
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri.buildUpon().appendPath("2/").build(),
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime = lastDataUpdateTime
+                )
+            )
+            .testEquals()
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = "$DISPLAY_NAME Two",
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime = lastDataUpdateTime
+                )
+            )
+            .testEquals()
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = FhirVersion(4, 3, 0),
+                    lastDataUpdateTime = lastDataUpdateTime
+                )
+            )
+            .testEquals()
+            .addEqualityGroup(
+                MedicalDataSource(
+                    id = ID,
+                    packageName = PACKAGE_NAME,
+                    fhirBaseUri = fhirBaseUri,
+                    displayName = DISPLAY_NAME,
+                    fhirVersion = fhirVersion,
+                    lastDataUpdateTime =
+                        Instant.parse(LAST_DATA_UPDATE_TIME.replace("2025-01-27", "2025-01-28"))
+                )
+            )
+            .testEquals()
+    }
+
+    @Test
+    fun toString_expectCorrectString() {
+        val medicalDataSource =
+            MedicalDataSource(
+                id = ID,
+                packageName = PACKAGE_NAME,
+                fhirBaseUri = fhirBaseUri,
+                displayName = DISPLAY_NAME,
+                fhirVersion = fhirVersion,
+                lastDataUpdateTime = lastDataUpdateTime
+            )
+
+        val toString = medicalDataSource.toString()
+
+        assertThat(toString).contains("id=testid")
+        assertThat(toString).contains("packageName=androidx.health.connect.client")
+        assertThat(toString).contains("fhirBaseUri=https://fhir.com/oauth/api/FHIR/R4/")
+        assertThat(toString).contains("displayName=Test Data Source")
+        assertThat(toString).contains("fhirVersion=FhirVersion")
+        assertThat(toString).contains("(4.0.1)")
+        assertThat(toString).contains("lastDataUpdateTime=$LAST_DATA_UPDATE_TIME")
+    }
+
+    @SuppressLint("NewApi") // checked with feature availability check
+    @OptIn(ExperimentalFeatureAvailabilityApi::class)
+    @Test
+    fun toPlatformMedicalDataSource_expectCorrectConversion() {
+        val medicalDataSource =
+            MedicalDataSource(
+                id = ID,
+                packageName = PACKAGE_NAME,
+                fhirBaseUri = fhirBaseUri,
+                displayName = DISPLAY_NAME,
+                fhirVersion = fhirVersion,
+                lastDataUpdateTime = lastDataUpdateTime
+            )
+
+        val platformMedicalDataSource = medicalDataSource.platformMedicalDataSource
+
+        assertThat(platformMedicalDataSource)
+            .isEqualTo(
+                PlatformMedicalDataSourceBuilder(
+                        ID,
+                        PACKAGE_NAME,
+                        fhirBaseUri,
+                        DISPLAY_NAME,
+                        fhirVersion.platformFhirVersion
+                    )
+                    .setLastDataUpdateTime(lastDataUpdateTime)
+                    .build()
+            )
+    }
+
+    companion object {
+        private const val ID = "testid"
+        private const val PACKAGE_NAME = "androidx.health.connect.client"
+        private const val DISPLAY_NAME = "Test Data Source"
+        private const val LAST_DATA_UPDATE_TIME = "2025-01-27T08:55:29.550677Z"
+        private val fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/")
+        private val lastDataUpdateTime = Instant.parse(LAST_DATA_UPDATE_TIME)
+        private val fhirVersion: FhirVersion by lazy { FhirVersion(4, 0, 1) }
+    }
+}
