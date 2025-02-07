@@ -422,6 +422,16 @@ package androidx.wear.protolayout.expression {
     method public androidx.wear.protolayout.expression.PlatformDataValues.Builder putAll(androidx.wear.protolayout.expression.PlatformDataValues);
   }
 
+  public final class PlatformEventKeys {
+    property public androidx.wear.protolayout.expression.PlatformDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool> VISIBILITY_STATUS;
+    field public static final androidx.wear.protolayout.expression.PlatformEventKeys INSTANCE;
+    field public static final androidx.wear.protolayout.expression.PlatformDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool> VISIBILITY_STATUS;
+  }
+
+  public final class PlatformEventSources {
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public static androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool platformVisibilityStatus();
+  }
+
   public class PlatformHealthSources {
     method @RequiresPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat dailyCalories();
     method @RequiresPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat dailyDistanceMeters();
