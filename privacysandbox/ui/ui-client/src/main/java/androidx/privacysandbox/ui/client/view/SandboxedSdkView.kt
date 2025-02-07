@@ -302,6 +302,11 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         signalMeasurer?.maybeSendSignals()
     }
 
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        signalMeasurer?.maybeSendSignals()
+    }
+
     override fun setAlpha(alpha: Float) {
         super.setAlpha(alpha)
         signalMeasurer?.maybeSendSignals()
