@@ -19,7 +19,6 @@ package androidx.wear.compose.material3
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
@@ -554,7 +553,6 @@ public object ConfirmationDialogDefaults {
      * A default composable used in [SuccessConfirmationDialog] that displays a success icon with an
      * animation.
      */
-    @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
     public fun SuccessIcon() {
         val animation =
@@ -577,7 +575,6 @@ public object ConfirmationDialogDefaults {
      * A default composable used in [FailureConfirmationDialog] that displays a failure icon with an
      * animation.
      */
-    @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
     public fun FailureIcon() {
         val animation =

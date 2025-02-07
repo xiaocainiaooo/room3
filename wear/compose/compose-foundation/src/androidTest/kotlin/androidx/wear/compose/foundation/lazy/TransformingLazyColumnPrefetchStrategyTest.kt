@@ -61,7 +61,6 @@ import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
-@OptIn(ExperimentalFoundationApi::class)
 class TransformingLazyColumnPrefetchStrategyTest {
 
     @get:Rule val rule = createComposeRule()
@@ -284,7 +283,6 @@ class TransformingLazyColumnPrefetchStrategyTest {
     }
 }
 
-@ExperimentalFoundationApi
 internal class TestPrefetchScheduler : PrefetchScheduler {
 
     private var activeRequests = mutableListOf<PrefetchRequest>()

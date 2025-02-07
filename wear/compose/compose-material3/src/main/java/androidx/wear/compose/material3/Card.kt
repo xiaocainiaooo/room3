@@ -17,7 +17,6 @@
 package androidx.wear.compose.material3
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.Interaction
@@ -833,7 +832,6 @@ public class CardColors(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CardImpl(
     onClick: () -> Unit,
