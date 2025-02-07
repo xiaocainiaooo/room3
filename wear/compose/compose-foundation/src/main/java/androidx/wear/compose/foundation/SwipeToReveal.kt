@@ -61,7 +61,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.util.Predicate
@@ -272,7 +271,7 @@ internal constructor(
     initialValue: RevealValue,
     animationSpec: AnimationSpec<Float>,
     confirmValueChange: (RevealValue) -> Boolean,
-    positionalThreshold: Density.(totalDistance: Float) -> Float,
+    positionalThreshold: (totalDistance: Float) -> Float,
     internal val anchors: Map<RevealValue, Float>,
     internal val coroutineScope: CoroutineScope,
     internal val nestedScrollDispatcher: NestedScrollDispatcher,
@@ -285,7 +284,7 @@ internal constructor(
             confirmValueChange = { revealValue ->
                 confirmValueChangeAndReset(confirmValueChange, revealValue)
             },
-            positionalThreshold = positionalThreshold,
+            positionalThreshold = { totalDistance -> positionalThreshold(totalDistance) },
             nestedScrollDispatcher = nestedScrollDispatcher,
         )
 
@@ -425,7 +424,7 @@ public fun rememberRevealState(
     initialValue: RevealValue = RevealValue.Covered,
     animationSpec: AnimationSpec<Float> = SwipeToRevealDefaults.animationSpec,
     confirmValueChange: (RevealValue) -> Boolean = { true },
-    positionalThreshold: Density.(totalDistance: Float) -> Float =
+    positionalThreshold: (totalDistance: Float) -> Float =
         SwipeToRevealDefaults.positionalThreshold,
     anchors: Map<RevealValue, Float> = createAnchors(),
 ): RevealState {
@@ -796,7 +795,7 @@ internal object SwipeToRevealDefaults {
      * (0.7 + 0.5 * (1 - 0.7)) of the component width to go from [RevealValue.RightRevealing] to
      * [RevealValue.RightRevealed].
      */
-    internal val positionalThreshold = fractionalPositionalThreshold(0.5f)
+    internal val positionalThreshold = { totalDistance: Float -> totalDistance * 0.5f }
 }
 
 @Composable
