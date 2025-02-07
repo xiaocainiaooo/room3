@@ -19,7 +19,6 @@ package androidx.wear.compose.foundation.lazy
 import androidx.collection.MutableObjectIntMap
 import androidx.collection.ObjectIntMap
 import androidx.collection.emptyObjectIntMap
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -27,6 +26,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.overscroll
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
@@ -175,7 +175,6 @@ public val LocalTransformingLazyColumnItemScope:
     ProvidableCompositionLocal<TransformingLazyColumnItemScope?> =
     compositionLocalOf(structuralEqualityPolicy()) { null }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun TransformingLazyColumnImpl(
     modifier: Modifier = Modifier,
@@ -232,8 +231,7 @@ internal fun TransformingLazyColumnImpl(
 
     val semanticState = remember(state) { TransformingLazyColumnSemanticState(state) }
 
-    // TODO: b/388191915 - Migrate to use rememberOverscrollEffect when updated to 1.8.0.
-    @Suppress("DEPRECATION") val overscrollEffect = ScrollableDefaults.overscrollEffect()
+    val overscrollEffect = rememberOverscrollEffect()
 
     LazyLayout(
         itemProvider = itemProviderLambda,

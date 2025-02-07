@@ -21,7 +21,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
@@ -297,7 +296,6 @@ public object OpenOnPhoneDialogDefaults {
      * @param modifier Modifier to be applied to the icon.
      * @param contentDescription The content description for the icon.
      */
-    @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
     public fun Icon(
         modifier: Modifier = Modifier,

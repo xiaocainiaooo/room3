@@ -25,9 +25,7 @@ import androidx.compose.ui.node.TraversableNode
 import androidx.compose.ui.node.TraversableNode.Companion.TraverseDescendantsAction
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.trace
-import androidx.wear.compose.foundation.lazy.layout.LazyLayoutPrefetchState.LazyLayoutPrefetchResultScope
 import androidx.wear.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource.Monotonic.markNow
@@ -66,22 +64,10 @@ internal class LazyLayoutPrefetchState(
      *
      * @param index item index to prefetch.
      * @param constraints [Constraints] to use for premeasuring.
-     * @param onItemPrefetched This callback is called when the item premeasuring is finished. If
-     *   the request is canceled or no measuring is performed this callback won't be called. Use
-     *   [LazyLayoutPrefetchResultScope.getSize] to get the item's size.
      */
-    fun schedulePrefetch(
-        index: Int,
-        constraints: Constraints,
-        onItemPrefetched: (LazyLayoutPrefetchResultScope.() -> Unit)? = null
-    ): PrefetchHandle {
-
-        return prefetchHandleProvider?.schedulePrefetch(
-            index,
-            constraints,
-            prefetchMetrics,
-            onItemPrefetched
-        ) ?: DummyHandle
+    fun schedulePrefetch(index: Int, constraints: Constraints): PrefetchHandle {
+        return prefetchHandleProvider?.schedulePrefetch(index, constraints, prefetchMetrics)
+            ?: DummyHandle
     }
 
     internal fun collectNestedPrefetchRequests(): List<PrefetchRequest> {
@@ -108,19 +94,6 @@ internal class LazyLayoutPrefetchState(
          * the frame is less than we spend on similar prefetch requests on average.
          */
         fun markAsUrgent()
-    }
-
-    /**
-     * A scope for [schedulePrefetch] callbacks. The scope provides additional information about a
-     * prefetched item.
-     */
-    interface LazyLayoutPrefetchResultScope {
-
-        /** The amount of placeables composed into this item. */
-        val placeablesCount: Int
-
-        /** Retrieves the latest measured size for a given placeable [index]. */
-        fun getSize(index: Int): IntSize
     }
 
     private inner class NestedPrefetchScopeImpl : NestedPrefetchScope {
@@ -266,15 +239,14 @@ private object DummyHandle : PrefetchHandle {
 internal class PrefetchHandleProvider(
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val subcomposeLayoutState: SubcomposeLayoutState,
-    private val executor: PrefetchScheduler,
+    private val executor: PrefetchScheduler
 ) {
     fun schedulePrefetch(
         index: Int,
         constraints: Constraints,
-        prefetchMetrics: PrefetchMetrics,
-        onItemPrefetched: (LazyLayoutPrefetchResultScope.() -> Unit)?
+        prefetchMetrics: PrefetchMetrics
     ): PrefetchHandle =
-        HandleAndRequestImpl(index, constraints, prefetchMetrics, onItemPrefetched).also {
+        HandleAndRequestImpl(index, constraints, prefetchMetrics).also {
             executor.schedulePrefetch(it)
         }
 
@@ -282,15 +254,13 @@ internal class PrefetchHandleProvider(
         index: Int,
         constraints: Constraints,
         prefetchMetrics: PrefetchMetrics,
-    ): PrefetchRequest =
-        HandleAndRequestImpl(index, constraints = constraints, prefetchMetrics, null)
+    ): PrefetchRequest = HandleAndRequestImpl(index, constraints = constraints, prefetchMetrics)
 
     private inner class HandleAndRequestImpl(
         private val index: Int,
         private val constraints: Constraints,
         private val prefetchMetrics: PrefetchMetrics,
-        private val onItemPrefetched: (LazyLayoutPrefetchResultScope.() -> Unit)?
-    ) : PrefetchHandle, PrefetchRequest, LazyLayoutPrefetchResultScope {
+    ) : PrefetchHandle, PrefetchRequest {
 
         private var precomposeHandle: SubcomposeLayoutState.PrecomposedSlotHandle? = null
         private var isMeasured = false
@@ -312,13 +282,6 @@ internal class PrefetchHandleProvider(
 
         override fun markAsUrgent() {
             isUrgent = true
-        }
-
-        override val placeablesCount: Int
-            get() = (precomposeHandle?.placeablesCount ?: 0)
-
-        override fun getSize(index: Int): IntSize {
-            return (precomposeHandle?.getSize(index) ?: IntSize.Zero)
         }
 
         private fun shouldExecute(available: Long, average: Long): Boolean {
@@ -416,7 +379,6 @@ internal class PrefetchHandleProvider(
                     trace("compose:lazy:prefetch:measure") { performMeasure(constraints) }
                     updateElapsedAndAvailableTime()
                     prefetchMetrics.saveMeasureTime(contentType, elapsedTimeNanos)
-                    onItemPrefetched?.invoke(this@HandleAndRequestImpl)
                 } else {
                     return true
                 }
@@ -469,8 +431,6 @@ internal class PrefetchHandleProvider(
             private val requestsByState: Array<List<PrefetchRequest>?> = arrayOfNulls(states.size)
             private var stateIndex: Int = 0
             private var requestIndex: Int = 0
-
-            init {}
 
             fun PrefetchRequestScope.executeNestedPrefetches(): Boolean {
                 if (stateIndex >= states.size) {
