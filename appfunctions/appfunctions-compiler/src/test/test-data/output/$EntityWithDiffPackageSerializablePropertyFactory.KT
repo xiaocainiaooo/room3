@@ -12,12 +12,14 @@ public class `$EntityWithDiffPackageSerializablePropertyFactory` :
       EntityWithDiffPackageSerializableProperty {
     val diffPackageInputSerializableFactory = `$DiffPackageInputSerializableFactory`()
 
+    val inputSerializableData = appFunctionData.getAppFunctionData("inputSerializable")
     val inputSerializable =
-        diffPackageInputSerializableFactory.fromAppFunctionData(appFunctionData.getAppFunctionData("inputSerializable"))
+        diffPackageInputSerializableFactory.fromAppFunctionData(inputSerializableData)
     val serializableListData = appFunctionData.getAppFunctionDataList("serializableList") ?:
         emptyList()
-    val serializableList = serializableListData.map {data ->
-        diffPackageInputSerializableFactory.fromAppFunctionData(data)}
+    val serializableList = serializableListData.map { data ->
+      diffPackageInputSerializableFactory.fromAppFunctionData(data)
+    }
 
     return EntityWithDiffPackageSerializableProperty(inputSerializable, serializableList)
   }
@@ -33,7 +35,8 @@ public class `$EntityWithDiffPackageSerializablePropertyFactory` :
     builder.setAppFunctionDataList("serializableList",
         entityWithDiffPackageSerializableProperty.serializableList.map{
         diffPackageInputSerializable ->
-        diffPackageInputSerializableFactory.toAppFunctionData(diffPackageInputSerializable) })
+      diffPackageInputSerializableFactory.toAppFunctionData(diffPackageInputSerializable)
+    })
 
     return builder.build()
   }

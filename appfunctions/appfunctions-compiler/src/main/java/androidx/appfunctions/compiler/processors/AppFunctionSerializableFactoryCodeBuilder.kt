@@ -51,11 +51,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
         return buildCodeBlock {
             add(factoryInitStatements)
             for (property in annotatedClass.getProperties()) {
-                if (property.type.toTypeName().isNullable) {
-                    appendNullableGetterStatement(property)
-                } else {
-                    appendGetterStatement(property)
-                }
+                appendGetterStatement(property)
             }
             appendGetterReturnStatement(
                 annotatedClass.originalClassName,
@@ -80,28 +76,6 @@ class AppFunctionSerializableFactoryCodeBuilder(
             }
             add("\nreturn builder.build()")
         }
-    }
-
-    private fun CodeBlock.Builder.appendNullableGetterStatement(
-        param: KSValueParameter
-    ): CodeBlock.Builder {
-        val paramName = checkNotNull(param.name).getShortName()
-
-        // Only singular AppFunctionData getters throw an error if absent. Arrays and Lists are
-        // nullable.
-        if (param.type.isSingularType()) {
-            return addStatement("var %L: %T", paramName, param.type.toTypeName())
-                .addStatement("try {")
-                .indent()
-                .appendGetterStatement(param)
-                .unindent()
-                .addStatement("} catch (e: %T) {", NoSuchElementException::class)
-                .indent()
-                .addStatement("%L = null", paramName)
-                .unindent()
-                .addStatement("}")
-        }
-        return appendGetterStatement(param)
     }
 
     private fun CodeBlock.Builder.appendGetterStatement(
@@ -133,14 +107,14 @@ class AppFunctionSerializableFactoryCodeBuilder(
 
         val formatStringMap =
             mapOf<String, Any>(
-                "prefix" to getOptionalValKeywordForType(param.type),
                 "param_name" to checkNotNull(param.name).asString(),
                 "app_function_data_param_name" to APP_FUNCTION_DATA_PARAM_NAME,
-                "getter_name" to getterName,
+                "getter_name" to
+                    "$getterName${if (param.type.toTypeName().isNullable && param.type.isSingularType()) "OrNull" else ""}",
                 "default_value_postfix" to getOptionalDefaultValuePostfixForType(param.type)
             )
         addNamed(
-            "%prefix:L%param_name:L = %app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L\n",
+            "val %param_name:L = %app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L\n",
             formatStringMap
         )
         return this
@@ -149,22 +123,40 @@ class AppFunctionSerializableFactoryCodeBuilder(
     private fun CodeBlock.Builder.appendSerializableGetterStatement(
         param: KSValueParameter
     ): CodeBlock.Builder {
+        val paramName = checkNotNull(param.name).asString()
         val typeName = param.type.ensureQualifiedTypeName().getShortName()
+        val isNullable = param.type.toTypeName().isNullable
         val formatStringMap =
             mapOf<String, Any>(
-                "prefix" to getOptionalValKeywordForType(param.type),
-                "param_name" to checkNotNull(param.name).asString(),
+                "param_name" to paramName,
+                "param_type" to param.type.toTypeName(),
                 "factory_name" to "${typeName}Factory".lowerFirstChar(),
                 "app_function_data_param_name" to APP_FUNCTION_DATA_PARAM_NAME,
-                "getter_name" to "getAppFunctionData",
-                "from_app_function_data_method_name" to FromAppFunctionDataMethod.METHOD_NAME
+                "getter_name" to "getAppFunctionData${if (isNullable) "OrNull" else ""}",
+                "from_app_function_data_method_name" to FromAppFunctionDataMethod.METHOD_NAME,
+                "serializable_data_val_name" to "${paramName}Data"
             )
 
         addNamed(
-            "%prefix:L%param_name:L = %factory_name:L.%from_app_function_data_method_name:L(" +
-                "%app_function_data_param_name:L.%getter_name:L(\"%param_name:L\"))\n",
+            "val %serializable_data_val_name:L = %app_function_data_param_name:L.%getter_name:L(%param_name:S)\n",
             formatStringMap
         )
+        if (isNullable) {
+            return addNamed("var %param_name:L: %param_type:T = null\n", formatStringMap)
+                .addNamed("if (%serializable_data_val_name:L != null) {\n", formatStringMap)
+                .indent()
+                .addNamed(
+                    "%param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L)\n",
+                    formatStringMap
+                )
+                .unindent()
+                .addStatement("}")
+        } else {
+            addNamed(
+                "val %param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L)\n",
+                formatStringMap
+            )
+        }
         return this
     }
 
@@ -178,23 +170,27 @@ class AppFunctionSerializableFactoryCodeBuilder(
 
         val formatStringMap =
             mapOf<String, Any>(
-                "prefix" to getOptionalValKeywordForType(param.type),
                 "param_name" to checkNotNull(param.name).asString(),
                 "temp_list_name" to checkNotNull(param.name).asString() + "Data",
                 "app_function_data_param_name" to APP_FUNCTION_DATA_PARAM_NAME,
                 "getter_name" to "getAppFunctionDataList",
                 "default_value_postfix" to getOptionalDefaultValuePostfixForType(param.type),
-                "null_safe_op" to if (param.type.toTypeName().isNullable) "?" else ""
+                "null_safe_op" to if (param.type.toTypeName().isNullable) "?" else "",
+                "factory_instance_name" to factoryInstanceName
             )
 
         addNamed(
-                "%prefix:L%temp_list_name:L = %app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L\n",
+                "val %temp_list_name:L = %app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L\n",
                 formatStringMap
             )
             .addNamed(
-                "%prefix:L%param_name:L = %temp_list_name:L%null_safe_op:L.map {data -> ${factoryInstanceName}.fromAppFunctionData(data)}\n",
+                "val %param_name:L = %temp_list_name:L%null_safe_op:L.map { data ->\n",
                 formatStringMap
             )
+            .indent()
+            .addNamed("%factory_instance_name:L.fromAppFunctionData(data)\n", formatStringMap)
+            .unindent()
+            .addStatement("}")
         return this
     }
 
@@ -316,11 +312,15 @@ class AppFunctionSerializableFactoryCodeBuilder(
             )
 
         addNamed(
-            "builder.%setter_name:L(\"%param_name:L\", " +
-                "%annotated_class_instance:L.%param_name:L" +
-                ".map{ %lambda_param_name:L -> %factory_name:L.toAppFunctionData(%lambda_param_name:L) })\n",
-            formatStringMap
-        )
+                "builder.%setter_name:L(\"%param_name:L\", " +
+                    "%annotated_class_instance:L.%param_name:L" +
+                    ".map{ %lambda_param_name:L ->\n",
+                formatStringMap
+            )
+            .indent()
+            .addNamed("%factory_name:L.toAppFunctionData(%lambda_param_name:L)\n", formatStringMap)
+            .unindent()
+            .addStatement("})")
         return this
     }
 
@@ -338,10 +338,6 @@ class AppFunctionSerializableFactoryCodeBuilder(
 
     private fun KSTypeReference.isPrimitiveArray(): Boolean {
         return SUPPORTED_ARRAY_PRIMITIVE_TYPES.contains(ensureQualifiedTypeName().asString())
-    }
-
-    private fun getOptionalValKeywordForType(type: KSTypeReference): String {
-        return if (type.toTypeName().isNullable && type.isSingularType()) "" else "val "
     }
 
     // Missing list/array types default to an empty list/array; missing singular properties throw an

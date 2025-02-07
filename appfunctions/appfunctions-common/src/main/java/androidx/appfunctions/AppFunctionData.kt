@@ -19,6 +19,8 @@ package androidx.appfunctions
 import android.app.appsearch.GenericDocument
 import android.os.Bundle
 import androidx.annotation.RequiresApi
+import androidx.annotation.RestrictTo
+import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
 import kotlin.collections.isEmpty
 
 /**
@@ -92,6 +94,21 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
     }
 
     /**
+     * Retrieve the boolean property in [key] if available, or null otherwise.
+     *
+     * @return [Boolean] property if a single value exists under [key], otherwise return null.
+     * @throws IllegalArgumentException if the property under [key] is not a boolean.
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun getBooleanOrNull(key: String): Boolean? {
+        return try {
+            getBoolean(key)
+        } catch (unused: NoSuchElementException) {
+            null
+        }
+    }
+
+    /**
      * Retrieve the double property in [key].
      *
      * @return [Double] property if the value exists under [key].
@@ -126,6 +143,21 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
     }
 
     /**
+     * Retrieve the double property in [key] if available, or null otherwise.
+     *
+     * @return [Double] property if a single value exists under [key], otherwise return null.
+     * @throws IllegalArgumentException if the property under [key] is not a double.
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun getDoubleOrNull(key: String): Double? {
+        return try {
+            getDouble(key)
+        } catch (unused: NoSuchElementException) {
+            null
+        }
+    }
+
+    /**
      * Retrieve the long property in [key].
      *
      * @return [Long] property if the value exist under [key].
@@ -145,7 +177,7 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
     /**
      * Retrieve the long property in [key] if available, or [defaultValue] otherwise.
      *
-     * @return [Long] property if the value existS under [key], otherwise return [defaultValue].
+     * @return [Long] property if the value exists under [key], otherwise return [defaultValue].
      * @throws IllegalArgumentException if the property under [key] is not a long.
      */
     public fun getLong(key: String, defaultValue: Long): Long {
@@ -156,6 +188,21 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
             throw IllegalArgumentException("Property under [$key] does not match request")
         }
         return array[0]
+    }
+
+    /**
+     * Retrieve the long property in [key] if available, or null otherwise.
+     *
+     * @return [Long] property if the value exists under [key], otherwise return null.
+     * @throws IllegalArgumentException if the property under [key] is not a long.
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun getLongOrNull(key: String): Long? {
+        return try {
+            getLong(key)
+        } catch (unused: NoSuchElementException) {
+            null
+        }
     }
 
     /**
@@ -178,7 +225,7 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
     /**
      * Retrieve the string property in [key] if available, or [defaultValue] otherwise.
      *
-     * @return [String] property if the value existS under [key], otherwise return [defaultValue].
+     * @return [String] property if the value exists under [key], otherwise return [defaultValue].
      * @throws IllegalArgumentException if the property under [key] is not a string.
      */
     public fun getString(key: String, defaultValue: String): String {
@@ -192,7 +239,22 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
     }
 
     /**
-     * Retrieve the appfunction data property in [key].
+     * Retrieve the string property in [key] if available, or null otherwise.
+     *
+     * @return [String] property if the value exists under [key], otherwise return null.
+     * @throws IllegalArgumentException if the property under [key] is not a string.
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun getStringOrNull(key: String): String? {
+        return try {
+            getString(key)
+        } catch (unused: NoSuchElementException) {
+            null
+        }
+    }
+
+    /**
+     * Retrieve the [AppFunctionData] property in [key].
      *
      * @return [AppFunctionData] property if the value exists under [key].
      * @throws NoSuchElementException if the property under [key] does not exist.
@@ -206,6 +268,21 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
             throw IllegalArgumentException("Property under [$key] does not match request")
         }
         return array[0]
+    }
+
+    /**
+     * Retrieve the [AppFunctionData] property in [key] if available, or null otherwise.
+     *
+     * @return [AppFunctionData] property if the value exists under [key], otherwise return null.
+     * @throws IllegalArgumentException if the property under [key] is not an [AppFunctionData].
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun getAppFunctionDataOrNull(key: String): AppFunctionData? {
+        return try {
+            getAppFunctionData(key)
+        } catch (unused: NoSuchElementException) {
+            null
+        }
     }
 
     /**
