@@ -53,6 +53,21 @@ class AppFunctionSerializableProcessorTest {
     }
 
     @Test
+    fun testProcessor_validNullableProperties_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf("EntityWithValidNullableProperties.KT", "InputSerializable.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$EntityWithValidNullablePropertiesFactory.kt",
+            goldenFileName = "\$EntityWithValidNullablePropertiesFactory.KT"
+        )
+    }
+
+    @Test
     fun testProcessor_differentPackageSerializableProperty_success() {
         val report =
             compilationTestHelper.compileAll(

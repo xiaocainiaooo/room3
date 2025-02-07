@@ -109,6 +109,10 @@ fun KSTypeReference.toTypeName(): TypeName {
     return resolve().toTypeName(args)
 }
 
+internal fun TypeName.ignoreNullable(): TypeName {
+    return copy(nullable = false)
+}
+
 private fun KSType.toTypeName(arguments: List<KSTypeArgument> = emptyList()): TypeName {
     val type =
         when (declaration) {
