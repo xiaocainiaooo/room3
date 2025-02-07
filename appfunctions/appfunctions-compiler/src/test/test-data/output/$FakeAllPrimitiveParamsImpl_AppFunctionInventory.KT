@@ -19,4 +19,8 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
   private val COM_TESTDATA_FAKEALLPRIMITIVEPARAMSIMPL_ALLPRIMITIVEPARAMS_SCHEMA_METADATA:
       AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category= "fake_schema_category",
       name="allPrimitiveParams", version=1)
+
+  private val COM_TESTDATA_FAKEALLPRIMITIVEPARAMSIMPL_ALLPRIMITIVEARRAYPARAMS_SCHEMA_METADATA:
+      AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category= "fake_schema_category",
+      name="allPrimitiveParams", version=1)
 }

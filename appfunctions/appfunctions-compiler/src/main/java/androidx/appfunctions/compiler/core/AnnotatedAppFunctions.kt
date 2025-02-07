@@ -19,8 +19,10 @@ package androidx.appfunctions.compiler.core
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
+import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
@@ -33,20 +35,15 @@ import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.TypeName
+import kotlin.reflect.KClass
 
 /**
  * Represents a collection of functions within a specific class that are annotated as app functions.
  */
 data class AnnotatedAppFunctions(
-    /**
-     * The [com.google.devtools.ksp.symbol.KSClassDeclaration] of the class that contains the
-     * annotated app functions.
-     */
+    /** The [KSClassDeclaration] of the class that contains the annotated app functions. */
     val classDeclaration: KSClassDeclaration,
-    /**
-     * The list of [com.google.devtools.ksp.symbol.KSFunctionDeclaration] that are annotated as app
-     * function.
-     */
+    /** The list of [KSFunctionDeclaration] that are annotated as app function. */
     val appFunctionDeclarations: List<KSFunctionDeclaration>
 ) {
     fun validate(): AnnotatedAppFunctions {
@@ -188,11 +185,7 @@ data class AnnotatedAppFunctions(
      * Currently, only primitive return types are supported.
      */
     private fun KSTypeReference.buildResponseObjectTypeMetadata(): AppFunctionDataTypeMetadata {
-        // TODO: Support beyond primitive return types
-        return AppFunctionPrimitiveTypeMetadata(
-            type = checkNotNull(toAppFunctionDataType()),
-            isNullable = resolve().isMarkedNullable == true
-        )
+        return toAppFunctionDataTypeMetadata()
     }
 
     /**
@@ -201,57 +194,85 @@ data class AnnotatedAppFunctions(
      * Currently, only primitive parameters are supported.
      */
     private fun KSFunctionDeclaration.buildParameterTypeMetadata():
-        List<AppFunctionParameterMetadata> {
-        return buildList {
-            for (ksValueParameter in parameters) {
-                if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
-                    // Skip the first parameter which is always the `AppFunctionContext`.
-                    continue
-                }
-
-                // TODO: Support serializable and collections
-                val isPropertyNullable = ksValueParameter.type.resolve().isMarkedNullable
-                val parameterName = checkNotNull(ksValueParameter.name).asString()
-                val dataTypeMetadata =
-                    AppFunctionPrimitiveTypeMetadata(
-                        type = ksValueParameter.type.toAppFunctionDataType(),
-                        isNullable = isPropertyNullable
-                    )
-
-                add(
-                    AppFunctionParameterMetadata(
-                        name = parameterName,
-                        // TODO(b/394553462): Parse required state from annotation.
-                        isRequired = true,
-                        dataType = dataTypeMetadata
-                    )
-                )
+        List<AppFunctionParameterMetadata> = buildList {
+        for (ksValueParameter in parameters) {
+            if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
+                // Skip the first parameter which is always the `AppFunctionContext`.
+                continue
             }
+
+            // TODO: Support serializable and their collections
+            val parameterName = checkNotNull(ksValueParameter.name).asString()
+            val dataTypeMetadata = ksValueParameter.type.toAppFunctionDataTypeMetadata()
+
+            add(
+                AppFunctionParameterMetadata(
+                    name = parameterName,
+                    // TODO(b/394553462): Parse required state from annotation.
+                    isRequired = true,
+                    dataType = dataTypeMetadata
+                )
+            )
         }
     }
 
-    private fun KSTypeReference.toAppFunctionDataType(): Int {
-        val resolvedTypeName = this.toTypeName().ignoreNullable().toString()
-
-        if (
-            SUPPORTED_ARRAY_PRIMITIVE_TYPES.contains(resolvedTypeName) ||
-                SUPPORTED_COLLECTION_TYPES.contains(resolvedTypeName)
-        ) {
-            return AppFunctionDataTypeMetadata.TYPE_ARRAY
-        }
-
-        return when (resolvedTypeName) {
-            "kotlin.String" -> AppFunctionDataTypeMetadata.TYPE_STRING
-            "kotlin.Int" -> AppFunctionDataTypeMetadata.TYPE_INT
-            "kotlin.Long" -> AppFunctionDataTypeMetadata.TYPE_LONG
-            "kotlin.Float" -> AppFunctionDataTypeMetadata.TYPE_FLOAT
-            "kotlin.Double" -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
-            "kotlin.Boolean" -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
-            "kotlin.Byte" -> AppFunctionDataTypeMetadata.TYPE_BYTES
-            "kotlin.Unit" -> AppFunctionDataTypeMetadata.TYPE_UNIT
-            else -> AppFunctionDataTypeMetadata.TYPE_OBJECT
+    private fun KSTypeReference.toAppFunctionDataTypeMetadata(): AppFunctionDataTypeMetadata {
+        val isNullable = resolve().isMarkedNullable
+        val typeName = toTypeName()
+        return when (typeName.ignoreNullable().toString()) {
+            in SUPPORTED_SINGLE_PRIMITIVE_TYPES ->
+                AppFunctionPrimitiveTypeMetadata(
+                    type = typeName.toAppFunctionDataType(),
+                    isNullable = isNullable
+                )
+            in SUPPORTED_ARRAY_PRIMITIVE_TYPES,
+            in SUPPORTED_COLLECTION_TYPES, ->
+                AppFunctionArrayTypeMetadata(
+                    itemType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = typeName.determineArrayItemType(),
+                            // TODO: Support List with nullable items.
+                            isNullable = false
+                        ),
+                    isNullable = isNullable
+                )
+            else ->
+                // TODO: Properly construct this when @AppFunctionSerializable is supported.
+                AppFunctionObjectTypeMetadata(
+                    properties = emptyMap(),
+                    required = emptyList(),
+                    qualifiedName = null,
+                    isNullable = isNullable
+                )
         }
     }
+
+    private fun TypeName.toAppFunctionDataType(): Int =
+        when (this.ignoreNullable().toString()) {
+            String::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_STRING
+            Int::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_INT
+            Long::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_LONG
+            Float::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_FLOAT
+            Double::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
+            Boolean::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+            Unit::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_UNIT
+            ByteArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BYTES
+            in SUPPORTED_ARRAY_PRIMITIVE_TYPES,
+            in SUPPORTED_COLLECTION_TYPES, -> AppFunctionDataTypeMetadata.TYPE_ARRAY
+            else -> TODO("Support AppFunctionSerializable types")
+        }
+
+    private fun TypeName.determineArrayItemType(): Int =
+        when (this.ignoreNullable().toString()) {
+            IntArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_INT
+            LongArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_LONG
+            FloatArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_FLOAT
+            DoubleArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
+            BooleanArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+            STRING_LIST_TYPE -> AppFunctionDataTypeMetadata.TYPE_STRING
+            BYTE_ARRAY_LIST_TYPE -> AppFunctionDataTypeMetadata.TYPE_BYTES
+            else -> TODO("Support Lists AppFunctionSerializable types")
+        }
 
     private fun computeAppFunctionAnnotationProperties(
         functionDeclaration: KSFunctionDeclaration
@@ -382,26 +403,33 @@ data class AnnotatedAppFunctions(
             return copy(nullable = false)
         }
 
+        private fun KClass<*>.ensureQualifiedName(): String = checkNotNull(qualifiedName)
+
         internal val SUPPORTED_ARRAY_PRIMITIVE_TYPES =
             setOf(
-                IntArray::class.qualifiedName!!,
-                LongArray::class.qualifiedName!!,
-                FloatArray::class.qualifiedName!!,
-                DoubleArray::class.qualifiedName!!,
-                BooleanArray::class.qualifiedName!!
+                IntArray::class.ensureQualifiedName(),
+                LongArray::class.ensureQualifiedName(),
+                FloatArray::class.ensureQualifiedName(),
+                DoubleArray::class.ensureQualifiedName(),
+                BooleanArray::class.ensureQualifiedName(),
             )
 
         internal val SUPPORTED_SINGLE_PRIMITIVE_TYPES =
             setOf(
-                Int::class.qualifiedName!!,
-                Long::class.qualifiedName!!,
-                Float::class.qualifiedName!!,
-                Double::class.qualifiedName!!,
-                Boolean::class.qualifiedName!!,
-                String::class.qualifiedName!!,
+                Int::class.ensureQualifiedName(),
+                Long::class.ensureQualifiedName(),
+                Float::class.ensureQualifiedName(),
+                Double::class.ensureQualifiedName(),
+                Boolean::class.ensureQualifiedName(),
+                String::class.ensureQualifiedName(),
+                ByteArray::class.ensureQualifiedName(),
+                Unit::class.ensureQualifiedName(),
             )
 
-        internal val SUPPORTED_COLLECTION_TYPES = setOf("kotlin.collections.List<kotlin.String>")
+        private const val STRING_LIST_TYPE = "kotlin.collections.List<kotlin.String>"
+        private const val BYTE_ARRAY_LIST_TYPE = "kotlin.collections.List<kotlin.ByteArray>"
+
+        internal val SUPPORTED_COLLECTION_TYPES = setOf(STRING_LIST_TYPE, BYTE_ARRAY_LIST_TYPE)
 
         internal val SUPPORTED_TYPES =
             SUPPORTED_SINGLE_PRIMITIVE_TYPES +
