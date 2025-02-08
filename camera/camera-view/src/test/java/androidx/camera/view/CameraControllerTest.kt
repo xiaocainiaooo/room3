@@ -29,6 +29,7 @@ import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.DynamicRange
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.FocusMeteringResult
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL
@@ -91,7 +92,8 @@ class CameraControllerTest {
         const val LINEAR_ZOOM = .1F
         const val ZOOM_RATIO = .5F
         const val TORCH_ENABLED = true
-        const val FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS = 5000L
+        const val FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS =
+            FocusMeteringAction.DEFAULT_AUTO_CANCEL_DURATION_MILLIS
     }
 
     private val previewViewTransform = Matrix().also { it.postRotate(90F) }
@@ -852,7 +854,10 @@ class CameraControllerTest {
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
         controller.onTapToFocus(pointFactory, 0f, 0f)
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS - 1, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(
+            FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS - 1,
+            TimeUnit.MILLISECONDS
+        )
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusInfoState.value?.focusState).isEqualTo(TAP_TO_FOCUS_STARTED)
@@ -865,7 +870,10 @@ class CameraControllerTest {
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
         controller.onTapToFocus(pointFactory, 0f, 0f)
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS - 1, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(
+            FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS - 1,
+            TimeUnit.MILLISECONDS
+        )
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_STARTED)
@@ -881,7 +889,7 @@ class CameraControllerTest {
         shadowOf(getMainLooper()).idle()
         assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_STARTED)
 
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusInfoState.value?.focusState)
@@ -899,7 +907,7 @@ class CameraControllerTest {
         shadowOf(getMainLooper()).idle()
         assumeTrue(controller.tapToFocusState.value == TAP_TO_FOCUS_STARTED)
 
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
@@ -915,7 +923,7 @@ class CameraControllerTest {
         shadowOf(getMainLooper()).idle()
         assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_FOCUSED)
 
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusInfoState.value?.focusState)
@@ -933,7 +941,7 @@ class CameraControllerTest {
         shadowOf(getMainLooper()).idle()
         assumeTrue(controller.tapToFocusState.value == TAP_TO_FOCUS_FOCUSED)
 
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
@@ -949,7 +957,7 @@ class CameraControllerTest {
         shadowOf(getMainLooper()).idle()
         assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_NOT_FOCUSED)
 
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusInfoState.value?.focusState)
@@ -967,9 +975,52 @@ class CameraControllerTest {
         shadowOf(getMainLooper()).idle()
         assumeTrue(controller.tapToFocusState.value == TAP_TO_FOCUS_NOT_FOCUSED)
 
-        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
 
         shadowOf(getMainLooper()).idle()
         assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Test
+    fun setTapToFocusAutoCancelDuration_stateIsNotStarted_whenSetDurationIsElapsedAfterStarted() {
+        val autoCancelDurationSeconds = 2L
+
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.setTapToFocusAutoCancelDuration(autoCancelDurationSeconds, TimeUnit.SECONDS)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+
+        // Ensure focus state has is not the initial NOT_STARTED state.
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_STARTED)
+
+        ShadowSystemClock.advanceBy(autoCancelDurationSeconds, TimeUnit.SECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState)
+            .isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Test
+    fun setTapToFocusAutoCancelDuration_stateNeverResetsToNotStarted_whenDurationIsZero() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.setTapToFocusAutoCancelDuration(0, TimeUnit.SECONDS)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+
+        // Ensure focus state has is not the initial NOT_STARTED state.
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_STARTED)
+
+        // Advance to end of time
+        ShadowSystemClock.advanceBy(Long.MAX_VALUE, TimeUnit.SECONDS)
+
+        // State is still the previous STARTED state
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState).isEqualTo(TAP_TO_FOCUS_STARTED)
     }
 }
