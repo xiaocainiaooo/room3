@@ -20,6 +20,11 @@ import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper
+import androidx.appfunctions.compiler.core.ProcessingException
+import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -93,13 +98,266 @@ class AppFunctionInventoryProcessor(
         val appFunctionMetadataList = appFunctionClass.createAppFunctionMetadataList()
 
         for (functionMetadata in appFunctionMetadataList) {
-            // Create a property for each function's schema metadata.
-            inventoryClassBuilder.addProperty(
-                buildSchemaMetadataProperty(functionMetadata.id, functionMetadata.schema)
+            addSchemaMetadataPropertyForFunction(
+                functionMetadata.id,
+                inventoryClassBuilder,
+                functionMetadata.schema
             )
-            // Todo Create a property for each function parameter object
+            addPropertiesForParameterMetadataList(
+                functionMetadata.id,
+                inventoryClassBuilder,
+                functionMetadata.parameters
+            )
             // Todo create a property for each function response object
         }
+    }
+
+    private fun addPropertiesForParameterMetadataList(
+        functionId: String,
+        inventoryClassBuilder: TypeSpec.Builder,
+        parameterMetadataList: List<AppFunctionParameterMetadata>
+    ) {
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    getMetadataPropertyName(functionId, "PARAMETER_METADATA_LIST"),
+                    List::class.asClassName()
+                        .parameterizedBy(IntrospectionHelper.APP_FUNCTION_PARAMETER_METADATA_CLASS)
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("buildList{")
+                        indent()
+                        for (parameterMetadata in parameterMetadataList) {
+                            addPropertiesForParameterMetadata(
+                                functionId,
+                                parameterMetadata,
+                                inventoryClassBuilder
+                            )
+                            addStatement("add(")
+                            indent()
+                            addStatement(
+                                "%L",
+                                getMetadataPropertyName(
+                                    functionId,
+                                    "${parameterMetadata.name.uppercase()}_PARAMETER_METADATA"
+                                )
+                            )
+                            unindent()
+                            addStatement(")")
+                        }
+                        unindent()
+                        addStatement("}")
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertiesForParameterMetadata(
+        functionId: String,
+        parameterMetadata: AppFunctionParameterMetadata,
+        inventoryClassBuilder: TypeSpec.Builder,
+    ) {
+        val parameterMetadataPropertyName =
+            getMetadataPropertyName(
+                functionId,
+                "${parameterMetadata.name.uppercase()}_PARAMETER_METADATA"
+            )
+        val datatypeVariableName =
+            when (val castDataType = parameterMetadata.dataType) {
+                is AppFunctionPrimitiveTypeMetadata -> {
+                    val primitiveTypeMetadataPropertyName =
+                        getPrimitiveTypeMetadataPropertyNameForParameter(
+                            functionId,
+                            parameterMetadata
+                        )
+                    addPropertyForPrimitiveTypeMetadata(
+                        primitiveTypeMetadataPropertyName,
+                        inventoryClassBuilder,
+                        castDataType
+                    )
+                    primitiveTypeMetadataPropertyName
+                }
+                is AppFunctionArrayTypeMetadata -> {
+                    val arrayTypeMetadataPropertyName =
+                        getArrayTypeMetadataPropertyNameForParameter(functionId, parameterMetadata)
+                    addPropertyForArrayTypeMetadata(
+                        arrayTypeMetadataPropertyName,
+                        inventoryClassBuilder,
+                        castDataType
+                    )
+                    arrayTypeMetadataPropertyName
+                }
+                is AppFunctionObjectTypeMetadata -> {
+                    val objectTypeMetadataPropertyName =
+                        getObjectTypeMetadataPropertyNameForParameter(functionId, parameterMetadata)
+                    addPropertyForObjectTypeMetadata(
+                        objectTypeMetadataPropertyName,
+                        inventoryClassBuilder,
+                        castDataType
+                    )
+                    objectTypeMetadataPropertyName
+                }
+                else -> {
+                    // TODO provide KSNode to improve error message
+                    throw ProcessingException(
+                        "Unable to build parameter metadata for unknown datatype: $castDataType",
+                        null
+                    )
+                }
+            }
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    parameterMetadataPropertyName,
+                    IntrospectionHelper.APP_FUNCTION_PARAMETER_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                name = %S,
+                                isRequired = %L,
+                                dataType = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_PARAMETER_METADATA_CLASS,
+                            parameterMetadata.name,
+                            parameterMetadata.isRequired,
+                            datatypeVariableName
+                        )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForPrimitiveTypeMetadata(
+        propertyName: String,
+        inventoryClassBuilder: TypeSpec.Builder,
+        primitiveTypeMetadata: AppFunctionPrimitiveTypeMetadata
+    ) {
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    IntrospectionHelper.APP_FUNCTION_PRIMITIVE_TYPE_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                type = %L,
+                                isNullable = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_PRIMITIVE_TYPE_METADATA_CLASS,
+                            primitiveTypeMetadata.type,
+                            primitiveTypeMetadata.isNullable
+                        )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForArrayTypeMetadata(
+        propertyName: String,
+        inventoryClassBuilder: TypeSpec.Builder,
+        arrayTypeMetadata: AppFunctionArrayTypeMetadata
+    ) {
+        val itemTypeVariableName =
+            when (val castItemType = arrayTypeMetadata.itemType) {
+                is AppFunctionPrimitiveTypeMetadata -> {
+                    val primitiveItemTypeVariableName = propertyName + "_PRIMITIVE_ITEM_TYPE"
+                    addPropertyForPrimitiveTypeMetadata(
+                        primitiveItemTypeVariableName,
+                        inventoryClassBuilder,
+                        castItemType
+                    )
+                    primitiveItemTypeVariableName
+                }
+                is AppFunctionObjectTypeMetadata -> {
+                    val objectItemTypeVariableName = propertyName + "_OBJECT_ITEM_TYPE"
+                    addPropertyForObjectTypeMetadata(
+                        objectItemTypeVariableName,
+                        inventoryClassBuilder,
+                        castItemType
+                    )
+                    objectItemTypeVariableName
+                }
+                else -> {
+                    // TODO provide KSNode to improve error message
+                    throw ProcessingException(
+                        "Unable to build parameter item type metadata for unknown itemType: " +
+                            "$castItemType",
+                        null
+                    )
+                }
+            }
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    IntrospectionHelper.APP_FUNCTION_ARRAY_TYPE_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                itemType = %L,
+                                isNullable = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_ARRAY_TYPE_METADATA_CLASS,
+                            itemTypeVariableName,
+                            arrayTypeMetadata.isNullable
+                        )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForObjectTypeMetadata(
+        propertyName: String,
+        inventoryClassBuilder: TypeSpec.Builder,
+        objectTypeMetadata: AppFunctionObjectTypeMetadata,
+    ) {
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    IntrospectionHelper.APP_FUNCTION_OBJECT_TYPE_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        // TODO: properly construct Object type metadata.
+                        addStatement(
+                            """
+                            %T(
+                                properties = emptyMap(),
+                                required = emptyList(),
+                                qualifiedName = %L,
+                                isNullable = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_OBJECT_TYPE_METADATA_CLASS,
+                            objectTypeMetadata.qualifiedName,
+                            objectTypeMetadata.isNullable,
+                        )
+                    }
+                )
+                .build()
+        )
     }
 
     /** Creates the `functionIdToMetadataMap` property of the `AppFunctionInventory`. */
@@ -118,31 +376,34 @@ class AppFunctionInventoryProcessor(
             .build()
     }
 
-    private fun buildSchemaMetadataProperty(
+    private fun addSchemaMetadataPropertyForFunction(
         functionId: String,
+        inventoryClassBuilder: TypeSpec.Builder,
         schemaMetadata: AppFunctionSchemaMetadata?
-    ): PropertySpec {
-        return PropertySpec.builder(
-                getSchemaMetadataPropertyName(functionId),
-                IntrospectionHelper.APP_FUNCTION_SCHEMA_METADATA_CLASS.copy(nullable = true)
-            )
-            .addModifiers(KModifier.PRIVATE)
-            .initializer(
-                buildCodeBlock {
-                    if (schemaMetadata == null) {
-                        addStatement("%L", null)
-                    } else {
-                        addStatement(
-                            "%T(category= %S, name=%S, version=%L)",
-                            IntrospectionHelper.APP_FUNCTION_SCHEMA_METADATA_CLASS,
-                            schemaMetadata.category,
-                            schemaMetadata.name,
-                            schemaMetadata.version
-                        )
+    ) {
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    getMetadataPropertyName(functionId, "SCHEMA_METADATA"),
+                    IntrospectionHelper.APP_FUNCTION_SCHEMA_METADATA_CLASS.copy(nullable = true)
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        if (schemaMetadata == null) {
+                            addStatement("%L", null)
+                        } else {
+                            addStatement(
+                                "%T(category= %S, name=%S, version=%L)",
+                                IntrospectionHelper.APP_FUNCTION_SCHEMA_METADATA_CLASS,
+                                schemaMetadata.category,
+                                schemaMetadata.name,
+                                schemaMetadata.version
+                            )
+                        }
                     }
-                }
-            )
-            .build()
+                )
+                .build()
+        )
     }
 
     // TODO: Remove doc once done with impl
@@ -160,13 +421,59 @@ class AppFunctionInventoryProcessor(
     }
 
     /**
-     * Generates the name of the property for the schema metadata of a function.
+     * Generates the name of the property for the metadata of a function.
      *
      * @param functionId The ID of the function.
+     * @param metadataType The type of metadata (e.g., "SCHEMA_METADATA").
      * @return The name of the property.
      */
-    private fun getSchemaMetadataPropertyName(functionId: String): String {
+    private fun getMetadataPropertyName(functionId: String, metadataType: String): String {
         // Replace all non-alphanumeric characters with underscores and convert to uppercase.
-        return "${functionId.replace("[^A-Za-z0-9]".toRegex(), "_").uppercase()}_SCHEMA_METADATA"
+        return "${functionId.replace("[^A-Za-z0-9]".toRegex(), "_").uppercase()}_$metadataType"
+    }
+
+    /**
+     * Generates the name of the property for the primitive type metadata of a parameter.
+     *
+     * @param functionId The ID of the function.
+     * @param parameterMetadata The metadata of the parameter.
+     * @return The name of the property.
+     */
+    private fun getPrimitiveTypeMetadataPropertyNameForParameter(
+        functionId: String,
+        parameterMetadata: AppFunctionParameterMetadata
+    ): String {
+        return getMetadataPropertyName(functionId, "PARAMETER_METADATA") +
+            "_${parameterMetadata.name.uppercase()}_PRIMITIVE_DATA_TYPE"
+    }
+
+    /**
+     * Generates the name of the property for the array type metadata of a parameter.
+     *
+     * @param functionId The ID of the function.
+     * @param parameterMetadata The metadata of the parameter.
+     * @return The name of the property.
+     */
+    private fun getArrayTypeMetadataPropertyNameForParameter(
+        functionId: String,
+        parameterMetadata: AppFunctionParameterMetadata
+    ): String {
+        return getMetadataPropertyName(functionId, "PARAMETER_METADATA") +
+            "_${parameterMetadata.name.uppercase()}_ARRAY_DATA_TYPE"
+    }
+
+    /**
+     * Generates the name of the property for the object type metadata of a parameter.
+     *
+     * @param functionId The ID of the function.
+     * @param parameterMetadata The metadata of the parameter.
+     * @return The name of the property.
+     */
+    private fun getObjectTypeMetadataPropertyNameForParameter(
+        functionId: String,
+        parameterMetadata: AppFunctionParameterMetadata
+    ): String {
+        return getMetadataPropertyName(functionId, "PARAMETER_METADATA") +
+            "_${parameterMetadata.name.uppercase()}_OBJECT_DATA_TYPE"
     }
 }

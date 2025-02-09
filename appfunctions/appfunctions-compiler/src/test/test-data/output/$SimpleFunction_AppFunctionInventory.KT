@@ -2,9 +2,11 @@ package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
+import kotlin.collections.List
 import kotlin.collections.Map
 
 /**
@@ -17,4 +19,8 @@ public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
 
   private val COM_TESTDATA_SIMPLEFUNCTION_SIMPLEFUNCTION_SCHEMA_METADATA: AppFunctionSchemaMetadata?
       = null
+
+  private val COM_TESTDATA_SIMPLEFUNCTION_SIMPLEFUNCTION_PARAMETER_METADATA_LIST:
+      List<AppFunctionParameterMetadata> = buildList{
+  }
 }
