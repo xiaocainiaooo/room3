@@ -30,18 +30,12 @@ import perfetto.protos.MutableTrackEvent
 internal class PooledTrackEvent(owner: Pool<PooledTrackEvent>, val trackEvent: MutableTrackEvent) :
     Poolable<PooledTrackEvent>(owner) {
     override fun recycle() {
-        trackEvent.name_iid = null
         trackEvent.name = null
         trackEvent.type = null
         trackEvent.track_uuid = null
         trackEvent.counter_value = null
         trackEvent.double_counter_value = null
         trackEvent.unknownFields = ByteString.EMPTY
-        trackEvent.categories = emptyList()
-        trackEvent.extra_counter_track_uuids = emptyList()
-        trackEvent.extra_counter_values = emptyList()
-        trackEvent.extra_double_counter_track_uuids = emptyList()
-        trackEvent.extra_double_counter_values = emptyList()
         trackEvent.flow_ids = emptyList()
         owner.release(this)
     }
