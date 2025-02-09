@@ -693,6 +693,20 @@ class SandboxedSdkViewTest {
     }
 
     @Test
+    fun signalsSentWhenVisibilityChanges() {
+        // onVisibilityAggregated is only available on N+
+        assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        addViewToLayoutAndWaitToBeActive()
+        val session = testSandboxedUiAdapter.testSession!!
+        // Catch initial UI change so that we can ensure the subsequent event is caught.
+        session.runAndRetrieveNextUiChange {}
+        // If no viewability event occurs, this will throw an exception.
+        session.runAndRetrieveNextUiChange {
+            activityScenarioRule.withActivity { view.visibility = View.INVISIBLE }
+        }
+    }
+
+    @Test
     fun addChildViewToSandboxedSdkView_throwsException() {
         addViewToLayout()
         val exception =
