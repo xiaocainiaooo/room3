@@ -58,10 +58,7 @@ message ProcessDescriptor {
 }
 
 message TrackEvent {
-  repeated string categories = 22;
   oneof name_field {
-    // interned EventName.
-    uint64 name_iid = 10;
     // non-interned variant.
     string name = 23;
   }
@@ -77,10 +74,6 @@ message TrackEvent {
     int64 counter_value = 30;
     double double_counter_value = 44;
   }
-  repeated uint64 extra_counter_track_uuids = 31;
-  repeated int64 extra_counter_values = 12;
-  repeated uint64 extra_double_counter_track_uuids = 45;
-  repeated double extra_double_counter_values = 46;
   repeated fixed64 flow_ids = 47;
 }
 
