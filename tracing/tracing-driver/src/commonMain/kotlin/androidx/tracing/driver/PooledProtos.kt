@@ -48,7 +48,7 @@ internal constructor(
     internal val tracePacket: MutableTracePacket,
     // We are keeping track of some associated Poolables this way, so they can consistently
     // be recycled correctly. A size of `4` ought to be big enough for our needs.
-    private val nested: Array<Poolable<*>?> = arrayOfNulls(4)
+    internal val nested: Array<Poolable<*>?> = arrayOfNulls(4)
 ) : Poolable<PooledTracePacket>(owner) {
     private var nestedIndex = 0
 
