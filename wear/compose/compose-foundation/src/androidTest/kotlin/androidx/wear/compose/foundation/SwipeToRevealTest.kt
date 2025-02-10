@@ -138,7 +138,7 @@ class SwipeToRevealTest {
         verifyGesture(
             revealValue = RevealValue.LeftRevealed,
             onFullSwipe = { onFullSwipeTriggered = true },
-            swipeDirection = SwipeDirection.Both,
+            revealDirection = RevealDirection.Both,
             gesture = { swipeRight() }
         )
 
@@ -583,7 +583,7 @@ class SwipeToRevealTest {
         revealValue: RevealValue,
         gesture: TouchInjectionScope.() -> Unit,
         onFullSwipe: () -> Unit = {},
-        swipeDirection: SwipeDirection = SwipeDirection.RightToLeft,
+        revealDirection: RevealDirection = RevealDirection.RightToLeft,
         revealingAnchor: Float = SwipeToRevealDefaults.revealingRatio,
         positionalThreshold: (totalDistance: Float) -> Float =
             SwipeToRevealDefaults.positionalThreshold
@@ -596,7 +596,7 @@ class SwipeToRevealTest {
                     anchors =
                         createAnchors(
                             revealingAnchor = revealingAnchor,
-                            swipeDirection = swipeDirection
+                            revealDirection = revealDirection
                         )
                 )
             swipeToRevealWithDefaults(

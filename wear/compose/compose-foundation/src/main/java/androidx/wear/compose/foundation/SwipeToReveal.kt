@@ -90,13 +90,13 @@ internal val STANDARD_IN_OUT = CubicBezierEasing(0.20f, 0.0f, 0.0f, 1.00f)
  * [RevealState.currentValue]. [RevealValue.Covered] is considered the default state where none of
  * the actions are revealed yet.
  *
- * [SwipeToReveal] direction is not localised, with the default being [SwipeDirection.RightToLeft],
+ * [SwipeToReveal] direction is not localised, with the default being [RevealDirection.RightToLeft],
  * and [RevealValue.RightRevealing] and [RevealValue.RightRevealed] correspond to the actions
  * getting revealed from the right side of the screen. In case swipe direction is set to
- * [SwipeDirection.Both], actions can also get revealed from the left side of the screen, and in
+ * [RevealDirection.Both], actions can also get revealed from the left side of the screen, and in
  * that case [RevealValue.LeftRevealing] and [RevealValue.LeftRevealed] are used.
  *
- * @see [SwipeDirection]
+ * @see [RevealDirection]
  */
 @JvmInline
 public value class RevealValue private constructor(public val value: Int) {
@@ -106,7 +106,7 @@ public value class RevealValue private constructor(public val value: Int) {
          * revealed, and they are displayed on the left side of the screen. This also represents the
          * state in which one of the actions has been triggered/performed.
          *
-         * This is only used when the swipe direction is set to [SwipeDirection.Both], and the user
+         * This is only used when the swipe direction is set to [RevealDirection.Both], and the user
          * swipes from the left side of the screen.
          */
         public val LeftRevealed: RevealValue = RevealValue(-2)
@@ -116,7 +116,7 @@ public value class RevealValue private constructor(public val value: Int) {
          * content is not being swiped. In this state, none of the actions have been triggered or
          * performed yet, and they are displayed on the left side of the screen.
          *
-         * This is only used when the swipe direction is set to [SwipeDirection.Both], and the user
+         * This is only used when the swipe direction is set to [RevealDirection.Both], and the user
          * swipes from the left side of the screen.
          */
         public val LeftRevealing: RevealValue = RevealValue(-1)
@@ -167,19 +167,19 @@ public value class RevealValue private constructor(public val value: Int) {
 /**
  * Different values [SwipeToReveal] composable can reveal the actions from.
  *
- * [SwipeDirection] is not localised, with the default being [SwipeDirection.RightToLeft] to prevent
- * conflict with the system-wide swipe to dismiss gesture in an activity, so it's strongly advised
- * to respect the default value to avoid conflicting gestures.
+ * [RevealDirection] is not localised, with the default being [RevealDirection.RightToLeft] to
+ * prevent conflict with the system-wide swipe to dismiss gesture in an activity, so it's strongly
+ * advised to respect the default value to avoid conflicting gestures.
  */
 @JvmInline
-public value class SwipeDirection private constructor(public val value: Int) {
+public value class RevealDirection private constructor(public val value: Int) {
     public companion object {
         /**
          * The default value which allows the user to swipe right to left to reveal or execute the
          * actions. It's strongly advised to respect the default behavior to avoid conflict with the
          * swipe-to-dismiss gesture.
          */
-        public val RightToLeft: SwipeDirection = SwipeDirection(0)
+        public val RightToLeft: RevealDirection = RevealDirection(0)
 
         /**
          * The value which allows the user to swipe in either direction to reveal or execute the
@@ -188,7 +188,7 @@ public value class SwipeDirection private constructor(public val value: Int) {
          * This is only supported for rare cases where the current screen does not support swipe to
          * dismiss.
          */
-        public val Both: SwipeDirection = SwipeDirection(1)
+        public val Both: RevealDirection = RevealDirection(1)
     }
 }
 
@@ -233,17 +233,17 @@ public value class RevealActionType private constructor(public val value: Int) {
  *   value
  * @param revealedAnchor Anchor for the [RevealValue.LeftRevealed] or [RevealValue.RightRevealed]
  *   value
- * @param swipeDirection The direction in which the content can be swiped. It's strongly advised to
- *   keep the default [SwipeDirection.RightToLeft] in order to preserve compatibility with the
+ * @param revealDirection The direction in which the content can be swiped. It's strongly advised to
+ *   keep the default [RevealDirection.RightToLeft] in order to preserve compatibility with the
  *   system wide swipe to dismiss gesture.
  */
 public fun createAnchors(
     coveredAnchor: Float = 0f,
     revealingAnchor: Float = SwipeToRevealDefaults.revealingRatio,
     revealedAnchor: Float = 1f,
-    swipeDirection: SwipeDirection = SwipeDirection.RightToLeft
+    revealDirection: RevealDirection = RevealDirection.RightToLeft
 ): Map<RevealValue, Float> {
-    if (swipeDirection == SwipeDirection.Both) {
+    if (revealDirection == RevealDirection.Both) {
         return mapOf(
             RevealValue.LeftRevealed to -revealedAnchor,
             RevealValue.LeftRevealing to -revealingAnchor,

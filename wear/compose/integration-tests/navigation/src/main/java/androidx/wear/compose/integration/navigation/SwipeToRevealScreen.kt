@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.SwipeDirection
+import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.SwipeToReveal
@@ -43,7 +43,7 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
         SwipeToReveal(
             revealState =
                 rememberRevealState(
-                    swipeDirection = SwipeDirection.RightToLeft,
+                    revealDirection = RevealDirection.RightToLeft,
                     anchorWidth = SwipeToRevealDefaults.SingleActionAnchorWidth,
                 ),
             actions = {
@@ -76,7 +76,7 @@ fun SwipeToRevealBothDirectionsNonAnchoring() {
         SwipeToReveal(
             revealState =
                 rememberRevealState(
-                    swipeDirection = SwipeDirection.Both,
+                    revealDirection = RevealDirection.Both,
                     useAnchoredActions = false,
                 ),
             actions = {
