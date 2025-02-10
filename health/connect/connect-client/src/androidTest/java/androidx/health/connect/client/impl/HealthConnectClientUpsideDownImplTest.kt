@@ -34,7 +34,9 @@ import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.records.WheelchairPushesRecord
+import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.connect.client.records.metadata.Metadata.Companion.RECORDING_METHOD_MANUAL_ENTRY
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
@@ -44,6 +46,7 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Mass
 import androidx.health.connect.client.units.grams
+import androidx.health.connect.client.units.kilocalories
 import androidx.health.connect.client.units.millimetersOfMercury
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -880,6 +883,124 @@ class HealthConnectClientUpsideDownImplTest {
     fun getGrantedPermissions() = runTest {
         assertThat(healthConnectClient.permissionController.getGrantedPermissions())
             .containsExactlyElementsIn(getAllRecordPermissions())
+    }
+
+    @Test
+    fun getDurationBucketDataOrigins_belowSdkExt10_isEmpty() = runTest {
+        assumeTrue(SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) < 10)
+
+        healthConnectClient.insertRecords(
+            listOf(
+                NutritionRecord(
+                    startTime = START_TIME,
+                    startZoneOffset = ZONE_OFFSET,
+                    endTime = START_TIME + 10.minutes,
+                    endZoneOffset = ZONE_OFFSET,
+                    energy = 600.kilocalories,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY)
+                )
+            )
+        )
+
+        val groupedByDurationResult =
+            healthConnectClient.aggregateGroupByDuration(
+                AggregateGroupByDurationRequest(
+                    metrics = setOf(NutritionRecord.ENERGY_TOTAL),
+                    TimeRangeFilter.after(START_TIME),
+                    Duration.ofHours(1)
+                )
+            )
+
+        assertThat(groupedByDurationResult[0].result.dataOrigins).isEmpty()
+    }
+
+    @Test
+    fun getDurationBucketDataOrigins_sdkExt10AndAbove_hasDataOrigins() = runTest {
+        assumeTrue(SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) >= 10)
+
+        healthConnectClient.insertRecords(
+            listOf(
+                NutritionRecord(
+                    startTime = START_TIME,
+                    startZoneOffset = ZONE_OFFSET,
+                    endTime = START_TIME + 10.minutes,
+                    endZoneOffset = ZONE_OFFSET,
+                    energy = 600.kilocalories,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY)
+                )
+            )
+        )
+
+        val groupedByDurationResult =
+            healthConnectClient.aggregateGroupByDuration(
+                AggregateGroupByDurationRequest(
+                    metrics = setOf(NutritionRecord.ENERGY_TOTAL),
+                    TimeRangeFilter.after(START_TIME),
+                    Duration.ofHours(1)
+                )
+            )
+
+        assertThat(groupedByDurationResult[0].result.dataOrigins)
+            .containsExactly(DataOrigin(packageName = context.packageName))
+    }
+
+    @Test
+    fun getPeriodBucketDataOrigins_belowSdkExt10_isEmpty() = runTest {
+        assumeTrue(SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) < 10)
+
+        healthConnectClient.insertRecords(
+            listOf(
+                NutritionRecord(
+                    startTime = START_TIME,
+                    startZoneOffset = ZONE_OFFSET,
+                    endTime = START_TIME + 10.minutes,
+                    endZoneOffset = ZONE_OFFSET,
+                    energy = 600.kilocalories,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY)
+                )
+            )
+        )
+
+        val groupedByPeriodResult =
+            healthConnectClient.aggregateGroupByPeriod(
+                AggregateGroupByPeriodRequest(
+                    metrics = setOf(NutritionRecord.ENERGY_TOTAL),
+                    TimeRangeFilter.after(LocalDateTime.ofInstant(START_TIME, ZONE_OFFSET)),
+                    Period.ofDays(1)
+                )
+            )
+
+        assertThat(groupedByPeriodResult[0].result.dataOrigins).isEmpty()
+    }
+
+    @Test
+    fun getPeriodBucketDataOrigins_sdkExt10AndAbove_hasDataOrigins() = runTest {
+        assumeTrue(SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) >= 10)
+
+        healthConnectClient.insertRecords(
+            listOf(
+                NutritionRecord(
+                    startTime = START_TIME,
+                    startZoneOffset = ZONE_OFFSET,
+                    endTime = START_TIME + 10.minutes,
+                    endZoneOffset = ZONE_OFFSET,
+                    energy = 600.kilocalories,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY)
+                )
+            )
+        )
+
+        val groupedByPeriodResult =
+            healthConnectClient.aggregateGroupByPeriod(
+                AggregateGroupByPeriodRequest(
+                    metrics = setOf(NutritionRecord.ENERGY_TOTAL),
+                    TimeRangeFilter.after(LocalDateTime.ofInstant(START_TIME, ZONE_OFFSET)),
+                    Period.ofDays(1)
+                )
+            )
+
+        assertThat(groupedByPeriodResult[0].result.dataOrigins)
+            .containsExactly(DataOrigin(packageName = context.packageName))
     }
 
     private fun <A, E> assertEquals(vararg assertions: Pair<A, E>) {
