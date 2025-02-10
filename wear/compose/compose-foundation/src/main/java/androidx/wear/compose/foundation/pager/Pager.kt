@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults as ComposePagerDefaults
-import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.runtime.Composable
@@ -178,7 +177,7 @@ public fun HorizontalPager(
                     requiresFocus = {
                         rotaryScrollableBehavior == null && state.currentPage == page
                     },
-                    content = { content(page) }
+                    content = { WearPagerScopeImpl.content(page) }
                 )
             }
         }
@@ -262,7 +261,7 @@ public fun VerticalPager(
     ) { page ->
         HierarchicalFocusCoordinator(
             requiresFocus = { rotaryScrollableBehavior == null && state.currentPage == page },
-            content = { content(page) }
+            content = { WearPagerScopeImpl.content(page) }
         )
     }
 }
