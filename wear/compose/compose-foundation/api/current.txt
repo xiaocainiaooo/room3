@@ -262,6 +262,19 @@ package androidx.wear.compose.foundation {
     property public int UndoAction;
   }
 
+  @kotlin.jvm.JvmInline public final value class RevealDirection {
+    method public int getValue();
+    property public int value;
+    field public static final androidx.wear.compose.foundation.RevealDirection.Companion Companion;
+  }
+
+  public static final class RevealDirection.Companion {
+    method public int getBoth();
+    method public int getRightToLeft();
+    property public int Both;
+    property public int RightToLeft;
+  }
+
   public interface RevealScope {
     method public int getLastActionType();
     method public float getRevealOffset();
@@ -331,19 +344,6 @@ package androidx.wear.compose.foundation {
     method public static androidx.wear.compose.foundation.ScrollInfoProvider ScrollInfoProvider(androidx.wear.compose.foundation.pager.PagerState state);
   }
 
-  @kotlin.jvm.JvmInline public final value class SwipeDirection {
-    method public int getValue();
-    property public int value;
-    field public static final androidx.wear.compose.foundation.SwipeDirection.Companion Companion;
-  }
-
-  public static final class SwipeDirection.Companion {
-    method public int getBoth();
-    method public int getRightToLeft();
-    property public int Both;
-    property public int RightToLeft;
-  }
-
   public final class SwipeToDismissBoxDefaults {
     method public androidx.compose.animation.core.SpringSpec<java.lang.Float> getAnimationSpec();
     method public float getEdgeWidth();
@@ -378,7 +378,7 @@ package androidx.wear.compose.foundation {
 
   public final class SwipeToRevealKt {
     method @androidx.compose.runtime.Composable public static void SwipeToReveal(kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.RevealScope,kotlin.Unit> primaryAction, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> onFullSwipe, optional androidx.wear.compose.foundation.RevealState state, optional kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.RevealScope,kotlin.Unit>? secondaryAction, optional kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.RevealScope,kotlin.Unit>? undoAction, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static java.util.Map<androidx.wear.compose.foundation.RevealValue,java.lang.Float> createAnchors(optional float coveredAnchor, optional float revealingAnchor, optional float revealedAnchor, optional int swipeDirection);
+    method public static java.util.Map<androidx.wear.compose.foundation.RevealValue,java.lang.Float> createAnchors(optional float coveredAnchor, optional float revealingAnchor, optional float revealedAnchor, optional int revealDirection);
     method @androidx.compose.runtime.Composable public static androidx.wear.compose.foundation.RevealState rememberRevealState(optional int initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.RevealValue,java.lang.Boolean> confirmValueChange, optional kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> positionalThreshold, optional java.util.Map<androidx.wear.compose.foundation.RevealValue,java.lang.Float> anchors);
   }
 

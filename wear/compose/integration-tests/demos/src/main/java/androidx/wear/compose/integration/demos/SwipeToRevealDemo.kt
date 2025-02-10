@@ -46,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.ExpandableState
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.RevealActionType
+import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
-import androidx.wear.compose.foundation.SwipeDirection
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.SwipeToReveal
 import androidx.wear.compose.foundation.createAnchors
@@ -399,7 +399,7 @@ private fun ShowDialog(
 @Composable
 fun SwipeToRevealDemoBothDirections() {
     val revealState =
-        rememberRevealState(anchors = createAnchors(swipeDirection = SwipeDirection.Both))
+        rememberRevealState(anchors = createAnchors(revealDirection = RevealDirection.Both))
     val coroutineScope = rememberCoroutineScope()
     SwipeToReveal(
         primaryAction = {
