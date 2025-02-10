@@ -14,7 +14,6 @@ class FakeAllNullablePrimitiveParamsWithDefaultValuesImpl :
         arg4: Double?,
         arg5: String?,
         arg6: Boolean?,
-        arg7: ByteArray?,
     ) {}
 
     @AppFunction
@@ -26,6 +25,7 @@ class FakeAllNullablePrimitiveParamsWithDefaultValuesImpl :
         arg4: DoubleArray?,
         arg5: List<String>,
         arg6: BooleanArray?,
-        arg7: List<ByteArray>?,
+        arg7: ByteArray?,
+        arg8: List<ByteArray>?,
     ) {}
 }
