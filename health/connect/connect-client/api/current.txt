@@ -1930,7 +1930,15 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public final class Metadata {
-    ctor public Metadata(int recordingMethod, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin, optional java.time.Instant lastModifiedTime, optional String? clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
+    ctor @Deprecated public Metadata(int recordingMethod, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin, optional java.time.Instant lastModifiedTime, optional String? clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public static androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device);
+    method public static androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId);
+    method public static androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId, optional long clientRecordVersion);
+    method public static androidx.health.connect.client.records.metadata.Metadata activelyRecordedWithId(String id, androidx.health.connect.client.records.metadata.Device device);
+    method public static androidx.health.connect.client.records.metadata.Metadata autoRecorded(androidx.health.connect.client.records.metadata.Device device);
+    method public static androidx.health.connect.client.records.metadata.Metadata autoRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId);
+    method public static androidx.health.connect.client.records.metadata.Metadata autoRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId, optional long clientRecordVersion);
+    method public static androidx.health.connect.client.records.metadata.Metadata autoRecordedWithId(String id, androidx.health.connect.client.records.metadata.Device device);
     method public String? getClientRecordId();
     method public long getClientRecordVersion();
     method public androidx.health.connect.client.records.metadata.DataOrigin getDataOrigin();
@@ -1938,6 +1946,20 @@ package androidx.health.connect.client.records.metadata {
     method public String getId();
     method public java.time.Instant getLastModifiedTime();
     method public int getRecordingMethod();
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntry();
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntry(optional androidx.health.connect.client.records.metadata.Device? device);
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntry(String clientRecordId);
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntry(String clientRecordId, optional long clientRecordVersion);
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntry(String clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntryWithId(String id);
+    method public static androidx.health.connect.client.records.metadata.Metadata manualEntryWithId(String id, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod();
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(optional androidx.health.connect.client.records.metadata.Device? device);
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(String clientRecordId);
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(String clientRecordId, optional long clientRecordVersion);
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(String clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethodWithId(String id);
+    method public static androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethodWithId(String id, optional androidx.health.connect.client.records.metadata.Device? device);
     property public String? clientRecordId;
     property public long clientRecordVersion;
     property public androidx.health.connect.client.records.metadata.DataOrigin dataOrigin;
@@ -1953,6 +1975,28 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public static final class Metadata.Companion {
+    method public androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device);
+    method public androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId);
+    method public androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId, optional long clientRecordVersion);
+    method public androidx.health.connect.client.records.metadata.Metadata activelyRecordedWithId(String id, androidx.health.connect.client.records.metadata.Device device);
+    method public androidx.health.connect.client.records.metadata.Metadata autoRecorded(androidx.health.connect.client.records.metadata.Device device);
+    method public androidx.health.connect.client.records.metadata.Metadata autoRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId);
+    method public androidx.health.connect.client.records.metadata.Metadata autoRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId, optional long clientRecordVersion);
+    method public androidx.health.connect.client.records.metadata.Metadata autoRecordedWithId(String id, androidx.health.connect.client.records.metadata.Device device);
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntry();
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntry(optional androidx.health.connect.client.records.metadata.Device? device);
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntry(String clientRecordId);
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntry(String clientRecordId, optional long clientRecordVersion);
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntry(String clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntryWithId(String id);
+    method public androidx.health.connect.client.records.metadata.Metadata manualEntryWithId(String id, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod();
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(optional androidx.health.connect.client.records.metadata.Device? device);
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(String clientRecordId);
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(String clientRecordId, optional long clientRecordVersion);
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethod(String clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethodWithId(String id);
+    method public androidx.health.connect.client.records.metadata.Metadata unknownRecordingMethodWithId(String id, optional androidx.health.connect.client.records.metadata.Device? device);
     property public static int RECORDING_METHOD_ACTIVELY_RECORDED;
     property public static int RECORDING_METHOD_AUTOMATICALLY_RECORDED;
     property public static int RECORDING_METHOD_MANUAL_ENTRY;

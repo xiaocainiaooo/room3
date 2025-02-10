@@ -17,7 +17,6 @@
 package androidx.health.connect.client.impl
 
 import android.content.Context
-import android.health.connect.datatypes.Metadata.RECORDING_METHOD_MANUAL_ENTRY
 import android.os.Build
 import android.os.ext.SdkExtensions
 import androidx.health.connect.client.HealthConnectClient
@@ -185,7 +184,7 @@ class HealthConnectClientUpsideDownImplTest {
                         startZoneOffset = null,
                         endTime = START_TIME + 1.minutes,
                         endZoneOffset = null,
-                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                        metadata = Metadata.manualEntry(),
                     )
                 )
             )
@@ -204,7 +203,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = null,
                             endTime = START_TIME + 1.minutes,
                             endZoneOffset = null,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                         ),
                         StepsRecord(
                             count = 15,
@@ -212,7 +211,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = null,
                             endTime = START_TIME + 3.minutes,
                             endZoneOffset = null,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                         ),
                         StepsRecord(
                             count = 20,
@@ -220,11 +219,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = null,
                             endTime = START_TIME + 5.minutes,
                             endZoneOffset = null,
-                            metadata =
-                                Metadata(
-                                    recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                                    clientRecordId = "clientId"
-                                )
+                            metadata = Metadata.manualEntry(clientRecordId = "clientId")
                         ),
                     )
                 )
@@ -260,7 +255,7 @@ class HealthConnectClientUpsideDownImplTest {
                         startZoneOffset = ZoneOffset.UTC,
                         endTime = START_TIME + 1.minutes,
                         endZoneOffset = ZoneOffset.UTC,
-                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                        metadata = Metadata.manualEntry(),
                     ),
                     StepsRecord(
                         count = 150,
@@ -268,7 +263,7 @@ class HealthConnectClientUpsideDownImplTest {
                         startZoneOffset = ZoneOffset.UTC,
                         endTime = START_TIME + 3.minutes,
                         endZoneOffset = ZoneOffset.UTC,
-                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                        metadata = Metadata.manualEntry(),
                     ),
                 )
             )
@@ -304,13 +299,11 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = null,
                             endTime = START_TIME + 30.seconds,
                             endZoneOffset = null,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                         )
                     )
                 )
                 .recordIdsList[0]
-
-        val insertedRecord = healthConnectClient.readRecord(StepsRecord::class, id).record
 
         healthConnectClient.updateRecords(
             listOf(
@@ -320,12 +313,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = null,
                     endTime = START_TIME + 30.seconds,
                     endZoneOffset = null,
-                    metadata =
-                        Metadata(
-                            recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                            id = id,
-                            dataOrigin = insertedRecord.metadata.dataOrigin
-                        )
+                    metadata = Metadata.manualEntryWithId(id = id)
                 )
             )
         )
@@ -346,7 +334,7 @@ class HealthConnectClientUpsideDownImplTest {
                         startZoneOffset = ZoneOffset.UTC,
                         endTime = START_TIME + 1.minutes,
                         endZoneOffset = ZoneOffset.UTC,
-                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                        metadata = Metadata.manualEntry(),
                     )
                 )
             )
@@ -373,7 +361,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 5,
@@ -381,7 +369,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 3.minutes,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
             )
         )
@@ -408,7 +396,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 30.seconds,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 5,
@@ -416,14 +404,14 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes + 30.seconds,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 HeartRateRecord(
                     startTime = START_TIME,
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 30.seconds,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                     samples =
                         listOf(
                             HeartRateRecord.Sample(START_TIME, 57L),
@@ -435,7 +423,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes + 30.seconds,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                     samples =
                         listOf(
                             HeartRateRecord.Sample(START_TIME + 1.minutes, 47L),
@@ -447,13 +435,13 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                     energy = Energy.kilocalories(200.0)
                 ),
                 WeightRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                     weight = Mass.kilograms(100.0)
                 ),
             )
@@ -537,13 +525,13 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                     transFat = 0.5.grams
                 ),
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 )
@@ -588,7 +576,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 10.seconds,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 2,
@@ -596,7 +584,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 25.seconds,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 5,
@@ -604,7 +592,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes,
                     endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 )
             )
         )
@@ -637,7 +625,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 5.minutes,
                     endZoneOffset = ZONE_OFFSET,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 200,
@@ -645,7 +633,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 30.minutes,
                     endZoneOffset = ZONE_OFFSET,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 50,
@@ -653,7 +641,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 1.days + 10.minutes,
                     endZoneOffset = ZONE_OFFSET,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 )
             )
         )
@@ -688,7 +676,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME - 40.days + 5.minutes,
                     endZoneOffset = ZONE_OFFSET,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 200,
@@ -696,7 +684,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME - 40.days + 30.minutes,
                     endZoneOffset = ZONE_OFFSET,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 ),
                 StepsRecord(
                     count = 50,
@@ -704,7 +692,7 @@ class HealthConnectClientUpsideDownImplTest {
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 10.minutes,
                     endZoneOffset = ZONE_OFFSET,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                    metadata = Metadata.manualEntry(),
                 )
             )
         )
@@ -794,7 +782,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = ZoneOffset.UTC,
                             endTime = START_TIME + 5.minutes,
                             endZoneOffset = ZoneOffset.UTC,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                         )
                     )
                 )
@@ -827,7 +815,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = ZONE_OFFSET,
                             endTime = START_TIME + 10.minutes,
                             endZoneOffset = ZONE_OFFSET,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                             calcium = Mass.grams(15.0),
                             monounsaturatedFat = Mass.grams(50.0),
                             energy = Energy.calories(300.0)
@@ -856,7 +844,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = ZONE_OFFSET,
                             endTime = START_TIME + 10.minutes,
                             endZoneOffset = ZONE_OFFSET,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                             calcium = Mass.grams(0.0),
                             monounsaturatedFat = Mass.grams(0.0),
                             energy = Energy.calories(0.0)
@@ -885,7 +873,7 @@ class HealthConnectClientUpsideDownImplTest {
                             startZoneOffset = ZONE_OFFSET,
                             endTime = START_TIME + 10.minutes,
                             endZoneOffset = ZONE_OFFSET,
-                            metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                            metadata = Metadata.manualEntry(),
                         )
                     )
                 )
