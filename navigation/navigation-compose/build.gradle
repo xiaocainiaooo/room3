@@ -41,6 +41,7 @@ dependencies {
     implementation("androidx.annotation:annotation:1.8.0")
     implementation("androidx.compose.animation:animation-core:1.7.2")
     implementation("androidx.compose.foundation:foundation-layout:1.7.2")
+    implementation("androidx.collection:collection-ktx:1.4.5")
     implementation("androidx.lifecycle:lifecycle-common:2.8.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.2")
@@ -49,7 +50,6 @@ dependencies {
     implementation(libs.kotlinSerializationCore)
 
     androidTestImplementation("androidx.activity:activity:1.9.2")
-    androidTestImplementation("androidx.collection:collection-ktx:1.4.2")
     androidTestImplementation("androidx.core:core-ktx:1.13.0")
     androidTestImplementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.2")
     androidTestImplementation("androidx.lifecycle:lifecycle-runtime:2.8.2")
