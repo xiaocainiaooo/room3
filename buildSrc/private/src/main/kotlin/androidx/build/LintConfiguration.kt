@@ -307,6 +307,8 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
         fatal.add("UastImplementation") // go/hide-uast-impl
         fatal.add("KotlincFE10") // b/239982263
 
+        disable.add("RequiresWindowSdk") // temporarily disable this check due to downstream diff
+
         val lintXmlPath =
             if (extension.type == SoftwareType.SAMPLES) {
                 "buildSrc/lint_samples.xml"
