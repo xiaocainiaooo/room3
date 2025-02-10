@@ -146,128 +146,6 @@ class SwipeToRevealTest {
     }
 
     @Test
-    fun noStateChanged_onBelowMinimumRevealingThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.Covered,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.39f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined
-                    // in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            }
-        )
-    }
-
-    @Test
-    fun stateToRevealing_onMinimumRevealingThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.RightRevealing,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.4f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined
-                    // in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            }
-        )
-    }
-
-    @Test
-    fun stateToRevealing_onBelowMinimumRevealedThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.RightRevealing,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.74f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined
-                    // in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            }
-        )
-    }
-
-    @Test
-    fun stateToRevealed_onMinimumRevealedThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.RightRevealed,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.75f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined
-                    // in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            }
-        )
-    }
-
-    @Test
-    fun noStateChanged_customThresholdAndRatio_onBelowMinimumRevealingThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.Covered,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.13f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            },
-            revealingAnchor = 0.25f,
-            positionalThreshold = { totalDistance -> totalDistance * 0.35f },
-        )
-    }
-
-    @Test
-    fun stateToRevealing_customThresholdAndRatio_onMinimumRevealingThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.RightRevealing,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.14f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            },
-            revealingAnchor = 0.25f,
-            positionalThreshold = { totalDistance -> totalDistance * 0.35f },
-        )
-    }
-
-    @Test
-    fun stateToRevealed_customThresholdAndRatio_onMinimumRevealedThresholdSwipeLeft() {
-        verifyGesture(
-            revealValue = RevealValue.RightRevealed,
-            gesture = {
-                swipeLeft(
-                    startX = width * 0.40f,
-                    endX = 0f,
-                    // Long duration in order to not perform faster than the velocity threshold
-                    // defined in SwipeableV2Defaults.VelocityThreshold
-                    durationMillis = 2000L
-                )
-            },
-            revealingAnchor = 0.25f,
-            positionalThreshold = { totalDistance -> totalDistance * 0.35f },
-        )
-    }
-
-    @Test
     fun stateToIconsVisible_onPartialSwipeLeft() {
         verifyGesture(
             revealValue = RevealValue.RightRevealing,
@@ -584,21 +462,11 @@ class SwipeToRevealTest {
         gesture: TouchInjectionScope.() -> Unit,
         onFullSwipe: () -> Unit = {},
         revealDirection: RevealDirection = RevealDirection.RightToLeft,
-        revealingAnchor: Float = SwipeToRevealDefaults.revealingRatio,
-        positionalThreshold: (totalDistance: Float) -> Float =
-            SwipeToRevealDefaults.positionalThreshold
     ) {
         lateinit var revealState: RevealState
         rule.setContent {
             revealState =
-                rememberRevealState(
-                    positionalThreshold = positionalThreshold,
-                    anchors =
-                        createAnchors(
-                            revealingAnchor = revealingAnchor,
-                            revealDirection = revealDirection
-                        )
-                )
+                rememberRevealState(anchors = createAnchors(revealDirection = revealDirection))
             swipeToRevealWithDefaults(
                 state = revealState,
                 onFullSwipe = onFullSwipe,
