@@ -609,6 +609,15 @@ internal constructor(
     public fun contentDeepHashCode(): Int
 
     /**
+     * Returns a string representation of the contents of this [SavedState] as if it is a [List].
+     * Nested [SavedState] are treated as lists too.
+     *
+     * If any of [SavedState] contains itself on any nesting level that reference is rendered as
+     * `"[...]"` to prevent recursion.
+     */
+    public fun contentDeepToString(): String
+
+    /**
      * Returns a new [Map] containing all key-value pairs from the [SavedState].
      *
      * The returned [Map] does not preserve the entry iteration order of the [SavedState].

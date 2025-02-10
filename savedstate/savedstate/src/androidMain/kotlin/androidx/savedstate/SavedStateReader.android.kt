@@ -566,6 +566,8 @@ internal actual constructor(
 
     public actual fun contentDeepHashCode(): Int = source.contentDeepHashCode()
 
+    public actual fun contentDeepToString(): String = source.contentDeepToString()
+
     public actual fun toMap(): Map<String, Any?> {
         return buildMap(capacity = source.size()) {
             for (key in source.keySet()) {
@@ -636,4 +638,51 @@ private fun SavedState.contentDeepHashCode(): Int {
     }
 
     return result
+}
+
+private fun SavedState.contentDeepToString(): String {
+    // in order not to overflow Int.MAX_VALUE
+    val length = size().coerceAtMost((Int.MAX_VALUE - 2) / 5) * 5 + 2
+    return buildString(length) { contentDeepToStringInternal(this, mutableListOf()) }
+}
+
+private fun SavedState.contentDeepToStringInternal(
+    result: StringBuilder,
+    processed: MutableList<SavedState>,
+) {
+    if (this in processed) {
+        result.append("[...]")
+        return
+    }
+    processed += this
+    result.append('[')
+
+    for ((i, k) in keySet().withIndex()) {
+        if (i != 0) {
+            result.append(", ")
+        }
+        result.append("$k=")
+        when (@Suppress("DEPRECATION") val element = this[k]) {
+            null -> result.append("null")
+            // container types
+            is SavedState -> element.contentDeepToStringInternal(result, processed)
+            is Array<*> -> result.append(element.contentDeepToString())
+
+            // primitive arrays
+            is ByteArray -> result.append(element.contentToString())
+            is ShortArray -> result.append(element.contentToString())
+            is IntArray -> result.append(element.contentToString())
+            is LongArray -> result.append(element.contentToString())
+            is FloatArray -> result.append(element.contentToString())
+            is DoubleArray -> result.append(element.contentToString())
+            is CharArray -> result.append(element.contentToString())
+            is BooleanArray -> result.append(element.contentToString())
+
+            // if nothing else works
+            else -> result.append(element.toString())
+        }
+    }
+
+    result.append(']')
+    processed.removeAt(processed.lastIndex)
 }
