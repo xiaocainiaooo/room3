@@ -30,6 +30,12 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"គ្មាន​ការកំណត់​កូដ PIN លំនាំ ឬពាក្យសម្ងាត់​ទេ។"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"ឧបករណ៍នេះ​មិនអាចប្រើកូដ PIN លំនាំ ឬពាក្យ​សម្ងាត់បានទេ។"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"រូបស្នាមម្រាមដៃ"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
+    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
+    <skip />
+    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ប្រើស្នាមម្រាមដៃ"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ប្រើមុខ"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ប្រើ​ជីវមាត្រ"</string>
@@ -44,4 +50,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ប្រើការចាក់សោអេក្រង់ ឬស្នាមម្រាមដៃរបស់អ្នក ដើម្បីបន្ត"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ប្រើការចាក់សោអេក្រង់ ឬមុខរបស់អ្នក ដើម្បីបន្ត"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ប្រើការចាក់សោអេក្រង់ ឬជីវមាត្ររបស់អ្នក ដើម្បីបន្ត"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"តម្រូវឱ្យមានជីវមាត្រ ដើម្បីបន្ត"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ការត្រួតពិនិត្យអត្តសញ្ញាណត្រូវបានបើក និងតម្រូវឱ្យមានជីវមាត្រ ប៉ុន្តែមិនអាចប្រើសេនស័រចាប់ស្នាមម្រាមដៃ ឬមុខរបស់អ្នកបានទេ\n"<ul><li>"ពិនិត្យមើលថាកាមេរ៉ារបស់អ្នកត្រូវបានបើក រួចព្យាយាមម្ដងទៀត"</li>\n<li>"អ្នកអាចបិទការត្រួតពិនិត្យអត្តសញ្ញាណដោយប្រើគណនី Google របស់អ្នក"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ការពិនិត្យអត្តសញ្ញាណត្រូវបានបើក និងមិនអាចផ្ទៀងផ្ទាត់ថាជាអ្នកបានទេ"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ជីវមាត្រមិនបានសម្រេចច្រើនដងពេក។ សូមចាក់សោ រួចដោះសោឧបករណ៍របស់អ្នក ដើម្បីព្យាយាមម្ដងទៀត។"</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"អ្នកអាចគ្រប់គ្រងការត្រួតពិនិត្យអត្តសញ្ញាណនៅក្នុងការកំណត់ការការពារចោរលួច។ ចូលទៅការកំណត់"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"ចាក់​សោ​អេក្រង់"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ចូលទៅការកំណត់"</string>
+    <string name="common_ok" msgid="7266105758672679693">"យល់ព្រម"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"បោះបង់"</string>
 </resources>
