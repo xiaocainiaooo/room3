@@ -237,6 +237,71 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun contentDeepToString_isEmpty_returnsEmptyBrackets() {
+        val savedState = savedState()
+        assertThat(savedState.read { contentDeepToString() }).isEqualTo("[]")
+    }
+
+    @Test
+    fun contentDeepToString_hasPrimitiveValues_returnsFormattedString() {
+        val savedState = savedState {
+            putInt("intKey", 42)
+            putString("stringKey", "Hello")
+            putBoolean("boolKey", true)
+        }
+        val expected = "[intKey=42, stringKey=Hello, boolKey=true]"
+        assertThat(savedState.read { contentDeepToString() }).isEqualTo(expected)
+    }
+
+    @Test
+    fun contentDeepToString_hasArrayValues_returnsFormattedArrayString() {
+        val savedState = savedState {
+            putStringArray("stringArray", arrayOf("A", "B", "C"))
+            putIntArray("intArray", intArrayOf(1, 2, 3))
+        }
+        val expected = "[stringArray=[A, B, C], intArray=[1, 2, 3]]"
+        assertThat(savedState.read { contentDeepToString() }).isEqualTo(expected)
+    }
+
+    @Test
+    fun contentDeepToString_hasNestedSavedState_returnsFormattedNestedString() {
+        val savedState = savedState {
+            putSavedState("nested", savedState { putString("nestedKey", "NestedValue") })
+        }
+        val expected = "[nested=[nestedKey=NestedValue]]"
+        assertThat(savedState.read { contentDeepToString() }).isEqualTo(expected)
+    }
+
+    @Test
+    fun contentDeepToString_hasNullValues_returnsStringWithNull() {
+        val savedState = savedState { putNull("nullKey") }
+        val expected = "[nullKey=null]"
+        assertThat(savedState.read { contentDeepToString() }).isEqualTo(expected)
+    }
+
+    @Test
+    fun contentDeepToString_hasSameContent_returnsEqualStrings() {
+        val state1 = createDefaultSavedState()
+        val state2 = createDefaultSavedState()
+
+        val toString1 = state1.read { contentDeepToString() }
+        val toString2 = state2.read { contentDeepToString() }
+
+        assertThat(toString1).isEqualTo(toString2)
+    }
+
+    @Test
+    fun contentDeepToString_hasDifferentContent_returnsDifferentStrings() {
+        val state1 = savedState(createDefaultSavedState()) { putInt("id", 1) }
+        val state2 = savedState(createDefaultSavedState()) { putInt("id", 2) }
+
+        val toString1 = state1.read { contentDeepToString() }
+        val toString2 = state2.read { contentDeepToString() }
+
+        assertThat(toString1).isNotEqualTo(toString2)
+    }
+
+    @Test
     fun toMap() {
         val sharedState = savedState {
             putInt(KEY_1, Int.MIN_VALUE)
