@@ -25,31 +25,28 @@ import androidx.camera.integration.core.util.StressTestUtil.LARGE_STRESS_TEST_RE
 import androidx.camera.integration.core.util.StressTestUtil.VERIFICATION_TARGET_VIDEO_CAPTURE
 import androidx.camera.integration.core.util.StressTestUtil.assumeCameraSupportUseCaseCombination
 import androidx.camera.testing.impl.LabTestRule
-import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import androidx.testutils.RepeatRule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
-@LargeTest
-@RunWith(Parameterized::class)
-@SdkSuppress(minSdkVersion = 21)
-class VideoCaptureLifecycleStatusChangeStressTestBase(
+abstract class VideoCaptureLifecycleStatusChangeStressTestBase(
     implName: String,
     cameraConfig: CameraXConfig,
     cameraId: String
 ) : LifecycleStatusChangeStressTestBase(implName, cameraConfig, cameraId) {
+
+    protected abstract val enableStreamSharing: Boolean
 
     @LabTestRule.LabTestOnly
     @Test
     @RepeatRule.Repeat(times = LARGE_STRESS_TEST_REPEAT_COUNT)
     fun pauseResumeActivity_checkVideoCaptureInEachTime_withPreviewVideoCapture() {
         val useCaseCombination = BIND_PREVIEW or BIND_VIDEO_CAPTURE
+        assumeCameraSupportUseCaseCombination(camera, useCaseCombination, enableStreamSharing)
         pauseResumeActivity_checkOutput_repeatedly(
             cameraId,
             useCaseCombination,
-            VERIFICATION_TARGET_VIDEO_CAPTURE
+            VERIFICATION_TARGET_VIDEO_CAPTURE,
+            enableStreamSharing = enableStreamSharing
         )
     }
 
@@ -58,11 +55,12 @@ class VideoCaptureLifecycleStatusChangeStressTestBase(
     @RepeatRule.Repeat(times = LARGE_STRESS_TEST_REPEAT_COUNT)
     fun pauseResumeActivity_checkVideoCaptureInEachTime_withPreviewVideoCaptureImageCapture() {
         val useCaseCombination = BIND_PREVIEW or BIND_VIDEO_CAPTURE or BIND_IMAGE_CAPTURE
-        assumeCameraSupportUseCaseCombination(camera, useCaseCombination)
+        assumeCameraSupportUseCaseCombination(camera, useCaseCombination, enableStreamSharing)
         pauseResumeActivity_checkOutput_repeatedly(
             cameraId,
             useCaseCombination,
-            VERIFICATION_TARGET_VIDEO_CAPTURE
+            VERIFICATION_TARGET_VIDEO_CAPTURE,
+            enableStreamSharing = enableStreamSharing
         )
     }
 
@@ -71,11 +69,12 @@ class VideoCaptureLifecycleStatusChangeStressTestBase(
     @RepeatRule.Repeat(times = LARGE_STRESS_TEST_REPEAT_COUNT)
     fun pauseResumeActivity_checkVideoCaptureInEachTime_withPreviewVideoCaptureImageAnalysis() {
         val useCaseCombination = BIND_PREVIEW or BIND_VIDEO_CAPTURE or BIND_IMAGE_ANALYSIS
-        assumeCameraSupportUseCaseCombination(camera, useCaseCombination)
+        assumeCameraSupportUseCaseCombination(camera, useCaseCombination, enableStreamSharing)
         pauseResumeActivity_checkOutput_repeatedly(
             cameraId,
             useCaseCombination,
-            VERIFICATION_TARGET_VIDEO_CAPTURE
+            VERIFICATION_TARGET_VIDEO_CAPTURE,
+            enableStreamSharing = enableStreamSharing
         )
     }
 
@@ -84,10 +83,12 @@ class VideoCaptureLifecycleStatusChangeStressTestBase(
     @RepeatRule.Repeat(times = LARGE_STRESS_TEST_REPEAT_COUNT)
     fun checkVideoCapture_afterPauseResumeRepeatedly_withPreviewVideoCapture() {
         val useCaseCombination = BIND_PREVIEW or BIND_VIDEO_CAPTURE
+        assumeCameraSupportUseCaseCombination(camera, useCaseCombination, enableStreamSharing)
         pauseResumeActivityRepeatedly_thenCheckOutput(
             cameraId,
             useCaseCombination,
-            VERIFICATION_TARGET_VIDEO_CAPTURE
+            VERIFICATION_TARGET_VIDEO_CAPTURE,
+            enableStreamSharing = enableStreamSharing
         )
     }
 
@@ -96,11 +97,12 @@ class VideoCaptureLifecycleStatusChangeStressTestBase(
     @RepeatRule.Repeat(times = LARGE_STRESS_TEST_REPEAT_COUNT)
     fun checkVideoCapture_afterPauseResumeRepeatedly_withPreviewVideoCaptureImageCapture() {
         val useCaseCombination = BIND_PREVIEW or BIND_VIDEO_CAPTURE or BIND_IMAGE_CAPTURE
-        assumeCameraSupportUseCaseCombination(camera, useCaseCombination)
+        assumeCameraSupportUseCaseCombination(camera, useCaseCombination, enableStreamSharing)
         pauseResumeActivityRepeatedly_thenCheckOutput(
             cameraId,
             useCaseCombination,
-            VERIFICATION_TARGET_VIDEO_CAPTURE
+            VERIFICATION_TARGET_VIDEO_CAPTURE,
+            enableStreamSharing = enableStreamSharing
         )
     }
 
@@ -109,11 +111,12 @@ class VideoCaptureLifecycleStatusChangeStressTestBase(
     @RepeatRule.Repeat(times = LARGE_STRESS_TEST_REPEAT_COUNT)
     fun checkVideoCapture_afterPauseResumeRepeatedly_withPreviewVideoCaptureImageAnalysis() {
         val useCaseCombination = BIND_PREVIEW or BIND_VIDEO_CAPTURE or BIND_IMAGE_ANALYSIS
-        assumeCameraSupportUseCaseCombination(camera, useCaseCombination)
+        assumeCameraSupportUseCaseCombination(camera, useCaseCombination, enableStreamSharing)
         pauseResumeActivityRepeatedly_thenCheckOutput(
             cameraId,
             useCaseCombination,
-            VERIFICATION_TARGET_VIDEO_CAPTURE
+            VERIFICATION_TARGET_VIDEO_CAPTURE,
+            enableStreamSharing = enableStreamSharing
         )
     }
 }
