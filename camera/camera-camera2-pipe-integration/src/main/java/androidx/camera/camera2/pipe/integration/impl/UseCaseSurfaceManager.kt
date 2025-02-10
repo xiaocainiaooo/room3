@@ -56,7 +56,7 @@ constructor(
 
     private val lock = Any()
 
-    @GuardedBy("lock") private var setupDeferred: Deferred<Unit>? = null
+    @GuardedBy("lock") private var setupDeferred: Deferred<Boolean>? = null
 
     @GuardedBy("lock") private val activeSurfaceMap = mutableMapOf<Surface, DeferrableSurface>()
 
@@ -70,7 +70,7 @@ constructor(
         sessionConfigAdapter: SessionConfigAdapter,
         surfaceToStreamMap: Map<DeferrableSurface, StreamId>,
         timeoutMillis: Long = TIMEOUT_GET_SURFACE_IN_MS,
-    ): Deferred<Unit> =
+    ): Deferred<Boolean> =
         synchronized(lock) {
             check(setupDeferred == null) { "Surfaces should only be set up once!" }
             check(stopDeferred == null) { "Surfaces being setup after stopped!" }
@@ -85,7 +85,7 @@ constructor(
                 threads.scope.launch {
                     sessionConfigAdapter.reportSurfaceInvalid(e.deferrableSurface)
                 }
-                return@synchronized CompletableDeferred(Unit)
+                return@synchronized CompletableDeferred(false)
             }
 
             val deferred =
@@ -99,16 +99,16 @@ constructor(
                             } catch (e: SurfaceClosedException) {
                                 Log.error(e) { "Failed to get Surfaces: Surfaces closed" }
                                 sessionConfigAdapter.reportSurfaceInvalid(e.deferrableSurface)
-                                return@async
+                                return@async false
                             } catch (e: TimeoutCancellationException) {
                                 Log.error(e) { "Failed to get Surfaces within $timeoutMillis ms" }
-                                return@async
+                                return@async false
                             }
                         if (!isActive || surfaces.isEmpty()) {
                             Log.error {
                                 "Failed to get Surfaces: isActive=$isActive, surfaces=$surfaces"
                             }
-                            return@async
+                            return@async false
                         }
                         if (surfaces.areValid()) {
                             synchronized(lock) {
@@ -129,6 +129,7 @@ constructor(
                                 inactiveSurfaceCloser.configure(stream, it.key, graph)
                             }
                             Log.info { "Surface setup complete" }
+                            return@async true
                         } else {
                             Log.error { "Surface setup failed: Some Surfaces are invalid" }
                             // Only handle the first failed Surface since subsequent calls to
@@ -137,6 +138,7 @@ constructor(
                             sessionConfigAdapter.reportSurfaceInvalid(
                                 deferrableSurfaces[surfaces.indexOf(null)]
                             )
+                            return@async false
                         }
                     }
                     .apply {
@@ -194,13 +196,11 @@ constructor(
             }
 
         try {
-            setupDeferred.await()
+            return setupDeferred.await()
         } catch (e: CancellationException) {
             Log.warn(e) { "Surface setup was cancelled" }
             return false
         }
-
-        return !setupDeferred.isCancelled
     }
 
     override fun onSurfaceActive(surface: Surface) {
