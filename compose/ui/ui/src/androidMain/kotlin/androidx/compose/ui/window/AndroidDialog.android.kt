@@ -450,6 +450,22 @@ private class DialogWrapper(
         window.setBackgroundDrawableResource(android.R.color.transparent)
         WindowCompat.setDecorFitsSystemWindows(window, properties.decorFitsSystemWindows)
         window.setGravity(Gravity.CENTER)
+        // On VIC+, while targeting VIC+, edge-to-edge is enabled by default, allowing the
+        // Dialog to go into the space of status bars and navigation bars. On lower versions,
+        // we have to explicitly ask to use the insets area so we can draw under the status bars
+        // and navigation bars areas.
+        if (
+            !properties.decorFitsSystemWindows &&
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM ||
+                    context.applicationInfo.targetSdkVersion <
+                        Build.VERSION_CODES.VANILLA_ICE_CREAM)
+        ) {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+            )
+        }
 
         dialogLayout =
             DialogLayout(context, window).apply {
