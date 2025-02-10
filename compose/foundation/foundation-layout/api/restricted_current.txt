@@ -370,6 +370,7 @@ package androidx.compose.foundation.layout {
   }
 
   public final class WindowInsetsKt {
+    method public static androidx.compose.foundation.layout.WindowInsets WindowInsets();
     method public static androidx.compose.foundation.layout.WindowInsets WindowInsets(optional float left, optional float top, optional float right, optional float bottom);
     method public static androidx.compose.foundation.layout.WindowInsets WindowInsets(optional int left, optional int top, optional int right, optional int bottom);
     method public static androidx.compose.foundation.layout.WindowInsets add(androidx.compose.foundation.layout.WindowInsets, androidx.compose.foundation.layout.WindowInsets insets);
