@@ -79,6 +79,7 @@ class ChangesResponseConverterTest {
                     endTime = Instant.ofEpochMilli(5678L),
                     endZoneOffset = null,
                     metadata =
+                        @Suppress("DEPRECATION") // The constructor will become internal
                         Metadata(
                             id = "uid",
                             lastModifiedTime = Instant.ofEpochMilli(9999L),

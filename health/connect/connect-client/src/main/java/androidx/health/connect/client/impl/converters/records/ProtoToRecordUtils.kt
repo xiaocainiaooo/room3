@@ -97,6 +97,7 @@ internal fun SeriesValueOrBuilder.getEnum(key: String): String? = valuesMap[key]
 @get:SuppressWarnings("GoodTime") // Safe to use for deserialization
 internal val DataProto.DataPoint.metadata: Metadata
     get() =
+        @Suppress("DEPRECATION") // The constructor will become internal
         Metadata(
             id = if (hasUid()) uid else Metadata.EMPTY_ID,
             dataOrigin = DataOrigin(dataOrigin.applicationId),

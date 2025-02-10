@@ -40,6 +40,7 @@ class MetadataConvertersTest {
 
     fun metadata_convertToPlatform() {
         val metadata =
+            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 id = "someId",
                 dataOrigin = DataOrigin("origin package name"),
@@ -79,6 +80,7 @@ class MetadataConvertersTest {
     @Test
     fun metadata_convertToPlatform_noDevice() {
         val metadata =
+            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_UNKNOWN,
                 id = "someId",

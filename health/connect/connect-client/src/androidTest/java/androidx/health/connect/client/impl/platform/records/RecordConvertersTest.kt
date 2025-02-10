@@ -2312,6 +2312,7 @@ class RecordConvertersTest {
         val END_ZONE_OFFSET: ZoneOffset = ZoneOffset.ofHours(2)
 
         val METADATA =
+            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_UNKNOWN,
                 id = "someId",

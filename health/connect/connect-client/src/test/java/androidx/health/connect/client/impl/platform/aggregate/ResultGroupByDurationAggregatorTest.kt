@@ -40,6 +40,7 @@ import org.junit.runner.RunWith
 
 @SuppressLint("NewApi")
 @RunWith(AndroidJUnit4::class)
+@Suppress("DEPRECATION") // The constructor will become internal
 class ResultGroupByDurationAggregatorTest {
 
     @Test

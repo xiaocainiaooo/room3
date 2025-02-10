@@ -39,9 +39,10 @@ import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.StepsRecord.Companion.COUNT_TOTAL
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
+import androidx.health.connect.client.records.metadata.Device
+import androidx.health.connect.client.records.metadata.DeviceTypes
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.records.metadata.Metadata.Companion.RECORDING_METHOD_MANUAL_ENTRY
-import androidx.health.connect.client.records.metadata.Metadata.Companion.RECORDING_METHOD_UNKNOWN
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
@@ -309,7 +310,7 @@ class HealthConnectClientImplTest {
                         endTime = Instant.ofEpochMilli(5678L),
                         endZoneOffset = null,
                         metadata =
-                            Metadata(recordingMethod = Metadata.RECORDING_METHOD_ACTIVELY_RECORDED)
+                            Metadata.activelyRecorded(device = Device(type = Device.TYPE_UNKNOWN)),
                     )
                 )
             )
@@ -324,6 +325,7 @@ class HealthConnectClientImplTest {
                     .putValues("count", DataProto.Value.newBuilder().setLongVal(100).build())
                     .setDataType(DataProto.DataType.newBuilder().setName("Steps"))
                     .setRecordingMethod(Metadata.RECORDING_METHOD_ACTIVELY_RECORDED)
+                    .setDevice(DataProto.Device.newBuilder().setType(DeviceTypes.UNKNOWN).build())
                     .build()
             )
     }
@@ -339,7 +341,7 @@ class HealthConnectClientImplTest {
                         weight = 45.8.kilograms,
                         time = Instant.ofEpochMilli(1234L),
                         zoneOffset = null,
-                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                        metadata = Metadata.manualEntry(),
                     )
                 )
             )
@@ -371,7 +373,7 @@ class HealthConnectClientImplTest {
                         startZoneOffset = null,
                         endTime = Instant.ofEpochMilli(5678L),
                         endZoneOffset = null,
-                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
+                        metadata = Metadata.manualEntry(),
                     )
                 )
             )
@@ -439,7 +441,7 @@ class HealthConnectClientImplTest {
                     startZoneOffset = null,
                     endTime = Instant.ofEpochMilli(5678L),
                     endZoneOffset = null,
-                    metadata = Metadata(recordingMethod = RECORDING_METHOD_UNKNOWN, id = "testUid")
+                    metadata = Metadata.unknownRecordingMethodWithId(id = "testUid")
                 )
             )
     }
@@ -455,6 +457,9 @@ class HealthConnectClientImplTest {
                             .setStartTimeMillis(1234L)
                             .setEndTimeMillis(5678L)
                             .setRecordingMethod(Metadata.RECORDING_METHOD_ACTIVELY_RECORDED)
+                            .setDevice(
+                                DataProto.Device.newBuilder().setType(DeviceTypes.UNKNOWN).build()
+                            )
                             .putValues(
                                 "count",
                                 DataProto.Value.newBuilder().setLongVal(100).build()
@@ -494,10 +499,10 @@ class HealthConnectClientImplTest {
                     endTime = Instant.ofEpochMilli(5678L),
                     endZoneOffset = null,
                     metadata =
-                        Metadata(
+                        Metadata.activelyRecordedWithId(
                             id = "testUid",
-                            recordingMethod = Metadata.RECORDING_METHOD_ACTIVELY_RECORDED,
-                        )
+                            device = Device(type = Device.TYPE_UNKNOWN),
+                        ),
                 )
             )
     }
@@ -558,8 +563,7 @@ class HealthConnectClientImplTest {
                         startZoneOffset = null,
                         endTime = Instant.ofEpochMilli(5678L),
                         endZoneOffset = null,
-                        metadata =
-                            Metadata(recordingMethod = RECORDING_METHOD_UNKNOWN, id = "testUid")
+                        metadata = Metadata.unknownRecordingMethodWithId(id = "testUid"),
                     )
                 )
             )
