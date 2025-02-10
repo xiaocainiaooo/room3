@@ -19,746 +19,584 @@ import kotlin.collections.Map
 public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINT_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINT_PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 7,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINT_INTPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "intParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINT_PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val INTPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "intParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINT_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINT_INTPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      INTPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONG_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONG_PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 6,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONG_LONGPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "longParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONG_PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val LONGPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "longParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONG_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONG_LONGPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      LONGPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOAT_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOAT_PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 5,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata
+        = AppFunctionPrimitiveTypeMetadata(
+            type = 5,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOAT_FLOATPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "floatParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOAT_PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val FLOATPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "floatParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOAT_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOAT_FLOATPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      FLOATPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLE_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLE_PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 4,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata
+        = AppFunctionPrimitiveTypeMetadata(
+            type = 4,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLE_DOUBLEPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "doubleParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLE_PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val DOUBLEPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "doubleParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLE_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLE_DOUBLEPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      DOUBLEPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEAN_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEAN_PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 1,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 1,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEAN_BOOLEANPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "booleanParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEAN_PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val BOOLEANPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "booleanParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEAN_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEAN_BOOLEANPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      BOOLEANPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRING_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRING_PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 8,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata
+        = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRING_STRINGPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "stringParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRING_PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val STRINGPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "stringParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRING_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRING_STRINGPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      STRINGPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINT_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINT_PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 7,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINT_INTPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "intParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINT_PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val INTPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "intParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_INTPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINT_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINT_INTPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      INTPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONG_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONG_PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 6,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONG_LONGPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "longParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONG_PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val LONGPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "longParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_LONGPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONG_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONG_LONGPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      LONGPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOAT_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOAT_PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 5,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata
+        = AppFunctionPrimitiveTypeMetadata(
+            type = 5,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOAT_FLOATPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "floatParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOAT_PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val FLOATPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "floatParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_FLOATPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOAT_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOAT_FLOATPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      FLOATPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLE_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLE_PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 4,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata
+        = AppFunctionPrimitiveTypeMetadata(
+            type = 4,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLE_DOUBLEPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "doubleParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLE_PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val DOUBLEPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "doubleParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_DOUBLEPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLE_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLE_DOUBLEPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      DOUBLEPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEAN_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEAN_PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 1,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 1,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEAN_BOOLEANPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "booleanParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEAN_PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val BOOLEANPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "booleanParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_BOOLEANPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEAN_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEAN_BOOLEANPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      BOOLEANPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRING_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRING_PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 8,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata
+        = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRING_STRINGPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "stringParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRING_PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE
-      )
+    private val STRINGPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "stringParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_STRINGPARAM_PRIMITIVE_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRING_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRING_STRINGPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      STRINGPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 7,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_INTARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "intArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val INTARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "intArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONINTARRAY_INTARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      INTARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 6,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_LONGARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "longArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val LONGARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "longArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONLONGARRAY_LONGARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      LONGARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 5,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 5,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_FLOATARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "floatArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val FLOATARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "floatArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONFLOATARRAY_FLOATARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      FLOATARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 4,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 4,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_DOUBLEARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "doubleArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val DOUBLEARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "doubleArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONDOUBLEARRAY_DOUBLEARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      DOUBLEARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 1,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 1,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_BOOLEANARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "booleanArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val BOOLEANARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "booleanArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONBOOLEANARRAY_BOOLEANARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      BOOLEANARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringListMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 8,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_STRINGLISTPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "stringListParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE
-      )
+    private val STRINGLISTPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "stringListParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONSTRINGLIST_STRINGLISTPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      STRINGLISTPARAM_PARAMETER_METADATA,
     )
   }
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 7,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_INTARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "intArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val INTARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "intArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_INTARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEINTARRAY_INTARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      INTARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongArrayMetadataObject
+      {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 6,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_LONGARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "longArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val LONGARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "longArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLELONGARRAY_LONGARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      LONGARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject
+      {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 5,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 5,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_FLOATARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "floatArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val FLOATARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "floatArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEFLOATARRAY_FLOATARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      FLOATARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object
+      ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 4,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 4,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_DOUBLEARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "doubleArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val DOUBLEARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "doubleArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEDOUBLEARRAY_DOUBLEARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      DOUBLEARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object
+      ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanArrayMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 1,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 1,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_BOOLEANARRAYPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "booleanArrayParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE
-      )
+    private val BOOLEANARRAYPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "booleanArrayParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLEBOOLEANARRAY_BOOLEANARRAYPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      BOOLEANARRAYPARAM_PARAMETER_METADATA,
     )
   }
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_SCHEMA_METADATA:
-      AppFunctionSchemaMetadata? = null
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject
+      {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
-      AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-          type = 8,
-          isNullable = false
-      )
+    private val PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE:
-      AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-          itemType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
-          isNullable = true
-      )
+    private val PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = true
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_STRINGLISTPARAM_PARAMETER_METADATA:
-      AppFunctionParameterMetadata = AppFunctionParameterMetadata(
-          name = "stringListParam",
-          isRequired = true,
-          dataType =
-          COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE
-      )
+    private val STRINGLISTPARAM_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "stringListParam",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE
+        )
 
-  private
-      val COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
-    add(
-      COM_TESTDATA_ALLPRIMITIVEINPUTFUNCTIONS_SIMPLEFUNCTIONNULLABLESTRINGLIST_STRINGLISTPARAM_PARAMETER_METADATA
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      STRINGLISTPARAM_PARAMETER_METADATA,
     )
   }
 }
