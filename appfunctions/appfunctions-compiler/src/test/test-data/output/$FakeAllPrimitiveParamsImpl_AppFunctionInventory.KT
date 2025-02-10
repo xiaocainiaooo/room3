@@ -5,6 +5,7 @@ import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
@@ -110,6 +111,16 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
       ARG5_PARAMETER_METADATA,
       ARG6_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveArrayParamsMetadataObject {
@@ -278,5 +289,15 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
       ARG7_PARAMETER_METADATA,
       ARG8_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 }
