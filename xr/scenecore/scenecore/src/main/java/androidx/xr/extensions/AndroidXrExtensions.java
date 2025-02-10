@@ -62,6 +62,38 @@ import java.util.concurrent.Executor;
 class AndroidXrExtensions implements XrExtensions {
     @NonNull private final com.android.extensions.xr.XrExtensions mExtensions;
 
+    /**
+     * Creates a new Consumer that accepts a platform type P, which calls through to a library type
+     * Consumer's accept method. A transformation is applied such that the returned object is
+     * essentially a bridge between a pair of Consumers for platform and library types.
+     *
+     * <p>This approach is necessary because the platform's
+     * com.android.extensions.xr.function.Consumer interface is not available at compile-time for
+     * clients, so any lambda-based platform Consumer implementation in the SDK code will be
+     * stripped by Proguard / R8.
+     *
+     * <p>"Platform types" are types which are defined in the platform layer, and "library types"
+     * are types which are defined in the library (SDK) layer.
+     */
+    private static <P, L> com.android.extensions.xr.function.Consumer<P> createPlatformConsumer(
+            Consumer<L> libraryConsumer, Transformer<P, L> transformer) {
+        return new com.android.extensions.xr.function.Consumer<P>() {
+            @Override
+            public void accept(P platformObj) {
+                libraryConsumer.accept(transformer.transform(platformObj));
+            }
+        };
+    }
+
+    /**
+     * Functional interface used as an argument for createPlatformConsumer, to transform a platform
+     * library type to one that can be consumed by the library Consumer.
+     */
+    @FunctionalInterface
+    private interface Transformer<P, L> {
+        L transform(P platformObj);
+    }
+
     AndroidXrExtensions(@NonNull com.android.extensions.xr.XrExtensions extensions) {
         requireNonNull(extensions);
         mExtensions = extensions;
@@ -178,9 +210,7 @@ class AndroidXrExtensions implements XrExtensions {
                 activity,
                 NodeTypeConverter.toFramework(sceneNode),
                 NodeTypeConverter.toFramework(windowNode),
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -197,9 +227,7 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         mExtensions.detachSpatialScene(
                 activity,
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -220,9 +248,7 @@ class AndroidXrExtensions implements XrExtensions {
                 activity,
                 width,
                 height,
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -249,9 +275,7 @@ class AndroidXrExtensions implements XrExtensions {
         mExtensions.attachSpatialEnvironment(
                 activity,
                 NodeTypeConverter.toFramework(environmentNode),
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -268,9 +292,7 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         mExtensions.detachSpatialEnvironment(
                 activity,
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -282,9 +304,7 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         mExtensions.setSpatialStateCallbackDeprecated(
                 activity,
-                /* callback= */ (event) -> {
-                    callback.accept(SpaceTypeConverter.toLibrary(event));
-                },
+                createPlatformConsumer(callback, event -> SpaceTypeConverter.toLibrary(event)),
                 executor);
     }
 
@@ -295,9 +315,7 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         mExtensions.setSpatialStateCallback(
                 activity,
-                /* callback= */ (state) -> {
-                    callback.accept(SpaceTypeConverter.toLibrary(state));
-                },
+                createPlatformConsumer(callback, state -> SpaceTypeConverter.toLibrary(state)),
                 executor);
     }
 
@@ -342,9 +360,7 @@ class AndroidXrExtensions implements XrExtensions {
         mExtensions.requestFullSpaceMode(
                 activity,
                 requestEnter,
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -381,9 +397,7 @@ class AndroidXrExtensions implements XrExtensions {
                 activity,
                 NodeTypeConverter.toFramework(origin),
                 NodeTypeConverter.toFramework(direction),
-                /* callback= */ (result) -> {
-                    callback.accept(SpaceTypeConverter.toLibrary(result));
-                },
+                createPlatformConsumer(callback, result -> SpaceTypeConverter.toLibrary(result)),
                 executor);
     }
 
@@ -397,8 +411,8 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Consumer<ReformEvent> callback, @NonNull Executor executor) {
         return NodeTypeConverter.toLibrary(
                 mExtensions.createReformOptions(
-                        /* callback= */ (event) ->
-                                callback.accept(NodeTypeConverter.toLibrary(event)),
+                        createPlatformConsumer(
+                                callback, event -> NodeTypeConverter.toLibrary(event)),
                         executor));
     }
 
@@ -432,9 +446,7 @@ class AndroidXrExtensions implements XrExtensions {
         mExtensions.setPreferredAspectRatio(
                 activity,
                 preferredRatio,
-                /* callback= */ (result) -> {
-                    callback.accept(new XrExtensionResultImpl(result));
-                },
+                createPlatformConsumer(callback, result -> new XrExtensionResultImpl(result)),
                 executor);
     }
 
@@ -446,9 +458,8 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         mExtensions.getSpatialCapabilities(
                 activity,
-                /* callback= */ (capabilities) -> {
-                    callback.accept(SpaceTypeConverter.toLibrary(capabilities));
-                },
+                createPlatformConsumer(
+                        callback, capabilities -> SpaceTypeConverter.toLibrary(capabilities)),
                 executor);
     }
 
@@ -460,9 +471,7 @@ class AndroidXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         mExtensions.getBounds(
                 activity,
-                /* callback= */ (bounds) -> {
-                    callback.accept(SpaceTypeConverter.toLibrary(bounds));
-                },
+                createPlatformConsumer(callback, bounds -> SpaceTypeConverter.toLibrary(bounds)),
                 executor);
     }
 
