@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -51,6 +50,7 @@ import androidx.wear.compose.foundation.LocalReduceMotion
 import androidx.wear.compose.foundation.ScrollInfoProvider
 import androidx.wear.compose.foundation.pager.HorizontalPager
 import androidx.wear.compose.foundation.pager.PagerDefaults
+import androidx.wear.compose.foundation.pager.PagerScope
 import androidx.wear.compose.foundation.pager.PagerState
 import androidx.wear.compose.foundation.pager.VerticalPager
 import androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior
