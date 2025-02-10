@@ -203,50 +203,56 @@ public object IconToggleButtonDefaults {
             max(SmallIconSize, buttonSize / 2f)
         }
 
-    /** Creates a [IconToggleButtonShapes] with a static [shape]. */
-    @Composable public fun shapes(): IconToggleButtonShapes = MaterialTheme.shapes.defaultShapes
+    /** Returns the default [IconToggleButtonShapes] for a static [IconToggleButton]. */
+    @Composable
+    public fun shapes(): IconToggleButtonShapes = MaterialTheme.shapes.defaultIconToggleButtonShapes
 
     /**
-     * Creates a [IconToggleButtonShapes] with a static [shape].
+     * Returns an [IconToggleButtonShapes] for an [IconToggleButton] with a static shape.
      *
      * @param shape The normal shape of the IconToggleButton.
      */
     @Composable
-    public fun shapes(shape: Shape? = null): IconToggleButtonShapes =
-        MaterialTheme.shapes.defaultShapes.copy(uncheckedShape = shape)
+    public fun shapes(shape: Shape): IconToggleButtonShapes =
+        MaterialTheme.shapes.defaultIconToggleButtonShapes.copy(uncheckedShape = shape)
 
     /**
-     * Creates a [Shape] with a animation between two CornerBasedShapes.
+     * Returns the default [IconToggleButtonShapes] with an animation between two CornerBasedShapes
+     * when pressed.
      *
      * A simple icon toggle button using the default colors, animated when pressed.
      *
      * @sample androidx.wear.compose.material3.samples.IconToggleButtonSample
      */
     @Composable
-    public fun animatedShapes(): IconToggleButtonShapes = MaterialTheme.shapes.defaultAnimatedShapes
+    public fun animatedShapes(): IconToggleButtonShapes =
+        MaterialTheme.shapes.defaultIconToggleButtonAnimatedShapes
 
     /**
-     * Creates a [Shape] with a animation between two CornerBasedShapes.
+     * Returns an [IconToggleButtonShapes] for an [IconToggleButton] with an animation between two
+     * CornerBasedShapes.
      *
      * A simple icon toggle button using the default colors, animated when pressed.
      *
      * @sample androidx.wear.compose.material3.samples.IconToggleButtonSample
-     * @param shape The normal shape of the IconToggleButton.
-     * @param pressedShape The pressed shape of the IconToggleButton.
+     * @param shape The normal shape of the IconToggleButton when unpressed - if null, the default
+     *   [IconToggleButtonDefaults.shape] is used.
+     * @param pressedShape The pressed shape of the IconToggleButton - if null, the default
+     *   [IconToggleButtonDefaults.pressedShape] is used.
      */
     @Composable
     public fun animatedShapes(
         shape: CornerBasedShape? = null,
         pressedShape: CornerBasedShape? = null,
     ): IconToggleButtonShapes =
-        MaterialTheme.shapes.defaultAnimatedShapes.copy(
+        MaterialTheme.shapes.defaultIconToggleButtonAnimatedShapes.copy(
             uncheckedShape = shape,
             uncheckedPressedShape = pressedShape
         )
 
     /**
-     * Creates a [Shape] with an animation between three [CornerSize]s based on the pressed state
-     * and checked/unchecked.
+     * Returns the default [IconToggleButtonShapes] with an animation between three [CornerSize]s
+     * based on the pressed state and checked/unchecked.
      *
      * A simple icon toggle button using the default colors, animated on Press and Check/Uncheck:
      *
@@ -257,14 +263,16 @@ public object IconToggleButtonDefaults {
         MaterialTheme.shapes.defaultVariantAnimatedShapes
 
     /**
-     * Creates a [Shape] with an animation between three [CornerSize]s based on the pressed state
-     * and checked/unchecked.
+     * Returns an [IconToggleButtonShapes] with an animation between three [CornerSize]s based on
+     * the pressed state and checked/unchecked.
      *
      * A simple icon toggle button using the default colors, animated on Press and Check/Uncheck:
      *
      * @sample androidx.wear.compose.material3.samples.IconToggleButtonVariantSample
-     * @param uncheckedShape the unchecked shape.
-     * @param checkedShape the checked shape.
+     * @param uncheckedShape the unchecked shape - if null, the default
+     *   [IconToggleButtonDefaults.shape] is used.
+     * @param checkedShape the checked shape - if null, the default
+     *   [IconToggleButtonDefaults.checkedShape] is used.
      */
     @Composable
     public fun variantAnimatedShapes(
@@ -281,7 +289,7 @@ public object IconToggleButtonDefaults {
         )
 
     /**
-     * Creates an [IconToggleButtonColors] for a [IconToggleButton]
+     * Returns an [IconToggleButtonColors] for a [IconToggleButton]
      * - by default, a colored background with a contrasting content color.
      *
      * If the button is disabled, then the colors will have an alpha ([DisabledContentAlpha] and
@@ -292,7 +300,7 @@ public object IconToggleButtonDefaults {
         MaterialTheme.colorScheme.defaultIconToggleButtonColors
 
     /**
-     * Creates a [IconToggleButtonColors] for a [IconToggleButton]
+     * Returns an [IconToggleButtonColors] for a [IconToggleButton]
      * - by default, a colored background with a contrasting content color.
      *
      * If the button is disabled, then the colors will have an alpha ([DisabledContentAlpha] and
@@ -337,7 +345,7 @@ public object IconToggleButtonDefaults {
             disabledUncheckedContentColor = disabledUncheckedContentColor,
         )
 
-    internal val Shapes.defaultShapes: IconToggleButtonShapes
+    internal val Shapes.defaultIconToggleButtonShapes: IconToggleButtonShapes
         @Composable
         get() {
             return defaultIconToggleButtonShapesCached
@@ -346,7 +354,7 @@ public object IconToggleButtonDefaults {
                 }
         }
 
-    internal val Shapes.defaultAnimatedShapes: IconToggleButtonShapes
+    internal val Shapes.defaultIconToggleButtonAnimatedShapes: IconToggleButtonShapes
         @Composable
         get() {
             return defaultIconToggleButtonAnimatedShapesCached
@@ -578,9 +586,9 @@ public class IconToggleButtonColors(
  */
 public class IconToggleButtonShapes(
     public val uncheckedShape: Shape,
-    public val checkedShape: Shape? = null,
-    public val uncheckedPressedShape: Shape? = null,
-    public val checkedPressedShape: Shape? = uncheckedPressedShape
+    public val checkedShape: Shape = uncheckedShape,
+    public val uncheckedPressedShape: Shape = uncheckedShape,
+    public val checkedPressedShape: Shape = uncheckedPressedShape
 ) {
     public fun copy(
         uncheckedShape: Shape? = this.uncheckedShape,
