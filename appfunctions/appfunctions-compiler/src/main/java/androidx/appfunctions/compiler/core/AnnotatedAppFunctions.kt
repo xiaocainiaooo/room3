@@ -166,16 +166,16 @@ data class AnnotatedAppFunctions(
         appFunctionDeclarations.map { functionDeclaration ->
             val appFunctionAnnotationProperties =
                 computeAppFunctionAnnotationProperties(functionDeclaration)
-            val parameterObjectTypeMetadata = functionDeclaration.buildParameterTypeMetadata()
-            val responseObjectTypeMetadata =
+            val parameterTypeMetadataList = functionDeclaration.buildParameterTypeMetadataList()
+            val responseTypeMetadata =
                 checkNotNull(functionDeclaration.returnType).buildResponseObjectTypeMetadata()
 
             AppFunctionMetadata(
                 id = getAppFunctionIdentifier(functionDeclaration),
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
                 schema = appFunctionAnnotationProperties.toAppFunctionSchemaMetadata(),
-                parameters = parameterObjectTypeMetadata,
-                response = AppFunctionResponseMetadata(valueType = responseObjectTypeMetadata)
+                parameters = parameterTypeMetadataList,
+                response = AppFunctionResponseMetadata(valueType = responseTypeMetadata)
             )
         }
 
@@ -193,7 +193,7 @@ data class AnnotatedAppFunctions(
      *
      * Currently, only primitive parameters are supported.
      */
-    private fun KSFunctionDeclaration.buildParameterTypeMetadata():
+    private fun KSFunctionDeclaration.buildParameterTypeMetadataList():
         List<AppFunctionParameterMetadata> = buildList {
         for (ksValueParameter in parameters) {
             if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
@@ -225,6 +225,7 @@ data class AnnotatedAppFunctions(
                     type = typeName.toAppFunctionDataType(),
                     isNullable = isNullable
                 )
+            // TODO: Support array of @AppFunctionSerializable as well
             in SUPPORTED_ARRAY_PRIMITIVE_TYPES,
             in SUPPORTED_COLLECTION_TYPES, ->
                 AppFunctionArrayTypeMetadata(
