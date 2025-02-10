@@ -132,6 +132,14 @@ internal constructor(
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
 
+    @get:Suppress("GetterSetterNames")
+    override val lastScrolledForward: Boolean
+        get() = scrollableState.lastScrolledForward
+
+    @get:Suppress("GetterSetterNames")
+    override val lastScrolledBackward: Boolean
+        get() = scrollableState.lastScrolledBackward
+
     override fun dispatchRawDelta(delta: Float): Float = scrollableState.dispatchRawDelta(delta)
 
     override suspend fun scroll(
