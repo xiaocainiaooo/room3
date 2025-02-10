@@ -10,9 +10,16 @@ package androidx.savedstate.compose {
 
 package androidx.savedstate.compose.serialization.serializers {
 
+  public final class MutableStateSerializer<T> implements kotlinx.serialization.KSerializer<androidx.compose.runtime.MutableState<T>> {
+    ctor public MutableStateSerializer(kotlinx.serialization.KSerializer<T> valueSerializer);
+    method public androidx.compose.runtime.MutableState<T> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, androidx.compose.runtime.MutableState<T> value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
+  }
+
   public final class MutableStateSerializerKt {
-    method public static inline <reified T> kotlinx.serialization.KSerializer<androidx.compose.runtime.MutableState<T>> MutableStateSerializer();
-    method public static <T> kotlinx.serialization.KSerializer<androidx.compose.runtime.MutableState<T>> MutableStateSerializer(kotlinx.serialization.KSerializer<T> serializer);
+    method public static inline <reified T> androidx.savedstate.compose.serialization.serializers.MutableStateSerializer<T> MutableStateSerializer();
   }
 
 }
