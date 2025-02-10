@@ -54,6 +54,17 @@ class MutableStateSerializerTest {
         assertThat(state.value).isEqualTo(decoded.value)
     }
 
+    @Test
+    fun encodeDecode_formatSpecificRepresentationShouldWork() {
+        val state = mutableStateOf(listOf(1, 2, 3))
+        val serializer = MutableStateSerializer<List<Int>>()
+
+        val encoded = encodeToSavedState(serializer, state)
+        val decoded = decodeFromSavedState(serializer, encoded)
+
+        assertThat(state.value).isEqualTo(decoded.value)
+    }
+
     companion object {
         val USER_JOHN_DOE = User(name = "John", surname = "Doe")
         @OptIn(InternalSerializationApi::class) val USER_SERIALIZER = User::class.serializer()

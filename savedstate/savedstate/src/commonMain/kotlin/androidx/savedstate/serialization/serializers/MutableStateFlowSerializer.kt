@@ -20,6 +20,7 @@ package androidx.savedstate.serialization.serializers
 
 import kotlin.experimental.ExperimentalTypeInference
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -70,8 +71,9 @@ public fun <T> MutableStateFlowSerializer(
 private class MutableStateFlowSerializerImpl<T>(
     private val valueSerializer: KSerializer<T>,
 ) : KSerializer<MutableStateFlow<T>> {
-
-    override val descriptor: SerialDescriptor = valueSerializer.descriptor
+    @OptIn(ExperimentalSerializationApi::class)
+    override val descriptor: SerialDescriptor =
+        SerialDescriptor("kotlinx.coroutines.flow.MutableStateFlow", valueSerializer.descriptor)
 
     override fun serialize(encoder: Encoder, value: MutableStateFlow<T>) {
         valueSerializer.serialize(encoder, value.value)
