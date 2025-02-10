@@ -17,10 +17,10 @@ import kotlin.collections.Map
 public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 
-  private val COM_TESTDATA_SIMPLEFUNCTION_SIMPLEFUNCTION_SCHEMA_METADATA: AppFunctionSchemaMetadata?
-      = null
+  private object ComTestdataSimpleFunctionSimpleFunctionMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-  private val COM_TESTDATA_SIMPLEFUNCTION_SIMPLEFUNCTION_PARAMETER_METADATA_LIST:
-      List<AppFunctionParameterMetadata> = buildList{
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+    )
   }
 }
