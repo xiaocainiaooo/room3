@@ -257,7 +257,6 @@ data class AnnotatedAppFunctions(
             Double::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
             Boolean::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
             Unit::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_UNIT
-            ByteArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BYTES
             in SUPPORTED_ARRAY_PRIMITIVE_TYPES,
             in SUPPORTED_COLLECTION_TYPES, -> AppFunctionDataTypeMetadata.TYPE_ARRAY
             else -> TODO("Support AppFunctionSerializable types")
@@ -270,6 +269,7 @@ data class AnnotatedAppFunctions(
             FloatArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_FLOAT
             DoubleArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
             BooleanArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+            ByteArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BYTES
             STRING_LIST_TYPE -> AppFunctionDataTypeMetadata.TYPE_STRING
             BYTE_ARRAY_LIST_TYPE -> AppFunctionDataTypeMetadata.TYPE_BYTES
             else -> TODO("Support Lists AppFunctionSerializable types")
@@ -413,6 +413,7 @@ data class AnnotatedAppFunctions(
                 FloatArray::class.ensureQualifiedName(),
                 DoubleArray::class.ensureQualifiedName(),
                 BooleanArray::class.ensureQualifiedName(),
+                ByteArray::class.ensureQualifiedName(),
             )
 
         internal val SUPPORTED_SINGLE_PRIMITIVE_TYPES =
@@ -423,7 +424,6 @@ data class AnnotatedAppFunctions(
                 Double::class.ensureQualifiedName(),
                 Boolean::class.ensureQualifiedName(),
                 String::class.ensureQualifiedName(),
-                ByteArray::class.ensureQualifiedName(),
                 Unit::class.ensureQualifiedName(),
             )
 

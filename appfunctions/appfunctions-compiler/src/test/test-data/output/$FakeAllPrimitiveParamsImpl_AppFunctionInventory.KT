@@ -102,19 +102,6 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
             dataType = PARAMETER_METADATA_ARG6_PRIMITIVE_DATA_TYPE
         )
 
-    private val PARAMETER_METADATA_ARG7_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata =
-        AppFunctionPrimitiveTypeMetadata(
-            type = 2,
-            isNullable = false
-        )
-
-    private val ARG7_PARAMETER_METADATA: AppFunctionParameterMetadata =
-        AppFunctionParameterMetadata(
-            name = "arg7",
-            isRequired = true,
-            dataType = PARAMETER_METADATA_ARG7_PRIMITIVE_DATA_TYPE
-        )
-
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       ARG1_PARAMETER_METADATA,
       ARG2_PARAMETER_METADATA,
@@ -122,7 +109,6 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
       ARG4_PARAMETER_METADATA,
       ARG5_PARAMETER_METADATA,
       ARG6_PARAMETER_METADATA,
-      ARG7_PARAMETER_METADATA,
     )
   }
 
@@ -263,6 +249,25 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
             dataType = PARAMETER_METADATA_ARG7_ARRAY_DATA_TYPE
         )
 
+    private val PARAMETER_METADATA_ARG8_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 2,
+            isNullable = false
+        )
+
+    private val PARAMETER_METADATA_ARG8_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_ARG8_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
+
+    private val ARG8_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "arg8",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_ARG8_ARRAY_DATA_TYPE
+        )
+
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       ARG1_PARAMETER_METADATA,
       ARG2_PARAMETER_METADATA,
@@ -271,6 +276,7 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
       ARG5_PARAMETER_METADATA,
       ARG6_PARAMETER_METADATA,
       ARG7_PARAMETER_METADATA,
+      ARG8_PARAMETER_METADATA,
     )
   }
 }

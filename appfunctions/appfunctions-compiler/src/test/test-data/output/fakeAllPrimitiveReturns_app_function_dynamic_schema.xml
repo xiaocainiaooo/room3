@@ -33,7 +33,12 @@
             <valueType>
                 <id>unused</id>
                 <isNullable>false</isNullable>
-                <type>2</type>
+                <itemType>
+                    <id>unused</id>
+                    <isNullable>false</isNullable>
+                    <type>2</type>
+                </itemType>
+                <type>10</type>
             </valueType>
         </response>
         <schema>
@@ -187,7 +192,12 @@
             <valueType>
                 <id>unused</id>
                 <isNullable>true</isNullable>
-                <type>2</type>
+                <itemType>
+                    <id>unused</id>
+                    <isNullable>false</isNullable>
+                    <type>2</type>
+                </itemType>
+                <type>10</type>
             </valueType>
         </response>
         <schema>
