@@ -67,11 +67,13 @@ import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.request.ReadRecordsRequest.Companion.DEDUPLICATION_STRATEGY_DISABLED
 import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
+import androidx.health.connect.client.response.ReadMedicalResourcesResponse
 import androidx.health.connect.client.response.ReadRecordResponse
 import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -406,6 +408,32 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                     }
                 }
                 .map { it.toSdkMedicalResource() }
+        }
+
+    @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
+    override suspend fun readMedicalResources(
+        request: ReadMedicalResourcesRequest
+    ): ReadMedicalResourcesResponse =
+        withPhrFeatureCheckSuspend(
+            this::class,
+            "readMedicalResources(request: ReadMedicalResourcesRequest)"
+        ) {
+            wrapPlatformException {
+                    suspendCancellableCoroutine { continuation ->
+                        healthConnectManager.readMedicalResources(
+                            request.platformReadMedicalResourcesRequest,
+                            executor,
+                            continuation.asOutcomeReceiver()
+                        )
+                    }
+                }
+                .let { platformResponse ->
+                    ReadMedicalResourcesResponse(
+                        platformResponse.medicalResources.map { it.toSdkMedicalResource() },
+                        platformResponse.nextPageToken,
+                        platformResponse.remainingCount
+                    )
+                }
         }
 
     @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)

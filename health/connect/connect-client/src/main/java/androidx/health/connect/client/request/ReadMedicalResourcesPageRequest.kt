@@ -16,11 +16,16 @@
 
 package androidx.health.connect.client.request
 
+import android.annotation.SuppressLint
 import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.withPhrFeatureCheck
+import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesPageRequestBuilder
+import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesRequest
 import androidx.health.connect.client.records.MedicalResource
+import androidx.health.connect.client.records.toString
 import androidx.health.connect.client.request.ReadMedicalResourcesRequest.Companion.DEFAULT_PAGE_SIZE
 import androidx.health.connect.client.response.ReadMedicalResourcesResponse
 
@@ -46,5 +51,35 @@ import androidx.health.connect.client.response.ReadMedicalResourcesResponse
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ReadMedicalResourcesPageRequest(val pageToken: String, pageSize: Int = DEFAULT_PAGE_SIZE) :
     ReadMedicalResourcesRequest(pageSize) {
-    // TODO: b/382682197 - The rest of this class & tests will be filled in a subsequent CL
+
+    @SuppressLint("NewApi") // already checked with a feature availability check
+    override val platformReadMedicalResourcesRequest: PlatformReadMedicalResourcesRequest =
+        withPhrFeatureCheck(this::class) {
+            PlatformReadMedicalResourcesPageRequestBuilder(pageToken).setPageSize(pageSize).build()
+        }
+
+    override fun toString(): String =
+        toString(
+            this,
+            mapOf(
+                "pageToken" to pageToken,
+                "pageSize" to pageSize,
+            )
+        )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ReadMedicalResourcesPageRequest) return false
+        if (!super.equals(other)) return false
+
+        if (pageToken != other.pageToken) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + pageToken.hashCode()
+        return result
+    }
 }

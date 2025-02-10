@@ -20,6 +20,7 @@ import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesRequest
 import androidx.health.connect.client.records.MedicalResource
 
 /**
@@ -35,6 +36,21 @@ import androidx.health.connect.client.records.MedicalResource
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 abstract class ReadMedicalResourcesRequest internal constructor(val pageSize: Int) {
+    internal abstract val platformReadMedicalResourcesRequest: PlatformReadMedicalResourcesRequest
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ReadMedicalResourcesRequest) return false
+
+        if (pageSize != other.pageSize) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return pageSize
+    }
+
     companion object {
         /** Default value for [ReadMedicalResourcesRequest.pageSize]. */
         const val DEFAULT_PAGE_SIZE = 1000
