@@ -32,7 +32,6 @@ import androidx.benchmark.json.BenchmarkData.TestResult.ProfilerOutput
 import androidx.benchmark.perfetto.StackSamplingConfig
 import androidx.benchmark.simpleperf.ProfileSession
 import androidx.benchmark.simpleperf.RecordOptions
-import androidx.benchmark.traceprocessor.TraceProcessor
 import androidx.benchmark.vmtrace.ArtTrace
 import java.io.File
 import java.io.FileOutputStream
@@ -277,41 +276,6 @@ internal object MethodTracing : Profiler() {
     override fun embedInPerfettoTrace(profilerTrace: File, perfettoTrace: File) {
         ArtTrace(profilerTrace)
             .writeAsPerfettoTrace(FileOutputStream(perfettoTrace, /* append= */ true))
-    }
-
-    fun queryMetrics(session: TraceProcessor.Session): List<MetricResult> {
-        // NOTE: This query assumes that method trace only wraps a single measurement iteration
-        val row =
-            session
-                .query(
-                    """
-                    CREATE OR REPLACE PERFETTO FUNCTION is_unmeasured(slice_id INT)
-                        RETURNS INT AS
-                        SELECT MIN(1, COUNT(*))
-                        FROM ancestor_slice(${'$'}slice_id)
-                        WHERE
-                          NAME = '${ArtTrace.RUN_WITH_MEASUREMENT_DISABLED_FULLNAME}' OR
-                          NAME = 'java.lang.invoke.MethodType.makeImpl: (Ljava/lang/Class;[Ljava/lang/Class;Z)Ljava/lang/invoke/MethodType;';
-
-                    SELECT COUNT(*) as methodCount, is_unmeasured from (
-                      SELECT
-                        name,
-                        is_unmeasured(slice.id) AS is_unmeasured
-                      FROM slice
-                      WHERE track_id like (
-                        SELECT id FROM track WHERE name LIKE 'Instr:%(Method Trace)' OR name = 'main (Method Trace)'
-                      )
-                      AND is_unmeasured = false
-                    ) GROUP BY is_unmeasured
-                """
-                        .trimIndent()
-                )
-                .firstOrNull()
-        return if (row != null) {
-            listOf(MetricResult("methodCount", data = listOf(row.long("methodCount").toDouble())))
-        } else {
-            emptyList()
-        }
     }
 
     var hasBeenUsed: Boolean = false
