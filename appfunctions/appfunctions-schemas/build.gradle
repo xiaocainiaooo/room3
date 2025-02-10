@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The Android Open Source Project
+ * Copyright (C) 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,39 +21,27 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
-import androidx.build.KotlinTarget
 import androidx.build.SoftwareType
 
 plugins {
     id("AndroidXPlugin")
-    id("kotlin")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
 }
-
-androidx.configureAarAsJarForConfiguration("testImplementation")
 
 dependencies {
     api(libs.kotlinStdlib)
-    implementation(libs.kspApi)
-    implementation(libs.kotlinPoet)
-
-    testImplementationAarAsJar(project(":appfunctions:appfunctions-runtime"))
-    testImplementation(libs.googleCompileTesting)
-    testImplementation(project(":room:room-compiler-processing-testing"))
-    testImplementation(libs.junit)
-    testImplementation(libs.truth)
+    // Add dependencies here
 }
 
-def testGeneratedSourcesPath = "${layout.buildDirectory.get().asFile}/testGeneratedSources"
-tasks.withType(Test).configureEach { test ->
-    test.doFirst {
-        systemProperty("test_output_dir", testGeneratedSourcesPath)
-    }
+android {
+    compileSdk = 35
+    namespace = "androidx.appfunctions.schemas"
 }
 
 androidx {
-    name = "androidx.appfunctions:appfunctions-app-compiler"
-    type = SoftwareType.ANNOTATION_PROCESSOR
-    inceptionYear = "2024"
-    description = "AppFunction App Compiler"
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    name = "androidx.appfunctions:appfunctions-schemas"
+    type = SoftwareType.PUBLISHED_LIBRARY
+    inceptionYear = "2025"
+    description = "Provide pre-defined schema for imlpementing AppFunctions."
 }
