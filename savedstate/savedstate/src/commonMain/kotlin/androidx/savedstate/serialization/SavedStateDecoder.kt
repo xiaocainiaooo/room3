@@ -43,8 +43,7 @@ public fun <T : Any> decodeFromSavedState(
     deserializer: DeserializationStrategy<T>,
     savedState: SavedState
 ): T {
-    return SavedStateDecoder(savedState, SavedStateConfig.DEFAULT)
-        .decodeSerializableValue(deserializer)
+    return decodeFromSavedState(deserializer, savedState, SavedStateConfig.DEFAULT)
 }
 
 /**
