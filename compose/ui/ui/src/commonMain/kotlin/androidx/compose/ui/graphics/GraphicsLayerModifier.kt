@@ -251,7 +251,8 @@ fun Modifier.graphicsLayer(
         ReplaceWith(
             "Modifier.graphicsLayer(scaleX, scaleY, alpha, translationX, translationY, " +
                 "shadowElevation, rotationX, rotationY, rotationZ, cameraDistance, transformOrigin, " +
-                "shape, clip, null, DefaultShadowColor, DefaultShadowColor, CompositingStrategy.Auto)",
+                "shape, clip, renderEffect, ambientShadowColor, spotShadowColor, " +
+                "CompositingStrategy.Auto)",
             "androidx.compose.ui.graphics"
         ),
     level = DeprecationLevel.HIDDEN
@@ -348,6 +349,18 @@ fun Modifier.graphicsLayer(
  * @param spotShadowColor see [GraphicsLayerScope.spotShadowColor]
  * @param compositingStrategy see [GraphicsLayerScope.compositingStrategy]
  */
+@Deprecated(
+    "Replace with graphicsLayer that consumes a blend mode and a color filter",
+    replaceWith =
+        ReplaceWith(
+            "Modifier.graphicsLayer(scaleX, scaleY, alpha, translationX, translationY, " +
+                "shadowElevation, rotationX, rotationY, rotationZ, cameraDistance, transformOrigin, " +
+                "shape, clip, renderEffect, ambientShadowColor, spotShadowColor, " +
+                "compositingStrategy, BlendMode.SrcOver, null)",
+            "androidx.compose.ui.graphics"
+        ),
+    level = DeprecationLevel.HIDDEN
+)
 @Stable
 fun Modifier.graphicsLayer(
     scaleX: Float = 1f,
