@@ -102,6 +102,7 @@ abstract class BaseRoomConnectionManager {
     private fun configureDatabase(connection: SQLiteConnection) {
         configureJournalMode(connection)
         configureSynchronousFlag(connection)
+        configureBusyTimeout(connection)
         val version =
             connection.prepare("PRAGMA user_version").use { statement ->
                 statement.step()
