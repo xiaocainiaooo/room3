@@ -30,6 +30,12 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"ບໍ່ໄດ້ຕັ້ງ PIN, ຮູບແບບປົດລັອກ ຫຼື ລະຫັດຜ່ານ."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"ອຸປະກອນນີ້ບໍ່ຮອງຮັບ PIN, ຮູບແບບ ຫຼື ລະຫັດຜ່ານ."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ໄອຄອນລາຍນິ້ວມື"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
+    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
+    <skip />
+    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ໃຊ້ລາຍນິ້ວມື"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ໃຊ້ໜ້າ"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ໃຊ້ລະບົບຊີວະມິຕິ"</string>
@@ -44,4 +50,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ໃຊ້ລາຍນິ້ວມື ຫຼື ການລັອກໜ້າຈໍຂອງທ່ານເພື່ອດຳເນີນການຕໍ່"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ໃຊ້ໜ້າ ຫຼື ການລັອກໜ້າຈໍຂອງທ່ານເພື່ອດຳເນີນການຕໍ່"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ໃຊ້ລະບົບຊີວະມິຕິ ຫຼື ການລັອກໜ້າຈໍຂອງທ່ານເພື່ອດຳເນີນການຕໍ່"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"ຕ້ອງໃຊ້ລະບົບຊີວະມິຕິເພື່ອສືບຕໍ່"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ການກວດສອບຕົວຕົນເປີດຢູ່ ແລະ ຕ້ອງໃຊ້ລະບົບຊີວະມິຕິ, ແຕ່ເຊັນເຊີໃບໜ້າ ຫຼື ເຊັນເຊີລາຍນິ້ວມືຂອງທ່ານບໍ່ພ້ອມໃຫ້ນຳໃຊ້\n"<ul><li>"ກວດສອບວ່າກ້ອງເປີດຢູ່ ແລ້ວລອງໃໝ່"</li>\n<li>"ທ່ານສາມາດປິດການກວດສອບຕົວຕົນໄດ້ໂດຍໃຊ້ບັນຊີ Google ຂອງທ່ານ"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ການກວດສອບຕົວຕົນເປີດຢູ່ ແລະ ບໍ່ສາມາດຢັ້ງຢືນວ່າແມ່ນທ່ານໄດ້"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ກວດສອບລະບົບຊີວະມິຕິບໍ່ຜ່ານຫຼາຍເທື່ອເກີນໄປ. ກະລຸນາລັອກ ແລະ ປົດລັອກອຸປະກອນຂອງທ່ານເພື່ອລອງໃໝ່."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"ທ່ານສາມາດຈັດການການກວດສອບຕົວຕົນໄດ້ໃນການຕັ້ງຄ່າການປົກປ້ອງຈາກການລັກ. ເຂົ້າໄປການຕັ້ງຄ່າ"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"ໜ້າຈໍລັອກ"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ເຂົ້າໄປການຕັ້ງຄ່າ"</string>
+    <string name="common_ok" msgid="7266105758672679693">"ຕົກລົງ"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"ຍົກເລີກ"</string>
 </resources>
