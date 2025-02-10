@@ -43,7 +43,8 @@ import kotlinx.serialization.encoding.Encoder
  */
 @OptIn(ExperimentalSerializationApi::class)
 public class SavedStateSerializer : KSerializer<SavedState> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SavedState")
+    override val descriptor: SerialDescriptor =
+        buildClassSerialDescriptor("androidx.savedstate.SavedState")
 
     override fun serialize(encoder: Encoder, value: SavedState) {
         require(encoder is SavedStateEncoder) {
