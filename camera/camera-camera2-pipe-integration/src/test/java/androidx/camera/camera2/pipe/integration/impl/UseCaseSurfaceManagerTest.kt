@@ -293,6 +293,31 @@ class UseCaseSurfaceManagerTest {
     }
 
     @Test
+    fun awaitSetupCompletion_returnsFalseWhenSurfaceSetupWithNullSurface() = runBlocking {
+        // Arrange
+        val testDeferrableSurface = NullProvidingDeferrableSurface()
+        val fakeTestUseCase = createFakeTestUseCase(testDeferrableSurface)
+
+        val fakeGraph = FakeCameraGraph()
+        val deferrableSurfaceToStreamId: Map<DeferrableSurface, StreamId> =
+            mapOf(testDeferrableSurface to StreamId(0))
+        val useCaseSurfaceManager =
+            createUseCaseSurfaceManager(listOf(fakeTestUseCase)).apply {
+                setupAsync(
+                        graph = fakeGraph,
+                        sessionConfigAdapter =
+                            SessionConfigAdapter(useCases = listOf(fakeTestUseCase)),
+                        surfaceToStreamMap = deferrableSurfaceToStreamId,
+                        timeoutMillis = TimeUnit.SECONDS.toMillis(1)
+                    )
+                    .await()
+            }
+
+        // Act & Assert
+        assertThat(useCaseSurfaceManager.awaitSetupCompletion()).isFalse()
+    }
+
+    @Test
     fun awaitSetupCompletion_returnsFalseWhenStoppedAfterSuccessfulSurfaceSetup() = runBlocking {
         // Arrange
         val testDeferrableSurface = createTestDeferrableSurface()
@@ -436,7 +461,7 @@ class UseCaseSurfaceManagerTest {
         useCases: List<UseCase>,
         surfaceToStreamMap: Map<DeferrableSurface, StreamId>,
         graph: CameraGraph = FakeCameraGraph(),
-    ): Deferred<Unit> {
+    ): Deferred<Boolean> {
         return createUseCaseSurfaceManager(useCases)
             .setupAsync(
                 graph = graph,
@@ -460,6 +485,14 @@ class UseCaseSurfaceManagerTest {
         fun cleanUp() {
             close()
             provideSurfaceDeferred.cancel()
+        }
+    }
+
+    class NullProvidingDeferrableSurface : DeferrableSurface() {
+        val provideSurfaceDeferred = CompletableDeferred<Surface>(null)
+
+        override fun provideSurface(): ListenableFuture<Surface> {
+            return provideSurfaceDeferred.asListenableFuture()
         }
     }
 
