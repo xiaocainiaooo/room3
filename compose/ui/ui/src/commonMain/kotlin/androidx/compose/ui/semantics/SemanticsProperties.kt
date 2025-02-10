@@ -449,15 +449,17 @@ private fun <T> throwSemanticsGetNotSupported(): T {
     )
 }
 
-internal fun <T> AccessibilityKey(name: String) =
+@Suppress("NOTHING_TO_INLINE")
+// inline to avoid different static initialization order on different targets.
+// See https://youtrack.jetbrains.com/issue/KT-65040 for more information.
+internal inline fun <T> AccessibilityKey(name: String) =
     SemanticsPropertyKey<T>(name = name, isImportantForAccessibility = true)
 
-internal fun <T> AccessibilityKey(name: String, mergePolicy: (T?, T) -> T?) =
-    SemanticsPropertyKey<T>(
-        name = name,
-        isImportantForAccessibility = true,
-        mergePolicy = mergePolicy
-    )
+@Suppress("NOTHING_TO_INLINE")
+// inline to avoid different static initialization order on different targets
+// See https://youtrack.jetbrains.com/issue/KT-65040 for more information.
+internal inline fun <T> AccessibilityKey(name: String, noinline mergePolicy: (T?, T) -> T?) =
+    SemanticsPropertyKey(name = name, isImportantForAccessibility = true, mergePolicy = mergePolicy)
 
 /**
  * Standard accessibility action.
