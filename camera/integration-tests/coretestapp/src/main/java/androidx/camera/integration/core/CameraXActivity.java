@@ -122,6 +122,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureCapabilities;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
+import androidx.camera.core.LowLightBoostState;
 import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
 import androidx.camera.core.TorchState;
@@ -383,6 +384,7 @@ public class CameraXActivity extends AppCompatActivity {
     private Toast mEvToast = null;
     private Toast mPSToast = null;
     private ToggleButton mPreviewStabilizationToggle;
+    private ToggleButton mLowLightBoostToggle;
 
     private OpenGLRenderer mPreviewRenderer;
     private DisplayManager.DisplayListener mDisplayListener;
@@ -396,6 +398,7 @@ public class CameraXActivity extends AppCompatActivity {
     private final Set<DynamicRange> mSelectableDynamicRanges = new HashSet<>();
     private int mVideoMirrorMode = MIRROR_MODE_ON_FRONT_ONLY;
     private boolean mIsPreviewStabilizationOn = false;
+    private boolean mIsLowLightBoostOn = false;
     private Range<Integer> mFpsRange = FPS_UNSPECIFIED;
     private boolean mForceEnableStreamSharing;
     private boolean mDisableViewPort;
@@ -1312,6 +1315,7 @@ public class CameraXActivity extends AppCompatActivity {
             mButtonImageOutputFormat.setVisibility(View.GONE);
             mRecordUi.hideUi();
             mPreviewStabilizationToggle.setVisibility(View.GONE);
+            mLowLightBoostToggle.setVisibility(View.GONE);
             if (!testCase.equals(SWITCH_TEST_CASE)) {
                 mCameraDirectionButton.setVisibility(View.GONE);
             }
@@ -1384,6 +1388,8 @@ public class CameraXActivity extends AppCompatActivity {
         mCameraDirectionButton.setEnabled(getCameraInfo() != null);
         mPreviewStabilizationToggle.setEnabled(mCamera != null
                 && Preview.getPreviewCapabilities(getCameraInfo()).isStabilizationSupported());
+        mLowLightBoostToggle.setEnabled(
+                mCamera != null && mCamera.getCameraInfo().isLowLightBoostSupported());
         mTorchButton.setEnabled(isFlashUnitAvailable());
         // Flash button
         mFlashButton.setEnabled(isFlashAvailable());
@@ -1597,6 +1603,7 @@ public class CameraXActivity extends AppCompatActivity {
         mDecEV = findViewById(R.id.dec_ev_toggle);
         mZslToggle = findViewById(R.id.zsl_toggle);
         mPreviewStabilizationToggle = findViewById(R.id.preview_stabilization);
+        mLowLightBoostToggle = findViewById(R.id.low_light_boost);
         mZoomSeekBar = findViewById(R.id.seekBar);
         mZoomRatioLabel = findViewById(R.id.zoomRatio);
         mZoomIn2XToggle = findViewById(R.id.zoom_in_2x_toggle);
@@ -2207,6 +2214,7 @@ public class CameraXActivity extends AppCompatActivity {
         mCamera = mCameraProvider.bindToLifecycle(this, mCurrentCameraSelector,
                 useCaseGroupBuilder.build());
         setupZoomSeeker();
+        setUpLowLightBoostButton();
         return mCamera;
     }
 
@@ -2343,6 +2351,42 @@ public class CameraXActivity extends AppCompatActivity {
                 showPreviewStabilizationToast("Preview Stabilization On, FOV changes");
             }
             tryBindUseCases();
+        });
+    }
+
+    @SuppressWarnings("FutureReturnValueIgnored")
+    private void setUpLowLightBoostButton() {
+        mIsLowLightBoostOn = false;
+        mLowLightBoostToggle.setVisibility(
+                mCamera == null || !mCamera.getCameraInfo().isLowLightBoostSupported() ? View.GONE
+                        : View.VISIBLE);
+        if (mLowLightBoostToggle.hasOnClickListeners()) {
+            return;
+        }
+        mLowLightBoostToggle.setOnClickListener(v -> {
+            mIsLowLightBoostOn = !mIsLowLightBoostOn;
+            if (mCamera == null) {
+                return;
+            }
+            // Show the low-light boost state to the toggle button text for easy observation.
+            mCamera.getCameraInfo().getLowLightBoostState().observe(
+                    this,
+                    state -> {
+                        int resId;
+                        switch (state) {
+                            case LowLightBoostState.INACTIVE:
+                                resId = R.string.toggle_low_light_boost_inactive;
+                                break;
+                            case LowLightBoostState.ACTIVE:
+                                resId = R.string.toggle_low_light_boost_active;
+                                break;
+                            default:
+                                resId = R.string.toggle_low_light_boost_off;
+                        }
+                        mLowLightBoostToggle.setText(resId);
+                    }
+            );
+            mCamera.getCameraControl().enableLowLightBoostAsync(mIsLowLightBoostOn);
         });
     }
 
