@@ -197,6 +197,7 @@ fun CircularProgressIndicatorCustomAnimationSample() {
             Modifier.fillMaxSize().focusable().drawBehind {
                 drawCircularProgressIndicator(
                     progress = animatedProgress.value,
+                    targetProgress = animatedProgress.targetValue,
                     strokeWidth = 10.dp,
                     colors = colors,
                     startAngle = 120f,
