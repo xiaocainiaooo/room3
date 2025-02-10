@@ -630,7 +630,7 @@ package androidx.wear.compose.foundation.pager {
     method public int getBeyondViewportPageCount();
     method public androidx.compose.animation.core.AnimationSpec<java.lang.Float> getSnapAnimationSpec();
     method public float getSwipeToDismissEdgeZoneFraction();
-    method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.TargetedFlingBehavior snapFlingBehavior(androidx.wear.compose.foundation.pager.PagerState state, optional androidx.compose.foundation.pager.PagerSnapDistance pagerSnapDistance, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, optional @FloatRange(from=0.0, to=1.0) float snapPositionalThreshold);
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.TargetedFlingBehavior snapFlingBehavior(androidx.wear.compose.foundation.pager.PagerState state, optional int maxFlingPages, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, optional @FloatRange(from=0.0, to=1.0) float snapPositionalThreshold);
     property public int BeyondViewportPageCount;
     property public androidx.compose.animation.core.AnimationSpec<java.lang.Float> SnapAnimationSpec;
     property public float SwipeToDismissEdgeZoneFraction;
