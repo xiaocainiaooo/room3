@@ -232,6 +232,9 @@ public fun CircularProgressIndicator(
  * @param enabled controls the enabled state. Although this component is not clickable, it can be
  *   contained within a clickable component. When enabled is `false`, this component will appear
  *   visually disabled.
+ * @param targetProgress Target value if the progress value is to be animated. Used to determine if
+ *   small progress values should be capped to a minimum of stroke width. For a static progress
+ *   indicator this should be equal to progress.
  * @param allowProgressOverflow When progress overflow is allowed, values smaller than 0.0 will be
  *   coerced to 0, while values larger than 1.0 will be wrapped around and shown as overflow with a
  *   different track color [ProgressIndicatorColors.overflowTrackBrush]. For example values 1.2, 2.2
@@ -246,20 +249,17 @@ public fun CircularProgressIndicator(
  *   o'clock and 9 o'clock respectively. By default equal to [startAngle].
  * @param gapSize The size (in Dp) of the gap between the ends of the progress indicator and the
  *   track. The stroke endcaps are not included in this distance.
- * @param targetProgress Target value if the progress value is to be animated. Used to determine if
- *   small progress values should be capped to a minimum of stroke width. For a static progress
- *   indicator this should be equal to progress.
  */
 public fun DrawScope.drawCircularProgressIndicator(
     progress: Float,
     colors: ProgressIndicatorColors,
     strokeWidth: Dp,
     enabled: Boolean = true,
+    targetProgress: Float = progress,
     allowProgressOverflow: Boolean = false,
     startAngle: Float = CircularProgressIndicatorDefaults.StartAngle,
     endAngle: Float = startAngle,
     gapSize: Dp = CircularProgressIndicatorDefaults.calculateRecommendedGapSize(strokeWidth),
-    targetProgress: Float = progress,
 ) {
     val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
     val strokePx = strokeWidth.toPx()
