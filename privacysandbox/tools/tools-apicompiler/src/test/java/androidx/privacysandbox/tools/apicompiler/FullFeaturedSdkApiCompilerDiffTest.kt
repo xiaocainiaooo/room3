@@ -38,6 +38,7 @@ class FullFeaturedSdkApiCompilerDiffTest : AbstractApiCompilerDiffTest() {
             "com/mysdk/IBundleTransactionCallback.java",
             "com/mysdk/IMyUiInterfaceTransactionCallback.java",
             "com/mysdk/IMySecondInterfaceTransactionCallback.java",
+            "com/mysdk/IMySharedUiInterfaceTransactionCallback.java",
             "com/mysdk/ISdkActivityLauncherTransactionCallback.java",
             "com/mysdk/IResponseTransactionCallback.java",
             "com/mysdk/IStringTransactionCallback.java",

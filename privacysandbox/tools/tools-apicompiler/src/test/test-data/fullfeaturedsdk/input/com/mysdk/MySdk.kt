@@ -33,7 +33,11 @@ interface MySdk {
 
     suspend fun returnUiInterface(): MyUiInterface
 
+    suspend fun returnSharedUiInterface(): MySharedUiInterface
+
     fun acceptUiInterfaceParam(input: MyUiInterface)
+
+    fun acceptSharedUiInterfaceParam(input: MySharedUiInterface)
 
     fun acceptSdkActivityLauncherParam(activityLauncher: SdkActivityLauncher)
 
@@ -91,6 +95,7 @@ data class Request(
     val maybeValue: InnerValue?,
     val myInterface: MyInterface,
     val myUiInterface: MyUiInterface,
+    val mySharedUiInterface: MySharedUiInterface,
     val activityLauncher: SdkActivityLauncher,
     val flag: RequestFlag,
 )
@@ -110,6 +115,7 @@ data class Response(
     val mySecondInterface: MySecondInterface,
     val maybeOtherInterface: MySecondInterface,
     val myUiInterface: MyUiInterface,
+    val mySharedUiInterface: MySharedUiInterface,
 )
 
 @PrivacySandboxCallback
@@ -120,7 +126,7 @@ interface MyCallback {
 
     fun onCompleteInterface(myInterface: MyInterface)
 
-    fun onCompleteUiInterface(myUiInterface: MyUiInterface)
+    fun onCompleteUiInterface(myUiInterface: MyUiInterface, mySharedUiInterface: MySharedUiInterface)
 
     suspend fun returnAValueFromCallback(): Response
 }

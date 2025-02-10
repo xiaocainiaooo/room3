@@ -191,6 +191,7 @@ interface UiAdapterSpecs {
     val adapterPropertyName: String
     val adapterFactoryClass: ClassName
     val openSessionSpec: FunSpec
+    val toCoreLibInfoExpression: String
 
     companion object {
         val sandboxedUiAdapterSpecs =
@@ -232,6 +233,7 @@ interface UiAdapterSpecs {
                             contextPropertyName,
                         )
                     }
+                override val toCoreLibInfoExpression: String = "%toCoreLibInfo:M(%context:N)"
             }
         val sharedUiAdapterSpecs =
             object : UiAdapterSpecs {
@@ -259,6 +261,7 @@ interface UiAdapterSpecs {
                             "${adapterPropertyName}.openSession(clientExecutor, client)",
                         )
                     }
+                override val toCoreLibInfoExpression: String = "%toCoreLibInfo:M()"
             }
     }
 }
