@@ -61,10 +61,8 @@
     <string name="m3c_bottom_sheet_collapse_description" msgid="2988463736136100848">"Доод хүснэгтийг хураах"</string>
     <string name="m3c_bottom_sheet_dismiss_description" msgid="1555567894577437024">"Доод хүснэгтийг хаах"</string>
     <string name="m3c_bottom_sheet_expand_description" msgid="6670819569745899763">"Доод хүснэгтийг дэлгэх"</string>
-    <!-- no translation found for m3c_floating_toolbar_collapse (6072492480528318635) -->
-    <skip />
-    <!-- no translation found for m3c_floating_toolbar_expand (6880757017246780255) -->
-    <skip />
+    <string name="m3c_floating_toolbar_collapse" msgid="6072492480528318635">"Самбарыг хураана уу"</string>
+    <string name="m3c_floating_toolbar_expand" msgid="6880757017246780255">"Самбарыг дэлгэнэ үү"</string>
     <string name="m3c_tooltip_pane_description" msgid="5460405025248574620">"Зөвлөмж"</string>
     <string name="m3c_tooltip_long_press_label" msgid="1805687647081129904">"Зөвлөмж харуулах"</string>
     <string name="m3c_time_picker_pm" msgid="6616362054113087709">"ҮХ"</string>

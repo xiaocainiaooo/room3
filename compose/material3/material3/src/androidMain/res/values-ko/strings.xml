@@ -61,10 +61,8 @@
     <string name="m3c_bottom_sheet_collapse_description" msgid="2988463736136100848">"하단 시트 접기"</string>
     <string name="m3c_bottom_sheet_dismiss_description" msgid="1555567894577437024">"하단 시트 닫기"</string>
     <string name="m3c_bottom_sheet_expand_description" msgid="6670819569745899763">"하단 시트 펼치기"</string>
-    <!-- no translation found for m3c_floating_toolbar_collapse (6072492480528318635) -->
-    <skip />
-    <!-- no translation found for m3c_floating_toolbar_expand (6880757017246780255) -->
-    <skip />
+    <string name="m3c_floating_toolbar_collapse" msgid="6072492480528318635">"툴바 접기"</string>
+    <string name="m3c_floating_toolbar_expand" msgid="6880757017246780255">"툴바 펼치기"</string>
     <string name="m3c_tooltip_pane_description" msgid="5460405025248574620">"도움말"</string>
     <string name="m3c_tooltip_long_press_label" msgid="1805687647081129904">"도움말 표시"</string>
     <string name="m3c_time_picker_pm" msgid="6616362054113087709">"오후"</string>
