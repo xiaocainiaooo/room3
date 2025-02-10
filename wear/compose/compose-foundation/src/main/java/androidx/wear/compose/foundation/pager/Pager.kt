@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults as ComposePagerDefaults
-import androidx.compose.foundation.pager.PagerSnapDistance
+import androidx.compose.foundation.pager.PagerSnapDistance as ComposePagerSnapDistance
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -273,9 +273,8 @@ public object PagerDefaults {
      *
      * @param state The [PagerState] that controls the [Pager] to which this FlingBehavior will be
      *   applied to.
-     * @param pagerSnapDistance A way to control the snapping destination for this [Pager]. Use
-     *   [PagerSnapDistance.atMost] to define a maximum number of pages this [Pager] is allowed to
-     *   fling after scrolling is finished and fling has started.
+     * @param maxFlingPages the maximum number of pages this [Pager] is allowed to fling after
+     *   scrolling is finished and fling has started.
      * @param decayAnimationSpec The animation spec used to approach the target offset. When the
      *   fling velocity is large enough. Large enough means large enough to naturally decay. For
      *   single page snapping this usually never happens since there won't be enough space to run a
@@ -298,14 +297,14 @@ public object PagerDefaults {
     @Composable
     public fun snapFlingBehavior(
         state: PagerState,
-        pagerSnapDistance: PagerSnapDistance = PagerSnapDistance.atMost(1),
+        maxFlingPages: Int = 1,
         decayAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay(),
         snapAnimationSpec: AnimationSpec<Float> = PagerDefaults.SnapAnimationSpec,
         @FloatRange(from = 0.0, to = 1.0) snapPositionalThreshold: Float = 0.5f
     ): TargetedFlingBehavior {
         return ComposePagerDefaults.flingBehavior(
             state = state,
-            pagerSnapDistance = pagerSnapDistance,
+            pagerSnapDistance = ComposePagerSnapDistance.atMost(maxFlingPages),
             decayAnimationSpec = decayAnimationSpec,
             snapAnimationSpec = snapAnimationSpec,
             snapPositionalThreshold = snapPositionalThreshold,

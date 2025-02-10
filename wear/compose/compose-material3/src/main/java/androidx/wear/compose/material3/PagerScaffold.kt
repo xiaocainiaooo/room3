@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -366,7 +365,7 @@ internal fun snapWithSpringBehavior(
 ): TargetedFlingBehavior {
     return PagerDefaults.snapFlingBehavior(
         state = state,
-        pagerSnapDistance = PagerSnapDistance.atMost(1),
+        maxFlingPages = 1,
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
         snapPositionalThreshold = 0.35f,
     )
