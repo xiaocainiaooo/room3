@@ -37,7 +37,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.launch
@@ -586,8 +585,8 @@ class SwipeToRevealTest {
         onFullSwipe: () -> Unit = {},
         swipeDirection: SwipeDirection = SwipeDirection.RightToLeft,
         revealingAnchor: Float = SwipeToRevealDefaults.revealingRatio,
-        positionalThreshold: Density.(totalDistance: Float) -> Float =
-            SwipeToRevealDefaults.positionalThreshold,
+        positionalThreshold: (totalDistance: Float) -> Float =
+            SwipeToRevealDefaults.positionalThreshold
     ) {
         lateinit var revealState: RevealState
         rule.setContent {
