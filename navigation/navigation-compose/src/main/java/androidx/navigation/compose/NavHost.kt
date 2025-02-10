@@ -18,6 +18,7 @@ package androidx.navigation.compose
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.PredictiveBackHandler
+import androidx.collection.mutableObjectFloatMapOf
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
@@ -559,7 +560,7 @@ public fun NavHost(
 
     val backStackEntry: NavBackStackEntry? = visibleEntries.lastOrNull()
 
-    val zIndices = remember { mutableMapOf<String, Float>() }
+    val zIndices = remember { mutableObjectFloatMapOf<String>() }
 
     if (backStackEntry != null) {
         val finalEnter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
@@ -659,14 +660,14 @@ public fun NavHost(
                 // a case where visible has cleared the old state for some reason, so instead of
                 // attempting to animate away from the initialState, we skip the animation.
                 if (initialState in visibleEntries) {
-                    val initialZIndex =
-                        zIndices[initialState.id] ?: 0f.also { zIndices[initialState.id] = 0f }
+                    val initialZIndex = zIndices.getOrPut(initialState.id) { 0f }
                     val targetZIndex =
                         when {
                             targetState.id == initialState.id -> initialZIndex
                             composeNavigator.isPop.value || inPredictiveBack -> initialZIndex - 1f
                             else -> initialZIndex + 1f
-                        }.also { zIndices[targetState.id] = it }
+                        }
+                    zIndices[targetState.id] = targetZIndex
 
                     ContentTransform(
                         finalEnter(this),
@@ -718,9 +719,7 @@ public fun NavHost(
                         transition.targetState == navController.currentBackStackEntry)
             ) {
                 visibleEntries.forEach { entry -> composeNavigator.onTransitionComplete(entry) }
-                zIndices
-                    .filter { it.key != transition.targetState.id }
-                    .forEach { zIndices.remove(it.key) }
+                zIndices.removeIf { key, _ -> key != transition.targetState.id }
             }
         }
     }
