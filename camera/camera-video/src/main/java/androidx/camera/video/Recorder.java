@@ -17,6 +17,7 @@
 package androidx.camera.video;
 
 import static androidx.camera.video.AudioStats.AUDIO_AMPLITUDE_NONE;
+import static androidx.camera.video.Quality.QUALITY_SOURCE_REGULAR;
 import static androidx.camera.video.VideoRecordEvent.Finalize.ERROR_DURATION_LIMIT_REACHED;
 import static androidx.camera.video.VideoRecordEvent.Finalize.ERROR_ENCODING_FAILED;
 import static androidx.camera.video.VideoRecordEvent.Finalize.ERROR_FILE_SIZE_LIMIT_REACHED;
@@ -3030,7 +3031,8 @@ public final class Recorder implements VideoOutput {
     public static @NonNull VideoCapabilities getVideoCapabilities(@NonNull CameraInfo cameraInfo,
             @VideoCapabilitiesSource int videoCapabilitiesSource) {
         return new RecorderVideoCapabilities(videoCapabilitiesSource,
-                (CameraInfoInternal) cameraInfo, VideoEncoderInfoImpl.FINDER);
+                (CameraInfoInternal) cameraInfo, QUALITY_SOURCE_REGULAR,
+                VideoEncoderInfoImpl.FINDER);
     }
 
     @AutoValue
