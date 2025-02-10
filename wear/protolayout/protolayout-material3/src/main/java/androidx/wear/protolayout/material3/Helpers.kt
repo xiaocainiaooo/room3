@@ -168,6 +168,7 @@ internal fun MaterialScope.componentContainer(
     contentPadding: Padding,
     metadataTag: String?,
     content: (MaterialScope.() -> LayoutElement)?,
+    useOverlayOnBackground: Boolean = true
 ): LayoutElement {
     val mod =
         LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then
@@ -196,9 +197,12 @@ internal fun MaterialScope.componentContainer(
                         BackgroundImageStyle(
                             width = expand(),
                             height = expand(),
-                            overlayColor = colorScheme.background.withOpacity(0.6f),
-                            overlayWidth = width,
-                            overlayHeight = height,
+                            overlayColor =
+                                if (useOverlayOnBackground) {
+                                    colorScheme.background.withOpacity(0.6f)
+                                } else {
+                                    null
+                                },
                             shape = protoLayoutModifiers.background?.corner ?: shapes.large,
                             contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS,
                         )

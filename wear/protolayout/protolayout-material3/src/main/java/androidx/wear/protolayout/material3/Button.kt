@@ -436,7 +436,7 @@ public fun MaterialScope.avatarButton(
  *   case of the fully opaque background image, then the background color will not be shown.
  * @param backgroundContent The background object to be used behind the content in the button. It is
  *   recommended to use the default styling that is automatically provided by only calling
- *   [backgroundImage] with the content. It can be combined with the specified
+ *   [backgroundImage] with the content and optional overlay. It can be combined with the specified
  *   [LayoutModifier.background] behind it.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
@@ -456,7 +456,8 @@ public fun MaterialScope.imageButton(
         modifier = modifier,
         width = width,
         height = height,
-        backgroundContent = backgroundContent
+        backgroundContent = backgroundContent,
+        useOverlayOnBackground = false
     )
 
 /**
@@ -618,7 +619,8 @@ internal fun MaterialScope.buttonContainer(
             wrapWithMinTapTargetDimension()
         },
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
-    contentPadding: Padding = DEFAULT_CONTENT_PADDING
+    contentPadding: Padding = DEFAULT_CONTENT_PADDING,
+    useOverlayOnBackground: Boolean = true
 ): LayoutElement =
     componentContainer(
         onClick = onClick,
@@ -628,5 +630,6 @@ internal fun MaterialScope.buttonContainer(
         backgroundContent = backgroundContent,
         contentPadding = contentPadding,
         metadataTag = METADATA_TAG_BUTTON,
-        content = content
+        content = content,
+        useOverlayOnBackground = useOverlayOnBackground
     )
