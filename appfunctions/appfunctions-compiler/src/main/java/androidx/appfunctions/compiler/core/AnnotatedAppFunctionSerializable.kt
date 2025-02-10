@@ -16,9 +16,10 @@
 
 package androidx.appfunctions.compiler.core
 
-import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPORTED_TYPES
-import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isAppFunctionSerializableType
-import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isSupportedType
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_LIST
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_SINGULAR
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.SUPPORTED_TYPES_STRING
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.isSupportedType
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
@@ -26,7 +27,6 @@ import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.LIST
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
 data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KSClassDeclaration) {
@@ -39,7 +39,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
      * 1. **Primary Constructor:** The class must have a public primary constructor.
      * 2. **Property Parameters:** Only properties (declared with `val`) can be passed as parameters
      *    to the primary constructor.
-     * 3. **Supported Types:** All properties must be of one of the [SUPPORTED_TYPES].
+     * 3. **Supported Types:** All properties must be of one of the supported types.
      *
      * @throws ProcessingException if the class does not adhere to the requirements
      */
@@ -70,7 +70,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
             if (!isSupportedType(ksValueParameter.type)) {
                 throw ProcessingException(
                     "AppFunctionSerializable properties must be one of the following types:\n" +
-                        SUPPORTED_TYPES.joinToString(",") +
+                        SUPPORTED_TYPES_STRING +
                         ", an @AppFunctionSerializable or a list of @AppFunctionSerializable\nbut found " +
                         ksValueParameter.type.toTypeName(),
                     ksValueParameter
@@ -88,9 +88,18 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
     /** Returns the properties that have @AppFunctionSerializable class types. */
     fun getSerializablePropertyTypes(): Set<KSTypeReference> {
         return getProperties()
-            .map { property -> property.type }
-            .filter { type -> isAppFunctionSerializableType(type) }
-            .map { type -> if (type.isOfType(LIST)) type.resolveListParameterizedType() else type }
+            .map { property -> AppFunctionTypeReference(property.type) }
+            .filter { afType ->
+                afType.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
+                    afType.isOfTypeCategory(SERIALIZABLE_LIST)
+            }
+            .map { afType ->
+                if (afType.isOfTypeCategory(SERIALIZABLE_LIST)) {
+                    afType.ksTypeReference.resolveListParameterizedType()
+                } else {
+                    afType.ksTypeReference
+                }
+            }
             .toSet()
     }
 
@@ -122,20 +131,24 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
     ) {
         val parameters: List<KSValueParameter> =
             serializableClassDefinition.primaryConstructor?.parameters ?: emptyList()
-        for (ksValueParameter in parameters) {
-            if (isAppFunctionSerializableType(ksValueParameter.type)) {
-                val appFunctionSerializableDefinition =
-                    ksValueParameter.type.resolve().declaration as KSClassDeclaration
-                // Skip serializable that have been seen before
-                if (visitedSerializableSet.contains(originalClassName)) {
-                    continue
+        val serializableParamTypes =
+            parameters
+                .map { param -> AppFunctionTypeReference(param.type) }
+                .filter { afType ->
+                    afType.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
+                        afType.isOfTypeCategory(SERIALIZABLE_LIST)
                 }
-                // Process newly found serializable
-                sourceFileSet.addAll(
-                    AnnotatedAppFunctionSerializable(appFunctionSerializableDefinition)
-                        .getSourceFiles()
-                )
+        for (serializableAfType in serializableParamTypes) {
+            val appFunctionSerializableDefinition =
+                serializableAfType.ksTypeReference.resolve().declaration as KSClassDeclaration
+            // Skip serializable that have been seen before
+            if (visitedSerializableSet.contains(originalClassName)) {
+                continue
             }
+            // Process newly found serializable
+            sourceFileSet.addAll(
+                AnnotatedAppFunctionSerializable(appFunctionSerializableDefinition).getSourceFiles()
+            )
         }
     }
 
