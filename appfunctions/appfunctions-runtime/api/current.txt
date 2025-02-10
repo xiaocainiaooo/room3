@@ -22,5 +22,23 @@ package androidx.appfunctions {
     property public abstract androidx.appfunctions.AppFunctionConfiguration appFunctionConfiguration;
   }
 
+  @RequiresApi(android.os.Build.VERSION_CODES.TIRAMISU) public final class AppFunctionManagerCompat {
+    ctor public AppFunctionManagerCompat(android.content.Context context);
+    method @RequiresPermission(value="android.permission.EXECUTE_APP_FUNCTIONS", conditional=true) public suspend Object? isAppFunctionEnabled(String packageName, String functionId, kotlin.coroutines.Continuation<? super java.lang.Boolean>);
+    method public suspend Object? isAppFunctionEnabled(String functionId, kotlin.coroutines.Continuation<? super java.lang.Boolean>);
+    method public boolean isSupported();
+    method @RequiresPermission(value="android.permission.EXECUTE_APP_FUNCTIONS", conditional=true) public suspend Object? setAppFunctionEnabled(String functionId, int newEnabledState, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    field public static final int APP_FUNCTION_STATE_DEFAULT = 0; // 0x0
+    field public static final int APP_FUNCTION_STATE_DISABLED = 2; // 0x2
+    field public static final int APP_FUNCTION_STATE_ENABLED = 1; // 0x1
+    field public static final androidx.appfunctions.AppFunctionManagerCompat.Companion Companion;
+  }
+
+  public static final class AppFunctionManagerCompat.Companion {
+    property public static int APP_FUNCTION_STATE_DEFAULT;
+    property public static int APP_FUNCTION_STATE_DISABLED;
+    property public static int APP_FUNCTION_STATE_ENABLED;
+  }
+
 }
 

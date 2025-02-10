@@ -35,12 +35,18 @@ dependencies {
     // Internal dependencies
     implementation("androidx.annotation:annotation:1.9.0-rc01")
     implementation project(":appfunctions:appfunctions-common")
+    implementation(libs.kotlinCoroutinesAndroid)
+
+    // Compile only dependencies
+    compileOnly(project(":appfunctions:appfunctions-stubs"))
 
     // Test dependencies
     testImplementation(libs.junit)
     testImplementation(libs.truth)
     testImplementation(libs.mockitoCore4)
 
+    androidTestImplementation("androidx.appsearch:appsearch:1.1.0-alpha07")
+    androidTestImplementation("androidx.appsearch:appsearch-platform-storage:1.1.0-alpha07")
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.junit)
