@@ -26,7 +26,6 @@ import android.os.RemoteException
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.HealthConnectFeaturesApkImpl
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.permission.HealthPermission.Companion.getReadPermission
@@ -130,10 +129,7 @@ private val API_METHOD_LIST =
 
 @Suppress("GoodTime") // Safe to use in test setup
 @RunWith(AndroidJUnit4::class)
-@OptIn(
-    kotlinx.coroutines.ExperimentalCoroutinesApi::class,
-    ExperimentalFeatureAvailabilityApi::class
-)
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class HealthConnectClientImplTest {
 
     private lateinit var healthConnectClient: HealthConnectClientImpl
