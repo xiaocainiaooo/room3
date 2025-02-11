@@ -51,6 +51,14 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.SerializableInputFunctions#simpleFunction",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataSerializableInputFunctionsSimpleFunctionSerializableListMetadataObject {
@@ -83,6 +91,14 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.SerializableInputFunctions#simpleFunctionSerializableList",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -118,6 +134,14 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.SerializableInputFunctions#simpleFunctionNullableSerializableList",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object
@@ -151,6 +175,14 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.SerializableInputFunctions#simpleFunctionNullableSerializable",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 }
