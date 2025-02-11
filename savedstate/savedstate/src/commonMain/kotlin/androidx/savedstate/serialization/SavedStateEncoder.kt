@@ -40,10 +40,9 @@ import kotlinx.serialization.serializer
 public fun <T : Any> encodeToSavedState(
     serializer: SerializationStrategy<T>,
     value: T
-): SavedState =
-    savedState().apply {
-        SavedStateEncoder(this, SavedStateConfig.DEFAULT).encodeSerializableValue(serializer, value)
-    }
+): SavedState {
+    return encodeToSavedState(serializer, value, SavedStateConfig.DEFAULT)
+}
 
 /**
  * Encode a serializable object to a [SavedState] with an explicit serializer, which can be a custom
