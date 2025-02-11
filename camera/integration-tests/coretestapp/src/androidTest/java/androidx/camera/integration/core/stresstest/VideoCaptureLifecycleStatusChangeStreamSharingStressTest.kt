@@ -25,11 +25,11 @@ import org.junit.runners.Parameterized
 @LargeTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = 21)
-class VideoCaptureLifecycleStatusChangeStressTest(
+class VideoCaptureLifecycleStatusChangeStreamSharingStressTest(
     implName: String,
     cameraConfig: CameraXConfig,
     cameraId: String
 ) : VideoCaptureLifecycleStatusChangeStressTestBase(implName, cameraConfig, cameraId) {
 
-    override val enableStreamSharing: Boolean = false
+    override val enableStreamSharing: Boolean = true
 }
