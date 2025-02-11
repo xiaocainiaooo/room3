@@ -41,6 +41,9 @@ dependencies {
     // Compile only dependencies
     compileOnly(project(":appfunctions:appfunctions-stubs"))
 
+    // Compile only dependencies
+    compileOnly(project(":appfunctions:appfunctions-stubs"))
+
     // Test dependencies
     testImplementation(libs.junit)
     testImplementation(libs.truth)
