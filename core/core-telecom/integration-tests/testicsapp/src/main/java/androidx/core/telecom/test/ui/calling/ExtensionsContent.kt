@@ -16,6 +16,7 @@
 
 package androidx.core.telecom.test.ui.calling
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -60,6 +61,7 @@ import androidx.core.telecom.util.ExperimentalAppActions
 import kotlinx.coroutines.launch
 
 data class ExtensionUiState(
+    val meetingSummaryUiState: MeetingSummaryUiState,
     val localCallSilenceUiState: LocalCallSilenceExtensionUiState?,
     val participantUiState: ParticipantExtensionUiState?,
     val callIconUiState: CallIconExtensionUiState?
@@ -70,6 +72,7 @@ class ExtensionProvider : PreviewParameterProvider<ExtensionUiState> {
     override val values =
         sequenceOf(
             ExtensionUiState(
+                MeetingSummaryUiState("John Smith", 1),
                 LocalCallSilenceExtensionUiState(true, {}, null),
                 ParticipantExtensionUiState(
                     isRaiseHandSupported = true,
@@ -126,7 +129,10 @@ fun ExtensionsContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            bitmap = extensionUiState.callIconUiState.bitmap!!.asImageBitmap(),
+                            bitmap =
+                                extensionUiState.callIconUiState.bitmap?.asImageBitmap()
+                                    ?: Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+                                        .asImageBitmap(),
                             contentDescription = "Bitmap Image",
                             contentScale = ContentScale.Fit,
                             modifier = Modifier.size(48.dp)
@@ -181,42 +187,53 @@ fun ExtensionsContent(
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
-
-        Text("Participants")
-        if (extensionUiState.participantUiState == null) {
-            Text(
-                modifier = Modifier.fillMaxWidth().padding(6.dp),
-                text = "<Participants is NOT supported>"
-            )
-        } else if (extensionUiState.participantUiState.participants.isEmpty()) {
-            Text(modifier = Modifier.padding(horizontal = 6.dp), text = "<No Participants>")
-        } else {
-            Column(
-                modifier =
-                    Modifier.height(150.dp)
-                        .fillMaxWidth()
-                        .padding(6.dp)
-                        .verticalScroll(rememberScrollState())
+        Column(modifier = Modifier.weight(1f).padding(6.dp)) {
+            Text("Participants")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                extensionUiState.participantUiState.participants.forEach {
-                    if (it.isActive) {
-                        ActiveParticipantContent(
-                            extensionUiState.participantUiState.isKickParticipantSupported,
-                            extensionUiState.participantUiState.isRaiseHandSupported,
-                            onRaiseHandStateChanged =
-                                extensionUiState.participantUiState.onRaiseHandStateChanged,
-                            it
-                        )
-                    } else {
-                        NonActiveParticipantContent(
-                            extensionUiState.participantUiState.isKickParticipantSupported,
-                            extensionUiState.participantUiState.isRaiseHandSupported,
-                            onRaiseHandStateChanged =
-                                extensionUiState.participantUiState.onRaiseHandStateChanged,
-                            it
-                        )
+                Text(
+                    "Participant Count: ${extensionUiState.meetingSummaryUiState.participantCount}"
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text("Active Speaker: ${extensionUiState.meetingSummaryUiState.activeSpeaker}")
+            }
+            if (extensionUiState.participantUiState == null) {
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(6.dp),
+                    text = "<Participants is NOT supported>"
+                )
+            } else if (extensionUiState.participantUiState.participants.isEmpty()) {
+                Text(modifier = Modifier.padding(horizontal = 6.dp), text = "<No Participants>")
+            } else {
+                Column(
+                    modifier =
+                        Modifier.height(150.dp)
+                            .fillMaxWidth()
+                            .padding(6.dp)
+                            .verticalScroll(rememberScrollState())
+                ) {
+                    extensionUiState.participantUiState.participants.forEach {
+                        if (it.isActive) {
+                            ActiveParticipantContent(
+                                extensionUiState.participantUiState.isKickParticipantSupported,
+                                extensionUiState.participantUiState.isRaiseHandSupported,
+                                onRaiseHandStateChanged =
+                                    extensionUiState.participantUiState.onRaiseHandStateChanged,
+                                it
+                            )
+                        } else {
+                            NonActiveParticipantContent(
+                                extensionUiState.participantUiState.isKickParticipantSupported,
+                                extensionUiState.participantUiState.isRaiseHandSupported,
+                                onRaiseHandStateChanged =
+                                    extensionUiState.participantUiState.onRaiseHandStateChanged,
+                                it
+                            )
+                        }
+                        Spacer(Modifier.padding(vertical = 6.dp))
                     }
-                    Spacer(Modifier.padding(vertical = 6.dp))
                 }
             }
         }

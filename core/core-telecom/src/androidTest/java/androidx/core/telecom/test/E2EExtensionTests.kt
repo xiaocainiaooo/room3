@@ -146,6 +146,32 @@ class E2EExtensionTests(private val parameters: TestParameters) : BaseTelecomTes
         }
     }
 
+    internal class CachedMeetingSummary(scope: CallExtensionScope) {
+        private val participantState = MutableStateFlow<Int>(0)
+        private val activeParticipantState = MutableStateFlow<String?>("")
+        val extension =
+            scope.addMeetingSummaryExtension(
+                onCurrentSpeakerChanged = activeParticipantState::emit,
+                onParticipantCountChanged = participantState::emit
+            )
+
+        suspend fun waitForParticipantCount(expected: Int) {
+            val result =
+                withTimeoutOrNull(ICS_EXTENSION_UPDATE_TIMEOUT_MS) {
+                    participantState.first { it == expected }
+                }
+            assertEquals("Never received expected participant count update", expected, result)
+        }
+
+        suspend fun waitForActiveParticipant(expected: String?) {
+            val result =
+                withTimeoutOrNull(ICS_EXTENSION_UPDATE_TIMEOUT_MS) {
+                    activeParticipantState.first { it == expected }
+                }
+            assertEquals("Never received expected active participant", expected, result)
+        }
+    }
+
     // TODO:: b/364316364 should assert on a per call basis
     internal class CachedLocalSilence(scope: CallExtensionScope) {
         private val isLocallySilenced = MutableStateFlow(false)
@@ -286,6 +312,7 @@ class E2EExtensionTests(private val parameters: TestParameters) : BaseTelecomTes
             with(ics) {
                 connectExtensions(call) {
                     val participants = CachedParticipants(this)
+                    val meetingSummary = CachedMeetingSummary(this)
                     onConnected {
                         hasConnected = true
                         assertTrue(
@@ -294,18 +321,23 @@ class E2EExtensionTests(private val parameters: TestParameters) : BaseTelecomTes
                         )
                         // Wait for initial state
                         participants.waitForParticipants(emptySet())
+                        meetingSummary.waitForParticipantCount(0)
                         participants.waitForActiveParticipant(null)
+                        meetingSummary.waitForActiveParticipant(null)
                         // Test VOIP -> ICS connection by updating state
                         val currentParticipants = TestUtils.generateParticipants(2)
                         voipAppControl.updateParticipants(
                             currentParticipants.map { it.toParticipantParcelable() }
                         )
                         participants.waitForParticipants(currentParticipants.toSet())
+                        meetingSummary.waitForParticipantCount(currentParticipants.size)
                         voipAppControl.updateActiveParticipant(
                             currentParticipants[0].toParticipantParcelable()
                         )
                         participants.waitForActiveParticipant(currentParticipants[0])
-
+                        meetingSummary.waitForActiveParticipant(
+                            currentParticipants[0].name.toString()
+                        )
                         call.disconnect()
                     }
                 }
