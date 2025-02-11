@@ -5,6 +5,7 @@ import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
@@ -38,6 +39,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       INTPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongMetadataObject {
@@ -59,6 +70,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       LONGPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatMetadataObject {
@@ -80,6 +101,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       FLOATPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleMetadataObject {
@@ -101,6 +132,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       DOUBLEPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanMetadataObject {
@@ -122,6 +163,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       BOOLEANPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringMetadataObject {
@@ -143,6 +194,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       STRINGPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntMetadataObject {
@@ -164,6 +225,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       INTPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongMetadataObject {
@@ -185,6 +256,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       LONGPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatMetadataObject {
@@ -206,6 +287,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       FLOATPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleMetadataObject {
@@ -227,6 +318,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       DOUBLEPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanMetadataObject {
@@ -248,6 +349,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       BOOLEANPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringMetadataObject {
@@ -269,6 +380,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       STRINGPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntArrayMetadataObject {
@@ -296,6 +417,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       INTARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongArrayMetadataObject {
@@ -323,6 +454,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       LONGARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatArrayMetadataObject {
@@ -350,6 +491,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       FLOATARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleArrayMetadataObject {
@@ -377,6 +528,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       DOUBLEARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanArrayMetadataObject {
@@ -404,6 +565,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       BOOLEANARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringListMetadataObject {
@@ -431,6 +602,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       STRINGLISTPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntArrayMetadataObject {
@@ -458,6 +639,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       INTARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongArrayMetadataObject
@@ -486,6 +677,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       LONGARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject
@@ -514,6 +715,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       FLOATARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object
@@ -542,6 +753,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       DOUBLEARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object
@@ -570,6 +791,16 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       BOOLEANARRAYPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject
@@ -598,5 +829,15 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
       STRINGLISTPARAM_PARAMETER_METADATA,
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 }
