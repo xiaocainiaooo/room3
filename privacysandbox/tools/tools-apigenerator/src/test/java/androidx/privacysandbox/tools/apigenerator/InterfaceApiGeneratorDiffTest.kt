@@ -31,6 +31,7 @@ class InterfaceApiGeneratorDiffTest : AbstractApiGeneratorDiffTest() {
             "com/sdk/IMyInterfaceTransactionCallback.java",
             "com/sdk/IMySecondInterfaceTransactionCallback.java",
             "com/sdk/IMySecondInterfaceCoreLibInfoAndBinderWrapper.java",
+            "com/sdk/IMySharedUiInterfaceTransactionCallback.java",
             "com/sdk/IMySharedUiInterfaceCoreLibInfoAndBinderWrapper.java",
             "com/sdk/IIntTransactionCallback.java",
             "com/sdk/ICancellationSignal.java",
