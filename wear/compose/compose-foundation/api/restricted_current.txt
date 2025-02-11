@@ -310,15 +310,11 @@ package androidx.wear.compose.foundation {
     method public int getCovered();
     method public int getLeftRevealed();
     method public int getLeftRevealing();
-    method @Deprecated public int getRevealed();
-    method @Deprecated public int getRevealing();
     method public int getRightRevealed();
     method public int getRightRevealing();
     property public int Covered;
     property public int LeftRevealed;
     property public int LeftRevealing;
-    property @Deprecated public int Revealed;
-    property @Deprecated public int Revealing;
     property public int RightRevealed;
     property public int RightRevealing;
   }

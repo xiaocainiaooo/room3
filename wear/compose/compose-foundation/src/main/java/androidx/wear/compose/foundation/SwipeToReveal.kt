@@ -131,26 +131,6 @@ public value class RevealValue private constructor(public val value: Int) {
         /**
          * The value which represents the state in which all the actions are revealed and the top
          * content is not being swiped. In this state, none of the actions have been triggered or
-         * performed yet.
-         *
-         * @deprecated Use [RightRevealing] instead.
-         */
-        @Deprecated("Use RightRevealing instead.", ReplaceWith("RightRevealing"))
-        public val Revealing: RevealValue = RevealValue(1)
-
-        /**
-         * The value which represents the state in which the whole revealable content is fully
-         * revealed. This also represents the state in which one of the actions has been
-         * triggered/performed.
-         *
-         * @deprecated Use [RightRevealed] instead.
-         */
-        @Deprecated("Use RightRevealed instead.", ReplaceWith("RightRevealed"))
-        public val Revealed: RevealValue = RevealValue(2)
-
-        /**
-         * The value which represents the state in which all the actions are revealed and the top
-         * content is not being swiped. In this state, none of the actions have been triggered or
          * performed yet, and they are displayed on the right side of the screen.
          */
         public val RightRevealing: RevealValue = RevealValue(1)
