@@ -21,6 +21,7 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -221,7 +222,7 @@ public value class RevealActionType private constructor(public val value: Int) {
 @SuppressWarnings("PrimitiveInCollection")
 public fun createRevealAnchors(
     coveredAnchor: Float = 0f,
-    revealingAnchor: Float = SwipeToRevealDefaults.revealingRatio,
+    revealingAnchor: Float = SwipeToRevealDefaults.RevealingRatio,
     revealedAnchor: Float = 1f,
     revealDirection: RevealDirection = RevealDirection.RightToLeft
 ): Map<RevealValue, Float> {
@@ -419,10 +420,10 @@ internal constructor(
 @Composable
 public fun rememberRevealState(
     initialValue: RevealValue = RevealValue.Covered,
-    animationSpec: AnimationSpec<Float> = SwipeToRevealDefaults.animationSpec,
+    animationSpec: AnimationSpec<Float> = SwipeToRevealDefaults.AnimationSpec,
     confirmValueChange: (RevealValue) -> Boolean = { true },
     positionalThreshold: (totalDistance: Float) -> Float =
-        SwipeToRevealDefaults.positionalThreshold,
+        SwipeToRevealDefaults.PositionalThreshold,
     anchors: Map<RevealValue, Float> = createRevealAnchors(),
 ): RevealState {
     val coroutineScope = rememberCoroutineScope()
@@ -665,14 +666,14 @@ public fun SwipeToReveal(
                                     if (
                                         secondaryAction != null && secondaryActionWeight.value > 0
                                     ) {
-                                        Spacer(Modifier.size(SwipeToRevealDefaults.padding))
+                                        Spacer(Modifier.size(SwipeToRevealDefaults.Padding))
                                         ActionSlot(
                                             weight = secondaryActionWeight.value,
                                             opacity = secondaryActionAlpha,
                                             content = secondaryAction,
                                         )
                                     }
-                                    Spacer(Modifier.size(SwipeToRevealDefaults.padding))
+                                    Spacer(Modifier.size(SwipeToRevealDefaults.Padding))
                                     ActionSlot(
                                         content = primaryAction,
                                         opacity = primaryActionAlpha
@@ -682,7 +683,7 @@ public fun SwipeToReveal(
                                         content = primaryAction,
                                         opacity = primaryActionAlpha
                                     )
-                                    Spacer(Modifier.size(SwipeToRevealDefaults.padding))
+                                    Spacer(Modifier.size(SwipeToRevealDefaults.Padding))
                                     // weight cannot be 0 so remove the composable when weight
                                     // becomes 0
                                     if (
@@ -693,7 +694,7 @@ public fun SwipeToReveal(
                                             opacity = secondaryActionAlpha,
                                             content = secondaryAction,
                                         )
-                                        Spacer(Modifier.size(SwipeToRevealDefaults.padding))
+                                        Spacer(Modifier.size(SwipeToRevealDefaults.Padding))
                                     }
                                 }
                             }
@@ -727,29 +728,31 @@ public fun SwipeToReveal(
 }
 
 /** An internal object containing some defaults used across the Swipe to reveal component. */
-internal object SwipeToRevealDefaults {
+public object SwipeToRevealDefaults {
     /** Default animation spec used when moving between states. */
-    internal val animationSpec = SwipeableV2Defaults.AnimationSpec
+    public val AnimationSpec: SpringSpec<Float> = SwipeableV2Defaults.AnimationSpec
 
     /** Default padding space between action slots. */
-    internal val padding = 2.dp
+    internal val Padding = 2.dp
 
     /**
      * Default ratio of the content displayed when in [RevealValue.RightRevealing] state, i.e. all
      * the actions are revealed and the top content is not being swiped. For example, a value of 0.7
      * means that 70% of the width is used to place the actions.
      */
-    internal const val revealingRatio = 0.7f
+    public val RevealingRatio: Float = 0.7f
 
     /**
      * Default position threshold that needs to be swiped in order to transition to the next state.
-     * Used in conjunction with [revealingRatio]; for example, a threshold of 0.5 with a revealing
+     * Used in conjunction with [RevealingRatio]; for example, a threshold of 0.5 with a revealing
      * ratio of 0.7 means that the user needs to swipe at least 35% (0.5 * 0.7) of the component
      * width to go from [RevealValue.Covered] to [RevealValue.RightRevealing] and at least 85%
      * (0.7 + 0.5 * (1 - 0.7)) of the component width to go from [RevealValue.RightRevealing] to
      * [RevealValue.RightRevealed].
      */
-    internal val positionalThreshold = { totalDistance: Float -> totalDistance * 0.5f }
+    public val PositionalThreshold: (totalDistance: Float) -> Float = { totalDistance: Float ->
+        totalDistance * 0.5f
+    }
 }
 
 @Composable

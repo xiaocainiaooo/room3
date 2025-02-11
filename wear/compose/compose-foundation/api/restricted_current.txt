@@ -369,6 +369,16 @@ package androidx.wear.compose.foundation {
     enum_constant public static final androidx.wear.compose.foundation.SwipeToDismissValue Dismissed;
   }
 
+  public final class SwipeToRevealDefaults {
+    method public androidx.compose.animation.core.SpringSpec<java.lang.Float> getAnimationSpec();
+    method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getPositionalThreshold();
+    method public float getRevealingRatio();
+    property public androidx.compose.animation.core.SpringSpec<java.lang.Float> AnimationSpec;
+    property public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> PositionalThreshold;
+    property public float RevealingRatio;
+    field public static final androidx.wear.compose.foundation.SwipeToRevealDefaults INSTANCE;
+  }
+
   public final class SwipeToRevealKt {
     method @androidx.compose.runtime.Composable public static void SwipeToReveal(kotlin.jvm.functions.Function0<kotlin.Unit> primaryAction, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> onFullSwipe, optional androidx.wear.compose.foundation.RevealState state, optional kotlin.jvm.functions.Function0<kotlin.Unit>? secondaryAction, optional kotlin.jvm.functions.Function0<kotlin.Unit>? undoAction, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public static java.util.Map<androidx.wear.compose.foundation.RevealValue,java.lang.Float> createRevealAnchors(optional float coveredAnchor, optional float revealingAnchor, optional float revealedAnchor, optional int revealDirection);
