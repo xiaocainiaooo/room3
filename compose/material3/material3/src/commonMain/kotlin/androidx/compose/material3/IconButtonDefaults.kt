@@ -828,7 +828,7 @@ object IconButtonDefaults {
             if (enabled) {
                 outlineColor
             } else {
-                outlineColor.copy(alpha = OutlinedIconButtonTokens.DisabledContainerOpacity)
+                outlineColor.copy(alpha = OutlinedIconButtonTokens.DisabledOpacity)
             }
         return remember(color) { BorderStroke(SmallIconButtonTokens.OutlinedOutlineWidth, color) }
     }
@@ -846,7 +846,7 @@ object IconButtonDefaults {
             if (enabled) {
                 outlineColor
             } else {
-                outlineColor.copy(alpha = OutlinedIconButtonTokens.DisabledContainerOpacity)
+                outlineColor.copy(alpha = OutlinedIconButtonTokens.DisabledOpacity)
             }
         return remember(color) { BorderStroke(SmallIconButtonTokens.OutlinedOutlineWidth, color) }
     }
@@ -1165,8 +1165,8 @@ object IconButtonDefaults {
                     XSmallIconButtonTokens.NarrowLeadingSpace +
                         XSmallIconButtonTokens.NarrowTrailingSpace
                 IconButtonWidthOption.Uniform ->
-                    XSmallIconButtonTokens.UniformLeadingSpace +
-                        XSmallIconButtonTokens.UniformLeadingSpace
+                    XSmallIconButtonTokens.DefaultLeadingSpace +
+                        XSmallIconButtonTokens.DefaultLeadingSpace
                 IconButtonWidthOption.Wide ->
                     XSmallIconButtonTokens.WideLeadingSpace +
                         XSmallIconButtonTokens.WideTrailingSpace
@@ -1193,8 +1193,8 @@ object IconButtonDefaults {
                     SmallIconButtonTokens.NarrowLeadingSpace +
                         SmallIconButtonTokens.NarrowTrailingSpace
                 IconButtonWidthOption.Uniform ->
-                    SmallIconButtonTokens.UniformLeadingSpace +
-                        SmallIconButtonTokens.UniformLeadingSpace
+                    SmallIconButtonTokens.DefaultLeadingSpace +
+                        SmallIconButtonTokens.DefaultLeadingSpace
                 IconButtonWidthOption.Wide ->
                     SmallIconButtonTokens.WideLeadingSpace + SmallIconButtonTokens.WideTrailingSpace
                 else -> 0.dp
@@ -1220,8 +1220,8 @@ object IconButtonDefaults {
                     MediumIconButtonTokens.NarrowLeadingSpace +
                         MediumIconButtonTokens.NarrowTrailingSpace
                 IconButtonWidthOption.Uniform ->
-                    MediumIconButtonTokens.UniformLeadingSpace +
-                        MediumIconButtonTokens.UniformLeadingSpace
+                    MediumIconButtonTokens.DefaultLeadingSpace +
+                        MediumIconButtonTokens.DefaultLeadingSpace
                 IconButtonWidthOption.Wide ->
                     MediumIconButtonTokens.WideLeadingSpace +
                         MediumIconButtonTokens.WideTrailingSpace
@@ -1275,8 +1275,8 @@ object IconButtonDefaults {
                     XLargeIconButtonTokens.NarrowLeadingSpace +
                         XLargeIconButtonTokens.NarrowTrailingSpace
                 IconButtonWidthOption.Uniform ->
-                    XLargeIconButtonTokens.UniformLeadingSpace +
-                        XLargeIconButtonTokens.UniformLeadingSpace
+                    XLargeIconButtonTokens.DefaultLeadingSpace +
+                        XLargeIconButtonTokens.DefaultLeadingSpace
                 IconButtonWidthOption.Wide ->
                     XLargeIconButtonTokens.WideLeadingSpace +
                         XLargeIconButtonTokens.WideTrailingSpace
