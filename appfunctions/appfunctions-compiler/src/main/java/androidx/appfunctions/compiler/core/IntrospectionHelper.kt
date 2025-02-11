@@ -22,8 +22,8 @@ import com.squareup.kotlinpoet.ClassName
 object IntrospectionHelper {
     // Package names
     const val APP_FUNCTIONS_AGGREGATED_DEPS_PACKAGE_NAME = "appfunctions_aggregated_deps"
+    const val APP_FUNCTIONS_INTERNAL_PACKAGE_NAME = "androidx.appfunctions.internal"
     private const val APP_FUNCTIONS_PACKAGE_NAME = "androidx.appfunctions"
-    private const val APP_FUNCTIONS_INTERNAL_PACKAGE_NAME = "androidx.appfunctions.internal"
     private const val APP_FUNCTIONS_METADATA_PACKAGE_NAME = "androidx.appfunctions.metadata"
 
     // Annotation classes
@@ -112,5 +112,19 @@ object IntrospectionHelper {
         object ToAppFunctionDataMethod {
             const val METHOD_NAME = "toAppFunctionData"
         }
+    }
+
+    object AggregateAppFunctionInventoryClass {
+        val CLASS_NAME =
+            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AggregateAppFunctionInventory")
+
+        const val PROPERTY_INVENTORIES_NAME = "inventories"
+    }
+
+    object AggregateAppFunctionInvokerClass {
+        val CLASS_NAME =
+            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AggregateAppFunctionInvoker")
+
+        const val PROPERTY_INVOKERS_NAME = "invokers"
     }
 }

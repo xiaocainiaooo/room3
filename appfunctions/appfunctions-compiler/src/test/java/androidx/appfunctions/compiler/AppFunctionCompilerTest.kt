@@ -491,4 +491,46 @@ class AppFunctionCompilerTest {
             goldenFileName = "${'$'}ComTestdataDiff_InvokerComponentRegistry.KT"
         )
     }
+
+    @Test
+    fun testGenerateAggregateInventoryImpl() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AllPrimitiveInputFunctions.KT",
+                        "SimpleFunction.KT",
+                        // TODO(b/395812003): Fix naming conflict issue
+                        //                        "SimpleFunctionDiffPackage.KT",
+                    ),
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}AggregateAppFunctionInventory_Impl.kt",
+            goldenFileName = "${'$'}AggregateAppFunctionInventory_Impl.KT"
+        )
+    }
+
+    @Test
+    fun testGenerateAggregateInvokerImpl() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AllPrimitiveInputFunctions.KT",
+                        "SimpleFunction.KT",
+                        // TODO(b/395812003): Fix naming conflict issue
+                        //                        "SimpleFunctionDiffPackage.KT",
+                    ),
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}AggregateAppFunctionInvoker_Impl.kt",
+            goldenFileName = "${'$'}AggregateAppFunctionInvoker_Impl.KT"
+        )
+    }
 }

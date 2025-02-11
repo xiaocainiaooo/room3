@@ -18,6 +18,7 @@ package androidx.appfunctions.compiler
 
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.logException
+import androidx.appfunctions.compiler.processors.AppFunctionAggregateProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionIdProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionIndexXmlProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInventoryProcessor
@@ -55,6 +56,8 @@ class AppFunctionCompiler(
     class Provider : SymbolProcessorProvider {
 
         override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
+            val options = AppFunctionCompilerOptions.from(environment.options)
+
             val idProcessor = AppFunctionIdProcessor(environment.codeGenerator)
             val inventoryProcessor = AppFunctionInventoryProcessor(environment.codeGenerator)
             val invokerProcessor = AppFunctionInvokerProcessor(environment.codeGenerator)
@@ -66,6 +69,8 @@ class AppFunctionCompiler(
             val indexXmlProcessor = AppFunctionIndexXmlProcessor(environment.codeGenerator)
             val entityProcessor =
                 AppFunctionSerializableProcessor(environment.codeGenerator, environment.logger)
+            val aggregateProcessor =
+                AppFunctionAggregateProcessor(options, environment.codeGenerator)
             return AppFunctionCompiler(
                 listOf(
                     idProcessor,
@@ -73,7 +78,8 @@ class AppFunctionCompiler(
                     invokerProcessor,
                     legacyIndexXmlProcessor,
                     indexXmlProcessor,
-                    entityProcessor
+                    entityProcessor,
+                    aggregateProcessor,
                 ),
                 environment.logger,
             )
