@@ -36,6 +36,7 @@ import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.IDelegateChangeListener
 import androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.IDelegatorCallback
+import androidx.privacysandbox.ui.core.IMotionEventTransferCallback
 import androidx.privacysandbox.ui.core.IRemoteSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
@@ -354,8 +355,16 @@ private class BinderAdapterDelegate(
                 session.notifySessionRendered(supportedSignalOptions.toSet())
             }
 
-            override fun notifyMotionEvent(motionEvent: MotionEvent, eventTargetFrameTime: Long) {
-                providerViewWrapper.scheduleMotionEventProcessing(motionEvent, eventTargetFrameTime)
+            override fun notifyMotionEvent(
+                motionEvent: MotionEvent,
+                eventTargetFrameTime: Long,
+                eventTransferCallback: IMotionEventTransferCallback?
+            ) {
+                providerViewWrapper.scheduleMotionEventProcessing(
+                    motionEvent,
+                    eventTargetFrameTime,
+                    eventTransferCallback
+                )
             }
 
             override fun close() {

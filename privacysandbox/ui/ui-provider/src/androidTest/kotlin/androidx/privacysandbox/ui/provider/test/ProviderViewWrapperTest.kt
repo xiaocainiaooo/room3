@@ -24,6 +24,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
+import androidx.privacysandbox.ui.core.IMotionEventTransferCallback
 import androidx.privacysandbox.ui.provider.ProviderViewWrapper
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -54,6 +55,7 @@ class ProviderViewWrapperTest {
     private lateinit var providerViewWrapper: ProviderViewWrapper
     private lateinit var providerView: View
     private var dispatchedEventsSinceLastFrame = 0
+    private lateinit var motionEventTransferCallback: MotionEventTransferCallbackProxy
 
     @Before
     fun setup() {
@@ -66,6 +68,7 @@ class ProviderViewWrapperTest {
             activity.setContentView(providerViewWrapper)
             setUpOnTouchListener()
         }
+        motionEventTransferCallback = MotionEventTransferCallbackProxy()
     }
 
     @Test
@@ -141,6 +144,43 @@ class ProviderViewWrapperTest {
         assertNumberOfDispatchedEventsOnSimulateFrameTimes(frameTimes, expectedEventsPerFrame)
     }
 
+    @Test
+    fun requestDisallowInterceptTest() {
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isFalse()
+
+        val downEvent = createMotionEvent(MotionEvent.ACTION_DOWN)
+        scheduleAndWaitForMotionEventProcessing(downEvent, motionEventTransferCallback)
+
+        activityRule.scenario.onActivity { activity ->
+            providerViewWrapper.requestDisallowInterceptTouchEvent(true)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
+
+        activityRule.scenario.onActivity { activity ->
+            providerView.parent.requestDisallowInterceptTouchEvent(false)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isFalse()
+    }
+
+    @Test
+    fun requestDisallowInterceptOnlyCalledOnLastTransferredCallbackTest() {
+        val eventTransferCallback1 = MotionEventTransferCallbackProxy()
+        val eventTransferCallback2 = MotionEventTransferCallbackProxy()
+        assertThat(eventTransferCallback1.lastValueForDisallowIntercept).isFalse()
+        assertThat(eventTransferCallback2.lastValueForDisallowIntercept).isFalse()
+
+        val downEvent1 = createMotionEvent(MotionEvent.ACTION_DOWN)
+        scheduleAndWaitForMotionEventProcessing(downEvent1, eventTransferCallback1)
+        val downEvent2 = createMotionEvent(MotionEvent.ACTION_DOWN)
+        scheduleAndWaitForMotionEventProcessing(downEvent2, eventTransferCallback2)
+
+        activityRule.scenario.onActivity { activity ->
+            providerView.parent.requestDisallowInterceptTouchEvent(true)
+        }
+        assertThat(eventTransferCallback1.lastValueForDisallowIntercept).isFalse()
+        assertThat(eventTransferCallback2.lastValueForDisallowIntercept).isTrue()
+    }
+
     private fun setUpOnTouchListener() {
         providerView.setOnTouchListener { _, event ->
             dispatchedEventsSinceLastFrame++
@@ -183,7 +223,11 @@ class ProviderViewWrapperTest {
             }
 
         for (i in 0 until events.size) {
-            providerViewWrapper.scheduleMotionEventProcessing(events[i], eventTargetTime[i])
+            providerViewWrapper.scheduleMotionEventProcessing(
+                events[i],
+                eventTargetTime[i],
+                motionEventTransferCallback
+            )
         }
     }
 
@@ -208,5 +252,36 @@ class ProviderViewWrapperTest {
             "Timeout before passing all frames",
             allFramesPassedLatch.await(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
         )
+    }
+
+    fun scheduleAndWaitForMotionEventProcessing(
+        motionEvent: MotionEvent,
+        eventTransferCallback: MotionEventTransferCallbackProxy
+    ) {
+        val eventDispatchLatch = CountDownLatch(1)
+        activityRule.scenario.onActivity { activity ->
+            providerView.setOnTouchListener { _, event ->
+                eventDispatchLatch.countDown()
+                providerView.onTouchEvent(event)
+                true
+            }
+        }
+        providerViewWrapper.scheduleMotionEventProcessing(
+            motionEvent,
+            motionEvent.eventTime,
+            eventTransferCallback
+        )
+        assertTrue(
+            "dispatchTouchEvent on providerView was not called within the timeout",
+            eventDispatchLatch.await(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+        )
+    }
+
+    class MotionEventTransferCallbackProxy : IMotionEventTransferCallback.Stub() {
+        var lastValueForDisallowIntercept = false
+
+        override fun requestDisallowIntercept(disallowIntercept: Boolean) {
+            lastValueForDisallowIntercept = disallowIntercept
+        }
     }
 }

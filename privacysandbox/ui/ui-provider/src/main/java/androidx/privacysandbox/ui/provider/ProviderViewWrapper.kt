@@ -23,6 +23,7 @@ import android.os.Message
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
+import androidx.privacysandbox.ui.core.IMotionEventTransferCallback
 
 /**
  * A container [FrameLayout] that wraps the provider content view.
@@ -31,6 +32,9 @@ import androidx.annotation.RequiresApi
  * objects passed from the host (accompanied with target frame time) are scheduled to be dispatched
  * on the UiThread with a delay from the target frame time, so any UI impact caused by processing
  * these events will target the following frame.
+ *
+ * It also proxies the calls of [android.view.ViewParent.requestDisallowInterceptTouchEvent] to the
+ * client side.
  */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 internal class ProviderViewWrapper(context: Context) : FrameLayout(context) {
@@ -41,6 +45,7 @@ internal class ProviderViewWrapper(context: Context) : FrameLayout(context) {
     }
 
     private var eventDispatchHandler: Handler? = null
+    private var currentMotionEventCallback: IMotionEventTransferCallback? = null
 
     override fun onAttachedToWindow() {
         eventDispatchHandler = Handler(handler.looper)
@@ -54,11 +59,23 @@ internal class ProviderViewWrapper(context: Context) : FrameLayout(context) {
         super.onDetachedFromWindow()
     }
 
-    fun scheduleMotionEventProcessing(motionEvent: MotionEvent, eventTargetFrameTime: Long) {
+    override fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+        currentMotionEventCallback?.requestDisallowIntercept(disallowIntercept)
+    }
+
+    fun scheduleMotionEventProcessing(
+        motionEvent: MotionEvent,
+        eventTargetFrameTime: Long,
+        motionEventTransferCallback: IMotionEventTransferCallback?
+    ) {
         if (eventDispatchHandler == null) {
             return
         }
-        val dispatchMessage: Message = Message.obtain(handler, { dispatchTouchEvent(motionEvent) })
+        val dispatchMessage: Message =
+            Message.obtain(handler) {
+                currentMotionEventCallback = motionEventTransferCallback
+                dispatchTouchEvent(motionEvent)
+            }
         dispatchMessage.isAsynchronous = true
 
         eventDispatchHandler?.sendMessageAtTime(
