@@ -154,6 +154,26 @@ internal class CallExtensionScopeImpl(
         return extension
     }
 
+    override fun addMeetingSummaryExtension(
+        onCurrentSpeakerChanged: suspend (String?) -> Unit,
+        onParticipantCountChanged: suspend (Int) -> Unit
+    ): MeetingSummaryRemote {
+        val extension =
+            MeetingSummaryRemoteImpl(callScope, onCurrentSpeakerChanged, onParticipantCountChanged)
+        registerExtension {
+            CallExtensionCreator(
+                extensionCapability =
+                    Capability().apply {
+                        featureId = Extensions.MEETING_SUMMARY
+                        featureVersion = ParticipantExtensionImpl.MEETING_SUMMARY_VERSION
+                        supportedActions = extension.actions
+                    },
+                onExchangeComplete = extension::onExchangeComplete
+            )
+        }
+        return extension
+    }
+
     override fun addLocalCallSilenceExtension(
         onIsLocallySilencedUpdated: suspend (Boolean) -> Unit
     ): LocalCallSilenceExtensionRemoteImpl {

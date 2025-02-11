@@ -22,6 +22,7 @@ import androidx.core.telecom.extensions.ICallIconStateListener
 import androidx.core.telecom.extensions.ICapabilityExchange
 import androidx.core.telecom.extensions.ICapabilityExchangeListener
 import androidx.core.telecom.extensions.ILocalSilenceStateListener
+import androidx.core.telecom.extensions.IMeetingSummaryStateListener
 import androidx.core.telecom.extensions.IParticipantStateListener
 import androidx.core.telecom.util.ExperimentalAppActions
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -94,6 +95,13 @@ class ExtensionAidlTest {
             actions: IntArray?,
             remoteName: String,
             l: ICallIconStateListener?
+        ) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onCreateMeetingSummaryExtension(
+            version: Int,
+            l: IMeetingSummaryStateListener?
         ) {
             TODO("Not yet implemented")
         }

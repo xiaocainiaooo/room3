@@ -86,6 +86,50 @@ public interface CallExtensionScope {
     ): ParticipantExtensionRemote
 
     /**
+     * Add support for this remote surface to display meeting summary information for this call.
+     *
+     * This function establishes a connection with a remote service that provides meeting summary
+     * information, such as the current speaker and the number of participants. The extension will
+     * provide updates via the provided callbacks:
+     *
+     * @param onCurrentSpeakerChanged A suspend function that is called whenever the current speaker
+     *   in the meeting changes. The function receives a [String] representing the new speaker's
+     *   identifier (e.g., name or ID) or null if there is no current speaker.
+     * @param onParticipantCountChanged A suspend function that is called whenever the number of
+     *   participants in the meeting changes. The function receives an [Int] representing the new
+     *   participant count.
+     * @return A [MeetingSummaryRemote] object with an `isSupported` property of this object will
+     *   indicate whether the meeting summary extension is supported by the calling application.
+     *
+     * Example Usage:
+     * ```kotlin
+     * connectExtensions(call) {
+     *     val meetingSummaryRemote =  addMeetingSummaryExtension(
+     *          onCurrentSpeakerChanged = { speaker ->
+     *              // Update UI with the new speaker
+     *              Log.d(TAG, "Current speaker: $speaker")
+     *         },
+     *         onParticipantCountChanged = { count ->
+     *             // Update UI with the new participant count
+     *             Log.d(TAG, "Participant count: $count")
+     *         }
+     *     )
+     *    onConnected {
+     *       if (meetingSummaryRemote.isSupported) {
+     *          // The extension is ready to use
+     *       } else {
+     *          // Handle the case where the extension is not supported.
+     *       }
+     *    }
+     * }
+     *  ```
+     */
+    public fun addMeetingSummaryExtension(
+        onCurrentSpeakerChanged: suspend (String?) -> Unit,
+        onParticipantCountChanged: suspend (Int) -> Unit
+    ): MeetingSummaryRemote
+
+    /**
      * Add support for this remote surface to display information related to the local call silence
      * state for this call.
      *
