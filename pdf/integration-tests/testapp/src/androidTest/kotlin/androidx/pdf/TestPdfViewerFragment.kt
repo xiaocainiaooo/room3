@@ -29,12 +29,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.pdf.idlingresource.PdfIdlingResource
 import androidx.pdf.metrics.EventCallback
 import androidx.pdf.testapp.R
+import androidx.pdf.viewer.fragment.PdfStylingOptions
 import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-internal class TestPdfViewerFragment : PdfViewerFragment() {
+internal class TestPdfViewerFragment : PdfViewerFragment {
+
+    constructor() : super()
+
+    constructor(pdfStylingOptions: PdfStylingOptions) : super(pdfStylingOptions)
+
     private var hostView: FrameLayout? = null
     private var search: FloatingActionButton? = null
     val pdfLoadingIdlingResource = PdfIdlingResource(PDF_LOAD_RESOURCE_NAME)
