@@ -18,8 +18,11 @@ package androidx.appfunctions.compiler.processors
 
 import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions
+import androidx.appfunctions.compiler.core.AppFunctionComponentRegistryGenerator
+import androidx.appfunctions.compiler.core.AppFunctionComponentRegistryGenerator.AppFunctionComponent
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTION_FUNCTION_NOT_FOUND_EXCEPTION_CLASS
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionComponentRegistryAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionInvokerClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.ConfigurableAppFunctionFactoryClass
@@ -89,13 +92,35 @@ class AppFunctionInvokerProcessor(private val codeGenerator: CodeGenerator) : Sy
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val appFunctionSymbolResolver = AppFunctionSymbolResolver(resolver)
         val appFunctionClasses = appFunctionSymbolResolver.resolveAnnotatedAppFunctions()
-        for (appFunctionClass in appFunctionClasses) {
-            generateAppFunctionInvokerClass(appFunctionClass)
-        }
+        val generatedInvokerComponents =
+            buildList<AppFunctionComponent> {
+                for (appFunctionClass in appFunctionClasses) {
+                    val invokerQualifiedName = generateAppFunctionInvokerClass(appFunctionClass)
+                    add(
+                        AppFunctionComponent(
+                            // Generated invoker is in the same package as the original class
+                            packageName = appFunctionClass.classDeclaration.packageName.asString(),
+                            qualifiedName = invokerQualifiedName,
+                            sourceFiles = appFunctionClass.getSourceFiles(),
+                        )
+                    )
+                }
+            }
+
+        AppFunctionComponentRegistryGenerator(codeGenerator)
+            .generateRegistriesByPackageName(
+                AppFunctionComponentRegistryAnnotation.Category.INVOKER,
+                generatedInvokerComponents,
+            )
         return emptyList()
     }
 
-    private fun generateAppFunctionInvokerClass(appFunctionClass: AnnotatedAppFunctions) {
+    /**
+     * Generates an implementation of AppFunctionInvoker for [appFunctionClass].
+     *
+     * @return fully qualified name of the generated invoker implementation class.
+     */
+    private fun generateAppFunctionInvokerClass(appFunctionClass: AnnotatedAppFunctions): String {
         val originalPackageName = appFunctionClass.classDeclaration.packageName.asString()
         val originalClassName = appFunctionClass.classDeclaration.simpleName.asString()
 
@@ -121,6 +146,8 @@ class AppFunctionInvokerProcessor(private val codeGenerator: CodeGenerator) : Sy
             )
             .bufferedWriter()
             .use { fileSpec.writeTo(it) }
+
+        return "${originalPackageName}.$invokerClassName"
     }
 
     private fun buildSupportedFunctionIdsProperty(
