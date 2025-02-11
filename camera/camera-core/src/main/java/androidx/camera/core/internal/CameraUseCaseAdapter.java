@@ -808,7 +808,10 @@ public final class CameraUseCaseAdapter implements Camera {
                     Preconditions.checkNotNull(useCase.getAttachedStreamSpec()).getDynamicRange(),
                     getCaptureTypes(useCase),
                     useCase.getAttachedStreamSpec().getImplementationOptions(),
-                    useCase.getCurrentConfig().getTargetFrameRate(null));
+                    useCase.getCurrentConfig().getTargetFrameRate(null),
+                    Preconditions.checkNotNull(
+                            useCase.getCurrentConfig().getTargetHighSpeedFrameRate(
+                                    FRAME_RATE_RANGE_UNSPECIFIED)));
             existingSurfaces.add(attachedSurfaceInfo);
             surfaceInfoUseCaseMap.put(attachedSurfaceInfo, useCase);
             suggestedStreamSpecs.put(useCase, useCase.getAttachedStreamSpec());

@@ -47,6 +47,7 @@ import androidx.camera.core.impl.CameraMode
 import androidx.camera.core.impl.EncoderProfilesProvider
 import androidx.camera.core.impl.ImageFormatConstants
 import androidx.camera.core.impl.StreamSpec
+import androidx.camera.core.impl.StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
 import androidx.camera.core.impl.SurfaceCombination
 import androidx.camera.core.impl.SurfaceConfig
 import androidx.camera.core.impl.SurfaceConfig.ConfigSize
@@ -267,12 +268,17 @@ public class SupportedSurfaceCombination(
         newUseCaseConfigsSupportedSizeMap: Map<UseCaseConfig<*>, List<Size>>,
         isPreviewStabilizationOn: Boolean = false,
         hasVideoCapture: Boolean = false,
-        targetHighSpeedFpsRange: Range<Int>? = null
     ): Pair<Map<UseCaseConfig<*>, StreamSpec>, Map<AttachedSurfaceInfo, StreamSpec>> {
         // Refresh Preview Size based on current display configurations.
         refreshPreviewSize()
 
-        val isHighSpeedOn = targetHighSpeedFpsRange != null
+        val targetHighSpeedFpsRange =
+            HighSpeedResolver.getTargetHighSpeedFrameRate(
+                attachedSurfaces,
+                newUseCaseConfigsSupportedSizeMap.keys
+            )
+
+        val isHighSpeedOn = targetHighSpeedFpsRange != FRAME_RATE_RANGE_UNSPECIFIED
         // Filter out unsupported sizes for high-speed at the beginning to ensure correct
         // resolution selection later. High-speed session requires all surface sizes to be the same.
         val filteredNewUseCaseConfigsSupportedSizeMap =
@@ -992,7 +998,8 @@ public class SupportedSurfaceCombination(
 
     private fun getMaxFrameRate(imageFormat: Int, size: Size, isHighSpeedOn: Boolean): Int {
         return if (isHighSpeedOn) {
-            highSpeedResolver.getMaxFrameRate(imageFormat, size)
+            check(imageFormat == ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE)
+            highSpeedResolver.getMaxFrameRate(size)
         } else {
             getMaxFrameRate(imageFormat, size)
         }
