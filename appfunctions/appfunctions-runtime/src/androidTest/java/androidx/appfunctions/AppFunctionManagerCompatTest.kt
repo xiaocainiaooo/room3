@@ -28,7 +28,7 @@ import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 
-@SdkSuppress(minSdkVersion = 33)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class AppFunctionManagerCompatTest {
 
