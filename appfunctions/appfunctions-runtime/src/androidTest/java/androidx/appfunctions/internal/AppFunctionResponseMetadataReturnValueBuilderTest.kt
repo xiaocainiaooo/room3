@@ -55,7 +55,7 @@ class AppFunctionResponseMetadataReturnValueBuilderTest {
 
         val returnValue = responseMetadata.unsafeBuildReturnValue(result)
 
-        assertThat(returnValue.getLong(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE))
+        assertThat(returnValue.getLong(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE))
             .isEqualTo(100L)
     }
 
@@ -108,7 +108,7 @@ class AppFunctionResponseMetadataReturnValueBuilderTest {
         val returnValue = responseMetadata.unsafeBuildReturnValue(result)
 
         assertThrows(NoSuchElementException::class.java) {
-            returnValue.getString(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE)
+            returnValue.getString(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
         }
     }
 
@@ -132,7 +132,9 @@ class AppFunctionResponseMetadataReturnValueBuilderTest {
 
         val returnValue = responseMetadata.unsafeBuildReturnValue(result)
 
-        assertThat(returnValue.getDoubleArray(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE))
+        assertThat(
+                returnValue.getDoubleArray(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
+            )
             .usingExactEquality()
             .containsExactly(1.0, 2.0, 3.0)
     }
@@ -197,7 +199,9 @@ class AppFunctionResponseMetadataReturnValueBuilderTest {
 
         val returnValue = responseMetadata.unsafeBuildReturnValue(result)
 
-        assertThat(returnValue.getLongArray(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE))
+        assertThat(
+                returnValue.getLongArray(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
+            )
             .isNull()
     }
 }

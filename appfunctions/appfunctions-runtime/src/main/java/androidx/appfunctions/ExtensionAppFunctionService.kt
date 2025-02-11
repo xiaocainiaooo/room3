@@ -45,7 +45,7 @@ public class ExtensionAppFunctionService : AppFunctionService() {
     ) {
         val executionJob =
             delegate.onExecuteFunction(
-                androidx.appfunctions.ExecuteAppFunctionRequest.fromPlatformClass(request),
+                androidx.appfunctions.ExecuteAppFunctionRequest.fromPlatformExtensionClass(request),
                 callingPackage,
                 object :
                     OutcomeReceiver<
@@ -53,7 +53,14 @@ public class ExtensionAppFunctionService : AppFunctionService() {
                         AppFunctionException,
                     > {
                     override fun onResult(result: ExecuteAppFunctionResponse) {
-                        callback.onResult(result.toPlatformClass())
+                        when (result) {
+                            is ExecuteAppFunctionResponse.Success -> {
+                                result.toPlatformExtensionClass()
+                            }
+                            is ExecuteAppFunctionResponse.Error -> {
+                                callback.onError(result.error.toPlatformExtensionsClass())
+                            }
+                        }
                     }
 
                     override fun onError(error: AppFunctionException) {

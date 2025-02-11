@@ -28,8 +28,8 @@ import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 class AppFunctionManagerCompatTest {
 
     private lateinit var context: Context
@@ -181,5 +181,57 @@ class AppFunctionManagerCompatTest {
         }
 
         assertThat(isEnabled).isFalse()
+    }
+
+    @Test
+    fun testExecuteAppFunction_functionNotExist() {
+        val request =
+            ExecuteAppFunctionRequest(
+                targetPackageName = context.packageName,
+                functionIdentifier = "fakeFunctionId",
+                functionParameters = AppFunctionData.EMPTY,
+            )
+
+        val response = runBlocking { appFunctionManagerCompat.executeAppFunction(request) }
+
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Error::class.java)
+        assertThat((response as ExecuteAppFunctionResponse.Error).error)
+            .isInstanceOf(AppFunctionFunctionNotFoundException::class.java)
+    }
+
+    @Test
+    fun testExecuteAppFunction_functionSucceed() {
+        val request =
+            ExecuteAppFunctionRequest(
+                targetPackageName = context.packageName,
+                functionIdentifier =
+                    AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED,
+                functionParameters = AppFunctionData.EMPTY,
+            )
+
+        val response = runBlocking { appFunctionManagerCompat.executeAppFunction(request) }
+
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
+        assertThat(
+                (response as ExecuteAppFunctionResponse.Success).returnValue.getString("testResult")
+            )
+            .isEqualTo("result")
+    }
+
+    @Test
+    fun testExecuteAppFunction_functionFail() {
+        val request =
+            ExecuteAppFunctionRequest(
+                targetPackageName = context.packageName,
+                functionIdentifier =
+                    AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_FAIL,
+                functionParameters = AppFunctionData.EMPTY,
+            )
+
+        val response = runBlocking { appFunctionManagerCompat.executeAppFunction(request) }
+
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Error::class.java)
+        assertThat((response as ExecuteAppFunctionResponse.Error).error)
+            .isInstanceOf(AppFunctionInvalidArgumentException::class.java)
     }
 }

@@ -121,7 +121,7 @@ internal class AppFunctionServiceDelegate(
                 )
             }
         val returnValue = appFunctionMetadata.response.unsafeBuildReturnValue(result)
-        return ExecuteAppFunctionResponse(returnValue)
+        return ExecuteAppFunctionResponse.Success(returnValue)
     }
 
     private fun buildAppFunctionContext(callingPackageName: String): AppFunctionContext {
