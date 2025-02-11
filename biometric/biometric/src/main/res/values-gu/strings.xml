@@ -30,6 +30,12 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"કોઈ પિન, પૅટર્ન અથવા પાસવર્ડ સેટ કરેલો નથી."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"આ ડિવાઇસ પિન, પૅટર્ન અથવા પાસવર્ડને સપોર્ટ કરતું નથી."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ફિંગરપ્રિન્ટ આઇકન"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
+    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
+    <skip />
+    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ફિંગરપ્રિન્ટનો ઉપયોગ કરો"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ચહેરાનો ઉપયોગ કરો"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"બાયોમેટ્રિક્સનો ઉપયોગ કરો"</string>
@@ -44,4 +50,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"આગળ વધવા માટે તમારી ફિંગરપ્રિન્ટ અથવા સ્ક્રીન લૉકનો ઉપયોગ કરો"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"આગળ વધવા માટે તમારા ફેસ લૉક અથવા સ્ક્રીન લૉકનો ઉપયોગ કરો"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"આગળ વધવા માટે તમારા બાયોમેટ્રિક અથવા સ્ક્રીન લૉકનો ઉપયોગ કરો"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"ચાલુ રાખવા માટે બાયોમેટ્રિક જરૂરી છે"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ઓળખની તપાસ ચાલુ છે અને તેના માટે બાયોમેટ્રિક જરૂરી છે, પણ તમારો ચહેરો અને ફિંગરપ્રિન્ટ સેન્સર ઉપલબ્ધ નથી\n"<ul><li>"ચેક કરો કે તમારો કૅમેરા ચાલુ છે અને ફરી પ્રયાસ કરો"</li>\n<li>"તમે તમારા Google એકાઉન્ટનો ઉપયોગ કરીને ઓળખની તપાસ બંધ કરી શકો છો"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ઓળખની તપાસ ચાલુ છે અને તે ચકાસી શકતી નથી કે આ તમે જ છો"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"બાયોમેટ્રિક્સ ઘણી વાર નિષ્ફ્ળ થયા. ફરી પ્રયાસ કરવા માટે તમારું ડિવાઇસ લૉક કરીને અનલૉક કરો."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"તમે ચોરી સામે સંરક્ષણના સેટિંગમાં ઓળખની તપાસને મેનેજ કરી શકો છો. સેટિંગ પર જાઓ"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"લૉક સ્ક્રીન"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"સેટિંગ પર જાઓ"</string>
+    <string name="common_ok" msgid="7266105758672679693">"ઓકે"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"રદ કરો"</string>
 </resources>

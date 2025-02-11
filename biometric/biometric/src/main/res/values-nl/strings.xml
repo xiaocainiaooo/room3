@@ -30,6 +30,12 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Geen pincode, patroon of wachtwoord ingesteld."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Dit apparaat ondersteunt geen pincode, patroon of wachtwoord."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Vingerafdrukicoon"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
+    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
+    <skip />
+    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Vingerafdruk gebruiken"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Gezicht gebruiken"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Biometrische gegevens gebruiken"</string>
@@ -44,4 +50,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Gebruik je vingerafdruk of schermvergrendeling om door te gaan"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Gebruik je gezicht of schermvergrendeling om door te gaan"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Gebruik je biometrische gegevens of schermvergrendeling om door te gaan"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometrische gegevens vereist om door te gaan"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Identiteitscontrole staat aan en vereist biometrische gegevens, maar je gezichtsherkenning of vingerafdruksensor is niet beschikbaar\n"<ul><li>"Check of je camera aanstaat en probeer het opnieuw"</li>\n<li>"Je kunt Identiteitscontrole uitzetten via je Google-account"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identiteitscontrole staat aan en kan niet verifiëren dat jij het bent"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometrische verificatie is te vaak mislukt. Vergrendel en ontgrendel je apparaat om het opnieuw te proberen."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Je kunt Identiteitscontrole beheren in de instellingen voor diefstalbeveiliging. Naar Instellingen"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Scherm vergrendelen"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Naar Instellingen"</string>
+    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Annuleren"</string>
 </resources>

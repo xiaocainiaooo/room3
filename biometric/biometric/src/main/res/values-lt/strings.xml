@@ -30,6 +30,9 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Nenustatytas PIN kodas, atrakinimo piešinys arba slaptažodis."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Šis įrenginys nepalaiko PIN kodo, šablono ar slaptažodžio."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Kontrolinio kodo piktograma"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Spustelėjamas mygtukas „Daugiau parinkčių“ turinio rodinyje."</string>
+    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"Klaidos dialogo lange naudotojai informuojami, kad biometriniai duomenys užrakinti ir naudotojas juos uždarė, kad būtų atšaukta, perjungiama į nustatymų puslapį arba užrakinamas ekranas."</string>
+    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"Klaidos dialogo lange naudotojai informuojami, kad biometrinių duomenų aparatinė įranga nepasiekiama ir naudotojas ją uždarė, kad būtų atšaukta, arba perjungiama į nustatymų puslapį."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Naudoti kontrolinį kodą"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Naudoti veido atpažinimo funkciją"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Naudoti biometrinius duomenis"</string>
@@ -44,4 +47,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Jei norite tęsti, naudokite kontrolinį kodą arba ekrano užraktą"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Jei norite tęsti, naudokite veido atpažinimo funkciją arba ekrano užraktą"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Jei norite tęsti, naudokite biometrinius duomenis arba ekrano užraktą"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Norint tęsti reikalingi biometriniai duomenys"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Tapatybės patikra įjungta ir reikia biometrinių duomenų, bet veido ar piršto atspaudo jutiklis nepasiekiamas\n"<ul><li>"Patikrinkite, ar fotoaparatas įjungtas, ir bandykite dar kartą"</li>\n<li>"Galite išjungti tapatybės patikrą naudodami „Google“ paskyrą"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Tapatybės patikra įjungta, bet nepavyko patvirtinti, kad tai jūs"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometrinių duomenų nepavyko gauti per daug kartų. Užrakinkite ir atrakinkite įrenginį, tada bandykite dar kartą."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Tapatybės patikrą galite valdyti apsaugos nuo vagystės nustatymuose. Eiti į nustatymus"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Užrakinti ekraną"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Eiti į nustatymus"</string>
+    <string name="common_ok" msgid="7266105758672679693">"Gerai"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Atšaukti"</string>
 </resources>
