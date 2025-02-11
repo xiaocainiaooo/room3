@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Nie je nastavený kód PIN, vzor ani heslo."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Toto zariadenie nepodporuje PIN, vzor ani heslo."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Ikona odtlačku prsta"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Použiť odtlačok prsta"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Použiť tvár"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Použiť biometrické údaje"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Pokračujte použitím odtlačku prsta alebo zámky obrazovky"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Pokračujte použitím tváre alebo zámky obrazovky"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Pokračujte použitím biometrie alebo zámky obrazovky"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Ak chcete pokračovať, vyžaduje sa biometria"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Overenie totožnosti je zapnuté a vyžaduje biometriu, ale senzor tváre alebo odtlačkov prstov nie je k dispozícii.\n"<ul><li>"Skontrolujte, či je kamera zapnutá, a skúste to znova."</li>\n<li>"Overenie totožnosti môžete vypnúť vo svojom účte Google."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Overenie totožnosti je zapnuté a nedokáže overiť vašu totožnosť"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Overenie biometriou sa nepodarilo príliš veľakrát. Ak chcete skúsiť znova, zamknite a odomknite zariadenie."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Overenie totožnosti môžete spravovať v nastaveniach ochrany v prípade krádeže. Prejsť do Nastavení"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Uzamknutá obrazovka"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Prejsť do Nastavení"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Zrušiť"</string>
 </resources>
