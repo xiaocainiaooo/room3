@@ -27,11 +27,11 @@ import org.junit.Test
 @SdkSuppress(minSdkVersion = 31)
 class ExecuteAppFunctionRequestTest {
     @Test
-    fun toPlatformClass_success() {
+    fun toPlatformExtensionClass_success() {
         assumeAppFunctionExtensionLibraryAvailable()
         val appFunctionData = AppFunctionData.Builder("").setString("testString", "value").build()
         val request = ExecuteAppFunctionRequest("pkg", "method", appFunctionData)
-        val platformRequest = request.toPlatformClass()
+        val platformRequest = request.toPlatformExtensionClass()
 
         assertThat(platformRequest.targetPackageName).isEqualTo("pkg")
         assertThat(platformRequest.functionIdentifier).isEqualTo("method")
@@ -44,7 +44,7 @@ class ExecuteAppFunctionRequestTest {
         val appFunctionDataWithExtras = AppFunctionData(appFunctionData.genericDocument, bundle)
         val requestWithExtras =
             ExecuteAppFunctionRequest("pkg2", "method2", appFunctionDataWithExtras)
-        val platformRequestWithExtras = requestWithExtras.toPlatformClass()
+        val platformRequestWithExtras = requestWithExtras.toPlatformExtensionClass()
 
         assertThat(platformRequestWithExtras.targetPackageName).isEqualTo("pkg2")
         assertThat(platformRequestWithExtras.functionIdentifier).isEqualTo("method2")
@@ -60,7 +60,7 @@ class ExecuteAppFunctionRequestTest {
             com.android.extensions.appfunctions.ExecuteAppFunctionRequest.Builder("pkg", "method")
                 .setParameters(appFunctionData.genericDocument)
                 .build()
-        val request = ExecuteAppFunctionRequest.fromPlatformClass(platformRequest)
+        val request = ExecuteAppFunctionRequest.fromPlatformExtensionClass(platformRequest)
         assertThat(request.targetPackageName).isEqualTo("pkg")
         assertThat(request.functionIdentifier).isEqualTo("method")
         assertThat(request.functionParameters.genericDocument)

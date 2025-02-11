@@ -189,7 +189,12 @@ class AppFunctionServiceDelegateTest {
 
         val response = runBlocking { executeFunctionBlocking(request) }
 
-        assertThat(response.result.getString(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE))
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
+        assertThat(
+                (response as ExecuteAppFunctionResponse.Success)
+                    .returnValue
+                    .getString(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
+            )
             .isEqualTo("TestString")
     }
 
@@ -232,7 +237,12 @@ class AppFunctionServiceDelegateTest {
 
         val response = runBlocking { executeFunctionBlocking(request) }
 
-        assertThat(response.result.getString(ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE))
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
+        assertThat(
+                (response as ExecuteAppFunctionResponse.Success)
+                    .returnValue
+                    .getString(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
+            )
             .isEqualTo("TestString")
     }
 

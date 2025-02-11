@@ -16,12 +16,44 @@
 
 package androidx.appfunctions
 
-import android.app.Service
-import android.content.Intent
-import android.os.IBinder
+import android.app.appsearch.GenericDocument
+import android.os.Build
+import android.os.CancellationSignal
+import android.os.OutcomeReceiver
+import androidx.annotation.RequiresApi
+import androidx.appfunctions.core.AppFunctionMetadataTestHelper
+import com.android.extensions.appfunctions.AppFunctionException
+import com.android.extensions.appfunctions.AppFunctionService
+import com.android.extensions.appfunctions.ExecuteAppFunctionRequest
+import com.android.extensions.appfunctions.ExecuteAppFunctionResponse
 
-class TestAppFunctionService : Service() {
-    override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
+@RequiresApi(Build.VERSION_CODES.S)
+class TestAppFunctionService : AppFunctionService() {
+    override fun onExecuteFunction(
+        request: ExecuteAppFunctionRequest,
+        callingPackage: String,
+        cancellationSignal: CancellationSignal,
+        callback: OutcomeReceiver<ExecuteAppFunctionResponse?, AppFunctionException?>
+    ) {
+        return when (request.functionIdentifier) {
+            AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED -> {
+                callback.onResult(
+                    ExecuteAppFunctionResponse(
+                        GenericDocument.Builder<GenericDocument.Builder<*>>("", "", "")
+                            .setPropertyString("testResult", "result")
+                            .build()
+                    )
+                )
+            }
+            AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_FAIL -> {
+                callback.onError(
+                    AppFunctionException(
+                        AppFunctionException.ERROR_INVALID_ARGUMENT,
+                        "error message"
+                    )
+                )
+            }
+            else -> throw IllegalArgumentException("Unknown function id")
+        }
     }
 }

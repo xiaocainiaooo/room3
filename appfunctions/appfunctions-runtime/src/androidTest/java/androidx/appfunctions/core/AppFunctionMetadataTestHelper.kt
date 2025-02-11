@@ -80,6 +80,9 @@ internal class AppFunctionMetadataTestHelper(private val context: Context) {
             "androidx.appfunctions.test#noSchema_enabledByDefault"
         const val NO_SCHEMA_DISABLED_BY_DEFAULT =
             "androidx.appfunctions.test#noSchema_disabledByDefault"
+        const val NO_SCHEMA_EXECUTION_SUCCEED =
+            "androidx.appfunctions.test#noSchema_executionSucceed"
+        const val NO_SCHEMA_EXECUTION_FAIL = "androidx.appfunctions.test#noSchema_executionFail"
     }
 
     companion object {

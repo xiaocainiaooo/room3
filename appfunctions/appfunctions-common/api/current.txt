@@ -139,15 +139,24 @@ package androidx.appfunctions {
   public static final class ExecuteAppFunctionRequest.Companion {
   }
 
-  public final class ExecuteAppFunctionResponse {
-    ctor public ExecuteAppFunctionResponse(androidx.appfunctions.AppFunctionData result);
-    method public androidx.appfunctions.AppFunctionData getResult();
-    property public androidx.appfunctions.AppFunctionData result;
-    field public static final androidx.appfunctions.ExecuteAppFunctionResponse.Companion Companion;
+  public sealed interface ExecuteAppFunctionResponse {
+  }
+
+  public static final class ExecuteAppFunctionResponse.Error implements androidx.appfunctions.ExecuteAppFunctionResponse {
+    ctor public ExecuteAppFunctionResponse.Error(androidx.appfunctions.AppFunctionException error);
+    method public androidx.appfunctions.AppFunctionException getError();
+    property public androidx.appfunctions.AppFunctionException error;
+  }
+
+  public static final class ExecuteAppFunctionResponse.Success implements androidx.appfunctions.ExecuteAppFunctionResponse {
+    ctor public ExecuteAppFunctionResponse.Success(androidx.appfunctions.AppFunctionData returnValue);
+    method public androidx.appfunctions.AppFunctionData getReturnValue();
+    property public androidx.appfunctions.AppFunctionData returnValue;
+    field public static final androidx.appfunctions.ExecuteAppFunctionResponse.Success.Companion Companion;
     field public static final String PROPERTY_RETURN_VALUE = "androidAppfunctionsReturnValue";
   }
 
-  public static final class ExecuteAppFunctionResponse.Companion {
+  public static final class ExecuteAppFunctionResponse.Success.Companion {
     property public static String PROPERTY_RETURN_VALUE;
   }
 
