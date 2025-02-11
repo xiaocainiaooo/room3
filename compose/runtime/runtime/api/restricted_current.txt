@@ -1233,8 +1233,8 @@ package androidx.compose.runtime.tooling {
   }
 
   public final class CompositionErrorContextKt {
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.tooling.CompositionErrorContext?> getLocalCompositionErrorContext();
-    property public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.tooling.CompositionErrorContext?> LocalCompositionErrorContext;
+    method public static androidx.compose.runtime.CompositionLocal<androidx.compose.runtime.tooling.CompositionErrorContext?> getLocalCompositionErrorContext();
+    property public static androidx.compose.runtime.CompositionLocal<androidx.compose.runtime.tooling.CompositionErrorContext?> LocalCompositionErrorContext;
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
