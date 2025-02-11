@@ -325,16 +325,19 @@ internal class TextFieldDecoratorModifierNode(
      * window receives the focus back. Element can stay focused even if the window loses its focus.
      */
     private var isElementFocused: Boolean = false
+        set(value) {
+            field = value
+            onObservedReadsChanged()
+        }
 
     /** Keeps focus state of the window */
     private var windowInfo: WindowInfo? = null
 
     private val isFocused: Boolean
         get() {
-            // make sure that we read both window focus and element focus for snapshot aware
-            // callers to successfully update when either one changes
-            val isWindowFocused = windowInfo?.isWindowFocused == true
-            return isElementFocused && isWindowFocused
+            // Avoid reading WindowInfo.isWindowFocused when the text field is not focused;
+            // otherwise all text fields in a window will be recomposed when it becomes focused.
+            return isElementFocused && windowInfo?.isWindowFocused == true
         }
 
     /**
@@ -631,7 +634,6 @@ internal class TextFieldDecoratorModifierNode(
             return
         }
         isElementFocused = focusState.isFocused
-        onFocusChange()
 
         val editable = enabled && !readOnly
         if (focusState.isFocused) {
