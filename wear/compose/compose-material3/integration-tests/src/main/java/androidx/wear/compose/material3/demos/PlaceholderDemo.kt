@@ -294,13 +294,18 @@ fun PlaceholderButtonList() {
             }
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CompactButton(label = { Text("Reset") }, onClick = { resetCount++ })
-        }
+        FloatingResetButton(onClick = { resetCount++ })
+    }
+}
+
+@Composable
+fun FloatingResetButton(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CompactButton(label = { Text("Reset") }, onClick = onClick)
     }
 }
 
@@ -322,7 +327,6 @@ fun PlaceholderCardList() {
 
     ScalingLazyColumn {
         item { ListHeader { Text("Overlaid Placeholders", textAlign = TextAlign.Center) } }
-        item { Centralize { Button(label = { Text("Reset") }, onClick = { resetCount++ }) } }
         repeat(4) { itemIndex ->
             item {
                 CardWithOverlaidPlaceholder(
@@ -335,6 +339,8 @@ fun PlaceholderCardList() {
             }
         }
     }
+
+    FloatingResetButton(onClick = { resetCount++ })
 }
 
 @Composable
