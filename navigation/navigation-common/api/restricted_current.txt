@@ -253,8 +253,8 @@ package androidx.navigation {
   }
 
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS, kotlin.annotation.AnnotationTarget.CLASS}) public static @interface NavDestination.ClassType {
-    method public abstract Class<? extends java.lang.Object?> value();
-    property public abstract Class<? extends java.lang.Object?> value;
+    method public abstract kotlin.reflect.KClass<? extends java.lang.Object?> value();
+    property public abstract kotlin.reflect.KClass<? extends java.lang.Object?> value;
   }
 
   public static final class NavDestination.Companion {
@@ -412,6 +412,7 @@ package androidx.navigation {
     method public androidx.navigation.NavOptions.Builder setLaunchSingleTop(boolean singleTop);
     method public androidx.navigation.NavOptions.Builder setPopEnterAnim(@AnimRes @AnimatorRes int popEnterAnim);
     method public androidx.navigation.NavOptions.Builder setPopExitAnim(@AnimRes @AnimatorRes int popExitAnim);
+    method public inline <reified T> androidx.navigation.NavOptions.Builder setPopUpTo(boolean inclusive);
     method public inline <reified T> androidx.navigation.NavOptions.Builder setPopUpTo(boolean inclusive, optional boolean saveState);
     method public androidx.navigation.NavOptions.Builder setPopUpTo(@IdRes int destinationId, boolean inclusive);
     method public androidx.navigation.NavOptions.Builder setPopUpTo(@IdRes int destinationId, boolean inclusive, optional boolean saveState);
@@ -578,7 +579,7 @@ package androidx.navigation {
     ctor public NavigatorProvider();
     method public final androidx.navigation.Navigator<? extends androidx.navigation.NavDestination>? addNavigator(androidx.navigation.Navigator<? extends androidx.navigation.NavDestination> navigator);
     method @CallSuper public androidx.navigation.Navigator<? extends androidx.navigation.NavDestination>? addNavigator(String name, androidx.navigation.Navigator<? extends androidx.navigation.NavDestination> navigator);
-    method public final <T extends androidx.navigation.Navigator<?>> T getNavigator(Class<T> navigatorClass);
+    method @CallSuper public final <T extends androidx.navigation.Navigator<?>> T getNavigator(Class<T> navigatorClass);
     method @CallSuper public <T extends androidx.navigation.Navigator<?>> T getNavigator(String name);
   }
 
