@@ -69,8 +69,6 @@ class AppFunctionInventoryProcessor(
         inventoryClassBuilder.addSuperinterface(IntrospectionHelper.APP_FUNCTION_INVENTORY_CLASS)
         inventoryClassBuilder.addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
         inventoryClassBuilder.addKdoc(buildSourceFilesKdoc(appFunctionClass))
-        inventoryClassBuilder.addProperty(buildFunctionIdToMetadataMapProperty())
-
         addFunctionMetadataProperties(inventoryClassBuilder, appFunctionClass)
 
         val fileSpec =
@@ -118,16 +116,16 @@ class AppFunctionInventoryProcessor(
             addPropertyForAppFunctionMetadata(functionMetadataObjectClassBuilder, functionMetadata)
             inventoryClassBuilder.addType(functionMetadataObjectClassBuilder.build())
         }
+        addFunctionIdToMetadataMapProperty(inventoryClassBuilder, appFunctionMetadataList)
     }
 
     private fun addPropertyForAppFunctionMetadata(
         functionMetadataObjectClassBuilder: TypeSpec.Builder,
         functionMetadata: AppFunctionMetadata
     ) {
-        val appFunctionMetadataPropertyName = "APP_FUNCTION_METADATA"
         functionMetadataObjectClassBuilder.addProperty(
             PropertySpec.builder(
-                    appFunctionMetadataPropertyName,
+                    APP_FUNCTION_METADATA_PROPERTY_NAME,
                     IntrospectionHelper.APP_FUNCTION_METADATA_CLASS
                 )
                 .addModifiers(KModifier.PUBLIC)
@@ -456,19 +454,41 @@ class AppFunctionInventoryProcessor(
     }
 
     /** Creates the `functionIdToMetadataMap` property of the `AppFunctionInventory`. */
-    private fun buildFunctionIdToMetadataMapProperty(): PropertySpec {
-        return PropertySpec.builder(
-                "functionIdToMetadataMap",
-                Map::class.asClassName()
-                    .parameterizedBy(
-                        String::class.asClassName(),
-                        IntrospectionHelper.APP_FUNCTION_METADATA_CLASS
-                    ),
-            )
-            .addModifiers(KModifier.OVERRIDE)
-            // TODO: Actually build map properties
-            .initializer(buildCodeBlock { addStatement("mapOf()") })
-            .build()
+    private fun addFunctionIdToMetadataMapProperty(
+        inventoryClassBuilder: TypeSpec.Builder,
+        appFunctionMetadataList: List<AppFunctionMetadata>
+    ) {
+        inventoryClassBuilder.addProperty(
+            PropertySpec.builder(
+                    FUNCTION_ID_TO_METADATA_MAP_PROPERTY_NAME,
+                    Map::class.asClassName()
+                        .parameterizedBy(
+                            String::class.asClassName(),
+                            IntrospectionHelper.APP_FUNCTION_METADATA_CLASS
+                        ),
+                )
+                .addModifiers(KModifier.OVERRIDE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("mapOf(")
+                        indent()
+                        for (appFunctionMetadata in appFunctionMetadataList) {
+                            addStatement(
+                                """
+                                %S to %L.%L,
+                                """
+                                    .trimIndent(),
+                                appFunctionMetadata.id,
+                                getFunctionMetadataObjectClassName(appFunctionMetadata.id),
+                                APP_FUNCTION_METADATA_PROPERTY_NAME
+                            )
+                        }
+                        unindent()
+                        addStatement(")")
+                    }
+                )
+                .build()
+        )
     }
 
     private fun addSchemaMetadataPropertyForFunction(
@@ -563,8 +583,10 @@ class AppFunctionInventoryProcessor(
     }
 
     companion object {
+        const val APP_FUNCTION_METADATA_PROPERTY_NAME = "APP_FUNCTION_METADATA"
         const val SCHEMA_METADATA_PROPERTY_NAME = "SCHEMA_METADATA"
         const val PARAMETER_METADATA_LIST_PROPERTY_NAME = "PARAMETER_METADATA_LIST"
         const val RESPONSE_METADATA_PROPERTY_NAME = "RESPONSE_METADATA"
+        const val FUNCTION_ID_TO_METADATA_MAP_PROPERTY_NAME = "functionIdToMetadataMap"
     }
 }
