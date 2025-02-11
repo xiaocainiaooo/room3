@@ -121,6 +121,14 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveParams",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveArrayParamsMetadataObject {
@@ -298,6 +306,14 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveArrayParams",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 }
