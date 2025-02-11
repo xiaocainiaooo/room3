@@ -998,7 +998,10 @@ private fun PlannedExerciseBlock.toPlatformPlannedExerciseBlock() =
     PlatformPlannedExerciseBlockBuilder(
             repetitions,
         )
-        .apply { setSteps(steps.map { it.toPlatformPlannedExerciseStep() }) }
+        .apply {
+            setDescription(description)
+            setSteps(steps.map { it.toPlatformPlannedExerciseStep() })
+        }
         .build()
 
 @SuppressLint("NewApi")
@@ -1009,6 +1012,7 @@ private fun PlannedExerciseStep.toPlatformPlannedExerciseStep() =
             completionGoal.toPlatformExerciseCompletionGoal()
         )
         .apply {
+            setDescription(description)
             setPerformanceGoals(performanceTargets.map { it.toPlatformExercisePerformanceTarget() })
         }
         .build()
@@ -1078,6 +1082,7 @@ private fun PlatformPlannedExerciseBlock.toSdkPlannedExerciseBlock() =
 @SuppressLint("NewApi")
 private fun PlatformPlannedExerciseStep.toSdkPlannedExerciseStep() =
     PlannedExerciseStep(
+        description = description?.toString(),
         exerciseType = exerciseType.toSdkExerciseSegmentType(),
         exercisePhase = exerciseCategory.toSdkExerciseCategory(),
         completionGoal = completionGoal.toSdkExerciseCompletionGoal(),
