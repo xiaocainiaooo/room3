@@ -17,7 +17,16 @@ import kotlin.collections.Map
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionInventory {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
+  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+    "com.testdata.SerializableOutputFunctions#simpleFunction" to
+        ComTestdataSerializableOutputFunctionsSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList" to
+        ComTestdataSerializableOutputFunctionsSimpleFunctionSerializableListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializableList" to
+        ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable" to
+        ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableMetadataObject.APP_FUNCTION_METADATA,
+  )
 
   private object ComTestdataSerializableOutputFunctionsSimpleFunctionMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null

@@ -19,7 +19,12 @@ import kotlin.collections.Map
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInventory {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
+  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+    "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveParams" to
+        ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveParamsMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveArrayParams" to
+        ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveArrayParamsMetadataObject.APP_FUNCTION_METADATA,
+  )
 
   private object ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveParamsMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=

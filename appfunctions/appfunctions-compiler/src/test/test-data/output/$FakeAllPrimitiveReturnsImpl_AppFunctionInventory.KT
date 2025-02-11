@@ -19,7 +19,66 @@ import kotlin.collections.Map
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionInventory {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
+  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+    "com.testdata.FakeAllPrimitiveReturnsImpl#unitReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplUnitReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#byteArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplByteArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#intReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplIntReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#longReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplLongReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#floatReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplFloatReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#doubleReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplDoubleReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#stringReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplStringReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#booleanReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableIntReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableLongReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableFloatReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableStringReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#intArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#byteArrayListReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplByteArrayListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#longArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#floatArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#doubleArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplDoubleArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#stringListReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplStringListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#booleanArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringListReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableStringListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayListReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatArrayReturn" to
+        ComTestdataFakeAllPrimitiveReturnsImplNullableFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+  )
 
   private object ComTestdataFakeAllPrimitiveReturnsImplUnitReturnMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
