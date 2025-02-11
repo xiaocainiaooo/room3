@@ -22,6 +22,7 @@ import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
@@ -114,15 +115,53 @@ class AppFunctionInventoryProcessor(
                 functionMetadataObjectClassBuilder,
                 functionMetadata.response
             )
+            addPropertyForAppFunctionMetadata(functionMetadataObjectClassBuilder, functionMetadata)
             inventoryClassBuilder.addType(functionMetadataObjectClassBuilder.build())
         }
+    }
+
+    private fun addPropertyForAppFunctionMetadata(
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        functionMetadata: AppFunctionMetadata
+    ) {
+        val appFunctionMetadataPropertyName = "APP_FUNCTION_METADATA"
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    appFunctionMetadataPropertyName,
+                    IntrospectionHelper.APP_FUNCTION_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PUBLIC)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                id = %S,
+                                isEnabledByDefault = %L,
+                                schema =  %L,
+                                parameters = %L,
+                                response = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_METADATA_CLASS,
+                            functionMetadata.id,
+                            functionMetadata.isEnabledByDefault,
+                            SCHEMA_METADATA_PROPERTY_NAME,
+                            PARAMETER_METADATA_LIST_PROPERTY_NAME,
+                            RESPONSE_METADATA_PROPERTY_NAME
+                        )
+                    }
+                )
+                .build()
+        )
     }
 
     private fun addPropertyForResponseMetadata(
         functionMetadataObjectClassBuilder: TypeSpec.Builder,
         appFunctionResponseMetadata: AppFunctionResponseMetadata
     ) {
-        val responseMetadataPropertyName = "RESPONSE_METADATA"
+        val responseMetadataPropertyName = RESPONSE_METADATA_PROPERTY_NAME
         val responseMetadataValueTypeName =
             when (val castDataType = appFunctionResponseMetadata.valueType) {
                 is AppFunctionPrimitiveTypeMetadata -> {
@@ -190,7 +229,7 @@ class AppFunctionInventoryProcessor(
     ) {
         functionMetadataObjectClassBuilder.addProperty(
             PropertySpec.builder(
-                    "PARAMETER_METADATA_LIST",
+                    PARAMETER_METADATA_LIST_PROPERTY_NAME,
                     List::class.asClassName()
                         .parameterizedBy(IntrospectionHelper.APP_FUNCTION_PARAMETER_METADATA_CLASS)
                 )
@@ -438,7 +477,7 @@ class AppFunctionInventoryProcessor(
     ) {
         functionMetadataObjectClassBuilder.addProperty(
             PropertySpec.builder(
-                    "SCHEMA_METADATA",
+                    SCHEMA_METADATA_PROPERTY_NAME,
                     IntrospectionHelper.APP_FUNCTION_SCHEMA_METADATA_CLASS.copy(nullable = true)
                 )
                 .addModifiers(KModifier.PRIVATE)
@@ -521,5 +560,11 @@ class AppFunctionInventoryProcessor(
         parameterMetadata: AppFunctionParameterMetadata
     ): String {
         return "PARAMETER_METADATA_${parameterMetadata.name.uppercase()}_OBJECT_DATA_TYPE"
+    }
+
+    companion object {
+        const val SCHEMA_METADATA_PROPERTY_NAME = "SCHEMA_METADATA"
+        const val PARAMETER_METADATA_LIST_PROPERTY_NAME = "PARAMETER_METADATA_LIST"
+        const val RESPONSE_METADATA_PROPERTY_NAME = "RESPONSE_METADATA"
     }
 }

@@ -34,5 +34,13 @@ public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.SimpleFunction#simpleFunction",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 }

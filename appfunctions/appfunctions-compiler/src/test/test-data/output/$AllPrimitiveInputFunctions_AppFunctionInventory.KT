@@ -49,6 +49,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionInt",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongMetadataObject {
@@ -79,6 +87,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLong",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -111,6 +127,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloat",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleMetadataObject {
@@ -141,6 +165,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDouble",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -173,6 +205,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBoolean",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringMetadataObject {
@@ -203,6 +243,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionString",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -235,6 +283,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableInt",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongMetadataObject {
@@ -265,6 +321,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLong",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -297,6 +361,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloat",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleMetadataObject {
@@ -327,6 +399,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDouble",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -359,6 +439,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBoolean",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringMetadataObject {
@@ -389,6 +477,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableString",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -427,6 +523,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionIntArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongArrayMetadataObject {
@@ -463,6 +567,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLongArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -501,6 +613,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloatArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleArrayMetadataObject {
@@ -537,6 +657,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDoubleArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -575,6 +703,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBooleanArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringListMetadataObject {
@@ -612,6 +748,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionStringList",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntArrayMetadataObject {
@@ -648,6 +792,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableIntArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -687,6 +839,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLongArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject
@@ -724,6 +884,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloatArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 
@@ -763,6 +931,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDoubleArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object
@@ -801,6 +977,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBooleanArray",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
   }
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject
@@ -838,6 +1022,14 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableStringList",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
         )
   }
 }
