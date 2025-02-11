@@ -73,10 +73,23 @@ class TracingDriverBenchmark {
 
     /**
      * This benchmark runs the measurement 32 times to ensure emitting the packet is captured once
-     * per measurement
+     * per measurement.
      */
     @Test
     fun beginEnd_basic32() {
+        beginEndBenchmark(measureSerialization = false)
+    }
+
+    /**
+     * This benchmark runs the measurement 32 times to ensure emitting the packet is captured once
+     * per measurement. Additionally it measures the cost of serialization.
+     */
+    @Test
+    fun beginEnd_basic32_withSerialization() {
+        beginEndBenchmark(measureSerialization = true)
+    }
+
+    private fun beginEndBenchmark(measureSerialization: Boolean) {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val dispatcher = StandardTestDispatcher()
         val sink = buildInMemorySink(context, dispatcher)
@@ -97,7 +110,11 @@ class TracingDriverBenchmark {
             // running OOM (when the consumer can't keep up) we wait for the packets to flush.
             // Note that we attempt to wait a consistent amount of time to ensure consistent
             // measurements.
-            runWithMeasurementDisabled { dispatcher.scheduler.advanceUntilIdle() }
+            if (!measureSerialization) {
+                runWithMeasurementDisabled { dispatcher.scheduler.advanceUntilIdle() }
+            } else {
+                dispatcher.scheduler.advanceUntilIdle()
+            }
         }
     }
 }
