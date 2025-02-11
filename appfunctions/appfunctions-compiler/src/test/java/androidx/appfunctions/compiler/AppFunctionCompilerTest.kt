@@ -93,7 +93,7 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testAllPrimitiveInputFunctions_genAppFunctionInventoryImpl_success() {
+    fun testAllPrimitiveInputFunctions_genAppFunctionInventory_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("AllPrimitiveInputFunctions.KT")
@@ -134,7 +134,7 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testSerializableInputFunctions_genAppFunctionInventoryImpl_success() {
+    fun testSerializableInputFunctions_genAppFunctionInventory_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("SerializableInputFunctions.KT")
@@ -149,7 +149,7 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testFakeAllPrimitiveParamsImpl_genAppFunctionInventoryImpl_success() {
+    fun testFakeAllPrimitiveParamsImpl_genAppFunctionInventory_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeAllPrimitiveParamsImpl.KT", "FakeSchemas.KT")
@@ -160,6 +160,36 @@ class AppFunctionCompilerTest {
             expectGeneratedSourceFileName =
                 "${'$'}FakeAllPrimitiveParamsImpl_AppFunctionInventory.kt",
             goldenFileName = "${'$'}FakeAllPrimitiveParamsImpl_AppFunctionInventory.KT",
+        )
+    }
+
+    @Test
+    fun testFakeAllPrimitiveReturnsImpl_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeAllPrimitiveReturnsImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}FakeAllPrimitiveReturnsImpl_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}FakeAllPrimitiveReturnsImpl_AppFunctionInventory.KT",
+        )
+    }
+
+    @Test
+    fun testSerializableOutputFunctions_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("SerializableOutputFunctions.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}SerializableOutputFunctions_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}SerializableOutputFunctions_AppFunctionInventory.KT",
         )
     }
 

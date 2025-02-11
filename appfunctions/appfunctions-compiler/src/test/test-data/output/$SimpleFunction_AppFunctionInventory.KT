@@ -3,6 +3,8 @@ package com.testdata
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
@@ -22,5 +24,15 @@ public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
   }
 }

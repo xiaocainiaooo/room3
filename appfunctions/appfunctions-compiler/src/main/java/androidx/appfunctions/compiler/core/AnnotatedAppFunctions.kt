@@ -168,7 +168,7 @@ data class AnnotatedAppFunctions(
                 computeAppFunctionAnnotationProperties(functionDeclaration)
             val parameterTypeMetadataList = functionDeclaration.buildParameterTypeMetadataList()
             val responseTypeMetadata =
-                checkNotNull(functionDeclaration.returnType).buildResponseObjectTypeMetadata()
+                checkNotNull(functionDeclaration.returnType).toAppFunctionDataTypeMetadata()
 
             AppFunctionMetadata(
                 id = getAppFunctionIdentifier(functionDeclaration),
@@ -178,15 +178,6 @@ data class AnnotatedAppFunctions(
                 response = AppFunctionResponseMetadata(valueType = responseTypeMetadata)
             )
         }
-
-    /**
-     * Builds an [AppFunctionDataTypeMetadata] instance for the return type of an app function.
-     *
-     * Currently, only primitive return types are supported.
-     */
-    private fun KSTypeReference.buildResponseObjectTypeMetadata(): AppFunctionDataTypeMetadata {
-        return toAppFunctionDataTypeMetadata()
-    }
 
     /**
      * Builds a list of [AppFunctionParameterMetadata] for the parameters of an app function.
