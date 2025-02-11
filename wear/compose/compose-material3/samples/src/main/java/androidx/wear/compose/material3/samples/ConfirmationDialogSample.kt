@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.ConfirmationDialog
 import androidx.wear.compose.material3.ConfirmationDialogDefaults
 import androidx.wear.compose.material3.FailureConfirmationDialog
@@ -44,23 +45,27 @@ import androidx.wear.compose.material3.samples.icons.FavoriteIcon
 fun ConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
-        FilledTonalButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { showConfirmation = true },
-            label = { Text("Show Confirmation") }
-        )
-    }
+    // Use AppScaffold to improve ConfirmationDialog's Performance
+    AppScaffold {
+        Box(Modifier.fillMaxSize()) {
+            FilledTonalButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { showConfirmation = true },
+                label = { Text("Show Confirmation") }
+            )
+        }
 
-    // Has an icon and a short curved text content, which will be displayed along the bottom edge of
-    // the screen.
-    val curvedTextStyle = ConfirmationDialogDefaults.curvedTextStyle
-    ConfirmationDialog(
-        visible = showConfirmation,
-        onDismissRequest = { showConfirmation = false },
-        curvedText = { confirmationDialogCurvedText("Confirmed", curvedTextStyle) },
-    ) {
-        FavoriteIcon(ConfirmationDialogDefaults.IconSize)
+        // Has an icon and a short curved text content, which will be displayed along the bottom
+        // edge of
+        // the screen.
+        val curvedTextStyle = ConfirmationDialogDefaults.curvedTextStyle
+        ConfirmationDialog(
+            visible = showConfirmation,
+            onDismissRequest = { showConfirmation = false },
+            curvedText = { confirmationDialogCurvedText("Confirmed", curvedTextStyle) },
+        ) {
+            FavoriteIcon(ConfirmationDialogDefaults.IconSize)
+        }
     }
 }
 
@@ -69,26 +74,30 @@ fun ConfirmationDialogSample() {
 fun LongTextConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
-        FilledTonalButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { showConfirmation = true },
-            label = { Text("Show Confirmation") }
-        )
-    }
+    // Use AppScaffold to improve ConfirmationDialog's Performance
+    AppScaffold {
+        Box(Modifier.fillMaxSize()) {
+            FilledTonalButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { showConfirmation = true },
+                label = { Text("Show Confirmation") }
+            )
+        }
 
-    // Has an icon and a text content. Text will be displayed in the center of the screen below the
-    // icon.
-    ConfirmationDialog(
-        visible = showConfirmation,
-        onDismissRequest = { showConfirmation = false },
-        text = { Text(text = "Your message has been sent") },
-    ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.Send,
-            contentDescription = null,
-            modifier = Modifier.size(ConfirmationDialogDefaults.SmallIconSize),
-        )
+        // Has an icon and a text content. Text will be displayed in the center of the screen below
+        // the
+        // icon.
+        ConfirmationDialog(
+            visible = showConfirmation,
+            onDismissRequest = { showConfirmation = false },
+            text = { Text(text = "Your message has been sent") },
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                contentDescription = null,
+                modifier = Modifier.size(ConfirmationDialogDefaults.SmallIconSize),
+            )
+        }
     }
 }
 
@@ -97,21 +106,24 @@ fun LongTextConfirmationDialogSample() {
 fun FailureConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
-        FilledTonalButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { showConfirmation = true },
-            label = { Text("Show Confirmation") }
+    // Use AppScaffold to improve ConfirmationDialog's Performance
+    AppScaffold {
+        Box(Modifier.fillMaxSize()) {
+            FilledTonalButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { showConfirmation = true },
+                label = { Text("Show Confirmation") }
+            )
+        }
+
+        val text = "Failure"
+        val style = ConfirmationDialogDefaults.curvedTextStyle
+        FailureConfirmationDialog(
+            visible = showConfirmation,
+            onDismissRequest = { showConfirmation = false },
+            curvedText = { confirmationDialogCurvedText(text, style) }
         )
     }
-
-    val text = "Failure"
-    val style = ConfirmationDialogDefaults.curvedTextStyle
-    FailureConfirmationDialog(
-        visible = showConfirmation,
-        onDismissRequest = { showConfirmation = false },
-        curvedText = { confirmationDialogCurvedText(text, style) }
-    )
 }
 
 @Sampled
@@ -119,19 +131,22 @@ fun FailureConfirmationDialogSample() {
 fun SuccessConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
-        FilledTonalButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { showConfirmation = true },
-            label = { Text("Show Confirmation") }
+    // Use AppScaffold to improve ConfirmationDialog's Performance
+    AppScaffold {
+        Box(Modifier.fillMaxSize()) {
+            FilledTonalButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { showConfirmation = true },
+                label = { Text("Show Confirmation") }
+            )
+        }
+
+        val text = "Success"
+        val style = ConfirmationDialogDefaults.curvedTextStyle
+        SuccessConfirmationDialog(
+            visible = showConfirmation,
+            onDismissRequest = { showConfirmation = false },
+            curvedText = { confirmationDialogCurvedText(text, style) }
         )
     }
-
-    val text = "Success"
-    val style = ConfirmationDialogDefaults.curvedTextStyle
-    SuccessConfirmationDialog(
-        visible = showConfirmation,
-        onDismissRequest = { showConfirmation = false },
-        curvedText = { confirmationDialogCurvedText(text, style) }
-    )
 }
