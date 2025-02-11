@@ -997,7 +997,12 @@ internal class LayoutNodeSubcompositionsState(
          */
         override fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable> {
             val nodeInSlot = slotIdToNode[slotId]
-            if (nodeInSlot != null && root.foldedChildren.indexOf(nodeInSlot) < currentIndex) {
+            val nodeState = nodeInSlot?.let { nodeToNodeState[it] }
+            if (
+                nodeInSlot != null &&
+                    root.foldedChildren.indexOf(nodeInSlot) < currentIndex &&
+                    nodeState?.forceRecompose != true
+            ) {
                 // Check that the node has been composed in lookahead. Otherwise, we need to
                 // compose the node in approach pass via approachSubcompose.
                 return nodeInSlot.childMeasurables
