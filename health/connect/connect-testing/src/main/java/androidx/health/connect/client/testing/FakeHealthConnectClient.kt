@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:JvmName("MetadataTestHelper")
 
 package androidx.health.connect.client.testing
 
@@ -436,7 +437,15 @@ public class FakeHealthConnectClient(
             .forEach { timeToChanges.remove(it) }
     }
 
-    internal fun setPackageName(newPackage: String) {
+    /**
+     * Sets the package name used by the [FakeHealthConnectClient].
+     *
+     * This method overrides the [DEFAULT_PACKAGE_NAME] and designates the provided [newPackage] as
+     * the caller for all subsequent method invocations on this [FakeHealthConnectClient] instance.
+     *
+     * @param newPackage The package name to be used for all calls to the [FakeHealthConnectClient].
+     */
+    public fun setPackageName(newPackage: String) {
         packageName = newPackage
     }
 
