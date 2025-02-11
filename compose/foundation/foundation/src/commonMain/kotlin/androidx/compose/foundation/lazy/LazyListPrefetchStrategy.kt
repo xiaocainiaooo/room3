@@ -95,8 +95,9 @@ interface LazyListPrefetchScope {
      *
      * @param index the index of the child to prefetch
      * @param onPrefetchFinished A callback that will be invoked when the prefetching of this item
-     *   is completed. If the prefetch request is cancelled or the item is not premeasured this will
-     *   not be called. The main axis size of the prefetched item is available.
+     *   is completed. This means precomposition and premeasuring. If the request is canceled before
+     *   either phases can complete, this callback won't be called. The main axis size in pixels of
+     *   the prefetched item is available as a parameter of this callback.
      */
     fun schedulePrefetch(
         index: Int,
