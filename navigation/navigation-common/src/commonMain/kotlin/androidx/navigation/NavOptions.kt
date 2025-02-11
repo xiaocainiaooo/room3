@@ -62,7 +62,7 @@ public expect class NavOptions {
      * Whether this navigation action should launch as single-top (i.e., there will be at most one
      * copy of a given destination on the top of the back stack).
      *
-     * This functions similarly to how [android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP] works with
+     * This functions similarly to how `android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP` works with
      * activities.
      */
     public fun shouldLaunchSingleTop(): Boolean
@@ -74,19 +74,19 @@ public expect class NavOptions {
     public fun shouldRestoreState(): Boolean
 
     /**
-     * Whether the destination set in [getPopUpTo] should be popped from the back stack.
+     * Whether the destination set in [popUpToRoute] should be popped from the back stack.
      *
      * @see Builder.setPopUpTo
-     * @see NavOptions.getPopUpTo
+     * @see NavOptions.popUpToRoute
      */
     public fun isPopUpToInclusive(): Boolean
 
     /**
      * Whether the back stack and the state of all destinations between the current destination and
-     * [popUpToId] should be saved for later restoration via [Builder.setRestoreState] or the
-     * `restoreState` attribute using the same ID as [popUpToId] (note: this matching ID is true if
-     * [isPopUpToInclusive] is true. If [isPopUpToInclusive] is false, this matching ID is the id of
-     * the last destination that is popped).
+     * [popUpToRoute] should be saved for later restoration via [Builder.setRestoreState] or the
+     * `restoreState` attribute using the same ID as [popUpToRoute] (note: this matching ID is true
+     * if [isPopUpToInclusive] is true. If [isPopUpToInclusive] is false, this matching ID is the id
+     * of the last destination that is popped).
      */
     public fun shouldPopUpToSaveState(): Boolean
 
@@ -121,7 +121,7 @@ public expect class NavOptions {
          *   (note: this matching ID is true if [inclusive] is true. If [inclusive] is false, this
          *   matching ID is the id of the last destination that is popped).
          * @return this Builder
-         * @see NavOptions.popUpToId
+         * @see NavOptions.popUpToRoute
          * @see NavOptions.isPopUpToInclusive
          */
         @JvmOverloads
@@ -145,7 +145,7 @@ public expect class NavOptions {
          *   [inclusive] is false, this matching ID is the id of the last destination that is
          *   popped).
          * @return this Builder
-         * @see NavOptions.popUpToId
+         * @see NavOptions.popUpToRoute
          * @see NavOptions.isPopUpToInclusive
          */
         @JvmOverloads
@@ -169,7 +169,7 @@ public expect class NavOptions {
          *   [inclusive] is false, this matching ID is the id of the last destination that is
          *   popped).
          * @return this Builder
-         * @see NavOptions.popUpToId
+         * @see NavOptions.popUpToRoute
          * @see NavOptions.isPopUpToInclusive
          */
         @JvmOverloads
@@ -193,7 +193,7 @@ public expect class NavOptions {
          *   [inclusive] is false, this matching ID is the id of the last destination that is
          *   popped).
          * @return this Builder
-         * @see NavOptions.popUpToId
+         * @see NavOptions.popUpToRoute
          * @see NavOptions.isPopUpToInclusive
          */
         @JvmOverloads
