@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"कोणताही पिन, पॅटर्न किंवा पासवर्ड सेट केलेला नाही."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"हे डिव्हाइस पिन, पॅटर्न किंवा पासवर्ड यांना सपोर्ट करत नाही."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"फिंगरप्रिंटचा आयकन"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"फिंगरप्रिंट वापरा"</string>
     <string name="use_face_label" msgid="6533512708069459542">"चेहरा वापरा"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"बायोमेट्रिक वापरा"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"पुढे सुरू ठेवण्यासाठी तुमची फिंगरप्रिंट किंवा स्क्रीन लॉक वापरा"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"पुढे सुरू ठेवण्यासाठी तुमचा चेहरा किंवा स्क्रीन लॉक वापरा"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"पुढे सुरू ठेवण्यासाठी तुमचे बायोमेट्रिक किंवा स्क्रीन लॉक वापरा"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"पुढे सुरू ठेवण्यासाठी बायोमेट्रिक आवश्यक आहे"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ओळख तपासणी सुरू आहे बायोमेट्रिक आवश्यक आहे, पण तुमचा चेहरा किंवा फिंगरप्रिंट सेन्सर उपलब्ध नाही\n"<ul><li>"तुमचा कॅमेरा सुरू असल्याचे तपासा आणि पुन्हा प्रयत्न करा"</li>\n<li>"तुम्ही तुमचे Google खाते वापरून ओळख तपासणी बंद करू शकता"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ओळख तपासणी सुरू आहे आणि तुम्हीच असल्याची पडताळणी करू शकत नाही"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"बायोमेट्रिक खूप वेळा यशस्वी झाले नाही. पुन्हा प्रयत्न करण्यासाठी तुमचे डिव्हाइस लॉक करा आणि अनलॉक करा."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"तुम्ही चोरीपासून संरक्षण सेटिंग्जमध्ये ओळख तपासणी व्यवस्थापित करू शकता. सेटिंग्ज वर जा"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"लॉक स्क्रीन"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"सेटिंग्ज वर जा"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ओके"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"रद्द करा"</string>
 </resources>

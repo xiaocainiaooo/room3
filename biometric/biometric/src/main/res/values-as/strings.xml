@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"কোনো পিন, আৰ্হি অথবা পাছৱৰ্ড ছেট কৰা হোৱা নাই।"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"এই ডিভাইচটোত পিন, আৰ্হি অথবা পাছৱৰ্ড ব্যৱহাৰ কৰিব নোৱাৰি।"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ফিংগাৰপ্ৰিণ্টৰ চিহ্ন"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"সমল ভিউত অধিক বিকল্পৰ বুটামটোত ক্লিক কৰা হৈছে।"</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"আসোঁৱাহৰ ডায়লগটোৱে ব্যৱহাৰকাৰীক অৱগত কৰে যে বায়’মেট্ৰিক লক কৰা হৈছে আৰু সেইটো বাতিলকৰণৰ বাবে, ছেটিং পৃষ্ঠালৈ সলনি কৰাৰ বাবে বা স্ক্ৰীনখন লক কৰাৰ বাবে ব্যৱহাৰকাৰীৰ দ্বাৰা অগ্ৰাহ্য কৰা হৈছে।"</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"আসোঁৱাহৰ ডায়লগটোৱে ব্যৱহাৰকাৰীক অৱগত কৰে যে বায়’মেট্ৰিক হাৰ্ডৱেৰটো উপলব্ধ নহয় আৰু সেইটো বাতিলকৰণৰ বাবে বা ছেটিং পৃষ্ঠালৈ সলনি কৰাৰ বাবে ব্যৱহাৰকাৰীৰ দ্বাৰা অগ্ৰাহ্য কৰা হৈছে।"</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ফিংগাৰপ্ৰিণ্ট ব্যৱহাৰ কৰক"</string>
     <string name="use_face_label" msgid="6533512708069459542">"মুখাৱয়ব ব্যৱহাৰ কৰক"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"বায়’মেট্ৰিক ব্যৱহাৰ কৰক"</string>
@@ -47,22 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"অব্যাহত ৰাখিবলৈ আপোনাৰ ফিংগাৰপ্ৰিণ্ট অথবা স্ক্ৰীন লক ব্যৱহাৰ কৰক"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"অব্যাহত ৰাখিবলৈ আপোনাৰ মুখাৱয়ব অথবা স্ক্ৰীন লক ব্যৱহাৰ কৰক"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"অব্যাহত ৰাখিবলৈ আপোনাৰ বায়’মেট্ৰিক অথবা স্ক্ৰীন লক ব্যৱহাৰ কৰক"</string>
-    <!-- no translation found for identity_check_general_error_title (1013215633038725034) -->
-    <skip />
-    <!-- no translation found for identity_check_general_error_description_1 (3156158514134319309) -->
-    <skip />
-    <!-- no translation found for identity_check_lockout_error_title (4996015551393725593) -->
-    <skip />
-    <!-- no translation found for identity_check_lockout_error_two_factor_auth_description_1 (6640337279532966835) -->
-    <skip />
-    <!-- no translation found for identity_check_lockout_error_description_2 (442136930958309272) -->
-    <skip />
-    <!-- no translation found for identity_check_lockout_error_lock_screen (2718968537410398463) -->
-    <skip />
-    <!-- no translation found for identity_check_go_to_settings (7249227005359617941) -->
-    <skip />
-    <!-- no translation found for common_ok (7266105758672679693) -->
-    <skip />
-    <!-- no translation found for common_cancel (4854611882282563034) -->
-    <skip />
 </resources>

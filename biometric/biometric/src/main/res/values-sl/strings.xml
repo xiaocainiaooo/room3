@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Nastavljena ni nobena koda PIN, vzorec ali geslo."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Ta naprava ne podpira kode PIN, vzorca ali gesla."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Ikona prstnih odtisov"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Uporabi prstni odtis"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Uporabi obraz"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Uporabi biometriko"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Za nadaljevanje uporabite prstni odtis ali možnost za zaklepanje zaslona."</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Za nadaljevanje uporabite obraz ali možnost za zaklepanje zaslona."</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Za nadaljevanje uporabite biometrični podatek ali možnost za zaklepanje zaslona."</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Za nadaljevanje je potreben biometrični podatek"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Preverjanje identitete je vklopljeno in zahteva biometrične podatke, vendar obraz ali tipalo prstnih odtisov ni na voljo.\n"<ul><li>"Preverite, ali je fotoaparat vklopljen, in poskusite znova."</li>\n<li>"Preverjanje identitete lahko izklopite v računu Google."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Preverjanje identitete je vklopljeno in ne more preveriti, ali ste to vi"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Preveč neuspešnih poskusov preverjanja z biometričnimi podatki. Če želite poskusiti znova, zaklenite in odklenite napravo."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Preverjanje identitete lahko upravljate v nastavitvah zaščite ob tatvini. Odpri nastavitve"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Zaklenjen zaslon"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Odpri nastavitve"</string>
-    <string name="common_ok" msgid="7266105758672679693">"V redu"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Prekliči"</string>
 </resources>

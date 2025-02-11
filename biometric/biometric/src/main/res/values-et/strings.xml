@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"PIN-koodi, mustrit ega parooli pole määratud."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"See seade ei toeta PIN-koodi, mustrit ega parooli."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Sõrmejälje ikoon"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Sisuvaates klõpsatakse nupul Rohkem valikuid."</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"Veadialoog teavitab kasutajaid, et biomeetriale puudub juurdepääs ja kasutaja loobub sellest tühistamise, seadete lehele lülitumise või ekraani lukustamise tõttu."</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"Veadialoog teavitab kasutajaid, et biomeetriline riistvara pole saadaval ja kasutaja loobub sellest tühistamise või seadete lehele lülitumise tõttu."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Kasuta sõrmejälge"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Kasuta nägu"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Kasuta biomeetrilisi andmeid"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Jätkamiseks kasutage oma sõrmejälge või ekraanilukku"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Jätkamiseks kasutage oma nägu või ekraanilukku"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Jätkamiseks kasutage oma biomeetrilisi andmeid või ekraanilukku"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Jätkamiseks on vaja biomeetrilisi andmeid"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Identiteedikontroll on sisse lülitatud ja nõuab biomeetrilist teavet, kuid teie näo- või sõrmejäljeandur pole saadaval\n"<ul><li>"Kontrollige, kas kaamera on sisse lülitatud, seejärel proovige uuesti"</li>\n<li>"Saate oma Google\'i konto abil identiteedikontrolli välja lülitada"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identiteedikontroll on sisse lülitatud ja teie isikut ei saa kontrollida"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biomeetria nurjus liiga palju kordi. Uuesti proovimiseks lukustage ja avage seade."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Saate hallata identiteedikontrolli vargusevastase kaitse seadetes. Ava seaded"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Lukustuskuva"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Ava seaded"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Tühista"</string>
 </resources>

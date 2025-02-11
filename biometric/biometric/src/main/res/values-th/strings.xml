@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"ไม่ได้ตั้ง PIN, รูปแบบ หรือรหัสผ่าน"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"อุปกรณ์นี้ไม่รองรับ PIN, รูปแบบ หรือรหัสผ่าน"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ไอคอนลายนิ้วมือ"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ใช้ลายนิ้วมือ"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ใช้ใบหน้า"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ใช้ข้อมูลไบโอเมตริก"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ใช้ลายนิ้วมือหรือการล็อกหน้าจอเพื่อดำเนินการต่อ"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ใช้ใบหน้าหรือการล็อกหน้าจอเพื่อดำเนินการต่อ"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ใช้ข้อมูลไบโอเมตริกหรือการล็อกหน้าจอเพื่อดำเนินการต่อ"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"ต้องใช้ข้อมูลไบโอเมตริกเพื่อดำเนินการต่อ"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"การตรวจสอบตัวตนเปิดอยู่และต้องใช้ข้อมูลไบโอเมตริก แต่เซ็นเซอร์ใบหน้าหรือลายนิ้วมือไม่พร้อมใช้งาน\n"<ul><li>"ตรวจสอบว่ากล้องเปิดอยู่และลองอีกครั้ง"</li>\n<li>"คุณปิดการตรวจสอบตัวตนได้โดยใช้บัญชี Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"การตรวจสอบตัวตนเปิดอยู่แต่ยืนยันตัวตนของคุณไม่ได้"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ตรวจสอบข้อมูลไบโอเมตริกไม่ผ่านหลายครั้งเกินไป โปรดล็อกและปลดล็อกอุปกรณ์เพื่อลองอีกครั้ง"</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"คุณจัดการการตรวจสอบตัวตนได้ในการตั้งค่าการป้องกันการขโมย ไปที่การตั้งค่า"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"หน้าจอล็อก"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ไปที่การตั้งค่า"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ตกลง"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"ยกเลิก"</string>
 </resources>

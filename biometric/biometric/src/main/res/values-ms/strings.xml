@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"PIN, corak atau kata laluan tidak ditetapkan."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Peranti ini tidak menyokong PIN, corak atau kata laluan."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Ikon cap jari"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Butang lagi pilihan dalam paparan kandungan diklik."</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"Dialog ralat memberitahu pengguna bahawa biometrik dikunci dan diketepikan oleh pengguna untuk pembatalan, bertukar kepada halaman tetapan atau mengunci skrin."</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"Dialog ralat memberitahu pengguna bahawa perkakasan biometrik tidak tersedia dan diketepikan oleh pengguna untuk pembatalan atau bertukar kepada halaman tetapan."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Gunakan cap jari"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Gunakan wajah"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Gunakan biometrik"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Gunakan cap jari atau kunci skrin anda untuk meneruskan"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Gunakan wajah atau kunci skrin anda untuk meneruskan"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Gunakan biometrik atau kunci skrin anda untuk meneruskan"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometrik diperlukan untuk meneruskan proses"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Semakan Identiti dihidupkan dan memerlukan biometrik tetapi penderia wajah atau cap jari anda tidak tersedia\n"<ul><li>"Pastikan bahawa kamera anda dihidupkan dan cuba lagi"</li>\n<li>"Anda boleh mematikan Semakan Identiti menggunakan Google Account anda"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identity Check dihidupkan dan tidak dapat mengesahkan identiti anda"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometrik gagal terlalu banyak kali. Kunci dan buka kunci peranti anda untuk mencuba semula."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Anda boleh mengurus Semakan Identiti dalam tetapan perlindungan kecurian. Pergi ke Tetapan"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Kunci skrin"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Pergi ke Tetapan"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Batal"</string>
 </resources>
