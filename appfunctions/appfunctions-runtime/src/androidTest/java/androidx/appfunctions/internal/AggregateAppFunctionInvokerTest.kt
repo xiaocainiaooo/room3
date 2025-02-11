@@ -18,13 +18,16 @@ package androidx.appfunctions.internal
 
 import android.content.Context
 import android.content.pm.SigningInfo
+import android.os.Build
 import androidx.appfunctions.AppFunctionContext
 import androidx.appfunctions.AppFunctionFunctionNotFoundException
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
 
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 class AggregateAppFunctionInvokerTest {
 
     @Test
