@@ -30,6 +30,12 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"ਕੋਈ ਪਿੰਨ, ਪੈਟਰਨ ਜਾਂ ਪਾਸਵਰਡ ਸੈੱਟ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"ਇਹ ਡੀਵਾਈਸ ਪਿੰਨ, ਪੈਟਰਨ ਜਾਂ ਪਾਸਵਰਡ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕਰਦਾ।"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ਫਿੰਗਰਪ੍ਰਿੰਟ ਪ੍ਰਤੀਕ"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
+    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
+    <skip />
+    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ਫਿੰਗਰਪ੍ਰਿੰਟ ਵਰਤੋ"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ਚਿਹਰੇ ਦੀ ਵਰਤੋਂ ਕਰੋ"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ਬਾਇਓਮੈਟ੍ਰਿਕ ਵਰਤੋ"</string>
@@ -44,4 +50,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ਜਾਰੀ ਰੱਖਣ ਲਈ ਆਪਣਾ ਫਿੰਗਰਪ੍ਰਿੰਟ ਜਾਂ ਸਕ੍ਰੀਨ ਲਾਕ ਵਰਤੋ"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ਜਾਰੀ ਰੱਖਣ ਲਈ ਆਪਣਾ ਚਿਹਰਾ ਜਾਂ ਸਕ੍ਰੀਨ ਲਾਕ ਵਰਤੋ"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ਜਾਰੀ ਰੱਖਣ ਲਈ ਆਪਣਾ ਬਾਇਓਮੈਟ੍ਰਿਕ ਜਾਂ ਸਕ੍ਰੀਨ ਲਾਕ ਵਰਤੋ"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"ਜਾਰੀ ਰੱਖਣ ਲਈ ਬਾਇਓਮੈਟ੍ਰਿਕ ਦੀ ਲੋੜ ਹੈ"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ਪਛਾਣ ਦੀ ਜਾਂਚ ਕਰਨ ਦੀ ਸੁਵਿਧਾ ਚਾਲੂ ਹੈ ਅਤੇ ਇਸਦੇ ਲਈ ਬਾਇਓਮੈਟ੍ਰਿਕ ਦੀ ਲੋੜ ਹੈ, ਪਰ ਤੁਹਾਡਾ ਚਿਹਰਾ ਨਹੀਂ ਦਿਖ ਰਿਹਾ ਜਾਂ ਫਿੰਗਰਪ੍ਰਿੰਟ ਸੈਂਸਰ ਉਪਲਬਧ ਨਹੀਂ ਹੈ\n"<ul><li>"ਦੇਖੋ ਕਿ ਤੁਹਾਡਾ ਕੈਮਰਾ ਚਾਲੂ ਹੈ ਜਾਂ ਨਹੀਂ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ"</li>\n<li>"ਤੁਸੀਂ ਆਪਣੇ Google ਖਾਤੇ ਦੀ ਵਰਤੋਂ ਕਰ ਕੇ ਪਛਾਣ ਦੀ ਜਾਂਚ ਦੀ ਸੈਟਿੰਗ ਨੂੰ ਬੰਦ ਕਰ ਸਕਦੇ ਹੋ"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ਪਛਾਣ ਦੀ ਜਾਂਚ ਕਰਨ ਦੀ ਸੁਵਿਧਾ ਚਾਲੂ ਹੈm ਪਰ ਤੁਹਾਡੀ ਪਛਾਣ ਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਹੋ ਰਹੀ"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ਬਾਇਓਮੈਟ੍ਰਿਕ ਕਈ ਵਾਰ ਅਸਫਲ ਹੋਇਆ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰਨ ਲਈ ਆਪਣੇ ਡੀਵਾਈਸ ਨੂੰ ਲਾਕ ਅਤੇ ਅਣਲਾਕ ਕਰੋ।"</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"ਤੁਸੀਂ ਚੋਰੀ ਤੋਂ ਸੁਰੱਖਿਆ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਜਾ ਕੇ ਪਛਾਣ ਦੀ ਜਾਂਚ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰ ਸਕਦੇ ਹੋ। ਸੈਟਿੰਗਾਂ \'ਤੇ ਜਾਓ"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"ਲਾਕ ਸਕ੍ਰੀਨ"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ਸੈਟਿੰਗਾਂ \'ਤੇ ਜਾਓ"</string>
+    <string name="common_ok" msgid="7266105758672679693">"ਠੀਕ ਹੈ"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"ਰੱਦ ਕਰੋ"</string>
 </resources>

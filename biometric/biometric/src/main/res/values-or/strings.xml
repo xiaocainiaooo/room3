@@ -30,6 +30,12 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"କୌଣସି PIN, ପାଟର୍ନ ବା ପାସୱାର୍ଡ ସେଟ୍ ହୋଇନାହିଁ।"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"ଏହି ଡିଭାଇସ୍ PIN, ପାଟର୍ନ କିମ୍ବା ପାସୱାର୍ଡକୁ ସମର୍ଥନ କରେ ନାହିଁ।"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ଟିପଚିହ୍ନ ଆଇକନ୍"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
+    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
+    <skip />
+    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ଟିପଚିହ୍ନ ବ୍ୟବହାର କରନ୍ତୁ"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ଫେସ ବ୍ୟବହାର କରନ୍ତୁ"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ବାୟୋମେଟ୍ରିକ୍ସ ବ୍ୟବହାର କରନ୍ତୁ"</string>
@@ -44,4 +50,22 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ଜାରି ରଖିବାକୁ ଆପଣଙ୍କ ଟିପଚିହ୍ନ କିମ୍ବା ସ୍କ୍ରିନ ଲକ ବ୍ୟବହାର କରନ୍ତୁ"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ଜାରି ରଖିବାକୁ ଆପଣଙ୍କ ଫେସ କିମ୍ବା ସ୍କ୍ରିନ ଲକ ବ୍ୟବହାର କରନ୍ତୁ"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ଜାରି ରଖିବାକୁ ଆପଣଙ୍କ ବାୟୋମେଟ୍ରିକ କିମ୍ବା ସ୍କ୍ରିନ ଲକ ବ୍ୟବହାର କରନ୍ତୁ"</string>
+    <!-- no translation found for identity_check_general_error_title (1013215633038725034) -->
+    <skip />
+    <!-- no translation found for identity_check_general_error_description_1 (3156158514134319309) -->
+    <skip />
+    <!-- no translation found for identity_check_lockout_error_title (4996015551393725593) -->
+    <skip />
+    <!-- no translation found for identity_check_lockout_error_two_factor_auth_description_1 (6640337279532966835) -->
+    <skip />
+    <!-- no translation found for identity_check_lockout_error_description_2 (442136930958309272) -->
+    <skip />
+    <!-- no translation found for identity_check_lockout_error_lock_screen (2718968537410398463) -->
+    <skip />
+    <!-- no translation found for identity_check_go_to_settings (7249227005359617941) -->
+    <skip />
+    <!-- no translation found for common_ok (7266105758672679693) -->
+    <skip />
+    <!-- no translation found for common_cancel (4854611882282563034) -->
+    <skip />
 </resources>

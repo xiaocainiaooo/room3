@@ -30,6 +30,9 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Niste podesili ni PIN, ni šablon, ni lozinku."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Ovaj uređaj ne podržava PIN, šablon ili lozinku."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Ikona otiska prsta"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Kliknuli ste na dugme Još opcija u prikazu sadržaja."</string>
+    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"Dijalog o grešci obaveštava korisnike da je biometrijski metod zaključan. Korisnik je odbacio dijalog radi otkazivanja, prelaska na stranicu sa podešavanjima ili zaključavanja ekrana."</string>
+    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"Dijalog o grešci obaveštava korisnike da biometrijski hardver nije dostupan. Korisnik je odbacio dijalog radi otkazivanja ili prelaska na stranicu sa podešavanjima."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Koristite otisak prsta"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Koristite lice"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Koristite biometriju"</string>
@@ -44,4 +47,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Koristite otisak prsta ili otključavanje ekrana da biste nastavili"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Koristite lice ili otključavanje ekrana da biste nastavili"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Koristite biometrijski podatak ili otključavanje ekrana da biste nastavili"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometrija je obavezna da biste nastavili"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Provera identiteta je uključena i zahteva biometriju, ali senzor za lice ili otisak prsta nije dostupan\n"<ul><li>"Proverite da li je kamera uključena i probajte ponovo"</li>\n<li>"Možete da isključite Proveru identiteta pomoću Google naloga"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Provera identiteta je uključena i ne može da potvrdi da ste to vi"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometrija nije uspela previše puta. Zaključajte i otključajte uređaj da biste probali ponovo."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Proverom identiteta možete da upravljate u podešavanjima zaštite od krađe. Otvorite Podešavanja"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Zaključani ekran"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Otvori Podešavanja"</string>
+    <string name="common_ok" msgid="7266105758672679693">"Potvrdi"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Otkaži"</string>
 </resources>
