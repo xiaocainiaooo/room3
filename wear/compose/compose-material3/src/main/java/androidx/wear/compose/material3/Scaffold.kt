@@ -27,10 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -41,7 +43,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-internal class ScaffoldState(private val appTimeText: (@Composable (() -> Unit))? = null) {
+internal class ScaffoldState(
+    internal val appScaffoldPresent: Boolean,
+    private val appTimeText: (@Composable (() -> Unit))? = null,
+) {
+    var fullScreenContent by mutableStateOf<(@Composable () -> Unit)?>(null)
+
     fun removeScreen(key: Any) {
         screenContent.removeIf { it.key === key }
     }
@@ -151,6 +158,6 @@ internal fun AnimatedIndicator(
     }
 }
 
-internal val LocalScaffoldState = compositionLocalOf { ScaffoldState() }
+internal val LocalScaffoldState = compositionLocalOf { ScaffoldState(appScaffoldPresent = false) }
 
 private const val IDLE_DELAY = 2500L

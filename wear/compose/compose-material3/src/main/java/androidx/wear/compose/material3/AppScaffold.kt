@@ -50,18 +50,22 @@ public fun AppScaffold(
     content: @Composable BoxScope.() -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalScaffoldState provides ScaffoldState(timeText),
+        LocalScaffoldState provides
+            ScaffoldState(appScaffoldPresent = true, appTimeText = timeText),
     ) {
         val scaffoldState = LocalScaffoldState.current
-        Box(
-            modifier =
-                modifier.fillMaxSize().graphicsLayer {
-                    scaleX = scaffoldState.parentScale.floatValue
-                    scaleY = scaffoldState.parentScale.floatValue
-                }
-        ) {
-            content()
-            scaffoldState.timeText()
+        Box(Modifier.fillMaxSize()) {
+            Box(
+                modifier =
+                    modifier.fillMaxSize().graphicsLayer {
+                        scaleX = scaffoldState.parentScale.floatValue
+                        scaleY = scaffoldState.parentScale.floatValue
+                    }
+            ) {
+                content()
+                scaffoldState.timeText()
+            }
+            scaffoldState.fullScreenContent?.let { it() }
         }
     }
 }
