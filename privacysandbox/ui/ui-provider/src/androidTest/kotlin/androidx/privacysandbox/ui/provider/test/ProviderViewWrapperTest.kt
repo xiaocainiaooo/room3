@@ -151,12 +151,12 @@ class ProviderViewWrapperTest {
         val downEvent = createMotionEvent(MotionEvent.ACTION_DOWN)
         scheduleAndWaitForMotionEventProcessing(downEvent, motionEventTransferCallback)
 
-        activityRule.scenario.onActivity { activity ->
+        activityRule.scenario.onActivity { _ ->
             providerViewWrapper.requestDisallowInterceptTouchEvent(true)
         }
         assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
 
-        activityRule.scenario.onActivity { activity ->
+        activityRule.scenario.onActivity { _ ->
             providerView.parent.requestDisallowInterceptTouchEvent(false)
         }
         assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isFalse()
@@ -174,15 +174,72 @@ class ProviderViewWrapperTest {
         val downEvent2 = createMotionEvent(MotionEvent.ACTION_DOWN)
         scheduleAndWaitForMotionEventProcessing(downEvent2, eventTransferCallback2)
 
-        activityRule.scenario.onActivity { activity ->
+        activityRule.scenario.onActivity { _ ->
             providerView.parent.requestDisallowInterceptTouchEvent(true)
         }
         assertThat(eventTransferCallback1.lastValueForDisallowIntercept).isFalse()
         assertThat(eventTransferCallback2.lastValueForDisallowIntercept).isTrue()
     }
 
+    @Test
+    fun requestDisallowInterceptWillOnlyProxiedOnChangeValueTest() {
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isFalse()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(0)
+
+        val downEvent1 = createMotionEvent(MotionEvent.ACTION_DOWN)
+        scheduleAndWaitForMotionEventProcessing(downEvent1, motionEventTransferCallback)
+
+        activityRule.scenario.onActivity { _ ->
+            providerView.parent.requestDisallowInterceptTouchEvent(false)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isFalse()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(0)
+
+        activityRule.scenario.onActivity { _ ->
+            providerView.parent.requestDisallowInterceptTouchEvent(true)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(1)
+
+        activityRule.scenario.onActivity { _ ->
+            providerView.parent.requestDisallowInterceptTouchEvent(true)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(1)
+    }
+
+    @Test
+    fun cachingLastValueOfRequestDisallowInterceptShouldResetForNewGestureTest() {
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isFalse()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(0)
+
+        val downEvent1 = createMotionEvent(MotionEvent.ACTION_DOWN)
+        scheduleAndWaitForMotionEventProcessing(downEvent1, motionEventTransferCallback)
+
+        activityRule.scenario.onActivity { _ ->
+            providerView.parent.requestDisallowInterceptTouchEvent(true)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(1)
+
+        val downEvent2 = createMotionEvent(MotionEvent.ACTION_DOWN)
+        scheduleAndWaitForMotionEventProcessing(downEvent2, motionEventTransferCallback)
+        // Calling requestDisallowIntercept with false, will have no effect for the new gesture.
+        activityRule.scenario.onActivity { _ ->
+            providerView.parent.requestDisallowInterceptTouchEvent(false)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(1)
+
+        activityRule.scenario.onActivity { _ ->
+            providerView.parent.requestDisallowInterceptTouchEvent(true)
+        }
+        assertThat(motionEventTransferCallback.lastValueForDisallowIntercept).isTrue()
+        assertThat(motionEventTransferCallback.numberOfRequestDisallowInterceptCalls).isEqualTo(2)
+    }
+
     private fun setUpOnTouchListener() {
-        providerView.setOnTouchListener { _, event ->
+        providerView.setOnTouchListener { _, _ ->
             dispatchedEventsSinceLastFrame++
             true
         }
@@ -259,7 +316,7 @@ class ProviderViewWrapperTest {
         eventTransferCallback: MotionEventTransferCallbackProxy
     ) {
         val eventDispatchLatch = CountDownLatch(1)
-        activityRule.scenario.onActivity { activity ->
+        activityRule.scenario.onActivity { _ ->
             providerView.setOnTouchListener { _, event ->
                 eventDispatchLatch.countDown()
                 providerView.onTouchEvent(event)
@@ -279,9 +336,11 @@ class ProviderViewWrapperTest {
 
     class MotionEventTransferCallbackProxy : IMotionEventTransferCallback.Stub() {
         var lastValueForDisallowIntercept = false
+        var numberOfRequestDisallowInterceptCalls = 0
 
         override fun requestDisallowIntercept(disallowIntercept: Boolean) {
             lastValueForDisallowIntercept = disallowIntercept
+            numberOfRequestDisallowInterceptCalls++
         }
     }
 }

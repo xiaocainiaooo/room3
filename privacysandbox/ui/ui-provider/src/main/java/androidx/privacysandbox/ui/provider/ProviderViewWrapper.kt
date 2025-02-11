@@ -46,6 +46,7 @@ internal class ProviderViewWrapper(context: Context) : FrameLayout(context) {
 
     private var eventDispatchHandler: Handler? = null
     private var currentMotionEventCallback: IMotionEventTransferCallback? = null
+    private var lastValueForRequestDisallowIntercept = false
 
     override fun onAttachedToWindow() {
         eventDispatchHandler = Handler(handler.looper)
@@ -60,7 +61,11 @@ internal class ProviderViewWrapper(context: Context) : FrameLayout(context) {
     }
 
     override fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+        if (disallowIntercept == lastValueForRequestDisallowIntercept) {
+            return
+        }
         currentMotionEventCallback?.requestDisallowIntercept(disallowIntercept)
+        lastValueForRequestDisallowIntercept = disallowIntercept
     }
 
     fun scheduleMotionEventProcessing(
@@ -72,15 +77,24 @@ internal class ProviderViewWrapper(context: Context) : FrameLayout(context) {
             return
         }
         val dispatchMessage: Message =
-            Message.obtain(handler) {
-                currentMotionEventCallback = motionEventTransferCallback
-                dispatchTouchEvent(motionEvent)
-            }
+            Message.obtain(handler) { processMotionEvent(motionEvent, motionEventTransferCallback) }
         dispatchMessage.isAsynchronous = true
 
         eventDispatchHandler?.sendMessageAtTime(
             dispatchMessage,
             eventTargetFrameTime + TRANSFERRED_EVENT_DISPATCH_DELAY_MS
         )
+    }
+
+    fun processMotionEvent(
+        motionEvent: MotionEvent,
+        motionEventTransferCallback: IMotionEventTransferCallback?
+    ) {
+        if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+            // Resetting the value of it to false (parent can intercept) for new gestures.
+            lastValueForRequestDisallowIntercept = false
+        }
+        currentMotionEventCallback = motionEventTransferCallback
+        dispatchTouchEvent(motionEvent)
     }
 }
