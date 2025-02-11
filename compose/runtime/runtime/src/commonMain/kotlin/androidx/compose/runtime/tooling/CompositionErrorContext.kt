@@ -17,6 +17,7 @@
 package androidx.compose.runtime.tooling
 
 import androidx.compose.runtime.ComposerImpl
+import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.changelist.OperationErrorContext
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlin.coroutines.CoroutineContext
@@ -30,7 +31,10 @@ import kotlin.coroutines.CoroutineContext
  * Compose runtime automatically appends information about exceptions that happen in composition and
  * effects.
  */
-val LocalCompositionErrorContext = staticCompositionLocalOf<CompositionErrorContext?> { null }
+val LocalCompositionErrorContext: CompositionLocal<CompositionErrorContext?> =
+    staticCompositionLocalOf {
+        null
+    }
 
 /**
  * Provides a way to attach a compose stack trace to a throwable based on a location of compose node
