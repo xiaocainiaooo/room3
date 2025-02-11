@@ -41,6 +41,14 @@ android {
     }
     buildFeatures { viewBinding = true }
     namespace = "androidx.xr.arcore.apps.whitebox"
+
+    buildTypes {
+	release {
+	    minifyEnabled = true
+	    shrinkResources = true
+	    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+	}
+    }
 }
 
 androidx {
