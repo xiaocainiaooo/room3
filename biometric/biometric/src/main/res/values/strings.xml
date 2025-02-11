@@ -50,11 +50,6 @@
     <string name="fingerprint_dialog_icon_description">Fingerprint icon</string>
     <!-- Error message shown when the more options button on content view is clicked. [CHAR LIMIT=NONE] -->
     <string name="content_view_more_options_button_clicked">More options button in the content view is clicked.</string>
-    <!-- Error message shown when the lockout error dialog is dismissed. [CHAR LIMIT=NONE] -->
-    <string name="lockout_error_dialog_dismissed">The error dialog informs users that the biometric is locked out and is dismissed by the user for cancellation, switching to the settings page, or locking the screen.</string>
-    <!-- Error message shown when the hardware error dialog is dismissed. [CHAR LIMIT=NONE] -->
-    <string name="biometric_hardware_error_dialog_dismissed">The error dialog informs users that the biometric hardware is unavailable and is dismissed by the user for cancellation, or switching to the settings page.</string>
-
 
     <!-- Label for a button or in-app setting that allows the user to authenticate with their
     fingerprint. [CHAR LIMIT=70] -->
