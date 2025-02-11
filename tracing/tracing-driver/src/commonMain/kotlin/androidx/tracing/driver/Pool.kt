@@ -43,9 +43,7 @@ internal class Pool<T>(
 
     init {
         // Eagerly create the objects for the pool
-        for (i in 0 until size) {
-            scrapPool.addFirst(factory(this))
-        }
+        repeat(size) { scrapPool.addLast(factory(this)) }
     }
 
     /** Obtain an instance of the object from the pool. */

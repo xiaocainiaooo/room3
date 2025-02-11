@@ -17,6 +17,8 @@
 package androidx.tracing.driver
 
 import androidx.collection.mutableScatterMapOf
+import perfetto.protos.MutableProcessDescriptor
+import perfetto.protos.MutableTrackDescriptor
 
 /** Represents a track for a process in a perfetto trace. */
 public open class ProcessTrack(
@@ -26,28 +28,21 @@ public open class ProcessTrack(
     internal val id: Int,
     /** The name of the process. */
     internal val name: String,
-    hasPreamble: Boolean = true,
-) : EventTrack(context = context, hasPreamble = hasPreamble, uuid = monotonicId(), parent = null) {
+) : EventTrack(context = context, uuid = monotonicId()) {
     internal val lock = Lock()
     internal val threads = mutableScatterMapOf<String, ThreadTrack>()
     internal val counters = mutableScatterMapOf<String, CounterTrack>()
 
-    override fun preamblePacket(): PooledTracePacket? {
-        val packet = pool.obtainTracePacket()
-        val track = pool.obtainTrackDescriptor()
-        val process = pool.obtainProcessDescriptor()
-        packet.trackPoolableForOwnership(track)
-        packet.trackPoolableForOwnership(process)
-        // Populate process details
-        process.processDescriptor.pid = id
-        process.processDescriptor.process_name = name
-        // Link
-        track.trackDescriptor.uuid = uuid
-        track.trackDescriptor.process = process.processDescriptor
-        packet.tracePacket.timestamp = nanoTime()
-        packet.tracePacket.track_descriptor = track.trackDescriptor
-        packet.tracePacket.trusted_packet_sequence_id = context.sequenceId
-        return packet
+    init {
+        emitPacket(immediateDispatch = true) { packet ->
+            packet.setPreamble(
+                this,
+                MutableTrackDescriptor(
+                    uuid = uuid,
+                    process = MutableProcessDescriptor(id, process_name = name)
+                )
+            )
+        }
     }
 
     /**
@@ -86,12 +81,9 @@ internal class EmptyProcessTrack(context: EmptyTraceContext) :
         context = context,
         id = EMPTY_PROCESS_ID,
         name = EMPTY_PROCESS_NAME,
-        hasPreamble = false
     ) {
 
     private val emptyContext: EmptyTraceContext = context
-
-    override fun preamblePacket(): PooledTracePacket? = null
 
     override fun getOrCreateThreadTrack(id: Int, name: String): ThreadTrack = emptyContext.thread
 

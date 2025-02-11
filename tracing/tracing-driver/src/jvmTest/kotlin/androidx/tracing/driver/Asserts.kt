@@ -17,25 +17,26 @@
 package androidx.tracing.driver
 
 import kotlin.test.assertNotNull
+import perfetto.protos.MutableTracePacket
 import perfetto.protos.MutableTrackEvent
 
-internal fun List<PooledTracePacket>.trackEventPacket(
-    name: String,
+internal fun List<MutableTracePacket>.trackEventPacket(
+    name: String?,
     type: MutableTrackEvent.Type? = null
-): PooledTracePacket? {
+): MutableTracePacket? {
     return find { packet ->
-        var result = packet.tracePacket.track_event?.name == name
+        var result = packet.track_event?.name == name
         if (type != null) {
-            val sameType = type == packet.tracePacket.track_event?.type
+            val sameType = type == packet.track_event?.type
             result = result and sameType
         }
         result
     }
 }
 
-internal fun List<PooledTracePacket>.assertTraceSection(name: String) {
+internal fun List<MutableTracePacket>.assertTraceSection(name: String) {
     val begin = trackEventPacket(name = name, type = MutableTrackEvent.Type.TYPE_SLICE_BEGIN)
-    val end = trackEventPacket(name = name, type = MutableTrackEvent.Type.TYPE_SLICE_END)
+    val end = trackEventPacket(name = null, type = MutableTrackEvent.Type.TYPE_SLICE_END)
     assertNotNull(begin) {
         "Cannot find a track event of type ${MutableTrackEvent.Type.TYPE_SLICE_BEGIN} for $name"
     }

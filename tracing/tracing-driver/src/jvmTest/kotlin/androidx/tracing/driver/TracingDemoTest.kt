@@ -77,7 +77,7 @@ class TracingDemoTest {
         }
         delay(random.nextLong(10L, 20L)) // Waterfall
         count += 1
-        counter.emitLongCounterPacket(count)
+        counter.setCounter(count)
         return frequency
     }
 

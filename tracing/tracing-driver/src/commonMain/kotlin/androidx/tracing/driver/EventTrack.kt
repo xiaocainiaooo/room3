@@ -23,52 +23,41 @@ import kotlinx.coroutines.withContext
 public abstract class EventTrack(
     /** The [TraceContext] instance. */
     context: TraceContext,
-    /** `true` iff we need to emit some preamble packets. */
-    hasPreamble: Boolean,
     /** The uuid for the track descriptor. */
-    uuid: Long,
-    /** The parent traceable. */
-    parent: Track?
-) : Track(context = context, hasPreamble = hasPreamble, uuid = uuid, parent = parent) {
-
-    public fun beginPacket(name: String, flowIds: List<Long> = emptyList()): PooledTracePacket? {
-        return if (!context.isEnabled) {
-            null
-        } else {
-            trackBeginPacket(name, flowIds)
-        }
-    }
-
-    public fun endPacket(name: String): PooledTracePacket? {
-        return if (!context.isEnabled) {
-            null
-        } else {
-            trackEndPacket(name)
-        }
-    }
-
-    public fun emitInstantPacket() {
+    uuid: Long
+) : Track(context = context, uuid = uuid) {
+    public fun beginSection(name: String, flowIds: List<Long>) {
         if (context.isEnabled) {
-            instantPacket()
+            emitPacket { packet ->
+                packet.setBeginSectionWithFlows(uuid, sequenceId, name, flowIds)
+            }
+        }
+    }
+
+    public fun beginSection(name: String) {
+        if (context.isEnabled) {
+            emitPacket { packet -> packet.setBeginSection(uuid, sequenceId, name) }
+        }
+    }
+
+    public fun endSection() {
+        if (context.isEnabled) {
+            emitPacket { packet -> packet.setEndSection(uuid, sequenceId) }
+        }
+    }
+
+    public fun instant() {
+        if (context.isEnabled) {
+            emitPacket { packet -> packet.setInstantEvent(uuid, sequenceId) }
         }
     }
 
     public inline fun <T> trace(name: String, crossinline block: () -> T): T {
-        if (context.isEnabled) {
-            val packet = beginPacket(name)
-            if (packet != null) {
-                emit(packet)
-            }
-        }
+        beginSection(name)
         try {
             return block()
         } finally {
-            if (context.isEnabled) {
-                val packet = endPacket(name)
-                if (packet != null) {
-                    emit(packet)
-                }
-            }
+            endSection()
         }
     }
 
@@ -100,17 +89,11 @@ public abstract class EventTrack(
             }
         val newElement = FlowContextElement(flowIds = newFlowIds)
         return withContext(coroutineContext + newElement) {
-            val begin = beginPacket(name = name, flowIds = newFlowIds)
-            if (begin != null) {
-                emit(begin)
-            }
+            beginSection(name = name, flowIds = newFlowIds)
             try {
                 block()
             } finally {
-                val end = endPacket(name)
-                if (end != null) {
-                    emit(end)
-                }
+                endSection()
             }
         }
     }

@@ -16,44 +16,39 @@
 
 package androidx.tracing.driver
 
+import perfetto.protos.MutableCounterDescriptor
+import perfetto.protos.MutableTrackDescriptor
+
 /** Represents a Perfetto Counter track. */
 public open class CounterTrack(
     /** The name of the counter track */
     private val name: String,
     /** The parent track the counter belongs to. */
-    private val parent: Track,
-    hasPreamble: Boolean = true,
-) :
-    Track(
-        context = parent.context,
-        hasPreamble = hasPreamble,
-        uuid = monotonicId(),
-        parent = parent
-    ) {
-    override fun preamblePacket(): PooledTracePacket? {
-        val packet = pool.obtainTracePacket()
-        val track = pool.obtainTrackDescriptor()
-        val counter = pool.obtainCounterDescriptor()
-        packet.trackPoolableForOwnership(track)
-        packet.trackPoolableForOwnership(counter)
-        track.trackDescriptor.uuid = uuid
-        track.trackDescriptor.name = name
-        track.trackDescriptor.parent_uuid = parent.uuid
-        track.trackDescriptor.counter = counter.counterDescriptor
-        packet.tracePacket.timestamp = nanoTime()
-        packet.tracePacket.track_descriptor = track.trackDescriptor
-        return packet
-    }
-
-    public fun emitLongCounterPacket(value: Long) {
-        if (context.isEnabled) {
-            emit(longCounterPacket(value))
+    private val parent: Track
+) : Track(context = parent.context, uuid = monotonicId()) {
+    init {
+        emitPacket(immediateDispatch = true) { packet ->
+            packet.setPreamble(
+                this,
+                MutableTrackDescriptor(
+                    name = name,
+                    uuid = uuid,
+                    parent_uuid = parent.uuid,
+                    counter = MutableCounterDescriptor()
+                )
+            )
         }
     }
 
-    public fun emitDoubleCounterPacket(value: Double) {
+    public fun setCounter(value: Long) {
         if (context.isEnabled) {
-            emit(doubleCounterPacket(value))
+            emitPacket { packet -> packet.setLongCounter(uuid, sequenceId, value) }
+        }
+    }
+
+    public fun setCounter(value: Double) {
+        if (context.isEnabled) {
+            emitPacket { packet -> packet.setDoubleCounter(uuid, sequenceId, value) }
         }
     }
 }
@@ -63,6 +58,4 @@ public open class CounterTrack(
 private const val EMPTY_COUNTER_NAME = "Empty Counter"
 
 internal class EmptyCounterTrack(process: EmptyProcessTrack) :
-    CounterTrack(name = EMPTY_COUNTER_NAME, parent = process, hasPreamble = false) {
-    override fun preamblePacket(): PooledTracePacket? = null
-}
+    CounterTrack(name = EMPTY_COUNTER_NAME, parent = process) {}

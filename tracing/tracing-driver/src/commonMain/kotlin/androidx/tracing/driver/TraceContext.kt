@@ -25,8 +25,9 @@ import okio.Closeable
  */
 public open class TraceContext
 internal constructor(
-    public val sequenceId: Int,
-    /** The sink all the [PooledTracePacket]'s are written to. */
+    @JvmField // optimize away accessors used for event critical path
+    internal val sequenceId: Int,
+    /** The sink all the trace events are written to. */
     public val sink: TraceSink,
     /** Is tracing enabled ? */
     public val isEnabled: Boolean,
@@ -95,6 +96,19 @@ internal constructor(
             }
         }
         return count
+    }
+
+    internal fun validateTrackPools(validateTrackPool: (Track) -> Unit) {
+        if (isDebug) {
+            processes.forEachValue { processTrack ->
+                validateTrackPool(processTrack)
+                processTrack.threads.forEachValue { threadTrack -> validateTrackPool(threadTrack) }
+
+                processTrack.counters.forEachValue { counterTrack ->
+                    validateTrackPool(counterTrack)
+                }
+            }
+        }
     }
 }
 

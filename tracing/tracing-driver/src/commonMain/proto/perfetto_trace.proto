@@ -69,7 +69,7 @@ message TrackEvent {
     TYPE_COUNTER = 4;
   }
   optional Type type = 9;
-  optional uint64 track_uuid = 11;
+  required uint64 track_uuid = 11; // Making this required to avoid boxing
   oneof counter_value_field {
     int64 counter_value = 30;
     double double_counter_value = 44;
@@ -164,7 +164,7 @@ message TracePacket {
     TraceUuid trace_uuid = 89;
     bytes compressed_packets = 50; // kept for testing purposes
   }
-  optional uint32 trusted_packet_sequence_id = 10;
+  required uint32 trusted_packet_sequence_id = 10; // Making this required to avoid boxing
   optional InternedData interned_data = 12;
 
   enum SequenceFlags {
