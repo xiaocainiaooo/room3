@@ -960,6 +960,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         zoom = DEFAULT_INIT_ZOOM
         pageManager = null
         pageLayoutManager = null
+        isInitialZoomDone = false
         backgroundScope.coroutineContext.cancelChildren()
         stopCollectingData()
     }
