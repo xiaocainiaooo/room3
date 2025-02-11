@@ -310,6 +310,11 @@ public class CameraXActivity extends AppCompatActivity {
     @VisibleForTesting
     // Sets this bit to bind ImageAnalysis when using INTENT_EXTRA_USE_CASE_COMBINATION
     public static final int BIND_IMAGE_ANALYSIS = 0x8;
+    // Launch the activity with the specified stream sharing force enable settings. Note that
+    // StreamSharing will only take effect when both Preview and VideoCapture are bound.
+    @VisibleForTesting
+    public static final String INTENT_EXTRA_FORCE_ENABLE_STREAM_SHARING =
+            "force_enable_stream_sharing";
 
     static final CameraSelector BACK_SELECTOR =
             new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
@@ -1501,6 +1506,16 @@ public class CameraXActivity extends AppCompatActivity {
         mAnalysisToggle.setChecked((useCaseCombination & BIND_IMAGE_ANALYSIS) != 0L);
     }
 
+    private void updateStreamSharingForceEnableStateByIntent(@NonNull Intent intent) {
+        Bundle bundle = intent.getExtras();
+        if (bundle == null) {
+            return;
+        }
+
+        mForceEnableStreamSharing = bundle.getBoolean(INTENT_EXTRA_FORCE_ENABLE_STREAM_SHARING,
+                false);
+    }
+
     private void updateVideoMirrorModeByIntent(@NonNull Intent intent) {
         int mirrorMode = intent.getIntExtra(INTENT_EXTRA_VIDEO_MIRROR_MODE, -1);
         if (mirrorMode != -1) {
@@ -1592,6 +1607,7 @@ public class CameraXActivity extends AppCompatActivity {
         mPreviewToggle = findViewById(R.id.PreviewToggle);
 
         updateUseCaseCombinationByIntent(getIntent());
+        updateStreamSharingForceEnableStateByIntent(getIntent());
 
         mTakePicture = findViewById(R.id.Picture);
         mFlashButton = findViewById(R.id.flash_toggle);
