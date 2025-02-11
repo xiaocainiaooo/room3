@@ -143,3 +143,5 @@ private fun ClassName.withTypeArguments(arguments: List<TypeName>): TypeName {
         this.parameterizedBy(arguments)
     }
 }
+
+fun KClass<*>.ensureQualifiedName(): String = checkNotNull(qualifiedName)
