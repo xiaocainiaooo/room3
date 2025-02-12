@@ -22,7 +22,7 @@ package androidx.health.connect.client {
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecord(kotlin.reflect.KClass<T> recordType, String recordId, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordResponse<T>>);
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecords(androidx.health.connect.client.request.ReadRecordsRequest<T> request, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordsResponse<T>>);
     method public suspend Object? updateRecords(java.util.List<? extends androidx.health.connect.client.records.Record> records, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    property @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi public default androidx.health.connect.client.HealthConnectFeatures features;
+    property public default androidx.health.connect.client.HealthConnectFeatures features;
     property public abstract androidx.health.connect.client.PermissionController permissionController;
     field public static final androidx.health.connect.client.HealthConnectClient.Companion Companion;
     field public static final int SDK_AVAILABLE = 3; // 0x3
@@ -53,7 +53,7 @@ package androidx.health.connect.client {
     method public static suspend inline <reified T extends androidx.health.connect.client.records.Record> Object? readRecord(androidx.health.connect.client.HealthConnectClient, String recordId, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordResponse<T>>);
   }
 
-  @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi public interface HealthConnectFeatures {
+  public interface HealthConnectFeatures {
     method public int getFeatureStatus(int feature);
     field public static final androidx.health.connect.client.HealthConnectFeatures.Companion Companion;
     field public static final int FEATURE_PLANNED_EXERCISE = 3; // 0x3
@@ -158,13 +158,6 @@ package androidx.health.connect.client.contracts {
     ctor public HealthPermissionsRequestContract(optional String providerPackageName);
     method public android.content.Intent createIntent(android.content.Context context, java.util.Set<java.lang.String> input);
     method public java.util.Set<java.lang.String> parseResult(int resultCode, android.content.Intent? intent);
-  }
-
-}
-
-package androidx.health.connect.client.feature {
-
-  @SuppressCompatibility @kotlin.RequiresOptIn(message="This is an experimental HealthConnect API.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalFeatureAvailabilityApi {
   }
 
 }

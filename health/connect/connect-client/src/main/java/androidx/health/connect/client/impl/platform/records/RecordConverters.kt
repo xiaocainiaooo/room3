@@ -16,7 +16,6 @@
 
 @file:RestrictTo(RestrictTo.Scope.LIBRARY)
 @file:RequiresApi(api = 34)
-@file:OptIn(ExperimentalFeatureAvailabilityApi::class)
 
 package androidx.health.connect.client.impl.platform.records
 
@@ -25,7 +24,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.BasalBodyTemperatureRecord
 import androidx.health.connect.client.records.BasalMetabolicRateRecord

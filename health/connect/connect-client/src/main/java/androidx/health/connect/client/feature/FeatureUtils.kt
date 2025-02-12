@@ -26,7 +26,6 @@ import kotlin.reflect.KClass
 
 internal const val FEATURE_CONSTANT_NAME_PHR = "FEATURE_PERSONAL_HEALTH_RECORD"
 
-@OptIn(ExperimentalFeatureAvailabilityApi::class)
 internal fun isPersonalHealthRecordFeatureAvailableInPlatform(): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         return false

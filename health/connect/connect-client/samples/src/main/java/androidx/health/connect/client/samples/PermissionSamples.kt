@@ -22,7 +22,6 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.Sampled
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.PermissionController
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_HISTORY
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
@@ -47,7 +46,6 @@ fun RequestPermission(activity: ActivityResultCaller) {
     requestPermission.launch(setOf(HealthPermission.getReadPermission(StepsRecord::class)))
 }
 
-@OptIn(ExperimentalFeatureAvailabilityApi::class)
 @Sampled
 fun RequestBackgroundReadPermission(
     features: HealthConnectFeatures,
@@ -73,7 +71,6 @@ fun RequestBackgroundReadPermission(
     }
 }
 
-@OptIn(ExperimentalFeatureAvailabilityApi::class)
 @Sampled
 fun RequestHistoryReadPermission(features: HealthConnectFeatures, activity: ActivityResultCaller) {
     val requestPermission =
@@ -107,7 +104,6 @@ suspend fun GetPermissions(permissionController: PermissionController) {
     }
 }
 
-@OptIn(ExperimentalFeatureAvailabilityApi::class)
 @Sampled
 fun RequestMedicalPermissions(features: HealthConnectFeatures, activity: ActivityResultCaller) {
     // The set of medical permissions to be requested (add additional read permissions as required)

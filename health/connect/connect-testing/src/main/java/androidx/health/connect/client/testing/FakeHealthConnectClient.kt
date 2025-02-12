@@ -26,7 +26,6 @@ import androidx.health.connect.client.aggregate.AggregationResultGroupedByPeriod
 import androidx.health.connect.client.changes.Change
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableImpl
 import androidx.health.connect.client.impl.converters.datatype.RECORDS_TYPE_NAME_MAP
 import androidx.health.connect.client.impl.converters.records.toProto
@@ -68,7 +67,6 @@ import kotlin.reflect.KClass
  * @param clock used to close open-ended [TimeRangeFilter]s and record update times.
  * @param permissionController grants and revokes permissions.
  */
-@OptIn(ExperimentalFeatureAvailabilityApi::class)
 public class FakeHealthConnectClient(
     private var packageName: String = DEFAULT_PACKAGE_NAME,
     private val clock: Clock = Clock.systemDefaultZone(),
