@@ -27,16 +27,12 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionS
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod.APP_FUNCTION_DATA_PARAM_NAME
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
-import androidx.appfunctions.compiler.core.isOfType
-import androidx.appfunctions.compiler.core.resolveListParameterizedType
 import androidx.appfunctions.compiler.core.toTypeName
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.buildCodeBlock
-import kotlin.text.replaceFirstChar
 
 /**
  * Wraps methods to build the [CodeBlock]s that make up the method bodies of the generated
@@ -115,7 +111,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
         afType: AppFunctionTypeReference
     ): CodeBlock.Builder {
         val paramName = checkNotNull(param.name).asString()
-        val typeName = afType.ksTypeReference.getTypeShortName()
+        val typeName = afType.selfTypeReference.getTypeShortName()
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to paramName,
@@ -154,7 +150,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
         param: KSValueParameter,
         afType: AppFunctionTypeReference
     ): CodeBlock.Builder {
-        val parametrizedTypeName = afType.ksTypeReference.getTypeShortName()
+        val parametrizedTypeName = afType.itemTypeReference.getTypeShortName()
         val factoryName = parametrizedTypeName + "Factory"
         val factoryInstanceName = factoryName.lowerFirstChar()
         val formatStringMap =
@@ -254,7 +250,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
         param: KSValueParameter,
         afType: AppFunctionTypeReference
     ): CodeBlock.Builder {
-        val typeName = afType.ksTypeReference.getTypeShortName()
+        val typeName = afType.selfTypeReference.getTypeShortName()
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to checkNotNull(param.name).asString(),
@@ -275,7 +271,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
         param: KSValueParameter,
         afType: AppFunctionTypeReference
     ): CodeBlock.Builder {
-        val parametrizedTypeName = afType.ksTypeReference.getTypeShortName()
+        val parametrizedTypeName = afType.selfOrItemTypeReference.getTypeShortName()
 
         val formatStringMap =
             mapOf<String, Any>(
@@ -301,7 +297,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
     }
 
     private fun getAppFunctionDataGetterName(afType: AppFunctionTypeReference): String {
-        val shortTypeName = afType.ksTypeReference.getTypeShortName()
+        val shortTypeName = afType.selfOrItemTypeReference.getTypeShortName()
         return when (afType.typeCategory) {
             PRIMITIVE_SINGULAR -> "get$shortTypeName${if (afType.isNullable) "OrNull" else ""}"
             PRIMITIVE_ARRAY -> "get$shortTypeName"
@@ -321,7 +317,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 if (afType.isNullable) {
                     ""
                 } else {
-                    " ?: ${afType.ksTypeReference.getTypeShortName()}(0)"
+                    " ?: ${afType.selfOrItemTypeReference.getTypeShortName()}(0)"
                 }
             PRIMITIVE_LIST,
             SERIALIZABLE_LIST -> if (afType.isNullable) "" else " ?: emptyList()"
@@ -331,8 +327,8 @@ class AppFunctionSerializableFactoryCodeBuilder(
     private fun getAppFunctionDataSetterName(afType: AppFunctionTypeReference): String {
         return when (afType.typeCategory) {
             PRIMITIVE_SINGULAR,
-            PRIMITIVE_ARRAY -> "set${afType.ksTypeReference.getTypeShortName()}"
-            PRIMITIVE_LIST -> "set${afType.ksTypeReference.getTypeShortName()}List"
+            PRIMITIVE_ARRAY -> "set${afType.selfOrItemTypeReference.getTypeShortName()}"
+            PRIMITIVE_LIST -> "set${afType.selfOrItemTypeReference.getTypeShortName()}List"
             SERIALIZABLE_SINGULAR -> "setAppFunctionData"
             SERIALIZABLE_LIST -> "setAppFunctionDataList"
         }
@@ -358,13 +354,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
     }
 
     private fun KSTypeReference.getTypeShortName(): String {
-        val type =
-            if (isOfType(LIST)) {
-                resolveListParameterizedType()
-            } else {
-                this
-            }
-        return type.ensureQualifiedTypeName().getShortName()
+        return this.ensureQualifiedTypeName().getShortName()
     }
 
     private fun String.lowerFirstChar(): String {
