@@ -149,6 +149,28 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testDiffPackageSerializableInputFunction_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AppFunctionWithInputFromDifferentPackage.KT",
+                        "DiffPackageSerializable.KT",
+                        "DiffPackageSchemas.KT",
+                        "AnotherDiffPackageSerializable.KT"
+                    )
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}AppFunctionWithInputFromDifferentPackage_AppFunctionInventory.kt",
+            goldenFileName =
+                "${'$'}AppFunctionWithInputFromDifferentPackage_AppFunctionInventory.KT",
+        )
+    }
+
+    @Test
     fun testFakeAllPrimitiveParamsImpl_genAppFunctionInventory_success() {
         val report =
             compilationTestHelper.compileAll(
@@ -190,6 +212,28 @@ class AppFunctionCompilerTest {
             expectGeneratedSourceFileName =
                 "${'$'}SerializableOutputFunctions_AppFunctionInventory.kt",
             goldenFileName = "${'$'}SerializableOutputFunctions_AppFunctionInventory.KT",
+        )
+    }
+
+    @Test
+    fun testDiffPackageSerializableOutputFunction_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AppFunctionWithOutputFromDifferentPackage.KT",
+                        "DiffPackageSerializable.KT",
+                        "DiffPackageSchemas.KT",
+                        "AnotherDiffPackageSerializable.KT"
+                    )
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory.kt",
+            goldenFileName =
+                "${'$'}AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory.KT",
         )
     }
 

@@ -28,6 +28,12 @@ import com.squareup.kotlinpoet.TypeName
 /** Represents a type that is supported by AppFunction and AppFunctionSerializable. */
 class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
 
+    /**
+     * The category of this reference type.
+     *
+     * The category of a type is determined by its underlying type. For example, a type reference to
+     * a list of strings will have a category of PRIMITIVE_LIST.
+     */
     val typeCategory: AppFunctionSupportedTypeCategory by lazy {
         val typeName = ksTypeReference.toTypeName().ignoreNullable().toString()
         if (typeName in SUPPORTED_COLLECTION_TYPES) {
@@ -48,13 +54,51 @@ class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
         }
     }
 
+    /**
+     * If this type is nullable.
+     *
+     * @return true if the type is nullable, false otherwise.
+     */
     val isNullable: Boolean by lazy { ksTypeReference.toTypeName().isNullable }
 
+    /**
+     * The type reference itself or the type reference of the list element if the type reference is
+     * a list. For example, if the type reference is List<String>, then the selfOrItemTypeReference
+     * will be String.
+     */
+    val selfOrItemTypeReference: KSTypeReference by lazy {
+        ksTypeReference.resolveTypeOrItemTypeReference()
+    }
+
+    /**
+     * Checks if the type reference is of the given category.
+     *
+     * @param category The category to check.
+     * @return true if the type reference is of the given category, false otherwise.
+     */
     fun isOfTypeCategory(category: AppFunctionSupportedTypeCategory): Boolean {
         return this.typeCategory == category
     }
 
-    /** The category of parameter type that is supported by app functions. */
+    /**
+     * Resolves the type reference of a parameter.
+     *
+     * If the parameter type is a list, it will resolve the type reference of the list element.
+     */
+    private fun KSTypeReference.resolveTypeOrItemTypeReference(): KSTypeReference {
+        return if (isOfType(LIST)) {
+            resolveListParameterizedType()
+        } else {
+            this
+        }
+    }
+
+    /**
+     * The category of types that are supported by app functions.
+     *
+     * The category of a type is determined by its underlying type. For example, a type reference to
+     * a list of strings will have a category of PRIMITIVE_LIST.
+     */
     enum class AppFunctionSupportedTypeCategory {
         PRIMITIVE_SINGULAR,
         PRIMITIVE_ARRAY,
