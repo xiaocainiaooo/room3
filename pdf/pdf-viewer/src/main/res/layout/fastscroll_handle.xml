@@ -23,5 +23,4 @@
     android:clickable="true"
     android:contentDescription="@string/scrollbar_description"
     android:scaleType="center"
-    android:src="@drawable/fast_scroll_thumb_drawable"
-    android:translationX="8dp" />
+    android:src="@drawable/fast_scroll_thumb_drawable" />
