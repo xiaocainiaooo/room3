@@ -21,6 +21,7 @@ import com.squareup.kotlinpoet.ClassName
 /** Helper class to introspect AppFunction symbols. */
 object IntrospectionHelper {
     // Package names
+    const val APP_FUNCTIONS_AGGREGATED_DEPS_PACKAGE_NAME = "appfunctions_aggregated_deps"
     private const val APP_FUNCTIONS_PACKAGE_NAME = "androidx.appfunctions"
     private const val APP_FUNCTIONS_INTERNAL_PACKAGE_NAME = "androidx.appfunctions.internal"
     private const val APP_FUNCTIONS_METADATA_PACKAGE_NAME = "androidx.appfunctions.metadata"
@@ -40,6 +41,17 @@ object IntrospectionHelper {
 
     object AppFunctionSerializableAnnotation {
         val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionSerializable")
+    }
+
+    object AppFunctionComponentRegistryAnnotation {
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionComponentRegistry")
+        const val PROPERTY_COMPONENT_CATEGORY = "componentCategory"
+        const val PROPERTY_COMPONENT_NAMES = "componentNames"
+
+        object Category {
+            const val INVENTORY = "INVENTORY"
+            const val INVOKER = "INVOKER"
+        }
     }
 
     // Classes

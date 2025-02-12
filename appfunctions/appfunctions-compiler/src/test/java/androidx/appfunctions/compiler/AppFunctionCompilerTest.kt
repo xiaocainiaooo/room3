@@ -399,4 +399,52 @@ class AppFunctionCompilerTest {
                 "fakeAllNullablePrimitiveParamsWithDefault_app_function_dynamic_schema.xml"
         )
     }
+
+    @Test
+    fun testGenerateInventoryComponentRegistry() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AllPrimitiveInputFunctions.KT",
+                        "SimpleFunction.KT",
+                        "SimpleFunctionDiffPackage.KT",
+                    )
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}ComTestdata_InventoryComponentRegistry.kt",
+            goldenFileName = "${'$'}ComTestdata_InventoryComponentRegistry.KT"
+        )
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}ComTestdataDiff_InventoryComponentRegistry.kt",
+            goldenFileName = "${'$'}ComTestdataDiff_InventoryComponentRegistry.KT"
+        )
+    }
+
+    @Test
+    fun testGenerateInvokerComponentRegistry() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AllPrimitiveInputFunctions.KT",
+                        "SimpleFunction.KT",
+                        "SimpleFunctionDiffPackage.KT",
+                    )
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}ComTestdata_InvokerComponentRegistry.kt",
+            goldenFileName = "${'$'}ComTestdata_InvokerComponentRegistry.KT"
+        )
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}ComTestdataDiff_InvokerComponentRegistry.kt",
+            goldenFileName = "${'$'}ComTestdataDiff_InvokerComponentRegistry.KT"
+        )
+    }
 }
