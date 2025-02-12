@@ -1,0 +1,29 @@
+{
+  "projectPath": ":bluetooth:bluetooth-testing",
+  "dependencyAdvice": [
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "junit:junit",
+        "resolvedVersion": "4.13.2"
+      },
+      "toConfiguration": "testImplementation"
+    },
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "org.robolectric:shadows-framework",
+        "resolvedVersion": "4.14"
+      },
+      "toConfiguration": "testImplementation"
+    },
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":bluetooth:bluetooth"
+      },
+      "fromConfiguration": "api",
+      "toConfiguration": "testImplementation"
+    }
+  ]
+}

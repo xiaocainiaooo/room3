@@ -1,0 +1,20 @@
+{
+  "projectPath": ":lifecycle:lifecycle-process",
+  "dependencyAdvice": [
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":lifecycle:lifecycle-common"
+      },
+      "toConfiguration": "api"
+    },
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":lifecycle:lifecycle-runtime"
+      },
+      "fromConfiguration": "api",
+      "toConfiguration": "implementation"
+    }
+  ]
+}
