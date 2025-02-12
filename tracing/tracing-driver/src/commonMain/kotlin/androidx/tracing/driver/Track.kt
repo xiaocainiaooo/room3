@@ -16,72 +16,54 @@
 
 package androidx.tracing.driver
 
-import androidx.annotation.RestrictTo
+import perfetto.protos.MutableTracePacket
 
 /** Entities that we can attach traces to. */
 public abstract class Track(
     /** The [TraceContext] instance. */
-    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public open val context: TraceContext,
-    /** `true` iff we need to emit some preamble packets. */
-    internal val hasPreamble: Boolean,
+    @JvmField // avoid getter generation
+    internal val context: TraceContext,
     /** The uuid for the track descriptor. */
-    internal val uuid: Long,
-    /** The parent traceable. */
-    private val parent: Track?
+    @JvmField // avoid getter generation
+    internal val uuid: Long
 ) {
+    @JvmField internal val sequenceId = context.sequenceId
     /**
      * Any time we emit trace packets relevant to this process. We need to make sure the necessary
      * preamble packets that describe the process and threads are also emitted. This is used to make
      * sure that we only do that once.
      */
-    private val preamble: AtomicBoolean = AtomicBoolean(false)
-    private val flushRequested = AtomicBoolean(false)
     // Every poolable that is obtained from the pool, keeps track of its owner.
     // The underlying poolable, if eventually recycled by the Sink after an emit() is complete.
     internal val pool: ProtoPool = ProtoPool(isDebug = context.isDebug)
-    private val queue: ArrayDeque<PooledTracePacket> = ArrayDeque(TRACE_PACKET_BUFFER_SIZE * 2)
 
-    /** @return The [PooledTracePacket] which is a preamble packet for the [Track]. */
-    public abstract fun preamblePacket(): PooledTracePacket?
-
-    internal fun emitPreamble() {
-        parent?.emitPreamble()
-        if (preamble.compareAndSet(expected = false, newValue = true)) {
-            val packet = preamblePacket()
-            if (packet != null) {
-                emit(packet)
-            }
-        }
-    }
+    // this would be private, but internal prevents getters from being created
+    @JvmField // avoid getter generation
+    internal var currentPacketArray = pool.obtainTracePacketArray()
+    @JvmField // we cache this separately to avoid having to query it with a function each time
+    internal var currentPacketArraySize = currentPacketArray.packets.size
 
     internal fun flush() {
-        if (flushRequested.compareAndSet(expected = false, newValue = true)) {
-            transferPooledPacketArray()
-        }
+        context.sink.enqueue(currentPacketArray)
+        currentPacketArray = pool.obtainTracePacketArray()
+        currentPacketArraySize = currentPacketArray.packets.size
     }
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun emit(packet: PooledTracePacket) {
-        emitPreamble()
-        queue.add(packet)
-        if (queue.size >= TRACE_PACKET_BUFFER_SIZE) {
-            flush()
-        }
-    }
+    /** Emit is internal, but it must be sure to only access */
+    internal inline fun emitPacket(
+        immediateDispatch: Boolean = false,
+        block: (MutableTracePacket) -> Unit
+    ) {
+        currentPacketArray.apply {
+            block(packets[fillCount])
+            fillCount++
+            if (fillCount == currentPacketArraySize || immediateDispatch) {
+                context.sink.enqueue(this)
 
-    private fun transferPooledPacketArray() {
-        do {
-            val pooledPacketArray = pool.obtainTracePacketArray()
-            var i = 0
-            while (queue.isNotEmpty() && i < pooledPacketArray.pooledTracePacketArray.size) {
-                val pooledTracePacket = queue.removeFirstOrNull()
-                if (pooledTracePacket != null) {
-                    pooledPacketArray.pooledTracePacketArray[i] = pooledTracePacket
-                    i += 1
-                }
+                // greedy reset / reallocate array
+                currentPacketArray = pool.obtainTracePacketArray()
+                currentPacketArraySize = currentPacketArray.packets.size
             }
-            context.sink.emit(pooledPacketArray)
-        } while (queue.isNotEmpty()) // There might still be more packets.
-        flushRequested.set(newValue = false)
+        }
     }
 }

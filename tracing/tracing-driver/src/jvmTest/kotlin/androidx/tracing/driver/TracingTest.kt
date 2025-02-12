@@ -16,7 +16,6 @@
 
 package androidx.tracing.driver
 
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull
@@ -25,17 +24,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import perfetto.protos.MutableTracePacket
 
 class TestSink : TraceSink() {
-    internal val packets = mutableListOf<PooledTracePacket>()
+    internal val packets = mutableListOf<MutableTracePacket>()
 
-    override fun emit(pooledPacketArray: PooledTracePacketArray) {
-        for (packet in pooledPacketArray.pooledTracePacketArray) {
-            if (packet != null) {
-                packets += packet
-            }
+    override fun enqueue(pooledPacketArray: PooledTracePacketArray) {
+        pooledPacketArray.forEach {
+            // Lol, deep copy!
+            packets += MutableTracePacket.ADAPTER.decode(it.encode())
         }
-        pooledPacketArray.recycle()
     }
 
     override fun flush() {
@@ -51,14 +49,6 @@ class TracingTest {
     private val sink = TestSink()
     private val context: TraceContext = TraceContext(sequenceId = 1, sink = sink, isEnabled = true)
 
-    @BeforeTest
-    fun setUp() {
-        for (packet in sink.packets) {
-            packet.recycle()
-        }
-        sink.packets.clear()
-    }
-
     @Test
     internal fun testProcessTrackEvents() {
         context.use {
@@ -67,14 +57,8 @@ class TracingTest {
             thread.trace("section") {}
         }
         assertTrue(sink.packets.size == 4)
-        assertNotNull(
-            sink.packets.find {
-                it.tracePacket.track_descriptor?.process?.process_name == "process"
-            }
-        )
-        assertNotNull(
-            sink.packets.find { it.tracePacket.track_descriptor?.thread?.thread_name == "thread" }
-        )
+        assertNotNull(sink.packets.find { it.track_descriptor?.process?.process_name == "process" })
+        assertNotNull(sink.packets.find { it.track_descriptor?.thread?.thread_name == "thread" })
         sink.packets.assertTraceSection("section")
     }
 
@@ -83,7 +67,7 @@ class TracingTest {
         context.use {
             val process = context.getOrCreateProcessTrack(id = 1, name = "process")
             val counter = process.getOrCreateCounterTrack("counter")
-            counter.emitLongCounterPacket(10L)
+            counter.setCounter(10L)
         }
         assertTrue(sink.packets.size == 3)
     }
@@ -96,11 +80,7 @@ class TracingTest {
             process.trace("section2") {}
         }
         assertTrue(sink.packets.size == 5)
-        assertNotNull(
-            sink.packets.find {
-                it.tracePacket.track_descriptor?.process?.process_name == "process"
-            }
-        )
+        assertNotNull(sink.packets.find { it.track_descriptor?.process?.process_name == "process" })
         sink.packets.assertTraceSection("section")
         sink.packets.assertTraceSection("section2")
     }
@@ -125,11 +105,11 @@ class TracingTest {
         val method1Begin = sink.packets.trackEventPacket(name = "method1")
         val method2Begin = sink.packets.trackEventPacket(name = "method2")
         assertNotNull(serviceBegin) { "Cannot find packet with name service" }
-        val flowId = serviceBegin.tracePacket.track_event?.flow_ids?.first()
+        val flowId = serviceBegin.track_event?.flow_ids?.first()
         assertNotNull(flowId) { "Packet $serviceBegin does not include a flow_id" }
         assertNotNull(method1Begin) { "Cannot find packet with name method1" }
         assertNotNull(method2Begin) { "Cannot find packet with name method2" }
-        assertContains(method1Begin.tracePacket.track_event?.flow_ids ?: emptyList(), flowId)
-        assertContains(method2Begin.tracePacket.track_event?.flow_ids ?: emptyList(), flowId)
+        assertContains(method1Begin.track_event?.flow_ids ?: emptyList(), flowId)
+        assertContains(method2Begin.track_event?.flow_ids ?: emptyList(), flowId)
     }
 }

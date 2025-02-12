@@ -34,6 +34,7 @@ import kotlinx.coroutines.Job
 import okio.BufferedSink
 import okio.appendingSink
 import okio.buffer
+import perfetto.protos.MutableTracePacket
 
 /** The trace sink that writes to a new file per trace session. */
 public class JvmTraceSink(
@@ -74,8 +75,8 @@ public class JvmTraceSink(
         makeDrainRequest()
     }
 
-    override fun emit(pooledPacketArray: PooledTracePacketArray) {
-        queue.addFirst(pooledPacketArray)
+    override fun enqueue(pooledPacketArray: PooledTracePacketArray) {
+        queue.addLast(pooledPacketArray)
         makeDrainRequest()
     }
 
@@ -98,11 +99,8 @@ public class JvmTraceSink(
         while (queue.isNotEmpty()) {
             val pooledPacketArray = queue.removeFirstOrNull()
             if (pooledPacketArray != null) {
-                for (pooledTracePacket in pooledPacketArray.pooledTracePacketArray) {
-                    if (pooledTracePacket != null) {
-                        pooledTracePacket.encodeTracePacket(protoWriter)
-                        pooledTracePacket.recycle()
-                    }
+                pooledPacketArray.forEach {
+                    MutableTracePacket.ADAPTER.encodeWithTag(protoWriter, 1, it)
                 }
                 pooledPacketArray.recycle()
             }
