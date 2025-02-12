@@ -10658,7 +10658,8 @@ public abstract class AppSearchSessionCtsTestBase {
                 .build();
         UnsupportedOperationException exception = assertThrows(
                 UnsupportedOperationException.class,
-                () -> mDb1.search("semanticSearch(getEmbeddingParameter(0), -1, 1)", searchSpec));
+                () -> mDb1.search("semanticSearch(getEmbeddingParameter(0), -1, 1)",
+                        searchSpec).getNextPageAsync().get());
         assertThat(exception).hasMessageThat().contains(Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG
                 + " is not available on this AppSearch implementation.");
     }
