@@ -19,9 +19,9 @@ package androidx.navigation
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.internal.SynchronizedObject
+import androidx.navigation.internal.synchronized
 import androidx.savedstate.SavedState
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * The NavigatorState encapsulates the state shared between the [Navigator] and the [NavController].
  */
 public abstract class NavigatorState {
-    private val backStackLock = ReentrantLock(true)
+    private val backStackLock = SynchronizedObject()
     private val _backStack: MutableStateFlow<List<NavBackStackEntry>> = MutableStateFlow(listOf())
     private val _transitionsInProgress: MutableStateFlow<Set<NavBackStackEntry>> =
         MutableStateFlow(setOf())
@@ -56,7 +56,7 @@ public abstract class NavigatorState {
 
     /** Adds the given [backStackEntry] to the [backStack]. */
     public open fun push(backStackEntry: NavBackStackEntry) {
-        backStackLock.withLock { _backStack.value = _backStack.value + backStackEntry }
+        synchronized(backStackLock) { _backStack.value = _backStack.value + backStackEntry }
     }
 
     /**
@@ -99,7 +99,9 @@ public abstract class NavigatorState {
      * the [backStack], saving their state if [saveState] is `true`.
      */
     public open fun pop(popUpTo: NavBackStackEntry, saveState: Boolean) {
-        backStackLock.withLock { _backStack.value = _backStack.value.takeWhile { it != popUpTo } }
+        synchronized(backStackLock) {
+            _backStack.value = _backStack.value.takeWhile { it != popUpTo }
+        }
     }
 
     /**
@@ -152,7 +154,7 @@ public abstract class NavigatorState {
     public open fun onLaunchSingleTop(backStackEntry: NavBackStackEntry) {
         // We update the back stack here because we don't want to leave it to the navigator since
         // it might be using transitions.
-        backStackLock.withLock {
+        synchronized(backStackLock) {
             val tempStack = backStack.value.toMutableList()
             tempStack
                 .indexOfLast { it.id == backStackEntry.id }
