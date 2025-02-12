@@ -466,7 +466,9 @@ class SwipeToRevealTest {
         lateinit var revealState: RevealState
         rule.setContent {
             revealState =
-                rememberRevealState(anchors = createAnchors(revealDirection = revealDirection))
+                rememberRevealState(
+                    anchors = createRevealAnchors(revealDirection = revealDirection)
+                )
             swipeToRevealWithDefaults(
                 state = revealState,
                 onFullSwipe = onFullSwipe,
