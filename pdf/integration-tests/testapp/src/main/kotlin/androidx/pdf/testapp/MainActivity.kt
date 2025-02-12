@@ -31,6 +31,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.pdf.testapp.databinding.MainActivityBinding
 import androidx.pdf.testapp.databinding.ScenarioButtonsBinding
 import androidx.pdf.testapp.ui.BasicPdfFragment
+import androidx.pdf.testapp.ui.XmlStyledPdfFragment
 import androidx.pdf.testapp.ui.scenarios.SinglePdfFragment
 import androidx.pdf.testapp.ui.scenarios.TabsViewPdfFragment
 import com.google.android.material.button.MaterialButton
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tabsViewButton: MaterialButton
     private lateinit var pdfFragmentv2Button: MaterialButton
     private lateinit var styledPdfFragmentButton: MaterialButton
+    private lateinit var xmlStyledPdfFragmentButton: MaterialButton
     private lateinit var fragmentContainer: FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         tabsViewButton = scenarioButtons.tabView
         pdfFragmentv2Button = scenarioButtons.pdfFragmentV2
         styledPdfFragmentButton = scenarioButtons.styledPdfFragment
+        xmlStyledPdfFragmentButton = scenarioButtons.xmlStyledPdfFragment
 
         fragmentContainer = mainActivity.pdfInteractionFragmentContainerView
 
@@ -72,6 +75,8 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
+
+        xmlStyledPdfFragmentButton.setOnClickListener { loadFragment(XmlStyledPdfFragment()) }
 
         handleWindowInsets()
         handleBackPress()
@@ -138,6 +143,7 @@ class MainActivity : AppCompatActivity() {
         tabsViewButton.visibility = View.VISIBLE
         pdfFragmentv2Button.visibility = View.VISIBLE
         styledPdfFragmentButton.visibility = View.VISIBLE
+        xmlStyledPdfFragmentButton.visibility = View.VISIBLE
     }
 
     private fun hideButtons() {
@@ -145,6 +151,7 @@ class MainActivity : AppCompatActivity() {
         tabsViewButton.visibility = View.GONE
         pdfFragmentv2Button.visibility = View.GONE
         styledPdfFragmentButton.visibility = View.GONE
+        xmlStyledPdfFragmentButton.visibility = View.GONE
     }
 
     private fun handleWindowInsets() {

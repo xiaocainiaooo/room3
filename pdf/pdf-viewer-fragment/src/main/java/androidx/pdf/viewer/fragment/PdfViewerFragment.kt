@@ -321,7 +321,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
             )
         try {
             val pdfViewStyleFromAttrs =
-                typedArray.getInt(
+                typedArray.getResourceId(
                     androidx.pdf.viewer.fragment.R.styleable.PdfViewerFragment_containerStyle,
                     ID_NULL
                 )
@@ -332,9 +332,11 @@ public open class PdfViewerFragment constructor() : Fragment() {
                  * save it in [androidx.pdf.viewer.fragment.PdfViewerFragment]'s arguments for
                  * fragment restoring scenarios.
                  */
-                (arguments ?: Bundle()).also { args ->
-                    args.putInt(KEY_PDF_VIEW_STYLE, pdfViewStyleFromAttrs)
-                }
+                arguments?.putInt(KEY_PDF_VIEW_STYLE, pdfViewStyleFromAttrs)
+                    ?: run {
+                        arguments =
+                            Bundle().also { it.putInt(KEY_PDF_VIEW_STYLE, pdfViewStyleFromAttrs) }
+                    }
             }
         } finally {
             typedArray.recycle()
