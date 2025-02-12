@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"ಯಾವುದೇ ಪಿನ್, ಪ್ಯಾಟರ್ನ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಹೊಂದಿಸಿಲ್ಲ."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"ಈ ಸಾಧನವು ಪಿನ್, ಪ್ಯಾಟರ್ನ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ಫಿಂಗರ್‌ಪ್ರಿಂಟ್ ಐಕಾನ್"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ಫಿಂಗರ್ ಪ್ರಿಂಟ್ ಬಳಸಿ"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ಮುಖವನ್ನು ಬಳಸಿ"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ಬಯೋಮೆಟ್ರಿಕ್ಸ್ ಬಳಸಿ"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ಮುಂದುವರಿಸಲು ಫಿಂಗರ್ ಪ್ರಿಂಟ್ ಅಥವಾ ಸ್ಕ್ರೀನ್ ಲಾಕ್ ಅನ್ನು ಬಳಸಿ"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ಮುಂದುವರಿಸಲು ನಿಮ್ಮ ಮುಖ ಅಥವಾ ಸ್ಕ್ರೀನ್ ಲಾಕ್ ಅನ್ನು ಬಳಸಿ"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ಮುಂದುವರಿಸಲು ನಿಮ್ಮ ಬಯೋಮೆಟ್ರಿಕ್ ಅಥವಾ ಸ್ಕ್ರೀನ್ ಲಾಕ್ ಅನ್ನು ಬಳಸಿ"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"ಮುಂದುವರಿಸಲು ಬಯೋಮೆಟ್ರಿಕ್ ಅಗತ್ಯವಿದೆ"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ಗುರುತಿನ ಪರಿಶೀಲನೆ ಆನ್ ಆಗಿದೆ ಮತ್ತು ಬಯೋಮೆಟ್ರಿಕ್‌ನ ಅಗತ್ಯವಿದೆ, ಆದರೆ ನಿಮ್ಮ ಫೇಸ್ ಮತ್ತು ಫಿಂಗರ್‌ಪ್ರಿಂಟ್ ಸೆನ್ಸರ್‌‌ ಲಭ್ಯವಿಲ್ಲ\n"<ul><li>"ನಿಮ್ಮ ಕ್ಯಾಮರಾ ಆನ್ ಆಗಿದೆಯೇ ಎಂಬುದನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ"</li>\n<li>"ನಿಮ್ಮ Google ಖಾತೆಯನ್ನು ಬಳಸಿಕೊಂಡು ನೀವು ಐಡೆಂಟಿಟಿ ಚೆಕ್ ಅನ್ನು ಆಫ್ ಮಾಡಬಹುದು"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ಐಡೆಂಟಿಟಿ ಚೆಕ್ ಆನ್ ಆಗಿದೆ ಹಾಗೂ ಇದು ನೀವೇ ಎಂಬುದನ್ನು ದೃಢೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ಬಯೋಮೆಟ್ರಿಕ್ಸ್ ಹಲವು ಬಾರಿ ವಿಫಲವಾಗಿದೆ. ಮರುಪ್ರಯತ್ನಿಸಲು ನಿಮ್ಮ ಸಾಧನವನ್ನು ಲಾಕ್ ಮಾಡಿ ಮತ್ತು ಅನ್‌ಲಾಕ್ ಮಾಡಿ."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"\'ಕಳ್ಳತನದಿಂದ ರಕ್ಷಣೆ\' ಯ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ನೀವು ಐಡೆಂಟಿಟಿ ಚೆಕ್ ಅನ್ನು ನಿರ್ವಹಿಸಬಹುದು. ಸೆಟ್ಟಿಂಗ್‌ಗಳಿಗೆ ಹೋಗಿ"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"ಲಾಕ್ ಸ್ಕ್ರೀನ್"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ಸೆಟ್ಟಿಂಗ್‌ಗಳಿಗೆ ಹೋಗಿ"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ಸರಿ"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"ರದ್ದುಮಾಡಿ"</string>
 </resources>

@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"کوئی پن، پیٹرن، یا پاس ورڈ سیٹ نہیں ہے۔"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"‏یہ آلہ PIN، پیٹرن یا پاس ورڈ کو سپورٹ نہیں کرتا ہے۔"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"فنگر پرنٹ آئیکن"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"مواد کے منظر میں مزید اختیارات کے بٹن پر کلک کیا جاتا ہے۔"</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"خرابی کا ڈائیلاگ صارفین کو بتاتا ہے کہ بایو میٹرک لاک ہے اور اسے صارف کے ذریعے منسوخی، ترتیبات کے صفحہ پر سوئچ کر کے یا اسکرین لاک کر کے برخاست کر دیا جاتا ہے۔"</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"خرابی کا ڈائیلاگ صارفین کو بتاتا ہے کہ بایو میٹرک ہارڈویئر دستیاب نہیں ہے اور اسے صارف کے ذریعے منسوخی یا ترتیبات کے صفحے پر سوئچ کر کے برخاست کر دیا جاتا ہے۔"</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"فنگر پرنٹ استعمال کریں"</string>
     <string name="use_face_label" msgid="6533512708069459542">"چہرے کا استعمال کریں"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"بایو میٹرکس استعمال کریں"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"جاری رکھنے کے لیے اپنے فنگر پرنٹ یا اسکرین لاک کا استعمال کریں"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"جاری رکھنے کے لیے اپنے چہرے یا اسکرین لاک کا استعمال کریں"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"جاری رکھنے کے لیے اپنے بایو میٹرک یا اسکرین لاک کا استعمال کریں"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"جاری رکھنے کے لیے بایو میٹرک درکار ہے"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"‏شناختی چیک آن ہے اور اس کے لیے بائیو میٹرک کی ضرورت ہے، لیکن آپ کا چہرہ یا فنگر پرنٹ سینسر دستیاب نہیں ہے\n"<ul><li>"چیک کریں کہ آپ کا کیمرا آن ہے اور دوبارہ کوشش کریں"</li>\n<li>"آپ اپنے Google اکاؤنٹ کا استعمال کر کے شناخت کی تصدیق کو آف کر سکتے ہیں"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"شناخت کی تصدیق خصوصیت آن ہے اور توثیق نہیں کر سکتی کہ یہ آپ ہی ہیں"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"بایو میٹرکس کئی بار ناکام ہوئے۔ دوبارہ کوشش کرنے کے لیے اپنے آلے کو مقفل اور غیر مقفل کریں۔"</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"آپ چوری سے تحفظ کی ترتیبات میں شناخت کی تصدیق کا نظم کر سکتے ہیں۔ ترتیبات پر جائیں"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"مقفل اسکرین"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ترتیبات پر جائیں"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ٹھیک ہے"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"منسوخ کریں"</string>
 </resources>

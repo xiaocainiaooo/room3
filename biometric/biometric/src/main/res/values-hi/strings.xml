@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"पिन, पैटर्न या पासवर्ड सेट नहीं है."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"इस डिवाइस को पिन, पैटर्न या पासवर्ड की मदद से लॉक/अनलॉक नहीं किया जा सकता."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"फ़िंगरप्रिंट आइकॉन"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"फ़िंगरप्रिंट का इस्तेमाल करें"</string>
     <string name="use_face_label" msgid="6533512708069459542">"चेहरा दिखाएं"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"बायोमेट्रिक्स का इस्तेमाल करें"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"जारी रखने के लिए, फ़िंगरप्रिंट या स्क्रीन लॉक क्रेडेंशियल का इस्तेमाल करें"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"जारी रखने के लिए, अपना चेहरा दिखाएं या स्क्रीन लॉक क्रेडेंशियल का इस्तेमाल करें"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"जारी रखने के लिए, बायोमेट्रिक या स्क्रीन लॉक क्रेडेंशियल का इस्तेमाल करें"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"पुष्टि करने के लिए बायोमेट्रिक डेटा ज़रूरी है"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"पहचान की पुष्टि करने की सेटिंग चालू है और इसके लिए बायोमेट्रिक डेटा की ज़रूरत है. फ़िलहाल, आपका चेहरा नहीं दिख रहा है या फ़िंगरप्रिंट सेंसर उपलब्ध नहीं है\n"<ul><li>"देखें कि आपके डिवाइस का कैमरा चालू है या नहीं. इसके बाद, फिर से कोशिश करें"</li>\n<li>"अपने Google खाते के ज़रिए, पहचान की पुष्टि करने की सेटिंग को बंद किया जा सकता है"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"पहचान की पुष्टि करने की सेटिंग चालू है, लेकिन यह आपकी पहचान की पुष्टि नहीं कर पा रही है"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"कई बार गलत बायोमेट्रिक्स का इस्तेमाल करने की वजह से, पुष्टि नहीं हो सकी. फिर से कोशिश करने के लिए, अपना डिवाइस लॉक और अनलॉक करें."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"डिवाइस चोरी होने पर डेटा को सुरक्षित रखने से जुड़ी सेटिंग में जाकर, पहचान की पुष्टि करने की सेटिंग को मैनेज किया जा सकता है. सेटिंग पर जाएं"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"लॉक स्क्रीन"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"सेटिंग पर जाएं"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ठीक है"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"अभी नहीं"</string>
 </resources>

@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"പിൻ, പാറ്റേൺ, അല്ലെങ്കിൽ പാസ്‍വേഡ് ഇവയൊന്നും സജ്ജീകരിച്ചിട്ടില്ല."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"പിൻ, പാറ്റേൺ, പാസ്‌വേഡ് എന്നിവ ഈ ഉപകരണം പിന്തുണയ്ക്കുന്നില്ല."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ഫിംഗർപ്രിന്റ് ഐക്കൺ"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"ഉള്ളടക്ക കാഴ്‌ചയിലെ കൂടുതൽ ഓപ്‌ഷനുകൾ ബട്ടൺ ക്ലിക്ക് ചെയ്‌തു."</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"ബയോമെട്രിക് ലോക്ക് ആണെന്നും അത് റദ്ദാക്കുന്നതിനോ ക്രമീകരണ പേജിലേക്ക് മാറുന്നതിനോ സ്‌ക്രീൻ ലോക്ക് ചെയ്യുന്നതിനോ ഉപയോക്താവ് ഡിസ്മിസ് ചെയ്തതായും പിശക് ഡയലോഗ് ഉപയോക്താക്കളെ അറിയിക്കുന്നു."</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"ബയോമെട്രിക് ഹാര്‍ഡ്‍വെയര്‍ ലഭ്യമല്ലെന്നും അത് റദ്ദാക്കുന്നതിനോ അല്ലെങ്കിൽ ക്രമീകരണ പേജിലേക്ക് മാറുന്നതിനോ വേണ്ടി ഉപയോക്താവ് ഡിസ്മിസ് ചെയ്തതായും പിശക് ഡയലോഗ് ഉപയോക്താക്കളെ അറിയിക്കുന്നു."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ഫിംഗർപ്രിന്റ് ഉപയോഗിക്കുക"</string>
     <string name="use_face_label" msgid="6533512708069459542">"മുഖം ഉപയോഗിക്കുക"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ബയോമെട്രിക്‌സ് ഉപയോഗിക്കുക"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"തുടരാൻ നിങ്ങളുടെ ഫിംഗർപ്രിന്റോ സ്‌ക്രീൻ ലോക്കോ ഉപയോഗിക്കുക"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"തുടരാൻ നിങ്ങളുടെ മുഖമോ സ്‌ക്രീൻ ലോക്കോ ഉപയോഗിക്കുക"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"തുടരാൻ നിങ്ങളുടെ ബയോമെട്രിക്‌ അല്ലെങ്കിൽ സ്‌ക്രീൻ ലോക്ക് ഉപയോഗിക്കുക"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"തുടരുന്നതിന് ബയോമെട്രിക് ആവശ്യമാണ്"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ഐഡന്റിറ്റി പരിശോധന ഓണാണ്, അതിന് ബയോമെട്രിക് ആവശ്യമാണ്, എന്നാൽ നിങ്ങളുടെ മുഖമോ ഫിംഗർപ്രിന്റ് സെൻസറോ ലഭ്യമല്ല\n"<ul><li>"നിങ്ങളുടെ ക്യാമറ ഓണാണോയെന്ന് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക"</li>\n<li>"നിങ്ങളുടെ Google Account ഉപയോഗിച്ച് ഐഡന്റിറ്റി പരിശോധന ഓഫാക്കാം"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ഐഡന്റിറ്റി പരിശോധന ഓണാണ്, ഇത് നിങ്ങൾ തന്നെയാണെന്ന് പരിശോധിച്ചുറപ്പിക്കാനാകുന്നില്ല"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ബയോമെട്രിക്‌സ് നിരവധി തവണ ഉപയോഗിച്ചതിനാൽ പരിശോധിച്ചുറപ്പിക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുന്നതിന് നിങ്ങളുടെ ഉപകരണം ലോക്ക് ചെയ്ത ശേഷം അൺലോക്ക് ചെയ്യുക."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"മോഷണം തടയൽ ക്രമീകരണത്തിൽ നിങ്ങൾക്ക് ഐഡന്റിറ്റി പരിശോധന മാനേജ് ചെയ്യാം. ക്രമീകരണത്തിലേക്ക് പോകുക"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"ലോക്ക് സ്‌ക്രീൻ"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"ക്രമീകരണത്തിലേക്ക് പോകുക"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ശരി"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"റദ്ദാക്കുക"</string>
 </resources>

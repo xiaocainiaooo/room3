@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Non hai impostato PIN, sequenza o password."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Questo dispositivo non supporta il PIN, la sequenza o la password."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Icona dell\'impronta"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"È stato selezionato il pulsante Altre opzioni nella visualizzazione dei contenuti."</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"La finestra di dialogo di errore informa gli utenti che la biometria è bloccata e viene ignorata dall\'utente per annullare l\'operazione, passare alla pagina delle impostazioni o bloccare lo schermo."</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"La finestra di dialogo di errore informa gli utenti che l\'hardware biometrico non è disponibile e viene ignorata dall\'utente per annullare l\'operazione o passare alla pagina delle impostazioni."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Usa l\'impronta"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Usa il volto"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Usa i dati biometrici"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Per continuare, devi usare la tua impronta o il tuo blocco schermo"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Per continuare, devi usare il tuo volto o il tuo blocco schermo"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Per continuare, devi usare i tuoi dati biometrici o il tuo blocco schermo"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometria obbligatoria per continuare"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"La funzionalità Verifica dell\'identità è attiva e richiede la biometria, ma il sensore di impronte digitali o del volto non è disponibile\n"<ul><li>"Controlla che la fotocamera sia accesa e riprova"</li>\n<li>"Puoi disattivare Verifica dell\'identità utilizzando il tuo Account Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"La funzionalità Verifica dell\'identità è attiva e non è in grado di verificare la tua identità"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Troppi tentativi di biometria non riusciti. Blocca e sblocca il dispositivo per riprovare."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Puoi gestire la funzionalità Verifica dell\'identità nelle impostazioni di protezione dai furti. Vai alle Impostazioni"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Schermata di blocco"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Vai alle Impostazioni"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Ok"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Annulla"</string>
 </resources>
