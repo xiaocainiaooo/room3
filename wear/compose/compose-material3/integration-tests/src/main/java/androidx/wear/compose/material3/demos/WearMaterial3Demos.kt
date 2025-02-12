@@ -95,8 +95,8 @@ val WearMaterial3Demos =
                 Material3DemoCategory(
                     "Button Group",
                     listOf(
-                        ComposableDemo("Two buttons") { ButtonGroupSample() },
-                        ComposableDemo("ABC") { ButtonGroupThreeButtonsSample() },
+                        ComposableDemo("Two buttons") { Centralize { ButtonGroupSample() } },
+                        ComposableDemo("ABC") { Centralize { ButtonGroupThreeButtonsSample() } },
                         ComposableDemo("Text And Icon") { ButtonGroupDemo() },
                         ComposableDemo("ToggleButtons") { ButtonGroupToggleButtonsDemo() },
                     )
