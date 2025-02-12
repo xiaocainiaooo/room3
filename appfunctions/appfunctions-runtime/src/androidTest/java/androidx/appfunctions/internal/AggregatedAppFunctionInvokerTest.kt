@@ -28,19 +28,19 @@ import org.junit.Assert
 import org.junit.Test
 
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
-class AggregateAppFunctionInvokerTest {
+class AggregatedAppFunctionInvokerTest {
 
     @Test
-    fun testEmptyAggregateInvoker() {
-        val aggregateInvoker =
-            object : AggregateAppFunctionInvoker() {
+    fun testEmptyAggregatedInvoker() {
+        val aggregatedInvoker =
+            object : AggregatedAppFunctionInvoker() {
                 override val invokers: List<AppFunctionInvoker> = emptyList()
             }
 
-        assertThat(aggregateInvoker.supportedFunctionIds).isEmpty()
+        assertThat(aggregatedInvoker.supportedFunctionIds).isEmpty()
         Assert.assertThrows(AppFunctionFunctionNotFoundException::class.java) {
             runBlocking {
-                aggregateInvoker.unsafeInvoke(
+                aggregatedInvoker.unsafeInvoke(
                     FakeAppFunctionContext,
                     "androidx.apfunctions.internal#test1",
                     mapOf()
@@ -50,9 +50,9 @@ class AggregateAppFunctionInvokerTest {
     }
 
     @Test
-    fun testAggregateInvoker_nonExistFunction() {
-        val aggregateInvoker =
-            object : AggregateAppFunctionInvoker() {
+    fun testAggregatedInvoker_nonExistFunction() {
+        val aggregatedInvoker =
+            object : AggregatedAppFunctionInvoker() {
                 override val invokers: List<AppFunctionInvoker> =
                     listOf(
                         Invoker1(),
@@ -60,12 +60,12 @@ class AggregateAppFunctionInvokerTest {
                     )
             }
 
-        assertThat(aggregateInvoker.supportedFunctionIds).hasSize(2)
-        assertThat(aggregateInvoker.supportedFunctionIds)
+        assertThat(aggregatedInvoker.supportedFunctionIds).hasSize(2)
+        assertThat(aggregatedInvoker.supportedFunctionIds)
             .containsNoneIn(listOf("androidx.appfunctions.internal#test0"))
         Assert.assertThrows(AppFunctionFunctionNotFoundException::class.java) {
             runBlocking {
-                aggregateInvoker.unsafeInvoke(
+                aggregatedInvoker.unsafeInvoke(
                     FakeAppFunctionContext,
                     "androidx.apfunctions.internal#test0",
                     mapOf()
@@ -75,9 +75,9 @@ class AggregateAppFunctionInvokerTest {
     }
 
     @Test
-    fun testAggregateInvoker_existFunctions() {
-        val aggregateInvoker =
-            object : AggregateAppFunctionInvoker() {
+    fun testAggregatedInvoker_existFunctions() {
+        val aggregatedInvoker =
+            object : AggregatedAppFunctionInvoker() {
                 override val invokers: List<AppFunctionInvoker> =
                     listOf(
                         Invoker1(),
@@ -86,21 +86,21 @@ class AggregateAppFunctionInvokerTest {
             }
 
         val invokeTest1Result = runBlocking {
-            aggregateInvoker.unsafeInvoke(
+            aggregatedInvoker.unsafeInvoke(
                 FakeAppFunctionContext,
                 "androidx.appfunctions.internal#test1",
                 mapOf()
             )
         }
         val invokeTest2Result = runBlocking {
-            aggregateInvoker.unsafeInvoke(
+            aggregatedInvoker.unsafeInvoke(
                 FakeAppFunctionContext,
                 "androidx.appfunctions.internal#test2",
                 mapOf()
             )
         }
 
-        assertThat(aggregateInvoker.supportedFunctionIds)
+        assertThat(aggregatedInvoker.supportedFunctionIds)
             .containsExactly(
                 "androidx.appfunctions.internal#test1",
                 "androidx.appfunctions.internal#test2"

@@ -6,7 +6,7 @@ import javax.`annotation`.processing.Generated
 import kotlin.collections.List
 
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$AggregateAppFunctionInvoker_Impl` : AggregateAppFunctionInvoker() {
+public class `$AggregatedAppFunctionInvoker_Impl` : AggregatedAppFunctionInvoker() {
   override val invokers: List<AppFunctionInvoker> = listOf(
     `$AllPrimitiveInputFunctions_AppFunctionInvoker`(),
     `$SimpleFunction_AppFunctionInvoker`(),

@@ -20,8 +20,8 @@ import android.content.Context
 import android.os.Build
 import android.os.OutcomeReceiver
 import androidx.annotation.RequiresApi
-import androidx.appfunctions.internal.AggregateAppFunctionInventory
-import androidx.appfunctions.internal.AggregateAppFunctionInvoker
+import androidx.appfunctions.internal.AggregatedAppFunctionInventory
+import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.AppFunctionInventory
 import androidx.appfunctions.internal.AppFunctionInvoker
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_LONG
@@ -52,24 +52,24 @@ class AppFunctionServiceDelegateTest {
 
     private lateinit var context: Context
 
-    private lateinit var fakeAggregateInvoker: FakeAggregateInvoker
+    private lateinit var fakeAggregatedInvoker: FakeAggregatedInvoker
 
-    private lateinit var fakeAggregateInventory: FakeAggregateInventory
+    private lateinit var fakeAggregatedInventory: FakeAggregatedInventory
 
     private lateinit var delegate: AppFunctionServiceDelegate
 
     @Before
     fun setup() {
         context = InstrumentationRegistry.getInstrumentation().context
-        fakeAggregateInvoker = FakeAggregateInvoker()
-        fakeAggregateInventory = FakeAggregateInventory()
+        fakeAggregatedInvoker = FakeAggregatedInvoker()
+        fakeAggregatedInventory = FakeAggregatedInventory()
         delegate =
             AppFunctionServiceDelegate(
                 context,
                 testDispatcher,
                 testDispatcher,
-                fakeAggregateInventory,
-                fakeAggregateInvoker,
+                fakeAggregatedInventory,
+                fakeAggregatedInvoker,
             )
     }
 
@@ -89,7 +89,7 @@ class AppFunctionServiceDelegateTest {
 
     @Test
     fun testOnExecuteFunction_invalidParameter() {
-        fakeAggregateInventory.setAppFunctionMetadata(
+        fakeAggregatedInventory.setAppFunctionMetadata(
             AppFunctionMetadata(
                 id = "invaliadParameterFunction",
                 isEnabledByDefault = true,
@@ -131,7 +131,7 @@ class AppFunctionServiceDelegateTest {
 
     @Test
     fun testOnExecuteFunction_buildReturnValueFail() {
-        fakeAggregateInventory.setAppFunctionMetadata(
+        fakeAggregatedInventory.setAppFunctionMetadata(
             AppFunctionMetadata(
                 id = "returnIncorrectResultFunction",
                 isEnabledByDefault = true,
@@ -148,7 +148,7 @@ class AppFunctionServiceDelegateTest {
             )
         )
         // Returns String instead of Long
-        fakeAggregateInvoker.setAppFunctionResult("returnIncorrectResultFunction") { "TestString" }
+        fakeAggregatedInvoker.setAppFunctionResult("returnIncorrectResultFunction") { "TestString" }
         val request =
             ExecuteAppFunctionRequest(
                 targetPackageName = context.packageName,
@@ -163,7 +163,7 @@ class AppFunctionServiceDelegateTest {
 
     @Test
     fun testOnExecuteFunction_succeed_noArg() {
-        fakeAggregateInventory.setAppFunctionMetadata(
+        fakeAggregatedInventory.setAppFunctionMetadata(
             AppFunctionMetadata(
                 id = "succeedFunction",
                 isEnabledByDefault = true,
@@ -179,7 +179,7 @@ class AppFunctionServiceDelegateTest {
                     )
             )
         )
-        fakeAggregateInvoker.setAppFunctionResult("succeedFunction") { "TestString" }
+        fakeAggregatedInvoker.setAppFunctionResult("succeedFunction") { "TestString" }
         val request =
             ExecuteAppFunctionRequest(
                 targetPackageName = context.packageName,
@@ -200,7 +200,7 @@ class AppFunctionServiceDelegateTest {
 
     @Test
     fun testOnExecuteFunction_succeed_withArg() {
-        fakeAggregateInventory.setAppFunctionMetadata(
+        fakeAggregatedInventory.setAppFunctionMetadata(
             AppFunctionMetadata(
                 id = "succeedFunction",
                 isEnabledByDefault = true,
@@ -227,7 +227,7 @@ class AppFunctionServiceDelegateTest {
                     )
             )
         )
-        fakeAggregateInvoker.setAppFunctionResult("succeedFunction") { "TestString" }
+        fakeAggregatedInvoker.setAppFunctionResult("succeedFunction") { "TestString" }
         val request =
             ExecuteAppFunctionRequest(
                 targetPackageName = context.packageName,
@@ -264,7 +264,7 @@ class AppFunctionServiceDelegateTest {
         )
     }
 
-    private class FakeAggregateInvoker : AggregateAppFunctionInvoker() {
+    private class FakeAggregatedInvoker : AggregatedAppFunctionInvoker() {
 
         private val internalInvoker =
             object : AppFunctionInvoker {
@@ -295,7 +295,7 @@ class AppFunctionServiceDelegateTest {
         }
     }
 
-    private class FakeAggregateInventory : AggregateAppFunctionInventory() {
+    private class FakeAggregatedInventory : AggregatedAppFunctionInventory() {
 
         private val internalInventory =
             object : AppFunctionInventory {

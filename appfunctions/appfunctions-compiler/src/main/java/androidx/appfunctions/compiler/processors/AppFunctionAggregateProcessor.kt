@@ -21,8 +21,8 @@ import androidx.appfunctions.compiler.AppFunctionCompilerOptions
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTIONS_INTERNAL_PACKAGE_NAME
 import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTION_INVENTORY_CLASS
-import androidx.appfunctions.compiler.core.IntrospectionHelper.AggregateAppFunctionInventoryClass
-import androidx.appfunctions.compiler.core.IntrospectionHelper.AggregateAppFunctionInvokerClass
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AggregatedAppFunctionInventoryClass
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AggregatedAppFunctionInvokerClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionInvokerClass
 import androidx.appfunctions.compiler.core.toClassName
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -40,8 +40,8 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 /**
- * The processor generates the implementation of AggregateAppFunctionInventory and
- * AggregateAppFunctionInvoker.
+ * The processor generates the implementation of AggregatedAppFunctionInventory and
+ * AggregatedAppFunctionInvoker.
  *
  * The processor would only start aggregation process when
  * * [AppFunctionCompilerOptions.aggregateAppFunctions] is true.
@@ -67,27 +67,27 @@ class AppFunctionAggregateProcessor(
             return emptyList()
         }
 
-        generateAggregateAppFunctionInventory(resolver)
-        generateAggregateAppFunctionInvoker(resolver)
+        generateAggregatedAppFunctionInventory(resolver)
+        generateAggregatedAppFunctionInvoker(resolver)
 
         hasProcessed = true
         return emptyList()
     }
 
-    private fun generateAggregateAppFunctionInventory(resolver: Resolver) {
+    private fun generateAggregatedAppFunctionInventory(resolver: Resolver) {
         val generatedInventories =
             AppFunctionSymbolResolver(resolver).getGeneratedAppFunctionInventories()
-        val aggregateInventoryClassName =
-            "${'$'}${AggregateAppFunctionInventoryClass.CLASS_NAME.simpleName}_Impl"
+        val aggregatedInventoryClassName =
+            "${'$'}${AggregatedAppFunctionInventoryClass.CLASS_NAME.simpleName}_Impl"
 
-        val aggregateInventoryClassBuilder = TypeSpec.classBuilder(aggregateInventoryClassName)
-        aggregateInventoryClassBuilder.superclass(AggregateAppFunctionInventoryClass.CLASS_NAME)
-        aggregateInventoryClassBuilder.addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
-        aggregateInventoryClassBuilder.addProperty(buildInventoriesProperty(generatedInventories))
+        val aggregatedInventoryClassBuilder = TypeSpec.classBuilder(aggregatedInventoryClassName)
+        aggregatedInventoryClassBuilder.superclass(AggregatedAppFunctionInventoryClass.CLASS_NAME)
+        aggregatedInventoryClassBuilder.addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
+        aggregatedInventoryClassBuilder.addProperty(buildInventoriesProperty(generatedInventories))
 
         val fileSpec =
-            FileSpec.builder(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, aggregateInventoryClassName)
-                .addType(aggregateInventoryClassBuilder.build())
+            FileSpec.builder(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, aggregatedInventoryClassName)
+                .addType(aggregatedInventoryClassBuilder.build())
                 .build()
 
         codeGenerator
@@ -95,7 +95,7 @@ class AppFunctionAggregateProcessor(
                 // TODO: Collect all AppFunction files as source files set
                 Dependencies.ALL_FILES,
                 APP_FUNCTIONS_INTERNAL_PACKAGE_NAME,
-                aggregateInventoryClassName
+                aggregatedInventoryClassName
             )
             .bufferedWriter()
             .use { fileSpec.writeTo(it) }
@@ -105,7 +105,7 @@ class AppFunctionAggregateProcessor(
         generatedInventories: List<KSClassDeclaration>
     ): PropertySpec {
         return PropertySpec.builder(
-                AggregateAppFunctionInventoryClass.PROPERTY_INVENTORIES_NAME,
+                AggregatedAppFunctionInventoryClass.PROPERTY_INVENTORIES_NAME,
                 List::class.asClassName().parameterizedBy(APP_FUNCTION_INVENTORY_CLASS)
             )
             .addModifiers(KModifier.OVERRIDE)
@@ -123,20 +123,20 @@ class AppFunctionAggregateProcessor(
             .build()
     }
 
-    private fun generateAggregateAppFunctionInvoker(resolver: Resolver) {
+    private fun generateAggregatedAppFunctionInvoker(resolver: Resolver) {
         val generatedInvokers =
             AppFunctionSymbolResolver(resolver).getGeneratedAppFunctionInvokers()
-        val aggregateInvokerClassName =
-            "${'$'}${AggregateAppFunctionInvokerClass.CLASS_NAME.simpleName}_Impl"
+        val aggregatedInvokerClassName =
+            "${'$'}${AggregatedAppFunctionInvokerClass.CLASS_NAME.simpleName}_Impl"
 
-        val aggregateInvokerClassBuilder = TypeSpec.classBuilder(aggregateInvokerClassName)
-        aggregateInvokerClassBuilder.superclass(AggregateAppFunctionInvokerClass.CLASS_NAME)
-        aggregateInvokerClassBuilder.addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
-        aggregateInvokerClassBuilder.addProperty(buildInvokersProperty(generatedInvokers))
+        val aggregatedInvokerClassBuilder = TypeSpec.classBuilder(aggregatedInvokerClassName)
+        aggregatedInvokerClassBuilder.superclass(AggregatedAppFunctionInvokerClass.CLASS_NAME)
+        aggregatedInvokerClassBuilder.addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
+        aggregatedInvokerClassBuilder.addProperty(buildInvokersProperty(generatedInvokers))
 
         val fileSpec =
-            FileSpec.builder(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, aggregateInvokerClassName)
-                .addType(aggregateInvokerClassBuilder.build())
+            FileSpec.builder(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, aggregatedInvokerClassName)
+                .addType(aggregatedInvokerClassBuilder.build())
                 .build()
 
         codeGenerator
@@ -144,7 +144,7 @@ class AppFunctionAggregateProcessor(
                 // TODO: Collect all AppFunction files as source files set
                 Dependencies.ALL_FILES,
                 APP_FUNCTIONS_INTERNAL_PACKAGE_NAME,
-                aggregateInvokerClassName
+                aggregatedInvokerClassName
             )
             .bufferedWriter()
             .use { fileSpec.writeTo(it) }
@@ -152,7 +152,7 @@ class AppFunctionAggregateProcessor(
 
     private fun buildInvokersProperty(generatedInvokers: List<KSClassDeclaration>): PropertySpec {
         return PropertySpec.builder(
-                AggregateAppFunctionInvokerClass.PROPERTY_INVOKERS_NAME,
+                AggregatedAppFunctionInvokerClass.PROPERTY_INVOKERS_NAME,
                 List::class.asClassName().parameterizedBy(AppFunctionInvokerClass.CLASS_NAME)
             )
             .addModifiers(KModifier.OVERRIDE)

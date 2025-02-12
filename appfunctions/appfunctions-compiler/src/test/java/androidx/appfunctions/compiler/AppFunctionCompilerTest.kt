@@ -508,8 +508,8 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "${'$'}AggregateAppFunctionInventory_Impl.kt",
-            goldenFileName = "${'$'}AggregateAppFunctionInventory_Impl.KT"
+            expectGeneratedSourceFileName = "${'$'}AggregatedAppFunctionInventory_Impl.kt",
+            goldenFileName = "${'$'}AggregatedAppFunctionInventory_Impl.KT"
         )
     }
 
@@ -529,8 +529,8 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "${'$'}AggregateAppFunctionInvoker_Impl.kt",
-            goldenFileName = "${'$'}AggregateAppFunctionInvoker_Impl.KT"
+            expectGeneratedSourceFileName = "${'$'}AggregatedAppFunctionInvoker_Impl.kt",
+            goldenFileName = "${'$'}AggregatedAppFunctionInvoker_Impl.KT"
         )
     }
 }

@@ -114,16 +114,16 @@ object IntrospectionHelper {
         }
     }
 
-    object AggregateAppFunctionInventoryClass {
+    object AggregatedAppFunctionInventoryClass {
         val CLASS_NAME =
-            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AggregateAppFunctionInventory")
+            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AggregatedAppFunctionInventory")
 
         const val PROPERTY_INVENTORIES_NAME = "inventories"
     }
 
-    object AggregateAppFunctionInvokerClass {
+    object AggregatedAppFunctionInvokerClass {
         val CLASS_NAME =
-            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AggregateAppFunctionInvoker")
+            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AggregatedAppFunctionInvoker")
 
         const val PROPERTY_INVOKERS_NAME = "invokers"
     }
