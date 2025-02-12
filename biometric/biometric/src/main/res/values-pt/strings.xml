@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Nenhum PIN, padrão ou senha configurado."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Este dispositivo não é compatível com PIN, padrão ou senha."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Ícone de impressão digital"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"O botão \"Mais opções\" na visualização de conteúdo foi selecionado."</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"A caixa de diálogo de erro informa que a biometria está bloqueada e é dispensada pelo usuário para cancelamento, mudança para a página de configurações ou bloqueio da tela."</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"A caixa de diálogo de erro informa que o hardware biométrico não está disponível e é dispensado pelo usuário para cancelamento ou mudança para a página de configurações."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Usar impressão digital"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Usar rosto"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Usar biometria"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Use sua impressão digital ou o bloqueio de tela para continuar"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Use seu rosto ou o bloqueio de tela para continuar"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Use a biometria ou o bloqueio de tela para continuar"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"É necessário usar a biometria para continuar"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"A confirmação de identidade está ativada e exige biometria, mas o sensor de impressão digital ou reconhecimento facial está indisponível\n"<ul><li>"Confira se a câmera está ligada e tente de novo"</li>\n<li>"Você pode desativar a confirmação de identidade usando sua Conta do Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"A confirmação de identidade está ativada e não verificou sua identidade"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"A biometria falhou muitas vezes. Bloqueie e desbloqueie o dispositivo para tentar de novo."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Você pode gerenciar a confirmação de identidade nas configurações da proteção contra roubo. Acessar as Configurações"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Tela de bloqueio"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Acessar as Configurações"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Cancelar"</string>
 </resources>

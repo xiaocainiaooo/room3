@@ -30,12 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Не заданы PIN-код, пароль или графический ключ."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"На этом устройстве не поддерживаются PIN-код, графический ключ и пароль."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Значок отпечатка пальца"</string>
-    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
-    <skip />
-    <!-- no translation found for lockout_error_dialog_dismissed (7054108354757819100) -->
-    <skip />
-    <!-- no translation found for biometric_hardware_error_dialog_dismissed (433688003408076574) -->
-    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Использовать отпечаток пальца"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Использовать фейсконтроль"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Использовать биометрию"</string>
@@ -50,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Чтобы продолжить, используйте отпечаток пальца или другой способ разблокировки экрана."</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Чтобы продолжить, используйте фейсконтроль или другой способ разблокировки экрана."</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Чтобы продолжить, разблокируйте экран с помощью биометрических данных или другого способа."</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Требуются биометрические данные"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Проверка личности включена, но биометрические данные подтвердить не удалось, так как камера или сканер отпечатков пальцев недоступны.\n"<ul><li>"Убедитесь, что камера включена, и повторите попытку."</li>\n<li>"Вы можете отключить проверку личности в аккаунте Google."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Не удалось выполнить проверку личности"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Слишком много неудачных попыток подтвердить биометрические данные. Чтобы продолжить, заблокируйте и разблокируйте устройство."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Изменить параметры проверки личности можно в настройках защиты от кражи. Открыть настройки"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Заблокировать экран"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Открыть настройки"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ОК"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Отмена"</string>
 </resources>

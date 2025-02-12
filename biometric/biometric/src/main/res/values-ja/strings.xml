@@ -30,9 +30,6 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"PIN、パターン、パスワードが設定されていません。"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"このデバイスは PIN、パターン、パスワードをサポートしていません。"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"指紋アイコン"</string>
-    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"コンテンツ ビューの [その他のオプション] ボタンがクリックされました。"</string>
-    <string name="lockout_error_dialog_dismissed" msgid="7054108354757819100">"このエラー ダイアログは、生体認証がロックアウトされたことをユーザーに通知するためのものです。ユーザーがキャンセルするか、設定ページに切り替えるか、画面をロックすると、このダイアログは閉じます。"</string>
-    <string name="biometric_hardware_error_dialog_dismissed" msgid="433688003408076574">"このエラー ダイアログは、生体認証ハードウェアを使用できないことをユーザーに通知するためのものです。ユーザーがキャンセルするか、設定ページに切り替えると、このダイアログは閉じます。"</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"指紋を使用"</string>
     <string name="use_face_label" msgid="6533512708069459542">"顔を使用"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"生体認証を使用"</string>
@@ -47,13 +44,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"続行するには指紋認証または画面ロックを使用してください"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"続行するには顔認証または画面ロックを使用してください"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"続行するには生体認証または画面ロックを使用してください"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"続行するには生体認証が必要です"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ID チェックが ON になっているため、生体認証が必要ですが、顔認証センサーまたは指紋認証センサーが使用できません\n"<ul><li>"カメラの電源が ON になっていることを確認して、もう一度お試しください"</li>\n<li>"ID チェックは Google アカウントで OFF にできます"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ID チェックが ON になっていますが、本人確認ができません"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"生体認証の失敗回数が多すぎます。デバイスをいったんロックしてからロックを解除して、もう一度お試しください。"</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"ID チェックは盗難保護の設定で管理できます。設定に移動"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"ロック画面"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"設定に移動"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"キャンセル"</string>
 </resources>
