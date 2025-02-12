@@ -74,7 +74,7 @@ class AppFunctionSerializableProcessorTest {
                 sourceFileNames =
                     listOf(
                         "EntityWithDiffPackageSerializableProperty.KT",
-                        "DiffPackageInputSerializable.KT"
+                        "DiffPackageSerializable.KT"
                     )
             )
 
