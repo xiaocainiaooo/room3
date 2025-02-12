@@ -162,14 +162,15 @@ internal class MetricsContainer(
                 MetricResult(name, metricData)
             }
 
-        val metricTraceLabels = names.map { "metric: $it" }
+        val metricTraceLabels = (names + listOf("iterations")).map { "metric: $it" }
         for (i in 0..repeatTiming.lastIndex step 2) {
             val measurementIndex = i / 2
             InMemoryTracing.beginSection(
                 "measurement $measurementIndex",
                 nanoTime = repeatTiming[i],
                 counterNames = metricTraceLabels,
-                counterValues = results.map { it.data[measurementIndex] }
+                counterValues =
+                    results.map { it.data[measurementIndex] } + listOf(maxIterations.toDouble())
             )
             InMemoryTracing.endSection(nanoTime = repeatTiming[i + 1])
         }
