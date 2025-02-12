@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Δεν έχει οριστεί PIN, μοτίβο ή κωδικός πρόσβασης."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Αυτή η συσκευή δεν υποστηρίζει PIN, μοτίβο ή κωδικό πρόσβασης."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Εικονίδιο δακτυλικών αποτυπωμάτων"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Έγινε κλικ στο κουμπί Περισσότερες επιλογές στην προβολή περιεχομένου."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Χρήση δακτυλικού αποτυπώματος"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Χρήση προσώπου"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Χρήση βιομετρικών"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Χρησιμοποιήστε το δακτυλικό σας αποτύπωμα ή το κλείδωμα οθόνης για συνέχεια."</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Χρησιμοποιήστε το πρόσωπό σας ή το κλείδωμα οθόνης για συνέχεια."</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Χρησιμοποιήστε βιομετρικά ή κλείδωμα οθόνης για συνέχεια."</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Για να συνεχίσετε, απαιτείται η χρήση βιομετρικών"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Ο Έλεγχος ταυτότητας είναι ενεργός και απαιτεί βιομετρικά στοιχεία, αλλά ο αισθητήρας προσώπου ή ο αισθητήρας δακτυλικών αποτυπωμάτων δεν είναι διαθέσιμος\n"<ul><li>"Ελέγξτε ότι η κάμερά σας είναι ενεργοποιημένη και δοκιμάστε ξανά"</li>\n<li>"Μπορείτε να απενεργοποιήσετε τον Έλεγχο ταυτότητας χρησιμοποιώντας τον Λογαριασμό σας Google"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Ο Έλεγχος ταυτότητας είναι ενεργός, αλλά δεν μπορεί να επαληθεύσει την ταυτότητά σας"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Η χρήση βιομετρικών απέτυχε πάρα πολλές φορές. Κλειδώστε και ξεκλειδώστε τη συσκευή σας, για να δοκιμάσετε ξανά."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Μπορείτε να διαχειριστείτε τον Έλεγχο ταυτότητας στις ρυθμίσεις προστασίας από κλοπή. Μετάβαση στις Ρυθμίσεις"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Οθόνη κλειδώματος"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Μετάβαση στις Ρυθμίσεις"</string>
+    <string name="common_ok" msgid="7266105758672679693">"ΟΚ"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Ακύρωση"</string>
 </resources>

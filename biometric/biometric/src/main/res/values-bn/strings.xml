@@ -30,6 +30,8 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"পিন, প্যাটার্ন অথবা পাসওয়ার্ড সেট করা নেই।"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"এই ডিভাইসে পিন, প্যাটার্ন বা পাসওয়ার্ড ব্যবহার করা যাবে না।"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ফিঙ্গারপ্রিন্ট আইকন"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"আঙুলের ছাপ ব্যবহার করুন"</string>
     <string name="use_face_label" msgid="6533512708069459542">"মুখ ব্যবহার করুন"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"বায়োমেট্রিক্স ব্যবহার করুন"</string>
@@ -44,4 +46,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"চালিয়ে যেতে আপনার আঙুলের ছাপ বা স্ক্রিন লক ব্যবহার করুন"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"চালিয়ে যেতে আপনার মুখ বা স্ক্রিন লক ব্যবহার করুন"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"চালিয়ে যেতে আপনার বায়োমেট্রিক বা স্ক্রিন লক ব্যবহার করুন"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"চালিয়ে যেতে বায়োমেট্রিক প্রয়োজন"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"\'পরিচয় যাচাই\' ফিচারটি চালু করা আছে এবং বায়োমেট্রিক প্রয়োজন, কিন্তু আপনার ফেস বা ফিঙ্গারপ্রিন্ট সেন্সর উপলভ্য নেই\n"<ul><li>"আপনার ক্যামেরা চালু করা আছে কিনা তা দেখে নিয়ে আবার চেষ্টা করুন"</li>\n<li>"Google অ্যাকাউন্ট ব্যবহার করে আপনি \'পরিচয় যাচাই\' ফিচার বন্ধ করতে পারবেন"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"\'পরিচয় যাচাই\' ফিচার চালু করা আছে এবং আপনার পরিচয় যাচাই করা যাচ্ছে না"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"একাধিকবার বায়োমেট্রিক কাজ করেনি। আবার চেষ্টা করতে, আপনার ডিভাইস লক করে আবার আনলক করুন।"</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"চুরি থেকে সুরক্ষা পাওয়ার সেটিংসে গিয়ে আপনি \'পরিচয় যাচাই\' ফিচার ম্যানেজ করতে পারবেন। সেটিংসে যান"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"লক স্ক্রিন"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"সেটিংসে যান"</string>
+    <string name="common_ok" msgid="7266105758672679693">"ঠিক আছে"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"বাতিল করুন"</string>
 </resources>

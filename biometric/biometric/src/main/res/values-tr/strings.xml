@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"PIN, desen veya şifre seti yok"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Bu cihaz PIN, desen veya şifre kullanımını desteklemiyor"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Parmak izi simgesi"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"İçerik görünümündeki Diğer seçenekler düğmesi tıklandı."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Parmak izi kullan"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Yüz tanıma kullan"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Biyometri kullan"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Devam etmek için parmak izi veya ekran kilidinizi kullanın"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Devam etmek için yüz veya ekran kilidinizi kullanın"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Devam etmek için biyometrik kimlik bilginizi veya ekran kilidinizi kullanın"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Devam etmek için biyometrik doğrulama gerekiyor"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Kimlik kontrolü açık ve biyometrik doğrulama gerektiriyor ancak yüz veya parmak izi sensörünüz kullanılamıyor.\n"<ul><li>"Kameranızın açık olduğundan emin olup tekrar deneyin."</li>\n<li>"Google Hesabınızı kullanarak kimlik kontrolünü kapatabilirsiniz."</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Kimlik Kontrolü açık ancak kimliğinizi doğrulayamıyor"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biyometrik doğrulama çok fazla kez yapılamadı. Yeniden denemek için cihazınızı kilitleyip kilidini açın."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Kimlik kontrolünü, hırsızlığa karşı koruma ayarlarından yönetebilirsiniz. Ayarlar\'a gidin."</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Kilit ekranı"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Ayarlar\'a git"</string>
+    <string name="common_ok" msgid="7266105758672679693">"Tamam"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"İptal"</string>
 </resources>

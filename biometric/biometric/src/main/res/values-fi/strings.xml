@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"PIN-koodia, kuviota tai salasanaa ei ole lisätty."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Tämä laite ei tue PIN-koodia, kuviota eikä salasanaa."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Sormenjälkikuvake"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Sisällönäkymän \"Lisää vaihtoehtoja\" ‑painiketta klikattu."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Käytä sormenjälkeä"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Käytä kasvoja"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Käytä biometriikkaa"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Jatka sormenjäljen tai näytön lukituksen avulla"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Jatka kasvojentunnistuksen tai näytön lukituksen avulla"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Jatka biometriikan tai näytön lukituksen avulla"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Jatkaminen edellyttää biometriikkaa"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Tunnistautuminen on päällä ja edellyttää biometriikkaa, mutta kasvojasi tai sormenjälkitunnistinta ei voi käyttää\n"<ul><li>"Tarkista, että kamera on päällä, ja yritä uudelleen"</li>\n<li>"Voit laittaa tunnistautumisen pois päältä Google-tililläsi"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Tunnistautuminen on päällä, eikä sinua voida tunnistaa"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometriikka epäonnistui liian monta kertaa. Yritä uudelleen lukitsemalla ja avaamalla laite."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Voit ylläpitää tunnistautumista varkauksilta suojautumisen asetuksista. Avaa Asetukset."</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Lukitusnäyttö"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Avaa Asetukset"</string>
+    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Peru"</string>
 </resources>

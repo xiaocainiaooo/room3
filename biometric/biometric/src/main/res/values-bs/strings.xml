@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Nije postavljen PIN, uzorak niti lozinka."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Ovaj uređaj ne podržava PIN, uzorak ili lozinku."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Ikona za otisak prsta"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Kliknuli ste na dugme za više opcija u prikazu sadržaja."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Koristi otisak prsta"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Koristi otključavanje licem"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Koristi biometriju"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Koristite otisak prsta ili zaključavanje ekrana da nastavite"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Koristite otključavanje licem ili zaključavanje ekrana da nastavite"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Koristite biometriju ili zaključavanje ekrana da nastavite"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Za nastavak su potrebni biometrijski podaci"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Provjera identiteta je uključena i zahtijeva biometrijske podatke, ali senzor za lice ili otisak prsta nije dostupan\n"<ul><li>"Provjerite je li kamera uključena i pokušajte ponovo"</li>\n<li>"Možete isključiti provjeru identiteta pomoću Google računa"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Provjera identiteta je uključena, ali ne može potvrditi vaš identitet"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Preuzimanje biometrijskih podataka nije uspjelo previše puta. Zaključajte pa otključajte uređaj da pokušate ponovo."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Možete upravljati provjerom identiteta u postavkama zaštite od krađe. Idite u Postavke"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Zaključani ekran"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Idi u Postavke"</string>
+    <string name="common_ok" msgid="7266105758672679693">"Uredu"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Otkaži"</string>
 </resources>

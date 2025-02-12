@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"未设置 PIN 码、解锁图案或密码。"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"此设备不支持 PIN 码、解锁图案或密码。"</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"指纹图标"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"点击了内容视图中的“更多选项”按钮。"</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"使用指纹"</string>
     <string name="use_face_label" msgid="6533512708069459542">"刷脸验证"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"使用生物识别"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"使用指纹或屏幕锁定解锁凭据验证身份后，才能继续"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"刷脸验证或使用屏幕锁定解锁凭据验证身份后，才能继续"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"使用生物识别或屏幕锁定解锁凭据验证身份后，才能继续"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"通过生物识别后才能继续"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"身份检查功能已开启，并且需要进行生物识别，但人脸/指纹传感器不可用\n"<ul><li>"请确保摄像头已开启，然后重试"</li>\n<li>"您可以使用 Google 账号来关闭身份检查功能"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"身份检查功能已开启，但无法验证您的身份"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"生物识别失败次数过多。请锁定设备并解锁，然后重试。"</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"您可以在盗窃防护设置中管理身份检查功能。前往“设置”"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"锁定屏幕"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"前往“设置”"</string>
+    <string name="common_ok" msgid="7266105758672679693">"确定"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"取消"</string>
 </resources>
