@@ -18,8 +18,11 @@ package androidx.appfunctions.compiler.processors
 
 import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions
+import androidx.appfunctions.compiler.core.AppFunctionComponentRegistryGenerator
+import androidx.appfunctions.compiler.core.AppFunctionComponentRegistryGenerator.AppFunctionComponent
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionComponentRegistryAnnotation
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
@@ -54,13 +57,35 @@ class AppFunctionInventoryProcessor(
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val appFunctionSymbolResolver = AppFunctionSymbolResolver(resolver)
         val appFunctionClasses = appFunctionSymbolResolver.resolveAnnotatedAppFunctions()
-        for (appFunctionClass in appFunctionClasses) {
-            generateAppFunctionInventoryClass(appFunctionClass)
-        }
+        val generatedInventoryComponents =
+            buildList<AppFunctionComponent> {
+                for (appFunctionClass in appFunctionClasses) {
+                    val inventoryQualifiedName = generateAppFunctionInventoryClass(appFunctionClass)
+                    add(
+                        AppFunctionComponent(
+                            // Generated inventory is in the same package as the original class
+                            packageName = appFunctionClass.classDeclaration.packageName.asString(),
+                            qualifiedName = inventoryQualifiedName,
+                            sourceFiles = appFunctionClass.getSourceFiles(),
+                        )
+                    )
+                }
+            }
+
+        AppFunctionComponentRegistryGenerator(codeGenerator)
+            .generateRegistriesByPackageName(
+                AppFunctionComponentRegistryAnnotation.Category.INVENTORY,
+                generatedInventoryComponents,
+            )
         return emptyList()
     }
 
-    private fun generateAppFunctionInventoryClass(appFunctionClass: AnnotatedAppFunctions) {
+    /**
+     * Generates an implementation of AppFunctionInventory for [appFunctionClass].
+     *
+     * @return fully qualified name of the generated inventory implementation class.
+     */
+    private fun generateAppFunctionInventoryClass(appFunctionClass: AnnotatedAppFunctions): String {
         val originalPackageName = appFunctionClass.classDeclaration.packageName.asString()
         val originalClassName = appFunctionClass.classDeclaration.simpleName.asString()
 
@@ -83,6 +108,8 @@ class AppFunctionInventoryProcessor(
             )
             .bufferedWriter()
             .use { fileSpec.writeTo(it) }
+
+        return "${originalPackageName}.$inventoryClassName"
     }
 
     /**
