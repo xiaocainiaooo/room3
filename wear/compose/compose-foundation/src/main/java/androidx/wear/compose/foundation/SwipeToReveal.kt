@@ -20,8 +20,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -730,7 +730,8 @@ public fun SwipeToReveal(
 /** An internal object containing some defaults used across the Swipe to reveal component. */
 public object SwipeToRevealDefaults {
     /** Default animation spec used when moving between states. */
-    public val AnimationSpec: SpringSpec<Float> = SwipeableV2Defaults.AnimationSpec
+    internal val AnimationSpec: AnimationSpec<Float> =
+        tween(durationMillis = RAPID_ANIMATION, easing = FastOutSlowInEasing)
 
     /** Default padding space between action slots. */
     internal val Padding = 2.dp
