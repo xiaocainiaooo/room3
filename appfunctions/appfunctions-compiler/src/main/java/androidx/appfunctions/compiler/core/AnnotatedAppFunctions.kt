@@ -40,9 +40,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
-import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.LIST
 
 /**
  * Represents a collection of functions within a specific class that are annotated as app functions.
@@ -95,7 +93,8 @@ data class AnnotatedAppFunctions(
                                 SUPPORTED_TYPES_STRING
                             }\n" +
                             "but found ${
-                                ksValueParameter.resolveTypeReference().ensureQualifiedTypeName()
+                                AppFunctionTypeReference(ksValueParameter.type)
+                                    .selfOrItemTypeReference.ensureQualifiedTypeName()
                                     .asString()
                             }",
                         ksValueParameter
@@ -144,22 +143,22 @@ data class AnnotatedAppFunctions(
                     // Skip the first parameter which is always the `AppFunctionContext`.
                     continue
                 }
-                val afType = AppFunctionTypeReference(ksValueParameter.type)
-                if (
-                    afType.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
-                        afType.isOfTypeCategory(SERIALIZABLE_LIST)
-                ) {
-                    val appFunctionSerializableClassDeclaration =
-                        ksValueParameter.type.resolve().declaration as KSClassDeclaration
-                    val annotatedSerializable =
-                        AnnotatedAppFunctionSerializable(appFunctionSerializableClassDeclaration)
-                    sourceFileSet.addAll(annotatedSerializable.getSourceFiles())
+                val parameterTypeReference = AppFunctionTypeReference(ksValueParameter.type)
+                if (parameterTypeReference.typeOrItemTypeIsAppFunctionSerializable()) {
+                    sourceFileSet.addAll(
+                        getAnnotatedAppFunctionSerializable(parameterTypeReference).getSourceFiles()
+                    )
                 }
             }
-        }
 
-        // Todo(b/391342300): Consider return value source file in case of returning an
-        // AppFunctionSerializable
+            val returnTypeReference =
+                AppFunctionTypeReference(checkNotNull(functionDeclaration.returnType))
+            if (returnTypeReference.typeOrItemTypeIsAppFunctionSerializable()) {
+                sourceFileSet.addAll(
+                    getAnnotatedAppFunctionSerializable(returnTypeReference).getSourceFiles()
+                )
+            }
+        }
         return sourceFileSet
     }
 
@@ -370,17 +369,13 @@ data class AnnotatedAppFunctions(
         return findRootAppFunctionSchemaInterface(superClassFunction)
     }
 
-    /**
-     * Resolves the type reference of a parameter.
-     *
-     * If the parameter type is a list, it will resolve the type reference of the list element.
-     */
-    private fun KSValueParameter.resolveTypeReference(): KSTypeReference {
-        return if (type.isOfType(LIST)) {
-            type.resolveListParameterizedType()
-        } else {
-            type
-        }
+    private fun getAnnotatedAppFunctionSerializable(
+        appFunctionTypeReference: AppFunctionTypeReference
+    ): AnnotatedAppFunctionSerializable {
+        val appFunctionSerializableClassDeclaration =
+            appFunctionTypeReference.selfOrItemTypeReference.resolve().declaration
+                as KSClassDeclaration
+        return AnnotatedAppFunctionSerializable(appFunctionSerializableClassDeclaration)
     }
 
     private fun AppFunctionAnnotationProperties.toAppFunctionSchemaMetadata():
@@ -394,6 +389,11 @@ data class AnnotatedAppFunctions(
         } else {
             null
         }
+    }
+
+    private fun AppFunctionTypeReference.typeOrItemTypeIsAppFunctionSerializable(): Boolean {
+        return this.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
+            this.isOfTypeCategory(SERIALIZABLE_LIST)
     }
 
     private data class AppFunctionAnnotationProperties(
