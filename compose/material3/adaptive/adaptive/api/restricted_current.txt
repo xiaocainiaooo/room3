@@ -48,12 +48,12 @@ package androidx.compose.material3.adaptive {
     method public static java.util.List<androidx.compose.ui.geometry.Rect> getOccludingVerticalHingeBounds(androidx.compose.material3.adaptive.Posture);
     method public static java.util.List<androidx.compose.ui.geometry.Rect> getSeparatingHorizontalHingeBounds(androidx.compose.material3.adaptive.Posture);
     method public static java.util.List<androidx.compose.ui.geometry.Rect> getSeparatingVerticalHingeBounds(androidx.compose.material3.adaptive.Posture);
-    property public static java.util.List<androidx.compose.ui.geometry.Rect> allHorizontalHingeBounds;
-    property public static java.util.List<androidx.compose.ui.geometry.Rect> allVerticalHingeBounds;
-    property public static java.util.List<androidx.compose.ui.geometry.Rect> occludingHorizontalHingeBounds;
-    property public static java.util.List<androidx.compose.ui.geometry.Rect> occludingVerticalHingeBounds;
-    property public static java.util.List<androidx.compose.ui.geometry.Rect> separatingHorizontalHingeBounds;
-    property public static java.util.List<androidx.compose.ui.geometry.Rect> separatingVerticalHingeBounds;
+    property public static java.util.List<androidx.compose.ui.geometry.Rect> androidx.compose.material3.adaptive.Posture.allHorizontalHingeBounds;
+    property public static java.util.List<androidx.compose.ui.geometry.Rect> androidx.compose.material3.adaptive.Posture.allVerticalHingeBounds;
+    property public static java.util.List<androidx.compose.ui.geometry.Rect> androidx.compose.material3.adaptive.Posture.occludingHorizontalHingeBounds;
+    property public static java.util.List<androidx.compose.ui.geometry.Rect> androidx.compose.material3.adaptive.Posture.occludingVerticalHingeBounds;
+    property public static java.util.List<androidx.compose.ui.geometry.Rect> androidx.compose.material3.adaptive.Posture.separatingHorizontalHingeBounds;
+    property public static java.util.List<androidx.compose.ui.geometry.Rect> androidx.compose.material3.adaptive.Posture.separatingVerticalHingeBounds;
   }
 
   @androidx.compose.runtime.Immutable public final class WindowAdaptiveInfo {

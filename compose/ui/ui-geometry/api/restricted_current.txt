@@ -154,9 +154,9 @@ package androidx.compose.ui.geometry {
     method public static inline boolean isUnspecified(long);
     method @androidx.compose.runtime.Stable public static long lerp(long start, long stop, float fraction);
     method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Offset> block);
-    property @androidx.compose.runtime.Stable public static inline boolean isFinite;
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isFinite;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isUnspecified;
   }
 
   @androidx.compose.runtime.Immutable public final class Rect {
@@ -291,17 +291,17 @@ package androidx.compose.ui.geometry {
     method public static boolean isSimple(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.RoundRect lerp(androidx.compose.ui.geometry.RoundRect start, androidx.compose.ui.geometry.RoundRect stop, float fraction);
     method public static androidx.compose.ui.geometry.RoundRect translate(androidx.compose.ui.geometry.RoundRect, long offset);
-    property public static androidx.compose.ui.geometry.Rect boundingRect;
-    property public static long center;
-    property public static boolean isCircle;
-    property public static boolean isEllipse;
-    property public static boolean isEmpty;
-    property public static boolean isFinite;
-    property public static boolean isRect;
-    property public static boolean isSimple;
-    property public static float maxDimension;
-    property public static float minDimension;
-    property public static androidx.compose.ui.geometry.Rect safeInnerRect;
+    property public static androidx.compose.ui.geometry.Rect androidx.compose.ui.geometry.RoundRect.boundingRect;
+    property public static long androidx.compose.ui.geometry.RoundRect.center;
+    property public static boolean androidx.compose.ui.geometry.RoundRect.isCircle;
+    property public static boolean androidx.compose.ui.geometry.RoundRect.isEllipse;
+    property public static boolean androidx.compose.ui.geometry.RoundRect.isEmpty;
+    property public static boolean androidx.compose.ui.geometry.RoundRect.isFinite;
+    property public static boolean androidx.compose.ui.geometry.RoundRect.isRect;
+    property public static boolean androidx.compose.ui.geometry.RoundRect.isSimple;
+    property public static float androidx.compose.ui.geometry.RoundRect.maxDimension;
+    property public static float androidx.compose.ui.geometry.RoundRect.minDimension;
+    property public static androidx.compose.ui.geometry.Rect androidx.compose.ui.geometry.RoundRect.safeInnerRect;
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class Size {
@@ -339,9 +339,9 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static inline operator long times(float, long size);
     method @androidx.compose.runtime.Stable public static inline operator long times(int, long size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(long);
-    property @androidx.compose.runtime.Stable public static long center;
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public static long long.center;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isUnspecified;
   }
 
 }
