@@ -1,0 +1,38 @@
+{
+  "projectPath": ":health:health-services-client",
+  "dependencyAdvice": [
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "com.google.code.findbugs:jsr305",
+        "resolvedVersion": "3.0.2"
+      },
+      "toConfiguration": "implementation"
+    },
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "com.google.guava:guava",
+        "resolvedVersion": "33.3.1-jre"
+      },
+      "fromConfiguration": "implementation",
+      "toConfiguration": "api"
+    },
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "org.robolectric:shadows-framework",
+        "resolvedVersion": "4.14"
+      },
+      "toConfiguration": "testImplementation"
+    },
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":health:health-services-client-proto"
+      },
+      "fromConfiguration": "implementation",
+      "toConfiguration": "api"
+    }
+  ]
+}

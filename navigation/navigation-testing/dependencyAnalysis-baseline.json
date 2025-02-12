@@ -1,0 +1,21 @@
+{
+  "projectPath": ":navigation:navigation-testing",
+  "dependencyAdvice": [
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "androidx.annotation:annotation",
+        "resolvedVersion": "1.8.1"
+      },
+      "toConfiguration": "implementation"
+    },
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":navigation:navigation-common"
+      },
+      "fromConfiguration": "implementation",
+      "toConfiguration": "api"
+    }
+  ]
+}
