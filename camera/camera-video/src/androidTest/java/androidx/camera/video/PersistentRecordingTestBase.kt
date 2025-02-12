@@ -37,6 +37,7 @@ import androidx.camera.testing.impl.CameraTaskTrackingExecutor
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.LabTestRule
 import androidx.camera.testing.impl.SurfaceTextureProvider
+import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
 import androidx.camera.testing.impl.video.AudioChecker
 import androidx.camera.testing.impl.video.RecordingSession
@@ -80,6 +81,8 @@ abstract class PersistentRecordingTestBase(
     @get:Rule
     val permissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
+
+    @get:Rule val wakelockEmptyActivityRule = WakelockEmptyActivityRule()
 
     @get:Rule val labTestRule = LabTestRule()
 
