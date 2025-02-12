@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"పిన్‌ను గానీ, ఆకృతిని గానీ, పాస్‌వర్డ్‌ను గానీ‌ సెట్ చేయలేదు."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"ఈ పరికరం పిన్, ఆకృతి లేదా పాస్‌వర్డ్‌‌ను సపోర్ట్ చేయదు."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"వేలిముద్ర చిహ్నం"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"కంటెంట్ వీక్షణలో ఉన్న మరిన్ని ఆప్షన్‌ల బటన్‌ను క్లిక్ చేశారు."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"వేలిముద్రను ఉపయోగించండి"</string>
     <string name="use_face_label" msgid="6533512708069459542">"ముఖాన్ని ఉపయోగించండి"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"బయోమెట్రిక్స్‌ను ఉపయోగించండి"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"కొనసాగించడానికి మీ వేలిముద్రను లేదా స్క్రీన్ లాక్‌ను ఉపయోగించండి"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"కొనసాగించడానికి మీ ముఖాన్ని లేదా స్క్రీన్ లాక్‌ను ఉపయోగించండి"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"కొనసాగించడానికి మీ బయోమెట్రిక్‌ను లేదా స్క్రీన్ లాక్‌ను ఉపయోగించండి"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"కొనసాగించడానికి బయోమెట్రిక్ అవసరం"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"ఐడెంటిటీ చెక్ ఆన్‌లో ఉంది, దానికి మీ బయోమెట్రిక్ అవసరం, కానీ మీ ఫేస్ లేదా వేలిముద్ర సెన్సార్ అందుబాటులో లేదు\n"<ul><li>"మీ కెమెరా ఆన్‌లో ఉందో లేదో చెక్ చేసి, మళ్లీ ట్రై చేయండి"</li>\n<li>"మీ Google ఖాతాను ఉపయోగించి మీరు గుర్తింపును వెరిఫై చేసే సెట్టింగ్‌ను ఆఫ్ చేయవచ్చు"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"ఐడెంటిటీ చెక్ ఆన్‌లో ఉంది, మీ ఐడెంటిటీని వెరిఫై చేయడం సాధ్యం కాలేదు"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"బయోమెట్రిక్ డేటా చాలా సార్లు విఫలమయ్యింది. మళ్లీ ట్రై చేయడానికి మీ పరికరాన్ని లాక్ చేసి, అన్‌లాక్ చేయండి."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"మీరు \'దొంగతనం నుండి రక్షణ\' సెట్టింగ్‌లలో ఐడెంటిటీ చెక్‌ను మేనేజ్ చేయవచ్చు. సెట్టింగ్‌లకు వెళ్లండి"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"లాక్ స్క్రీన్"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"సెట్టింగ్‌లకు వెళ్లండి"</string>
+    <string name="common_ok" msgid="7266105758672679693">"సరే"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"రద్దు చేయండి"</string>
 </resources>

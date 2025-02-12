@@ -30,6 +30,8 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Aucun NIP, schéma ni mot de passe défini"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Cet appareil ne prend pas en charge les NIP, les schémas ni les mots de passe."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Icône d\'empreinte digitale"</string>
+    <!-- no translation found for content_view_more_options_button_clicked (5031325658202184259) -->
+    <skip />
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Utiliser l\'empreinte digitale"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Utiliser le visage"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Utiliser les données biométriques"</string>
@@ -44,4 +46,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Utilisez votre empreinte digitale ou le verrouillage de l\'écran pour continuer"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Utilisez votre visage ou le verrouillage de l\'écran pour continuer"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Utilisez vos données biométriques ou le verrouillage de l\'écran pour continuer"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Données biométriques requises pour continuer"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"La Vérification d\'identité est activée et nécessite des données biométriques, mais votre capteur de visage ou d\'empreintes digitales n\'est pas accessible\n"<ul><li>"Vérifiez que votre appareil photo est allumé et réessayez"</li>\n<li>"Vous pouvez désactiver la Vérification d\'identité à l\'aide de votre compte Google"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"La Vérification d\'identité est activée et ne peut pas confirmer qu\'il s\'agit bien de vous"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Les données biométriques ont échoué trop souvent. Verrouillez et déverrouillez votre appareil pour réessayer."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Vous pouvez gérer la Vérification d\'identité dans les paramètres de protection contre le vol. Accéder à Paramètres"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Écran de verrouillage"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Accéder à Paramètres"</string>
+    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Annuler"</string>
 </resources>

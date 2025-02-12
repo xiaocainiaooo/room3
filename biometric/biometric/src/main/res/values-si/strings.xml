@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"PIN, රටා, හෝ මුරපද කිසිවක් සකසා නැත"</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"මෙම උපාංගය PIN, රටාව හෝ මුරපදය සඳහා සහාය නොදක්වයි."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"ඇඟිලි සලකුණු නිරූපකය"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"අන්තර්ගත දර්ශනයේ ඇති තවත් විකල්ප බොත්තම ක්ලික් කර ඇත."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"ඇඟිලි සලකුණ භාවිත කරන්න"</string>
     <string name="use_face_label" msgid="6533512708069459542">"මුහුණ භාවිත කරන්න"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"ජෛවමිතික භාවිත කරන්න"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"ඉදිරියට යාමට ඔබගේ ඇඟිලි සලකුණ හෝ තිර අගුල භාවිත කරන්න"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"ඉදිරියට යාමට ඔබගේ මුහුණු හෝ තිර අගුල භාවිත කරන්න"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"ඉදිරියට යාමට ඔබගේ ජෛවමිතික හෝ තිර අගුල භාවිත කරන්න"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"ඉදිරියට යාමට ජෛවමිතික අවශ්‍යයි"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"අනන්‍යතා පරීක්ෂාව ක්‍රියාත්මක වන අතර ජෛවමිතික අවශ්‍ය නමුත්, ඔබේ මුහුණ හෝ ඇඟිලි සලකුණු සංවේදකය ලබා ගත නොහැක\n"<ul><li>"ඔබේ කැමරාව ක්‍රියාත්මක දැයි පරීක්ෂා කර නැවත උත්සාහ කරන්න"</li>\n<li>"ඔබට ඔබේ Google ගිණුම භාවිතයෙන් අනන්‍යතා පරීක්ෂාව ක්‍රියාවිරහිත කළ හැක"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"අනන්‍යතා පරීක්ෂාව ක්‍රියාත්මක වන අතර ඒ ඔබ බව සත්‍යාපනය කළ නොහැක"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"ජෛවමිතික බොහෝ වාර ගණනක් අසාර්ථක විය. නැවත උත්සාහ කිරීමට ඔබේ උපාංගය අඟුළු දමා අගුළු හරින්න."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"ඔබට සොරකම් ආරක්ෂණ සැකසීම් තුළ අනන්‍යතා පරීක්ෂාව කළමනාකරණය කළ හැක. සැකසීම් වෙත යන්න"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"අගුළු තිරය"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"සැකසීම් වෙත යන්න"</string>
+    <string name="common_ok" msgid="7266105758672679693">"හරි"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"අවලංගු කරන්න"</string>
 </resources>

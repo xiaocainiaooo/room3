@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Ekkert PIN-númer, mynstur eða aðgangsorð stillt."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Þetta tæki styður ekki PIN-númer, mynstur eða aðgangsorð."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Fingrafaratákn"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Smellt er á hnappinn „Fleiri valkostir“ í efnisyfirlitinu."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Nota fingrafar"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Nota andlit"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Nota lífkenni"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Notaðu fingrafar eða skjálás til að halda áfram"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Notaðu andlitið eða skjálás til að halda áfram"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Notaðu lífkenni eða skjálás til að halda áfram"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Lífkenna krafist til að halda áfram"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Kveikt er á sannvottun auðkennis sem krefst lífkenna en andlits- eða fingrafaralesari tækisins er ekki tiltækur.\n"<ul><li>"Gakktu úr skugga um að kveikt sé á myndavélinni og reyndu aftur."</li>\n<li>"Þú getur slökkt á sannvottun auðkennis á Google-reikningnum þínum"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Kveikt er á sannvottun auðkennis en ekki tókst að staðfesta að þetta sért þú"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Of margar tilraunir til að lesa lífkenni. Læstu tækinu, taktu það síðan úr lás og reyndu aftur."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Þú getur stjórnað sannvottun auðkennis í stillingum þjófnaðarvarnar. Opna stillingar"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Lásskjár"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Opna stillingar"</string>
+    <string name="common_ok" msgid="7266105758672679693">"Í lagi"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Hætta við"</string>
 </resources>

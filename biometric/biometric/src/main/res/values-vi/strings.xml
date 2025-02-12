@@ -30,6 +30,7 @@
     <string name="generic_error_no_device_credential" msgid="3791785319221634505">"Chưa đặt mã PIN, hình mở khóa hoặc mật khẩu."</string>
     <string name="generic_error_no_keyguard" msgid="1807436368654974044">"Thiết bị này không hỗ trợ mã PIN, hình mở khóa hoặc mật khẩu."</string>
     <string name="fingerprint_dialog_icon_description" msgid="5462024216548165325">"Biểu tượng vân tay"</string>
+    <string name="content_view_more_options_button_clicked" msgid="5031325658202184259">"Đã nhấp vào nút Tuỳ chọn khác trong chế độ xem nội dung."</string>
     <string name="use_fingerprint_label" msgid="6961788485681412417">"Dùng vân tay"</string>
     <string name="use_face_label" msgid="6533512708069459542">"Dùng khuôn mặt"</string>
     <string name="use_biometric_label" msgid="6524145989441579428">"Dùng dữ liệu sinh trắc học"</string>
@@ -44,4 +45,13 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Dùng vân tay hoặc phương thức khóa màn hình để tiếp tục"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Dùng khuôn mặt hoặc phương thức khóa màn hình để tiếp tục"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Dùng dữ liệu sinh trắc học hoặc phương thức khóa màn hình để tiếp tục"</string>
+    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Cần có dữ liệu sinh trắc học để tiếp tục"</string>
+    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Tính năng Kiểm tra danh tính đang bật và cần có dữ liệu sinh trắc học, nhưng cảm biến vân tay hoặc khuôn mặt của bạn không hoạt động\n"<ul><li>"Hãy kiểm tra xem camera của bạn có đang bật hay không rồi thử lại"</li>\n<li>"Bạn có thể tắt tính năng Kiểm tra danh tính bằng Tài khoản Google của mình"</li></ul></string>
+    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Tính năng Kiểm tra danh tính đang bật nhưng không xác minh được danh tính của bạn"</string>
+    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Hệ thống nhận dạng sinh trắc học xác minh không thành công quá nhiều lần. Hãy khoá rồi mở khoá thiết bị của bạn để thử lại."</string>
+    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Bạn có thể quản lý tính năng Kiểm tra danh tính trong phần cài đặt bảo vệ chống trộm. Chuyển đến phần Cài đặt"</string>
+    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Khoá màn hình"</string>
+    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Chuyển đến phần Cài đặt"</string>
+    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
+    <string name="common_cancel" msgid="4854611882282563034">"Huỷ"</string>
 </resources>
