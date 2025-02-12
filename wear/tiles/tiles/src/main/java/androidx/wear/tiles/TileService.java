@@ -266,6 +266,9 @@ public abstract class TileService extends Service {
      * time this method was called. The time between calls to this method may vary, do not depend on
      * it for time-sensitive or critical tasks.
      *
+     * <p>Interaction events represent user direct interaction with a tile, when a tile comes into
+     * view (enter event) or when the tiles goes out of view (leave event).
+     *
      * <p>The returned future must complete after at most 10 seconds from the moment this method is
      * called (exact timeout length subject to change, but 10 seconds is guaranteed).
      *
