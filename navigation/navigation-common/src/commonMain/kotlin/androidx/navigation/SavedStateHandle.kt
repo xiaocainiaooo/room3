@@ -22,6 +22,9 @@ package androidx.navigation
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.serialization.decodeArguments
 import androidx.navigation.serialization.generateNavArguments
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
+import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlinx.serialization.InternalSerializationApi

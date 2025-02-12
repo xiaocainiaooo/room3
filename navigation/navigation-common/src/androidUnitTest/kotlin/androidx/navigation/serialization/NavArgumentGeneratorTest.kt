@@ -659,7 +659,7 @@ class NavArgumentGeneratorTest {
         val converted = serializer<TestClass>().generateNavArguments()
         val expected =
             navArgument("arg") {
-                type = InternalNavType.EnumListType(TestEnum::class.java)
+                type = InternalAndroidNavType.EnumListType(TestEnum::class.java)
                 nullable = false
             }
         assertThat(converted).containsExactlyInOrder(expected)
@@ -673,7 +673,7 @@ class NavArgumentGeneratorTest {
         val converted = serializer<TestClass>().generateNavArguments()
         val expected =
             navArgument("arg") {
-                type = InternalNavType.EnumListType(TestEnum::class.java)
+                type = InternalAndroidNavType.EnumListType(TestEnum::class.java)
                 nullable = true
             }
         assertThat(converted).containsExactlyInOrder(expected)
@@ -944,7 +944,8 @@ class NavArgumentGeneratorTest {
         @Suppress("UNCHECKED_CAST")
         val expected =
             navArgument("arg") {
-                type = InternalNavType.EnumNullableType(TestEnum::class.java as Class<Enum<*>?>)
+                type =
+                    InternalAndroidNavType.EnumNullableType(TestEnum::class.java as Class<Enum<*>?>)
                 nullable = true
             }
         val converted = serializer<TestClass>().generateNavArguments()
