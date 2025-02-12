@@ -24,6 +24,7 @@ package androidx.health.connect.client.testing {
     method public suspend Object? insertRecords(java.util.List<? extends androidx.health.connect.client.records.Record> records, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.InsertRecordsResponse>);
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecord(kotlin.reflect.KClass<T> recordType, String recordId, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordResponse<T>>);
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecords(androidx.health.connect.client.request.ReadRecordsRequest<T> request, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordsResponse<T>>);
+    method public void setPackageName(String newPackage);
     method public void setPageSizeGetChanges(int);
     method public suspend Object? updateRecords(java.util.List<? extends androidx.health.connect.client.records.Record> records, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public androidx.health.connect.client.HealthConnectFeatures features;
@@ -82,6 +83,13 @@ package androidx.health.connect.client.testing {
     method public void replaceGrantedPermissions(java.util.Set<java.lang.String> permissions);
     method public suspend Object? revokeAllPermissions(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public void revokePermission(String permission);
+  }
+
+  public final class MetadataTestHelperKt {
+    method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata);
+    method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata, optional String id);
+    method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin);
+    method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin, optional java.time.Instant lastModifiedTime);
   }
 
 }
