@@ -17,6 +17,7 @@
 package androidx.camera.viewfinder
 
 import android.view.ViewGroup
+import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.test.core.app.ActivityScenario
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.seconds
@@ -25,6 +26,18 @@ import kotlinx.coroutines.runBlocking
 
 const val ANY_WIDTH = 640
 const val ANY_HEIGHT = 480
+
+val ANY_TRANSFORMATION_INFO =
+    TransformationInfo(
+        sourceRotation = 0,
+        cropRectLeft = 0f,
+        cropRectTop = 0f,
+        cropRectRight = ANY_WIDTH.toFloat(),
+        cropRectBottom = ANY_HEIGHT.toFloat(),
+        isSourceMirroredHorizontally = false,
+        isSourceMirroredVertically = false
+    )
+
 val REQUEST_TIMEOUT = 2.seconds
 
 inline fun runViewfinderTest(

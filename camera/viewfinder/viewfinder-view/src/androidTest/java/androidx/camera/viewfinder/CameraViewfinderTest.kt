@@ -16,7 +16,6 @@
 package androidx.camera.viewfinder
 
 import android.view.Surface
-import androidx.camera.viewfinder.CameraViewfinderExt.requestSurfaceSession
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.test.filters.LargeTest
@@ -68,7 +67,9 @@ class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
             assertThrows<TimeoutCancellationException> {
                 withTimeout(REQUEST_TIMEOUT) {
                     withContext(Dispatchers.Main) {
-                        viewfinder.requestSurfaceSession(surfaceRequest).close()
+                        viewfinder
+                            .requestSurfaceSession(surfaceRequest, ANY_TRANSFORMATION_INFO)
+                            .close()
                     }
                 }
             }
@@ -78,6 +79,16 @@ class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
     fun provideSurface_ifSurfaceTextureAvailable() = runViewfinderTest {
         withTimeout(REQUEST_TIMEOUT) {
                 withContext(Dispatchers.Main) { viewfinder.requestSurfaceSession(surfaceRequest) }
+            }
+            .use { session -> assertThat(session.surface.isValid).isTrue() }
+    }
+
+    @Test
+    fun provideSurface_ifSurfaceTextureAvailable_whenTransformInfoProvided() = runViewfinderTest {
+        withTimeout(REQUEST_TIMEOUT) {
+                withContext(Dispatchers.Main) {
+                    viewfinder.requestSurfaceSession(surfaceRequest, ANY_TRANSFORMATION_INFO)
+                }
             }
             .use { session -> assertThat(session.surface.isValid).isTrue() }
     }
@@ -94,7 +105,9 @@ class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
 
         var surface: Surface
         withTimeout(REQUEST_TIMEOUT) {
-                withContext(Dispatchers.Main) { viewfinder.requestSurfaceSession(surfaceRequest) }
+                withContext(Dispatchers.Main) {
+                    viewfinder.requestSurfaceSession(surfaceRequest, ANY_TRANSFORMATION_INFO)
+                }
             }
             .use { session ->
                 // Ensure session has an initially valid Surface
@@ -117,7 +130,9 @@ class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
     fun surfaceReleased_afterSessionClosed_thenViewRemoved() = runViewfinderTest {
         var surface: Surface
         withTimeout(REQUEST_TIMEOUT) {
-                withContext(Dispatchers.Main) { viewfinder.requestSurfaceSession(surfaceRequest) }
+                withContext(Dispatchers.Main) {
+                    viewfinder.requestSurfaceSession(surfaceRequest, ANY_TRANSFORMATION_INFO)
+                }
             }
             .use { session ->
                 // Ensure session has an initially valid Surface
@@ -144,12 +159,14 @@ class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
                     // Viewfinder is not attached, so this should never complete. It will be
                     // cancelled
                     // by the second request.
-                    viewfinder.requestSurfaceSession(surfaceRequest)
+                    viewfinder.requestSurfaceSession(surfaceRequest, ANY_TRANSFORMATION_INFO)
                 }
 
             // Send second request asynchronously to cancel first
             val secondRequestFuture =
-                withContext(mainContext) { viewfinder.requestSurfaceSessionAsync(surfaceRequest) }
+                withContext(mainContext) {
+                    viewfinder.requestSurfaceSessionAsync(surfaceRequest, ANY_TRANSFORMATION_INFO)
+                }
             try {
                 firstRequestJob.join()
                 assertThat(firstRequestJob.isCancelled).isTrue()

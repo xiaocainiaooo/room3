@@ -112,6 +112,14 @@ final class ViewfinderTransformation {
     }
 
     /**
+     * Returns the currently set {@link TransformationInfo}, or {@code null} if none has been set.
+     */
+    @Nullable
+    TransformationInfo getTransformationInfo() {
+        return mTransformationInfo;
+    }
+
+    /**
      * Calculates the transformation and applies it to the inner view of {@link CameraViewfinder}.
      *
      * <p> The inner view could be {@link SurfaceView} or a {@link TextureView}.
