@@ -83,17 +83,15 @@ public fun NavigationBar(
     containerColor: Color = NavigationBarDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
     tonalElevation: Dp = NavigationBarDefaults.Elevation,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
-    val orbiterProperties =
-        LocalNavigationBarOrbiterProperties.current ?: DefaultNavigationBarOrbiterProperties
-    HorizontalOrbiter(orbiterProperties) {
+    HorizontalOrbiter(LocalNavigationBarOrbiterProperties.current) {
         Surface(
             shape = CircleShape,
             color = containerColor,
             contentColor = contentColor,
             tonalElevation = tonalElevation,
-            modifier = modifier
+            modifier = modifier,
         ) {
             Row(
                 // XR-changed: Original NavigationBar uses fillMaxWidth() and windowInsets,
@@ -105,7 +103,7 @@ public fun NavigationBar(
                         .selectableGroup(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                content = content
+                content = content,
             )
         }
     }
@@ -113,8 +111,7 @@ public fun NavigationBar(
 
 private object XrNavigationBarTokens {
     /** The [EdgeOffset] for NavigationBar Orbiters in Full Space Mode (FSM). */
-    val OrbiterEdgeOffset
-        @Composable get() = EdgeOffset.inner(24.dp)
+    val OrbiterEdgeOffset = EdgeOffset.inner(24.dp)
 
     val HorizontalPadding = 8.dp
 
@@ -144,29 +141,21 @@ internal object XrNavigationBarComponentOverride : NavigationBarComponentOverrid
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalMaterial3XrApi
 @ExperimentalMaterial3XrApi
-public val DefaultNavigationBarOrbiterProperties: HorizontalOrbiterProperties
-    @Composable
-    get() =
-        HorizontalOrbiterProperties(
-            position = OrbiterEdge.Horizontal.Bottom,
-            offset = XrNavigationBarTokens.OrbiterEdgeOffset,
-            alignment = Alignment.CenterHorizontally,
-            settings = OrbiterDefaults.orbiterSettings,
-            shape = OrbiterDefaults.shape,
-        )
+public val DefaultNavigationBarOrbiterProperties: HorizontalOrbiterProperties =
+    HorizontalOrbiterProperties(
+        position = OrbiterEdge.Horizontal.Bottom,
+        offset = XrNavigationBarTokens.OrbiterEdgeOffset,
+        alignment = Alignment.CenterHorizontally,
+        settings = OrbiterDefaults.orbiterSettings,
+        shape = OrbiterDefaults.shape,
+    )
 
-/**
- * The [HorizontalOrbiterProperties] used by [NavigationBar].
- *
- * If `null`, [DefaultNavigationBarOrbiterProperties] will be used.
- *
- * TODO(b/387339197): Make this non-null and default to DefaultNavigationBarXrProperties
- */
+/** The [HorizontalOrbiterProperties] used by [NavigationBar]. */
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalMaterial3XrApi
 @ExperimentalMaterial3XrApi
 public val LocalNavigationBarOrbiterProperties:
-    ProvidableCompositionLocal<HorizontalOrbiterProperties?> =
+    ProvidableCompositionLocal<HorizontalOrbiterProperties> =
     compositionLocalOf {
-        null
+        DefaultNavigationBarOrbiterProperties
     }
