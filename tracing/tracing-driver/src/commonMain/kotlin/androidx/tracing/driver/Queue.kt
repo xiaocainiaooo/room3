@@ -34,8 +34,8 @@ internal class Queue<T>(capacity: Int = QUEUE_CAPACITY) {
     internal val size
         get() = { lock.withLock { queue.size } }
 
-    internal fun addFirst(value: T) {
-        lock.withLock { queue.addFirst(value) }
+    internal fun addLast(value: T) {
+        lock.withLock { queue.addLast(value) }
     }
 
     internal fun removeFirstOrNull(): T? {

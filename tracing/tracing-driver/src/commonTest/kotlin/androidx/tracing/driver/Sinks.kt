@@ -18,10 +18,7 @@ package androidx.tracing.driver
 
 /** A sink that does very little. We simply drop the trace packets without writing it to a file. */
 class NoOpSink : TraceSink() {
-    override fun emit(pooledPacketArray: PooledTracePacketArray) {
-        for (packet in pooledPacketArray.pooledTracePacketArray) {
-            packet?.recycle()
-        }
+    override fun enqueue(pooledPacketArray: PooledTracePacketArray) {
         pooledPacketArray.recycle()
     }
 
