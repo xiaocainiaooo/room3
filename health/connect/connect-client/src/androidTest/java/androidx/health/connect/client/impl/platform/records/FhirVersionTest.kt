@@ -17,7 +17,6 @@
 package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.records.FhirVersion
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -113,7 +112,6 @@ class FhirVersionTest {
         assertThat(fhirVersion).isEqualTo(FhirVersion(major = 1, minor = 1, patch = 10))
     }
 
-    @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @SuppressLint("NewApi") // checked with feature availability check
     @Test
     fun toPlatformFhirVersion_expectCorrectConversion() {

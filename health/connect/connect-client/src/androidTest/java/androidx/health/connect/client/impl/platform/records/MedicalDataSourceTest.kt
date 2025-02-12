@@ -18,7 +18,6 @@ package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.records.FhirVersion
 import androidx.health.connect.client.records.MedicalDataSource
@@ -156,7 +155,6 @@ class MedicalDataSourceTest {
     }
 
     @SuppressLint("NewApi") // checked with feature availability check
-    @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @Test
     fun toPlatformMedicalDataSource_expectCorrectConversion() {
         val medicalDataSource =
