@@ -108,7 +108,7 @@ class MedicalResourceTest {
                 FHIR_RESOURCE_EMPTY
             )
 
-        val platform = sdk.toPlatformMedicalResource()
+        val platform = sdk.platformMedicalResource
 
         assertThat(platform)
             .isEqualTo(

@@ -36,6 +36,7 @@ import androidx.health.connect.client.readRecord
 import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_IMMUNIZATION
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_RESOURCE_TYPE_VACCINES
 import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -46,6 +47,8 @@ import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesInitialRequest
+import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
@@ -902,7 +905,61 @@ class HealthConnectClientUpsideDownImplTest {
         "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
     )
     @Test
-    fun upsertNewMedicalResourcesThenRead_expectCorrectResponse() = runTest {
+    fun upsertNewMedicalResourcesThenReadByRequest_expectCorrectResponse() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+        // TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added
+        val dataSourceId = ""
+        val requests =
+            listOf(
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = "immunization-101"
+                ),
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = "immunization-102"
+                )
+            )
+
+        // insert a new MedicalResource
+        val upsertResponse = healthConnectClient.upsertMedicalResources(requests)
+
+        assertThat(upsertResponse).hasSize(2)
+        assertThat(upsertResponse.map { it.fhirResource.data }).isEqualTo(requests.map { it.data })
+
+        // read the first MedicalResource with ReadMedicalResourcesInitialRequest
+        val firstPageResponse =
+            healthConnectClient.readMedicalResources(
+                ReadMedicalResourcesInitialRequest(
+                    MEDICAL_RESOURCE_TYPE_VACCINES,
+                    setOf(dataSourceId),
+                    pageSize = 1
+                )
+            )
+
+        assertThat(firstPageResponse.medicalResources).containsExactly(upsertResponse[0])
+        assertThat(firstPageResponse.remainingCount).isEqualTo(1)
+        assertThat(firstPageResponse.nextPageToken).isNotNull()
+
+        // read the second MedicalResource with ReadMedicalResourcesPageRequest
+        val secondPageResponse =
+            healthConnectClient.readMedicalResources(
+                ReadMedicalResourcesPageRequest(firstPageResponse.nextPageToken!!)
+            )
+
+        assertThat(secondPageResponse.medicalResources).containsExactly(upsertResponse[1])
+        assertThat(secondPageResponse.remainingCount).isEqualTo(0)
+        assertThat(secondPageResponse.nextPageToken).isNull()
+    }
+
+    @Ignore(
+        "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
+    )
+    @Test
+    fun upsertNewMedicalResourcesThenReadByIds_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
@@ -943,7 +1000,7 @@ class HealthConnectClientUpsideDownImplTest {
         "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
     )
     @Test
-    fun upsertExistingMedicalResourcesThenRead_expectCorrectResponse() = runTest {
+    fun upsertExistingMedicalResourcesThenReadByIds_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()

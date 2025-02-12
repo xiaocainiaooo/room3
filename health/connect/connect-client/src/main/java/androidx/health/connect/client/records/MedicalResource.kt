@@ -64,8 +64,8 @@ class MedicalResource(
     val fhirResource: FhirResource,
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check
-    private val platformMedicalResource: Any =
-        withPhrFeatureCheck(MedicalResource::class.java.simpleName) {
+    internal val platformMedicalResource: PlatformMedicalResource =
+        withPhrFeatureCheck(this::class) {
             PlatformMedicalResourceBuilder(
                     type.toPlatformMedicalResourceType(),
                     dataSourceId,
@@ -73,12 +73,6 @@ class MedicalResource(
                     fhirResource.platformFhirResource
                 )
                 .build()
-        }
-
-    @SuppressLint("NewApi") // already checked with a feature availability check
-    internal fun toPlatformMedicalResource(): PlatformMedicalResource =
-        withPhrFeatureCheck(MedicalResource::class.java.simpleName) {
-            platformMedicalResource as PlatformMedicalResource
         }
 
     override fun toString(): String =

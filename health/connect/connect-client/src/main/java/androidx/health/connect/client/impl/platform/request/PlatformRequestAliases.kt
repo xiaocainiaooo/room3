@@ -33,3 +33,18 @@ internal typealias PlatformUpsertMedicalResourceRequest =
 
 internal typealias PlatformUpsertMedicalResourceRequestBuilder =
     android.health.connect.UpsertMedicalResourceRequest.Builder
+
+internal typealias PlatformReadMedicalResourcesRequest =
+    android.health.connect.ReadMedicalResourcesRequest
+
+internal typealias PlatformReadMedicalResourcesInitialRequest =
+    android.health.connect.ReadMedicalResourcesInitialRequest
+
+internal typealias PlatformReadMedicalResourcesInitialRequestBuilder =
+    android.health.connect.ReadMedicalResourcesInitialRequest.Builder
+
+internal typealias PlatformReadMedicalResourcesPageRequest =
+    android.health.connect.ReadMedicalResourcesPageRequest
+
+internal typealias PlatformReadMedicalResourcesPageRequestBuilder =
+    android.health.connect.ReadMedicalResourcesPageRequest.Builder

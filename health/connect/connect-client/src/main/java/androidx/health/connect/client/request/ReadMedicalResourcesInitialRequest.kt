@@ -16,12 +16,19 @@
 
 package androidx.health.connect.client.request
 
+import android.annotation.SuppressLint
 import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.withPhrFeatureCheck
+import androidx.health.connect.client.impl.platform.records.toPlatformMedicalResourceType
+import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesInitialRequestBuilder
+import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesRequest
+import androidx.health.connect.client.records.MedicalDataSource
 import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.MedicalResource.Companion.MedicalResourceType
+import androidx.health.connect.client.records.toString
 import androidx.health.connect.client.request.ReadMedicalResourcesRequest.Companion.DEFAULT_PAGE_SIZE
 
 /**
@@ -39,8 +46,9 @@ import androidx.health.connect.client.request.ReadMedicalResourcesRequest.Compan
  *   returned. An [IllegalArgumentException] might be thrown if an invalid type is used, see
  *   [MedicalResourceType] for valid values.
  * @property medicalDataSourceIds Only [MedicalResource]s belong to one of the [MedicalDataSource]s
- *   represented by these IDs will be returned. An [IllegalArgumentException] might be thrown if any
- *   ID is deemed as invalid.
+ *   represented by these IDs will be returned. An empty set is permitted, it means
+ *   [MedicalResource]s from all available apps will be included in the response. An
+ *   [IllegalArgumentException] might be thrown if any ID is deemed as invalid.
  * @see [HealthConnectClient.readMedicalResources]
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
@@ -50,5 +58,42 @@ class ReadMedicalResourcesInitialRequest(
     val medicalDataSourceIds: Set<String>,
     pageSize: Int = DEFAULT_PAGE_SIZE
 ) : ReadMedicalResourcesRequest(pageSize) {
-    // TODO: b/382682197 - The rest of this class & tests will be filled in a subsequent CL
+    @SuppressLint("NewApi") // already checked with a feature availability check
+    override val platformReadMedicalResourcesRequest: PlatformReadMedicalResourcesRequest =
+        withPhrFeatureCheck(this::class) {
+            PlatformReadMedicalResourcesInitialRequestBuilder(
+                    medicalResourceType.toPlatformMedicalResourceType()
+                )
+                .addDataSourceIds(medicalDataSourceIds)
+                .setPageSize(pageSize)
+                .build()
+        }
+
+    override fun toString(): String =
+        toString(
+            this,
+            mapOf(
+                "medicalResourceType" to medicalResourceType,
+                "medicalDataSourceIds" to medicalDataSourceIds,
+                "pageSize" to pageSize,
+            )
+        )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ReadMedicalResourcesInitialRequest) return false
+        if (!super.equals(other)) return false
+
+        if (medicalResourceType != other.medicalResourceType) return false
+        if (medicalDataSourceIds != other.medicalDataSourceIds) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + medicalResourceType
+        result = 31 * result + medicalDataSourceIds.hashCode()
+        return result
+    }
 }

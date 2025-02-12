@@ -21,6 +21,7 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
 import androidx.health.connect.client.records.MedicalResource
+import androidx.health.connect.client.records.toString
 import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
 
 /**
@@ -44,5 +45,31 @@ class ReadMedicalResourcesResponse(
     val nextPageToken: String?,
     val remainingCount: Int
 ) {
-    // TODO: b/382682197 - The rest of this class & tests will be filled in a subsequent CL
+    override fun toString(): String =
+        toString(
+            this,
+            mapOf(
+                "medicalResources" to medicalResources,
+                "nextPageToken" to nextPageToken,
+                "remainingCount" to remainingCount
+            )
+        )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ReadMedicalResourcesResponse) return false
+
+        if (remainingCount != other.remainingCount) return false
+        if (medicalResources != other.medicalResources) return false
+        if (nextPageToken != other.nextPageToken) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = remainingCount
+        result = 31 * result + medicalResources.hashCode()
+        result = 31 * result + (nextPageToken?.hashCode() ?: 0)
+        return result
+    }
 }
