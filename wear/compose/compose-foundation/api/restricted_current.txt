@@ -491,6 +491,8 @@ package androidx.wear.compose.foundation.lazy {
     property public int centerItemIndex;
     property public int centerItemScrollOffset;
     property public boolean isScrollInProgress;
+    property public boolean lastScrolledBackward;
+    property public boolean lastScrolledForward;
     property public androidx.wear.compose.foundation.lazy.ScalingLazyListLayoutInfo layoutInfo;
     field public static final androidx.wear.compose.foundation.lazy.ScalingLazyListState.Companion Companion;
   }
@@ -599,6 +601,8 @@ package androidx.wear.compose.foundation.lazy {
     property public boolean canScrollBackward;
     property public boolean canScrollForward;
     property public boolean isScrollInProgress;
+    property public boolean lastScrolledBackward;
+    property public boolean lastScrolledForward;
     property public androidx.wear.compose.foundation.lazy.TransformingLazyColumnLayoutInfo layoutInfo;
   }
 
