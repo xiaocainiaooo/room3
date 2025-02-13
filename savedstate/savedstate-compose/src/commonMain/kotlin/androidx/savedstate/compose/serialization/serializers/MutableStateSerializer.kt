@@ -36,39 +36,25 @@ import kotlinx.serialization.serializer
  * [KSerializer] for serialization and deserialization of [MutableState].
  *
  * @param T The type of the value stored in the [MutableState].
- * @return A [KSerializer] for handling [MutableState] containing a [Serializable] type [T].
+ * @return A [MutableStateSerializer] for handling [MutableState] containing a [Serializable] type
+ *   [T].
  */
 @Suppress("FunctionName")
-public inline fun <reified T> MutableStateSerializer(): KSerializer<MutableState<T>> {
+public inline fun <reified T> MutableStateSerializer(): MutableStateSerializer<T> {
     return MutableStateSerializer(serializer())
 }
 
 /**
- * Creates a [KSerializer] for a [MutableState] containing a [Serializable] value of type [T].
+ * A [KSerializer] for [MutableState].
  *
- * This function allows for explicit specification of the [KSerializer] for the state type [T]. It
- * provides serialization and deserialization capabilities for [MutableState] objects.
- *
- * @param T The type of the value stored in the [MutableState].
- * @param serializer The [KSerializer] for the [Serializable] type [T].
- * @return A [KSerializer] for handling [MutableState] containing a [Serializable] type [T].
- */
-@Suppress("FunctionName")
-public fun <T> MutableStateSerializer(serializer: KSerializer<T>): KSerializer<MutableState<T>> {
-    return MutableStateSerializerImpl<T>(serializer)
-}
-
-/**
- * Internal implementation of [KSerializer] for [MutableState].
- *
- * This private class wraps a [KSerializer] for the inner value type [T], enabling serialization and
+ * This class wraps a [KSerializer] for the inner value type [T], enabling serialization and
  * deserialization of [MutableState] instances. The inner value serialization is delegated to the
  * provided [valueSerializer].
  *
  * @param T The type of the value stored in the [MutableState].
- * @property valueSerializer The [KSerializer] used to serialize and deserialize the inner value.
+ * @param valueSerializer The [KSerializer] used to serialize and deserialize the inner value.
  */
-private class MutableStateSerializerImpl<T>(
+public class MutableStateSerializer<T>(
     private val valueSerializer: KSerializer<T>,
 ) : KSerializer<MutableState<T>> {
 

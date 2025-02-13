@@ -16,6 +16,7 @@
 
 package androidx.savedstate.compose.serialization.serializers
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.kruth.assertThat
 import androidx.savedstate.serialization.decodeFromSavedState
@@ -63,6 +64,20 @@ class MutableStateSerializerTest {
         val decoded = decodeFromSavedState(serializer, encoded)
 
         assertThat(state.value).isEqualTo(decoded.value)
+    }
+
+    @Test
+    fun serializerOnProperties() {
+        @Serializable
+        data class Foo(
+            @Serializable(with = MutableStateSerializer::class) val state: MutableState<User>
+        )
+
+        val original = Foo(mutableStateOf(USER_JOHN_DOE))
+        val encoded = encodeToSavedState(original)
+        val decoded = decodeFromSavedState<Foo>(encoded)
+
+        assertThat(decoded.state.value).isEqualTo(original.state.value)
     }
 
     companion object {
