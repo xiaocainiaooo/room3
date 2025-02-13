@@ -3100,14 +3100,25 @@ package androidx.compose.ui.node {
     method public default void measureAndLayoutForTest();
     method public boolean sendKeyEvent(android.view.KeyEvent keyEvent);
     method public default void setAccessibilityEventBatchIntervalMillis(long intervalMillis);
-    method public default void setExceptionHandler(androidx.compose.ui.node.RootForTest.ExceptionHandler? exceptionHandler);
+    method public default void setUncaughtExceptionHandler(androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler? handler);
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.semantics.SemanticsOwner semanticsOwner;
     property @Deprecated public abstract androidx.compose.ui.text.input.TextInputService textInputService;
   }
 
-  public static fun interface RootForTest.ExceptionHandler {
-    method public boolean handleException(Throwable e);
+  public static fun interface RootForTest.UncaughtExceptionHandler {
+    method public void onUncaughtException(Throwable t, int phase);
+  }
+
+  @kotlin.jvm.JvmInline public static final value class RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase {
+    field public static final androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion Companion;
+  }
+
+  public static final class RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion {
+    method public int getDraw();
+    method public int getLayout();
+    property public int Draw;
+    property public int Layout;
   }
 
   public interface SemanticsModifierNode extends androidx.compose.ui.node.DelegatableNode {
