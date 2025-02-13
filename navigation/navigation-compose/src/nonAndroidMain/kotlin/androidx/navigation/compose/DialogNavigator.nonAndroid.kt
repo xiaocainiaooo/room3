@@ -24,17 +24,18 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.DialogNavigator.Destination
+import androidx.navigation.compose.internal.implementedInJetBrainsFork
+import kotlinx.coroutines.flow.StateFlow
 
-@Navigator.Name("dialog")
 public actual class DialogNavigator actual constructor() : Navigator<Destination>() {
-    internal actual val backStack
-        get() = state.backStack
+    internal actual val backStack: StateFlow<List<NavBackStackEntry>>
+        get() = implementedInJetBrainsFork()
 
-    internal actual val transitionInProgress
-        get() = state.transitionsInProgress
+    internal actual val transitionInProgress: StateFlow<Set<NavBackStackEntry>>
+        get() = implementedInJetBrainsFork()
 
     internal actual fun dismiss(backStackEntry: NavBackStackEntry) {
-        popBackStack(backStackEntry, false)
+        implementedInJetBrainsFork()
     }
 
     actual override fun navigate(
@@ -42,29 +43,19 @@ public actual class DialogNavigator actual constructor() : Navigator<Destination
         navOptions: NavOptions?,
         navigatorExtras: Extras?
     ) {
-        entries.forEach { entry -> state.push(entry) }
+        implementedInJetBrainsFork()
     }
 
-    actual override fun createDestination(): Destination {
-        return Destination(this) {}
-    }
+    actual override fun createDestination(): Destination = implementedInJetBrainsFork()
 
     actual override fun popBackStack(popUpTo: NavBackStackEntry, savedState: Boolean) {
-        state.popWithTransition(popUpTo, savedState)
-        // When popping, the incoming dialog is marked transitioning to hold it in
-        // STARTED. With pop complete, we can remove it from transition so it can move to RESUMED.
-        val popIndex = state.transitionsInProgress.value.indexOf(popUpTo)
-        // do not mark complete for entries up to and including popUpTo
-        state.transitionsInProgress.value.forEachIndexed { index, entry ->
-            if (index > popIndex) onTransitionComplete(entry)
-        }
+        implementedInJetBrainsFork()
     }
 
     internal actual fun onTransitionComplete(entry: NavBackStackEntry) {
-        state.markTransitionComplete(entry)
+        implementedInJetBrainsFork()
     }
 
-    @NavDestination.ClassType(Composable::class)
     public actual class Destination
     actual constructor(
         navigator: DialogNavigator,

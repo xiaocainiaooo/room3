@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("DialogHostKt")
-@file:JvmMultifileClass
-
 package androidx.navigation.compose
 
 import androidx.compose.runtime.Composable

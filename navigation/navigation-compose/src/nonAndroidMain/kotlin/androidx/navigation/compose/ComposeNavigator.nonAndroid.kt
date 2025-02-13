@@ -22,52 +22,51 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.ComposeNavigator.Destination
+import androidx.navigation.implementedInJetBrainsFork
+import kotlin.jvm.JvmSuppressWildcards
 import kotlinx.coroutines.flow.StateFlow
 
-@Navigator.Name("composable")
 public actual class ComposeNavigator actual constructor() : Navigator<Destination>() {
 
-    internal actual val transitionsInProgress
-        get() = state.transitionsInProgress
+    internal actual val transitionsInProgress: StateFlow<Set<NavBackStackEntry>>
+        get() = implementedInJetBrainsFork()
 
     public actual val backStack: StateFlow<List<NavBackStackEntry>>
-        get() = state.backStack
+        get() = implementedInJetBrainsFork()
 
-    internal actual val isPop = mutableStateOf(false)
+    internal actual val isPop: MutableState<Boolean> = implementedInJetBrainsFork()
 
     actual override fun navigate(
         entries: List<NavBackStackEntry>,
         navOptions: NavOptions?,
         navigatorExtras: Extras?
     ) {
-        entries.forEach { entry -> state.pushWithTransition(entry) }
-        isPop.value = false
+        implementedInJetBrainsFork()
     }
 
     actual override fun createDestination(): Destination {
-        return Destination(this) {}
+        implementedInJetBrainsFork()
     }
 
     actual override fun popBackStack(popUpTo: NavBackStackEntry, savedState: Boolean) {
-        state.popWithTransition(popUpTo, savedState)
-        isPop.value = true
+        implementedInJetBrainsFork()
     }
 
     public actual fun prepareForTransition(entry: NavBackStackEntry) {
-        state.prepareForTransition(entry)
+        implementedInJetBrainsFork()
     }
 
     public actual fun onTransitionComplete(entry: NavBackStackEntry) {
-        state.markTransitionComplete(entry)
+        implementedInJetBrainsFork()
     }
 
-    @NavDestination.ClassType(Composable::class)
+    /** NavDestination specific to [ComposeNavigator] */
     public actual class Destination
     actual constructor(
         navigator: ComposeNavigator,

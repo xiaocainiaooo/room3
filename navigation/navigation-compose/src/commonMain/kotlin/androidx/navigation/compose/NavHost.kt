@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-@file:JvmName("NavHostKt")
-@file:JvmMultifileClass
-
 package androidx.navigation.compose
 
-import android.annotation.SuppressLint
-import androidx.activity.compose.PredictiveBackHandler
 import androidx.collection.mutableObjectFloatMapOf
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -49,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -58,9 +52,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.Navigator
+import androidx.navigation.compose.internal.LocalViewModelStoreOwner
+import androidx.navigation.compose.internal.PredictiveBackHandler
 import androidx.navigation.createGraph
 import androidx.navigation.get
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlinx.coroutines.launch
@@ -415,7 +412,6 @@ public fun NavHost(
     message = "Deprecated in favor of NavHost that supports sizeTransform",
     level = DeprecationLevel.HIDDEN
 )
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 public fun NavHost(
     navController: NavHostController,
@@ -461,7 +457,6 @@ public fun NavHost(
  * @param popExitTransition callback to define popExit transitions for destination in this host
  * @param sizeTransform callback to define the size transform for destinations in this host
  */
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 public fun NavHost(
     navController: NavHostController,

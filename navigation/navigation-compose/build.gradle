@@ -158,6 +158,7 @@ androidx {
     description = "Compose integration with Navigation"
     samples(project(":navigation:navigation-compose:navigation-compose-samples"))
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    metalavaK2UastEnabled = false
     addGoldenImageAssets()
 }
 

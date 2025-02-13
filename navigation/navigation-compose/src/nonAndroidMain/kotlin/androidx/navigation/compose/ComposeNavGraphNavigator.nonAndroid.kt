@@ -25,12 +25,13 @@ import androidx.navigation.NavGraph
 import androidx.navigation.NavGraphNavigator
 import androidx.navigation.Navigator
 import androidx.navigation.NavigatorProvider
+import androidx.navigation.implementedInJetBrainsFork
+import kotlin.jvm.JvmSuppressWildcards
 
-@Navigator.Name("navigation")
 internal actual class ComposeNavGraphNavigator
 actual constructor(navigatorProvider: NavigatorProvider) : NavGraphNavigator(navigatorProvider) {
     actual override fun createDestination(): NavGraph {
-        return ComposeNavGraph(this)
+        implementedInJetBrainsFork()
     }
 
     internal actual class ComposeNavGraph
