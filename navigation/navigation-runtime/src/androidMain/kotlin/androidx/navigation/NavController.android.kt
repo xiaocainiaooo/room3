@@ -2341,27 +2341,26 @@ public actual open class NavController(
             if (b == null) {
                 b = savedState()
             }
-            val backStack = arrayOfNulls<Parcelable>(backQueue.size)
-            var index = 0
+            val backStack = arrayListOf<Parcelable>()
             for (backStackEntry in this.backQueue) {
-                backStack[index++] = NavBackStackEntryState(backStackEntry)
+                backStack.add(NavBackStackEntryState(backStackEntry))
             }
-            b.write { putParcelableList(KEY_BACK_STACK, backStack.toList().filterNotNull()) }
+            b.write { putParcelableList(KEY_BACK_STACK, backStack) }
         }
         if (backStackMap.isNotEmpty()) {
             if (b == null) {
                 b = savedState()
             }
             val backStackDestIds = IntArray(backStackMap.size)
-            val backStackIds = ArrayList<String?>()
+            val backStackIds = ArrayList<String>()
             var index = 0
             for ((destId, id) in backStackMap) {
                 backStackDestIds[index++] = destId
-                backStackIds += id
+                backStackIds.add(id ?: "")
             }
             b.write {
                 putIntArray(KEY_BACK_STACK_DEST_IDS, backStackDestIds)
-                putStringList(KEY_BACK_STACK_IDS, backStackIds.toList().filterNotNull())
+                putStringList(KEY_BACK_STACK_IDS, backStackIds)
             }
         }
         if (backStackStates.isNotEmpty()) {
@@ -2371,16 +2370,9 @@ public actual open class NavController(
             val backStackStateIds = ArrayList<String>()
             for ((id, backStackStates) in backStackStates) {
                 backStackStateIds += id
-                val states = arrayOfNulls<Parcelable>(backStackStates.size)
-                backStackStates.forEachIndexed { stateIndex, backStackState ->
-                    states[stateIndex] = backStackState
-                }
-                b.write {
-                    putParcelableList(
-                        KEY_BACK_STACK_STATES_PREFIX + id,
-                        states.toList().filterNotNull()
-                    )
-                }
+                val states = arrayListOf<Parcelable>()
+                backStackStates.forEach { backStackState -> states.add(backStackState) }
+                b.write { putParcelableList(KEY_BACK_STACK_STATES_PREFIX + id, states) }
             }
             b.write { putStringList(KEY_BACK_STACK_STATES_IDS, backStackStateIds) }
         }
@@ -2413,7 +2405,12 @@ public actual open class NavController(
                 val backStackDestIds = getIntArray(KEY_BACK_STACK_DEST_IDS)
                 val backStackIds = getStringList(KEY_BACK_STACK_IDS)
                 backStackDestIds.forEachIndexed { index, id ->
-                    backStackMap[id] = backStackIds[index]
+                    backStackMap[id] =
+                        if (backStackIds[index] != "") {
+                            backStackIds[index]
+                        } else {
+                            null
+                        }
                 }
             }
             if (contains(KEY_BACK_STACK_STATES_IDS)) {
