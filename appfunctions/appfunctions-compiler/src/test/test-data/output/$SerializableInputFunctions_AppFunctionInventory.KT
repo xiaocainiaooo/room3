@@ -1,10 +1,11 @@
 package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
+import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
-import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
@@ -32,11 +33,9 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
   private object ComTestdataSerializableInputFunctionsSimpleFunctionMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
-        AppFunctionObjectTypeMetadata(
-            properties = emptyMap(),
-            required = emptyList(),
-            qualifiedName = null,
+    private val PARAMETER_METADATA_SERIALIZABLE_REFERENCE_DATA_TYPE:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
             isNullable = false
         )
 
@@ -44,7 +43,7 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
         AppFunctionParameterMetadata(
             name = "serializable",
             isRequired = true,
-            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+            dataType = PARAMETER_METADATA_SERIALIZABLE_REFERENCE_DATA_TYPE
         )
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
@@ -73,11 +72,15 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
   private object ComTestdataSerializableInputFunctionsSimpleFunctionSerializableListMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
-        AppFunctionObjectTypeMetadata(
-            properties = emptyMap(),
-            required = emptyList(),
-            qualifiedName = null,
+    private val PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE_REFERENCE_ITEM_TYPE:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
+            isNullable = false
+        )
+
+    private val PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE_REFERENCE_ITEM_TYPE,
             isNullable = false
         )
 
@@ -85,7 +88,7 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
         AppFunctionParameterMetadata(
             name = "serializable",
             isRequired = true,
-            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+            dataType = PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE
         )
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
@@ -115,11 +118,15 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
       ComTestdataSerializableInputFunctionsSimpleFunctionNullableSerializableListMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
-        AppFunctionObjectTypeMetadata(
-            properties = emptyMap(),
-            required = emptyList(),
-            qualifiedName = null,
+    private val PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE_REFERENCE_ITEM_TYPE:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
+            isNullable = false
+        )
+
+    private val PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE_REFERENCE_ITEM_TYPE,
             isNullable = true
         )
 
@@ -127,7 +134,7 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
         AppFunctionParameterMetadata(
             name = "serializable",
             isRequired = true,
-            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+            dataType = PARAMETER_METADATA_SERIALIZABLE_ARRAY_DATA_TYPE
         )
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
@@ -157,11 +164,9 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
       ComTestdataSerializableInputFunctionsSimpleFunctionNullableSerializableMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
-    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
-        AppFunctionObjectTypeMetadata(
-            properties = emptyMap(),
-            required = emptyList(),
-            qualifiedName = null,
+    private val PARAMETER_METADATA_SERIALIZABLE_REFERENCE_DATA_TYPE:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
             isNullable = true
         )
 
@@ -169,7 +174,7 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
         AppFunctionParameterMetadata(
             name = "serializable",
             isRequired = true,
-            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+            dataType = PARAMETER_METADATA_SERIALIZABLE_REFERENCE_DATA_TYPE
         )
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(

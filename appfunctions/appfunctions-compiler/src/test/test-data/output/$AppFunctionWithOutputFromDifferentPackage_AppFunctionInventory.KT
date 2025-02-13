@@ -1,9 +1,10 @@
 package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
+import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
-import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
@@ -37,16 +38,14 @@ public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
 
-    private val OBJECT_RESPONSE_VALUE_TYPE: AppFunctionObjectTypeMetadata =
-        AppFunctionObjectTypeMetadata(
-            properties = emptyMap(),
-            required = emptyList(),
-            qualifiedName = null,
+    private val REFERENCE_RESPONSE_VALUE_TYPE: AppFunctionReferenceTypeMetadata =
+        AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.differentPackage.DiffPackageSerializable",
             isNullable = false
         )
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
-            valueType = OBJECT_RESPONSE_VALUE_TYPE
+            valueType = REFERENCE_RESPONSE_VALUE_TYPE
         )
 
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
@@ -68,16 +67,21 @@ public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
 
-    private val OBJECT_RESPONSE_VALUE_TYPE: AppFunctionObjectTypeMetadata =
-        AppFunctionObjectTypeMetadata(
-            properties = emptyMap(),
-            required = emptyList(),
-            qualifiedName = null,
+    private val ARRAY_RESPONSE_VALUE_TYPE_REFERENCE_ITEM_TYPE: AppFunctionReferenceTypeMetadata =
+        AppFunctionReferenceTypeMetadata(
+            referenceDataType =
+            "com.testdata.anotherDifferentPackage.AnotherDiffPackageSerializable",
+            isNullable = false
+        )
+
+    private val ARRAY_RESPONSE_VALUE_TYPE: AppFunctionArrayTypeMetadata =
+        AppFunctionArrayTypeMetadata(
+            itemType = ARRAY_RESPONSE_VALUE_TYPE_REFERENCE_ITEM_TYPE,
             isNullable = false
         )
 
     private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
-            valueType = OBJECT_RESPONSE_VALUE_TYPE
+            valueType = ARRAY_RESPONSE_VALUE_TYPE
         )
 
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
