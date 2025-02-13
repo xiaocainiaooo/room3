@@ -25,11 +25,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler
+import androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.WindowRecomposerPolicy
+import androidx.compose.ui.test.ComposeRootRegistry.OnRegistrationChangedListener
 import androidx.compose.ui.unit.Density
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
@@ -327,6 +330,8 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
     private val recomposerContinuationInterceptor: ApplyingContinuationInterceptor
     private val infiniteAnimationPolicy: InfiniteAnimationPolicy
 
+    private var pendingThrowable: Throwable? = null
+
     init {
         frameClock =
             TestMonotonicFrameClock(
@@ -439,6 +444,7 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         composeRootRegistry.waitForComposeRoots(atLeastOneRootExpected)
         // Then await composition(s)
         idlingStrategy.runUntilIdle()
+        throwPendingException()
         // Then wait for the next frame to ensure any scheduled drawing has completed
         waitForNextChoreographerFrame()
         // Check if a coroutine threw an uncaught exception
@@ -458,16 +464,54 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
             view.postOnAnimation { view.post { frameHit = true } }
             while (!frameHit) {
                 idlingStrategy.runUntilIdle()
+                throwPendingException()
             }
         }
     }
 
     private fun <R> withWindowRecomposer(block: () -> R): R {
+        val rootRegistrationListener =
+            object : OnRegistrationChangedListener {
+                val uncaughtExceptionHandler =
+                    object : UncaughtExceptionHandler {
+                        override fun onUncaughtException(
+                            t: Throwable,
+                            phase: ExceptionOriginPhase
+                        ) {
+                            pendingThrowable =
+                                pendingThrowable?.apply { addSuppressed(t) }
+                                    ?: ForwardedComposeViewException(
+                                        "An unhandled exception was thrown during ${when (phase) {
+                                        ExceptionOriginPhase.Layout -> "Layout"
+                                        ExceptionOriginPhase.Draw -> "Draw"
+                                        else -> "unknown view phase"
+                                    }}",
+                                        t
+                                    )
+                        }
+                    }
+
+                override fun onRegistrationChanged(
+                    composeRoot: ViewRootForTest,
+                    registered: Boolean
+                ) {
+                    composeRoot.setUncaughtExceptionHandler(
+                        if (registered) {
+                            uncaughtExceptionHandler
+                        } else {
+                            null
+                        }
+                    )
+                }
+            }
+
         @OptIn(InternalComposeUiApi::class)
         return WindowRecomposerPolicy.withFactory({ recomposer }) {
             try {
                 // Start the recomposer:
                 recomposerCoroutineScope.launch { recomposer.runRecomposeAndApplyChanges() }
+                // Install an uncaught exception handler into every Composition in the test
+                composeRootRegistry.addOnRegistrationChangedListener(rootRegistrationListener)
                 block()
             } finally {
                 // Stop the recomposer:
@@ -475,6 +519,10 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
                 // Cancel our scope to ensure there are no active coroutines when
                 // cleanupTestCoroutines is called in the CleanupCoroutinesStatement
                 recomposerCoroutineScope.cancel()
+                // Remove the exception handler installer
+                composeRootRegistry.removeOnRegistrationChangedListener(rootRegistrationListener)
+
+                throwPendingException()
             }
         }
     }
@@ -552,6 +600,7 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
 
         override fun waitForIdle() {
             waitForIdle(atLeastOneRootExpected = true)
+            throwPendingException()
         }
 
         override suspend fun awaitIdle() {
@@ -561,8 +610,10 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
             withContext(idlingStrategy.synchronizationContext) {
                 // Then await composition(s)
                 idlingStrategy.runUntilIdle()
+                throwPendingException()
                 // Then wait for the next frame to ensure any scheduled drawing has completed
                 waitForNextChoreographerFrame()
+                throwPendingException()
             }
             // Check if a coroutine threw an uncaught exception
             coroutineExceptionHandler.throwUncaught()
@@ -580,6 +631,7 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
                 }
                 // Let Android run measure, draw and in general any other async operations.
                 Thread.sleep(10)
+                throwPendingException()
                 if (System.nanoTime() - startTime > timeoutMillis * NanoSecondsPerMilliSecond) {
                     throw ComposeTimeoutException(
                         buildWaitUntilTimeoutMessage(timeoutMillis, conditionDescription)
@@ -632,6 +684,13 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         }
     }
 
+    private fun throwPendingException() {
+        pendingThrowable?.let {
+            pendingThrowable = null
+            throw it
+        }
+    }
+
     private inner class AndroidTestOwner : TestOwner {
         override val mainClock: MainTestClock
             get() = mainClockImpl
@@ -656,6 +715,9 @@ internal fun <A : ComponentActivity> ActivityScenario<A>.getActivity(): A? {
     onActivity { activity = it }
     return activity
 }
+
+internal class ForwardedComposeViewException(message: String, cause: Throwable?) :
+    RuntimeException(message, cause)
 
 @ExperimentalTestApi
 actual sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {
