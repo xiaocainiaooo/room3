@@ -679,7 +679,7 @@ internal class MeasurePassDelegate(private val layoutNodeLayoutDelegate: LayoutN
                 // children `placeOrder`s are updated.
                 layoutNode.parent?.requestRelayout()
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             layoutNode.rethrowWithComposeStackTrace(e)
         } finally {
             relayoutWithoutParentInProgress = false

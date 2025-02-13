@@ -1107,7 +1107,7 @@ internal class CompositionImpl(
         val invalidations = takeInvalidations()
         return try {
             block(invalidations)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             this.invalidations = invalidations
             throw e
         }
@@ -1116,7 +1116,7 @@ internal class CompositionImpl(
     private inline fun <T> guardChanges(block: () -> T): T =
         try {
             trackAbandonedValues(block)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             abandonChanges()
             throw e
         }
