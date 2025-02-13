@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import androidx.build.ApkCopyHelperKt
+
 plugins {
     id("com.android.application")
     id("AndroidXPlugin")
@@ -26,6 +29,13 @@ android {
     defaultConfig {
         minSdk = 34
     }
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
+    }
 }
 
 dependencies {
@@ -38,3 +48,8 @@ dependencies {
     implementation("androidx.compose.runtime:runtime:1.8.0-alpha06")
     implementation("androidx.compose.foundation:foundation-layout:1.8.0-alpha06")
 }
+
+// Making this APK available via Android Build so the QA team can
+// access it in a convenient manner.
+ApkCopyHelperKt.setupAppApkCopy(project, "release")
+
