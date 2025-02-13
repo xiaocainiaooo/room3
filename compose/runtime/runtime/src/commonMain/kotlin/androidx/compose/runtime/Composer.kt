@@ -3786,7 +3786,7 @@ internal class ComposerImpl(
                 }
                 endRoot()
                 complete = true
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 throw e.attachComposeStackTrace { currentStackTrace() }
             } finally {
                 isComposing = false
