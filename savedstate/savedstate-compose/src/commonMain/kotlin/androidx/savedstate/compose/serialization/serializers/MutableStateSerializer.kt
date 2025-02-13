@@ -24,6 +24,8 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -59,8 +61,14 @@ public class MutableStateSerializer<T>(
 ) : KSerializer<MutableState<T>> {
 
     @OptIn(ExperimentalSerializationApi::class)
-    override val descriptor: SerialDescriptor =
-        SerialDescriptor("androidx.compose.runtime.MutableState", valueSerializer.descriptor)
+    override val descriptor: SerialDescriptor by lazy {
+        val structureKind = valueSerializer.descriptor.kind
+        if (structureKind is PrimitiveKind) {
+            PrimitiveSerialDescriptor(SERIAL_NAME, structureKind)
+        } else {
+            SerialDescriptor(SERIAL_NAME, valueSerializer.descriptor)
+        }
+    }
 
     override fun serialize(encoder: Encoder, value: MutableState<T>) {
         valueSerializer.serialize(encoder, value.value)
@@ -70,3 +78,5 @@ public class MutableStateSerializer<T>(
         return mutableStateOf(valueSerializer.deserialize(decoder))
     }
 }
+
+private const val SERIAL_NAME = "androidx.compose.runtime.MutableState"
