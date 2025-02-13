@@ -12,15 +12,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.appcompat:appcompat",
-        "resolvedVersion": "1.2.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.savedstate:savedstate",
         "resolvedVersion": "1.3.0-alpha05"
       },

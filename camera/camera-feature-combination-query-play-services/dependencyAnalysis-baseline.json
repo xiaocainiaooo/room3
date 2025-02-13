@@ -84,14 +84,6 @@
       },
       "fromConfiguration": "testImplementation",
       "toConfiguration": "testRuntimeOnly"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":camera:camera-feature-combination-query"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

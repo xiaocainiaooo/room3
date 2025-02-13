@@ -41,15 +41,6 @@
         "resolvedVersion": "1.3"
       },
       "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "org.jspecify:jspecify",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "androidTestImplementation"
     }
   ]
 }

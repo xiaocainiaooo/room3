@@ -12,15 +12,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.core:core-animation",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.core:core",
         "resolvedVersion": "1.13.0"
       },
@@ -49,14 +40,6 @@
         "resolvedVersion": "4.13.2"
       },
       "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":vectordrawable:vectordrawable"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

@@ -17,14 +17,6 @@
       },
       "fromConfiguration": "androidTestImplementation",
       "toConfiguration": "androidTestRuntimeOnly"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":privacysandbox:sdkruntime:sdkruntime-core"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

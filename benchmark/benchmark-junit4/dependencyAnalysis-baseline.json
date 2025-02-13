@@ -11,15 +11,6 @@
     },
     {
       "coordinates": {
-        "type": "module",
-        "identifier": "androidx.test:runner",
-        "resolvedVersion": "1.5.2"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
         "type": "project",
         "identifier": ":benchmark:benchmark-traceprocessor"
       },

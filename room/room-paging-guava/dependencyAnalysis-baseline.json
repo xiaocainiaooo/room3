@@ -28,15 +28,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.guava:guava",
-        "resolvedVersion": "31.1-android"
-      },
-      "fromConfiguration": "androidTestImplementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "junit:junit",
         "resolvedVersion": "4.13.2"
       },

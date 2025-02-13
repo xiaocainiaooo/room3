@@ -20,15 +20,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.dynamicanimation:dynamicanimation",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.lifecycle:lifecycle-common",
         "resolvedVersion": "2.5.1"
       },

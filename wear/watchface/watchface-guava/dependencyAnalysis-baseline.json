@@ -86,15 +86,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "org.jspecify:jspecify",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.robolectric:sandbox",
         "resolvedVersion": "4.14"
       },

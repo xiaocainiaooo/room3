@@ -20,15 +20,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "junit:junit",
-        "resolvedVersion": "4.13.2"
-      },
-      "fromConfiguration": "testImplementation",
-      "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.hamcrest:hamcrest-core",
         "resolvedVersion": "1.3"
       },

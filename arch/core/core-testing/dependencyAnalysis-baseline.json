@@ -41,15 +41,6 @@
         "resolvedVersion": "1.3"
       },
       "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "org.mockito:mockito-core",
-        "resolvedVersion": "2.25.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

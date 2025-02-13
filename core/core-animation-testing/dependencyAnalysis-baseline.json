@@ -16,15 +16,6 @@
         "resolvedVersion": "1.13.0"
       },
       "fromConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "junit:junit",
-        "resolvedVersion": "4.13.2"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

@@ -13,28 +13,10 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.truth:truth",
-        "resolvedVersion": "1.0.1"
-      },
-      "fromConfiguration": "testImplementation",
-      "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "junit:junit",
         "resolvedVersion": "4.13.2"
       },
       "fromConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "org.jspecify:jspecify",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "androidTestImplementation"
     },
     {
       "coordinates": {
@@ -49,22 +31,6 @@
         "identifier": ":datastore:datastore"
       },
       "fromConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":datastore:datastore-core"
-      },
-      "fromConfiguration": "androidTestImplementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":datastore:datastore-preferences"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     },
     {
       "coordinates": {

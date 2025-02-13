@@ -88,14 +88,6 @@
         "identifier": ":wear:watchface:watchface-complications-data"
       },
       "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:watchface:watchface-style-old-api-test-stub"
-      },
-      "fromConfiguration": "androidTestApi",
-      "toConfiguration": "androidTestImplementation"
     }
   ]
 }

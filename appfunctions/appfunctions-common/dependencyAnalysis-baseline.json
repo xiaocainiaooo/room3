@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.appsearch:appsearch",
-        "resolvedVersion": "1.1.0-alpha07"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.core:core",
         "resolvedVersion": "1.9.0"
       },

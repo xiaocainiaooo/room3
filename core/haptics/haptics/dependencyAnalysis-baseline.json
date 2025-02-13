@@ -13,15 +13,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.truth:truth",
-        "resolvedVersion": "1.0.1"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "junit:junit",
         "resolvedVersion": "4.13.2"
       },

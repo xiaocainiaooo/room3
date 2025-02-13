@@ -93,15 +93,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.dagger:hilt-android",
-        "resolvedVersion": "2.54"
-      },
-      "fromConfiguration": "androidTestImplementation",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "com.google.dagger:hilt-core",
         "resolvedVersion": "2.54"
       },
@@ -130,14 +121,6 @@
         "resolvedVersion": "4.13.2"
       },
       "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":hilt:hilt-navigation"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     },
     {
       "coordinates": {

@@ -12,28 +12,10 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.appcompat:appcompat",
-        "resolvedVersion": "1.1.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.collection:collection",
         "resolvedVersion": "1.1.0"
       },
       "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "androidx.core:core",
-        "resolvedVersion": "1.10.1"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     },
     {
       "coordinates": {

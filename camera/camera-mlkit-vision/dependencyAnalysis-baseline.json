@@ -96,14 +96,6 @@
         "identifier": ":camera:camera-view"
       },
       "fromConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":camera:camera-view"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

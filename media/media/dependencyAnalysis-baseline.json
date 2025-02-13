@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.core:core",
-        "resolvedVersion": "1.9.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test.espresso:espresso-core",
         "resolvedVersion": "3.7.0-alpha01"
       },
