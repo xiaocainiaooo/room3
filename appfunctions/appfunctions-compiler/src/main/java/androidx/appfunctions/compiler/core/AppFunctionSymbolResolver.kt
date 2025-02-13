@@ -16,7 +16,10 @@
 
 package androidx.appfunctions.compiler.core
 
+import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTIONS_AGGREGATED_DEPS_PACKAGE_NAME
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionComponentRegistryAnnotation
+import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
@@ -53,5 +56,65 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
             .map { (classDeclaration, appFunctionsDeclarations) ->
                 AnnotatedAppFunctions(classDeclaration, appFunctionsDeclarations).validate()
             }
+    }
+
+    /** Gets generated AppFunctionInventory implementations. */
+    fun getGeneratedAppFunctionInventories(): List<KSClassDeclaration> {
+        return filterAppFunctionComponentQualifiedNames(
+                AppFunctionComponentRegistryAnnotation.Category.INVENTORY
+            )
+            .map { componentName ->
+                val ksName = resolver.getKSNameFromString(componentName)
+                resolver.getClassDeclarationByName(ksName)
+                    ?: throw ProcessingException(
+                        "Unable to find KSClassDeclaration for ${ksName.asString()}",
+                        null
+                    )
+            }
+    }
+
+    /** Gets generated AppFunctionInvoker implementations. */
+    fun getGeneratedAppFunctionInvokers(): List<KSClassDeclaration> {
+        return filterAppFunctionComponentQualifiedNames(
+                AppFunctionComponentRegistryAnnotation.Category.INVOKER
+            )
+            .map { componentName ->
+                val ksName = resolver.getKSNameFromString(componentName)
+                resolver.getClassDeclarationByName(ksName)
+                    ?: throw ProcessingException(
+                        "Unable to find KSClassDeclaration for ${ksName.asString()}",
+                        null
+                    )
+            }
+    }
+
+    @OptIn(KspExperimental::class)
+    private fun filterAppFunctionComponentQualifiedNames(
+        filterComponentCategory: String,
+    ): List<String> {
+        return resolver
+            .getDeclarationsFromPackage(APP_FUNCTIONS_AGGREGATED_DEPS_PACKAGE_NAME)
+            .flatMap { node ->
+                val registryAnnotation =
+                    node.annotations.findAnnotation(
+                        AppFunctionComponentRegistryAnnotation.CLASS_NAME
+                    ) ?: return@flatMap emptyList<String>()
+                val componentCategory =
+                    registryAnnotation.requirePropertyValueOfType(
+                        AppFunctionComponentRegistryAnnotation.PROPERTY_COMPONENT_CATEGORY,
+                        String::class
+                    )
+                val componentNames =
+                    registryAnnotation.requirePropertyValueOfType(
+                        AppFunctionComponentRegistryAnnotation.PROPERTY_COMPONENT_NAMES,
+                        List::class
+                    )
+                return@flatMap if (componentCategory == filterComponentCategory) {
+                    componentNames.filterIsInstance<String>()
+                } else {
+                    emptyList<String>()
+                }
+            }
+            .toList()
     }
 }

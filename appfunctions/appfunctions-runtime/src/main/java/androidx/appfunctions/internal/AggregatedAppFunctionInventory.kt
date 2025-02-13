@@ -27,7 +27,7 @@ import androidx.appfunctions.metadata.AppFunctionMetadata
  * generated [AppFunctionMetadata] exposed by the application.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public abstract class AggregateAppFunctionInventory : AppFunctionInventory {
+public abstract class AggregatedAppFunctionInventory : AppFunctionInventory {
 
     /** The list of [AppFunctionInventory] instances that contribute to this aggregate. */
     public abstract val inventories: List<AppFunctionInventory>

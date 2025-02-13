@@ -27,7 +27,7 @@ import androidx.appfunctions.AppFunctionFunctionNotFoundException
  * AppFunction compiler will automatically generate the implementation of this class.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public abstract class AggregateAppFunctionInvoker : AppFunctionInvoker {
+public abstract class AggregatedAppFunctionInvoker : AppFunctionInvoker {
 
     /** The list of [AppFunctionInvoker] instances that contribute to this aggregate. */
     public abstract val invokers: List<AppFunctionInvoker>

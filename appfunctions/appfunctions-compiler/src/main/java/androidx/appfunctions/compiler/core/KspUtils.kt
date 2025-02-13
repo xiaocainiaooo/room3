@@ -35,6 +35,13 @@ import com.squareup.kotlinpoet.WildcardTypeName
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
+/** Gets [ClassName] from [KSClassDeclaration]. */
+fun KSClassDeclaration.toClassName(): ClassName {
+    val packageName = this.packageName.asString()
+    val simpleName = this.simpleName.asString()
+    return ClassName(packageName, simpleName)
+}
+
 /**
  * Resolves the type reference to the parameterized type if it is a list.
  *
