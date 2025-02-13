@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.os.CancellationSignal
 import android.os.OutcomeReceiver
 import androidx.annotation.RestrictTo
+import androidx.appfunctions.internal.Dependencies
+import androidx.appfunctions.internal.Dispatchers
 import com.android.extensions.appfunctions.AppFunctionException as ExtensionAppFunctionException
 import com.android.extensions.appfunctions.AppFunctionService
 import com.android.extensions.appfunctions.ExecuteAppFunctionRequest as ExtensionExecuteAppFunctionRequest
@@ -34,6 +36,14 @@ public class ExtensionAppFunctionService : AppFunctionService() {
 
     override fun onCreate() {
         super.onCreate()
+        delegate =
+            AppFunctionServiceDelegate(
+                this@ExtensionAppFunctionService,
+                Dispatchers.Worker,
+                Dispatchers.Main,
+                Dependencies.getInstance().aggregatedAppFunctionInventory,
+                Dependencies.getInstance().aggregatedAppFunctionInvoker,
+            )
     }
 
     override fun onExecuteFunction(
@@ -55,7 +65,7 @@ public class ExtensionAppFunctionService : AppFunctionService() {
                     override fun onResult(result: ExecuteAppFunctionResponse) {
                         when (result) {
                             is ExecuteAppFunctionResponse.Success -> {
-                                result.toPlatformExtensionClass()
+                                callback.onResult(result.toPlatformExtensionClass())
                             }
                             is ExecuteAppFunctionResponse.Error -> {
                                 callback.onError(result.error.toPlatformExtensionsClass())
@@ -73,5 +83,6 @@ public class ExtensionAppFunctionService : AppFunctionService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        delegate.onDestroy()
     }
 }
