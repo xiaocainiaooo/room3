@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.traceprocessor
+package androidx.benchmark.macro
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -22,7 +22,6 @@ import android.security.NetworkSecurityPolicy
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
-import androidx.benchmark.BenchmarkState.Companion.TAG
 import androidx.benchmark.InMemoryTracing
 import androidx.benchmark.InstrumentationResults
 import androidx.benchmark.Outputs
@@ -32,6 +31,9 @@ import androidx.benchmark.ShellScript
 import androidx.benchmark.StartedShellScript
 import androidx.benchmark.inMemoryTrace
 import androidx.benchmark.perfetto.PerfettoHelper
+import androidx.benchmark.traceprocessor.PerfettoTrace
+import androidx.benchmark.traceprocessor.ServerLifecycleManager
+import androidx.benchmark.traceprocessor.TraceProcessor
 import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -42,7 +44,6 @@ private object Api24Impl {
         NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted("localhost")
 }
 
-@RequiresApi(23)
 internal class ShellServerLifecycleManager : ServerLifecycleManager {
     companion object {
         private const val SERVER_PROCESS_NAME = "trace_processor_shell"
@@ -139,7 +140,6 @@ internal class ShellServerLifecycleManager : ServerLifecycleManager {
 }
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-@RequiresApi(23)
 fun <T> TraceProcessor.Companion.runSingleSessionServer(
     absoluteTracePath: String,
     block: TraceProcessor.Session.() -> T
@@ -153,8 +153,6 @@ fun <T> TraceProcessor.Companion.runSingleSessionServer(
  *
  * @param block Command to execute using trace processor
  */
-@ExperimentalTraceProcessorApi
-@RequiresApi(23)
 fun <T> TraceProcessor.Companion.runServer(block: TraceProcessor.() -> T): T =
     TraceProcessor.runServer(60.seconds, block)
 
@@ -165,8 +163,6 @@ fun <T> TraceProcessor.Companion.runServer(block: TraceProcessor.() -> T): T =
  * @param timeout waiting for the server to start. If less or equal to zero uses 60 seconds
  * @param block Command to execute using trace processor
  */
-@ExperimentalTraceProcessorApi
-@RequiresApi(23)
 fun <T> TraceProcessor.Companion.runServer(timeout: Duration, block: TraceProcessor.() -> T): T =
     runServer(
         ShellServerLifecycleManager(),
