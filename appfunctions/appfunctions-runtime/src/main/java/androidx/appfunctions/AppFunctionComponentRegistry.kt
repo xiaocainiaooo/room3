@@ -74,12 +74,12 @@ internal annotation class AppFunctionComponentCategory {
     companion object {
         /**
          * The components in inventory category are used to generate the implementation of an
-         * implementation of [androidx.appfunctions.internal.AggregateAppFunctionInventory].
+         * implementation of [androidx.appfunctions.internal.AggregatedAppFunctionInventory].
          */
         const val INVENTORY: String = "INVENTORY"
         /**
          * The components in invoker category are used to generate the implementation of an
-         * implementation of [androidx.appfunctions.internal.AggregateAppFunctionInvoker].
+         * implementation of [androidx.appfunctions.internal.AggregatedAppFunctionInvoker].
          */
         const val INVOKER: String = "INVOKER"
     }

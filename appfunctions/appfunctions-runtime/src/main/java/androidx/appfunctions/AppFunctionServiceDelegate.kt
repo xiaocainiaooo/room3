@@ -22,8 +22,8 @@ import android.os.Build
 import android.os.OutcomeReceiver
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.appfunctions.internal.AggregateAppFunctionInventory
-import androidx.appfunctions.internal.AggregateAppFunctionInvoker
+import androidx.appfunctions.internal.AggregatedAppFunctionInventory
+import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
 import androidx.appfunctions.internal.unsafeBuildReturnValue
 import androidx.appfunctions.internal.unsafeGetParameterValue
@@ -41,8 +41,8 @@ internal class AppFunctionServiceDelegate(
     context: Context,
     workerCoroutineContext: CoroutineContext,
     private val mainCoroutineContext: CoroutineContext,
-    private val aggregateInventory: AggregateAppFunctionInventory,
-    private val aggregateInvoker: AggregateAppFunctionInvoker,
+    private val aggregatedInventory: AggregatedAppFunctionInventory,
+    private val aggregatedInvoker: AggregatedAppFunctionInvoker,
 ) {
 
     private val job = Job()
@@ -57,7 +57,7 @@ internal class AppFunctionServiceDelegate(
         workerCoroutineScope.launch {
             try {
                 val appFunctionMetadata =
-                    aggregateInventory.functionIdToMetadataMap[
+                    aggregatedInventory.functionIdToMetadataMap[
                             executeAppFunctionRequest.functionIdentifier]
                 if (appFunctionMetadata == null) {
                     Log.d(
@@ -114,7 +114,7 @@ internal class AppFunctionServiceDelegate(
     ): ExecuteAppFunctionResponse {
         val result =
             withContext(mainCoroutineContext) {
-                aggregateInvoker.unsafeInvoke(
+                aggregatedInvoker.unsafeInvoke(
                     buildAppFunctionContext(callingPackageName),
                     request.functionIdentifier,
                     parameters

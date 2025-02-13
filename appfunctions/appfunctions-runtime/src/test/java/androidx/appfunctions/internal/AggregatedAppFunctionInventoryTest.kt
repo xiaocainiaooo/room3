@@ -24,28 +24,28 @@ import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class AggregateAppFunctionInventoryTest {
+class AggregatedAppFunctionInventoryTest {
 
     @Test
     fun testEmpty() {
-        val aggregateInventory =
-            object : AggregateAppFunctionInventory() {
+        val aggregatedInventory =
+            object : AggregatedAppFunctionInventory() {
                 override val inventories: List<AppFunctionInventory> = emptyList()
             }
 
-        assertThat(aggregateInventory.functionIdToMetadataMap).hasSize(0)
+        assertThat(aggregatedInventory.functionIdToMetadataMap).hasSize(0)
     }
 
     @Test
     fun testUniqueInventories() {
-        val aggregateInventory =
-            object : AggregateAppFunctionInventory() {
+        val aggregatedInventory =
+            object : AggregatedAppFunctionInventory() {
                 override val inventories: List<AppFunctionInventory> =
                     listOf(Inventory1(), Inventory2())
             }
 
-        assertThat(aggregateInventory.functionIdToMetadataMap).hasSize(2)
-        assertThat(aggregateInventory.functionIdToMetadataMap.keys)
+        assertThat(aggregatedInventory.functionIdToMetadataMap).hasSize(2)
+        assertThat(aggregatedInventory.functionIdToMetadataMap.keys)
             .containsExactly(
                 "androix.appfunctions.internal#test1",
                 "androix.appfunctions.internal#test2"
@@ -54,14 +54,14 @@ class AggregateAppFunctionInventoryTest {
 
     @Test
     fun testDuplicatedInventories() {
-        val aggregateInventory =
-            object : AggregateAppFunctionInventory() {
+        val aggregatedInventory =
+            object : AggregatedAppFunctionInventory() {
                 override val inventories: List<AppFunctionInventory> =
                     listOf(Inventory1(), Inventory1())
             }
 
-        assertThat(aggregateInventory.functionIdToMetadataMap).hasSize(1)
-        assertThat(aggregateInventory.functionIdToMetadataMap.keys)
+        assertThat(aggregatedInventory.functionIdToMetadataMap).hasSize(1)
+        assertThat(aggregatedInventory.functionIdToMetadataMap.keys)
             .containsExactly(
                 "androix.appfunctions.internal#test1",
             )
