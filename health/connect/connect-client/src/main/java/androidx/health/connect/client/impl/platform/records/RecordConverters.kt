@@ -53,6 +53,7 @@ import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.IntermenstrualBleedingRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.MedicalDataSource
 import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.MenstruationFlowRecord
@@ -1323,6 +1324,17 @@ internal fun PlatformMedicalResourceId.toSdkMedicalResourceId() =
 
 @SuppressLint("NewApi") // Guarded by sdk extension check
 internal fun PlatformFhirVersion.toSdkFhirVersion() = FhirVersion(major, minor, patch)
+
+@SuppressLint("NewApi") // Guarded by sdk extension check
+internal fun PlatformMedicalDataSource.toSdkMedicalDataSource() =
+    MedicalDataSource(
+        id = id,
+        packageName = packageName,
+        fhirBaseUri = fhirBaseUri,
+        displayName = displayName,
+        fhirVersion = FhirVersion(fhirVersion.major, fhirVersion.minor, fhirVersion.patch),
+        lastDataUpdateTime = lastDataUpdateTime
+    )
 
 @SuppressLint("NewApi") // Guarded by sdk extension check
 internal fun PlatformFhirResource.toSdkFhirResource() =

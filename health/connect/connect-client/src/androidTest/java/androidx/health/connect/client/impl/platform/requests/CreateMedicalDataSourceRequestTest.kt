@@ -48,33 +48,33 @@ class CreateMedicalDataSourceRequestTest {
         EqualsTester()
             .addEqualityGroup(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
+                    fhirVersion = FHIR_VERSION,
                 ),
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
+                    fhirVersion = FHIR_VERSION,
                 )
             )
             .addEqualityGroup(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = fhirBaseUri.buildUpon().appendPath("2/").build(),
+                    fhirBaseUri = FHIR_BASE_URI.buildUpon().appendPath("2/").build(),
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
+                    fhirVersion = FHIR_VERSION,
                 )
             )
             .addEqualityGroup(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = "$DISPLAY_NAME Two",
-                    fhirVersion = fhirVersion,
+                    fhirVersion = FHIR_VERSION,
                 )
             )
             .addEqualityGroup(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
                     fhirVersion = FhirVersion(4, 3, 0),
                 )
@@ -86,9 +86,9 @@ class CreateMedicalDataSourceRequestTest {
     fun toString_expectCorrectString() {
         val createMedicalDataSourceRequest =
             CreateMedicalDataSourceRequest(
-                fhirBaseUri = fhirBaseUri,
+                fhirBaseUri = FHIR_BASE_URI,
                 displayName = DISPLAY_NAME,
-                fhirVersion = fhirVersion,
+                fhirVersion = FHIR_VERSION,
             )
 
         val toString = createMedicalDataSourceRequest.toString()
@@ -104,9 +104,9 @@ class CreateMedicalDataSourceRequestTest {
     fun toPlatformCreateMedicalDataSourceRequest_expectCorrectConversion() {
         val createMedicalDataSourceRequest =
             CreateMedicalDataSourceRequest(
-                fhirBaseUri = fhirBaseUri,
+                fhirBaseUri = FHIR_BASE_URI,
                 displayName = DISPLAY_NAME,
-                fhirVersion = fhirVersion,
+                fhirVersion = FHIR_VERSION,
             )
 
         val platformCreateMedicalDataSourceRequest =
@@ -115,9 +115,9 @@ class CreateMedicalDataSourceRequestTest {
         assertThat(platformCreateMedicalDataSourceRequest)
             .isEqualTo(
                 PlatformCreateMedicalDataSourceRequestBuilder(
-                        fhirBaseUri,
+                        FHIR_BASE_URI,
                         DISPLAY_NAME,
-                        fhirVersion.platformFhirVersion,
+                        FHIR_VERSION.platformFhirVersion,
                     )
                     .build()
             )
@@ -125,7 +125,7 @@ class CreateMedicalDataSourceRequestTest {
 
     companion object {
         private const val DISPLAY_NAME = "Test Data Source"
-        private val fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/")
-        private val fhirVersion: FhirVersion by lazy { FhirVersion(4, 0, 1) }
+        private val FHIR_BASE_URI = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/")
+        private val FHIR_VERSION: FhirVersion by lazy { FhirVersion(4, 0, 1) }
     }
 }

@@ -28,6 +28,12 @@ internal typealias PlatformCreateMedicalDataSourceRequest =
 internal typealias PlatformCreateMedicalDataSourceRequestBuilder =
     android.health.connect.CreateMedicalDataSourceRequest.Builder
 
+internal typealias PlatformGetMedicalDataSourcesRequest =
+    android.health.connect.GetMedicalDataSourcesRequest
+
+internal typealias PlatformGetMedicalDataSourcesRequestBuilder =
+    android.health.connect.GetMedicalDataSourcesRequest.Builder
+
 internal typealias PlatformUpsertMedicalResourceRequest =
     android.health.connect.UpsertMedicalResourceRequest
 

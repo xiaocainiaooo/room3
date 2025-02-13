@@ -17,6 +17,7 @@
 package androidx.health.connect.client.impl
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.ext.SdkExtensions
 import androidx.health.connect.client.HealthConnectClient
@@ -34,6 +35,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.readRecord
 import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_IMMUNIZATION
+import androidx.health.connect.client.records.FhirVersion
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_RESOURCE_TYPE_VACCINES
 import androidx.health.connect.client.records.MedicalResourceId
@@ -46,6 +48,8 @@ import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
+import androidx.health.connect.client.request.CreateMedicalDataSourceRequest
+import androidx.health.connect.client.request.GetMedicalDataSourcesRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesInitialRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
@@ -897,6 +901,65 @@ class HealthConnectClientUpsideDownImplTest {
         )
         assertThat(healthConnectClient.permissionController.getGrantedPermissions())
             .containsExactlyElementsIn(getAllRecordPermissions())
+    }
+
+    @Ignore(
+        "TODO: b/383498168 - Remove Ignore and tearDown with deleteMedicalDataSource once available"
+    )
+    @Test
+    fun createMedicalDataSource_thenGetByRequest_expectSuccess() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+
+        // Create a MedicalDataSource
+        val createMedicalDataSourceResponse =
+            healthConnectClient.createMedicalDataSource(
+                CreateMedicalDataSourceRequest(
+                    fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/"),
+                    displayName = "Test Data Source",
+                    fhirVersion = FhirVersion(4, 0, 1)
+                )
+            )
+        assertThat(createMedicalDataSourceResponse.id).isNotEmpty()
+
+        // Retrieve newly created data source by request and verify retrieved == created response
+        val getMedicalDataSourcesByRequestResponse =
+            healthConnectClient.getMedicalDataSources(
+                GetMedicalDataSourcesRequest(listOf(createMedicalDataSourceResponse.packageName))
+            )
+        assertThat(getMedicalDataSourcesByRequestResponse)
+            .containsExactly(createMedicalDataSourceResponse)
+    }
+
+    @Ignore(
+        "TODO: b/383498168 - Remove Ignore and tearDown with deleteMedicalDataSource once available"
+    )
+    @Test
+    fun createMedicalDataSource_thenGetByIds_expectSuccess() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+
+        // Create a MedicalDataSource
+        val createMedicalDataSourceResponse =
+            healthConnectClient.createMedicalDataSource(
+                CreateMedicalDataSourceRequest(
+                    fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/"),
+                    displayName = "Test Data Source",
+                    fhirVersion = FhirVersion(4, 0, 1)
+                )
+            )
+        assertThat(createMedicalDataSourceResponse.id).isNotEmpty()
+
+        // Retrieve newly created data source by ID and verify retrieved == created response
+        val getMedicalDataSourcesByIdsResponse =
+            healthConnectClient.getMedicalDataSources(listOf(createMedicalDataSourceResponse.id))
+        assertThat(getMedicalDataSourcesByIdsResponse).hasSize(1)
+        assertThat(getMedicalDataSourcesByIdsResponse)
+            .containsExactly(createMedicalDataSourceResponse)
     }
 
     @Ignore(
