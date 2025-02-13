@@ -506,10 +506,32 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        var handled = event?.let { fastScrollGestureDetector?.handleEvent(it, width) } ?: false
+        // Needs to be set so that any ancestor of PdfView does not consume the touch event before
+        // the library does. This particularly creates an issue with zoom and scroll when integrated
+        // with the ViewPager library.
+        parent?.requestDisallowInterceptTouchEvent(true)
+
+        var handled =
+            event?.let { fastScrollGestureDetector?.handleEvent(it, parent, width) } ?: false
         handled = handled || maybeDragSelectionHandle(event)
-        handled = handled || event?.let { gestureTracker.feed(it) } ?: false
+        handled =
+            handled ||
+                event?.let { gestureTracker.feed(it, parent, isContentAtHorizontalEdges()) }
+                    ?: false
+
+        if (!handled) {
+            parent?.requestDisallowInterceptTouchEvent(false)
+        }
+
         return handled || super.onTouchEvent(event)
+    }
+
+    private fun isContentAtHorizontalEdges(): Boolean {
+        val leftContentEdgePx = -scrollX
+        val rightContentEdgePx =
+            toViewCoord(contentWidth.toFloat(), zoom, scrollX).toInt() - paddingRight - paddingLeft
+
+        return leftContentEdgePx == 0 || rightContentEdgePx == viewportWidth
     }
 
     private fun maybeShowFastScroller() {
@@ -531,6 +553,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 PointF(toContentX(event.x), toContentY(event.y)),
                 getVisibleAreaInContentCoords()
             )
+
+        if (event.action == MotionEvent.ACTION_UP) {
+            parent?.requestDisallowInterceptTouchEvent(false)
+        }
+
         return selectionStateManager?.maybeDragSelectionHandle(event.action, touchPoint, zoom) ==
             true
     }
