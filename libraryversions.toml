@@ -151,6 +151,7 @@ TESTSCREENSHOT = "1.0.0-alpha01"
 TEST_UIAUTOMATOR = "2.4.0-alpha01"
 TEXT = "1.0.0-alpha01"
 TRACING = "1.3.0-beta01"
+TRACING_DRIVER = "1.0.0-alpha01"
 TRACING_PERFETTO = "1.0.0"
 TRANSITION = "1.6.0-beta01"
 TV = "1.0.0-alpha12"
@@ -303,6 +304,7 @@ TESTSCREENSHOT = { group = "androidx.test.screenshot", atomicGroupVersion = "ver
 TEST_UIAUTOMATOR = { group = "androidx.test.uiautomator", atomicGroupVersion = "versions.TEST_UIAUTOMATOR" }
 TEXT = { group = "androidx.text", atomicGroupVersion = "versions.TEXT" }
 TRACING = { group = "androidx.tracing", atomicGroupVersion = "versions.TRACING" }
+TRACING_DRIVER = { group = "androidx.tracing", atomicGroupVersion = "versions.TRACING_DRIVER", overrideInclude = [ ":tracing:tracing-driver" ] }
 TRACING_PERFETTO = { group = "androidx.tracing", atomicGroupVersion = "versions.TRACING_PERFETTO", overrideInclude = [ ":tracing:tracing-perfetto", ":tracing:tracing-perfetto-binary", ":tracing:tracing-perfetto-handshake" ] }
 TRANSITION = { group = "androidx.transition", atomicGroupVersion = "versions.TRANSITION" }
 TV = { group = "androidx.tv" }
