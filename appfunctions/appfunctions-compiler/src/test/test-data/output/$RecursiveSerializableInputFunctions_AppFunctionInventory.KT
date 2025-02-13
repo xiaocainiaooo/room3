@@ -2,8 +2,14 @@ package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
+import kotlin.collections.List
 import kotlin.collections.Map
 
 /**
@@ -11,7 +17,186 @@ import kotlin.collections.Map
  * RecursiveSerializableInputFunctions.....kt
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$RecursiveSerializableInputFunctions_AppFunctionInventory_Impl` : AppFunctionInventory
-    {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
+public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFunctionInventory {
+  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+    "com.testdata.RecursiveSerializableInputFunctions#simpleFunction" to
+        ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionSerializableList" to
+        ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionSerializableListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializableList" to
+        ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionNullableSerializableListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializable" to
+        ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionNullableSerializableMetadataObject.APP_FUNCTION_METADATA,
+  )
+
+  private object ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
+
+    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = emptyMap(),
+            required = emptyList(),
+            qualifiedName = null,
+            isNullable = false
+        )
+
+    private val SERIALIZABLE_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "serializable",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+        )
+
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      SERIALIZABLE_PARAMETER_METADATA,
+    )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.RecursiveSerializableInputFunctions#simpleFunction",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
+  }
+
+  private object
+      ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionSerializableListMetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
+
+    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = emptyMap(),
+            required = emptyList(),
+            qualifiedName = null,
+            isNullable = false
+        )
+
+    private val SERIALIZABLE_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "serializable",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+        )
+
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      SERIALIZABLE_PARAMETER_METADATA,
+    )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id = "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionSerializableList",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
+  }
+
+  private object
+      ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionNullableSerializableListMetadataObject
+      {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
+
+    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = emptyMap(),
+            required = emptyList(),
+            qualifiedName = null,
+            isNullable = true
+        )
+
+    private val SERIALIZABLE_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "serializable",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+        )
+
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      SERIALIZABLE_PARAMETER_METADATA,
+    )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id =
+            "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializableList",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
+  }
+
+  private object
+      ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionNullableSerializableMetadataObject
+      {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
+
+    private val PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = emptyMap(),
+            required = emptyList(),
+            qualifiedName = null,
+            isNullable = true
+        )
+
+    private val SERIALIZABLE_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "serializable",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_SERIALIZABLE_OBJECT_DATA_TYPE
+        )
+
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      SERIALIZABLE_PARAMETER_METADATA,
+    )
+
+    private val PRIMITIVE_RESPONSE_VALUE_TYPE: AppFunctionPrimitiveTypeMetadata =
+        AppFunctionPrimitiveTypeMetadata(
+            type = 0,
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
+        )
+
+    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+            id =
+            "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializable",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA
+        )
+  }
 }
