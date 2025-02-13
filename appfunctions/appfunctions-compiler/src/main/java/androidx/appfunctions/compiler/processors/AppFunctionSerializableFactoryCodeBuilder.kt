@@ -336,8 +336,9 @@ class AppFunctionSerializableFactoryCodeBuilder(
 
     private val factoryInitStatements = buildCodeBlock {
         val factoryInstanceNameToClassMap: Map<String, ClassName> = buildMap {
-            for (serializableType in annotatedClass.getSerializablePropertyTypes()) {
-                val qualifiedName = serializableType.ensureQualifiedTypeName()
+            for (serializableType in annotatedClass.getSerializablePropertyTypeReferences()) {
+                val qualifiedName =
+                    serializableType.selfOrItemTypeReference.ensureQualifiedTypeName()
                 put(
                     "${qualifiedName.getShortName().lowerFirstChar()}Factory",
                     ClassName(

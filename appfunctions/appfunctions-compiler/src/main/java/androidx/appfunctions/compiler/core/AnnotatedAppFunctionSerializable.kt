@@ -23,7 +23,6 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.is
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
-import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ClassName
@@ -86,23 +85,40 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
     }
 
     /** Returns the properties that have @AppFunctionSerializable class types. */
-    fun getSerializablePropertyTypes(): Set<KSTypeReference> {
+    fun getSerializablePropertyTypeReferences(): Set<AppFunctionTypeReference> {
         return getProperties()
-            .map { property -> AppFunctionTypeReference(property.type) }
+            .map { param -> AppFunctionTypeReference(param.type) }
             .filter { afType ->
                 afType.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
                     afType.isOfTypeCategory(SERIALIZABLE_LIST)
             }
-            .map { afType -> afType.selfOrItemTypeReference }
             .toSet()
     }
 
     /**
-     * Returns the set of source files that contain the definition of the
-     * [appFunctionSerializableClass] and all the @AppFunctionSerializable classes that it contains.
+     * Returns the set of source files that contain the definition of [appFunctionSerializableClass]
+     * and all @AppFunctionSerializable classes directly reachable through its fields. This method
+     * differs from [getTransitiveSerializableSourceFiles] by excluding transitively
+     * nested @AppFunctionSerializable classes.
      */
-    // TODO(b/392587953): include sources of serializable properties
-    fun getSourceFiles(): Set<KSFile> {
+    fun getSerializableSourceFiles(): Set<KSFile> {
+        val sourceFileSet: MutableSet<KSFile> = mutableSetOf()
+        appFunctionSerializableClass.containingFile?.let { sourceFileSet.add(it) }
+        for (serializableAfType in getSerializablePropertyTypeReferences()) {
+            val appFunctionSerializableDefinition =
+                serializableAfType.selfOrItemTypeReference.resolve().declaration
+                    as KSClassDeclaration
+            appFunctionSerializableDefinition.containingFile?.let { sourceFileSet.add(it) }
+        }
+        return sourceFileSet
+    }
+
+    /**
+     * Returns the set of source files that contain the definition of [appFunctionSerializableClass]
+     * and all @AppFunctionSerializable classes transitively reachable through its fields or nested
+     * classes.
+     */
+    fun getTransitiveSerializableSourceFiles(): Set<KSFile> {
         val sourceFileSet: MutableSet<KSFile> = mutableSetOf()
         val visitedSerializableSet: MutableSet<ClassName> = mutableSetOf()
 
@@ -110,29 +126,15 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
         // seen
         appFunctionSerializableClass.containingFile?.let { sourceFileSet.add(it) }
         visitedSerializableSet.add(originalClassName)
-        traverseSerializableClassSourceFiles(
-            appFunctionSerializableClass,
-            sourceFileSet,
-            visitedSerializableSet
-        )
+        traverseSerializableClassSourceFiles(sourceFileSet, visitedSerializableSet)
         return sourceFileSet
     }
 
     private fun traverseSerializableClassSourceFiles(
-        serializableClassDefinition: KSClassDeclaration,
         sourceFileSet: MutableSet<KSFile>,
         visitedSerializableSet: MutableSet<ClassName>
     ) {
-        val parameters: List<KSValueParameter> =
-            serializableClassDefinition.primaryConstructor?.parameters ?: emptyList()
-        val serializableParamTypes =
-            parameters
-                .map { param -> AppFunctionTypeReference(param.type) }
-                .filter { afType ->
-                    afType.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
-                        afType.isOfTypeCategory(SERIALIZABLE_LIST)
-                }
-        for (serializableAfType in serializableParamTypes) {
+        for (serializableAfType in getSerializablePropertyTypeReferences()) {
             val appFunctionSerializableDefinition =
                 serializableAfType.selfOrItemTypeReference.resolve().declaration
                     as KSClassDeclaration
@@ -142,7 +144,8 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
             }
             // Process newly found serializable
             sourceFileSet.addAll(
-                AnnotatedAppFunctionSerializable(appFunctionSerializableDefinition).getSourceFiles()
+                AnnotatedAppFunctionSerializable(appFunctionSerializableDefinition)
+                    .getTransitiveSerializableSourceFiles()
             )
         }
     }

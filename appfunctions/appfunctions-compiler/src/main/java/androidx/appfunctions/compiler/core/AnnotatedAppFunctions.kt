@@ -146,7 +146,8 @@ data class AnnotatedAppFunctions(
                 val parameterTypeReference = AppFunctionTypeReference(ksValueParameter.type)
                 if (parameterTypeReference.typeOrItemTypeIsAppFunctionSerializable()) {
                     sourceFileSet.addAll(
-                        getAnnotatedAppFunctionSerializable(parameterTypeReference).getSourceFiles()
+                        getAnnotatedAppFunctionSerializable(parameterTypeReference)
+                            .getTransitiveSerializableSourceFiles()
                     )
                 }
             }
@@ -155,7 +156,8 @@ data class AnnotatedAppFunctions(
                 AppFunctionTypeReference(checkNotNull(functionDeclaration.returnType))
             if (returnTypeReference.typeOrItemTypeIsAppFunctionSerializable()) {
                 sourceFileSet.addAll(
-                    getAnnotatedAppFunctionSerializable(returnTypeReference).getSourceFiles()
+                    getAnnotatedAppFunctionSerializable(returnTypeReference)
+                        .getTransitiveSerializableSourceFiles()
                 )
             }
         }

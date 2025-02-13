@@ -144,8 +144,8 @@ class AppFunctionSerializableProcessor(
         codeGenerator
             .createNewFile(
                 Dependencies(
-                    aggregating = false,
-                    checkNotNull(annotatedClass.appFunctionSerializableClass.containingFile)
+                    aggregating = true,
+                    *annotatedClass.getSerializableSourceFiles().toTypedArray()
                 ),
                 annotatedClass.originalClassName.packageName,
                 generatedFactoryClassName
