@@ -27,11 +27,13 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnota
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -172,39 +174,45 @@ data class AnnotatedAppFunctions(
      * Creates a list of [AppFunctionMetadata] instances for each of the app functions defined in
      * this class.
      */
-    fun createAppFunctionMetadataList(): List<AppFunctionMetadata> =
-        appFunctionDeclarations.map { functionDeclaration ->
+    fun createAppFunctionMetadataList(): List<AppFunctionMetadata> {
+        val sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata> = mutableMapOf()
+        return appFunctionDeclarations.map { functionDeclaration ->
             val appFunctionAnnotationProperties =
                 computeAppFunctionAnnotationProperties(functionDeclaration)
-            val parameterTypeMetadataList = functionDeclaration.buildParameterTypeMetadataList()
+            val parameterTypeMetadataList =
+                functionDeclaration.buildParameterTypeMetadataList(sharedDataTypeMap)
             val responseTypeMetadata =
-                checkNotNull(functionDeclaration.returnType).toAppFunctionDataTypeMetadata()
+                checkNotNull(functionDeclaration.returnType)
+                    .toAppFunctionDataTypeMetadata(sharedDataTypeMap)
 
             AppFunctionMetadata(
                 id = getAppFunctionIdentifier(functionDeclaration),
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
                 schema = appFunctionAnnotationProperties.toAppFunctionSchemaMetadata(),
                 parameters = parameterTypeMetadataList,
-                response = AppFunctionResponseMetadata(valueType = responseTypeMetadata)
+                response = AppFunctionResponseMetadata(valueType = responseTypeMetadata),
+                components = AppFunctionComponentsMetadata(dataTypes = sharedDataTypeMap)
             )
         }
+    }
 
     /**
      * Builds a list of [AppFunctionParameterMetadata] for the parameters of an app function.
      *
      * Currently, only primitive parameters are supported.
      */
-    private fun KSFunctionDeclaration.buildParameterTypeMetadataList():
-        List<AppFunctionParameterMetadata> = buildList {
+    private fun KSFunctionDeclaration.buildParameterTypeMetadataList(
+        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>
+    ): List<AppFunctionParameterMetadata> = buildList {
         for (ksValueParameter in parameters) {
             if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
                 // Skip the first parameter which is always the `AppFunctionContext`.
                 continue
             }
 
-            // TODO: Support serializable and their collections
             val parameterName = checkNotNull(ksValueParameter.name).asString()
-            val dataTypeMetadata = ksValueParameter.type.toAppFunctionDataTypeMetadata()
+            val dataTypeMetadata =
+                ksValueParameter.type.toAppFunctionDataTypeMetadata(sharedDataTypeMap)
 
             add(
                 AppFunctionParameterMetadata(
@@ -217,36 +225,85 @@ data class AnnotatedAppFunctions(
         }
     }
 
-    private fun KSTypeReference.toAppFunctionDataTypeMetadata(): AppFunctionDataTypeMetadata {
-        val isNullable = resolve().isMarkedNullable
-        val afType = AppFunctionTypeReference(this)
-        return when (afType.typeCategory) {
+    private fun KSTypeReference.toAppFunctionDataTypeMetadata(
+        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>
+    ): AppFunctionDataTypeMetadata {
+        val appFunctionTypeReference = AppFunctionTypeReference(this)
+        return when (appFunctionTypeReference.typeCategory) {
             PRIMITIVE_SINGULAR ->
                 AppFunctionPrimitiveTypeMetadata(
-                    type = afType.toAppFunctionDataType(),
-                    isNullable = isNullable
+                    type = appFunctionTypeReference.toAppFunctionDataType(),
+                    isNullable = appFunctionTypeReference.isNullable
                 )
-            // TODO: Support array of @AppFunctionSerializable as well
             PRIMITIVE_ARRAY,
             PRIMITIVE_LIST ->
                 AppFunctionArrayTypeMetadata(
                     itemType =
                         AppFunctionPrimitiveTypeMetadata(
-                            type = afType.determineArrayItemType(),
+                            type = appFunctionTypeReference.determineArrayItemType(),
                             // TODO: Support List with nullable items.
                             isNullable = false
                         ),
-                    isNullable = isNullable
+                    isNullable = appFunctionTypeReference.isNullable
                 )
-            SERIALIZABLE_SINGULAR,
-            SERIALIZABLE_LIST ->
-                // TODO: Properly construct this when @AppFunctionSerializable is supported.
+            SERIALIZABLE_SINGULAR -> {
+                addSerializableTypeMetadataToSharedDataTypeMap(
+                    appFunctionTypeReference,
+                    sharedDataTypeMap
+                )
+                AppFunctionReferenceTypeMetadata(
+                    referenceDataType =
+                        appFunctionTypeReference.selfTypeReference
+                            .toTypeName()
+                            .ignoreNullable()
+                            .toString(),
+                    isNullable = appFunctionTypeReference.isNullable
+                )
+            }
+            SERIALIZABLE_LIST -> {
+                addSerializableTypeMetadataToSharedDataTypeMap(
+                    appFunctionTypeReference,
+                    sharedDataTypeMap
+                )
+                AppFunctionArrayTypeMetadata(
+                    itemType =
+                        AppFunctionReferenceTypeMetadata(
+                            referenceDataType =
+                                appFunctionTypeReference.itemTypeReference
+                                    .toTypeName()
+                                    .ignoreNullable()
+                                    .toString(),
+                            // TODO: Support List with nullable items.
+                            isNullable = false
+                        ),
+                    isNullable = appFunctionTypeReference.isNullable
+                )
+            }
+        }
+    }
+
+    // Todo: Add serializable types to components map
+    private fun addSerializableTypeMetadataToSharedDataTypeMap(
+        serializableTypeReference: AppFunctionTypeReference,
+        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>
+    ) {
+        val serializableTypeReferenceQualifier =
+            serializableTypeReference.selfOrItemTypeReference
+                .toTypeName()
+                .ignoreNullable()
+                .toString()
+
+        if (!sharedDataTypeMap.containsKey(serializableTypeReferenceQualifier)) {
+            // TODO: Actually build object type for unseen AppFunctionSerializable
+            val serializableTypeMetadata =
                 AppFunctionObjectTypeMetadata(
                     properties = emptyMap(),
                     required = emptyList(),
-                    qualifiedName = null,
-                    isNullable = isNullable
+                    qualifiedName = serializableTypeReferenceQualifier,
+                    isNullable = serializableTypeReference.isNullable
                 )
+            // Immediately add this type as seen
+            sharedDataTypeMap.put(serializableTypeReferenceQualifier, serializableTypeMetadata)
         }
     }
 

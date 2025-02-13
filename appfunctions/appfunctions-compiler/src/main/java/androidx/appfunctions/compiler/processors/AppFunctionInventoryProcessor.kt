@@ -29,6 +29,7 @@ import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -141,6 +142,7 @@ class AppFunctionInventoryProcessor(
                 functionMetadata.response
             )
             addPropertyForAppFunctionMetadata(functionMetadataObjectClassBuilder, functionMetadata)
+            // TODO: Add appfunction component properties
             inventoryClassBuilder.addType(functionMetadataObjectClassBuilder.build())
         }
         addFunctionIdToMetadataMapProperty(inventoryClassBuilder, appFunctionMetadataList)
@@ -215,6 +217,15 @@ class AppFunctionInventoryProcessor(
                         castDataType
                     )
                     objectReturnTypeMetadataPropertyName
+                }
+                is AppFunctionReferenceTypeMetadata -> {
+                    val referenceReturnTypeMetadataPropertyName = "REFERENCE_RESPONSE_VALUE_TYPE"
+                    addPropertyForReferenceTypeMetadata(
+                        referenceReturnTypeMetadataPropertyName,
+                        functionMetadataObjectClassBuilder,
+                        castDataType
+                    )
+                    referenceReturnTypeMetadataPropertyName
                 }
                 else -> {
                     // TODO provide KSNode to improve error message
@@ -319,6 +330,16 @@ class AppFunctionInventoryProcessor(
                     )
                     objectTypeMetadataPropertyName
                 }
+                is AppFunctionReferenceTypeMetadata -> {
+                    val referenceTypeMetadataPropertyName =
+                        getReferenceTypeMetadataPropertyNameForParameter(parameterMetadata)
+                    addPropertyForReferenceTypeMetadata(
+                        referenceTypeMetadataPropertyName,
+                        functionMetadataObjectClassBuilder,
+                        castDataType
+                    )
+                    referenceTypeMetadataPropertyName
+                }
                 else -> {
                     // TODO provide KSNode to improve error message
                     throw ProcessingException(
@@ -411,6 +432,15 @@ class AppFunctionInventoryProcessor(
                     )
                     objectItemTypeVariableName
                 }
+                is AppFunctionReferenceTypeMetadata -> {
+                    val referenceItemTypeVariableName = propertyName + "_REFERENCE_ITEM_TYPE"
+                    addPropertyForReferenceTypeMetadata(
+                        referenceItemTypeVariableName,
+                        functionMetadataObjectClassBuilder,
+                        castItemType
+                    )
+                    referenceItemTypeVariableName
+                }
                 else -> {
                     // TODO provide KSNode to improve error message
                     throw ProcessingException(
@@ -439,6 +469,37 @@ class AppFunctionInventoryProcessor(
                             IntrospectionHelper.APP_FUNCTION_ARRAY_TYPE_METADATA_CLASS,
                             itemTypeVariableName,
                             arrayTypeMetadata.isNullable
+                        )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForReferenceTypeMetadata(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        referenceTypeMetadata: AppFunctionReferenceTypeMetadata,
+    ) {
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    IntrospectionHelper.APP_FUNCTION_REFERENCE_TYPE_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                referenceDataType = %S,
+                                isNullable = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_REFERENCE_TYPE_METADATA_CLASS,
+                            referenceTypeMetadata.referenceDataType,
+                            referenceTypeMetadata.isNullable
                         )
                     }
                 )
@@ -607,6 +668,18 @@ class AppFunctionInventoryProcessor(
         parameterMetadata: AppFunctionParameterMetadata
     ): String {
         return "PARAMETER_METADATA_${parameterMetadata.name.uppercase()}_OBJECT_DATA_TYPE"
+    }
+
+    /**
+     * Generates the name of the property for the reference type metadata of a parameter.
+     *
+     * @param parameterMetadata The metadata of the parameter.
+     * @return The name of the property.
+     */
+    private fun getReferenceTypeMetadataPropertyNameForParameter(
+        parameterMetadata: AppFunctionParameterMetadata
+    ): String {
+        return "PARAMETER_METADATA_${parameterMetadata.name.uppercase()}_REFERENCE_DATA_TYPE"
     }
 
     companion object {
