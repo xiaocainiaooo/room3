@@ -20,12 +20,15 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.RestrictTo;
@@ -496,6 +499,25 @@ public class FastScrollView extends FrameLayout implements PaginationModelObserv
         if (mPaginationModel == null || !mPaginationModel.isInitialized()) {
             throw new IllegalStateException("PaginationModel not initialized!");
         }
+    }
+
+    /**
+     * Sets the scrollbar thumb drawable.
+     *
+     * @param thumbDrawable the [StateListDrawable] to set, or null to clear.
+     */
+    public void setFastScrollVerticalThumbDrawable(@Nullable StateListDrawable thumbDrawable) {
+        ((ImageView) mDragHandle).setImageDrawable(thumbDrawable);
+    }
+
+
+    /**
+     * Sets the page indicator background.
+     *
+     * @param pageIndicatorDrawable the Drawable to set, or null to clear.
+     */
+    public void setPageIndicatorBackgroundDrawable(@Nullable Drawable pageIndicatorDrawable) {
+        mPageIndicator.setBackground(pageIndicatorDrawable);
     }
 
     /**

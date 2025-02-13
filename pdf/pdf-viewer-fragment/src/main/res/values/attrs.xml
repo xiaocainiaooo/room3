@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  Copyright 2024 The Android Open Source Project
+  Copyright 2025 The Android Open Source Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,7 +14,9 @@
   limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="?attr/colorSurfaceContainerHigh" />
-</shape>
+<resources>
+    <declare-styleable name="PdfViewerFragment">
+        <!-- identifier of style resource to be applied on pdf viewer container. -->
+        <attr name="containerStyle" format="reference" />
+    </declare-styleable>
+</resources>
