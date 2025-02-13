@@ -247,9 +247,16 @@ package androidx.savedstate.serialization.serializers {
     property public final kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
+  public final class MutableStateFlowSerializer<T> implements kotlinx.serialization.KSerializer<kotlinx.coroutines.flow.MutableStateFlow<T>> {
+    ctor public MutableStateFlowSerializer(kotlinx.serialization.KSerializer<T> valueSerializer);
+    method public kotlinx.coroutines.flow.MutableStateFlow<T> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, kotlinx.coroutines.flow.MutableStateFlow<T> value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
+  }
+
   public final class MutableStateFlowSerializerKt {
-    method public static inline <reified T> kotlinx.serialization.KSerializer<kotlinx.coroutines.flow.MutableStateFlow<T>> MutableStateFlowSerializer();
-    method public static <T> kotlinx.serialization.KSerializer<kotlinx.coroutines.flow.MutableStateFlow<T>> MutableStateFlowSerializer(kotlinx.serialization.KSerializer<T> serializer);
+    method public static inline <reified T> androidx.savedstate.serialization.serializers.MutableStateFlowSerializer<T> MutableStateFlowSerializer();
   }
 
   public final class ParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.os.Parcelable[]> {

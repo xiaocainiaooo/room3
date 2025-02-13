@@ -36,39 +36,24 @@ import kotlinx.serialization.serializer
  * [KSerializer] for serialization and deserialization of [MutableStateFlow].
  *
  * @param T The type of the value stored in the [MutableStateFlow].
- * @return A [KSerializer] for handling [MutableStateFlow] containing a [Serializable] type [T].
+ * @return A [MutableStateFlowSerializer] for handling [MutableStateFlow] containing a
+ *   [Serializable] type [T].
  */
-public inline fun <reified T> MutableStateFlowSerializer(): KSerializer<MutableStateFlow<T>> {
+public inline fun <reified T> MutableStateFlowSerializer(): MutableStateFlowSerializer<T> {
     return MutableStateFlowSerializer(serializer())
 }
 
 /**
- * Creates a [KSerializer] for a [MutableStateFlow] containing a [Serializable] value of type [T].
+ * A [KSerializer] for [MutableStateFlow].
  *
- * This function allows for explicit specification of the [KSerializer] for the state type [T]. It
- * provides serialization and deserialization capabilities for [MutableStateFlow] objects.
- *
- * @param T The type of the value stored in the [MutableStateFlow].
- * @param serializer The [KSerializer] for the [Serializable] type [T].
- * @return A [KSerializer] for handling [MutableStateFlow] containing a [Serializable] type [T].
- */
-public fun <T> MutableStateFlowSerializer(
-    serializer: KSerializer<T>
-): KSerializer<MutableStateFlow<T>> {
-    return MutableStateFlowSerializerImpl<T>(serializer)
-}
-
-/**
- * Internal implementation of [KSerializer] for [MutableStateFlow].
- *
- * This private class wraps a [KSerializer] for the inner value type [T], enabling serialization and
+ * This class wraps a [KSerializer] for the inner value type [T], enabling serialization and
  * deserialization of [MutableStateFlow] instances. The inner value serialization is delegated to
  * the provided [valueSerializer].
  *
  * @param T The type of the value stored in the [MutableStateFlow].
- * @property valueSerializer The [KSerializer] used to serialize and deserialize the inner value.
+ * @param valueSerializer The [KSerializer] used to serialize and deserialize the inner value.
  */
-private class MutableStateFlowSerializerImpl<T>(
+public class MutableStateFlowSerializer<T>(
     private val valueSerializer: KSerializer<T>,
 ) : KSerializer<MutableStateFlow<T>> {
     @OptIn(ExperimentalSerializationApi::class)

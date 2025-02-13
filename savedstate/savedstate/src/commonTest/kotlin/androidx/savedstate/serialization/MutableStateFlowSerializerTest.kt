@@ -60,6 +60,21 @@ internal class MutableStateFlowSerializerTest : RobolectricTest() {
         assertThat(state.value).isEqualTo(decoded.value)
     }
 
+    @Test
+    fun serializerOnProperties() {
+        @Serializable
+        data class Foo(
+            @Serializable(with = MutableStateFlowSerializer::class)
+            val state: MutableStateFlow<User>
+        )
+
+        val original = Foo(MutableStateFlow(USER_JOHN_DOE))
+        val encoded = encodeToSavedState(original)
+        val decoded = decodeFromSavedState<Foo>(encoded)
+
+        assertThat(decoded.state.value).isEqualTo(original.state.value)
+    }
+
     companion object {
         val USER_JOHN_DOE = User(name = "John", surname = "Doe")
         @OptIn(InternalSerializationApi::class) val USER_SERIALIZER = User::class.serializer()
