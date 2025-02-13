@@ -22,7 +22,6 @@ import androidx.benchmark.traceprocessor.Insight
 import androidx.benchmark.traceprocessor.PerfettoTrace
 import androidx.benchmark.traceprocessor.StartupInsights
 import androidx.benchmark.traceprocessor.TraceProcessor
-import androidx.benchmark.traceprocessor.runSingleSessionServer
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
