@@ -87,17 +87,21 @@ fun VerticalDragHandle(
                 .hoverable(interactionSource)
                 .pressable(interactionSource, { isPressed = true }, { isPressed = false })
                 .graphicsLayer {
-                    shape = if (isDragged || isPressed) shapes.pressedShape else shapes.defaultShape
+                    shape =
+                        when {
+                            isDragged -> shapes.draggedShape
+                            isPressed -> shapes.pressedShape
+                            else -> shapes.shape
+                        }
                     clip = true
                 }
                 .layout { measurable, _ ->
                     val dragHandleSize =
-                        if (isDragged || isPressed) {
-                                sizes.pressedSize
-                            } else {
-                                sizes.defaultSize
-                            }
-                            .toSize()
+                        when {
+                            isDragged -> sizes.draggedSize
+                            isPressed -> sizes.pressedSize
+                            else -> sizes.size
+                        }.toSize()
                     // set constraints here to be the size needed
                     val placeable =
                         measurable.measure(
@@ -110,7 +114,11 @@ fun VerticalDragHandle(
                 }
                 .drawBehind {
                     drawRect(
-                        if (isDragged || isPressed) colors.pressedColor else colors.defaultColor
+                        when {
+                            isDragged -> colors.draggedColor
+                            isPressed -> colors.pressedColor
+                            else -> colors.color
+                        }
                     )
                 }
                 .indication(interactionSource, ripple())
@@ -120,22 +128,25 @@ fun VerticalDragHandle(
 /**
  * Specifies the colors that will be used in a drag handle in different states.
  *
- * @param defaultColor the default color of the drag handle when it's not being pressed.
- * @param pressedColor the color of the drag handle when it's being pressed or dragged.
+ * @param color the default color of the drag handle when it's not being pressed.
+ * @param pressedColor the color of the drag handle when it's being pressed.
+ * @param draggedColor the color of the drag handle when it's being dragged.
  */
 @Immutable
-class DragHandleColors(val defaultColor: Color, val pressedColor: Color) {
+class DragHandleColors(val color: Color, val pressedColor: Color, val draggedColor: Color) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || other !is DragHandleColors) return false
-        if (defaultColor != other.defaultColor) return false
+        if (color != other.color) return false
         if (pressedColor != other.pressedColor) return false
+        if (draggedColor != other.draggedColor) return false
         return true
     }
 
     override fun hashCode(): Int {
-        var result = defaultColor.hashCode()
+        var result = color.hashCode()
         result = 31 * result + pressedColor.hashCode()
+        result = 31 * result + draggedColor.hashCode()
         return result
     }
 }
@@ -143,22 +154,25 @@ class DragHandleColors(val defaultColor: Color, val pressedColor: Color) {
 /**
  * Specifies the shapes that will be used in a drag handle in different states.
  *
- * @param defaultShape the default shape of the drag handle when it's not being pressed.
- * @param pressedShape the shape of the drag handle when it's being pressed or dragged.
+ * @param shape the default shape of the drag handle when it's not being pressed.
+ * @param pressedShape the shape of the drag handle when it's being pressed.
+ * @param draggedShape the shape of the drag handle when it's being dragged.
  */
 @Immutable
-class DragHandleShapes(val defaultShape: Shape, val pressedShape: Shape) {
+class DragHandleShapes(val shape: Shape, val pressedShape: Shape, val draggedShape: Shape) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || other !is DragHandleShapes) return false
-        if (defaultShape != other.defaultShape) return false
+        if (shape != other.shape) return false
         if (pressedShape != other.pressedShape) return false
+        if (draggedShape != other.draggedShape) return false
         return true
     }
 
     override fun hashCode(): Int {
-        var result = defaultShape.hashCode()
+        var result = shape.hashCode()
         result = 31 * result + pressedShape.hashCode()
+        result = 31 * result + draggedShape.hashCode()
         return result
     }
 }
@@ -166,22 +180,25 @@ class DragHandleShapes(val defaultShape: Shape, val pressedShape: Shape) {
 /**
  * Specifies the sizes that will be used in a drag handle in different states.
  *
- * @param defaultSize the default size of the drag handle when it's not being pressed.
- * @param pressedSize the size of the drag handle when it's being pressed or dragged.
+ * @param size the default size of the drag handle when it's not being pressed.
+ * @param pressedSize the size of the drag handle when it's being pressed.
+ * @param draggedSize the size of the drag handle when it's being dragged.
  */
 @Immutable
-class DragHandleSizes(val defaultSize: DpSize, val pressedSize: DpSize) {
+class DragHandleSizes(val size: DpSize, val pressedSize: DpSize, val draggedSize: DpSize) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || other !is DragHandleSizes) return false
-        if (defaultSize != other.defaultSize) return false
+        if (size != other.size) return false
         if (pressedSize != other.pressedSize) return false
+        if (draggedSize != other.draggedSize) return false
         return true
     }
 
     override fun hashCode(): Int {
-        var result = defaultSize.hashCode()
+        var result = size.hashCode()
         result = 31 * result + pressedSize.hashCode()
+        result = 31 * result + draggedSize.hashCode()
         return result
     }
 }
@@ -198,20 +215,24 @@ object VerticalDragHandleDefaults {
      * Creates a [DragHandleColors] that represents the default and pressed colors used in an
      * [VerticalDragHandle].
      *
-     * @param defaultColor provides a different color to override the default color of the drag
-     *   handle when it's not being pressed.
+     * @param color provides a different color to override the default color of the drag handle when
+     *   it's not being pressed.
      * @param pressedColor provides a different color to override the color of the drag handle when
-     *   it's being pressed or dragged.
+     *   it's being pressed.
+     * @param draggedColor provides a different color to override the color of the drag handle when
+     *   it's being dragged.
      */
     @Composable
     fun colors(
-        defaultColor: Color = Color.Unspecified,
-        pressedColor: Color = Color.Unspecified
+        color: Color = Color.Unspecified,
+        pressedColor: Color = Color.Unspecified,
+        draggedColor: Color = Color.Unspecified
     ): DragHandleColors =
         with(MaterialTheme.colorScheme.colors) {
             DragHandleColors(
-                defaultColor.takeOrElse { this.defaultColor },
+                color.takeOrElse { this.color },
                 pressedColor.takeOrElse { this.pressedColor },
+                draggedColor.takeOrElse { this.draggedColor },
             )
         }
 
@@ -225,17 +246,24 @@ object VerticalDragHandleDefaults {
      * Creates a [DragHandleShapes] that represents the default and pressed shapes used in an
      * [VerticalDragHandle].
      *
-     * @param defaultShape provides a different shape to override the default shape of the drag
-     *   handle when it's not being pressed.
+     * @param shape provides a different shape to override the default shape of the drag handle when
+     *   it's not being pressed.
      * @param pressedShape provides a different shape to override the shape of the drag handle when
-     *   it's being pressed or dragged.
+     *   it's being pressed.
+     * @param draggedShape provides a different shape to override the shape of the drag handle when
+     *   it's being dragged.
      */
     @Composable
-    fun shapes(defaultShape: Shape? = null, pressedShape: Shape? = null): DragHandleShapes =
+    fun shapes(
+        shape: Shape? = null,
+        pressedShape: Shape? = null,
+        draggedShape: Shape? = null
+    ): DragHandleShapes =
         with(MaterialTheme.shapes.shapes) {
             DragHandleShapes(
-                defaultShape ?: this.defaultShape,
+                shape ?: this.shape,
                 pressedShape ?: this.pressedShape,
+                draggedShape ?: this.draggedShape,
             )
         }
 
@@ -243,24 +271,29 @@ object VerticalDragHandleDefaults {
      * Creates a [DragHandleSizes] that represents the default and pressed sizes used in an
      * [VerticalDragHandle].
      *
-     * @param defaultSize provides a different size to override the default size of the drag handle
-     *   when it's not being pressed.
+     * @param size provides a different size to override the default size of the drag handle when
+     *   it's not being pressed.
      * @param pressedSize provides a different size to override the size of the drag handle when
-     *   it's being pressed or dragged.
+     *   it's being pressed.
+     * @param draggedSize provides a different size to override the size of the drag handle when
+     *   it's being dragged.
      */
     fun sizes(
-        defaultSize: DpSize = DpSize(DragHandleTokens.Width, DragHandleTokens.Height),
-        pressedSize: DpSize = DpSize(DragHandleTokens.PressedWidth, DragHandleTokens.PressedHeight)
-    ): DragHandleSizes = DragHandleSizes(defaultSize, pressedSize)
+        size: DpSize = DpSize(DragHandleTokens.Width, DragHandleTokens.Height),
+        pressedSize: DpSize = DpSize(DragHandleTokens.PressedWidth, DragHandleTokens.PressedHeight),
+        draggedSize: DpSize = DpSize(DragHandleTokens.DraggedWidth, DragHandleTokens.DraggedHeight)
+    ): DragHandleSizes = DragHandleSizes(size, pressedSize, draggedSize)
 
-    internal val Sizes = sizes()
+    /** The default sizes in different states of a [VerticalDragHandle]. */
+    val Sizes = sizes()
 
     private val ColorScheme.colors: DragHandleColors
         get() {
             return defaultVerticalDragHandleColorsCached
                 ?: DragHandleColors(
-                        defaultColor = fromToken(DragHandleTokens.Color),
+                        color = fromToken(DragHandleTokens.Color),
                         pressedColor = fromToken(DragHandleTokens.PressedColor),
+                        draggedColor = fromToken(DragHandleTokens.DraggedColor),
                     )
                     .also { defaultVerticalDragHandleColorsCached = it }
         }
@@ -269,8 +302,9 @@ object VerticalDragHandleDefaults {
         get() {
             return defaultVerticalDragHandleShapesCached
                 ?: DragHandleShapes(
-                        defaultShape = fromToken(DragHandleTokens.Shape),
+                        shape = fromToken(DragHandleTokens.Shape),
                         pressedShape = fromToken(DragHandleTokens.PressedShape),
+                        draggedShape = fromToken(DragHandleTokens.DraggedShape),
                     )
                     .also { defaultVerticalDragHandleShapesCached = it }
         }
