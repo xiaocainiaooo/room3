@@ -26,7 +26,7 @@ import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.TypeName
 
 /** Represents a type that is supported by AppFunction and AppFunctionSerializable. */
-class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
+class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
 
     /**
      * The category of this reference type.
@@ -35,21 +35,21 @@ class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
      * a list of strings will have a category of PRIMITIVE_LIST.
      */
     val typeCategory: AppFunctionSupportedTypeCategory by lazy {
-        val typeName = ksTypeReference.toTypeName().ignoreNullable().toString()
+        val typeName = selfTypeReference.toTypeName().ignoreNullable().toString()
         if (typeName in SUPPORTED_COLLECTION_TYPES) {
             PRIMITIVE_LIST
         } else if (typeName in SUPPORTED_SINGLE_PRIMITIVE_TYPES) {
             PRIMITIVE_SINGULAR
         } else if (typeName in SUPPORTED_ARRAY_PRIMITIVE_TYPES) {
             PRIMITIVE_ARRAY
-        } else if (isAppFunctionSerializableListType(ksTypeReference)) {
+        } else if (isAppFunctionSerializableListType(selfTypeReference)) {
             SERIALIZABLE_LIST
-        } else if (isAppFunctionSerializableType(ksTypeReference)) {
+        } else if (isAppFunctionSerializableType(selfTypeReference)) {
             SERIALIZABLE_SINGULAR
         } else {
             throw ProcessingException(
-                "Unsupported type reference ${ksTypeReference.ensureQualifiedTypeName().asString()}",
-                ksTypeReference
+                "Unsupported type reference ${selfTypeReference.ensureQualifiedTypeName().asString()}",
+                selfTypeReference
             )
         }
     }
@@ -59,7 +59,17 @@ class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
      *
      * @return true if the type is nullable, false otherwise.
      */
-    val isNullable: Boolean by lazy { ksTypeReference.toTypeName().isNullable }
+    val isNullable: Boolean by lazy { selfTypeReference.toTypeName().isNullable }
+
+    /**
+     * The type reference of the list element if the type reference is a list.
+     *
+     * @return the type reference of the list element if the type reference is a list, null
+     *   otherwise.
+     */
+    val itemTypeReference: KSTypeReference by lazy { ->
+        checkNotNull(selfTypeReference.resolveItemTypeReference())
+    }
 
     /**
      * The type reference itself or the type reference of the list element if the type reference is
@@ -67,7 +77,11 @@ class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
      * will be String.
      */
     val selfOrItemTypeReference: KSTypeReference by lazy {
-        ksTypeReference.resolveTypeOrItemTypeReference()
+        if (selfTypeReference.isOfType(LIST)) {
+            itemTypeReference
+        } else {
+            selfTypeReference
+        }
     }
 
     /**
@@ -85,11 +99,11 @@ class AppFunctionTypeReference(val ksTypeReference: KSTypeReference) {
      *
      * If the parameter type is a list, it will resolve the type reference of the list element.
      */
-    private fun KSTypeReference.resolveTypeOrItemTypeReference(): KSTypeReference {
+    private fun KSTypeReference.resolveItemTypeReference(): KSTypeReference? {
         return if (isOfType(LIST)) {
             resolveListParameterizedType()
         } else {
-            this
+            null
         }
     }
 

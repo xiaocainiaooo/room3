@@ -21,8 +21,6 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionS
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.PRIMITIVE_SINGULAR
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_LIST
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_SINGULAR
-import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.BYTE_ARRAY_LIST_TYPE
-import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.STRING_LIST_TYPE
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.SUPPORTED_TYPES_STRING
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.isSupportedType
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
@@ -254,56 +252,49 @@ data class AnnotatedAppFunctions(
 
     private fun AppFunctionTypeReference.toAppFunctionDataType(): Int {
         return when (this.typeCategory) {
+            PRIMITIVE_SINGULAR -> selfTypeReference.toAppFunctionDatatype()
+            SERIALIZABLE_SINGULAR -> AppFunctionDataTypeMetadata.TYPE_OBJECT
             PRIMITIVE_ARRAY,
             PRIMITIVE_LIST,
             SERIALIZABLE_LIST -> AppFunctionDataTypeMetadata.TYPE_ARRAY
-            SERIALIZABLE_SINGULAR -> AppFunctionDataTypeMetadata.TYPE_OBJECT
-            PRIMITIVE_SINGULAR ->
-                when (this.ksTypeReference.toTypeName().ignoreNullable().toString()) {
-                    String::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_STRING
-                    Int::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_INT
-                    Long::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_LONG
-                    Float::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_FLOAT
-                    Double::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
-                    Boolean::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
-                    Unit::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_UNIT
-                    else ->
-                        throw ProcessingException(
-                            "Unsupported type reference ${ksTypeReference.ensureQualifiedTypeName().asString()}",
-                            ksTypeReference
-                        )
-                }
         }
     }
 
     private fun AppFunctionTypeReference.determineArrayItemType(): Int {
         return when (this.typeCategory) {
             SERIALIZABLE_LIST -> AppFunctionDataTypeMetadata.TYPE_OBJECT
-            PRIMITIVE_ARRAY,
-            PRIMITIVE_LIST ->
-                when (this.ksTypeReference.toTypeName().ignoreNullable().toString()) {
-                    IntArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_INT
-                    LongArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_LONG
-                    FloatArray::class.ensureQualifiedName() ->
-                        AppFunctionDataTypeMetadata.TYPE_FLOAT
-                    DoubleArray::class.ensureQualifiedName() ->
-                        AppFunctionDataTypeMetadata.TYPE_DOUBLE
-                    BooleanArray::class.ensureQualifiedName() ->
-                        AppFunctionDataTypeMetadata.TYPE_BOOLEAN
-                    ByteArray::class.ensureQualifiedName(),
-                    BYTE_ARRAY_LIST_TYPE -> AppFunctionDataTypeMetadata.TYPE_BYTES
-                    STRING_LIST_TYPE -> AppFunctionDataTypeMetadata.TYPE_STRING
-                    else ->
-                        throw ProcessingException(
-                            "Unsupported type reference ${ksTypeReference.ensureQualifiedTypeName().asString()}",
-                            ksTypeReference
-                        )
-                }
+            PRIMITIVE_ARRAY -> selfTypeReference.toAppFunctionDatatype()
+            PRIMITIVE_LIST -> itemTypeReference.toAppFunctionDatatype()
             PRIMITIVE_SINGULAR,
             SERIALIZABLE_SINGULAR ->
                 throw ProcessingException(
-                    "Not a supported array type ${ksTypeReference.ensureQualifiedTypeName().asString()}",
-                    ksTypeReference
+                    "Not a supported array type " +
+                        selfTypeReference.ensureQualifiedTypeName().asString(),
+                    selfTypeReference
+                )
+        }
+    }
+
+    private fun KSTypeReference.toAppFunctionDatatype(): Int {
+        return when (this.toTypeName().ignoreNullable().toString()) {
+            String::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_STRING
+            Int::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_INT
+            Long::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_LONG
+            Float::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_FLOAT
+            Double::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
+            Boolean::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+            Unit::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_UNIT
+            Byte::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BYTES
+            IntArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_INT
+            LongArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_LONG
+            FloatArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_FLOAT
+            DoubleArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
+            BooleanArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+            ByteArray::class.ensureQualifiedName() -> AppFunctionDataTypeMetadata.TYPE_BYTES
+            else ->
+                throw ProcessingException(
+                    "Unsupported type reference " + this.ensureQualifiedTypeName().asString(),
+                    this
                 )
         }
     }
