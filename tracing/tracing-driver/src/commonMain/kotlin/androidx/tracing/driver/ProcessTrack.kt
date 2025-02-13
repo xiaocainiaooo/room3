@@ -29,19 +29,55 @@ public open class ProcessTrack(
     /** The name of the process. */
     internal val name: String,
 ) : EventTrack(context = context, uuid = monotonicId()) {
-    internal val lock = Lock()
+    internal val packetLock = Any()
     internal val threads = mutableScatterMapOf<String, ThreadTrack>()
     internal val counters = mutableScatterMapOf<String, CounterTrack>()
 
     init {
         emitPacket(immediateDispatch = true) { packet ->
-            packet.setPreamble(
-                this,
-                MutableTrackDescriptor(
-                    uuid = uuid,
-                    process = MutableProcessDescriptor(id, process_name = name)
+            synchronized(packetLock) {
+                packet.setPreamble(
+                    this,
+                    MutableTrackDescriptor(
+                        uuid = uuid,
+                        process = MutableProcessDescriptor(id, process_name = name)
+                    )
                 )
-            )
+            }
+        }
+    }
+
+    public override fun beginSection(name: String, flowIds: List<Long>) {
+        if (context.isEnabled) {
+            synchronized(packetLock) {
+                emitPacket { packet ->
+                    packet.setBeginSectionWithFlows(uuid, sequenceId, name, flowIds)
+                }
+            }
+        }
+    }
+
+    public override fun beginSection(name: String) {
+        if (context.isEnabled) {
+            synchronized(packetLock) {
+                emitPacket { packet -> packet.setBeginSection(uuid, sequenceId, name) }
+            }
+        }
+    }
+
+    public override fun endSection() {
+        if (context.isEnabled) {
+            synchronized(packetLock) {
+                emitPacket { packet -> packet.setEndSection(uuid, sequenceId) }
+            }
+        }
+    }
+
+    public override fun instant() {
+        if (context.isEnabled) {
+            synchronized(packetLock) {
+                emitPacket { packet -> packet.setInstantEvent(uuid, sequenceId) }
+            }
         }
     }
 
@@ -54,7 +90,7 @@ public open class ProcessTrack(
         // Therefore we end up combining the `name` of the thread and its `id` as a key.
         val key = "$id/$name"
         return threads[key]
-            ?: lock.withLock {
+            ?: synchronized(threads) {
                 val track =
                     threads.getOrPut(key) { ThreadTrack(id = id, name = name, process = this) }
                 check(track.name == name)
@@ -65,7 +101,7 @@ public open class ProcessTrack(
     /** @return A [CounterTrack] for a given [ProcessTrack] and the provided counter [name]. */
     public open fun getOrCreateCounterTrack(name: String): CounterTrack {
         return counters[name]
-            ?: lock.withLock {
+            ?: synchronized(counters) {
                 counters.getOrPut(name) { CounterTrack(name = name, parent = this) }
             }
     }

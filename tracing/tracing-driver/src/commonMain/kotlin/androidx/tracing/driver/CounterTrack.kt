@@ -26,29 +26,37 @@ public open class CounterTrack(
     /** The parent track the counter belongs to. */
     private val parent: Track
 ) : Track(context = parent.context, uuid = monotonicId()) {
+    internal val packetLock = Any()
+
     init {
-        emitPacket(immediateDispatch = true) { packet ->
-            packet.setPreamble(
-                this,
-                MutableTrackDescriptor(
-                    name = name,
-                    uuid = uuid,
-                    parent_uuid = parent.uuid,
-                    counter = MutableCounterDescriptor()
+        synchronized(packetLock) {
+            emitPacket(immediateDispatch = true) { packet ->
+                packet.setPreamble(
+                    this,
+                    MutableTrackDescriptor(
+                        name = name,
+                        uuid = uuid,
+                        parent_uuid = parent.uuid,
+                        counter = MutableCounterDescriptor()
+                    )
                 )
-            )
+            }
         }
     }
 
     public fun setCounter(value: Long) {
         if (context.isEnabled) {
-            emitPacket { packet -> packet.setLongCounter(uuid, sequenceId, value) }
+            synchronized(packetLock) {
+                emitPacket { packet -> packet.setLongCounter(uuid, sequenceId, value) }
+            }
         }
     }
 
     public fun setCounter(value: Double) {
         if (context.isEnabled) {
-            emitPacket { packet -> packet.setDoubleCounter(uuid, sequenceId, value) }
+            synchronized(packetLock) {
+                emitPacket { packet -> packet.setDoubleCounter(uuid, sequenceId, value) }
+            }
         }
     }
 }
