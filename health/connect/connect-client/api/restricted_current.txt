@@ -1946,7 +1946,6 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public final class Metadata {
-    ctor @Deprecated public Metadata(int recordingMethod, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin, optional java.time.Instant lastModifiedTime, optional String? clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
     method public static androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device);
     method public static androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId);
     method public static androidx.health.connect.client.records.metadata.Metadata activelyRecorded(androidx.health.connect.client.records.metadata.Device device, String clientRecordId, optional long clientRecordVersion);
