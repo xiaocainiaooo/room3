@@ -100,9 +100,7 @@ fun ButtonGroup(
     content: @Composable ButtonGroupScope.() -> Unit
 ) {
     // TODO Load the motionScheme tokens from the component tokens file
-    // MotionSchemeKeyTokens.DefaultEffects is intentional here to prevent
-    // any bounce in this component.
-    val defaultAnimationSpec = MotionSchemeKeyTokens.DefaultEffects.value<Float>()
+    val defaultAnimationSpec = MotionSchemeKeyTokens.FastSpatial.value<Float>()
     val anim = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
     var pressedIndex by remember { mutableIntStateOf(-1) }
