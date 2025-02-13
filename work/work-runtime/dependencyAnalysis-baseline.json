@@ -52,24 +52,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.lifecycle:lifecycle-livedata",
-        "resolvedVersion": "2.6.2"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "androidx.lifecycle:lifecycle-service",
-        "resolvedVersion": "2.6.2"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.room:room-common",
         "resolvedVersion": "2.6.1"
       },

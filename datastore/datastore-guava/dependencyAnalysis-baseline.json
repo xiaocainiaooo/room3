@@ -53,14 +53,6 @@
     {
       "coordinates": {
         "type": "project",
-        "identifier": ":datastore:datastore"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
         "identifier": ":datastore:datastore-core"
       },
       "toConfiguration": "api"

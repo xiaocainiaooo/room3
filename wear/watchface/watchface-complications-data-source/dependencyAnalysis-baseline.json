@@ -4,6 +4,13 @@
     {
       "coordinates": {
         "type": "module",
+        "identifier": "wear-sdk.jar"
+      },
+      "fromConfiguration": "testImplementation"
+    },
+    {
+      "coordinates": {
+        "type": "module",
         "identifier": "androidx.core:core",
         "resolvedVersion": "1.7.0"
       },
@@ -16,15 +23,6 @@
         "resolvedVersion": "1.1.0"
       },
       "fromConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "androidx.test:core",
-        "resolvedVersion": "1.7.0-alpha01"
-      },
-      "fromConfiguration": "testImplementation",
-      "toConfiguration": "testRuntimeOnly"
     },
     {
       "coordinates": {
@@ -62,11 +60,10 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "org.jspecify:jspecify",
-        "resolvedVersion": "1.0.0"
+        "identifier": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+        "resolvedVersion": "1.7.3"
       },
-      "fromConfiguration": "api",
-      "toConfiguration": "testImplementation"
+      "toConfiguration": "implementation"
     },
     {
       "coordinates": {
@@ -99,14 +96,6 @@
         "resolvedVersion": "4.14"
       },
       "toConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:watchface:watchface-complications"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

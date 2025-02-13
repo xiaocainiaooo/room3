@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.annotation:annotation-experimental",
-        "resolvedVersion": "1.4.1"
-      },
-      "fromConfiguration": "androidTestImplementation",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.annotation:annotation",
         "resolvedVersion": "1.8.1"
       },

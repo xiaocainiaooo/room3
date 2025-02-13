@@ -20,24 +20,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.vectordrawable:vectordrawable-animated",
-        "resolvedVersion": "1.1.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "androidx.vectordrawable:vectordrawable",
-        "resolvedVersion": "1.1.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "com.google.truth:truth",
         "resolvedVersion": "1.0.1"
       },

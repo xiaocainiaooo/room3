@@ -57,14 +57,6 @@
         "identifier": ":wear:protolayout:protolayout-expression"
       },
       "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:protolayout:protolayout-proto"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

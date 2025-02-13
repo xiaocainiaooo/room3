@@ -33,14 +33,6 @@
         "resolvedVersion": "4.13.2"
       },
       "toConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:protolayout:protolayout-proto"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

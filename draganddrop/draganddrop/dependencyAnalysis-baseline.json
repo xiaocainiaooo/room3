@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.appcompat:appcompat",
-        "resolvedVersion": "1.4.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test:core",
         "resolvedVersion": "1.7.0-alpha01"
       },

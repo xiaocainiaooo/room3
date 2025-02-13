@@ -28,15 +28,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.crypto.tink:tink-android",
-        "resolvedVersion": "1.5.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "com.google.guava:guava",
         "resolvedVersion": "28.1-android"
       },

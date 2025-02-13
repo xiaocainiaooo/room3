@@ -40,15 +40,6 @@
         "resolvedVersion": "2.5.1"
       },
       "fromConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "com.google.dagger:hilt-android",
-        "resolvedVersion": "2.54"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

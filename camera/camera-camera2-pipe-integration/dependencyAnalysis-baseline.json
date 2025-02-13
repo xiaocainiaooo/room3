@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.annotation:annotation-experimental",
-        "resolvedVersion": "1.4.1"
-      },
-      "fromConfiguration": "androidTestImplementation",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.arch.core:core-common",
         "resolvedVersion": "2.1.0"
       },
@@ -89,15 +80,6 @@
         "resolvedVersion": "1.7.0-alpha01"
       },
       "fromConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "com.google.dagger:dagger",
-        "resolvedVersion": "2.54"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     },
     {
       "coordinates": {
@@ -237,14 +219,6 @@
         "resolvedVersion": "4.14"
       },
       "toConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":camera:camera-camera2-pipe"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     },
     {
       "coordinates": {

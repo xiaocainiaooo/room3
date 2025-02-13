@@ -65,14 +65,6 @@
       },
       "fromConfiguration": "testImplementation",
       "toConfiguration": "testRuntimeOnly"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":security:security-state"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

@@ -8,23 +8,6 @@
         "resolvedVersion": "2.28.4"
       },
       "fromConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "org.jspecify:jspecify",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":fragment:fragment-testing-manifest"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     }
   ]
 }

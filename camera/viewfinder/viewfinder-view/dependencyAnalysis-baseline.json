@@ -20,15 +20,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.test.espresso:espresso-idling-resource",
-        "resolvedVersion": "3.7.0-alpha01"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test:monitor",
         "resolvedVersion": "1.8.0-alpha01"
       },
@@ -75,15 +66,6 @@
         "resolvedVersion": "33.3.1-jre"
       },
       "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "com.google.guava:listenablefuture",
-        "resolvedVersion": "1.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     },
     {
       "coordinates": {

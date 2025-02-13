@@ -20,15 +20,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.squareup.moshi:moshi",
-        "resolvedVersion": "1.13.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "com.squareup.okio:okio",
         "resolvedVersion": "3.9.1"
       },

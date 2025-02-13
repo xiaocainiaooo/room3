@@ -36,24 +36,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.core:core",
-        "resolvedVersion": "1.13.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "androidx.customview:customview-poolingcontainer",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.lifecycle:lifecycle-viewmodel",
         "resolvedVersion": "2.8.3"
       },

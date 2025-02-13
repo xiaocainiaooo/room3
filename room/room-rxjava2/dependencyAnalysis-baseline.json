@@ -12,15 +12,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.arch.core:core-runtime",
-        "resolvedVersion": "2.2.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.lifecycle:lifecycle-livedata",
         "resolvedVersion": "2.0.0"
       },

@@ -23,14 +23,6 @@
         "identifier": ":appcompat:appcompat-resources"
       },
       "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":asynclayoutinflater:asynclayoutinflater"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

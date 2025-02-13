@@ -45,15 +45,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.guava:guava",
-        "resolvedVersion": "33.3.1-jre"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.jetbrains.kotlin:kotlin-reflect",
         "resolvedVersion": "1.8.22"
       },
@@ -109,14 +100,6 @@
         "resolvedVersion": "4.14"
       },
       "toConfiguration": "testImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":health:connect:connect-client-proto"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

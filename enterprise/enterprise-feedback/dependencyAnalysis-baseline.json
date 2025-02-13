@@ -13,15 +13,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.auto.value:auto-value-annotations",
-        "resolvedVersion": "1.6.3"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.robolectric:annotations",
         "resolvedVersion": "4.14"
       },

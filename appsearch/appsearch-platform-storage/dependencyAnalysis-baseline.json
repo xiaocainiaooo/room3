@@ -12,15 +12,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.concurrent:concurrent-futures",
-        "resolvedVersion": "1.1.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test:rules",
         "resolvedVersion": "1.7.0-alpha01"
       },
@@ -40,14 +31,6 @@
         "identifier": "com.google.guava:listenablefuture",
         "resolvedVersion": "1.0"
       },
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":appsearch:appsearch"
-      },
-      "fromConfiguration": "implementation",
       "toConfiguration": "api"
     }
   ]

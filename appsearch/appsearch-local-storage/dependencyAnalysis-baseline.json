@@ -52,14 +52,6 @@
     {
       "coordinates": {
         "type": "project",
-        "identifier": ":appsearch:appsearch"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
         "identifier": ":appsearch:appsearch-external-protobuf"
       },
       "fromConfiguration": "implementation"
