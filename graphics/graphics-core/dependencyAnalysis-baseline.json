@@ -28,15 +28,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.core:core",
-        "resolvedVersion": "1.8.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test:core",
         "resolvedVersion": "1.7.0-alpha01"
       },

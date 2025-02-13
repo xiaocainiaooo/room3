@@ -17,14 +17,6 @@
         "resolvedVersion": "1.7.3"
       },
       "fromConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":core:core-performance"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

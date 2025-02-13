@@ -20,15 +20,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.lifecycle:lifecycle-common",
-        "resolvedVersion": "2.6.2"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.lifecycle:lifecycle-viewmodel",
         "resolvedVersion": "2.6.2"
       },
@@ -73,14 +64,6 @@
         "resolvedVersion": "1.7.3"
       },
       "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":privacysandbox:activity:activity-core"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

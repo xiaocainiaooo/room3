@@ -36,15 +36,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.fragment:fragment",
-        "resolvedVersion": "1.3.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.legacy:legacy-support-v4",
         "resolvedVersion": "1.0.0"
       },
@@ -80,23 +71,6 @@
         "identifier": "androidx.recyclerview:recyclerview",
         "resolvedVersion": "1.0.0"
       },
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "com.google.guava:guava",
-        "resolvedVersion": "31.1-android"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":appsearch:appsearch"
-      },
-      "fromConfiguration": "implementation",
       "toConfiguration": "api"
     }
   ]

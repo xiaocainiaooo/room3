@@ -28,15 +28,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.core:core",
-        "resolvedVersion": "1.13.1"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.lifecycle:lifecycle-common",
         "resolvedVersion": "2.6.2"
       },
@@ -114,14 +105,6 @@
         "identifier": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
         "resolvedVersion": "1.7.3"
       },
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":pdf:pdf-document-service"
-      },
-      "fromConfiguration": "api",
       "toConfiguration": "implementation"
     }
   ]

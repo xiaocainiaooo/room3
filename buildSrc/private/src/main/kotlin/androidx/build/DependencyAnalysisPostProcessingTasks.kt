@@ -205,6 +205,7 @@ internal fun Project.configureDependencyAnalysisPlugin() {
         extensions.getByType(com.autonomousapps.DependencyAnalysisSubExtension::class.java)
     dependencyAnalysisSubExtension.registerPostProcessingTask(reportDependencyAnalysisAdviceTask)
     dependencyAnalysisSubExtension.registerPostProcessingTask(updateDependencyAnalysisBaselineTask)
+    dependencyAnalysisSubExtension.issues { it.onIncorrectConfiguration { it.severity("ignore") } }
 }
 
 /**

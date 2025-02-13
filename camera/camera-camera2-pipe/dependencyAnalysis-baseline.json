@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.dagger:dagger",
-        "resolvedVersion": "2.54"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "com.google.truth:truth",
         "resolvedVersion": "1.0.1"
       },

@@ -28,15 +28,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.test.uiautomator:uiautomator",
-        "resolvedVersion": "2.2.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test:core",
         "resolvedVersion": "1.7.0-alpha01"
       },
@@ -71,15 +62,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.tracing:tracing-perfetto-handshake",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.tracing:tracing-perfetto",
         "resolvedVersion": "1.0.0"
       },
@@ -93,24 +75,6 @@
         "resolvedVersion": "5.2.1"
       },
       "fromConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "junit:junit",
-        "resolvedVersion": "4.13.2"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
-        "identifier": "org.jspecify:jspecify",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     },
     {
       "coordinates": {

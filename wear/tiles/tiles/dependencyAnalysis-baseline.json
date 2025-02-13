@@ -80,14 +80,6 @@
         "identifier": ":wear:protolayout:protolayout-proto"
       },
       "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:tiles:tiles-proto"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

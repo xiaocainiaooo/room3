@@ -21,15 +21,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.guava:guava",
-        "resolvedVersion": "33.2.1-jre"
-      },
-      "fromConfiguration": "androidTestImplementation",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.jetbrains.kotlinx:kotlinx-coroutines-guava",
         "resolvedVersion": "1.7.3"
       },
@@ -56,14 +47,6 @@
         "identifier": ":wear:protolayout:protolayout-expression"
       },
       "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:protolayout:protolayout-expression-pipeline"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

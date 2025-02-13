@@ -29,15 +29,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.wear.protolayout:protolayout-expression-pipeline",
-        "resolvedVersion": "1.0.0"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
         "resolvedVersion": "1.7.3"
       },

@@ -36,15 +36,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.wear:wear",
-        "resolvedVersion": "1.2.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.robolectric:annotations",
         "resolvedVersion": "4.14"
       },

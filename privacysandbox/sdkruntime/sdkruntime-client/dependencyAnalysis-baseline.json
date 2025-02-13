@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.activity:activity",
-        "resolvedVersion": "1.9.3"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.annotation:annotation",
         "resolvedVersion": "1.8.2"
       },

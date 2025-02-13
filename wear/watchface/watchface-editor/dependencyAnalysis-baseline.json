@@ -84,15 +84,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
-        "resolvedVersion": "1.7.3"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
         "resolvedVersion": "1.7.3"
       },
@@ -118,14 +109,6 @@
         "identifier": ":wear:watchface:watchface-complications-data"
       },
       "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":wear:watchface:watchface-data"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
     },
     {
       "coordinates": {

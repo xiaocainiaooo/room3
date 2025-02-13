@@ -32,14 +32,6 @@
         "resolvedVersion": "1.8.0-alpha01"
       },
       "toConfiguration": "androidTestImplementation"
-    },
-    {
-      "coordinates": {
-        "type": "project",
-        "identifier": ":core:core-performance"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
     }
   ]
 }

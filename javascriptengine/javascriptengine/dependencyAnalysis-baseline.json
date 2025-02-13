@@ -4,15 +4,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "androidx.concurrent:concurrent-futures",
-        "resolvedVersion": "1.1.0"
-      },
-      "fromConfiguration": "api",
-      "toConfiguration": "implementation"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "androidx.test:rules",
         "resolvedVersion": "1.7.0-alpha01"
       },

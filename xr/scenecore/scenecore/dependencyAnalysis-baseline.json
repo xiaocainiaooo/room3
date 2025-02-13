@@ -85,15 +85,6 @@
     {
       "coordinates": {
         "type": "module",
-        "identifier": "com.google.ar:impress",
-        "resolvedVersion": "0.0.2"
-      },
-      "fromConfiguration": "implementation",
-      "toConfiguration": "api"
-    },
-    {
-      "coordinates": {
-        "type": "module",
         "identifier": "com.google.guava:guava",
         "resolvedVersion": "33.3.1-jre"
       },
