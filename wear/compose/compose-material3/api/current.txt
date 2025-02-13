@@ -1805,8 +1805,8 @@ package androidx.wear.compose.material3.lazy {
   public interface TransformedPainterScope {
     method public float getItemHeight(androidx.compose.ui.graphics.drawscope.DrawScope);
     method public long getScrollProgress();
-    property public abstract float itemHeight;
-    property public abstract long scrollProgress;
+    property public abstract float androidx.compose.ui.graphics.drawscope.DrawScope.itemHeight;
+    property public abstract long androidx.compose.ui.graphics.drawscope.DrawScope.scrollProgress;
   }
 
 }

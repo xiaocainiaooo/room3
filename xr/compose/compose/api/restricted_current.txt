@@ -787,15 +787,15 @@ package @RequiresApi(34) androidx.xr.compose.unit {
     property @kotlin.PublishedApi internal float DP_PER_METER;
     property public float Infinity;
     property public float NaN;
-    property public float centimeters;
-    property public float centimeters;
-    property public float centimeters;
-    property public float meters;
-    property public float meters;
-    property public float meters;
-    property public float millimeters;
-    property public float millimeters;
-    property public float millimeters;
+    property public float int.centimeters;
+    property public float float.centimeters;
+    property public float double.centimeters;
+    property public float int.meters;
+    property public float float.meters;
+    property public float double.meters;
+    property public float int.millimeters;
+    property public float float.millimeters;
+    property public float double.millimeters;
   }
 
   public final class MeterKt {

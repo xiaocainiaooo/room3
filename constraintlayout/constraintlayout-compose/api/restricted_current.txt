@@ -250,10 +250,10 @@ package androidx.constraintlayout.compose {
     method public static androidx.constraintlayout.compose.Dimension getAtLeastWrapContent(androidx.constraintlayout.compose.Dimension.MinCoercible);
     method public static androidx.constraintlayout.compose.Dimension.MinCoercible getAtMostWrapContent(androidx.constraintlayout.compose.Dimension.Coercible);
     method public static androidx.constraintlayout.compose.Dimension getAtMostWrapContent(androidx.constraintlayout.compose.Dimension.MaxCoercible);
-    property public static androidx.constraintlayout.compose.Dimension.MaxCoercible atLeastWrapContent;
-    property public static androidx.constraintlayout.compose.Dimension atLeastWrapContent;
-    property public static androidx.constraintlayout.compose.Dimension.MinCoercible atMostWrapContent;
-    property public static androidx.constraintlayout.compose.Dimension atMostWrapContent;
+    property public static androidx.constraintlayout.compose.Dimension.MaxCoercible androidx.constraintlayout.compose.Dimension.Coercible.atLeastWrapContent;
+    property public static androidx.constraintlayout.compose.Dimension androidx.constraintlayout.compose.Dimension.MinCoercible.atLeastWrapContent;
+    property public static androidx.constraintlayout.compose.Dimension.MinCoercible androidx.constraintlayout.compose.Dimension.Coercible.atMostWrapContent;
+    property public static androidx.constraintlayout.compose.Dimension androidx.constraintlayout.compose.Dimension.MaxCoercible.atMostWrapContent;
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker public final class ConstraintLayoutScope extends androidx.constraintlayout.compose.ConstraintLayoutBaseScope {
@@ -288,8 +288,8 @@ package androidx.constraintlayout.compose {
     method public static Object? getConstraintLayoutId(androidx.compose.ui.layout.Measurable);
     method public static Object? getConstraintLayoutTag(androidx.compose.ui.layout.Measurable);
     method public static androidx.compose.ui.Modifier layoutId(androidx.compose.ui.Modifier, String layoutId, optional String? tag);
-    property public static Object? constraintLayoutId;
-    property public static Object? constraintLayoutTag;
+    property public static Object? androidx.compose.ui.layout.Measurable.constraintLayoutId;
+    property public static Object? androidx.compose.ui.layout.Measurable.constraintLayoutTag;
   }
 
   public interface ConstraintLayoutTagParentData {
@@ -842,7 +842,7 @@ package androidx.constraintlayout.compose {
     method public float getStaggeredWeight(androidx.constraintlayout.compose.ConstrainScope);
     method public void setStaggeredWeight(androidx.constraintlayout.compose.ConstrainScope, float);
     method public void transition(androidx.constraintlayout.compose.ConstraintSetRef from, androidx.constraintlayout.compose.ConstraintSetRef to, optional String? name, kotlin.jvm.functions.Function1<? super androidx.constraintlayout.compose.TransitionScope,kotlin.Unit> transitionContent);
-    property public float staggeredWeight;
+    property public float androidx.constraintlayout.compose.ConstrainScope.staggeredWeight;
   }
 
   public final class MotionSceneScope.ConstrainedLayoutReferences {
@@ -1043,7 +1043,7 @@ package androidx.constraintlayout.compose {
   public final class ToolingUtilsKt {
     method public static androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.constraintlayout.compose.DesignInfoProvider> getDesignInfoDataKey();
     property public static androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.constraintlayout.compose.DesignInfoProvider> DesignInfoDataKey;
-    property @kotlin.PublishedApi internal static androidx.constraintlayout.compose.DesignInfoProvider designInfoProvider;
+    property @kotlin.PublishedApi internal static androidx.constraintlayout.compose.DesignInfoProvider androidx.compose.ui.semantics.SemanticsPropertyReceiver.designInfoProvider;
     field @kotlin.PublishedApi internal static final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.constraintlayout.compose.DesignInfoProvider> designInfoProvider$delegate;
   }
 

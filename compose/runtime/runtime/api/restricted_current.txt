@@ -262,7 +262,7 @@ package androidx.compose.runtime {
     method @SuppressCompatibility @androidx.compose.runtime.ExperimentalComposeApi @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.ControlledComposition ControlledComposition(androidx.compose.runtime.Applier<? extends java.lang.Object?> applier, androidx.compose.runtime.CompositionContext parent, kotlin.coroutines.CoroutineContext recomposeCoroutineContext);
     method public static androidx.compose.runtime.ReusableComposition ReusableComposition(androidx.compose.runtime.Applier<? extends java.lang.Object?> applier, androidx.compose.runtime.CompositionContext parent);
     method @SuppressCompatibility @androidx.compose.runtime.ExperimentalComposeApi public static kotlin.coroutines.CoroutineContext getRecomposeCoroutineContext(androidx.compose.runtime.ControlledComposition);
-    property @SuppressCompatibility @androidx.compose.runtime.ExperimentalComposeApi public static kotlin.coroutines.CoroutineContext recomposeCoroutineContext;
+    property @SuppressCompatibility @androidx.compose.runtime.ExperimentalComposeApi public static kotlin.coroutines.CoroutineContext androidx.compose.runtime.ControlledComposition.recomposeCoroutineContext;
   }
 
   @androidx.compose.runtime.Stable public abstract sealed class CompositionLocal<T> {
@@ -272,7 +272,7 @@ package androidx.compose.runtime {
 
   public interface CompositionLocalAccessorScope {
     method public <T> T getCurrentValue(androidx.compose.runtime.CompositionLocal<T>);
-    property public abstract T currentValue;
+    property public abstract <T> T androidx.compose.runtime.CompositionLocal<T>.currentValue;
   }
 
   @androidx.compose.runtime.Stable public final class CompositionLocalContext {
@@ -443,7 +443,7 @@ package androidx.compose.runtime {
     method public static suspend inline <R> Object? withFrameMillis(androidx.compose.runtime.MonotonicFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
     method public static suspend <R> Object? withFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
     method public static suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
-    property @SuppressCompatibility @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.MonotonicFrameClock monotonicFrameClock;
+    property @SuppressCompatibility @androidx.compose.runtime.ExperimentalComposeApi public static androidx.compose.runtime.MonotonicFrameClock kotlin.coroutines.CoroutineContext.monotonicFrameClock;
   }
 
   @SuppressCompatibility @androidx.compose.runtime.InternalComposeApi public final class MovableContent<P> {

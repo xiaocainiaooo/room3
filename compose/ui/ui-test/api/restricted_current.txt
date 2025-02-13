@@ -263,23 +263,23 @@ package androidx.compose.ui.test {
     method @Deprecated @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public static void swipeUp(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
     method @Deprecated public static void swipeWithVelocity(androidx.compose.ui.test.GestureScope, long start, long end, float endVelocity, optional long durationMillis);
     method @Deprecated public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
-    property @Deprecated public static inline float bottom;
-    property @Deprecated public static long bottomCenter;
-    property @Deprecated public static long bottomLeft;
-    property @Deprecated public static long bottomRight;
-    property @Deprecated public static long center;
-    property @Deprecated public static long centerLeft;
-    property @Deprecated public static long centerRight;
-    property @Deprecated public static inline float centerX;
-    property @Deprecated public static inline float centerY;
-    property @Deprecated public static inline int height;
-    property @Deprecated public static inline float left;
-    property @Deprecated public static inline float right;
-    property @Deprecated public static inline float top;
-    property @Deprecated public static long topCenter;
-    property @Deprecated public static long topLeft;
-    property @Deprecated public static long topRight;
-    property @Deprecated public static inline int width;
+    property @Deprecated public static inline float androidx.compose.ui.test.GestureScope.bottom;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.bottomCenter;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.bottomLeft;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.bottomRight;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.center;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.centerLeft;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.centerRight;
+    property @Deprecated public static inline float androidx.compose.ui.test.GestureScope.centerX;
+    property @Deprecated public static inline float androidx.compose.ui.test.GestureScope.centerY;
+    property @Deprecated public static inline int androidx.compose.ui.test.GestureScope.height;
+    property @Deprecated public static inline float androidx.compose.ui.test.GestureScope.left;
+    property @Deprecated public static inline float androidx.compose.ui.test.GestureScope.right;
+    property @Deprecated public static inline float androidx.compose.ui.test.GestureScope.top;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.topCenter;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.topLeft;
+    property @Deprecated public static long androidx.compose.ui.test.GestureScope.topRight;
+    property @Deprecated public static inline int androidx.compose.ui.test.GestureScope.width;
   }
 
   public final class GlobalAssertions {
@@ -366,11 +366,11 @@ package androidx.compose.ui.test {
     method public static void withKeyToggled(androidx.compose.ui.test.KeyInjectionScope, long key, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
     method public static void withKeysDown(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
     method public static void withKeysToggled(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
-    property public static boolean isAltDown;
-    property public static boolean isCtrlDown;
-    property public static boolean isFnDown;
-    property public static boolean isMetaDown;
-    property public static boolean isShiftDown;
+    property public static boolean androidx.compose.ui.test.KeyInjectionScope.isAltDown;
+    property public static boolean androidx.compose.ui.test.KeyInjectionScope.isCtrlDown;
+    property public static boolean androidx.compose.ui.test.KeyInjectionScope.isFnDown;
+    property public static boolean androidx.compose.ui.test.KeyInjectionScope.isMetaDown;
+    property public static boolean androidx.compose.ui.test.KeyInjectionScope.isShiftDown;
   }
 
   public final class KeyInputHelpersKt {
@@ -558,7 +558,7 @@ package androidx.compose.ui.test {
 
   public final class TestMonotonicFrameClock_jvmKt {
     method @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
-    property @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public static long frameDelayMillis;
+    property @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public static long androidx.compose.ui.test.TestMonotonicFrameClock.frameDelayMillis;
   }
 
   public final class TextActionsKt {

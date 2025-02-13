@@ -119,20 +119,20 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline operator long times(float, long size);
     method @androidx.compose.runtime.Stable public static inline operator float times(int, float other);
     method @androidx.compose.runtime.Stable public static inline operator long times(int, long size);
-    property @androidx.compose.runtime.Stable public static long center;
-    property @androidx.compose.runtime.Stable public static inline float dp;
-    property @androidx.compose.runtime.Stable public static inline float dp;
-    property @androidx.compose.runtime.Stable public static inline float dp;
-    property @androidx.compose.runtime.Stable public static inline float height;
-    property @androidx.compose.runtime.Stable public static inline boolean isFinite;
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
-    property @androidx.compose.runtime.Stable public static inline long size;
-    property @androidx.compose.runtime.Stable public static inline float width;
+    property @androidx.compose.runtime.Stable public static long long.center;
+    property @androidx.compose.runtime.Stable public static inline float int.dp;
+    property @androidx.compose.runtime.Stable public static inline float double.dp;
+    property @androidx.compose.runtime.Stable public static inline float float.dp;
+    property @androidx.compose.runtime.Stable public static inline float androidx.compose.ui.unit.DpRect.height;
+    property @androidx.compose.runtime.Stable public static inline boolean float.isFinite;
+    property @androidx.compose.runtime.Stable public static inline boolean float.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean float.isUnspecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isUnspecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isUnspecified;
+    property @androidx.compose.runtime.Stable public static inline long androidx.compose.ui.unit.DpRect.size;
+    property @androidx.compose.runtime.Stable public static inline float androidx.compose.ui.unit.DpRect.width;
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class DpOffset {
@@ -338,7 +338,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect toIntRect(long);
     method @androidx.compose.runtime.Stable public static long toIntSize(long);
     method @androidx.compose.runtime.Stable public static long toSize(long);
-    property @androidx.compose.runtime.Stable public static long center;
+    property @androidx.compose.runtime.Stable public static long long.center;
   }
 
   public enum LayoutDirection {
@@ -382,14 +382,14 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline operator long times(double, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times(float, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times(int, long other);
-    property @androidx.compose.runtime.Stable public static long em;
-    property @androidx.compose.runtime.Stable public static long em;
-    property @androidx.compose.runtime.Stable public static long em;
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
-    property @androidx.compose.runtime.Stable public static long sp;
-    property @androidx.compose.runtime.Stable public static long sp;
-    property @androidx.compose.runtime.Stable public static long sp;
+    property @androidx.compose.runtime.Stable public static long float.em;
+    property @androidx.compose.runtime.Stable public static long double.em;
+    property @androidx.compose.runtime.Stable public static long int.em;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isUnspecified;
+    property @androidx.compose.runtime.Stable public static long float.sp;
+    property @androidx.compose.runtime.Stable public static long double.sp;
+    property @androidx.compose.runtime.Stable public static long int.sp;
   }
 
   @kotlin.jvm.JvmInline public final value class TextUnitType {
