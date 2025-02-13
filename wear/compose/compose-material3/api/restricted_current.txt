@@ -1749,6 +1749,23 @@ package androidx.wear.compose.material3 {
 
 package androidx.wear.compose.material3.lazy {
 
+  public sealed interface ResponsiveTransformationSpec extends androidx.wear.compose.material3.lazy.TransformationSpec {
+  }
+
+  public final class ResponsiveTransformationSpecDefaults {
+    method public int getLargeScreenSizeDp();
+    method public int getSmallScreenSizeDp();
+    method public androidx.wear.compose.material3.lazy.ResponsiveTransformationSpec largeScreenSpec(optional int screenSizeDp, optional @FloatRange(from=0.0, to=1.0) float minElementHeightFraction, optional @FloatRange(from=0.0, to=1.0) float maxElementHeightFraction, optional @FloatRange(from=0.0, to=1.0) float minTransitionAreaHeightFraction, optional @FloatRange(from=0.0, to=1.0) float maxTransitionAreaHeightFraction, optional androidx.compose.animation.core.Easing easing, optional androidx.wear.compose.material3.lazy.TransformationVariableSpec containerAlpha, optional androidx.wear.compose.material3.lazy.TransformationVariableSpec contentAlpha, optional androidx.wear.compose.material3.lazy.TransformationVariableSpec scale);
+    method public androidx.wear.compose.material3.lazy.ResponsiveTransformationSpec smallScreenSpec(optional int screenSizeDp, optional @FloatRange(from=0.0, to=1.0) float minElementHeightFraction, optional @FloatRange(from=0.0, to=1.0) float maxElementHeightFraction, optional @FloatRange(from=0.0, to=1.0) float minTransitionAreaHeightFraction, optional @FloatRange(from=0.0, to=1.0) float maxTransitionAreaHeightFraction, optional androidx.compose.animation.core.Easing easing, optional androidx.wear.compose.material3.lazy.TransformationVariableSpec containerAlpha, optional androidx.wear.compose.material3.lazy.TransformationVariableSpec contentAlpha, optional androidx.wear.compose.material3.lazy.TransformationVariableSpec scale);
+    property public int LargeScreenSizeDp;
+    property public int SmallScreenSizeDp;
+    field public static final androidx.wear.compose.material3.lazy.ResponsiveTransformationSpecDefaults INSTANCE;
+  }
+
+  public final class ResponsiveTransformationSpecKt {
+    method @androidx.compose.runtime.Composable public static androidx.wear.compose.material3.lazy.ResponsiveTransformationSpec rememberResponsiveTransformationSpec(androidx.wear.compose.material3.lazy.ResponsiveTransformationSpec... specs);
+  }
+
   public final class ScrollTransformKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier scrollTransform(androidx.compose.ui.Modifier, androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope scope);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.Modifier scrollTransform(androidx.compose.ui.Modifier, androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope scope, androidx.compose.ui.graphics.Shape shape, androidx.compose.ui.graphics.painter.Painter painter, optional androidx.compose.foundation.BorderStroke? border);
@@ -1757,6 +1774,39 @@ package androidx.wear.compose.material3.lazy {
 
   public final class TargetMorphingHeightKt {
     method public static androidx.compose.ui.Modifier targetMorphingHeight(androidx.compose.ui.Modifier, androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope scope);
+  }
+
+  public interface TransformationSpec {
+    method public void applyContainerTransformation(androidx.compose.ui.graphics.GraphicsLayerScope, long scrollProgress);
+    method public void applyContentTransformation(androidx.compose.ui.graphics.GraphicsLayerScope, long scrollProgress);
+    method public androidx.compose.ui.graphics.painter.Painter createTransformedPainter(androidx.wear.compose.material3.lazy.TransformedPainterScope, androidx.compose.ui.graphics.painter.Painter painter, androidx.compose.ui.graphics.Shape shape, androidx.compose.foundation.BorderStroke? border);
+    method public int getTransformedHeight(int measuredHeight, long scrollProgress);
+  }
+
+  public final class TransformationSpecKt {
+    method public static androidx.wear.compose.material3.lazy.TransformationVariableSpec lerp(androidx.wear.compose.material3.lazy.TransformationVariableSpec start, androidx.wear.compose.material3.lazy.TransformationVariableSpec stop, float progress);
+  }
+
+  public final class TransformationVariableSpec {
+    ctor public TransformationVariableSpec(@FloatRange(from=0.0, to=1.0) float topValue, optional @FloatRange(from=0.0, to=1.0) float targetValue, optional @FloatRange(from=0.0, to=1.0) float bottomValue, optional @FloatRange(from=0.0, to=1.0) float transformationZoneEnterFraction, optional @FloatRange(from=0.0, to=1.0) float transformationZoneExitFraction);
+    method public androidx.wear.compose.material3.lazy.TransformationVariableSpec copy(optional float topValue, optional float targetValue, optional float bottomValue, optional float transformationZoneEnterFraction, optional float transformationZoneExitFraction);
+    method public float getBottomValue();
+    method public float getTargetValue();
+    method public float getTopValue();
+    method public float getTransformationZoneEnterFraction();
+    method public float getTransformationZoneExitFraction();
+    property @FloatRange(from=0.0, to=1.0) public float bottomValue;
+    property @FloatRange(from=0.0, to=1.0) public float targetValue;
+    property @FloatRange(from=0.0, to=1.0) public float topValue;
+    property @FloatRange(from=0.0, to=1.0) public float transformationZoneEnterFraction;
+    property @FloatRange(from=0.0, to=1.0) public float transformationZoneExitFraction;
+  }
+
+  public interface TransformedPainterScope {
+    method public float getItemHeight(androidx.compose.ui.graphics.drawscope.DrawScope);
+    method public long getScrollProgress();
+    property public abstract float itemHeight;
+    property public abstract long scrollProgress;
   }
 
 }

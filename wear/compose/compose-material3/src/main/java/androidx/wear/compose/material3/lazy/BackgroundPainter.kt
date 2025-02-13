@@ -17,7 +17,6 @@
 package androidx.wear.compose.material3.lazy
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.runtime.State
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
@@ -77,8 +76,8 @@ internal class ScalingMorphingBackgroundPainter(
 }
 
 internal class BackgroundPainter(
-    private val transformState: State<TransformationState?>,
-    private val shape: Shape,
+    internal val transformState: DrawScope.() -> TransformationState?,
+    internal val shape: Shape,
     private val border: BorderStroke?,
     private val backgroundPainter: Painter
 ) : Painter() {
@@ -86,13 +85,12 @@ internal class BackgroundPainter(
         get() = Size.Unspecified
 
     override fun DrawScope.onDraw() {
-        transformState.value?.let {
-            val contentWidth =
-                (1f - 2 * (1f - it.backgroundXOffsetFraction)) * size.width * it.scale
+        transformState()?.let {
+            val contentWidth = size.width * it.scale
             val xOffset = (size.width - contentWidth) / 2f
 
             translate(xOffset, 0f) {
-                val placementHeight = it.morphedHeight * it.scale // Save as placement height ?
+                val placementHeight = it.itemHeight * it.scale // Save as placement height ?
                 val shapeOutline =
                     shape.createOutline(
                         Size(contentWidth, placementHeight),
@@ -107,7 +105,7 @@ internal class BackgroundPainter(
                             outline = shapeOutline,
                             brush = border.brush,
                             alpha = it.containerAlpha,
-                            style = Stroke(border.width.toPx())
+                            style = Stroke((border.width.toPx() * it.scale).coerceAtLeast(1f))
                         )
                     }
                     with(backgroundPainter) {
