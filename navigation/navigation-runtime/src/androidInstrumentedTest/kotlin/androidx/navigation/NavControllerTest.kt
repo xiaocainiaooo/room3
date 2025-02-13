@@ -3074,6 +3074,35 @@ class NavControllerTest {
 
     @UiThreadTest
     @Test
+    fun testNavigateOptionSaveStateNavControllerRestoreNonInclusive() {
+        val navController = createNavController()
+        navController.setViewModelStore(ViewModelStore())
+        navController.setGraph(R.navigation.nav_simple)
+        val navigator = navController.navigatorProvider.getNavigator(TestNavigator::class.java)
+        assertThat(navigator.backStack.size).isEqualTo(1)
+        val originalBackStackEntry = navigator.backStack[0]
+        val originalViewModel =
+            ViewModelProvider(originalBackStackEntry).get<TestAndroidViewModel>()
+        navController.navigate(
+            R.id.second_test,
+            null,
+            navOptions { popUpTo(R.id.start_test) { saveState = true } }
+        )
+        assertThat(navController.currentDestination?.id ?: 0).isEqualTo(R.id.second_test)
+        assertThat(navigator.backStack.size).isEqualTo(2)
+
+        val state = navController.saveState()
+
+        val restoredNavController = createNavController()
+        restoredNavController.restoreState(state)
+
+        assertThat(navController.currentDestination?.id ?: 0).isEqualTo(R.id.second_test)
+        assertThat(navigator.backStack.size).isEqualTo(2)
+        assertThat(originalViewModel.isCleared).isFalse()
+    }
+
+    @UiThreadTest
+    @Test
     fun testNavigateOptionPopUpToInAction() {
         val navController = createNavController()
         navController.setGraph(R.navigation.nav_simple)
