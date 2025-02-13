@@ -16,6 +16,9 @@
 
 package androidx.pdf
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.Lifecycle
 import androidx.test.platform.app.InstrumentationRegistry
@@ -24,13 +27,14 @@ internal object FragmentUtils {
 
     private const val TEST_DOCUMENT_FILE = "sample.pdf"
 
-    internal fun scenarioLoadDocument(
-        scenario: FragmentScenario<TestPdfViewerFragmentV2>,
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+    internal fun <T : Fragment> scenarioLoadDocument(
+        scenario: FragmentScenario<T>,
         filename: String = TEST_DOCUMENT_FILE,
         nextState: Lifecycle.State,
         orientation: Int,
         onDocumentLoading: (() -> Unit)? = null
-    ): FragmentScenario<TestPdfViewerFragmentV2> {
+    ): FragmentScenario<T> {
         val context = InstrumentationRegistry.getInstrumentation().context
         val inputStream = context.assets.open(filename)
 
@@ -42,8 +46,13 @@ internal object FragmentUtils {
         // Load the document in the fragment
         scenario.onFragment { fragment ->
             // Increment pdf load idling resource to wait for background task to complete.
-            fragment.pdfLoadingIdlingResource.increment()
-            fragment.documentUri = TestUtils.saveStream(inputStream, fragment.requireContext())
+            if (fragment is TestPdfViewerFragment) {
+                fragment.pdfLoadingIdlingResource.increment()
+                fragment.documentUri = TestUtils.saveStream(inputStream, fragment.requireContext())
+            } else if (fragment is TestPdfViewerFragmentV2) {
+                fragment.pdfLoadingIdlingResource.increment()
+                fragment.documentUri = TestUtils.saveStream(inputStream, fragment.requireContext())
+            }
         }
 
         return scenario
