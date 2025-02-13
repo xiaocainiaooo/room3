@@ -21,6 +21,7 @@ import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.records.metadata.Metadata
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
+import java.time.Instant.EPOCH
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 
@@ -33,9 +34,11 @@ class MetadataTestHelperTest {
     }
 
     @Test
-    fun createMetadataForTesting_allFieldsSet() = runTest {
+    fun populatedWithTestValues_allMetadataFieldsSet_copyValues() = runTest {
         val metadata =
             Metadata.activelyRecorded(
+                clientRecordId = "clientId",
+                clientRecordVersion = 321,
                 device =
                     Device(
                         manufacturer = "some company",
@@ -58,5 +61,20 @@ class MetadataTestHelperTest {
         assertThat(updatedMetadata.clientRecordId).isEqualTo(metadata.clientRecordId)
         assertThat(updatedMetadata.clientRecordVersion).isEqualTo(metadata.clientRecordVersion)
         assertThat(updatedMetadata.device).isEqualTo(metadata.device)
+    }
+
+    @Test
+    fun populatedWithTestValues_noMetadataFieldsSet_defaultValues() = runTest {
+        val metadata = Metadata.unknownRecordingMethod()
+        val updatedMetadata = metadata.populatedWithTestValues()
+
+        assertThat(updatedMetadata.id).isEqualTo("")
+        assertThat(updatedMetadata.dataOrigin).isEqualTo(DataOrigin(""))
+        assertThat(updatedMetadata.lastModifiedTime).isEqualTo(EPOCH)
+
+        assertThat(updatedMetadata.recordingMethod).isEqualTo(metadata.recordingMethod)
+        assertThat(updatedMetadata.clientRecordId).isNull()
+        assertThat(updatedMetadata.clientRecordVersion).isEqualTo(0)
+        assertThat(updatedMetadata.device).isNull()
     }
 }

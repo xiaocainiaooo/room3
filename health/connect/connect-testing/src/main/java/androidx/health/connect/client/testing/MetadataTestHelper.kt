@@ -17,8 +17,11 @@
 
 package androidx.health.connect.client.testing
 
+import androidx.health.connect.client.impl.converters.records.metadata
+import androidx.health.connect.client.impl.converters.records.toProto
 import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.platform.client.proto.DataProto
 import java.time.Instant
 
 /**
@@ -39,14 +42,24 @@ public fun Metadata.populatedWithTestValues(
     id: String = "",
     dataOrigin: DataOrigin = DataOrigin(""),
     lastModifiedTime: Instant = Instant.EPOCH,
-): Metadata =
-    @Suppress("DEPRECATION") // The constructor will become internal
-    Metadata(
-        recordingMethod = this.recordingMethod,
-        id = id,
-        dataOrigin = dataOrigin,
-        lastModifiedTime = lastModifiedTime,
-        clientRecordId = this.clientRecordId,
-        clientRecordVersion = this.clientRecordVersion,
-        device = this.device,
-    )
+): Metadata {
+    val obj = this
+    val dataProto =
+        DataProto.DataPoint.newBuilder()
+            .setRecordingMethod(this.recordingMethod)
+            .setUid(id)
+            .setUpdateTimeMillis(lastModifiedTime.toEpochMilli())
+            .setDataOrigin(
+                DataProto.DataOrigin.newBuilder().setApplicationId(dataOrigin.packageName).build()
+            )
+            .apply {
+                obj.device?.let { setDevice(it.toProto()) }
+                obj.clientRecordId?.let { setClientId(it) }
+                if (obj.clientRecordVersion > 0) {
+                    setClientVersion(obj.clientRecordVersion)
+                }
+            }
+            .build()
+
+    return dataProto.metadata
+}
