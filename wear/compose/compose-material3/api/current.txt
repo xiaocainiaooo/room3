@@ -718,8 +718,9 @@ package androidx.wear.compose.material3 {
   }
 
   public final class LevelIndicatorKt {
-    method @androidx.compose.runtime.Composable public static void LevelIndicator(kotlin.jvm.functions.Function0<java.lang.Float> value, optional androidx.compose.ui.Modifier modifier, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional boolean enabled, optional androidx.wear.compose.material3.LevelIndicatorColors colors, optional float strokeWidth, optional float sweepAngle, optional boolean reverseDirection);
-    method @androidx.compose.runtime.Composable public static void LevelIndicator(kotlin.jvm.functions.Function0<java.lang.Integer> value, kotlin.ranges.IntProgression valueProgression, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.wear.compose.material3.LevelIndicatorColors colors, optional float strokeWidth, optional float sweepAngle, optional boolean reverseDirection);
+    method @androidx.compose.runtime.Composable public static void LevelIndicator(kotlin.jvm.functions.Function0<java.lang.Float> value, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.wear.compose.material3.LevelIndicatorColors colors, optional float strokeWidth, optional float sweepAngle, optional boolean reverseDirection);
+    method @androidx.compose.runtime.Composable public static void StepperLevelIndicator(kotlin.jvm.functions.Function0<java.lang.Float> value, optional androidx.compose.ui.Modifier modifier, optional kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional boolean enabled, optional androidx.wear.compose.material3.LevelIndicatorColors colors, optional float strokeWidth, optional float sweepAngle, optional boolean reverseDirection);
+    method @androidx.compose.runtime.Composable public static void StepperLevelIndicator(kotlin.jvm.functions.Function0<java.lang.Integer> value, kotlin.ranges.IntProgression valueProgression, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.wear.compose.material3.LevelIndicatorColors colors, optional float strokeWidth, optional float sweepAngle, optional boolean reverseDirection);
   }
 
   public final class LinearProgressIndicatorDefaults {

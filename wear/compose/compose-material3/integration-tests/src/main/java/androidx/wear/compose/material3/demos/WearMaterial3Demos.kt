@@ -30,6 +30,7 @@ import androidx.wear.compose.material3.samples.ButtonGroupThreeButtonsSample
 import androidx.wear.compose.material3.samples.EdgeButtonListSample
 import androidx.wear.compose.material3.samples.EdgeButtonSample
 import androidx.wear.compose.material3.samples.EdgeSwipeForSwipeToDismiss
+import androidx.wear.compose.material3.samples.LevelIndicatorSample
 import androidx.wear.compose.material3.samples.ListHeaderSample
 import androidx.wear.compose.material3.samples.SimpleSwipeToDismissBox
 import androidx.wear.compose.material3.samples.StatefulSwipeToDismissBox
@@ -44,6 +45,7 @@ val WearMaterial3Demos =
     Material3DemoCategory(
         "Material 3",
         listOf(
+                ComposableDemo("LevelIndicator") { Centralize { LevelIndicatorSample() } },
                 ComposableDemo("Haptics") { Centralize { HapticsDemos() } },
                 ComposableDemo("Performance") { Centralize { PerformanceDemos() } },
                 Material3DemoCategory(

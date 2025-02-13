@@ -28,7 +28,54 @@ import kotlin.math.sin
 
 /**
  * Creates a [LevelIndicator] for screens that that control a setting such as volume with either
- * rotating side button, rotating bezel or a [Stepper].
+ * rotating side button, rotating bezel.
+ *
+ * Example of [LevelIndicator]:
+ *
+ * @sample androidx.wear.compose.material3.samples.LevelIndicatorSample
+ * @param value Value of the indicator as a fraction in the range [0,1]. Values outside of the range
+ *   [0,1] will be coerced.
+ * @param modifier Modifier to be applied to the component
+ * @param enabled Controls the enabled state of [LevelIndicator] - when false, disabled colors will
+ *   be used.
+ * @param colors [LevelIndicatorColors] that will be used to resolve the indicator and track colors
+ *   for this [LevelIndicator] in different states
+ * @param strokeWidth The stroke width for the indicator and track strokes
+ * @param sweepAngle The angle covered by the curved LevelIndicator
+ * @param reverseDirection Reverses direction of PositionIndicator if true
+ */
+@Composable
+public fun LevelIndicator(
+    value: () -> Float,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: LevelIndicatorColors = LevelIndicatorDefaults.colors(),
+    strokeWidth: Dp = LevelIndicatorDefaults.StrokeWidth,
+    sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
+    reverseDirection: Boolean = false,
+) {
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val paddingHorizontal = LevelIndicatorDefaults.edgePadding
+    val radius = screenWidthDp / 2 - paddingHorizontal.value - strokeWidth.value / 2
+    // Calculate indicator height based on a triangle of the top half of the sweep angle
+    val indicatorHeight = 2f * sin((0.5f * sweepAngle).toRadians()) * radius
+
+    IndicatorImpl(
+        state = FractionPositionStateAdapter { value().coerceIn(0f, 1f) },
+        indicatorHeight = indicatorHeight.dp,
+        indicatorWidth = strokeWidth,
+        paddingHorizontal = paddingHorizontal,
+        background = colors.trackColor(enabled),
+        color = colors.indicatorColor(enabled),
+        modifier = modifier,
+        reverseDirection = reverseDirection,
+        rsbSide = false,
+    )
+}
+
+/**
+ * Creates a [StepperLevelIndicator] for screens that that control a setting, such as volume, with a
+ * [Stepper].
  *
  * Example of [LevelIndicator] with a [Stepper]:
  *
@@ -45,7 +92,7 @@ import kotlin.math.sin
  * @param reverseDirection Reverses direction of PositionIndicator if true
  */
 @Composable
-public fun LevelIndicator(
+public fun StepperLevelIndicator(
     value: () -> Float,
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
@@ -54,32 +101,20 @@ public fun LevelIndicator(
     strokeWidth: Dp = LevelIndicatorDefaults.StrokeWidth,
     sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
     reverseDirection: Boolean = false,
-) {
-    val screenWidthDp = LocalConfiguration.current.screenWidthDp
-    val paddingHorizontal = LevelIndicatorDefaults.edgePadding
-    val radius = screenWidthDp / 2 - paddingHorizontal.value - strokeWidth.value / 2
-    // Calculate indicator height based on a triangle of the top half of the sweep angle
-    val indicatorHeight = 2f * sin((0.5f * sweepAngle).toRadians()) * radius
-
-    IndicatorImpl(
-        state =
-            FractionPositionStateAdapter {
-                (value() - valueRange.start) / (valueRange.endInclusive - valueRange.start)
-            },
-        indicatorHeight = indicatorHeight.dp,
-        indicatorWidth = strokeWidth,
-        paddingHorizontal = paddingHorizontal,
-        background = colors.trackColor(enabled),
-        color = colors.indicatorColor(enabled),
+): Unit =
+    LevelIndicator(
+        value = { (value() - valueRange.start) / (valueRange.endInclusive - valueRange.start) },
         modifier = modifier,
+        enabled = enabled,
+        colors = colors,
+        strokeWidth = strokeWidth,
+        sweepAngle = sweepAngle,
         reverseDirection = reverseDirection,
-        rsbSide = false,
     )
-}
 
 /**
- * Creates a [LevelIndicator] for screens that that control a setting such as volume with either
- * rotating side button, rotating bezel or a [Stepper].
+ * Creates a [StepperLevelIndicator] for screens that that control a setting, such as volume, with a
+ * [Stepper].
  *
  * Example of [LevelIndicator] with a [Stepper] working on an [IntProgression]:
  *
@@ -87,8 +122,8 @@ public fun LevelIndicator(
  * @param value Current value of the Stepper. If outside of [valueProgression] provided, value will
  *   be coerced to this range.
  * @param modifier Modifier to be applied to the component
- * @param valueProgression Progression of values that [LevelIndicator] value can take. Consists of
- *   rangeStart, rangeEnd and step. Range will be equally divided by step size
+ * @param valueProgression Progression of values that [StepperLevelIndicator] value can take.
+ *   Consists of rangeStart, rangeEnd and step. Range will be equally divided by step size.
  * @param enabled Controls the enabled state of [LevelIndicator] - when false, disabled colors will
  *   be used.
  * @param colors [LevelIndicatorColors] that will be used to resolve the indicator and track colors
@@ -98,7 +133,7 @@ public fun LevelIndicator(
  * @param reverseDirection Reverses direction of PositionIndicator if true
  */
 @Composable
-public fun LevelIndicator(
+public fun StepperLevelIndicator(
     value: () -> Int,
     valueProgression: IntProgression,
     modifier: Modifier = Modifier,
@@ -107,18 +142,19 @@ public fun LevelIndicator(
     strokeWidth: Dp = LevelIndicatorDefaults.StrokeWidth,
     sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
     reverseDirection: Boolean = false,
-) {
+): Unit =
     LevelIndicator(
-        value = { value().toFloat() },
+        value = {
+            (value() - valueProgression.first) /
+                (valueProgression.last - valueProgression.first).toFloat()
+        },
         modifier = modifier,
-        valueRange = valueProgression.first.toFloat()..valueProgression.last.toFloat(),
         enabled = enabled,
         colors = colors,
         strokeWidth = strokeWidth,
         sweepAngle = sweepAngle,
         reverseDirection = reverseDirection,
     )
-}
 
 /** Contains the default values used for [LevelIndicator]. */
 public object LevelIndicatorDefaults {
