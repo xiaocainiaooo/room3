@@ -76,7 +76,11 @@ public class SandboxedPdfDocument(
     override suspend fun getPageInfo(pageNumber: Int): PdfDocument.PageInfo {
         return withDocument { document ->
             document.getPageDimensions(pageNumber).let { dimensions ->
-                PdfDocument.PageInfo(pageNumber, dimensions.height, dimensions.width)
+                if (dimensions.height <= 0 || dimensions.width <= 0) {
+                    PdfDocument.PageInfo(pageNumber, DEFAULT_PAGE, DEFAULT_PAGE)
+                } else {
+                    PdfDocument.PageInfo(pageNumber, dimensions.height, dimensions.width)
+                }
             }
         }
     }
@@ -203,6 +207,8 @@ public class SandboxedPdfDocument(
     }
 
     private companion object {
+        private const val DEFAULT_PAGE = 400
+
         /**
          * Converts a list of items into a SparseArray, using the item's index as the key.
          *
