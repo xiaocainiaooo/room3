@@ -169,7 +169,7 @@ class AppFunctionDataTypeMetadataTest {
     fun appFunctionPrimitiveTypeMetadata_equalsAndHashCode() {
         val primitive1a = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false)
         val primitive1b = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false)
-        val primitive2 = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true)
+        val primitive2 = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, false)
 
         assertThat(primitive1a).isEqualTo(primitive1b)
         assertThat(primitive1a.hashCode()).isEqualTo(primitive1b.hashCode())

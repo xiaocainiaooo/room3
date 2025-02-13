@@ -260,16 +260,16 @@ public class AppFunctionPrimitiveTypeMetadata(
 ) : AppFunctionDataTypeMetadata(isNullable) {
     override fun equals(other: Any?): Boolean {
         if (!super.equals(other)) return false
-        if (other !is AppFunctionDataTypeMetadata) return false
+        if (other !is AppFunctionPrimitiveTypeMetadata) return false
 
-        if (isNullable != other.isNullable) return false
+        if (type != other.type) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + isNullable.hashCode()
+        result = 31 * result * type.hashCode()
         return result
     }
 
