@@ -415,6 +415,22 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .toSdkMedicalDataSource()
         }
 
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 16)
+    override suspend fun deleteMedicalDataSourceWithData(id: String) {
+        withPhrFeatureCheckSuspend(this::class, "deleteMedicalDataSourceWithData(id: String)") {
+            wrapPlatformException {
+                suspendCancellableCoroutine { continuation ->
+                    healthConnectManager.deleteMedicalDataSourceWithData(
+                        id,
+                        executor,
+                        continuation.asOutcomeReceiver()
+                    )
+                }
+            }
+        }
+    }
+
     @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 16)
     override suspend fun getMedicalDataSources(
         request: GetMedicalDataSourcesRequest

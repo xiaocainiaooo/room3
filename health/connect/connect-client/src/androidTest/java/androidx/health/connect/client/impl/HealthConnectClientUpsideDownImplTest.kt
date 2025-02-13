@@ -137,11 +137,15 @@ class HealthConnectClientUpsideDownImplTest {
         for (recordType in SDK_TO_PLATFORM_RECORD_CLASS.keys) {
             healthConnectClient.deleteRecords(recordType, TimeRangeFilter.none())
         }
-
         if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) >= 13) {
             for (recordType in SDK_TO_PLATFORM_RECORD_CLASS_EXT_13.keys) {
                 healthConnectClient.deleteRecords(recordType, TimeRangeFilter.none())
             }
+        }
+        if (isPersonalHealthRecordFeatureAvailableInPlatform()) {
+            healthConnectClient
+                .getMedicalDataSources(GetMedicalDataSourcesRequest(listOf(context.packageName)))
+                .forEach { healthConnectClient.deleteMedicalDataSourceWithData(it.id) }
         }
     }
 
@@ -903,9 +907,6 @@ class HealthConnectClientUpsideDownImplTest {
             .containsExactlyElementsIn(getAllRecordPermissions())
     }
 
-    @Ignore(
-        "TODO: b/383498168 - Remove Ignore and tearDown with deleteMedicalDataSource once available"
-    )
     @Test
     fun createMedicalDataSource_thenGetByRequest_expectSuccess() = runTest {
         assumeTrue(
@@ -933,9 +934,6 @@ class HealthConnectClientUpsideDownImplTest {
             .containsExactly(createMedicalDataSourceResponse)
     }
 
-    @Ignore(
-        "TODO: b/383498168 - Remove Ignore and tearDown with deleteMedicalDataSource once available"
-    )
     @Test
     fun createMedicalDataSource_thenGetByIds_expectSuccess() = runTest {
         assumeTrue(
@@ -960,6 +958,33 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(getMedicalDataSourcesByIdsResponse).hasSize(1)
         assertThat(getMedicalDataSourcesByIdsResponse)
             .containsExactly(createMedicalDataSourceResponse)
+    }
+
+    @Test
+    fun createMedicalDataSource_thenDelete_expectSuccess() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+
+        // Create a MedicalDataSource
+        val createMedicalDataSourceResponse =
+            healthConnectClient.createMedicalDataSource(
+                CreateMedicalDataSourceRequest(
+                    fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/"),
+                    displayName = "Test Data Source",
+                    fhirVersion = FhirVersion(4, 0, 1)
+                )
+            )
+        assertThat(createMedicalDataSourceResponse.id).isNotEmpty()
+
+        // Delete the newly created data source
+        healthConnectClient.deleteMedicalDataSourceWithData(createMedicalDataSourceResponse.id)
+
+        // Verify newly created data source does not exist
+        val getMedicalDataSourcesByIdsResponse =
+            healthConnectClient.getMedicalDataSources(listOf(createMedicalDataSourceResponse.id))
+        assertThat(getMedicalDataSourcesByIdsResponse).hasSize(0)
     }
 
     @Ignore(
