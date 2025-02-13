@@ -177,7 +177,7 @@ import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.node.onUncaughtDrawException
+import androidx.compose.ui.node.handleOrThrow
 import androidx.compose.ui.node.visitSubtree
 import androidx.compose.ui.platform.MotionEventVerifierApi29.isValidMotionEvent
 import androidx.compose.ui.platform.coreshims.ContentCaptureSessionCompat
@@ -522,7 +522,6 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     override val rectManager = RectManager(layoutNodes)
 
     override val rootForTest: RootForTest = this
-    internal var uncaughtExceptionHandler: RootForTest.UncaughtExceptionHandler? = null
 
     override val semanticsOwner: SemanticsOwner =
         SemanticsOwner(root, rootSemanticsNode, layoutNodes)
@@ -888,6 +887,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     private val matrixToWindow =
         if (SDK_INT < Q) CalculateMatrixToWindowApi21(tmpMatrix) else CalculateMatrixToWindowApi29()
+
+    private var testExceptionHandler: RootForTest.ExceptionHandler? = null
 
     /**
      * Keyboard modifiers state might be changed when window is not focused, so window doesn't
@@ -1606,9 +1607,9 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         measureAndLayout()
     }
 
-    override fun setUncaughtExceptionHandler(handler: RootForTest.UncaughtExceptionHandler?) {
-        uncaughtExceptionHandler = handler
-        measureAndLayoutDelegate.uncaughtExceptionHandler = handler
+    override fun setExceptionHandler(exceptionHandler: RootForTest.ExceptionHandler?) {
+        testExceptionHandler = exceptionHandler
+        measureAndLayoutDelegate.testExceptionHandler = exceptionHandler
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -1903,8 +1904,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
             dirtyLayers.clear()
             isDrawingContent = false
-        } catch (t: Throwable) {
-            uncaughtExceptionHandler?.onUncaughtDrawException(t) ?: throw t
+        } catch (e: Throwable) {
+            testExceptionHandler.handleOrThrow(e)
         }
 
         // updateDisplayList operations performed above (during root.draw and during the explicit
