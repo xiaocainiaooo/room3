@@ -85,7 +85,7 @@ package androidx.health.connect.client.testing {
     method public void revokePermission(String permission);
   }
 
-  public final class MetadataTestHelperKt {
+  public final class MetadataTestHelper {
     method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata);
     method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata, optional String id);
     method public static androidx.health.connect.client.records.metadata.Metadata populatedWithTestValues(androidx.health.connect.client.records.metadata.Metadata, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin);
