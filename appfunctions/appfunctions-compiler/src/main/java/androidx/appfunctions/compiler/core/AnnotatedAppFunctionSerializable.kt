@@ -93,13 +93,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                 afType.isOfTypeCategory(SERIALIZABLE_SINGULAR) ||
                     afType.isOfTypeCategory(SERIALIZABLE_LIST)
             }
-            .map { afType ->
-                if (afType.isOfTypeCategory(SERIALIZABLE_LIST)) {
-                    afType.ksTypeReference.resolveListParameterizedType()
-                } else {
-                    afType.ksTypeReference
-                }
-            }
+            .map { afType -> afType.selfOrItemTypeReference }
             .toSet()
     }
 
@@ -140,7 +134,8 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                 }
         for (serializableAfType in serializableParamTypes) {
             val appFunctionSerializableDefinition =
-                serializableAfType.ksTypeReference.resolve().declaration as KSClassDeclaration
+                serializableAfType.selfOrItemTypeReference.resolve().declaration
+                    as KSClassDeclaration
             // Skip serializable that have been seen before
             if (visitedSerializableSet.contains(originalClassName)) {
                 continue
