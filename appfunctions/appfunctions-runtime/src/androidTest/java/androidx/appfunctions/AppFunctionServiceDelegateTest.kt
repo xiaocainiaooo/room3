@@ -24,12 +24,12 @@ import androidx.appfunctions.internal.AggregatedAppFunctionInventory
 import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.AppFunctionInventory
 import androidx.appfunctions.internal.AppFunctionInvoker
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_LONG
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_STRING
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry

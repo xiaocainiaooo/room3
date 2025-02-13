@@ -21,11 +21,11 @@ import androidx.annotation.RequiresApi
 import androidx.appfunctions.AppFunctionAppUnknownException
 import androidx.appfunctions.ExecuteAppFunctionResponse
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_BOOLEAN
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_DOUBLE
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_LONG
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_STRING
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_BOOLEAN
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_DOUBLE
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat

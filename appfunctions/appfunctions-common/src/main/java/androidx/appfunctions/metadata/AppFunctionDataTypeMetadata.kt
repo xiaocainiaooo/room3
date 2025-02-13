@@ -60,28 +60,27 @@ internal constructor(
 
     public companion object {
         /** Void type. */
-        public const val TYPE_UNIT: Int = 0
+        internal const val TYPE_UNIT: Int = 0
         /** Boolean type. */
-        public const val TYPE_BOOLEAN: Int = 1
+        internal const val TYPE_BOOLEAN: Int = 1
         /** Byte array type. */
-        public const val TYPE_BYTES: Int = 2
+        internal const val TYPE_BYTES: Int = 2
         /**
          * Object type. The schema of the object is defined in a [AppFunctionObjectTypeMetadata].
          */
-        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE_OBJECT: Int = 3
+        internal const val TYPE_OBJECT: Int = 3
         /** Double type. */
-        public const val TYPE_DOUBLE: Int = 4
+        internal const val TYPE_DOUBLE: Int = 4
         /** Float type. */
-        public const val TYPE_FLOAT: Int = 5
+        internal const val TYPE_FLOAT: Int = 5
         /** Long type. */
-        public const val TYPE_LONG: Int = 6
+        internal const val TYPE_LONG: Int = 6
         /** Integer type. */
-        public const val TYPE_INT: Int = 7
+        internal const val TYPE_INT: Int = 7
         /** String type. */
-        public const val TYPE_STRING: Int = 8
-        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        internal const val TYPE_STRING: Int = 8
         /** Array type. The schema of the array is defined in a [AppFunctionArrayTypeMetadata] */
-        public const val TYPE_ARRAY: Int = 10
+        internal const val TYPE_ARRAY: Int = 10
     }
 
     override fun equals(other: Any?): Boolean {
@@ -138,9 +137,14 @@ public class AppFunctionArrayTypeMetadata(
     override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         return AppFunctionDataTypeMetadataDocument(
             itemType = itemType.toAppFunctionDataTypeMetadataDocument(),
-            type = TYPE_ARRAY,
+            type = TYPE,
             isNullable = isNullable,
         )
+    }
+
+    public companion object {
+        /** Array type. The schema of the array is defined in a [AppFunctionArrayTypeMetadata] */
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_ARRAY
     }
 }
 
@@ -203,12 +207,19 @@ public class AppFunctionObjectTypeMetadata(
                 )
             }
         return AppFunctionDataTypeMetadataDocument(
-            type = TYPE_OBJECT,
+            type = TYPE,
             properties = properties,
             required = required,
             objectQualifiedName = qualifiedName,
             isNullable = isNullable,
         )
+    }
+
+    public companion object {
+        /**
+         * Object type. The schema of the object is defined in a [AppFunctionObjectTypeMetadata].
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_OBJECT
     }
 }
 
@@ -246,10 +257,17 @@ public class AppFunctionReferenceTypeMetadata(
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         return AppFunctionDataTypeMetadataDocument(
-            type = TYPE_OBJECT,
+            type = TYPE,
             dataTypeReference = referenceDataType,
             isNullable = isNullable,
         )
+    }
+
+    public companion object {
+        /**
+         * Object type. The schema of the object is defined in a [AppFunctionObjectTypeMetadata].
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_OBJECT
     }
 }
 
@@ -283,6 +301,25 @@ public class AppFunctionPrimitiveTypeMetadata(
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         return AppFunctionDataTypeMetadataDocument(type = type, isNullable = isNullable)
+    }
+
+    public companion object {
+        /** Void type. */
+        public const val TYPE_UNIT: Int = AppFunctionDataTypeMetadata.TYPE_UNIT
+        /** Boolean type. */
+        public const val TYPE_BOOLEAN: Int = AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+        /** Byte array type. */
+        public const val TYPE_BYTES: Int = AppFunctionDataTypeMetadata.TYPE_BYTES
+        /** Double type. */
+        public const val TYPE_DOUBLE: Int = AppFunctionDataTypeMetadata.TYPE_DOUBLE
+        /** Float type. */
+        public const val TYPE_FLOAT: Int = AppFunctionDataTypeMetadata.TYPE_FLOAT
+        /** Long type. */
+        public const val TYPE_LONG: Int = AppFunctionDataTypeMetadata.TYPE_LONG
+        /** Integer type. */
+        public const val TYPE_INT: Int = AppFunctionDataTypeMetadata.TYPE_INT
+        /** String type. */
+        public const val TYPE_STRING: Int = AppFunctionDataTypeMetadata.TYPE_STRING
     }
 }
 
