@@ -248,6 +248,7 @@ object ButtonGroupDefaults {
     /** Default shape for the checked state for the buttons in a connected button group */
     val connectedButtonCheckedShape = ShapeTokens.CornerFull
 
+    /** Default shape for the pressed state for the middle buttons in a connected button group. */
     val connectedMiddleButtonPressShape: Shape
         @Composable
         get() =
