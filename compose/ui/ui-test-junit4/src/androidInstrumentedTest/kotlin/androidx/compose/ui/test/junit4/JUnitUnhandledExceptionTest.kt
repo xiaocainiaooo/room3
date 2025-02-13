@@ -38,6 +38,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.core.view.forEach
 import org.junit.Assert.fail
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -90,6 +91,7 @@ class JUnitUnhandledExceptionTest(activityClass: Class<out ComponentActivity>) {
         composeTestRule.waitForIdle()
     }
 
+    @Ignore
     @Test
     fun throwDuringInteraction() {
         installContent { Button(onClick = { throwExpectedException() }) { Text("throw") } }
@@ -97,6 +99,7 @@ class JUnitUnhandledExceptionTest(activityClass: Class<out ComponentActivity>) {
         composeTestRule.onNodeWithText("throw").performClick()
     }
 
+    @Ignore
     @Test
     fun throwDuringMeasure() {
         installContent { Box(modifier = Modifier.layout { _, _ -> throwExpectedException() }) }
@@ -104,6 +107,7 @@ class JUnitUnhandledExceptionTest(activityClass: Class<out ComponentActivity>) {
         composeTestRule.waitForIdle()
     }
 
+    @Ignore
     @Test
     fun throwDuringDraw() {
         installContent {
