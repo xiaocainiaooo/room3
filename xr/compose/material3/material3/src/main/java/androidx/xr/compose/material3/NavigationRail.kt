@@ -85,8 +85,7 @@ public fun NavigationRail(
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val orbiterProperties =
-        LocalNavigationRailOrbiterProperties.current ?: DefaultNavigationRailOrbiterProperties
+    val orbiterProperties = LocalNavigationRailOrbiterProperties.current
     VerticalOrbiter(orbiterProperties) {
         Surface(
             shape = CircleShape,
@@ -121,8 +120,7 @@ public fun NavigationRail(
 
 private object XrNavigationRailTokens {
     /** The [EdgeOffset] for NavigationRail Orbiters in Full Space Mode (FSM). */
-    val OrbiterEdgeOffset
-        @Composable get() = EdgeOffset.inner(24.dp)
+    val OrbiterEdgeOffset = EdgeOffset.inner(24.dp)
 
     /**
      * Vertical padding between the contents of the [NavigationRail] and its top/bottom, and
@@ -155,30 +153,24 @@ internal object XrNavigationRailComponentOverride : NavigationRailComponentOverr
  * The default [VerticalOrbiterProperties] used by [NavigationRail] if none is specified in
  * [LocalNavigationRailOrbiterProperties].
  */
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+@get:ExperimentalMaterial3XrApi
 @ExperimentalMaterial3XrApi
-public val DefaultNavigationRailOrbiterProperties: VerticalOrbiterProperties
-    @Composable
-    get() =
-        VerticalOrbiterProperties(
-            position = OrbiterEdge.Vertical.Start,
-            offset = XrNavigationRailTokens.OrbiterEdgeOffset,
-            alignment = Alignment.CenterVertically,
-            settings = OrbiterDefaults.orbiterSettings,
-            shape = OrbiterDefaults.shape,
-        )
+public val DefaultNavigationRailOrbiterProperties: VerticalOrbiterProperties =
+    VerticalOrbiterProperties(
+        position = OrbiterEdge.Vertical.Start,
+        offset = XrNavigationRailTokens.OrbiterEdgeOffset,
+        alignment = Alignment.CenterVertically,
+        settings = OrbiterDefaults.orbiterSettings,
+        shape = OrbiterDefaults.shape,
+    )
 
-/**
- * The [VerticalOrbiterProperties] used by [NavigationRail].
- *
- * If `null`, [DefaultNavigationRailOrbiterProperties] will be used.
- *
- * TODO(b/387339197): Make this non-null and default to DefaultNavigationRailXrProperties
- */
+/** The [VerticalOrbiterProperties] used by [NavigationRail]. */
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalMaterial3XrApi
 @ExperimentalMaterial3XrApi
 public val LocalNavigationRailOrbiterProperties:
-    ProvidableCompositionLocal<VerticalOrbiterProperties?> =
+    ProvidableCompositionLocal<VerticalOrbiterProperties> =
     compositionLocalOf {
-        null
+        DefaultNavigationRailOrbiterProperties
     }
