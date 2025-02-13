@@ -58,13 +58,42 @@ class TracingDriverBenchmark {
         )
     }
 
+    private val context: Context = ApplicationProvider.getApplicationContext<Context>()
+    private val dispatcher = StandardTestDispatcher()
+    private val sink = buildInMemorySink(context, dispatcher)
+    // This test intentionally does not close the TraceContext instance. The reason is
+    // when we call close() we end up blocking the Thread on which close() was called.
+    // Also given the fact that we are using a TestDispatcher here, that blocks forever because
+    // there is no good way to advance the TestScheduler by calling advanceUntilIdle().
+    // Not calling close() here is okay, given we drain all trace packets before the next
+    // measurement loop.
+    private val traceContext = buildTraceContext(sink, true)
+    private val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
+
+    /**
+     * This benchmark runs a subset of basic32 in order to measure just the cost of dispatching an
+     * event to the sink
+     */
+    @Test
+    fun beginEnd_basic32_writeOnly() {
+        benchmarkRule.measureRepeated {
+            repeat(4) {
+                repeat(8) { process.trace(BASIC_STRING) {} }
+                // 32 total events (or 16 begin/end pairs) will dispatch
+                // instead, we reset after 8 begin/end pairs so we only measure
+                // producer write cost without sending to sink
+                process.resetFillCount()
+            }
+        }
+    }
+
     /**
      * This benchmark runs the measurement 32 times to ensure emitting the packet is captured once
      * per measurement.
      */
     @Test
     fun beginEnd_basic32() {
-        beginEndBenchmark(measureSerialization = false)
+        beginEndBenchmark32(measureSerialization = false)
     }
 
     /**
@@ -73,21 +102,10 @@ class TracingDriverBenchmark {
      */
     @Test
     fun beginEnd_basic32_withSerialization() {
-        beginEndBenchmark(measureSerialization = true)
+        beginEndBenchmark32(measureSerialization = true)
     }
 
-    private fun beginEndBenchmark(measureSerialization: Boolean) {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        val dispatcher = StandardTestDispatcher()
-        val sink = buildInMemorySink(context, dispatcher)
-        // This test intentionally does not close the TraceContext instance. The reason is
-        // when we call close() we end up blocking the Thread on which close() was called.
-        // Also given the fact that we are using a TestDispatcher here, that blocks forever because
-        // there is no good way to advance the TestScheduler by calling advanceUntilIdle().
-        // Not calling close() here is okay, given we drain all trace packets before the next
-        // measurement loop.
-        val traceContext = buildTraceContext(sink, true)
-        val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
+    private fun beginEndBenchmark32(measureSerialization: Boolean) {
         // we assert this value at runtime and build the number into the method name so it's
         // clear how many begin/ends it is measuring. test needs to be renamed if const changes.
         assertEquals(32, TRACE_PACKET_BUFFER_SIZE)
@@ -102,6 +120,19 @@ class TracingDriverBenchmark {
             } else {
                 dispatcher.scheduler.advanceUntilIdle()
             }
+        }
+    }
+
+    /**
+     * This benchmark runs a subset of basic32 in order to measure just the cost of enqeuing a batch
+     * to the sink
+     */
+    @Test
+    fun beginEnd_enqueue2() {
+        benchmarkRule.measureRepeated {
+            process.enqueueSingleUnmodifiedEvent()
+            process.enqueueSingleUnmodifiedEvent()
+            runWithMeasurementDisabled { dispatcher.scheduler.advanceUntilIdle() }
         }
     }
 }

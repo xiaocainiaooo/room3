@@ -16,6 +16,8 @@
 
 package androidx.tracing.driver
 
+import androidx.annotation.RestrictTo
+
 /** Entities that we can attach traces to. */
 public abstract class Track(
     /** The [TraceContext] instance. */
@@ -62,5 +64,19 @@ public abstract class Track(
                 currentPacketArraySize = currentPacketArray.packets.size
             }
         }
+    }
+
+    /** Test API for benchmarking */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun enqueueSingleUnmodifiedEvent() {
+        emitTraceEvent(immediateDispatch = true) {
+            // noop
+        }
+    }
+
+    /** Test API for benchmarking */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun resetFillCount() {
+        currentPacketArray.fillCount = 0
     }
 }
