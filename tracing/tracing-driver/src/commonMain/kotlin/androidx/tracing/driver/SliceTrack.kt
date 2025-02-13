@@ -20,7 +20,7 @@ import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.withContext
 
 /** Entities that we can attach traces to to be visualized on the timeline with slices & flows. */
-public abstract class EventTrack(
+public abstract class SliceTrack(
     /** The [TraceContext] instance. */
     context: TraceContext,
     /** The uuid for the track descriptor. */
@@ -28,27 +28,25 @@ public abstract class EventTrack(
 ) : Track(context = context, uuid = uuid) {
     public open fun beginSection(name: String, flowIds: List<Long>) {
         if (context.isEnabled) {
-            emitPacket { packet ->
-                packet.setBeginSectionWithFlows(uuid, sequenceId, name, flowIds)
-            }
+            emitTraceEvent { event -> event.setBeginSectionWithFlows(uuid, name, flowIds) }
         }
     }
 
     public open fun beginSection(name: String) {
         if (context.isEnabled) {
-            emitPacket { packet -> packet.setBeginSection(uuid, sequenceId, name) }
+            emitTraceEvent { event -> event.setBeginSection(uuid, name) }
         }
     }
 
     public open fun endSection() {
         if (context.isEnabled) {
-            emitPacket { packet -> packet.setEndSection(uuid, sequenceId) }
+            emitTraceEvent { event -> event.setEndSection(uuid) }
         }
     }
 
-    public open fun instant() {
+    public open fun instant(name: String) {
         if (context.isEnabled) {
-            emitPacket { packet -> packet.setInstantEvent(uuid, sequenceId) }
+            emitTraceEvent { event -> event.setInstant(uuid, name) }
         }
     }
 

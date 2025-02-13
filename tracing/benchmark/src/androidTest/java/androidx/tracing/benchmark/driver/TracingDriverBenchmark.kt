@@ -45,30 +45,17 @@ class TracingDriverBenchmark {
     @get:Rule val benchmarkRule = BenchmarkRule()
 
     private fun buildTraceContext(sink: TraceSink, isEnabled: Boolean): TraceContext {
-        return TraceContext(sequenceId = 1, sink = sink, isEnabled = isEnabled)
+        return TraceContext(sink = sink, isEnabled = isEnabled)
     }
 
     fun buildInMemorySink(context: Context, coroutineContext: CoroutineContext): AndroidTraceSink {
         val buffer = blackholeSink().buffer()
         return AndroidTraceSink(
+            sequenceId = 1,
             context = context,
             bufferedSink = buffer,
             coroutineContext = coroutineContext
         )
-    }
-
-    @Test
-    fun beginEnd_basic_noSink() {
-        val traceContext = buildTraceContext(NoOpSink(), true)
-        val process = traceContext.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
-        traceContext.use { benchmarkRule.measureRepeated { process.trace(BASIC_STRING) {} } }
-    }
-
-    @Test
-    fun beginEnd_basic_disabled() {
-        val context = buildTraceContext(NoOpSink(), false)
-        val process = context.getOrCreateProcessTrack(id = 10, name = PROCESS_NAME)
-        context.use { benchmarkRule.measureRepeated { process.trace(BASIC_STRING) {} } }
     }
 
     /**
