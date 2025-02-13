@@ -24,7 +24,7 @@ import java.time.Instant
 @SuppressWarnings("NewApi") // Temporary until we can enable java8 desugaring effectively.
 public class Metadata
 // TODO(b/394783116) make the constructor internal
-@Deprecated("Public constructor will become internal. Use factory methods instead")
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public constructor(
     /**
      * Client supplied data recording method to help to understand how the data was recorded.
@@ -164,7 +164,6 @@ public constructor(
          */
         @JvmStatic
         fun activelyRecorded(device: Device): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_ACTIVELY_RECORDED,
                 device = device,
@@ -186,7 +185,6 @@ public constructor(
             clientRecordId: String,
             clientRecordVersion: Long = 0,
         ): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_ACTIVELY_RECORDED,
                 device = device,
@@ -206,7 +204,6 @@ public constructor(
          */
         @JvmStatic
         fun activelyRecordedWithId(id: String, device: Device): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_ACTIVELY_RECORDED,
                 id = id,
@@ -222,7 +219,6 @@ public constructor(
          */
         @JvmStatic
         fun autoRecorded(device: Device): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_AUTOMATICALLY_RECORDED,
                 device = device,
@@ -244,7 +240,6 @@ public constructor(
             clientRecordId: String,
             clientRecordVersion: Long = 0,
         ): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_AUTOMATICALLY_RECORDED,
                 device = device,
@@ -264,7 +259,6 @@ public constructor(
          */
         @JvmStatic
         fun autoRecordedWithId(id: String, device: Device): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_AUTOMATICALLY_RECORDED,
                 id = id,
@@ -282,7 +276,6 @@ public constructor(
         @JvmStatic
         @JvmOverloads
         fun manualEntry(device: Device? = null): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
                 device = device,
@@ -305,7 +298,6 @@ public constructor(
             clientRecordVersion: Long = 0,
             device: Device? = null,
         ): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
                 device = device,
@@ -326,7 +318,6 @@ public constructor(
         @JvmStatic
         @JvmOverloads
         fun manualEntryWithId(id: String, device: Device? = null): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
                 id = id,
@@ -345,7 +336,6 @@ public constructor(
         @JvmStatic
         @JvmOverloads
         fun unknownRecordingMethod(device: Device? = null): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(recordingMethod = RECORDING_METHOD_UNKNOWN, device = device)
 
         /**
@@ -366,7 +356,6 @@ public constructor(
             clientRecordVersion: Long = 0,
             device: Device? = null,
         ): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_UNKNOWN,
                 device = device,
@@ -387,7 +376,6 @@ public constructor(
         @JvmStatic
         @JvmOverloads
         fun unknownRecordingMethodWithId(id: String, device: Device? = null): Metadata =
-            @Suppress("DEPRECATION") // The constructor will become internal
             Metadata(
                 recordingMethod = RECORDING_METHOD_UNKNOWN,
                 id = id,
