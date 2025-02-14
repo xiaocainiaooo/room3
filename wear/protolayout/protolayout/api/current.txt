@@ -1605,6 +1605,13 @@ package androidx.wear.protolayout.modifiers {
     method public static androidx.wear.protolayout.modifiers.LayoutModifier semanticsRole(androidx.wear.protolayout.modifiers.LayoutModifier, int semanticsRole);
   }
 
+  public final class TransitionKt {
+    method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.modifiers.LayoutModifier enterTransition(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.EnterTransition transition);
+    method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.modifiers.LayoutModifier enterTransition(androidx.wear.protolayout.modifiers.LayoutModifier, optional androidx.wear.protolayout.ModifiersBuilders.FadeInTransition? fadeIn, optional androidx.wear.protolayout.ModifiersBuilders.SlideInTransition? slideIn);
+    method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.modifiers.LayoutModifier exitTransition(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.ExitTransition transition);
+    method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.modifiers.LayoutModifier exitTransition(androidx.wear.protolayout.modifiers.LayoutModifier, optional androidx.wear.protolayout.ModifiersBuilders.FadeOutTransition? fadeOut, optional androidx.wear.protolayout.ModifiersBuilders.SlideOutTransition? slideOut);
+  }
+
   public final class VisibilityKt {
     method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) public static androidx.wear.protolayout.modifiers.LayoutModifier visibility(androidx.wear.protolayout.modifiers.LayoutModifier, boolean staticVisibility, optional androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool? dynamicVisibility);
   }

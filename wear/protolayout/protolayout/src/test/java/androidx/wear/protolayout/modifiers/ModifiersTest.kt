@@ -21,8 +21,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.ActionBuilders.LoadAction
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.ModifiersBuilders.Corner
+import androidx.wear.protolayout.ModifiersBuilders.DefaultContentTransitions.fadeInSlideIn
+import androidx.wear.protolayout.ModifiersBuilders.DefaultContentTransitions.fadeOutSlideOut
+import androidx.wear.protolayout.ModifiersBuilders.FadeInTransition
+import androidx.wear.protolayout.ModifiersBuilders.FadeOutTransition
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_NONE
+import androidx.wear.protolayout.ModifiersBuilders.SLIDE_DIRECTION_BOTTOM_TO_TOP
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.expression.dynamicDataMapOf
@@ -252,6 +257,32 @@ class ModifiersTest {
             .isEqualTo(DYNAMIC_BOOL.toDynamicBoolProto())
     }
 
+    @Test
+    fun enterTransition_toModifier() {
+        val modifier =
+            LayoutModifier.enterTransition(fadeInSlideIn(SLIDE_DIRECTION_BOTTOM_TO_TOP))
+                .enterTransition(fadeIn = FadeInTransition.Builder().setInitialAlpha(ALPHA).build())
+                .toProtoLayoutModifiers()
+
+        assertThat(modifier.contentUpdateAnimation?.enterTransition?.fadeIn?.initialAlpha)
+            .isEqualTo(ALPHA)
+        assertThat(modifier.contentUpdateAnimation?.enterTransition?.slideIn?.direction)
+            .isEqualTo(SLIDE_DIRECTION_BOTTOM_TO_TOP)
+    }
+
+    @Test
+    fun exitTransition_toModifier() {
+        val modifier =
+            LayoutModifier.exitTransition(fadeOutSlideOut(SLIDE_DIRECTION_BOTTOM_TO_TOP))
+                .exitTransition(fadeOut = FadeOutTransition.Builder().setTargetAlpha(ALPHA).build())
+                .toProtoLayoutModifiers()
+
+        assertThat(modifier.contentUpdateAnimation?.exitTransition?.fadeOut?.targetAlpha)
+            .isEqualTo(ALPHA)
+        assertThat(modifier.contentUpdateAnimation?.exitTransition?.slideOut?.direction)
+            .isEqualTo(SLIDE_DIRECTION_BOTTOM_TO_TOP)
+    }
+
     companion object {
         const val STATIC_CONTENT_DESCRIPTION = "content desc"
         val DYNAMIC_CONTENT_DESCRIPTION = DynamicString.constant("dynamic content")
@@ -268,5 +299,6 @@ class ModifiersTest {
         val METADATA_BYTE_ARRAY = METADATA.toByteArray()
         const val WIDTH_DP = 5f
         val DYNAMIC_BOOL = DynamicBool.constant(true)
+        const val ALPHA = 0.7f
     }
 }
