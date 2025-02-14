@@ -96,6 +96,12 @@ class HealthConnectClientUpsideDownImplTest {
         private val ZONE_OFFSET = ZoneOffset.UTC
         private val ZONE_ID = ZoneId.of(ZONE_OFFSET.id)
 
+        private const val MEDICAL_DATA_SOURCE_DISPLAY_NAME = "Data source test app"
+        private val FHIR_BASE_URI = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/")
+        // lazy is needed, otherwise the object would be constructed without a check for PHR feature
+        // availability, which would lead to a crash.
+        private val FHIR_VERSION_4_0_1 by lazy { FhirVersion(4, 0, 1) }
+
         fun getAllRecordPermissions(): Array<String> {
             val permissions: HashSet<String> = HashSet()
 
@@ -918,9 +924,9 @@ class HealthConnectClientUpsideDownImplTest {
         val createMedicalDataSourceResponse =
             healthConnectClient.createMedicalDataSource(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/"),
-                    displayName = "Test Data Source",
-                    fhirVersion = FhirVersion(4, 0, 1)
+                    fhirBaseUri = FHIR_BASE_URI,
+                    displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                    fhirVersion = FHIR_VERSION_4_0_1
                 )
             )
         assertThat(createMedicalDataSourceResponse.id).isNotEmpty()
@@ -945,9 +951,9 @@ class HealthConnectClientUpsideDownImplTest {
         val createMedicalDataSourceResponse =
             healthConnectClient.createMedicalDataSource(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/"),
-                    displayName = "Test Data Source",
-                    fhirVersion = FhirVersion(4, 0, 1)
+                    fhirBaseUri = FHIR_BASE_URI,
+                    displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                    fhirVersion = FHIR_VERSION_4_0_1
                 )
             )
         assertThat(createMedicalDataSourceResponse.id).isNotEmpty()
@@ -971,9 +977,9 @@ class HealthConnectClientUpsideDownImplTest {
         val createMedicalDataSourceResponse =
             healthConnectClient.createMedicalDataSource(
                 CreateMedicalDataSourceRequest(
-                    fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/"),
-                    displayName = "Test Data Source",
-                    fhirVersion = FhirVersion(4, 0, 1)
+                    fhirBaseUri = FHIR_BASE_URI,
+                    displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                    fhirVersion = FHIR_VERSION_4_0_1
                 )
             )
         assertThat(createMedicalDataSourceResponse.id).isNotEmpty()
@@ -987,17 +993,22 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(getMedicalDataSourcesByIdsResponse).hasSize(0)
     }
 
-    @Ignore(
-        "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
-    )
     @Test
     fun upsertNewMedicalResourcesThenReadByRequest_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
         )
-        // TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added
-        val dataSourceId = ""
+        val dataSourceId =
+            healthConnectClient
+                .createMedicalDataSource(
+                    CreateMedicalDataSourceRequest(
+                        fhirBaseUri = FHIR_BASE_URI,
+                        displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                        fhirVersion = FHIR_VERSION_4_0_1
+                    )
+                )
+                .id
         val requests =
             listOf(
                 createVaccinesUpsertMedicalResourceRequest(
@@ -1041,17 +1052,22 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(secondPageResponse.nextPageToken).isNull()
     }
 
-    @Ignore(
-        "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
-    )
     @Test
     fun upsertNewMedicalResourcesThenReadByIds_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
         )
-        // TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added
-        val dataSourceId = ""
+        val dataSourceId =
+            healthConnectClient
+                .createMedicalDataSource(
+                    CreateMedicalDataSourceRequest(
+                        fhirBaseUri = FHIR_BASE_URI,
+                        displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                        fhirVersion = FHIR_VERSION_4_0_1
+                    )
+                )
+                .id
         val fhirResourceId = "immunization-101"
         val requests =
             listOf(
@@ -1082,17 +1098,22 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(medicalResources).isEqualTo(upsertResponse)
     }
 
-    @Ignore(
-        "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
-    )
     @Test
     fun upsertExistingMedicalResourcesThenReadByIds_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
         )
-        // TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added
-        val dataSourceId = ""
+        val dataSourceId =
+            healthConnectClient
+                .createMedicalDataSource(
+                    CreateMedicalDataSourceRequest(
+                        fhirBaseUri = FHIR_BASE_URI,
+                        displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                        fhirVersion = FHIR_VERSION_4_0_1
+                    )
+                )
+                .id
         val fhirResourceId = "immunization-101"
         val insertRequests =
             listOf(
@@ -1139,9 +1160,6 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(medicalResources).isEqualTo(updateResponse)
     }
 
-    @Ignore(
-        "TODO(b/382680485): Remove Ignore and call createMedicalDataSource once it has been added"
-    )
     @Test
     fun insertMedicalResourcesThenDelete_expectSuccessfulDeletion() = runTest {
         assumeTrue(
@@ -1149,8 +1167,15 @@ class HealthConnectClientUpsideDownImplTest {
             isPersonalHealthRecordFeatureAvailableInPlatform()
         )
         val dataSourceId =
-            "" // TODO(b/382680485): Remove Ignore and call createMedicalDataSource once it has been
-        // added
+            healthConnectClient
+                .createMedicalDataSource(
+                    CreateMedicalDataSourceRequest(
+                        fhirBaseUri = FHIR_BASE_URI,
+                        displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                        fhirVersion = FHIR_VERSION_4_0_1
+                    )
+                )
+                .id
         val fhirResourceId = "immunization-101"
         val requests =
             listOf(
