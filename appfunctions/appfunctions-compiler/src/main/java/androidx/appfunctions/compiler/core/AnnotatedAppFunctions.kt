@@ -36,10 +36,12 @@ import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.ClassName
 
 /**
@@ -51,7 +53,36 @@ data class AnnotatedAppFunctions(
     /** The list of [KSFunctionDeclaration] that are annotated as app function. */
     val appFunctionDeclarations: List<KSFunctionDeclaration>
 ) {
+    /** Gets all annotated nodes. */
+    fun getAllAnnotated(): List<KSAnnotated> {
+        return buildList {
+            // Only functions are annotated.
+            for (appFunctionDeclaration in appFunctionDeclarations) {
+                add(appFunctionDeclaration)
+            }
+        }
+    }
+
+    /**
+     * Validates if the AppFunction implementation is valid.
+     *
+     * @throws SymbolNotReadyException if any related nodes are not ready for processing yet.
+     */
     fun validate(): AnnotatedAppFunctions {
+        if (!classDeclaration.validate()) {
+            throw SymbolNotReadyException(
+                "AppFunction enclosing class not ready for processing yet",
+                classDeclaration
+            )
+        }
+        for (appFunction in appFunctionDeclarations) {
+            if (!appFunction.validate()) {
+                throw SymbolNotReadyException(
+                    "AppFunction method not ready for processing yet",
+                    appFunction
+                )
+            }
+        }
         validateFirstParameter()
         validateParameterTypes()
         return this

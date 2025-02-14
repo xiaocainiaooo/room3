@@ -482,13 +482,8 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "${'$'}ComTestdata_InventoryComponentRegistry.kt",
-            goldenFileName = "${'$'}ComTestdata_InventoryComponentRegistry.KT"
-        )
-        compilationTestHelper.assertSuccessWithSourceContent(
-            report = report,
-            expectGeneratedSourceFileName = "${'$'}ComTestdataDiff_InventoryComponentRegistry.kt",
-            goldenFileName = "${'$'}ComTestdataDiff_InventoryComponentRegistry.KT"
+            expectGeneratedSourceFileName = "${'$'}Main_InventoryComponentRegistry.kt",
+            goldenFileName = "${'$'}Main_InventoryComponentRegistry.KT"
         )
     }
 
@@ -506,13 +501,8 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "${'$'}ComTestdata_InvokerComponentRegistry.kt",
-            goldenFileName = "${'$'}ComTestdata_InvokerComponentRegistry.KT"
-        )
-        compilationTestHelper.assertSuccessWithSourceContent(
-            report = report,
-            expectGeneratedSourceFileName = "${'$'}ComTestdataDiff_InvokerComponentRegistry.kt",
-            goldenFileName = "${'$'}ComTestdataDiff_InvokerComponentRegistry.KT"
+            expectGeneratedSourceFileName = "${'$'}Main_InvokerComponentRegistry.kt",
+            goldenFileName = "${'$'}Main_InvokerComponentRegistry.KT"
         )
     }
 

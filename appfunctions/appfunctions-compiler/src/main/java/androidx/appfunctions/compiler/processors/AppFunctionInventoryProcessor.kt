@@ -34,6 +34,7 @@ import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
@@ -53,11 +54,22 @@ import com.squareup.kotlinpoet.buildCodeBlock
  *
  * It resolves all functions in a class annotated with `@AppFunction`, and generates the
  * corresponding metadata for those functions.
+ *
+ * **Important:** [androidx.appfunctions.compiler.processors.AppFunctionInventoryProcessor] will
+ * process exactly once for each compilation unit to generate a single registry for looking up all
+ * generated inventories within the compilation unit.
  */
 class AppFunctionInventoryProcessor(
     private val codeGenerator: CodeGenerator,
 ) : SymbolProcessor {
+
+    private var hasProcessed = false
+
+    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        if (hasProcessed) return emptyList()
+        hasProcessed = true
+
         val appFunctionSymbolResolver = AppFunctionSymbolResolver(resolver)
         val appFunctionClasses = appFunctionSymbolResolver.resolveAnnotatedAppFunctions()
         val generatedInventoryComponents =
@@ -66,8 +78,6 @@ class AppFunctionInventoryProcessor(
                     val inventoryQualifiedName = generateAppFunctionInventoryClass(appFunctionClass)
                     add(
                         AppFunctionComponent(
-                            // Generated inventory is in the same package as the original class
-                            packageName = appFunctionClass.classDeclaration.packageName.asString(),
                             qualifiedName = inventoryQualifiedName,
                             sourceFiles = appFunctionClass.getSourceFiles(),
                         )
@@ -76,7 +86,8 @@ class AppFunctionInventoryProcessor(
             }
 
         AppFunctionComponentRegistryGenerator(codeGenerator)
-            .generateRegistriesByPackageName(
+            .generateRegistry(
+                resolver.getModuleName().asString(),
                 AppFunctionComponentRegistryAnnotation.Category.INVENTORY,
                 generatedInventoryComponents,
             )
