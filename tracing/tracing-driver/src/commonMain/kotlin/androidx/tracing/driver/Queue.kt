@@ -20,25 +20,24 @@ internal const val QUEUE_CAPACITY = 64
 
 /** An actual thread safe queue implementation. */
 internal class Queue<T>(capacity: Int = QUEUE_CAPACITY) {
-    private val lock = Lock()
     private val queue: ArrayDeque<T> = ArrayDeque(capacity)
 
     internal fun isEmpty(): Boolean {
-        return lock.withLock { queue.isEmpty() }
+        return synchronized(queue) { queue.isEmpty() }
     }
 
     internal fun isNotEmpty(): Boolean {
-        return lock.withLock { queue.isNotEmpty() }
+        return synchronized(queue) { queue.isNotEmpty() }
     }
 
     internal val size
-        get() = { lock.withLock { queue.size } }
+        get() = { synchronized(queue) { queue.size } }
 
     internal fun addLast(value: T) {
-        lock.withLock { queue.addLast(value) }
+        synchronized(queue) { queue.addLast(value) }
     }
 
     internal fun removeFirstOrNull(): T? {
-        return lock.withLock { queue.removeFirstOrNull() }
+        return synchronized(queue) { queue.removeFirstOrNull() }
     }
 }

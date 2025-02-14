@@ -43,7 +43,7 @@ internal constructor(
         isEnabled: Boolean
     ) : this(sequenceId, sink, isEnabled, isDebug = false)
 
-    internal val lock = Lock()
+    internal val processTrackLock = Any()
     internal val processes = mutableIntObjectMapOf<ProcessTrack>()
 
     /**
@@ -53,7 +53,7 @@ internal constructor(
     public open fun getOrCreateProcessTrack(id: Int, name: String): ProcessTrack {
         val track = processes[id]
         return track
-            ?: lock.withLock {
+            ?: synchronized(processTrackLock) {
                 val track =
                     processes.getOrPut(id) { ProcessTrack(context = this, id = id, name = name) }
                 check(track.name == name)
