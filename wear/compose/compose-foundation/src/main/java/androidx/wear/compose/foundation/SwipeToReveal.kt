@@ -218,7 +218,8 @@ public value class RevealActionType private constructor(public val value: Int) {
  *   keep the default [RevealDirection.RightToLeft] in order to preserve compatibility with the
  *   system wide swipe to dismiss gesture.
  */
-public fun createAnchors(
+@SuppressWarnings("PrimitiveInCollection")
+public fun createRevealAnchors(
     coveredAnchor: Float = 0f,
     revealingAnchor: Float = SwipeToRevealDefaults.revealingRatio,
     revealedAnchor: Float = 1f,
@@ -423,7 +424,7 @@ public fun rememberRevealState(
     confirmValueChange: (RevealValue) -> Boolean = { true },
     positionalThreshold: (totalDistance: Float) -> Float =
         SwipeToRevealDefaults.positionalThreshold,
-    anchors: Map<RevealValue, Float> = createAnchors(),
+    anchors: Map<RevealValue, Float> = createRevealAnchors(),
 ): RevealState {
     val coroutineScope = rememberCoroutineScope()
     val nestedScrollDispatcher = remember { NestedScrollDispatcher() }

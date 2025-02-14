@@ -60,7 +60,7 @@ import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
 import androidx.wear.compose.foundation.SwipeToReveal
-import androidx.wear.compose.foundation.createAnchors
+import androidx.wear.compose.foundation.createRevealAnchors
 import androidx.wear.compose.material3.ButtonDefaults.buttonColors
 import androidx.wear.compose.material3.tokens.SwipeToRevealTokens
 import androidx.wear.compose.materialcore.screenWidthDp
@@ -377,7 +377,7 @@ public fun rememberRevealState(
         initialValue = initialValue,
         animationSpec = tween(durationMillis = RAPID_ANIMATION, easing = FastOutSlowInEasing),
         anchors =
-            createAnchors(
+            createRevealAnchors(
                 revealingAnchor = if (useAnchoredActions) anchorFraction else 0f,
                 revealDirection = revealDirection,
             ),
