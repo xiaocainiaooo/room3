@@ -310,7 +310,7 @@ package androidx.compose.ui.autofill {
   public final class ContentDataType_androidKt {
     method public static androidx.compose.ui.autofill.ContentDataType ContentDataType(int dataType);
     method public static int getDataType(androidx.compose.ui.autofill.ContentDataType);
-    property public static int dataType;
+    property public static int androidx.compose.ui.autofill.ContentDataType.dataType;
   }
 
   public sealed interface ContentType {
@@ -1869,13 +1869,13 @@ package androidx.compose.ui.input.key {
     method public static boolean isCtrlPressed(android.view.KeyEvent);
     method public static boolean isMetaPressed(android.view.KeyEvent);
     method public static boolean isShiftPressed(android.view.KeyEvent);
-    property public static boolean isAltPressed;
-    property public static boolean isCtrlPressed;
-    property public static boolean isMetaPressed;
-    property public static boolean isShiftPressed;
-    property public static long key;
-    property public static int type;
-    property public static int utf16CodePoint;
+    property public static boolean android.view.KeyEvent.isAltPressed;
+    property public static boolean android.view.KeyEvent.isCtrlPressed;
+    property public static boolean android.view.KeyEvent.isMetaPressed;
+    property public static boolean android.view.KeyEvent.isShiftPressed;
+    property public static long android.view.KeyEvent.key;
+    property public static int android.view.KeyEvent.type;
+    property public static int android.view.KeyEvent.utf16CodePoint;
   }
 
   public final class KeyInputModifierKt {
@@ -1891,7 +1891,7 @@ package androidx.compose.ui.input.key {
   public final class Key_androidKt {
     method public static long Key(int nativeKeyCode);
     method public static int getNativeKeyCode(long);
-    property public static int nativeKeyCode;
+    property public static int long.nativeKeyCode;
   }
 
   public interface SoftKeyboardInterceptionModifierNode extends androidx.compose.ui.node.DelegatableNode {
@@ -2078,22 +2078,22 @@ package androidx.compose.ui.input.pointer {
     method public static boolean isShiftPressed(int);
     method public static boolean isSymPressed(int);
     method public static boolean isTertiaryPressed(int);
-    property public static boolean areAnyPressed;
-    property public static boolean isAltGraphPressed;
-    property public static boolean isAltPressed;
-    property public static boolean isBackPressed;
-    property public static boolean isCapsLockOn;
-    property public static boolean isCtrlPressed;
-    property public static boolean isForwardPressed;
-    property public static boolean isFunctionPressed;
-    property public static boolean isMetaPressed;
-    property public static boolean isNumLockOn;
-    property public static boolean isPrimaryPressed;
-    property public static boolean isScrollLockOn;
-    property public static boolean isSecondaryPressed;
-    property public static boolean isShiftPressed;
-    property public static boolean isSymPressed;
-    property public static boolean isTertiaryPressed;
+    property public static boolean int.areAnyPressed;
+    property public static boolean int.isAltGraphPressed;
+    property public static boolean int.isAltPressed;
+    property public static boolean int.isBackPressed;
+    property public static boolean int.isCapsLockOn;
+    property public static boolean int.isCtrlPressed;
+    property public static boolean int.isForwardPressed;
+    property public static boolean int.isFunctionPressed;
+    property public static boolean int.isMetaPressed;
+    property public static boolean int.isNumLockOn;
+    property public static boolean int.isPrimaryPressed;
+    property public static boolean int.isScrollLockOn;
+    property public static boolean int.isSecondaryPressed;
+    property public static boolean int.isShiftPressed;
+    property public static boolean int.isSymPressed;
+    property public static boolean int.isTertiaryPressed;
   }
 
   @androidx.compose.runtime.Stable public interface PointerIcon {
@@ -2489,7 +2489,7 @@ package androidx.compose.ui.layout {
   public final class LayoutIdKt {
     method public static Object? getLayoutId(androidx.compose.ui.layout.Measurable);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier layoutId(androidx.compose.ui.Modifier, Object layoutId);
-    property public static Object? layoutId;
+    property public static Object? androidx.compose.ui.layout.Measurable.layoutId;
   }
 
   public interface LayoutIdParentData {
@@ -2525,7 +2525,7 @@ package androidx.compose.ui.layout {
 
   public final class LayoutInfo_androidKt {
     method public static android.view.View? getView(androidx.compose.ui.layout.LayoutInfo);
-    property public static android.view.View? view;
+    property public static android.view.View? androidx.compose.ui.layout.LayoutInfo.view;
   }
 
   public final class LayoutKt {
@@ -2554,7 +2554,7 @@ package androidx.compose.ui.layout {
     method public androidx.compose.ui.layout.LayoutCoordinates getLookaheadScopeCoordinates(androidx.compose.ui.layout.Placeable.PlacementScope);
     method public default long localLookaheadPositionOf(androidx.compose.ui.layout.LayoutCoordinates, androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, optional long relativeToSource, optional boolean includeMotionFrameOfReference);
     method public androidx.compose.ui.layout.LayoutCoordinates toLookaheadCoordinates(androidx.compose.ui.layout.LayoutCoordinates);
-    property public abstract androidx.compose.ui.layout.LayoutCoordinates lookaheadScopeCoordinates;
+    property public abstract androidx.compose.ui.layout.LayoutCoordinates androidx.compose.ui.layout.Placeable.PlacementScope.lookaheadScopeCoordinates;
   }
 
   public final class LookaheadScopeKt {
@@ -2771,8 +2771,8 @@ package androidx.compose.ui.layout {
     method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.layout.ScaleFactor> block);
     method @androidx.compose.runtime.Stable public static operator long times(long, long scaleFactor);
     method @androidx.compose.runtime.Stable public static operator long times(long, long size);
-    property @androidx.compose.runtime.Stable public static inline boolean isSpecified;
-    property @androidx.compose.runtime.Stable public static inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isSpecified;
+    property @androidx.compose.runtime.Stable public static inline boolean long.isUnspecified;
   }
 
   public final class SubcomposeLayoutKt {
@@ -2857,7 +2857,7 @@ package androidx.compose.ui.modifier {
     method public default <T> T getCurrent(androidx.compose.ui.modifier.ModifierLocal<T>);
     method public default androidx.compose.ui.modifier.ModifierLocalMap getProvidedValues();
     method public default <T> void provide(androidx.compose.ui.modifier.ModifierLocal<T> key, T value);
-    property public default T current;
+    property public default <T> T androidx.compose.ui.modifier.ModifierLocal<T>.current;
     property public default androidx.compose.ui.modifier.ModifierLocalMap providedValues;
   }
 
@@ -2884,7 +2884,7 @@ package androidx.compose.ui.modifier {
 
   public interface ModifierLocalReadScope {
     method public <T> T getCurrent(androidx.compose.ui.modifier.ModifierLocal<T>);
-    property public abstract T current;
+    property public abstract <T> T androidx.compose.ui.modifier.ModifierLocal<T>.current;
   }
 
   @androidx.compose.runtime.Stable public final class ProvidableModifierLocal<T> extends androidx.compose.ui.modifier.ModifierLocal<T> {
@@ -3611,7 +3611,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
     method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
     method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext?);
-    property public static androidx.compose.runtime.CompositionContext? compositionContext;
+    property public static androidx.compose.runtime.CompositionContext? android.view.View.compositionContext;
   }
 
 }
@@ -4095,40 +4095,40 @@ package androidx.compose.ui.semantics {
     method public static void setTraversalIndex(androidx.compose.ui.semantics.SemanticsPropertyReceiver, float);
     method public static void setVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange);
     method public static void showTextSubstitution(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Boolean,java.lang.Boolean>? action);
-    property public static androidx.compose.ui.semantics.CollectionInfo collectionInfo;
-    property public static androidx.compose.ui.semantics.CollectionItemInfo collectionItemInfo;
-    property public static androidx.compose.ui.autofill.ContentDataType contentDataType;
-    property public static String contentDescription;
-    property public static androidx.compose.ui.autofill.ContentType contentType;
-    property public static java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> customActions;
-    property public static androidx.compose.ui.text.AnnotatedString editableText;
-    property public static boolean focused;
-    property public static androidx.compose.ui.semantics.ScrollAxisRange horizontalScrollAxisRange;
-    property @Deprecated public static int imeAction;
-    property @Deprecated public static boolean isContainer;
-    property public static boolean isEditable;
-    property public static boolean isShowingTextSubstitution;
-    property public static boolean isTraversalGroup;
-    property public static int liveRegion;
-    property public static int maxTextLength;
-    property public static String paneTitle;
-    property public static androidx.compose.ui.semantics.ProgressBarRangeInfo progressBarRangeInfo;
-    property public static int role;
-    property public static boolean selected;
-    property public static String stateDescription;
-    property public static String testTag;
-    property public static androidx.compose.ui.text.AnnotatedString text;
-    property public static long textSelectionRange;
-    property public static androidx.compose.ui.text.AnnotatedString textSubstitution;
-    property public static androidx.compose.ui.state.ToggleableState toggleableState;
-    property public static float traversalIndex;
-    property public static androidx.compose.ui.semantics.ScrollAxisRange verticalScrollAxisRange;
+    property public static androidx.compose.ui.semantics.CollectionInfo androidx.compose.ui.semantics.SemanticsPropertyReceiver.collectionInfo;
+    property public static androidx.compose.ui.semantics.CollectionItemInfo androidx.compose.ui.semantics.SemanticsPropertyReceiver.collectionItemInfo;
+    property public static androidx.compose.ui.autofill.ContentDataType androidx.compose.ui.semantics.SemanticsPropertyReceiver.contentDataType;
+    property public static String androidx.compose.ui.semantics.SemanticsPropertyReceiver.contentDescription;
+    property public static androidx.compose.ui.autofill.ContentType androidx.compose.ui.semantics.SemanticsPropertyReceiver.contentType;
+    property public static java.util.List<androidx.compose.ui.semantics.CustomAccessibilityAction> androidx.compose.ui.semantics.SemanticsPropertyReceiver.customActions;
+    property public static androidx.compose.ui.text.AnnotatedString androidx.compose.ui.semantics.SemanticsPropertyReceiver.editableText;
+    property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.focused;
+    property public static androidx.compose.ui.semantics.ScrollAxisRange androidx.compose.ui.semantics.SemanticsPropertyReceiver.horizontalScrollAxisRange;
+    property @Deprecated public static int androidx.compose.ui.semantics.SemanticsPropertyReceiver.imeAction;
+    property @Deprecated public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isContainer;
+    property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isEditable;
+    property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isShowingTextSubstitution;
+    property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isTraversalGroup;
+    property public static int androidx.compose.ui.semantics.SemanticsPropertyReceiver.liveRegion;
+    property public static int androidx.compose.ui.semantics.SemanticsPropertyReceiver.maxTextLength;
+    property public static String androidx.compose.ui.semantics.SemanticsPropertyReceiver.paneTitle;
+    property public static androidx.compose.ui.semantics.ProgressBarRangeInfo androidx.compose.ui.semantics.SemanticsPropertyReceiver.progressBarRangeInfo;
+    property public static int androidx.compose.ui.semantics.SemanticsPropertyReceiver.role;
+    property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.selected;
+    property public static String androidx.compose.ui.semantics.SemanticsPropertyReceiver.stateDescription;
+    property public static String androidx.compose.ui.semantics.SemanticsPropertyReceiver.testTag;
+    property public static androidx.compose.ui.text.AnnotatedString androidx.compose.ui.semantics.SemanticsPropertyReceiver.text;
+    property public static long androidx.compose.ui.semantics.SemanticsPropertyReceiver.textSelectionRange;
+    property public static androidx.compose.ui.text.AnnotatedString androidx.compose.ui.semantics.SemanticsPropertyReceiver.textSubstitution;
+    property public static androidx.compose.ui.state.ToggleableState androidx.compose.ui.semantics.SemanticsPropertyReceiver.toggleableState;
+    property public static float androidx.compose.ui.semantics.SemanticsPropertyReceiver.traversalIndex;
+    property public static androidx.compose.ui.semantics.ScrollAxisRange androidx.compose.ui.semantics.SemanticsPropertyReceiver.verticalScrollAxisRange;
   }
 
   public final class SemanticsProperties_androidKt {
     method public static boolean getTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void setTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
-    property public static boolean testTagsAsResourceId;
+    property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.testTagsAsResourceId;
   }
 
   public final class SemanticsPropertyKey<T> {

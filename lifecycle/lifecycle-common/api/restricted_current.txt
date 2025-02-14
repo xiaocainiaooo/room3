@@ -73,8 +73,8 @@ package androidx.lifecycle {
   public final class LifecycleKt {
     method public static androidx.lifecycle.LifecycleCoroutineScope getCoroutineScope(androidx.lifecycle.Lifecycle);
     method public static kotlinx.coroutines.flow.Flow<androidx.lifecycle.Lifecycle.Event> getEventFlow(androidx.lifecycle.Lifecycle);
-    property public static androidx.lifecycle.LifecycleCoroutineScope coroutineScope;
-    property public static kotlinx.coroutines.flow.Flow<androidx.lifecycle.Lifecycle.Event> eventFlow;
+    property public static androidx.lifecycle.LifecycleCoroutineScope androidx.lifecycle.Lifecycle.coroutineScope;
+    property public static kotlinx.coroutines.flow.Flow<androidx.lifecycle.Lifecycle.Event> androidx.lifecycle.Lifecycle.eventFlow;
   }
 
   public interface LifecycleObserver {
@@ -87,7 +87,7 @@ package androidx.lifecycle {
 
   public final class LifecycleOwnerKt {
     method public static androidx.lifecycle.LifecycleCoroutineScope getLifecycleScope(androidx.lifecycle.LifecycleOwner);
-    property public static androidx.lifecycle.LifecycleCoroutineScope lifecycleScope;
+    property public static androidx.lifecycle.LifecycleCoroutineScope androidx.lifecycle.LifecycleOwner.lifecycleScope;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Lifecycling {

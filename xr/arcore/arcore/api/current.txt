@@ -96,7 +96,7 @@ package androidx.xr.arcore {
 
   public final class PerceptionStateExtenderKt {
     method public static androidx.xr.arcore.PerceptionState? getPerceptionState(androidx.xr.runtime.CoreState);
-    property public static androidx.xr.arcore.PerceptionState? perceptionState;
+    property public static androidx.xr.arcore.PerceptionState? androidx.xr.runtime.CoreState.perceptionState;
   }
 
   public final class Plane implements androidx.xr.arcore.Trackable<androidx.xr.arcore.Plane.State> {
