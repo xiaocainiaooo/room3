@@ -2,7 +2,10 @@ package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
@@ -60,12 +63,62 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
+        AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
+            itemType =
+            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "value" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE,
+      "listValue" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "value",
+      "listValue",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunction",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -105,12 +158,62 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
+        AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
+            itemType =
+            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "value" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE,
+      "listValue" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "value",
+      "listValue",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunctionSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -151,12 +254,62 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
+        AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
+            itemType =
+            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "value" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE,
+      "listValue" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "value",
+      "listValue",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunctionNullableSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -191,12 +344,62 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
+        AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
+            itemType =
+            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "value" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_VALUE,
+      "listValue" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "value",
+      "listValue",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunctionNullableSerializable",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 }

@@ -7,14 +7,14 @@ import androidx.appfunctions.AppFunctionSerializable
 class SerializableOutputFunctions {
     @AppFunction
     fun simpleFunction(appFunctionContext: AppFunctionContext): SampleSerializable {
-        return SampleSerializable("testValue")
+        return SampleSerializable("testValue", listOf("testListValue"))
     }
 
     @AppFunction
     fun simpleFunctionSerializableList(
         appFunctionContext: AppFunctionContext,
     ): List<SampleSerializable> {
-        return listOf(SampleSerializable("testValue"))
+        return listOf(SampleSerializable("testValue", listOf("testListValue")))
     }
 
     @AppFunction
@@ -32,4 +32,4 @@ class SerializableOutputFunctions {
     }
 }
 
-@AppFunctionSerializable class SampleSerializable(val value: String) {}
+@AppFunctionSerializable class SampleSerializable(val value: String, val listValue: List<String>) {}

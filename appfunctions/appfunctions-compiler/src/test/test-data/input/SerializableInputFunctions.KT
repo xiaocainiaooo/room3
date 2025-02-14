@@ -27,4 +27,4 @@ class SerializableInputFunctions {
     ) {}
 }
 
-@AppFunctionSerializable class SampleSerializable(val value: String) {}
+@AppFunctionSerializable class SampleSerializable(val value: String, val listValue: List<String>) {}

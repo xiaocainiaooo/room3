@@ -25,6 +25,8 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionComponentRegistryAnnotation
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
@@ -141,8 +143,11 @@ class AppFunctionInventoryProcessor(
                 functionMetadataObjectClassBuilder,
                 functionMetadata.response
             )
+            addPropertyForComponentsMetadata(
+                functionMetadataObjectClassBuilder,
+                functionMetadata.components
+            )
             addPropertyForAppFunctionMetadata(functionMetadataObjectClassBuilder, functionMetadata)
-            // TODO: Add appfunction component properties
             inventoryClassBuilder.addType(functionMetadataObjectClassBuilder.build())
         }
         addFunctionIdToMetadataMapProperty(inventoryClassBuilder, appFunctionMetadataList)
@@ -167,7 +172,8 @@ class AppFunctionInventoryProcessor(
                                 isEnabledByDefault = %L,
                                 schema =  %L,
                                 parameters = %L,
-                                response = %L
+                                response = %L,
+                                components = %L
                             )
                             """
                                 .trimIndent(),
@@ -176,8 +182,103 @@ class AppFunctionInventoryProcessor(
                             functionMetadata.isEnabledByDefault,
                             SCHEMA_METADATA_PROPERTY_NAME,
                             PARAMETER_METADATA_LIST_PROPERTY_NAME,
-                            RESPONSE_METADATA_PROPERTY_NAME
+                            RESPONSE_METADATA_PROPERTY_NAME,
+                            COMPONENT_METADATA_PROPERTY_NAME
                         )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForComponentsMetadata(
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        appFunctionComponentsMetadata: AppFunctionComponentsMetadata
+    ) {
+        val componentDataTypesPropertyName = COMPONENT_METADATA_PROPERTY_NAME + "_DATA_TYPES_MAP"
+        addPropertyForComponentsDataTypes(
+            componentDataTypesPropertyName,
+            functionMetadataObjectClassBuilder,
+            appFunctionComponentsMetadata.dataTypes
+        )
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    COMPONENT_METADATA_PROPERTY_NAME,
+                    IntrospectionHelper.APP_FUNCTION_COMPONENTS_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                dataTypes = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_COMPONENTS_METADATA_CLASS,
+                            componentDataTypesPropertyName
+                        )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForComponentsDataTypes(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        dataTypes: Map<String, AppFunctionDataTypeMetadata>
+    ) {
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    Map::class.asClassName()
+                        .parameterizedBy(
+                            String::class.asClassName(),
+                            IntrospectionHelper.APP_FUNCTION_DATA_TYPE_METADATA
+                        ),
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("mapOf(")
+                        indent()
+                        for ((componentReferenceKey, componentReferenceTypeMetadata) in dataTypes) {
+                            val datatypeVariableName =
+                                when (componentReferenceTypeMetadata) {
+                                    is AppFunctionObjectTypeMetadata -> {
+                                        val objectTypeMetadataPropertyName =
+                                            getObjectTypeMetadataPropertyNameForComponent(
+                                                componentReferenceKey
+                                            )
+                                        addPropertyForObjectTypeMetadata(
+                                            objectTypeMetadataPropertyName,
+                                            functionMetadataObjectClassBuilder,
+                                            componentReferenceTypeMetadata
+                                        )
+                                        objectTypeMetadataPropertyName
+                                    }
+                                    else -> {
+                                        // TODO provide KSNode to improve error message
+                                        throw ProcessingException(
+                                            "Component types contains unsupported datatype: " +
+                                                componentReferenceTypeMetadata,
+                                            null
+                                        )
+                                    }
+                                }
+                            addStatement(
+                                """
+                                %S to %L,
+                                """
+                                    .trimIndent(),
+                                componentReferenceKey,
+                                datatypeVariableName
+                            )
+                        }
+                        addStatement(")")
+                        unindent()
                     }
                 )
                 .build()
@@ -188,7 +289,6 @@ class AppFunctionInventoryProcessor(
         functionMetadataObjectClassBuilder: TypeSpec.Builder,
         appFunctionResponseMetadata: AppFunctionResponseMetadata
     ) {
-        val responseMetadataPropertyName = RESPONSE_METADATA_PROPERTY_NAME
         val responseMetadataValueTypeName =
             when (val castDataType = appFunctionResponseMetadata.valueType) {
                 is AppFunctionPrimitiveTypeMetadata -> {
@@ -237,7 +337,7 @@ class AppFunctionInventoryProcessor(
             }
         functionMetadataObjectClassBuilder.addProperty(
             PropertySpec.builder(
-                    responseMetadataPropertyName,
+                    RESPONSE_METADATA_PROPERTY_NAME,
                     IntrospectionHelper.APP_FUNCTION_RESPONSE_METADATA_CLASS
                 )
                 .addModifiers(KModifier.PRIVATE)
@@ -512,6 +612,18 @@ class AppFunctionInventoryProcessor(
         functionMetadataObjectClassBuilder: TypeSpec.Builder,
         objectTypeMetadata: AppFunctionObjectTypeMetadata,
     ) {
+        val objectPropertiesMapPropertyName = propertyName + "_PROPERTIES_MAP"
+        addPropertyForObjectPropertiesMap(
+            objectPropertiesMapPropertyName,
+            functionMetadataObjectClassBuilder,
+            objectTypeMetadata.properties
+        )
+        val requiredPropertiesListPropertyName = propertyName + "_REQUIRED_PROPERTIES_LIST"
+        addPropertyForListOfRequiredObjectProperties(
+            requiredPropertiesListPropertyName,
+            functionMetadataObjectClassBuilder,
+            objectTypeMetadata.required
+        )
         functionMetadataObjectClassBuilder.addProperty(
             PropertySpec.builder(
                     propertyName,
@@ -520,21 +632,121 @@ class AppFunctionInventoryProcessor(
                 .addModifiers(KModifier.PRIVATE)
                 .initializer(
                     buildCodeBlock {
-                        // TODO: properly construct Object type metadata.
                         addStatement(
                             """
                             %T(
-                                properties = emptyMap(),
-                                required = emptyList(),
-                                qualifiedName = %L,
+                                properties = %L,
+                                required = %L,
+                                qualifiedName = %S,
                                 isNullable = %L
                             )
                             """
                                 .trimIndent(),
                             IntrospectionHelper.APP_FUNCTION_OBJECT_TYPE_METADATA_CLASS,
+                            objectPropertiesMapPropertyName,
+                            requiredPropertiesListPropertyName,
                             objectTypeMetadata.qualifiedName,
                             objectTypeMetadata.isNullable,
                         )
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForListOfRequiredObjectProperties(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        requiredProperties: List<String>
+    ) {
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    List::class.asClassName().parameterizedBy(String::class.asClassName())
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("listOf(")
+                        indent()
+                        for (requiredProperty in requiredProperties) {
+                            addStatement("%S,", requiredProperty)
+                        }
+                        unindent()
+                        addStatement(")")
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForObjectPropertiesMap(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        propertiesMap: Map<String, AppFunctionDataTypeMetadata>,
+    ) {
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    Map::class.asClassName()
+                        .parameterizedBy(
+                            String::class.asClassName(),
+                            IntrospectionHelper.APP_FUNCTION_DATA_TYPE_METADATA
+                        ),
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("mapOf(")
+                        indent()
+                        for ((objectPropertyName, objectPropertyTypeMetadata) in propertiesMap) {
+                            val dataTypeVariableName =
+                                propertyName + "_${objectPropertyName.uppercase()}"
+                            when (objectPropertyTypeMetadata) {
+                                is AppFunctionPrimitiveTypeMetadata ->
+                                    addPropertyForPrimitiveTypeMetadata(
+                                        dataTypeVariableName,
+                                        functionMetadataObjectClassBuilder,
+                                        objectPropertyTypeMetadata
+                                    )
+                                is AppFunctionArrayTypeMetadata ->
+                                    addPropertyForArrayTypeMetadata(
+                                        dataTypeVariableName,
+                                        functionMetadataObjectClassBuilder,
+                                        objectPropertyTypeMetadata
+                                    )
+                                is AppFunctionObjectTypeMetadata ->
+                                    addPropertyForObjectTypeMetadata(
+                                        dataTypeVariableName,
+                                        functionMetadataObjectClassBuilder,
+                                        objectPropertyTypeMetadata
+                                    )
+                                is AppFunctionReferenceTypeMetadata ->
+                                    addPropertyForReferenceTypeMetadata(
+                                        dataTypeVariableName,
+                                        functionMetadataObjectClassBuilder,
+                                        objectPropertyTypeMetadata
+                                    )
+                                else -> {
+                                    // TODO provide KSNode to improve error message
+                                    throw ProcessingException(
+                                        "Unable to build metadata for unknown object property " +
+                                            "datatype: $objectPropertyTypeMetadata",
+                                        null
+                                    )
+                                }
+                            }
+                            addStatement(
+                                """
+                                %S to %L,
+                                """
+                                    .trimIndent(),
+                                objectPropertyName,
+                                dataTypeVariableName
+                            )
+                        }
+                        unindent()
+                        addStatement(")")
                     }
                 )
                 .build()
@@ -682,11 +894,22 @@ class AppFunctionInventoryProcessor(
         return "PARAMETER_METADATA_${parameterMetadata.name.uppercase()}_REFERENCE_DATA_TYPE"
     }
 
+    /**
+     * Generates the name of the property for the object type metadata of a component.
+     *
+     * @param componentName The name of the component.
+     * @return The name of the property.
+     */
+    private fun getObjectTypeMetadataPropertyNameForComponent(componentName: String): String {
+        return "${componentName.uppercase().replace(".", "_")}_OBJECT_DATA_TYPE"
+    }
+
     companion object {
         const val APP_FUNCTION_METADATA_PROPERTY_NAME = "APP_FUNCTION_METADATA"
         const val SCHEMA_METADATA_PROPERTY_NAME = "SCHEMA_METADATA"
         const val PARAMETER_METADATA_LIST_PROPERTY_NAME = "PARAMETER_METADATA_LIST"
         const val RESPONSE_METADATA_PROPERTY_NAME = "RESPONSE_METADATA"
+        const val COMPONENT_METADATA_PROPERTY_NAME = "COMPONENTS_METADATA"
         const val FUNCTION_ID_TO_METADATA_MAP_PROPERTY_NAME = "functionIdToMetadataMap"
     }
 }
