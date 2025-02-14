@@ -65,6 +65,8 @@ object IntrospectionHelper {
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionSchemaMetadata")
     val APP_FUNCTION_PARAMETER_METADATA_CLASS =
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionParameterMetadata")
+    val APP_FUNCTION_DATA_TYPE_METADATA =
+        ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionDataTypeMetadata")
     val APP_FUNCTION_PRIMITIVE_TYPE_METADATA_CLASS =
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionPrimitiveTypeMetadata")
     val APP_FUNCTION_OBJECT_TYPE_METADATA_CLASS =
@@ -73,6 +75,8 @@ object IntrospectionHelper {
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionArrayTypeMetadata")
     val APP_FUNCTION_REFERENCE_TYPE_METADATA_CLASS =
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionReferenceTypeMetadata")
+    val APP_FUNCTION_COMPONENTS_METADATA_CLASS =
+        ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionComponentsMetadata")
     val APP_FUNCTION_RESPONSE_METADATA_CLASS =
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionResponseMetadata")
 

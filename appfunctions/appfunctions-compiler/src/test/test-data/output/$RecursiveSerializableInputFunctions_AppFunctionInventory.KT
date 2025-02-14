@@ -2,7 +2,10 @@ package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
@@ -60,12 +63,46 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "nested" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "nested",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.RecursiveSerializableInputFunctions#simpleFunction",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -106,12 +143,46 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "nested" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "nested",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -153,13 +224,47 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "nested" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "nested",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id =
             "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -195,13 +300,47 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "nested" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NESTED,
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "nested",
+    )
+
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.SampleSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.SampleSerializable" to COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id =
             "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializable",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 }

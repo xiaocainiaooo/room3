@@ -2,6 +2,8 @@ package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
@@ -99,12 +101,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionInt",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -138,12 +149,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLong",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -177,12 +197,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloat",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -216,12 +245,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDouble",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -255,12 +293,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBoolean",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -294,12 +341,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionString",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -333,12 +389,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableInt",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -372,12 +437,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLong",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -411,12 +485,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloat",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -450,12 +533,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDouble",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -489,12 +581,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBoolean",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -528,12 +629,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableString",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -573,12 +683,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionIntArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -618,12 +737,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLongArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -663,12 +791,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloatArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -708,12 +845,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDoubleArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -753,12 +899,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBooleanArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -798,12 +953,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionStringList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -843,12 +1007,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableIntArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -889,12 +1062,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLongArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -935,12 +1117,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloatArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -981,12 +1172,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDoubleArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -1027,12 +1227,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBooleanArray",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -1073,12 +1282,21 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
             valueType = PRIMITIVE_RESPONSE_VALUE_TYPE
         )
 
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableStringList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 }
