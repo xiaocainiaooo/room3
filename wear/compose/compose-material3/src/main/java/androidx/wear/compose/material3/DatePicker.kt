@@ -348,18 +348,25 @@ public fun DatePicker(
                     val spacing = if (isLargeScreen) 6.dp else 4.dp
                     // Pass a negative value as the selected picker index when none is selected.
                     PickerGroup(
-                        selectedPickerIndex = selectedIndex ?: -1,
-                        onPickerSelected = { selectedIndex = it },
+                        selectedPickerState =
+                            selectedIndex?.let {
+                                when (datePickerOptions.getOrNull(it)) {
+                                    DatePickerOption.Day -> datePickerState.dayState
+                                    DatePickerOption.Month -> datePickerState.monthState
+                                    DatePickerOption.Year -> datePickerState.yearState
+                                    else -> null
+                                }
+                            },
                         autoCenter = true,
-                        separator = { Spacer(Modifier.width(if (isLargeScreen) 12.dp else 8.dp)) },
                     ) {
                         datePickerOptions.forEachIndexed { index, datePickerOption ->
                             when (datePickerOption) {
                                 DatePickerOption.Day ->
-                                    pickerGroupItem(
+                                    PickerGroupItem(
                                         pickerState = datePickerState.dayState,
                                         modifier = Modifier.width(dayWidth).fillMaxHeight(),
                                         onSelected = { onPickerSelected(index, index + 1) },
+                                        selected = index == selectedIndex,
                                         contentDescription = dayContentDescription,
                                         option =
                                             pickerTextOption(
@@ -383,10 +390,11 @@ public fun DatePicker(
                                         verticalSpacing = spacing,
                                     )
                                 DatePickerOption.Month ->
-                                    pickerGroupItem(
+                                    PickerGroupItem(
                                         pickerState = datePickerState.monthState,
                                         modifier = Modifier.width(monthYearWidth).fillMaxHeight(),
                                         onSelected = { onPickerSelected(index, index + 1) },
+                                        selected = index == selectedIndex,
                                         contentDescription = monthContentDescription,
                                         option =
                                             pickerTextOption(
@@ -411,10 +419,11 @@ public fun DatePicker(
                                         verticalSpacing = spacing,
                                     )
                                 DatePickerOption.Year ->
-                                    pickerGroupItem(
+                                    PickerGroupItem(
                                         pickerState = datePickerState.yearState,
                                         modifier = Modifier.width(monthYearWidth).fillMaxHeight(),
                                         onSelected = { onPickerSelected(index, index + 1) },
+                                        selected = index == selectedIndex,
                                         contentDescription = yearContentDescription,
                                         option =
                                             pickerTextOption(
@@ -437,6 +446,9 @@ public fun DatePicker(
                                             ),
                                         verticalSpacing = spacing,
                                     )
+                            }
+                            if (index < datePickerOptions.size - 1) {
+                                Spacer(Modifier.width(if (isLargeScreen) 12.dp else 8.dp))
                             }
                         }
                     }

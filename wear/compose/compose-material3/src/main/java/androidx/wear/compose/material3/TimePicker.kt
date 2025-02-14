@@ -233,25 +233,25 @@ public fun TimePicker(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
+
                     // Pass a negative value as the selected picker index when none is selected.
                     PickerGroup(
-                        selectedPickerIndex = selectedIndex ?: -1,
-                        onPickerSelected = { selectedIndex = it },
+                        selectedPickerState =
+                            when {
+                                focusedPicker == FocusableElements.Hours -> hourState
+                                focusedPicker == FocusableElements.Minutes -> minuteState
+                                focusedPicker == FocusableElements.SecondsOrPeriod &&
+                                    thirdPicker != null -> thirdPicker.state
+                                else -> null
+                            },
                         modifier = Modifier.fillMaxWidth(),
-                        separator = {
-                            Separator(
-                                textStyle = styles.optionTextStyle,
-                                color = colors.separatorColor,
-                                separatorPadding = styles.separatorPadding,
-                                text = if (it == 0 || !is12hour) ":" else ""
-                            )
-                        },
                         autoCenter = false,
                     ) {
                         // Hours Picker
-                        pickerGroupItem(
+                        PickerGroupItem(
                             pickerState = hourState,
                             modifier = Modifier.width(styles.optionWidth).fillMaxHeight(),
+                            selected = selectedIndex == FocusableElements.Hours.index,
                             onSelected = {
                                 onPickerSelected(
                                     FocusableElements.Hours,
@@ -270,10 +270,18 @@ public fun TimePicker(
                             verticalSpacing = styles.optionSpacing
                         )
 
+                        Separator(
+                            textStyle = styles.optionTextStyle,
+                            color = colors.separatorColor,
+                            separatorPadding = styles.separatorPadding,
+                            text = ":"
+                        )
+
                         // Minutes Picker
-                        pickerGroupItem(
+                        PickerGroupItem(
                             pickerState = minuteState,
                             modifier = Modifier.width(styles.optionWidth).fillMaxHeight(),
+                            selected = selectedIndex == FocusableElements.Minutes.index,
                             onSelected = {
                                 onPickerSelected(
                                     FocusableElements.Minutes,
@@ -298,9 +306,17 @@ public fun TimePicker(
 
                         // Seconds or Period picker
                         if (thirdPicker != null) {
-                            pickerGroupItem(
+                            Separator(
+                                text = if (!is12hour) ":" else "",
+                                textStyle = styles.optionTextStyle,
+                                color = colors.separatorColor,
+                                separatorPadding = styles.separatorPadding,
+                            )
+
+                            PickerGroupItem(
                                 pickerState = thirdPicker.state,
                                 modifier = Modifier.width(styles.optionWidth).fillMaxHeight(),
+                                selected = selectedIndex == FocusableElements.SecondsOrPeriod.index,
                                 onSelected = {
                                     onPickerSelected(
                                         FocusableElements.SecondsOrPeriod,
