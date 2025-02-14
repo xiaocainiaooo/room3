@@ -46,13 +46,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"जारी राख्न आफ्नो फिंगरप्रिन्ट वा स्क्रिन लक प्रयोग गरी पुष्टि गर्नुहोस्"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"जारी राख्न आफ्नो फेस वा स्क्रिन लक प्रयोग गरी पुष्टि गर्नुहोस्"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"जारी राख्न आफ्नो बायोमेट्रिक वा स्क्रिन लक प्रयोग गरी पुष्टि गर्नुहोस्"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"अगाडि बढ्न बायोमेट्रिक चाहिन्छ"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"पहिचान पुष्टि गर्ने सुविधा अन भएकाले बायोमेट्रिक चाहिन्छ तर तपाईंको फेस वा फिंगरप्रिन्ट सेन्सर उपलब्ध छैन\n"<ul><li>"तपाईंको क्यामेरा अन छ कि छैन हेर्नुहोस् र फेरि प्रयास गर्नुहोस्"</li>\n<li>"तपाईं आफ्नो Google खाता प्रयोग गरेर पहिचान पुष्टि गर्ने सुविधा अफ गर्न सक्नुहुन्छ"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"पहिचान पुष्टि गर्ने सुविधा अन छ तर पहिचान पुष्टि गर्न सकिएन"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"धेरै पटक गलत बायोमेट्रिक हालियो। फेरि प्रयास गर्न आफ्नो डिभाइस लक गरी अनलक गर्नुहोस्।"</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"तपाईं चोरीबाट सुरक्षा प्रदान गर्ने सेटिङमा गई पहिचान पुष्टि गर्ने सुविधा व्यवस्थापन गर्न सक्नुहुन्छ। सेटिङमा जानुहोस्"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"लक स्क्रिन"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"सेटिङमा जानुहोस्"</string>
-    <string name="common_ok" msgid="7266105758672679693">"ठिक छ"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"रद्द गर्नुहोस्"</string>
 </resources>

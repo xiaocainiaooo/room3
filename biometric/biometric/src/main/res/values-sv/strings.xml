@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Fortsätt med hjälp av ditt fingeravtryck eller skärmlåset"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Fortsätt med hjälp av ditt ansikte eller skärmlåset"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Fortsätt med hjälp av din biometriska data eller skärmlåset"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometri krävs för att fortsätta"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Identitetskontrollen är aktiverad och kräver biometri, men ansikts- eller fingeravtryckssensorn är inte tillgänglig\n"<ul><li>"Kontrollera att kameran är på och försök igen"</li>\n<li>"Du kan inaktivera identitetskontroll med ditt Google-konto"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identitetskontroll är aktiverad och din identitet kan inte verifieras"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometri misslyckades för många gånger. Lås och lås upp enheten för att försöka igen."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Du kan hantera identitetskontrollen i inställningarna för stöldskydd. Öppna Inställningar"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Låsskärm"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Öppna Inställningar"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Avbryt"</string>
 </resources>

@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"請使用指紋解鎖或螢幕鎖定功能驗證身分，才能繼續操作"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"請使用面孔解鎖或螢幕鎖定功能驗證身分，才能繼續操作"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"請使用生物識別或螢幕鎖定功能驗證身分，才能繼續操作"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"需要生物識別資料才可繼續"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"身分檢查功能已開啟，需要生物識別資料，但你的面孔或指紋感應器無法使用\n"<ul><li>"請檢查相機是否已開啟，然後再試一次"</li>\n<li>"你可使用 Google 帳戶關閉身分檢查功能"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"身分檢查功能已開啟，但無法識別你的身分"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"生物識別資料驗證失敗太多次。請先鎖定裝置，然後解鎖以重試。"</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"你可前往防盜設定管理身分檢查功能。前往「設定」"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"上鎖畫面"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"前往「設定」"</string>
-    <string name="common_ok" msgid="7266105758672679693">"確定"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"取消"</string>
 </resources>

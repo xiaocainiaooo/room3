@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Brug dit fingeraftryk eller din skærmlås for at fortsætte"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Brug din ansigts- eller skærmlås for at fortsætte"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Brug biometri eller din skærmlås for at fortsætte"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometriske data er påkrævet for at fortsætte"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Identitetstjek er aktiveret og kræver biometriske data, men din ansigts- eller fingeraftrykssensor er ikke tilgængelig\n"<ul><li>"Tjek, at dit kamera er tændt, og prøv igen"</li>\n<li>"Du kan deaktivere identitetstjek via din Google-konto"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identitetstjek er aktiveret og kan ikke verificere din identitet"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"De biometriske data mislykkedes for mange gange. Lås og lås op for din enhed for at prøve igen."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Du kan administrere identitetstjek i indstillingerne for tyveribeskyttelse. Gå til Indstillinger"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Låseskærm"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Gå til Indstillinger"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Annuller"</string>
 </resources>

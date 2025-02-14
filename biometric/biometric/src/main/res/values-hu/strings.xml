@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"A folytatás ujjlenyomattal vagy a képernyőzár feloldásával lehetséges"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"A folytatás arcalapú feloldással vagy a képernyőzár feloldásával lehetséges"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"A folytatás biometriai feloldással vagy a képernyőzár feloldásával lehetséges"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"A folytatáshoz biometrikus azonosítás szükséges"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"A személyazonosság-ellenőrzés be van kapcsolva, és biometrikus azonosítást igényel, de az arc- vagy ujjlenyomat-érzékelő nem áll rendelkezésre\n"<ul><li>"Ellenőrizze, hogy a kamera be van-e kapcsolva, és próbálkozzon újra"</li>\n<li>"Google-fiókjával kikapcsolhatja a személyazonosság-ellenőrzést"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Az Identity Check be van kapcsolva, de nem tudja ellenőrizni az Ön személyazonosságát"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"A biometrikus azonosítás túl sokszor volt sikertelen. Az újbóli próbálkozáshoz zárolja eszközét, majd oldja fel a zárolását."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"A személyazonosság ellenőrzését a lopás elleni védelem beállításai között kezelheti. Ugrás a Beállításokhoz"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Lezárási képernyő"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Ugrás a Beállításokhoz"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Mégse"</string>
 </resources>

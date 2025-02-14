@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Tumia alama ya kidole au mbinu yako ya kufunga skrini ili uendelee"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Tumia uso au mbinu yako ya kufunga skrini ili uendelee"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Tumia bayometriki au mbinu yako ya kufunga skrini ili uendelee"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Taarifa za kibayometri zinahitajika ili uendelee"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Kipengele cha Kuthibitisha Utambulisho kimewashwa na kinahitaji taarifa za kibayometri, lakini kitambuzi chako cha uso au cha alama ya kidole hakipatikani\n"<ul><li>"Hakikisha kuwa umewasha kamera kisha ujaribu tena"</li>\n<li>"Unaweza kuzima kipengele cha Kuthibitisha Utambulisho ukitumia Akaunti yako ya Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Kipengele cha Kuthibitisha Utambulisho kimewashwa na kimeshindwa kuthibitisha kuwa ni wewe"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Imeshindwa kuthibitisha taarifa za kibayometri mara nyingi mno. Funga kisha ufungue kifaa chako ili ujaribu tena."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Unaweza kudhibiti kipengele cha Kuthibitisha Utambulisho katika mipangilio ya ulinzi dhidi ya wizi. Nenda kwenye Mipangilio"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Skrini iliyofungwa"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Nenda kwenye Mipangilio"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Sawa"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Katisha"</string>
 </resources>

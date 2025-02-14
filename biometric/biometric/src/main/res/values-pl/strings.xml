@@ -46,13 +46,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Aby kontynuować, użyj odcisku palca lub blokady ekranu"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Aby kontynuować, użyj rozpoznawania twarzy lub blokady ekranu"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Aby kontynuować, użyj biometrii lub blokady ekranu"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Aby przejść dalej, musisz użyć biometrii"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Potwierdzenie tożsamości jest włączone i wymaga danych biometrycznych, ale funkcja rozpoznawania twarzy lub czytnik linii papilarnych są niedostępne\n"<ul><li>"Sprawdź, czy aparat jest włączony, i spróbuj ponownie"</li>\n<li>"Potwierdzenie tożsamości możesz wyłączyć na koncie Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Potwierdzenie tożsamości jest włączone, ale nie może potwierdzić, że to Ty"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Przekazanie danych biometrycznych nie powiodło się zbyt wiele razy. Zablokuj i odblokuj urządzenie, aby spróbować ponownie."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Potwierdzeniem tożsamości można zarządzać w ustawieniach ochrony w razie kradzieży. Otwórz Ustawienia"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Ekran blokady"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Otwórz Ustawienia"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Anuluj"</string>
 </resources>

@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Izmantojiet pirksta nospiedumu vai ekrāna bloķēšanas opciju, lai turpinātu"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Izmantojiet autorizāciju pēc sejas vai ekrāna bloķēšanas opciju, lai turpinātu"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Izmantojiet biometrijas datus vai ekrāna bloķēšanas opciju, lai turpinātu"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Lai turpinātu, nepieciešama biometrija"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Identitātes pārbaude ir ieslēgta, un tai ir nepieciešama biometrija, taču sejas vai pirksta nospieduma sensors nav pieejams.\n"<ul><li>"Pārbaudiet, vai kamera ir ieslēgta, un mēģiniet vēlreiz."</li>\n<li>"Varat izslēgt identitātes pārbaudi, izmantojot Google kontu."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identitātes pārbaude ir ieslēgta, un jūsu identitāti nevar verificēt"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Pārāk daudz reižu neizdevās izmantot biometriju. Lai mēģinātu vēlreiz, bloķējiet un atbloķējiet ierīci."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Varat pārvaldīt identitātes pārbaudi iestatījumu sadaļā “Aizsardzība pret zādzību”. Pārejiet uz iestatījumiem."</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Bloķēt ekrānu"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Pāriet uz iestatījumiem"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Labi"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Atcelt"</string>
 </resources>

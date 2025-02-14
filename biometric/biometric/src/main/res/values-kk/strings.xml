@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Жалғастыру үшін саусақ ізін немесе экран құлпын пайдаланыңыз."</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Жалғастыру үшін бетті анықтау функциясын немесе экран құлпын пайдаланыңыз."</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Жалғастыру үшін биометриканы немесе экран құлпын пайдаланыңыз."</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Жалғастыру үшін биометрия қажет"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Жеке басты тексеру функциясы қосулы және оған биометрия қажет, бірақ бет тану немесе саусақ ізін оқу сканері қолжетімді емес.\n"<ul><li>"Камераңыз қосулы екенін тексеріңіз де, әрекетті қайталап көріңіз."</li>\n<li>"Жеке басты тексеру функциясын Google аккаунтыңыз арқылы өшіре аласыз."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Жеке басты тексеру қосулы, бірақ жеке басыңызды растай алмайды"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Биометрияны алу талпынысы тым көп рет сәтсіз аяқталды. Қайталап көру үшін құрылғыны құлыптаңыз да, қайта ашыңыз."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Жеке басты тексеру функциясын ұрлықтан қорғау параметрлері арқылы басқара аласыз. Параметрлерге өту"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Құлыптаулы экран"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Параметрлерге өту"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Жарайды"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Бас тарту"</string>
 </resources>

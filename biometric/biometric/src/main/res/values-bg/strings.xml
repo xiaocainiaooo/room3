@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Използвайте отпечатъка си или опцията за заключване на екрана, за да продължите"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Използвайте лицето си или опцията за заключване на екрана, за да продължите"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Използвайте биометричните си данни или опцията за заключване на екрана, за да продължите"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Изисква се биометрично удостов., за да продължите"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Проверката на самоличността е включена и изисква биометрично удостоверяване, но няма достъп до функцията за отключване с лице или сензора за отпечатъци.\n"<ul><li>"Проверете дали камерата ви е включена и опитайте отново."</li>\n<li>"Можете да изключите проверката на самоличността от профила си в Google."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Проверката на самоличността е включена и не може да потвърди, че това сте вие"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Твърде много неуспешни опити за биометрично удостоверяване. За да опитате отново, заключете устройството си и го отключете."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Можете да управлявате проверката на самоличността от настройките на функцията за защита при кражба. Към настройките"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Заключен екран"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Към настройките"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Отказ"</string>
 </resources>

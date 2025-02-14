@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Gamitin ang iyong fingerprint o lock ng screen para magpatuloy"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Gamitin ang iyong mukha o lock ng screen para magpatuloy"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Gamitin ang iyong biometric o lock ng screen para magpatuloy"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Nire-require ang biometric para magpatuloy"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Naka-on ang Pag-check sa Identity at nagre-require ito ng biometric, pero hindi available ang iyong sensor para sa mukha o fingerprint\n"<ul><li>"Tiyaking naka-on ang camera mo at subukan ulit"</li>\n<li>"Mao-off mo ang Pag-check sa Identity gamit ang iyong Google Account"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Naka-on ang Pag-check sa Identity at hindi ma-verify na ikaw ito"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Masyadong maraming beses na pumalya ang biometrics. I-lock at i-unlock ang iyong device para subukan ulit."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Puwede mong pamahalaan ang Pag-check sa Identity sa mga setting ng proteksyon sa pagnanakaw. Pumunta sa Mga Setting"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"I-lock ang screen"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Pumunta sa Mga Setting"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Kanselahin"</string>
 </resources>

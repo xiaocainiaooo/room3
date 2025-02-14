@@ -46,13 +46,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Sebenzisa izigxivizo zakho zomunwe noma ukukhiya isikrini ukuze uqhubeke"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Sebenzisa ubuso bakho noma ukukhiya isikrini ukuze uqhubeke"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Sebenzisa i-biometric noma ukukhiya isikrini ukuze uqhubeke"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Ibiometric iyadingeka ukuze uqhubeke"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Ukuhlola Ubunikazi kuvuliwe futhi kudinga ibiometric, kodwa ubuso bakho noma inzwa yesigxivizo somunwe ayitholakali\n"<ul><li>"Hlola ukuthi ikhamera yakho ivuliwe bese uyazama futhi"</li>\n<li>"Ungavala Ukuhlola Ubunikazi usebenzisa iGoogle Account yakho"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Ukuhlola Ubunikazi kuvuliwe futhi akukwazi ukuqinisekisa ukuthi nguwe"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Amabiometric ahluleke izikhathi eziningi kakhulu. Khiya uphinde uvule idivayisi yakho ukuze uzame kabusha."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Ungalawula Ukuhlola Ubunikazi kumasethingi okuvikela ukweba. Iya kokuthi Amasethingi"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Khiya isikrini"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Iya kokuthi Amasethingi"</string>
-    <string name="common_ok" msgid="7266105758672679693">"KULUNGILE"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Khansela"</string>
 </resources>

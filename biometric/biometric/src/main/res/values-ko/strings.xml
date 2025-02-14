@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"계속하려면 지문이나 화면 잠금을 사용하세요."</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"계속하려면 얼굴 또는 화면 잠금을 사용하세요."</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"계속하려면 생체 인식이나 화면 잠금을 사용하세요."</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"계속하려면 생체 인식 필요"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"본인 확인이 사용 설정되어 있으며 생체 인식이 필요하지만 얼굴 또는 지문 센서를 사용할 수 없습니다.\n"<ul><li>"카메라가 켜져 있는지 확인한 후 다시 시도해 주세요."</li>\n<li>"Google 계정을 사용하여 본인 확인을 사용 중지할 수 있습니다."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"본인 확인이 사용 설정되어 있으며 본인 인증을 할 수 없습니다"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"생체 인식 실패 횟수가 너무 많습니다. 기기를 잠갔다가 잠금 해제한 후 다시 시도하세요."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"도난 방지 설정에서 본인 확인을 관리할 수 있습니다. 설정으로 이동"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"잠금 화면"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"설정으로 이동"</string>
-    <string name="common_ok" msgid="7266105758672679693">"확인"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"취소"</string>
 </resources>

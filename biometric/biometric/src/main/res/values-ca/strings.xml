@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Utilitza l\'empremta digital o el bloqueig de pantalla per continuar"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Utilitza la cara o el bloqueig de pantalla per continuar"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Utilitza la biometria o el bloqueig de pantalla per continuar"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Cal un mètode biomètric per continuar"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"La comprovació d\'identitat està activada i requereix un mètode biomètric, però el sensor facial o d\'empremtes digitals no està disponible.\n"<ul><li>"Comprova que la càmera estigui activada i torna-ho a provar."</li>\n<li>"Pots desactivar la comprovació d\'identitat amb el teu Compte de Google."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"La comprovació d\'identitat està activada i no es pot verificar que ets tu"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"La biometria ha fallat massa vegades. Bloqueja i desbloqueja el dispositiu per tornar-ho a provar."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Pots gestionar la comprovació d\'identitat a la configuració de la protecció antirobatori. Ves a Configuració."</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Pantalla de bloqueig"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Ves a Configuració"</string>
-    <string name="common_ok" msgid="7266105758672679693">"D\'acord"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Cancel·la"</string>
 </resources>
