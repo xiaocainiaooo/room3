@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Улантуу үчүн манжа изин же экрандын кулпусун колдонуңуз"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Улантуу үчүн жүзүңүздү же экрандын кулпусун колдонуңуз"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Улантуу үчүн биометрикалык маалыматты же экрандын кулпусун колдонуңуз"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Улантуу үчүн биометрикалык маалымат талап кылынат"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Өздүгүн текшерүү функциясы күйүк жана биометрикалык маалыматты талап кылат, бирок жүзүңүздүн же манжа изинин сенсору жеткиликсиз\n"<ul><li>"Камераңыз күйүп турганын текшерип, кайталап көрүңүз"</li>\n<li>"Өздүгүн текшерүү функциясын Google аккаунтуңуздан өчүрө аласыз"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Өздүгүн текшерүү функциясы күйүк, бирок сиз экениңизди ырастай албайт"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Биометрикалык маалыматты ырастоо үчүн өтө көп аракет жасалды. Кайра аракет кылуу үчүн түзмөгүңүздү кулпулап, кайрадан кулпусун ачыңыз."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Уурудан коргоо параметрлеринен Өздүгүн текшерүү функциясын тескей аласыз. Параметрлерге өтүү"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Кулпуланган экран"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Параметрлерге өтүү"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Жарайт"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Жокко чыгаруу"</string>
 </resources>

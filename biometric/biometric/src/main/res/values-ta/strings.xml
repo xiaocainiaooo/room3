@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"தொடர்வதற்கு உங்கள் கைரேகை அல்லது திரைப் பூட்டைப் பயன்படுத்துங்கள்"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"தொடர்வதற்கு உங்கள் முகத்தையோ திரைப் பூட்டையோ பயன்படுத்துங்கள்"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"தொடர்வதற்கு உங்கள் பயோமெட்ரிக்கையோ திரைப் பூட்டையோ பயன்படுத்துங்கள்"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"தொடர, பயோமெட்ரிக் தேவை"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"அடையாளச் சரிபார்ப்பு இயக்கப்பட்டுள்ளது, இதற்கு பயோமெட்ரிக் தேவை. ஆனால் உங்கள் முகம் சரியாகத் தெரியவில்லை அல்லது கைரேகை சென்சார் வேலை செய்யவில்லை.\n"<ul><li>"உங்கள் கேமரா இயக்கப்பட்டுள்ளதை உறுதிசெய்து மீண்டும் முயலவும்."</li>\n<li>"உங்கள் Google கணக்கைப் பயன்படுத்தி அடையாளச் சரிபார்ப்பை முடக்கலாம்."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Identity Check இயக்கப்பட்டுள்ளது, ஆனால் இது நீங்கள்தான் என்பதை உறுதிப்படுத்த முடியவில்லை"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"பயோமெட்ரிக்ஸ் சரிபார்ப்பு பலமுறை தோல்வியடைந்தது. மீண்டும் முயல, உங்கள் சாதனத்தை லாக் செய்து அன்லாக் செய்யவும்."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"திருட்டிலிருந்து பாதுகாத்தல் அமைப்புகளில் அடையாளச் சரிபார்ப்பை நீங்கள் நிர்வகிக்கலாம். அமைப்புகளுக்குச் செல்லவும்"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"பூட்டுத் திரை"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"அமைப்புகளுக்குச் செல்"</string>
-    <string name="common_ok" msgid="7266105758672679693">"சரி"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"ரத்துசெய்"</string>
 </resources>

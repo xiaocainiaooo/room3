@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Folosește amprenta sau blocarea ecranului pentru a continua"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Folosește-ți chipul sau blocarea ecranului pentru a continua"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Folosește sistemele biometrice sau blocarea ecranului pentru a continua"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Pentru a continua sunt necesare date biometrice"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Verificarea identității este activată și necesită o formă de identificare biometrică, dar senzorul pentru chip sau de amprentă nu este disponibil\n"<ul><li>"Verifică dacă ai pornit camera foto și încearcă din nou"</li>\n<li>"Poți să dezactivezi Verificarea identității folosind Contul Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Verificarea identității este activată și nu îți poate confirma identitatea"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Au apărut prea multe erori de identificare biometrică. Blochează și deblochează dispozitivul pentru a încerca din nou."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Poți să gestionezi Verificarea identității în setările de protecție antifurt. Accesează Setările"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Ecranul de blocare"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Accesează Setările"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Anulează"</string>
 </resources>

@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Per continuare, devi usare la tua impronta o il tuo blocco schermo"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Per continuare, devi usare il tuo volto o il tuo blocco schermo"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Per continuare, devi usare i tuoi dati biometrici o il tuo blocco schermo"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometria obbligatoria per continuare"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"La funzionalità Verifica dell\'identità è attiva e richiede la biometria, ma il sensore di impronte digitali o del volto non è disponibile\n"<ul><li>"Controlla che la fotocamera sia accesa e riprova"</li>\n<li>"Puoi disattivare Verifica dell\'identità utilizzando il tuo Account Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"La funzionalità Verifica dell\'identità è attiva e non è in grado di verificare la tua identità"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Troppi tentativi di biometria non riusciti. Blocca e sblocca il dispositivo per riprovare."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Puoi gestire la funzionalità Verifica dell\'identità nelle impostazioni di protezione dai furti. Vai alle Impostazioni"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Schermata di blocco"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Vai alle Impostazioni"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Ok"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Annulla"</string>
 </resources>

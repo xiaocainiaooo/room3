@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Usa la huella digital o tu bloqueo de pantalla para continuar"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Usa la cara o tu bloqueo de pantalla para continuar"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Usa la biometría o tu bloqueo de pantalla para continuar"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Debes usar un método biométrico para continuar"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Verificación de identidad está activada y requiere un método biométrico, pero el sensor facial o de huellas digitales no está disponible\n"<ul><li>"Comprueba que la cámara esté encendida y vuelve a intentarlo"</li>\n<li>"Puedes desactivar Verificación de identidad con tu cuenta de Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Verificación de identidad está activada y no puede verificar que eres tú"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"El método biométrico ha fallado demasiadas veces. Bloquea y desbloquea tu dispositivo para volver a intentarlo."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Puedes gestionar Verificación de identidad en los ajustes de protección antirrobo. Ir a Ajustes"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Pantalla de bloqueo"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Ir a Ajustes"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Aceptar"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Cancelar"</string>
 </resources>

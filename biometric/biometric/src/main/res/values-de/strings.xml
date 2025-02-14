@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Verwende den Fingerabdruck oder die Displaysperre, um fortzufahren"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Verwende die Gesichtserkennung oder die Displaysperre, um fortzufahren"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Verwende das biometrische Verfahren oder die Displaysperre, um fortzufahren"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Biometrische Authentifizierung erforderlich"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Die Identitätsüberprüfung ist aktiviert und erfordert eine biometrische Authentifizierung, aber die Gesichtserkennung oder der Fingerabdrucksensor ist nicht verfügbar\n"<ul><li>"Prüfe, ob die Kamera eingeschaltet ist, und versuche es noch einmal"</li>\n<li>"Du kannst die Identitätsüberprüfung über dein Google-Konto deaktivieren"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Die Identitätsprüfung ist aktiviert und deine Identität konnte nicht bestätigt werden"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Die biometrische Authentifizierung ist zu oft fehlgeschlagen. Sperre dein Gerät und entsperre es wieder, um es noch einmal zu versuchen."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Du kannst die Einstellungen für die Identitätsprüfung in den Einstellungen für den Diebstahlschutz verwalten. Einstellungen öffnen"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Display sperren"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Einstellungen öffnen"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Ok"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Abbrechen"</string>
 </resources>

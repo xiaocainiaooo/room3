@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Para continuar, utiliza a impresión dixital ou o bloqueo de pantalla"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Para continuar, utiliza o desbloqueo facial ou o bloqueo de pantalla"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Para continuar, utiliza o desbloqueo biométrico ou o bloqueo de pantalla"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Para continuar, cómpre usar un método biométrico"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"A comprobación de identidade está activada e require un método biométrico, pero o sensor de impresión dixital ou de desbloqueo facial non está dispoñible\n"<ul><li>"Comproba que teñas a cámara acendida e téntao de novo"</li>\n<li>"Podes desactivar a comprobación de identidade coa túa Conta de Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"A función de comprobación de identidade está activada, pero non puido verificar que es ti"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Producíronse demasiados erros ao usar o método biométrico. Bloquea e desbloquea o dispositivo para tentalo de novo."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Podes xestionar a comprobación de identidade na configuración da protección antirroubo. Ir a Configuración"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Pantalla de bloqueo"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Ir a Configuración"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Aceptar"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Cancelar"</string>
 </resources>

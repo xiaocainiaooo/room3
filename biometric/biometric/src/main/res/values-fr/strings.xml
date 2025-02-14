@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Utilisez votre empreinte digitale ou le verrouillage de l\'écran pour continuer"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Utilisez la reconnaissance faciale ou le verrouillage de l\'écran pour continuer"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Utilisez la biométrie ou le verrouillage de l\'écran pour continuer"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Données biométriques nécessaires pour continuer"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"La vérification de l\'identité est activée et nécessite des données biométriques, mais votre lecteur d\'empreinte digitale ou de reconnaissance faciale n\'est pas disponible\n"<ul><li>"Vérifiez que votre appareil photo est activé, puis réessayez"</li>\n<li>"Vous pouvez désactiver la vérification de l\'identité à l\'aide de votre compte Google"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"La vérification de l\'identité est activée, mais ne peut pas confirmer votre identité"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"La reconnaissance biométrique a échoué de trop nombreuses fois. Verrouillez et déverrouillez votre appareil pour réessayer."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Vous pouvez gérer la vérification de l\'identité dans les paramètres de protection contre le vol. Accéder aux paramètres"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Écran de verrouillage"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Accéder aux paramètres"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Annuler"</string>
 </resources>

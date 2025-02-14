@@ -46,13 +46,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Përdor gjurmën tënde të gishtit ose kyçjen e ekranit për të vazhduar"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Përdor fytyrën tënde ose kyçjen e ekranit për të vazhduar"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Përdor sistemet e tua biometrike ose kyçjen e ekranit për të vazhduar"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Kërkohen të dhënat biometrike për të vazhduar"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"\"Kontrolli i identitetit\" është aktiv dhe kërkon të dhënat biometrike, por sensori i fytyrës ose gjurmës së gishtit është i padisponueshëm\n"<ul><li>"Kontrollo që kamera të jetë aktive dhe provo përsëri"</li>\n<li>"Mund ta çaktivizosh \"Kontrollin e identitetit\" duke përdorur \"Llogarinë tënde të Google\""</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"\"Kontrolli i identitetit\" është aktiv dhe nuk mund të verifikojë që je ti"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Të dhënat biometrike dështuan shumë herë. Kyçe dhe shkyçe pajisjen tënde për të provuar përsëri."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Mund ta menaxhosh \"Kontrollin e identitetit\" te cilësimet e mbrojtjes nga vjedhja. Shko te \"Cilësimet\""</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Ekrani i kyçjes"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Shko te \"Cilësimet\""</string>
-    <string name="common_ok" msgid="7266105758672679693">"Në rregull"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Anulo"</string>
 </resources>

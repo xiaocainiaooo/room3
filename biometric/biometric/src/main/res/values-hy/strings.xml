@@ -45,13 +45,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Շարունակելու համար օգտագործեք ձեր մատնահետքը կամ էկրանի կողպումը"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Շարունակելու համար օգտագործեք դեմքի նույնականացումը կամ էկրանի կողպումը"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Շարունակելու համար օգտագործեք կենսաչափական համակարգեր կամ էկրանի կողպումը"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"Պահանջվում է կենսաչափական տվյալների հաստատում"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Ինքնության ստուգումը միացված է, սակայն կենսաչափական տվյալները չհաջողվեց հաստատել, քանի որ դեմքի կամ մատնահետքերի սկաները հասանելի չէ\n"<ul><li>"Համոզվեք, որ ձեր տեսախցիկը միացված է, և նորից փորձեք"</li>\n<li>"Դուք կարող եք անջատել ինքնության ստուգումը ձեր Google հաշվում"</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Ինքնության ստուգումը միացված է, սակայն չհաջողվեց հաստատել ձեր ինքնությունը"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Կենսաչափական տվյալները հաստատելու չափազանց շատ անհաջող փորձեր են արվել։ Շարունակելու համար կողպեք և ապակողպեք ձեր սարքը։"</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Դուք կարող եք փոխել ինքնության ստուգման կարգավորումները գողությունից պաշտպանության կարգավորումներում։ Անցնել Կարգավորումներ"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Կողպէկրան"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Անցնել Կարգավորումներ"</string>
-    <string name="common_ok" msgid="7266105758672679693">"Եղավ"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Չեղարկել"</string>
 </resources>

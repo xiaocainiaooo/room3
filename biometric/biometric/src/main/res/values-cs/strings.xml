@@ -46,13 +46,4 @@
     <string name="fingerprint_or_screen_lock_prompt_message" msgid="8382576858490514495">"Pokračujte ověřením pomocí otisku prstu nebo zámku obrazovky"</string>
     <string name="face_or_screen_lock_prompt_message" msgid="4562557128765735254">"Pokračujte ověřením pomocí obličeje nebo zámku obrazovky"</string>
     <string name="biometric_or_screen_lock_prompt_message" msgid="2102429900219199821">"Pokračujte ověřením pomocí biometrických údajů nebo zámku obrazovky"</string>
-    <string name="identity_check_general_error_title" msgid="1013215633038725034">"K pokračování jsou potřeba biometrické údaje"</string>
-    <string name="identity_check_general_error_description_1" msgid="3156158514134319309">"Ověření totožnosti je zapnuté a vyžaduje biometrickou kontrolu, ale váš obličej nebo snímač otisků prstů není k dispozici.\n"<ul><li>"Zkontrolujte, zda je zapnutý fotoaparát, a zkuste to znovu."</li>\n<li>"Kontrolu identity můžete pomocí účtu Google vypnout."</li></ul></string>
-    <string name="identity_check_lockout_error_title" msgid="4996015551393725593">"Ověření totožnosti je zapnuté a nedokáže ověřit, že jste to vy"</string>
-    <string name="identity_check_lockout_error_two_factor_auth_description_1" msgid="6640337279532966835">"Biometrie příliš mnohokrát selhala. Zamkněte a odemkněte zařízení a zkuste to znovu."</string>
-    <string name="identity_check_lockout_error_description_2" msgid="442136930958309272">"Kontrolu identity můžete spravovat v nastavení ochrany pro případ krádeže. Přejít do Nastavení"</string>
-    <string name="identity_check_lockout_error_lock_screen" msgid="2718968537410398463">"Uzamčení obrazovky"</string>
-    <string name="identity_check_go_to_settings" msgid="7249227005359617941">"Přejít do Nastavení"</string>
-    <string name="common_ok" msgid="7266105758672679693">"OK"</string>
-    <string name="common_cancel" msgid="4854611882282563034">"Zrušit"</string>
 </resources>
