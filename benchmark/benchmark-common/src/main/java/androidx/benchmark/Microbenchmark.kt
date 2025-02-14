@@ -72,7 +72,11 @@ constructor(internal val state: MicrobenchmarkRunningState) {
     }
 
     /**
-     * Resume measurement after a call to [pauseMeasurement].
+     * Pause measurement until the next call to [resumeMeasurement].
+     *
+     * [resumeMeasurement] must be called before exiting the measurement loop.
+     *
+     * Re-entrant pausing is not supported.
      *
      * Kotlin callers should generally instead use [runWithMeasurementDisabled].
      */
