@@ -399,7 +399,7 @@ private fun ColumnScope.StepperButton(
 
     val (finalShape, finalInteractionSource) =
         animateButtonShape(
-            defaultShape = shape,
+            shape = shape,
             pressedShape = pressedShape,
             onPressAnimationSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>().faster(200f),
             onReleaseAnimationSpec = MaterialTheme.motionScheme.slowSpatialSpec(),

@@ -556,7 +556,7 @@ package androidx.wear.compose.material3 {
 
   public final class IconButtonDefaults {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonShapes animatedShapes();
-    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonShapes animatedShapes(optional androidx.compose.foundation.shape.CornerBasedShape shape, optional androidx.compose.foundation.shape.CornerBasedShape pressedShape);
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonShapes animatedShapes(optional androidx.compose.foundation.shape.CornerBasedShape? shape, optional androidx.compose.foundation.shape.CornerBasedShape? pressedShape);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonColors filledIconButtonColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonColors filledIconButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonColors filledTonalIconButtonColors();
@@ -579,7 +579,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonColors outlinedIconButtonColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonColors outlinedIconButtonColors(optional long contentColor, optional long disabledContentColor);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonShapes shapes();
-    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonShapes shapes(optional androidx.compose.ui.graphics.Shape? shape);
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconButtonShapes shapes(androidx.compose.ui.graphics.Shape shape);
     property public float DefaultButtonSize;
     property public float DefaultIconSize;
     property public float DisabledImageOpacity;
@@ -601,11 +601,11 @@ package androidx.wear.compose.material3 {
   }
 
   public final class IconButtonShapes {
-    ctor public IconButtonShapes(androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape? pressedShape);
+    ctor public IconButtonShapes(androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape pressedShape);
     method public androidx.wear.compose.material3.IconButtonShapes copy(optional androidx.compose.ui.graphics.Shape? shape, optional androidx.compose.ui.graphics.Shape? pressedShape);
-    method public androidx.compose.ui.graphics.Shape? getPressedShape();
+    method public androidx.compose.ui.graphics.Shape getPressedShape();
     method public androidx.compose.ui.graphics.Shape getShape();
-    property public androidx.compose.ui.graphics.Shape? pressedShape;
+    property public androidx.compose.ui.graphics.Shape pressedShape;
     property public androidx.compose.ui.graphics.Shape shape;
   }
 
@@ -654,7 +654,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonColors iconToggleButtonColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonColors iconToggleButtonColors(optional long checkedContainerColor, optional long checkedContentColor, optional long uncheckedContainerColor, optional long uncheckedContentColor, optional long disabledCheckedContainerColor, optional long disabledCheckedContentColor, optional long disabledUncheckedContainerColor, optional long disabledUncheckedContentColor);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonShapes shapes();
-    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonShapes shapes(optional androidx.compose.ui.graphics.Shape? shape);
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonShapes shapes(androidx.compose.ui.graphics.Shape shape);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonShapes variantAnimatedShapes();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.IconToggleButtonShapes variantAnimatedShapes(optional androidx.compose.foundation.shape.CornerBasedShape? uncheckedShape, optional androidx.compose.foundation.shape.CornerBasedShape? checkedShape);
     property public float DefaultButtonSize;
@@ -676,15 +676,15 @@ package androidx.wear.compose.material3 {
   }
 
   public final class IconToggleButtonShapes {
-    ctor public IconToggleButtonShapes(androidx.compose.ui.graphics.Shape uncheckedShape, optional androidx.compose.ui.graphics.Shape? checkedShape, optional androidx.compose.ui.graphics.Shape? uncheckedPressedShape, optional androidx.compose.ui.graphics.Shape? checkedPressedShape);
+    ctor public IconToggleButtonShapes(androidx.compose.ui.graphics.Shape uncheckedShape, optional androidx.compose.ui.graphics.Shape checkedShape, optional androidx.compose.ui.graphics.Shape uncheckedPressedShape, optional androidx.compose.ui.graphics.Shape checkedPressedShape);
     method public androidx.wear.compose.material3.IconToggleButtonShapes copy(optional androidx.compose.ui.graphics.Shape? uncheckedShape, optional androidx.compose.ui.graphics.Shape? checkedShape, optional androidx.compose.ui.graphics.Shape? uncheckedPressedShape, optional androidx.compose.ui.graphics.Shape? checkedPressedShape);
-    method public androidx.compose.ui.graphics.Shape? getCheckedPressedShape();
-    method public androidx.compose.ui.graphics.Shape? getCheckedShape();
-    method public androidx.compose.ui.graphics.Shape? getUncheckedPressedShape();
+    method public androidx.compose.ui.graphics.Shape getCheckedPressedShape();
+    method public androidx.compose.ui.graphics.Shape getCheckedShape();
+    method public androidx.compose.ui.graphics.Shape getUncheckedPressedShape();
     method public androidx.compose.ui.graphics.Shape getUncheckedShape();
-    property public androidx.compose.ui.graphics.Shape? checkedPressedShape;
-    property public androidx.compose.ui.graphics.Shape? checkedShape;
-    property public androidx.compose.ui.graphics.Shape? uncheckedPressedShape;
+    property public androidx.compose.ui.graphics.Shape checkedPressedShape;
+    property public androidx.compose.ui.graphics.Shape checkedShape;
+    property public androidx.compose.ui.graphics.Shape uncheckedPressedShape;
     property public androidx.compose.ui.graphics.Shape uncheckedShape;
   }
 
@@ -1501,7 +1501,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonColors outlinedTextButtonColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonColors outlinedTextButtonColors(optional long contentColor, optional long disabledContentColor);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonShapes shapes();
-    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonShapes shapes(optional androidx.compose.ui.graphics.Shape? shape);
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonShapes shapes(androidx.compose.ui.graphics.Shape shape);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonColors textButtonColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextButtonColors textButtonColors(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor);
     property public float DefaultButtonSize;
@@ -1520,11 +1520,11 @@ package androidx.wear.compose.material3 {
   }
 
   public final class TextButtonShapes {
-    ctor public TextButtonShapes(androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape? pressedShape);
+    ctor public TextButtonShapes(androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape pressedShape);
     method public androidx.wear.compose.material3.TextButtonShapes copy(optional androidx.compose.ui.graphics.Shape? shape, optional androidx.compose.ui.graphics.Shape? pressedShape);
-    method public androidx.compose.ui.graphics.Shape? getPressedShape();
+    method public androidx.compose.ui.graphics.Shape getPressedShape();
     method public androidx.compose.ui.graphics.Shape getShape();
-    property public androidx.compose.ui.graphics.Shape? pressedShape;
+    property public androidx.compose.ui.graphics.Shape pressedShape;
     property public androidx.compose.ui.graphics.Shape shape;
   }
 
@@ -1592,7 +1592,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.shape.CornerBasedShape getPressedShape();
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.shape.RoundedCornerShape getShape();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextToggleButtonShapes shapes();
-    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextToggleButtonShapes shapes(optional androidx.compose.ui.graphics.Shape? shape);
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextToggleButtonShapes shapes(androidx.compose.ui.graphics.Shape shape);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextToggleButtonColors textToggleButtonColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextToggleButtonColors textToggleButtonColors(optional long checkedContainerColor, optional long checkedContentColor, optional long uncheckedContainerColor, optional long uncheckedContentColor, optional long disabledCheckedContainerColor, optional long disabledCheckedContentColor, optional long disabledUncheckedContainerColor, optional long disabledUncheckedContentColor);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TextToggleButtonShapes variantAnimatedShapes();
@@ -1614,15 +1614,15 @@ package androidx.wear.compose.material3 {
   }
 
   public final class TextToggleButtonShapes {
-    ctor public TextToggleButtonShapes(androidx.compose.ui.graphics.Shape uncheckedShape, optional androidx.compose.ui.graphics.Shape? checkedShape, optional androidx.compose.ui.graphics.Shape? uncheckedPressedShape, optional androidx.compose.ui.graphics.Shape? checkedPressedShape);
+    ctor public TextToggleButtonShapes(androidx.compose.ui.graphics.Shape uncheckedShape, optional androidx.compose.ui.graphics.Shape checkedShape, optional androidx.compose.ui.graphics.Shape uncheckedPressedShape, optional androidx.compose.ui.graphics.Shape checkedPressedShape);
     method public androidx.wear.compose.material3.TextToggleButtonShapes copy(optional androidx.compose.ui.graphics.Shape? uncheckedShape, optional androidx.compose.ui.graphics.Shape? checkedShape, optional androidx.compose.ui.graphics.Shape? uncheckedPressedShape, optional androidx.compose.ui.graphics.Shape? checkedPressedShape);
-    method public androidx.compose.ui.graphics.Shape? getCheckedPressedShape();
-    method public androidx.compose.ui.graphics.Shape? getCheckedShape();
-    method public androidx.compose.ui.graphics.Shape? getUncheckedPressedShape();
+    method public androidx.compose.ui.graphics.Shape getCheckedPressedShape();
+    method public androidx.compose.ui.graphics.Shape getCheckedShape();
+    method public androidx.compose.ui.graphics.Shape getUncheckedPressedShape();
     method public androidx.compose.ui.graphics.Shape getUncheckedShape();
-    property public androidx.compose.ui.graphics.Shape? checkedPressedShape;
-    property public androidx.compose.ui.graphics.Shape? checkedShape;
-    property public androidx.compose.ui.graphics.Shape? uncheckedPressedShape;
+    property public androidx.compose.ui.graphics.Shape checkedPressedShape;
+    property public androidx.compose.ui.graphics.Shape checkedShape;
+    property public androidx.compose.ui.graphics.Shape uncheckedPressedShape;
     property public androidx.compose.ui.graphics.Shape uncheckedShape;
   }
 
