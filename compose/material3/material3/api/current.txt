@@ -757,10 +757,12 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.runtime.Immutable public final class DragHandleColors {
-    ctor public DragHandleColors(long defaultColor, long pressedColor);
-    method public long getDefaultColor();
+    ctor public DragHandleColors(long color, long pressedColor, long draggedColor);
+    method public long getColor();
+    method public long getDraggedColor();
     method public long getPressedColor();
-    property public long defaultColor;
+    property public long color;
+    property public long draggedColor;
     property public long pressedColor;
   }
 
@@ -769,19 +771,23 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.runtime.Immutable public final class DragHandleShapes {
-    ctor public DragHandleShapes(androidx.compose.ui.graphics.Shape defaultShape, androidx.compose.ui.graphics.Shape pressedShape);
-    method public androidx.compose.ui.graphics.Shape getDefaultShape();
+    ctor public DragHandleShapes(androidx.compose.ui.graphics.Shape shape, androidx.compose.ui.graphics.Shape pressedShape, androidx.compose.ui.graphics.Shape draggedShape);
+    method public androidx.compose.ui.graphics.Shape getDraggedShape();
     method public androidx.compose.ui.graphics.Shape getPressedShape();
-    property public androidx.compose.ui.graphics.Shape defaultShape;
+    method public androidx.compose.ui.graphics.Shape getShape();
+    property public androidx.compose.ui.graphics.Shape draggedShape;
     property public androidx.compose.ui.graphics.Shape pressedShape;
+    property public androidx.compose.ui.graphics.Shape shape;
   }
 
   @androidx.compose.runtime.Immutable public final class DragHandleSizes {
-    ctor public DragHandleSizes(long defaultSize, long pressedSize);
-    method public long getDefaultSize();
+    ctor public DragHandleSizes(long size, long pressedSize, long draggedSize);
+    method public long getDraggedSize();
     method public long getPressedSize();
-    property public long defaultSize;
+    method public long getSize();
+    property public long draggedSize;
     property public long pressedSize;
+    property public long size;
   }
 
   public final class DrawerDefaults {
@@ -3222,10 +3228,12 @@ package androidx.compose.material3 {
 
   public final class VerticalDragHandleDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleColors colors();
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleColors colors(optional long defaultColor, optional long pressedColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleColors colors(optional long color, optional long pressedColor, optional long draggedColor);
+    method public androidx.compose.material3.DragHandleSizes getSizes();
     method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleShapes shapes();
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleShapes shapes(optional androidx.compose.ui.graphics.Shape? defaultShape, optional androidx.compose.ui.graphics.Shape? pressedShape);
-    method public androidx.compose.material3.DragHandleSizes sizes(optional long defaultSize, optional long pressedSize);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleShapes shapes(optional androidx.compose.ui.graphics.Shape? shape, optional androidx.compose.ui.graphics.Shape? pressedShape, optional androidx.compose.ui.graphics.Shape? draggedShape);
+    method public androidx.compose.material3.DragHandleSizes sizes(optional long size, optional long pressedSize, optional long draggedSize);
+    property public androidx.compose.material3.DragHandleSizes Sizes;
     field public static final androidx.compose.material3.VerticalDragHandleDefaults INSTANCE;
   }
 
