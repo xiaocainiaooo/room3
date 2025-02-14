@@ -538,9 +538,6 @@ package androidx.wear.compose.material3 {
     property public float Small;
   }
 
-  @SuppressCompatibility @kotlin.RequiresOptIn(message="This Wear Material3 API is experimental and is likely to change or to be removed in" + " the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalWearMaterial3Api {
-  }
-
   @androidx.compose.runtime.Immutable public final class IconButtonColors {
     ctor public IconButtonColors(long containerColor, long contentColor, long disabledContainerColor, long disabledContentColor);
     method public androidx.wear.compose.material3.IconButtonColors copy(optional long containerColor, optional long contentColor, optional long disabledContainerColor, optional long disabledContentColor);
@@ -689,9 +686,7 @@ package androidx.wear.compose.material3 {
   }
 
   public final class InteractiveComponentSizeKt {
-    method @SuppressCompatibility @androidx.wear.compose.material3.ExperimentalWearMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumInteractiveComponentEnforcement();
-    method public static androidx.compose.ui.Modifier minimumInteractiveComponentSize(androidx.compose.ui.Modifier);
-    property @SuppressCompatibility @androidx.wear.compose.material3.ExperimentalWearMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumInteractiveComponentEnforcement;
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier minimumInteractiveComponentSize(androidx.compose.ui.Modifier);
   }
 
   public final class LevelIndicatorColors {
