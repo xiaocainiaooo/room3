@@ -51,6 +51,7 @@ object IntrospectionHelper {
         object Category {
             const val INVENTORY = "INVENTORY"
             const val INVOKER = "INVOKER"
+            const val FUNCTION = "FUNCTION"
         }
     }
 

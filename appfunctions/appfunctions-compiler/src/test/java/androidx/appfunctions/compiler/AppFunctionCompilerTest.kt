@@ -507,6 +507,25 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testGenerateFunctionComponentRegistry() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "AllPrimitiveInputFunctions.KT",
+                        "SimpleFunction.KT",
+                        "SimpleFunctionDiffPackage.KT",
+                    )
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}Main_FunctionComponentRegistry.kt",
+            goldenFileName = "${'$'}Main_FunctionComponentRegistry.KT"
+        )
+    }
+
+    @Test
     fun testGenerateAggregateInventoryImpl() {
         val report =
             compilationTestHelper.compileAll(

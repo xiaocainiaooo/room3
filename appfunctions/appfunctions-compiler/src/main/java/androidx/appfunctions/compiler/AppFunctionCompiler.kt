@@ -22,6 +22,7 @@ import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.SymbolNotReadyException
 import androidx.appfunctions.compiler.core.logException
 import androidx.appfunctions.compiler.processors.AppFunctionAggregateProcessor
+import androidx.appfunctions.compiler.processors.AppFunctionFunctionRegistryProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionIdProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionIndexXmlProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInventoryProcessor
@@ -88,6 +89,8 @@ class AppFunctionCompiler(
         override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
             val options = AppFunctionCompilerOptions.from(environment.options)
 
+            val functionRegistryProcessor =
+                AppFunctionFunctionRegistryProcessor(environment.codeGenerator)
             val idProcessor = AppFunctionIdProcessor(environment.codeGenerator)
             val inventoryProcessor = AppFunctionInventoryProcessor(environment.codeGenerator)
             val invokerProcessor = AppFunctionInvokerProcessor(environment.codeGenerator)
@@ -103,6 +106,7 @@ class AppFunctionCompiler(
                 AppFunctionAggregateProcessor(options, environment.codeGenerator)
             return AppFunctionCompiler(
                 listOf(
+                    functionRegistryProcessor,
                     idProcessor,
                     inventoryProcessor,
                     invokerProcessor,
