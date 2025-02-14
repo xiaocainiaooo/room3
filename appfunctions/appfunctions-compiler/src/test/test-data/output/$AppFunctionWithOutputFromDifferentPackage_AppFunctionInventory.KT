@@ -2,8 +2,12 @@ package com.testdata
 
 import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
@@ -48,13 +52,87 @@ public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
             valueType = REFERENCE_RESPONSE_VALUE_TYPE
         )
 
+    private
+        val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LONGPARAM:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "longParam" to
+          COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LONGPARAM,
+    )
+
+    private
+        val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "longParam",
+    )
+
+    private val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties =
+            COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required =
+            COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.differentPackage.DiffPackageSerializable",
+            isNullable = true
+        )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGPARAM:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "stringParam" to
+          COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGPARAM,
+    )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "stringParam",
+    )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties =
+            COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required =
+            COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.anotherDifferentPackage.AnotherDiffPackageSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.differentPackage.DiffPackageSerializable" to
+          COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE,
+      "com.testdata.anotherDifferentPackage.AnotherDiffPackageSerializable" to
+          COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id =
             "com.testdata.AppFunctionWithOutputFromDifferentPackage#functionWithDiffPackageOutput",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 
@@ -84,13 +162,87 @@ public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
             valueType = ARRAY_RESPONSE_VALUE_TYPE
         )
 
+    private
+        val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LONGPARAM:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "longParam" to
+          COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LONGPARAM,
+    )
+
+    private
+        val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "longParam",
+    )
+
+    private val COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties =
+            COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required =
+            COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.differentPackage.DiffPackageSerializable",
+            isNullable = true
+        )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGPARAM:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "stringParam" to
+          COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGPARAM,
+    )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "stringParam",
+    )
+
+    private
+        val COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties =
+            COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required =
+            COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.anotherDifferentPackage.AnotherDiffPackageSerializable",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.differentPackage.DiffPackageSerializable" to
+          COM_TESTDATA_DIFFERENTPACKAGE_DIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE,
+      "com.testdata.anotherDifferentPackage.AnotherDiffPackageSerializable" to
+          COM_TESTDATA_ANOTHERDIFFERENTPACKAGE_ANOTHERDIFFPACKAGESERIALIZABLE_OBJECT_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id =
             "com.testdata.AppFunctionWithOutputFromDifferentPackage#functionWithAnotherDiffPackageOutput",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
         )
   }
 }
