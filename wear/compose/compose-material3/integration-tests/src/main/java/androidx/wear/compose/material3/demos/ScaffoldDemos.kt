@@ -44,9 +44,11 @@ val ScaffoldDemos =
     listOf(
         ComposableDemo("Scaffold Sample") { ScaffoldSample() },
         ComposableDemo("Screen Scaffold") { ScaffoldWithEdgeButtonSample() },
-        ComposableDemo("Horizontal Pager Scaffold") { HorizontalPagerScaffoldSample() },
+        ComposableDemo("Horizontal Pager Scaffold") {
+            HorizontalPagerScaffoldSample(it.navigateBack)
+        },
         ComposableDemo("Horizontal Pager Scaffold (Fade Out Indicator)") {
-            HorizontalPagerScaffoldFadeOutIndicatorDemo()
+            HorizontalPagerScaffoldFadeOutIndicatorDemo(it.navigateBack)
         },
         ComposableDemo("Vertical Pager Scaffold") { VerticalPagerScaffoldSample() },
         ComposableDemo("Vertical Pager Scaffold (Fade Out Indicator)") {
@@ -81,7 +83,7 @@ fun RandomComponent(page: Int) {
 }
 
 @Composable
-fun HorizontalPagerScaffoldFadeOutIndicatorDemo() {
+fun HorizontalPagerScaffoldFadeOutIndicatorDemo(navigateBack: () -> Unit) {
     AppScaffold {
         val pagerState = rememberPagerState(pageCount = { 10 })
 
@@ -97,7 +99,11 @@ fun HorizontalPagerScaffoldFadeOutIndicatorDemo() {
                 ) {
                     Text("Page $page")
                     Spacer(modifier = Modifier.height(16.dp))
-                    RandomComponent(page)
+                    if (page == 0) {
+                        Button(onClick = navigateBack) { Text("Exit") }
+                    } else {
+                        RandomComponent(page)
+                    }
                 }
             }
         }
