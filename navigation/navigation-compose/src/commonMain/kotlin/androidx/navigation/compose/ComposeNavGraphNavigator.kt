@@ -25,43 +25,34 @@ import androidx.navigation.NavGraph
 import androidx.navigation.NavGraphNavigator
 import androidx.navigation.Navigator
 import androidx.navigation.NavigatorProvider
+import kotlin.jvm.JvmSuppressWildcards
 
 /**
  * Custom subclass of [NavGraphNavigator] that adds support for defining transitions at the
  * navigation graph level.
  */
-@Navigator.Name("navigation")
-internal class ComposeNavGraphNavigator(navigatorProvider: NavigatorProvider) :
-    NavGraphNavigator(navigatorProvider) {
-    override fun createDestination(): NavGraph {
-        return ComposeNavGraph(this)
-    }
+internal expect class ComposeNavGraphNavigator(navigatorProvider: NavigatorProvider) :
+    NavGraphNavigator {
+    override fun createDestination(): NavGraph
 
-    internal class ComposeNavGraph(navGraphNavigator: Navigator<out NavGraph>) :
-        NavGraph(navGraphNavigator) {
+    internal class ComposeNavGraph(navGraphNavigator: Navigator<out NavGraph>) : NavGraph {
         internal var enterTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
-            null
-
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)?
         internal var exitTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)?
 
         internal var popEnterTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)?
 
         internal var popExitTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)?
 
         internal var sizeTransform:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform?)?
     }
 }

@@ -246,7 +246,7 @@ dependencies {
     docs(project(":metrics:metrics-performance"))
     kmpDocs(project(":navigation:navigation-common"))
     docs(project(":navigation:navigation-common-ktx"))
-    docs(project(":navigation:navigation-compose"))
+    kmpDocs(project(":navigation:navigation-compose"))
     docs(project(":navigation:navigation-dynamic-features-fragment"))
     docs(project(":navigation:navigation-dynamic-features-runtime"))
     docs(project(":navigation:navigation-fragment"))

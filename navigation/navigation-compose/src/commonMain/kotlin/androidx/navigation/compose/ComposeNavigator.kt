@@ -22,12 +22,13 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.ComposeNavigator.Destination
+import kotlin.jvm.JvmSuppressWildcards
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -35,36 +36,25 @@ import kotlinx.coroutines.flow.StateFlow
  * valid [Composable] by setting it directly on an instantiated [Destination] or calling
  * [composable].
  */
-@Navigator.Name("composable")
-public class ComposeNavigator : Navigator<Destination>() {
+public expect class ComposeNavigator() : Navigator<Destination> {
 
     /** Get the map of transitions currently in progress from the [state]. */
-    internal val transitionsInProgress
-        get() = state.transitionsInProgress
+    internal val transitionsInProgress: StateFlow<Set<NavBackStackEntry>>
 
     /** Get the back stack from the [state]. */
     public val backStack: StateFlow<List<NavBackStackEntry>>
-        get() = state.backStack
 
-    internal val isPop = mutableStateOf(false)
+    internal val isPop: MutableState<Boolean>
 
     override fun navigate(
         entries: List<NavBackStackEntry>,
         navOptions: NavOptions?,
         navigatorExtras: Extras?
-    ) {
-        entries.forEach { entry -> state.pushWithTransition(entry) }
-        isPop.value = false
-    }
+    )
 
-    override fun createDestination(): Destination {
-        return Destination(this) {}
-    }
+    override fun createDestination(): Destination
 
-    override fun popBackStack(popUpTo: NavBackStackEntry, savedState: Boolean) {
-        state.popWithTransition(popUpTo, savedState)
-        isPop.value = true
-    }
+    override fun popBackStack(popUpTo: NavBackStackEntry, savedState: Boolean)
 
     /**
      * Function to prepare the entry for transition.
@@ -72,9 +62,7 @@ public class ComposeNavigator : Navigator<Destination>() {
      * This should be called when the entry needs to move the [Lifecycle.State] in preparation for a
      * transition such as when using predictive back.
      */
-    public fun prepareForTransition(entry: NavBackStackEntry) {
-        state.prepareForTransition(entry)
-    }
+    public fun prepareForTransition(entry: NavBackStackEntry)
 
     /**
      * Callback to mark a navigation in transition as complete.
@@ -86,55 +74,39 @@ public class ComposeNavigator : Navigator<Destination>() {
      * Failing to call this method could result in entries being prevented from reaching their final
      * [Lifecycle.State].
      */
-    public fun onTransitionComplete(entry: NavBackStackEntry) {
-        state.markTransitionComplete(entry)
-    }
+    public fun onTransitionComplete(entry: NavBackStackEntry)
 
     /** NavDestination specific to [ComposeNavigator] */
-    @NavDestination.ClassType(Composable::class)
     public class Destination(
         navigator: ComposeNavigator,
+        content: @Composable AnimatedContentScope.(@JvmSuppressWildcards NavBackStackEntry) -> Unit
+    ) : NavDestination {
         internal val content:
             @Composable
             AnimatedContentScope.(@JvmSuppressWildcards NavBackStackEntry) -> Unit
-    ) : NavDestination(navigator) {
-
-        @Deprecated(
-            message = "Deprecated in favor of Destination that supports AnimatedContent",
-            level = DeprecationLevel.HIDDEN,
-        )
-        public constructor(
-            navigator: ComposeNavigator,
-            content: @Composable (NavBackStackEntry) -> @JvmSuppressWildcards Unit
-        ) : this(navigator, content = { entry -> content(entry) })
 
         internal var enterTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)?
 
         internal var exitTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)?
 
         internal var popEnterTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)?
 
         internal var popExitTransition:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)?
 
         internal var sizeTransform:
             (@JvmSuppressWildcards
-            AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform?)? =
-            null
+            AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform?)?
     }
 
     internal companion object {
-        internal const val NAME = "composable"
+        internal val NAME: String
     }
 }

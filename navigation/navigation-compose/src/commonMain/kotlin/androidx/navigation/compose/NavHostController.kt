@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavHostControllerKt")
+@file:JvmMultifileClass
+
 package androidx.navigation.compose
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.Navigator
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 /**
  * Gets the current navigation back stack entry as a [MutableState]. When the given navController
@@ -52,30 +53,6 @@ public fun NavController.currentBackStackEntryAsState(): State<NavBackStackEntry
  * @see NavHost
  */
 @Composable
-public fun rememberNavController(
+public expect fun rememberNavController(
     vararg navigators: Navigator<out NavDestination>
-): NavHostController {
-    val context = LocalContext.current
-    return rememberSaveable(inputs = navigators, saver = NavControllerSaver(context)) {
-            createNavController(context)
-        }
-        .apply {
-            for (navigator in navigators) {
-                navigatorProvider.addNavigator(navigator)
-            }
-        }
-}
-
-private fun createNavController(context: Context) =
-    NavHostController(context).apply {
-        navigatorProvider.addNavigator(ComposeNavGraphNavigator(navigatorProvider))
-        navigatorProvider.addNavigator(ComposeNavigator())
-        navigatorProvider.addNavigator(DialogNavigator())
-    }
-
-/** Saver to save and restore the NavController across config change and process death. */
-private fun NavControllerSaver(context: Context): Saver<NavHostController, *> =
-    Saver(
-        save = { it.saveState() },
-        restore = { createNavController(context).apply { restoreState(it) } }
-    )
+): NavHostController
