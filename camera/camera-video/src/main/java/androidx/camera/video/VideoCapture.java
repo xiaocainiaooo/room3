@@ -49,7 +49,6 @@ import static androidx.camera.video.StreamInfo.STREAM_ID_ERROR;
 import static androidx.camera.video.impl.VideoCaptureConfig.OPTION_FORCE_ENABLE_SURFACE_PROCESSING;
 import static androidx.camera.video.impl.VideoCaptureConfig.OPTION_VIDEO_ENCODER_INFO_FINDER;
 import static androidx.camera.video.impl.VideoCaptureConfig.OPTION_VIDEO_OUTPUT;
-import static androidx.camera.video.internal.config.VideoConfigUtil.resolveVideoEncoderConfig;
 import static androidx.camera.video.internal.config.VideoConfigUtil.resolveVideoMimeInfo;
 import static androidx.camera.video.internal.utils.DynamicRangeUtil.isHdrSettingsMatched;
 import static androidx.camera.video.internal.utils.DynamicRangeUtil.videoProfileBitDepthToDynamicRangeBitDepth;
@@ -74,7 +73,6 @@ import androidx.annotation.MainThread;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.RestrictTo.Scope;
 import androidx.annotation.VisibleForTesting;
-import androidx.arch.core.util.Function;
 import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraInfo;
 import androidx.camera.core.DynamicRange;
@@ -129,7 +127,6 @@ import androidx.camera.video.internal.compat.quirk.DeviceQuirks;
 import androidx.camera.video.internal.compat.quirk.SizeCannotEncodeVideoQuirk;
 import androidx.camera.video.internal.config.VideoMimeInfo;
 import androidx.camera.video.internal.encoder.SwappedVideoEncoderInfo;
-import androidx.camera.video.internal.encoder.VideoEncoderConfig;
 import androidx.camera.video.internal.encoder.VideoEncoderInfo;
 import androidx.camera.video.internal.encoder.VideoEncoderInfoImpl;
 import androidx.camera.video.internal.workaround.VideoEncoderInfoWrapper;
@@ -700,8 +697,7 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
                 videoCapabilities.findNearestHigherSupportedEncoderProfilesFor(resolution,
                         dynamicRange);
         VideoEncoderInfo videoEncoderInfo = resolveVideoEncoderInfo(
-                config.getVideoEncoderInfoFinder(), encoderProfiles, mediaSpec,  resolution,
-                dynamicRange, expectedFrameRate);
+                config.getVideoEncoderInfoFinder(), encoderProfiles, mediaSpec, dynamicRange);
         mRotationDegrees = getCompensatedRotation(camera);
         Rect originalCropRect = calculateCropRect(resolution, videoEncoderInfo);
         mCropRect = adjustCropRectWithInProgressTransformation(originalCropRect, mRotationDegrees);
@@ -871,7 +867,7 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
                 SurfaceRequest::willNotProvideSurface;
         private static final VideoCaptureConfig<?> DEFAULT_CONFIG;
 
-        private static final Function<VideoEncoderConfig, VideoEncoderInfo>
+        private static final VideoEncoderInfo.Finder
                 DEFAULT_VIDEO_ENCODER_INFO_FINDER = VideoEncoderInfoImpl.FINDER;
 
         static final Range<Integer> DEFAULT_FPS_RANGE = new Range<>(30, 30);
@@ -1334,25 +1330,15 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
     }
 
     private static @Nullable VideoEncoderInfo resolveVideoEncoderInfo(
-            @NonNull Function<VideoEncoderConfig, VideoEncoderInfo> videoEncoderInfoFinder,
+            VideoEncoderInfo.@NonNull Finder videoEncoderInfoFinder,
             @Nullable VideoValidatedEncoderProfilesProxy encoderProfiles,
             @NonNull MediaSpec mediaSpec,
-            @NonNull Size resolution,
-            @NonNull DynamicRange dynamicRange,
-            @NonNull Range<Integer> expectedFrameRate) {
-        // Resolve the VideoEncoderConfig
+            @NonNull DynamicRange dynamicRange) {
         VideoMimeInfo videoMimeInfo = resolveVideoMimeInfo(mediaSpec, dynamicRange,
                 encoderProfiles);
-        VideoEncoderConfig videoEncoderConfig = resolveVideoEncoderConfig(
-                videoMimeInfo,
-                // Timebase won't affect the found EncoderInfo so give a arbitrary one.
-                Timebase.UPTIME,
-                mediaSpec.getVideoSpec(),
-                resolution,
-                dynamicRange,
-                expectedFrameRate);
 
-        VideoEncoderInfo videoEncoderInfo = videoEncoderInfoFinder.apply(videoEncoderConfig);
+        VideoEncoderInfo videoEncoderInfo = videoEncoderInfoFinder.find(
+                videoMimeInfo.getMimeType());
         if (videoEncoderInfo == null) {
             // If VideoCapture cannot find videoEncoderInfo, it means that VideoOutput should
             // also not be able to find the encoder. VideoCapture will not handle this situation
@@ -1562,8 +1548,7 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
                 // camera stream.
                 VideoEncoderInfo videoEncoderInfo = findLargestSupportedSizeVideoEncoderInfo(
                         config.getVideoEncoderInfoFinder(), encoderProfiles, dynamicRange,
-                        mediaSpec, resolution,
-                        requireNonNull(config.getTargetFrameRate(Defaults.DEFAULT_FPS_RANGE)));
+                        mediaSpec);
                 if (videoEncoderInfo != null && !videoEncoderInfo.isSizeSupportedAllowSwapping(
                         resolution.getWidth(), resolution.getHeight())) {
                     sizeIterator.remove();
@@ -1579,15 +1564,13 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
     }
 
     private static @Nullable VideoEncoderInfo findLargestSupportedSizeVideoEncoderInfo(
-            @NonNull Function<VideoEncoderConfig, VideoEncoderInfo> videoEncoderInfoFinder,
+            VideoEncoderInfo.@NonNull Finder videoEncoderInfoFinder,
             @NonNull VideoValidatedEncoderProfilesProxy encoderProfiles,
             @NonNull DynamicRange dynamicRange,
-            @NonNull MediaSpec mediaSpec,
-            @NonNull Size resolution,
-            @NonNull Range<Integer> expectedFrameRate) {
+            @NonNull MediaSpec mediaSpec) {
         if (dynamicRange.isFullySpecified()) {
-            return resolveVideoEncoderInfo(videoEncoderInfoFinder, encoderProfiles,
-                    mediaSpec, resolution, dynamicRange, expectedFrameRate);
+            return resolveVideoEncoderInfo(videoEncoderInfoFinder, encoderProfiles, mediaSpec,
+                    dynamicRange);
         }
         // There could be multiple VideoProfiles that match the non-fully specified DynamicRange.
         // The one with the largest supported size will be returned.
@@ -1600,8 +1583,8 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
                         videoProfileHdrFormatsToDynamicRangeEncoding(videoProfile.getHdrFormat()),
                         videoProfileBitDepthToDynamicRangeBitDepth(videoProfile.getBitDepth()));
                 VideoEncoderInfo videoEncoderInfo =
-                        resolveVideoEncoderInfo(videoEncoderInfoFinder, encoderProfiles,
-                                mediaSpec, resolution, profileDynamicRange, expectedFrameRate);
+                        resolveVideoEncoderInfo(videoEncoderInfoFinder, encoderProfiles, mediaSpec,
+                                profileDynamicRange);
                 if (videoEncoderInfo == null) {
                     continue;
                 }
@@ -1784,7 +1767,7 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
         }
 
         @NonNull Builder<T> setVideoEncoderInfoFinder(
-                @NonNull Function<VideoEncoderConfig, VideoEncoderInfo> videoEncoderInfoFinder) {
+                VideoEncoderInfo.@NonNull Finder videoEncoderInfoFinder) {
             getMutableConfig().insertOption(OPTION_VIDEO_ENCODER_INFO_FINDER,
                     videoEncoderInfoFinder);
             return this;
