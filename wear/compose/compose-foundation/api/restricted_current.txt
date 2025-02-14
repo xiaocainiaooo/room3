@@ -531,8 +531,8 @@ package androidx.wear.compose.foundation.lazy {
     method public long getScrollProgress(androidx.compose.ui.graphics.drawscope.DrawScope);
     method public long getScrollProgress(androidx.compose.ui.graphics.GraphicsLayerScope);
     method public androidx.compose.ui.Modifier transformedHeight(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super java.lang.Integer,? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress,java.lang.Integer> heightProvider);
-    property public abstract long scrollProgress;
-    property public abstract long scrollProgress;
+    property public abstract long androidx.compose.ui.graphics.drawscope.DrawScope.scrollProgress;
+    property public abstract long androidx.compose.ui.graphics.GraphicsLayerScope.scrollProgress;
   }
 
   @kotlin.jvm.JvmInline public final value class TransformingLazyColumnItemScrollProgress {

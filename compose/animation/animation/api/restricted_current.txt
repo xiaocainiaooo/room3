@@ -26,7 +26,7 @@ package androidx.compose.animation {
     method public androidx.compose.animation.EnterTransition slideIntoContainer(int towards, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffset);
     method public androidx.compose.animation.ExitTransition slideOutOfContainer(int towards, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffset);
     method public infix androidx.compose.animation.ContentTransform using(androidx.compose.animation.ContentTransform, androidx.compose.animation.SizeTransform? sizeTransform);
-    property public default androidx.compose.animation.ExitTransition KeepUntilTransitionsFinished;
+    property public default androidx.compose.animation.ExitTransition androidx.compose.animation.ExitTransition.Companion.KeepUntilTransitionsFinished;
     property public abstract androidx.compose.ui.Alignment contentAlignment;
   }
 
@@ -76,7 +76,7 @@ package androidx.compose.animation {
 
   public final class ColorVectorConverterKt {
     method public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> getVectorConverter(androidx.compose.ui.graphics.Color.Companion);
-    property public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> VectorConverter;
+    property public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> androidx.compose.ui.graphics.Color.Companion.VectorConverter;
   }
 
   public final class ContentTransform {

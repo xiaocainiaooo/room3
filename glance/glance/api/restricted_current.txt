@@ -424,8 +424,8 @@ package androidx.glance.semantics {
     method public static String getTestTag(androidx.glance.semantics.SemanticsPropertyReceiver);
     method public static void setContentDescription(androidx.glance.semantics.SemanticsPropertyReceiver, String);
     method public static void setTestTag(androidx.glance.semantics.SemanticsPropertyReceiver, String);
-    property public static String contentDescription;
-    property public static String testTag;
+    property public static String androidx.glance.semantics.SemanticsPropertyReceiver.contentDescription;
+    property public static String androidx.glance.semantics.SemanticsPropertyReceiver.testTag;
   }
 
   public final class SemanticsPropertyKey<T> {
