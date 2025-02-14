@@ -43,6 +43,7 @@ import androidx.wear.protolayout.testing.hasWidth
 import androidx.wear.protolayout.types.argb
 import androidx.wear.protolayout.types.dp
 import androidx.wear.protolayout.types.layoutString
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.internal.DoNotInstrument
@@ -531,6 +532,30 @@ class CardTest {
             .assert(hasWidth(expand()))
             .assert(hasHeight((height.toDp())))
             .assert(hasTag(CardDefaults.METADATA_TAG))
+    }
+
+    @Test
+    fun cardColors_copy() {
+        val color = Color.YELLOW
+        val color2 = Color.MAGENTA
+        val originCardColors = CardColors()
+
+        val cardColors =
+            originCardColors.copy(timeColor = color.argb, graphicIconColor = color2.argb)
+
+        assertThat(cardColors.backgroundColor.staticArgb)
+            .isEqualTo(originCardColors.backgroundColor.staticArgb)
+        assertThat(cardColors.titleColor.staticArgb)
+            .isEqualTo(originCardColors.titleColor.staticArgb)
+        assertThat(cardColors.labelColor.staticArgb)
+            .isEqualTo(originCardColors.labelColor.staticArgb)
+        assertThat(cardColors.timeColor.staticArgb).isEqualTo(color)
+        assertThat(cardColors.secondaryIconColor.staticArgb)
+            .isEqualTo(originCardColors.secondaryIconColor.staticArgb)
+        assertThat(cardColors.secondaryTextColor.staticArgb)
+            .isEqualTo(originCardColors.secondaryTextColor.staticArgb)
+        assertThat(cardColors.graphicProgressIndicatorColors).isNull()
+        assertThat(cardColors.graphicIconColor!!.staticArgb).isEqualTo(color2)
     }
 
     companion object {

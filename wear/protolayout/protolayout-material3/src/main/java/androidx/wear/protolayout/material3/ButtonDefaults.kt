@@ -41,9 +41,14 @@ import androidx.wear.protolayout.types.argb
 /**
  * Represents the container and content colors used in buttons, such as [textEdgeButton] or
  * [iconEdgeButton].
+ *
+ * @param containerColor The container color to be used for a button's background.
+ * @param iconColor The icon tint color to be used for a button.
+ * @param labelColor The label color to be used for a button.
+ * @param secondaryLabelColor The secondary label color to be used for a button.
  */
 public class ButtonColors(
-    /** The container color to be used for a button. */
+    /** The container color to be used for a button's background. */
     public val containerColor: LayoutColor = Color.BLACK.argb,
     /** The icon tint color to be used for a button. */
     public val iconColor: LayoutColor = Color.BLACK.argb,
@@ -51,7 +56,29 @@ public class ButtonColors(
     public val labelColor: LayoutColor = Color.BLACK.argb,
     /** The secondary label color to be used for a button. */
     public val secondaryLabelColor: LayoutColor = Color.BLACK.argb,
-)
+) {
+    /**
+     * Returns a copy of this [androidx.wear.protolayout.material3.ButtonColors], optionally
+     * overriding some of the values.
+     *
+     * @param containerColor The container color to be used for a button's background.
+     * @param iconColor The icon tint color to be used for a button.
+     * @param labelColor The label color to be used for a button.
+     * @param secondaryLabelColor The secondary label color to be used for a button.
+     */
+    public fun copy(
+        containerColor: LayoutColor = this.containerColor,
+        iconColor: LayoutColor = this.iconColor,
+        labelColor: LayoutColor = this.labelColor,
+        secondaryLabelColor: LayoutColor = this.secondaryLabelColor,
+    ): ButtonColors =
+        ButtonColors(
+            containerColor = containerColor,
+            iconColor = iconColor,
+            labelColor = labelColor,
+            secondaryLabelColor = secondaryLabelColor
+        )
+}
 
 public object ButtonDefaults {
     /**
@@ -67,12 +94,13 @@ public object ButtonDefaults {
         secondaryLabel: LayoutElement?,
         icon: LayoutElement?,
         @HorizontalAlignment horizontalAlignment: Int,
-        style: ButtonStyle
+        style: ButtonStyle,
+        width: ContainerDimension,
     ): LayoutElement {
         val labels: Column.Builder =
             Column.Builder().setWidth(expand()).setHorizontalAlignment(horizontalAlignment)
 
-        val row: Row.Builder = Row.Builder()
+        val row: Row.Builder = Row.Builder().setWidth(width)
 
         ContainerWithSpacersBuilder<LayoutElement>(labels::addContent, label)
             .addElement(secondaryLabel, horizontalSpacer(style.labelsSpaceDp))
