@@ -176,8 +176,10 @@ package androidx.savedstate.serialization {
 
   public final class SavedStateConfig {
     method public int getClassDiscriminatorMode();
+    method public boolean getEncodeDefaults();
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
     property public int classDiscriminatorMode;
+    property public boolean encodeDefaults;
     property public kotlinx.serialization.modules.SerializersModule serializersModule;
     field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
     field public static final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
@@ -185,10 +187,13 @@ package androidx.savedstate.serialization {
 
   public static final class SavedStateConfig.Builder {
     method public int getClassDiscriminatorMode();
+    method public boolean getEncodeDefaults();
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
     method public void setClassDiscriminatorMode(int);
+    method public void setEncodeDefaults(boolean);
     method public void setSerializersModule(kotlinx.serialization.modules.SerializersModule);
     property public int classDiscriminatorMode;
+    property public boolean encodeDefaults;
     property public kotlinx.serialization.modules.SerializersModule serializersModule;
   }
 

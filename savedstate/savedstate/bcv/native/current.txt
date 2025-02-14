@@ -24,6 +24,8 @@ final class <#A: kotlin/Any?> androidx.savedstate.serialization.serializers/Muta
 final class androidx.savedstate.serialization/SavedStateConfig { // androidx.savedstate.serialization/SavedStateConfig|null[0]
     final val classDiscriminatorMode // androidx.savedstate.serialization/SavedStateConfig.classDiscriminatorMode|{}classDiscriminatorMode[0]
         final fun <get-classDiscriminatorMode>(): kotlin/Int // androidx.savedstate.serialization/SavedStateConfig.classDiscriminatorMode.<get-classDiscriminatorMode>|<get-classDiscriminatorMode>(){}[0]
+    final val encodeDefaults // androidx.savedstate.serialization/SavedStateConfig.encodeDefaults|{}encodeDefaults[0]
+        final fun <get-encodeDefaults>(): kotlin/Boolean // androidx.savedstate.serialization/SavedStateConfig.encodeDefaults.<get-encodeDefaults>|<get-encodeDefaults>(){}[0]
     final val serializersModule // androidx.savedstate.serialization/SavedStateConfig.serializersModule|{}serializersModule[0]
         final fun <get-serializersModule>(): kotlinx.serialization.modules/SerializersModule // androidx.savedstate.serialization/SavedStateConfig.serializersModule.<get-serializersModule>|<get-serializersModule>(){}[0]
 
@@ -31,6 +33,9 @@ final class androidx.savedstate.serialization/SavedStateConfig { // androidx.sav
         final var classDiscriminatorMode // androidx.savedstate.serialization/SavedStateConfig.Builder.classDiscriminatorMode|{}classDiscriminatorMode[0]
             final fun <get-classDiscriminatorMode>(): kotlin/Int // androidx.savedstate.serialization/SavedStateConfig.Builder.classDiscriminatorMode.<get-classDiscriminatorMode>|<get-classDiscriminatorMode>(){}[0]
             final fun <set-classDiscriminatorMode>(kotlin/Int) // androidx.savedstate.serialization/SavedStateConfig.Builder.classDiscriminatorMode.<set-classDiscriminatorMode>|<set-classDiscriminatorMode>(kotlin.Int){}[0]
+        final var encodeDefaults // androidx.savedstate.serialization/SavedStateConfig.Builder.encodeDefaults|{}encodeDefaults[0]
+            final fun <get-encodeDefaults>(): kotlin/Boolean // androidx.savedstate.serialization/SavedStateConfig.Builder.encodeDefaults.<get-encodeDefaults>|<get-encodeDefaults>(){}[0]
+            final fun <set-encodeDefaults>(kotlin/Boolean) // androidx.savedstate.serialization/SavedStateConfig.Builder.encodeDefaults.<set-encodeDefaults>|<set-encodeDefaults>(kotlin.Boolean){}[0]
         final var serializersModule // androidx.savedstate.serialization/SavedStateConfig.Builder.serializersModule|{}serializersModule[0]
             final fun <get-serializersModule>(): kotlinx.serialization.modules/SerializersModule // androidx.savedstate.serialization/SavedStateConfig.Builder.serializersModule.<get-serializersModule>|<get-serializersModule>(){}[0]
             final fun <set-serializersModule>(kotlinx.serialization.modules/SerializersModule) // androidx.savedstate.serialization/SavedStateConfig.Builder.serializersModule.<set-serializersModule>|<set-serializersModule>(kotlinx.serialization.modules.SerializersModule){}[0]
