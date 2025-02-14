@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavBackStackEntryProviderKt")
+@file:JvmMultifileClass
+
 package androidx.navigation.compose
 
 import androidx.compose.runtime.Composable
@@ -29,18 +32,8 @@ import androidx.navigation.NavBackStackEntry
 import java.lang.ref.WeakReference
 import java.util.UUID
 
-/**
- * Provides [this] [NavBackStackEntry] as [LocalViewModelStoreOwner], [LocalLifecycleOwner] and
- * [LocalSavedStateRegistryOwner] to the [content] and saves the [content]'s saveable states with
- * the given [saveableStateHolder].
- *
- * @param saveableStateHolder The [SaveableStateHolder] that holds the saved states. The same holder
- *   should be used for all [NavBackStackEntry]s in the encapsulating [Composable] and the holder
- *   should be hoisted.
- * @param content The content [Composable]
- */
 @Composable
-public fun NavBackStackEntry.LocalOwnersProvider(
+public actual fun NavBackStackEntry.LocalOwnersProvider(
     saveableStateHolder: SaveableStateHolder,
     content: @Composable () -> Unit
 ) {
