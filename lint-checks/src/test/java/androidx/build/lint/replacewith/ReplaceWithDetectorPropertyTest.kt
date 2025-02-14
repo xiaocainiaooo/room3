@@ -35,13 +35,13 @@ class ReplaceWithDetectorPropertyTest {
         // Kotlin property accessors until we can properly convert the expressions to Java.
         val expected =
             """
-src/replacewith/PropertyJava.java:42: Information: Replacement available [ReplaceWith]
+src/replacewith/PropertyJava.java:42: Hint: Replacement available [ReplaceWith]
         clazz.setMethodDeprecated("value");
               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/replacewith/PropertyJava.java:43: Information: Replacement available [ReplaceWith]
+src/replacewith/PropertyJava.java:43: Hint: Replacement available [ReplaceWith]
         clazz.getMethodDeprecated();
               ~~~~~~~~~~~~~~~~~~~
-0 errors, 0 warnings
+0 errors, 0 warnings, 2 hints
         """
                 .trimIndent()
 
