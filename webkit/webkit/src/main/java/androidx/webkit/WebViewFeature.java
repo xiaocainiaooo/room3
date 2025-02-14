@@ -665,7 +665,7 @@ public class WebViewFeature {
      * {@link Profile#setSpeculativeLoadingConfig(SpeculativeLoadingConfig)}
      */
     @Profile.ExperimentalUrlPrefetch
-    public static final String SPECULATIVE_LOADING_CONFIG = "SPECULATIVE_LOADING_CONFIG";
+    public static final String SPECULATIVE_LOADING_CONFIG = "SPECULATIVE_LOADING_CONFIG_V2";
 
     /**
      * Return whether a feature is supported at run-time. This will check whether a feature is
