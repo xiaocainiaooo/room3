@@ -85,11 +85,14 @@ package androidx.benchmark.traceprocessor {
     ctor @SuppressCompatibility @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public TraceProcessor(androidx.benchmark.traceprocessor.ServerLifecycleManager serverLifecycleManager, optional androidx.benchmark.traceprocessor.TraceProcessor.Tracer tracer, optional androidx.benchmark.traceprocessor.TraceProcessor.EventCallback eventCallback);
     method public <T> T loadTrace(androidx.benchmark.traceprocessor.PerfettoTrace trace, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor.Session,? extends T> block);
     method @SuppressCompatibility @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public static <T> T runServer(androidx.benchmark.traceprocessor.ServerLifecycleManager serverLifecycleManager, androidx.benchmark.traceprocessor.TraceProcessor.EventCallback eventCallback, androidx.benchmark.traceprocessor.TraceProcessor.Tracer tracer, optional long timeout, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor,? extends T> block);
+    method @SuppressCompatibility @CheckResult @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public static androidx.benchmark.traceprocessor.TraceProcessor.Handle startServer(androidx.benchmark.traceprocessor.ServerLifecycleManager serverLifecycleManager, androidx.benchmark.traceprocessor.TraceProcessor.EventCallback eventCallback, androidx.benchmark.traceprocessor.TraceProcessor.Tracer tracer, optional long timeout);
+    method @CheckResult public androidx.benchmark.traceprocessor.TraceProcessor.Session.Handle startSession(androidx.benchmark.traceprocessor.PerfettoTrace trace);
     field public static final androidx.benchmark.traceprocessor.TraceProcessor.Companion Companion;
   }
 
   public static final class TraceProcessor.Companion {
     method @SuppressCompatibility @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public <T> T runServer(androidx.benchmark.traceprocessor.ServerLifecycleManager serverLifecycleManager, androidx.benchmark.traceprocessor.TraceProcessor.EventCallback eventCallback, androidx.benchmark.traceprocessor.TraceProcessor.Tracer tracer, optional long timeout, kotlin.jvm.functions.Function1<? super androidx.benchmark.traceprocessor.TraceProcessor,? extends T> block);
+    method @SuppressCompatibility @CheckResult @androidx.benchmark.traceprocessor.ExperimentalTraceProcessorApi public androidx.benchmark.traceprocessor.TraceProcessor.Handle startServer(androidx.benchmark.traceprocessor.ServerLifecycleManager serverLifecycleManager, androidx.benchmark.traceprocessor.TraceProcessor.EventCallback eventCallback, androidx.benchmark.traceprocessor.TraceProcessor.Tracer tracer, optional long timeout);
   }
 
   public static interface TraceProcessor.EventCallback {
@@ -101,12 +104,26 @@ package androidx.benchmark.traceprocessor {
     field public static final androidx.benchmark.traceprocessor.TraceProcessor.EventCallback.Noop INSTANCE;
   }
 
+  public static final class TraceProcessor.Handle implements java.lang.AutoCloseable {
+    ctor public TraceProcessor.Handle(androidx.benchmark.traceprocessor.TraceProcessor traceProcessor);
+    method public void close();
+    method public androidx.benchmark.traceprocessor.TraceProcessor getTraceProcessor();
+    property public androidx.benchmark.traceprocessor.TraceProcessor traceProcessor;
+  }
+
   public static final class TraceProcessor.Session {
     method public kotlin.sequences.Sequence<androidx.benchmark.traceprocessor.Row> query(String query);
     method public String queryMetricsJson(java.util.List<java.lang.String> metrics);
     method public byte[] queryMetricsProtoBinary(java.util.List<java.lang.String> metrics);
     method public String queryMetricsProtoText(java.util.List<java.lang.String> metrics);
     method public byte[] rawQuery(String query);
+  }
+
+  public static final class TraceProcessor.Session.Handle implements java.lang.AutoCloseable {
+    ctor public TraceProcessor.Session.Handle(androidx.benchmark.traceprocessor.TraceProcessor.Session session);
+    method public void close();
+    method public androidx.benchmark.traceprocessor.TraceProcessor.Session getSession();
+    property public androidx.benchmark.traceprocessor.TraceProcessor.Session session;
   }
 
   public static class TraceProcessor.Tracer {
