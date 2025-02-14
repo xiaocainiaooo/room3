@@ -128,9 +128,7 @@ fun ToggleButton(
     @Suppress("NAME_SHADOWING")
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     // TODO Load the motionScheme tokens from the component tokens file
-    // MotionSchemeKeyTokens.DefaultEffects is intentional here to prevent
-    // any bounce in this component.
-    val defaultAnimationSpec = MotionSchemeKeyTokens.DefaultEffects.value<Float>()
+    val defaultAnimationSpec = MotionSchemeKeyTokens.FastSpatial.value<Float>()
     val pressed by interactionSource.collectIsPressedAsState()
     val containerColor = colors.containerColor(enabled, checked)
     val contentColor = colors.contentColor(enabled, checked)
