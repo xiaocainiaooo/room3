@@ -189,7 +189,7 @@ final class ViewfinderTransformation {
                         mResolution.getWidth(),
                         mResolution.getHeight()
                 );
-        RectF surfaceRectInPreviewView = getTransformedSurfaceRect(viewfinderSize,
+        RectF surfaceRectInViewfinder = getTransformedSurfaceRect(viewfinderSize,
                 layoutDirection);
 
         Bitmap transformed = Bitmap.createBitmap(
@@ -198,9 +198,9 @@ final class ViewfinderTransformation {
 
         Matrix canvasTransform = new Matrix();
         canvasTransform.postConcat(textureViewCorrection);
-        canvasTransform.postScale(surfaceRectInPreviewView.width() / mResolution.getWidth(),
-                surfaceRectInPreviewView.height() / mResolution.getHeight());
-        canvasTransform.postTranslate(surfaceRectInPreviewView.left, surfaceRectInPreviewView.top);
+        canvasTransform.postScale(surfaceRectInViewfinder.width() / mResolution.getWidth(),
+                surfaceRectInViewfinder.height() / mResolution.getHeight());
+        canvasTransform.postTranslate(surfaceRectInViewfinder.left, surfaceRectInViewfinder.top);
 
         canvas.drawBitmap(original, canvasTransform,
                 new Paint(ANTI_ALIAS_FLAG | FILTER_BITMAP_FLAG | DITHER_FLAG));
