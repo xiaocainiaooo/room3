@@ -89,6 +89,13 @@ public abstract class VideoEncoderConfig implements EncoderConfig {
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, getColorFormat());
         format.setInteger(MediaFormat.KEY_BIT_RATE, getBitrate());
         format.setInteger(MediaFormat.KEY_FRAME_RATE, getEncodeFrameRate());
+        if (getEncodeFrameRate() != getCaptureFrameRate()) {
+            // MediaCodec will adjust the frame timestamp when KEY_CAPTURE_RATE is different from
+            // KEY_FRAME_RATE.
+            format.setInteger(MediaFormat.KEY_CAPTURE_RATE, getCaptureFrameRate());
+            format.setInteger(MediaFormat.KEY_OPERATING_RATE, getCaptureFrameRate());
+            format.setInteger(MediaFormat.KEY_PRIORITY, 0); // Smaller value, higher priority.
+        }
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, getIFrameInterval());
         if (getProfile() != EncoderConfig.CODEC_PROFILE_NONE) {
             format.setInteger(MediaFormat.KEY_PROFILE, getProfile());
