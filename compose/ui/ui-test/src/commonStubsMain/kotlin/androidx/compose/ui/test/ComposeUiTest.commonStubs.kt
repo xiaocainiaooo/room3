@@ -19,12 +19,14 @@ package androidx.compose.ui.test
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Density
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.test.TestResult
 
 @ExperimentalTestApi
 actual fun runComposeUiTest(
     effectContext: CoroutineContext,
-    block: ComposeUiTest.() -> Unit
-): Unit = implementedInJetBrainsFork()
+    runTestContext: CoroutineContext,
+    block: suspend ComposeUiTest.() -> Unit
+): TestResult = implementedInJetBrainsFork()
 
 @ExperimentalTestApi
 actual sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {
