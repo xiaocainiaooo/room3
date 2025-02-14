@@ -178,14 +178,18 @@ data class AnnotatedAppFunctions(
      */
     fun createAppFunctionMetadataList(): List<AppFunctionMetadata> {
         val sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata> = mutableMapOf()
+        val seenDataTypeQualifiers: MutableSet<String> = mutableSetOf()
         return appFunctionDeclarations.map { functionDeclaration ->
             val appFunctionAnnotationProperties =
                 computeAppFunctionAnnotationProperties(functionDeclaration)
             val parameterTypeMetadataList =
-                functionDeclaration.buildParameterTypeMetadataList(sharedDataTypeMap)
+                functionDeclaration.buildParameterTypeMetadataList(
+                    sharedDataTypeMap,
+                    seenDataTypeQualifiers
+                )
             val responseTypeMetadata =
                 checkNotNull(functionDeclaration.returnType)
-                    .toAppFunctionDataTypeMetadata(sharedDataTypeMap)
+                    .toAppFunctionDataTypeMetadata(sharedDataTypeMap, seenDataTypeQualifiers)
 
             AppFunctionMetadata(
                 id = getAppFunctionIdentifier(functionDeclaration),
@@ -198,13 +202,10 @@ data class AnnotatedAppFunctions(
         }
     }
 
-    /**
-     * Builds a list of [AppFunctionParameterMetadata] for the parameters of an app function.
-     *
-     * Currently, only primitive parameters are supported.
-     */
+    /** Builds a list of [AppFunctionParameterMetadata] for the parameters of an app function. */
     private fun KSFunctionDeclaration.buildParameterTypeMetadataList(
-        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>
+        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>,
+        seenDataTypeQualifiers: MutableSet<String>
     ): List<AppFunctionParameterMetadata> = buildList {
         for (ksValueParameter in parameters) {
             if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
@@ -214,7 +215,10 @@ data class AnnotatedAppFunctions(
 
             val parameterName = checkNotNull(ksValueParameter.name).asString()
             val dataTypeMetadata =
-                ksValueParameter.type.toAppFunctionDataTypeMetadata(sharedDataTypeMap)
+                ksValueParameter.type.toAppFunctionDataTypeMetadata(
+                    sharedDataTypeMap,
+                    seenDataTypeQualifiers
+                )
 
             add(
                 AppFunctionParameterMetadata(
@@ -228,7 +232,8 @@ data class AnnotatedAppFunctions(
     }
 
     private fun KSTypeReference.toAppFunctionDataTypeMetadata(
-        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>
+        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>,
+        seenDataTypeQualifiers: MutableSet<String>
     ): AppFunctionDataTypeMetadata {
         val appFunctionTypeReference = AppFunctionTypeReference(this)
         return when (appFunctionTypeReference.typeCategory) {
@@ -251,7 +256,8 @@ data class AnnotatedAppFunctions(
             SERIALIZABLE_SINGULAR -> {
                 addSerializableTypeMetadataToSharedDataTypeMap(
                     appFunctionTypeReference,
-                    sharedDataTypeMap
+                    sharedDataTypeMap,
+                    seenDataTypeQualifiers
                 )
                 AppFunctionReferenceTypeMetadata(
                     referenceDataType =
@@ -265,7 +271,8 @@ data class AnnotatedAppFunctions(
             SERIALIZABLE_LIST -> {
                 addSerializableTypeMetadataToSharedDataTypeMap(
                     appFunctionTypeReference,
-                    sharedDataTypeMap
+                    sharedDataTypeMap,
+                    seenDataTypeQualifiers
                 )
                 AppFunctionArrayTypeMetadata(
                     itemType =
@@ -284,10 +291,10 @@ data class AnnotatedAppFunctions(
         }
     }
 
-    // Todo: Add serializable types to components map
     private fun addSerializableTypeMetadataToSharedDataTypeMap(
         serializableTypeReference: AppFunctionTypeReference,
-        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>
+        sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata>,
+        seenDataTypeQualifiers: MutableSet<String>
     ) {
         val serializableTypeReferenceQualifier =
             serializableTypeReference.selfOrItemTypeReference
@@ -295,18 +302,41 @@ data class AnnotatedAppFunctions(
                 .ignoreNullable()
                 .toString()
 
-        if (!sharedDataTypeMap.containsKey(serializableTypeReferenceQualifier)) {
-            // TODO: Actually build object type for unseen AppFunctionSerializable
-            val serializableTypeMetadata =
-                AppFunctionObjectTypeMetadata(
-                    properties = emptyMap(),
-                    required = emptyList(),
-                    qualifiedName = serializableTypeReferenceQualifier,
-                    isNullable = serializableTypeReference.isNullable
-                )
-            // Immediately add this type as seen
-            sharedDataTypeMap.put(serializableTypeReferenceQualifier, serializableTypeMetadata)
+        // This type has already been added to the sharedDataMap.
+        if (seenDataTypeQualifiers.contains(serializableTypeReferenceQualifier)) {
+            return
         }
+
+        seenDataTypeQualifiers.add(serializableTypeReferenceQualifier)
+        val annotatedAppFunctionSerializable =
+            getAnnotatedAppFunctionSerializable(serializableTypeReference)
+        val appFunctionSerializableProperties = annotatedAppFunctionSerializable.getProperties()
+        val requiredPropertiesList: MutableList<String> = mutableListOf()
+        val appFunctionSerializablePropertiesMap: Map<String, AppFunctionDataTypeMetadata> =
+            buildMap {
+                for (property in appFunctionSerializableProperties) {
+                    val innerAppFunctionDataTypeMetadata =
+                        AppFunctionTypeReference(property.type)
+                            .selfTypeReference
+                            .toAppFunctionDataTypeMetadata(
+                                sharedDataTypeMap,
+                                seenDataTypeQualifiers
+                            )
+                    put(checkNotNull(property.name).asString(), innerAppFunctionDataTypeMetadata)
+                    // TODO(b/394553462): Parse required state from annotation.
+                    requiredPropertiesList.add(checkNotNull(property.name).asString())
+                }
+            }
+        val serializableTypeMetadata =
+            AppFunctionObjectTypeMetadata(
+                properties = appFunctionSerializablePropertiesMap,
+                required = requiredPropertiesList,
+                qualifiedName = serializableTypeReferenceQualifier,
+                // Shared reference is nullable by default since the actual nullable state is
+                // reflected in the parameter metadata
+                isNullable = true
+            )
+        sharedDataTypeMap.put(serializableTypeReferenceQualifier, serializableTypeMetadata)
     }
 
     private fun AppFunctionTypeReference.toAppFunctionDataType(): Int {
