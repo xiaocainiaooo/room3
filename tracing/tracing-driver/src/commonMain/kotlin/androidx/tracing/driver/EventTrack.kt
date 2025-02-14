@@ -26,7 +26,7 @@ public abstract class EventTrack(
     /** The uuid for the track descriptor. */
     uuid: Long
 ) : Track(context = context, uuid = uuid) {
-    public fun beginSection(name: String, flowIds: List<Long>) {
+    public open fun beginSection(name: String, flowIds: List<Long>) {
         if (context.isEnabled) {
             emitPacket { packet ->
                 packet.setBeginSectionWithFlows(uuid, sequenceId, name, flowIds)
@@ -34,19 +34,19 @@ public abstract class EventTrack(
         }
     }
 
-    public fun beginSection(name: String) {
+    public open fun beginSection(name: String) {
         if (context.isEnabled) {
             emitPacket { packet -> packet.setBeginSection(uuid, sequenceId, name) }
         }
     }
 
-    public fun endSection() {
+    public open fun endSection() {
         if (context.isEnabled) {
             emitPacket { packet -> packet.setEndSection(uuid, sequenceId) }
         }
     }
 
-    public fun instant() {
+    public open fun instant() {
         if (context.isEnabled) {
             emitPacket { packet -> packet.setInstantEvent(uuid, sequenceId) }
         }
