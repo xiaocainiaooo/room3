@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -423,9 +424,13 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
             }
         }
 
-        findViewRootForTest(view)!!.setUncaughtExceptionHandler { e, _ ->
-            exceptionHandler.invoke(e)
-        }
+        findViewRootForTest(view)!!.setUncaughtExceptionHandler(
+            object : RootForTest.UncaughtExceptionHandler {
+                override fun onUncaughtException(t: Throwable) {
+                    exceptionHandler.invoke(t)
+                }
+            }
+        )
         view.setContent {
             if (!lookahead) {
                 content()

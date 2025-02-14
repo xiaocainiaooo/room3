@@ -3092,19 +3092,8 @@ package androidx.compose.ui.node {
     property @Deprecated public abstract androidx.compose.ui.text.input.TextInputService textInputService;
   }
 
-  public static fun interface RootForTest.UncaughtExceptionHandler {
-    method public void onUncaughtException(Throwable t, int phase);
-  }
-
-  @kotlin.jvm.JvmInline public static final value class RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase {
-    field public static final androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion Companion;
-  }
-
-  public static final class RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion {
-    method public int getDraw();
-    method public int getLayout();
-    property public int Draw;
-    property public int Layout;
+  public static interface RootForTest.UncaughtExceptionHandler {
+    method public void onUncaughtException(Throwable t);
   }
 
   public interface SemanticsModifierNode extends androidx.compose.ui.node.DelegatableNode {

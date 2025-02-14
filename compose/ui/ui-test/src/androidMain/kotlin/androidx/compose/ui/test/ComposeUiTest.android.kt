@@ -26,7 +26,6 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler
-import androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
@@ -36,6 +35,8 @@ import androidx.compose.ui.test.ComposeRootRegistry.OnRegistrationChangedListene
 import androidx.compose.ui.unit.Density
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import java.io.PrintStream
+import java.io.PrintWriter
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -474,20 +475,12 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
             object : OnRegistrationChangedListener {
                 val uncaughtExceptionHandler =
                     object : UncaughtExceptionHandler {
-                        override fun onUncaughtException(
-                            t: Throwable,
-                            phase: ExceptionOriginPhase
-                        ) {
+                        override fun onUncaughtException(t: Throwable) {
                             pendingThrowable =
-                                pendingThrowable?.apply { addSuppressed(t) }
-                                    ?: ForwardedComposeViewException(
-                                        "An unhandled exception was thrown during ${when (phase) {
-                                        ExceptionOriginPhase.Layout -> "Layout"
-                                        ExceptionOriginPhase.Draw -> "Draw"
-                                        else -> "unknown view phase"
-                                    }}",
-                                        t
-                                    )
+                                pendingThrowable?.apply {
+                                    addCascadingErrorHeaderIfAbsent()
+                                    addSuppressed(t)
+                                } ?: t
                         }
                     }
 
@@ -545,7 +538,11 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
             try {
                 viewRootForTest.tryDiscardComposition()
             } catch (e: Exception) {
-                exception = exception?.apply { addSuppressed(e) } ?: e
+                exception =
+                    exception?.apply {
+                        addCascadingErrorHeaderIfAbsent()
+                        addSuppressed(e)
+                    } ?: e
             }
         }
     }
@@ -716,8 +713,34 @@ internal fun <A : ComponentActivity> ActivityScenario<A>.getActivity(): A? {
     return activity
 }
 
-internal class ForwardedComposeViewException(message: String, cause: Throwable?) :
-    RuntimeException(message, cause)
+private fun Throwable.addCascadingErrorHeaderIfAbsent() {
+    if (suppressed.none { it is BeginningOfCascadingComposeErrors }) {
+        addSuppressed(BeginningOfCascadingComposeErrors())
+    }
+}
+
+internal class BeginningOfCascadingComposeErrors() : RuntimeException(MESSAGE) {
+    override fun getStackTrace() = emptyArray<StackTraceElement>()
+
+    override fun fillInStackTrace() = this
+
+    override fun printStackTrace() {}
+
+    override fun printStackTrace(s: PrintStream) {}
+
+    override fun printStackTrace(s: PrintWriter) {}
+
+    companion object {
+        private const val MESSAGE =
+            """Beginning of cascading composition errors.
+
+               The following suppressed exceptions occurred when the test continued composition
+               or teardown after the first exception was thrown. Exceptions that follow this
+               message are likely not actionable or relevant for troubleshooting purposes.
+               They have been included for information purposes.
+               """
+    }
+}
 
 @ExperimentalTestApi
 actual sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {

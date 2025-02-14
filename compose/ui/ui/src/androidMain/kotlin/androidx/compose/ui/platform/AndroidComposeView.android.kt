@@ -179,7 +179,6 @@ import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.node.onUncaughtDrawException
 import androidx.compose.ui.node.visitSubtree
 import androidx.compose.ui.platform.MotionEventVerifierApi29.isValidMotionEvent
 import androidx.compose.ui.platform.coreshims.ContentCaptureSessionCompat
@@ -1913,7 +1912,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             dirtyLayers.clear()
             isDrawingContent = false
         } catch (t: Throwable) {
-            uncaughtExceptionHandler?.onUncaughtDrawException(t) ?: throw t
+            uncaughtExceptionHandler?.onUncaughtException(t) ?: throw t
         }
 
         // updateDisplayList operations performed above (during root.draw and during the explicit
