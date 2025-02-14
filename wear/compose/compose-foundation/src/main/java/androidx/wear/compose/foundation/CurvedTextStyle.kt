@@ -67,7 +67,9 @@ internal val DefaultCurvedTextStyles =
  *   [letterSpacing] to account for the fact that going clockwise, text fans out from the baseline
  *   while going counter clockwise text fans in. If not specified, the value for [letterSpacing]
  *   will be used.
- * @param lineHeight Line height for the text in [TextUnit] unit, e.g. SP or EM.
+ * @param lineHeight Line height for the text in [TextUnit] unit, e.g. SP or EM. Note that since
+ *   curved text only has one line, this used the equivalent of a lineHeightStyle: alignment =
+ *   Center, trim = None, mode = Fixed
  */
 public class CurvedTextStyle(
     public val background: Color = Color.Unspecified,
