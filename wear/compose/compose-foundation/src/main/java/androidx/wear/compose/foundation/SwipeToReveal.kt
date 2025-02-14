@@ -247,7 +247,6 @@ public fun createRevealAnchors(
  *
  * @constructor Create a [RevealState].
  */
-@OptIn(ExperimentalWearFoundationApi::class)
 public class RevealState
 internal constructor(
     initialValue: RevealValue,
@@ -480,7 +479,6 @@ public fun rememberRevealState(
  *   [RevealState.currentValue] becomes [RevealValue.RightRevealed].
  * @param content The content that will be initially displayed over the other actions provided.
  */
-@OptIn(ExperimentalWearFoundationApi::class)
 @Composable
 public fun SwipeToReveal(
     primaryAction: @Composable () -> Unit,
@@ -729,7 +727,6 @@ public fun SwipeToReveal(
 }
 
 /** An internal object containing some defaults used across the Swipe to reveal component. */
-@OptIn(ExperimentalWearFoundationApi::class)
 internal object SwipeToRevealDefaults {
     /** Default animation spec used when moving between states. */
     internal val animationSpec = SwipeableV2Defaults.AnimationSpec
