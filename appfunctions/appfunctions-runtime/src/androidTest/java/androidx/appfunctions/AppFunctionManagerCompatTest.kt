@@ -213,7 +213,9 @@ class AppFunctionManagerCompatTest {
 
         assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
         assertThat(
-                (response as ExecuteAppFunctionResponse.Success).returnValue.getString("testResult")
+                (response as ExecuteAppFunctionResponse.Success)
+                    .returnValue
+                    .getString(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
             )
             .isEqualTo("result")
     }

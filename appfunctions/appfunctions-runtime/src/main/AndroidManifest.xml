@@ -25,9 +25,9 @@
                 android:name="android.app.appfunctions"
                 android:value="app_function.xml" />
             <!--TODO: Renable this after resolve test conflict -->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.app.appfunctions.AppFunctionService"/>-->
-<!--            </intent-filter>-->
+            <intent-filter>
+                <action android:name="android.app.appfunctions.AppFunctionService"/>
+            </intent-filter>
         </service>
     </application>
 </manifest>
