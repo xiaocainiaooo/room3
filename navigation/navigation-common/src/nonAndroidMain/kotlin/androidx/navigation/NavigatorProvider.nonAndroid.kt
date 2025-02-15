@@ -19,7 +19,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import kotlin.reflect.KClass
 
-public actual open class NavigatorProvider {
+public actual open class NavigatorProvider actual constructor() {
 
     @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public actual val navigators: Map<String, Navigator<out NavDestination>>
