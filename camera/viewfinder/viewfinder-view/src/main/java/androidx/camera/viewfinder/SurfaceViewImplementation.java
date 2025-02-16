@@ -17,7 +17,6 @@
 package androidx.camera.viewfinder;
 
 import android.graphics.Bitmap;
-import android.os.Handler;
 import android.view.PixelCopy;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -25,9 +24,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.impl.PixelCopyCompat;
 import androidx.camera.viewfinder.core.impl.RefCounted;
 import androidx.camera.viewfinder.core.impl.SurfaceControlCompat;
 import androidx.camera.viewfinder.internal.utils.Logger;
@@ -49,8 +48,7 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
 
     private static final String TAG = "SurfaceViewImpl";
 
-    // Wait for 100ms for a screenshot. It usually takes <10ms on Pixel 6a / OS 14.
-    private static final int SCREENSHOT_TIMEOUT_MILLIS = 100;
+    private static final int SCREENSHOT_TIMEOUT_MILLIS = 500;
 
     // Synthetic Accessor
     @SuppressWarnings("WeakerAccess")
@@ -204,10 +202,8 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
 
     /**
      * Getting a Bitmap from a Surface is achieved using the `PixelCopy#request()` API, which
-     * would introduced in API level 24. CameraViewfinder doesn't currently use a SurfaceView on API
-     * levels below 24.
+     * would introduced in API level 24. Below API 24, the bitmap will be blank.
      */
-    @RequiresApi(24)
     @Override
     @Nullable
     Bitmap getViewfinderBitmap() {
@@ -226,18 +222,15 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
             // Copy display contents of the surfaceView's surface into a Bitmap.
             final Bitmap bitmap = Bitmap.createBitmap(mCurrentSurfaceWidth, mCurrentSurfaceHeight,
                     Bitmap.Config.ARGB_8888);
-            Api24Impl.pixelCopyRequest(surface, bitmap, copyResult -> {
-                if (copyResult == PixelCopy.SUCCESS) {
-                    Logger.d(TAG,
-                            "CameraViewfinder.SurfaceViewImplementation.getBitmap() succeeded");
-                } else {
-                    Logger.e(TAG,
-                            "CameraViewfinder.SurfaceViewImplementation.getBitmap() failed with "
-                                    + "error "
-                                    + copyResult);
-                }
-            }, mSurfaceView.getHandler());
-
+            int copyRes = PixelCopyCompat.requestSync(surface, bitmap, SCREENSHOT_TIMEOUT_MILLIS);
+            if (copyRes == PixelCopy.SUCCESS) {
+                Logger.d(TAG,
+                        "CameraViewfinder.SurfaceViewImplementation.getBitmap() succeeded");
+            } else {
+                Logger.e(TAG,
+                        "CameraViewfinder.SurfaceViewImplementation.getBitmap() failed with "
+                                + "error " + copyRes);
+            }
             return bitmap;
         } finally {
             mActiveSurface.release();
@@ -297,21 +290,6 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
             Logger.d(TAG, "Surface invalidated: " + mSurfaceRequest);
             // TODO(b/323226220): Differentiate between surface being released by consumer
             //  vs producer
-        }
-    }
-
-    /**
-     * Nested class to avoid verification errors for methods introduced in Android 7.0 (API 24).
-     */
-    @RequiresApi(24)
-    private static class Api24Impl {
-
-        private Api24Impl() {
-        }
-
-        static void pixelCopyRequest(@NonNull Surface source, @NonNull Bitmap dest,
-                PixelCopy.@NonNull OnPixelCopyFinishedListener listener, @NonNull Handler handler) {
-            PixelCopy.request(source, dest, listener, handler);
         }
     }
 }
