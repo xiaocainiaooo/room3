@@ -54,7 +54,6 @@ internal object SavedStateCodecTestUtils {
                     encodeToSavedState(serializer, this, config)
                 }
             }
-
         encoded.read { checkEncoded() }
 
         val restored = platformEncodeDecode(encoded)
