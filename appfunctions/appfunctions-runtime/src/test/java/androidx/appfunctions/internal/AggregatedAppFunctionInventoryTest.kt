@@ -17,7 +17,6 @@
 package androidx.appfunctions.internal
 
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
@@ -80,7 +79,7 @@ class AggregatedAppFunctionInventoryTest {
                             AppFunctionResponseMetadata(
                                 valueType =
                                     AppFunctionPrimitiveTypeMetadata(
-                                        type = AppFunctionDataTypeMetadata.TYPE_UNIT,
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
                                         isNullable = false
                                     ),
                             ),
@@ -102,7 +101,7 @@ class AggregatedAppFunctionInventoryTest {
                             AppFunctionResponseMetadata(
                                 valueType =
                                     AppFunctionPrimitiveTypeMetadata(
-                                        type = AppFunctionDataTypeMetadata.TYPE_UNIT,
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
                                         isNullable = false
                                     ),
                             ),

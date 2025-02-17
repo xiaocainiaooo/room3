@@ -16,7 +16,7 @@
 
 package androidx.appfunctions.metadata
 
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_INT
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_INT
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 

@@ -168,6 +168,10 @@ package androidx.appfunctions.metadata {
     ctor public AppFunctionArrayTypeMetadata(androidx.appfunctions.metadata.AppFunctionDataTypeMetadata itemType, boolean isNullable);
     method public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata getItemType();
     property public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata itemType;
+    field public static final androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata.Companion Companion;
+  }
+
+  public static final class AppFunctionArrayTypeMetadata.Companion {
   }
 
   public final class AppFunctionComponentsMetadata {
@@ -181,25 +185,9 @@ package androidx.appfunctions.metadata {
     method public final boolean isNullable();
     property public final boolean isNullable;
     field public static final androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion Companion;
-    field public static final int TYPE_BOOLEAN = 1; // 0x1
-    field public static final int TYPE_BYTES = 2; // 0x2
-    field public static final int TYPE_DOUBLE = 4; // 0x4
-    field public static final int TYPE_FLOAT = 5; // 0x5
-    field public static final int TYPE_INT = 7; // 0x7
-    field public static final int TYPE_LONG = 6; // 0x6
-    field public static final int TYPE_STRING = 8; // 0x8
-    field public static final int TYPE_UNIT = 0; // 0x0
   }
 
   public static final class AppFunctionDataTypeMetadata.Companion {
-    property public static int TYPE_BOOLEAN;
-    property public static int TYPE_BYTES;
-    property public static int TYPE_DOUBLE;
-    property public static int TYPE_FLOAT;
-    property public static int TYPE_INT;
-    property public static int TYPE_LONG;
-    property public static int TYPE_STRING;
-    property public static int TYPE_UNIT;
   }
 
   public final class AppFunctionMetadata {
@@ -227,6 +215,10 @@ package androidx.appfunctions.metadata {
     property public java.util.Map<java.lang.String,androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> properties;
     property public String? qualifiedName;
     property public java.util.List<java.lang.String> required;
+    field public static final androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata.Companion Companion;
+  }
+
+  public static final class AppFunctionObjectTypeMetadata.Companion {
   }
 
   public final class AppFunctionParameterMetadata {
@@ -243,12 +235,36 @@ package androidx.appfunctions.metadata {
     ctor public AppFunctionPrimitiveTypeMetadata(int type, boolean isNullable);
     method public int getType();
     property public int type;
+    field public static final androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion Companion;
+    field public static final int TYPE_BOOLEAN = 1; // 0x1
+    field public static final int TYPE_BYTES = 2; // 0x2
+    field public static final int TYPE_DOUBLE = 4; // 0x4
+    field public static final int TYPE_FLOAT = 5; // 0x5
+    field public static final int TYPE_INT = 7; // 0x7
+    field public static final int TYPE_LONG = 6; // 0x6
+    field public static final int TYPE_STRING = 8; // 0x8
+    field public static final int TYPE_UNIT = 0; // 0x0
+  }
+
+  public static final class AppFunctionPrimitiveTypeMetadata.Companion {
+    property public static int TYPE_BOOLEAN;
+    property public static int TYPE_BYTES;
+    property public static int TYPE_DOUBLE;
+    property public static int TYPE_FLOAT;
+    property public static int TYPE_INT;
+    property public static int TYPE_LONG;
+    property public static int TYPE_STRING;
+    property public static int TYPE_UNIT;
   }
 
   public final class AppFunctionReferenceTypeMetadata extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata {
     ctor public AppFunctionReferenceTypeMetadata(String referenceDataType, boolean isNullable);
     method public String getReferenceDataType();
     property public String referenceDataType;
+    field public static final androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata.Companion Companion;
+  }
+
+  public static final class AppFunctionReferenceTypeMetadata.Companion {
   }
 
   public final class AppFunctionResponseMetadata {
