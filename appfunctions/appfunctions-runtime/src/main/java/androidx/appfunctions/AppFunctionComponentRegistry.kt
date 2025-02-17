@@ -68,19 +68,25 @@ public annotation class AppFunctionComponentRegistry(
 @StringDef(
     AppFunctionComponentCategory.INVENTORY,
     AppFunctionComponentCategory.INVOKER,
+    AppFunctionComponentCategory.FUNCTION,
 )
 @Retention(AnnotationRetention.SOURCE)
 internal annotation class AppFunctionComponentCategory {
     companion object {
         /**
          * The components in inventory category are used to generate the implementation of an
-         * implementation of [androidx.appfunctions.internal.AggregatedAppFunctionInventory].
+         * [androidx.appfunctions.internal.AggregatedAppFunctionInventory].
          */
         const val INVENTORY: String = "INVENTORY"
         /**
          * The components in invoker category are used to generate the implementation of an
-         * implementation of [androidx.appfunctions.internal.AggregatedAppFunctionInvoker].
+         * [androidx.appfunctions.internal.AggregatedAppFunctionInvoker].
          */
         const val INVOKER: String = "INVOKER"
+        /**
+         * The components in function category are used to generate the asset XML file for platform
+         * indexer to index available functions from the app.
+         */
+        const val FUNCTION: String = "FUNCTION"
     }
 }

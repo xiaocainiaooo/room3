@@ -27,6 +27,7 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContex
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionInvokerClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.ConfigurableAppFunctionFactoryClass
 import androidx.appfunctions.compiler.core.toTypeName
+import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
@@ -87,9 +88,19 @@ import com.squareup.kotlinpoet.buildCodeBlock
  *   }
  * }
  * ```
+ * * **Important:** [androidx.appfunctions.compiler.processors.AppFunctionInvokerProcessor] will
+ * * process exactly once for each compilation unit to generate a single registry for looking up
+ * * all generated invokers within the compilation unit.
  */
 class AppFunctionInvokerProcessor(private val codeGenerator: CodeGenerator) : SymbolProcessor {
+
+    private var hasProcessed = false
+
+    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        if (hasProcessed) return emptyList()
+        hasProcessed = true
+
         val appFunctionSymbolResolver = AppFunctionSymbolResolver(resolver)
         val appFunctionClasses = appFunctionSymbolResolver.resolveAnnotatedAppFunctions()
         val generatedInvokerComponents =
@@ -98,8 +109,6 @@ class AppFunctionInvokerProcessor(private val codeGenerator: CodeGenerator) : Sy
                     val invokerQualifiedName = generateAppFunctionInvokerClass(appFunctionClass)
                     add(
                         AppFunctionComponent(
-                            // Generated invoker is in the same package as the original class
-                            packageName = appFunctionClass.classDeclaration.packageName.asString(),
                             qualifiedName = invokerQualifiedName,
                             sourceFiles = appFunctionClass.getSourceFiles(),
                         )
@@ -108,7 +117,8 @@ class AppFunctionInvokerProcessor(private val codeGenerator: CodeGenerator) : Sy
             }
 
         AppFunctionComponentRegistryGenerator(codeGenerator)
-            .generateRegistriesByPackageName(
+            .generateRegistry(
+                resolver.getModuleName().asString(),
                 AppFunctionComponentRegistryAnnotation.Category.INVOKER,
                 generatedInvokerComponents,
             )

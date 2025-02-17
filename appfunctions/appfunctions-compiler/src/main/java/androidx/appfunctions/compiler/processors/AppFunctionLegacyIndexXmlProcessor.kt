@@ -47,7 +47,9 @@ class AppFunctionLegacyIndexXmlProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        generateLegacyIndexXml(AppFunctionSymbolResolver(resolver).resolveAnnotatedAppFunctions())
+        generateLegacyIndexXml(
+            AppFunctionSymbolResolver(resolver).getAnnotatedAppFunctionsFromAllModules()
+        )
         return emptyList()
     }
 

@@ -69,6 +69,7 @@ class AppFunctionAggregateProcessor(
 
         generateAggregatedAppFunctionInventory(resolver)
         generateAggregatedAppFunctionInvoker(resolver)
+        generateAggregatedIndexXml(resolver)
 
         hasProcessed = true
         return emptyList()
@@ -168,6 +169,17 @@ class AppFunctionAggregateProcessor(
                 }
             )
             .build()
+    }
+
+    private fun generateAggregatedIndexXml(resolver: Resolver) {
+        // We generate both XML formats supported by old and new AppSearch indexer respectively
+        // as it can't be guaranteed that the device will have the latest version of AppSearch.
+        // TODO: Add compiler option to disable legacy xml generator.
+        val legacyIndexProcessor = AppFunctionLegacyIndexXmlProcessor(codeGenerator)
+        legacyIndexProcessor.process(resolver)
+
+        val indexProcessor = AppFunctionIndexXmlProcessor(codeGenerator)
+        indexProcessor.process(resolver)
     }
 
     private fun shouldProcess(resolver: Resolver): Boolean {
