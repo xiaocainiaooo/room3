@@ -541,6 +541,35 @@ interface HealthConnectClient {
     }
 
     /**
+     * Deletes a [MedicalDataSource] and all data contained within it.
+     *
+     * Regarding permissions:
+     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
+     *   [SecurityException] will be thrown.
+     * - With [PERMISSION_WRITE_MEDICAL_DATA] granted, caller is permitted to call this API in
+     *   either foreground or background.
+     * - Caller may only delete data sources it has created.
+     *
+     * Medical data is represented using the
+     * [Fast Healthcare Interoperability Resources (FHIR)](https://hl7.org/fhir/) standard.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param id The id of the data source to delete.
+     * @sample // TODO: b/394856391 - add sample
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun deleteMedicalDataSourceWithData(id: String) {
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#deleteMedicalDataSourceWithData()"
+        )
+    }
+
+    /**
      * Gets the requested [MedicalDataSource]s using [GetMedicalDataSourcesRequest]. Number of data
      * sources returned by this API will depend based on below factors:
      * - If an empty [GetMedicalDataSourcesRequest] is passed, all data sources for all apps are
