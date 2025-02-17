@@ -36,7 +36,7 @@ import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 import androidx.wear.protolayout.TypeBuilders.StringProp
-import androidx.wear.protolayout.expression.DynamicBuilders
+import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.expression.dynamicDataMapOf
 import androidx.wear.protolayout.expression.intAppDataKey
 import androidx.wear.protolayout.expression.mapTo
@@ -45,7 +45,6 @@ import androidx.wear.protolayout.modifiers.loadAction
 import androidx.wear.protolayout.types.LayoutString
 import androidx.wear.protolayout.types.asLayoutConstraint
 import androidx.wear.protolayout.types.layoutString
-import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.internal.DoNotInstrument
@@ -57,7 +56,7 @@ class FiltersTest {
     fun notClickable() {
         val testElement = Box.Builder().setModifiers(Modifiers.Builder().build()).build()
 
-        assertThat(isClickable().matches(testElement)).isFalse()
+        assert(isClickable().not().matches(testElement))
     }
 
     @Test
@@ -67,7 +66,7 @@ class FiltersTest {
                 .setModifiers(Modifiers.Builder().setClickable(Clickable.Builder().build()).build())
                 .build()
 
-        assertThat(isClickable().matches(testElement)).isTrue()
+        assert(isClickable().matches(testElement))
     }
 
     @Test
@@ -78,7 +77,7 @@ class FiltersTest {
                 .setModifiers(Modifiers.Builder().setClickable(clickable).build())
                 .build()
 
-        assertThat(hasClickable().matches(testElement)).isTrue()
+        assert(hasClickable().matches(testElement))
     }
 
     @Test
@@ -92,11 +91,11 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(
-                hasClickable(action = loadAction(dynamicDataMapOf(intAppDataKey("key") mapTo 42)))
-                    .matches(testElement)
-            )
-            .isFalse()
+        assert(
+            hasClickable(action = loadAction(dynamicDataMapOf(intAppDataKey("key") mapTo 42)))
+                .not()
+                .matches(testElement)
+        )
     }
 
     @Test
@@ -115,13 +114,11 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(hasContentDescription(description).matches(testElement)).isTrue()
-        assertThat(hasContentDescription("blabla").matches(testElement)).isFalse()
-        assertThat(
-                hasContentDescription(Regex(".*TEST.*", RegexOption.IGNORE_CASE))
-                    .matches(testElement)
-            )
-            .isTrue()
+        assert(hasContentDescription(description).matches(testElement))
+        assert(hasContentDescription("blabla").not().matches(testElement))
+        assert(
+            hasContentDescription(Regex(".*TEST.*", RegexOption.IGNORE_CASE)).matches(testElement)
+        )
     }
 
     @Test
@@ -138,8 +135,8 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(hasTag(tag).matches(testElement)).isTrue()
-        assertThat(containsTag("test").matches(testElement)).isTrue()
+        assert(hasTag(tag).matches(testElement))
+        assert(containsTag("test").matches(testElement))
     }
 
     @Test
@@ -147,8 +144,8 @@ class FiltersTest {
         val textContent = "random test content"
         val testElement = basicText(textContent.layoutString)
 
-        assertThat(hasText(textContent).matches(testElement)).isTrue()
-        assertThat(hasText("blabla").matches(testElement)).isFalse()
+        assert(hasText(textContent).matches(testElement))
+        assert(hasText("blabla").not().matches(testElement))
     }
 
     @Test
@@ -156,13 +153,13 @@ class FiltersTest {
         val textContent =
             LayoutString(
                 "static content",
-                DynamicBuilders.DynamicString.constant("dynamic content"),
+                DynamicString.constant("dynamic content"),
                 "static content".asLayoutConstraint()
             )
         val testElement = basicText(textContent)
 
-        assertThat(hasText(textContent).matches(testElement)).isTrue()
-        assertThat(hasText("blabla").matches(testElement)).isFalse()
+        assert(hasText(textContent).matches(testElement))
+        assert(hasText("blabla").not().matches(testElement))
     }
 
     @Test
@@ -170,8 +167,8 @@ class FiltersTest {
         val resId = "randomRes"
         val testElement = Image.Builder().setResourceId(resId).build()
 
-        assertThat(hasImage(resId).matches(testElement)).isTrue()
-        assertThat(hasImage("blabla").matches(testElement)).isFalse()
+        assert(hasImage(resId).matches(testElement))
+        assert(hasImage("blabla").not().matches(testElement))
     }
 
     @Test
@@ -189,8 +186,8 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(hasColor(Color.BLUE).matches(testBox)).isTrue()
-        assertThat(hasColor(Color.GREEN).matches(testBox)).isFalse()
+        assert(hasColor(Color.BLUE).matches(testBox))
+        assert(hasColor(Color.GREEN).not().matches(testBox))
     }
 
     @Test
@@ -202,8 +199,8 @@ class FiltersTest {
                     FontStyle.Builder().setColor(ColorProp.Builder(Color.CYAN).build()).build()
             )
 
-        assertThat(hasColor(Color.CYAN).matches(testText)).isTrue()
-        assertThat(hasColor(Color.GREEN).matches(testText)).isFalse()
+        assert(hasColor(Color.CYAN).matches(testText))
+        assert(hasColor(Color.GREEN).not().matches(testText))
     }
 
     @Test
@@ -216,8 +213,8 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(hasColor(Color.MAGENTA).matches(testImage)).isTrue()
-        assertThat(hasColor(Color.GREEN).matches(testImage)).isFalse()
+        assert(hasColor(Color.MAGENTA).matches(testImage))
+        assert(hasColor(Color.GREEN).not().matches(testImage))
     }
 
     @Test
@@ -229,15 +226,15 @@ class FiltersTest {
         val height2 = wrap()
         val testBox2 = Box.Builder().setWidth(width2).setHeight(height2).build()
 
-        assertThat(hasWidth(width1).matches(testBox1)).isTrue()
-        assertThat(hasHeight(height1).matches(testBox1)).isTrue()
-        assertThat(hasWidth(width2).matches(testBox2)).isTrue()
-        assertThat(hasHeight(height2).matches(testBox2)).isTrue()
+        assert(hasWidth(width1).matches(testBox1))
+        assert(hasHeight(height1).matches(testBox1))
+        assert(hasWidth(width2).matches(testBox2))
+        assert(hasHeight(height2).matches(testBox2))
 
-        assertThat(hasWidth(width2).matches(testBox1)).isFalse()
-        assertThat(hasHeight(width1).matches(testBox1)).isFalse()
-        assertThat(hasWidth(height1).matches(testBox2)).isFalse()
-        assertThat(hasHeight(width2).matches(testBox2)).isFalse()
+        assert(hasWidth(width2).not().matches(testBox1))
+        assert(hasHeight(width1).not().matches(testBox1))
+        assert(hasWidth(height1).not().matches(testBox2))
+        assert(hasHeight(width2).not().matches(testBox2))
     }
 
     @Test
@@ -249,15 +246,15 @@ class FiltersTest {
         val height2 = wrap()
         val testColumn2 = Column.Builder().setWidth(width2).setHeight(height2).build()
 
-        assertThat(hasWidth(width1).matches(testColumn1)).isTrue()
-        assertThat(hasHeight(height1).matches(testColumn1)).isTrue()
-        assertThat(hasWidth(width2).matches(testColumn2)).isTrue()
-        assertThat(hasHeight(height2).matches(testColumn2)).isTrue()
+        assert(hasWidth(width1).matches(testColumn1))
+        assert(hasHeight(height1).matches(testColumn1))
+        assert(hasWidth(width2).matches(testColumn2))
+        assert(hasHeight(height2).matches(testColumn2))
 
-        assertThat(hasWidth(width2).matches(testColumn1)).isFalse()
-        assertThat(hasHeight(width1).matches(testColumn1)).isFalse()
-        assertThat(hasWidth(height1).matches(testColumn2)).isFalse()
-        assertThat(hasHeight(width2).matches(testColumn2)).isFalse()
+        assert(hasWidth(width2).not().matches(testColumn1))
+        assert(hasHeight(width1).not().matches(testColumn1))
+        assert(hasWidth(height1).not().matches(testColumn2))
+        assert(hasHeight(width2).not().matches(testColumn2))
     }
 
     @Test
@@ -269,15 +266,15 @@ class FiltersTest {
         val height2 = wrap()
         val testRow2 = Row.Builder().setWidth(width2).setHeight(height2).build()
 
-        assertThat(hasWidth(width1).matches(testRow1)).isTrue()
-        assertThat(hasHeight(height1).matches(testRow1)).isTrue()
-        assertThat(hasWidth(width2).matches(testRow2)).isTrue()
-        assertThat(hasHeight(height2).matches(testRow2)).isTrue()
+        assert(hasWidth(width1).matches(testRow1))
+        assert(hasHeight(height1).matches(testRow1))
+        assert(hasWidth(width2).matches(testRow2))
+        assert(hasHeight(height2).matches(testRow2))
 
-        assertThat(hasWidth(width2).matches(testRow1)).isFalse()
-        assertThat(hasHeight(width1).matches(testRow1)).isFalse()
-        assertThat(hasWidth(height1).matches(testRow2)).isFalse()
-        assertThat(hasHeight(width2).matches(testRow2)).isFalse()
+        assert(hasWidth(width2).not().matches(testRow1))
+        assert(hasHeight(width1).not().matches(testRow1))
+        assert(hasWidth(height1).not().matches(testRow2))
+        assert(hasHeight(width2).not().matches(testRow2))
     }
 
     @Test
@@ -291,15 +288,15 @@ class FiltersTest {
         val testImage2 =
             Image.Builder().setResourceId("id").setWidth(width2).setHeight(height2).build()
 
-        assertThat(hasWidth(width1).matches(testImage1)).isTrue()
-        assertThat(hasHeight(height1).matches(testImage1)).isTrue()
-        assertThat(hasWidth(width2).matches(testImage2)).isTrue()
-        assertThat(hasHeight(height2).matches(testImage2)).isTrue()
+        assert(hasWidth(width1).matches(testImage1))
+        assert(hasHeight(height1).matches(testImage1))
+        assert(hasWidth(width2).matches(testImage2))
+        assert(hasHeight(height2).matches(testImage2))
 
-        assertThat(hasWidth(width2).matches(testImage1)).isFalse()
-        assertThat(hasHeight(width1).matches(testImage1)).isFalse()
-        assertThat(hasWidth(height1).matches(testImage2)).isFalse()
-        assertThat(hasHeight(width2).matches(testImage2)).isFalse()
+        assert(hasWidth(width2).not().matches(testImage1))
+        assert(hasHeight(width1).not().matches(testImage1))
+        assert(hasWidth(height1).not().matches(testImage2))
+        assert(hasHeight(width2).not().matches(testImage2))
     }
 
     @Test
@@ -311,15 +308,15 @@ class FiltersTest {
         val height2 = expand()
         val testImage2 = Spacer.Builder().setWidth(width2).setHeight(height2).build()
 
-        assertThat(hasWidth(width1).matches(testImage1)).isTrue()
-        assertThat(hasHeight(height1).matches(testImage1)).isTrue()
-        assertThat(hasWidth(width2).matches(testImage2)).isTrue()
-        assertThat(hasHeight(height2).matches(testImage2)).isTrue()
+        assert(hasWidth(width1).matches(testImage1))
+        assert(hasHeight(height1).matches(testImage1))
+        assert(hasWidth(width2).matches(testImage2))
+        assert(hasHeight(height2).matches(testImage2))
 
-        assertThat(hasWidth(width2).matches(testImage1)).isFalse()
-        assertThat(hasHeight(width1).matches(testImage1)).isFalse()
-        assertThat(hasWidth(height1).matches(testImage2)).isFalse()
-        assertThat(hasHeight(width1).matches(testImage2)).isFalse()
+        assert(hasWidth(width2).not().matches(testImage1))
+        assert(hasHeight(width1).not().matches(testImage1))
+        assert(hasWidth(height1).not().matches(testImage2))
+        assert(hasHeight(width1).not().matches(testImage2))
     }
 
     @Test
@@ -343,13 +340,13 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(hasChild(isClickable()).matches(testLayout)).isTrue()
-        assertThat(hasChild(hasWidth(width)).matches(testLayout)).isTrue()
-        assertThat(hasChild(hasImage("image") or isClickable()).matches(testLayout)).isTrue()
-        assertThat(hasChild(hasImage("image")).matches(testLayout.children[0])).isTrue()
-        assertThat(hasChild(hasText("text")).matches(testLayout.children[1])).isTrue()
-        assertThat(hasChild(hasImage("image")).matches(testLayout)).isFalse()
-        assertThat(hasChild(hasText("text")).matches(testLayout)).isFalse()
+        assert(hasChild(isClickable()).matches(testLayout))
+        assert(hasChild(hasWidth(width)).matches(testLayout))
+        assert(hasChild(hasImage("image") or isClickable()).matches(testLayout))
+        assert(hasChild(hasImage("image")).matches(testLayout.children[0]))
+        assert(hasChild(hasText("text")).matches(testLayout.children[1]))
+        assert(hasChild(hasImage("image")).not().matches(testLayout))
+        assert(hasChild(hasText("text")).not().matches(testLayout))
     }
 
     @Test
@@ -373,10 +370,10 @@ class FiltersTest {
                 )
                 .build()
 
-        assertThat(hasDescendant(isClickable()).matches(testLayout)).isTrue()
-        assertThat(hasDescendant(hasWidth(width)).matches(testLayout)).isTrue()
-        assertThat(hasDescendant(hasImage("image")).matches(testLayout)).isTrue()
-        assertThat(hasDescendant(hasText("text")).matches(testLayout)).isTrue()
-        assertThat(hasDescendant(hasImage("image") and isClickable()).matches(testLayout)).isFalse()
+        assert(hasDescendant(isClickable()).matches(testLayout))
+        assert(hasDescendant(hasWidth(width)).matches(testLayout))
+        assert(hasDescendant(hasImage("image")).matches(testLayout))
+        assert(hasDescendant(hasText("text")).matches(testLayout))
+        assert(hasDescendant(hasImage("image") and isClickable()).not().matches(testLayout))
     }
 }
