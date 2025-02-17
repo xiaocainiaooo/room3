@@ -298,7 +298,8 @@ public fun MaterialScope.button(
                             .iconContent()
                     },
                 horizontalAlignment = horizontalAlignment,
-                style = style
+                style = style,
+                width = width,
             )
         }
     )
