@@ -191,6 +191,14 @@ package androidx.savedstate {
 
 package androidx.savedstate.serialization {
 
+  public final class ClassDiscriminatorMode {
+    property public static int ALL_OBJECTS;
+    property public static int POLYMORPHIC;
+    field public static final int ALL_OBJECTS = 1; // 0x1
+    field public static final androidx.savedstate.serialization.ClassDiscriminatorMode INSTANCE;
+    field public static final int POLYMORPHIC = 2; // 0x2
+  }
+
   public final class SavedStateConfig {
     property @kotlin.PublishedApi internal kotlinx.serialization.modules.SerializersModule serializersModule;
     field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
@@ -198,8 +206,11 @@ package androidx.savedstate.serialization {
   }
 
   public static final class SavedStateConfig.Builder {
+    method public int getClassDiscriminatorMode();
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
+    method public void setClassDiscriminatorMode(int);
     method public void setSerializersModule(kotlinx.serialization.modules.SerializersModule);
+    property public int classDiscriminatorMode;
     property public kotlinx.serialization.modules.SerializersModule serializersModule;
   }
 

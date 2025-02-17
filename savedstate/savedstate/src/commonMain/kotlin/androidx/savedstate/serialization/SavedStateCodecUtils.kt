@@ -16,12 +16,16 @@
 
 package androidx.savedstate.serialization
 
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.BooleanArraySerializer
 import kotlinx.serialization.builtins.CharArraySerializer
 import kotlinx.serialization.builtins.DoubleArraySerializer
 import kotlinx.serialization.builtins.FloatArraySerializer
 import kotlinx.serialization.builtins.IntArraySerializer
 import kotlinx.serialization.builtins.LongArraySerializer
+import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 import kotlinx.serialization.serializer
 
 internal val intListDescriptor = serializer<List<Int>>().descriptor
@@ -33,3 +37,13 @@ internal val floatArrayDescriptor = FloatArraySerializer().descriptor
 internal val intArrayDescriptor = IntArraySerializer().descriptor
 internal val longArrayDescriptor = LongArraySerializer().descriptor
 internal val stringArrayDescriptor = serializer<Array<String>>().descriptor
+
+@OptIn(InternalSerializationApi::class)
+internal fun <T> SerializationStrategy<T>.isPolymorphicSerializer(): Boolean {
+    return this is AbstractPolymorphicSerializer<*>
+}
+
+@OptIn(InternalSerializationApi::class)
+internal fun <T> DeserializationStrategy<T>.isPolymorphicSerializer(): Boolean {
+    return this is AbstractPolymorphicSerializer<*>
+}

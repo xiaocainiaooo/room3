@@ -22,7 +22,12 @@ import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import kotlinx.serialization.KSerializer
 
+/**
+ * Utility object providing helper functions for encoding and decoding instances of `T` using
+ * [SavedState]. It supports serialization, parcelization (on Android), and deserialization.
+ */
 internal object SavedStateCodecTestUtils {
+
     /* Test the following steps: 1. encode `T` to a `SavedState`, 2. parcelize it to a `Parcel`,
      * 3. un-parcelize it back to a `SavedState`, and 4. decode it back to a `T`. Step 2 and 3
      * are only performed on Android. Here's the whole process:
@@ -77,4 +82,13 @@ internal object SavedStateCodecTestUtils {
     }
 }
 
+/**
+ * Platform-specific function for encoding and decoding `SavedState` objects.
+ *
+ * This function ensures that the encoded state is processed through the platform's parcelization
+ * and unparcelization logic (on Android) to simulate real-world behavior.
+ *
+ * @param savedState The `SavedState` to be encoded and then decoded.
+ * @return The resulting `SavedState` after going through the platform encoding-decoding process.
+ */
 expect fun platformEncodeDecode(savedState: SavedState): SavedState

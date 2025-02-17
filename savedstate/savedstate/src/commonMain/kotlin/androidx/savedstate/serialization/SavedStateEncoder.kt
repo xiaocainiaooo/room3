@@ -17,12 +17,14 @@
 package androidx.savedstate.serialization
 
 import androidx.savedstate.SavedState
+import androidx.savedstate.read
 import androidx.savedstate.savedState
 import androidx.savedstate.write
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.serializer
@@ -59,10 +61,11 @@ public fun <T : Any> encodeToSavedState(
     serializer: SerializationStrategy<T>,
     value: T,
     config: SavedStateConfig,
-): SavedState =
-    savedState().apply {
+): SavedState {
+    return savedState().apply {
         SavedStateEncoder(this, config).encodeSerializableValue(serializer, value)
     }
+}
 
 /**
  * Encode a serializable object to a [SavedState] with the default serializer.
@@ -95,6 +98,7 @@ internal class SavedStateEncoder(
     internal val savedState: SavedState,
     private val config: SavedStateConfig
 ) : AbstractEncoder() {
+
     internal var key: String = ""
         private set
 
@@ -108,7 +112,27 @@ internal class SavedStateEncoder(
         // `@SerialName`. The key for collections will be decimal integer Strings ("0",
         // "1", "2", ...).
         key = descriptor.getElementName(index)
+        checkDiscriminatorCollisions(savedState, key)
+
         return true
+    }
+
+    private fun checkDiscriminatorCollisions(
+        savedState: SavedState,
+        elementName: String,
+    ) {
+        if (config.classDiscriminatorMode == ClassDiscriminatorMode.ALL_OBJECTS) {
+            val hasClassDiscriminator = savedState.read { contains(CLASS_DISCRIMINATOR_KEY) }
+            val hasConflictingElementName = elementName == CLASS_DISCRIMINATOR_KEY
+            if (hasClassDiscriminator && hasConflictingElementName) {
+                val classDiscriminator = savedState.read { getString(CLASS_DISCRIMINATOR_KEY) }
+                throw IllegalArgumentException(
+                    "SavedStateEncoder for $classDiscriminator has property '$elementName' that " +
+                        "conflicts with the class discriminator. You can rename a property with " +
+                        "@SerialName annotation."
+                )
+            }
+        }
     }
 
     override fun encodeBoolean(value: Boolean) {
@@ -198,13 +222,33 @@ internal class SavedStateEncoder(
         // `{{"first" = 3, "second" = 5}}`, which is more consistent but less
         // efficient.
         return if (key == "") {
+            putClassDiscriminatorIfRequired(config, descriptor, savedState)
             this
         } else {
-            SavedStateEncoder(
-                savedState =
-                    savedState().also { child -> savedState.write { putSavedState(key, child) } },
-                config = config
-            )
+            val childState = savedState()
+            savedState.write { putSavedState(key, childState) } // Link child to parent.
+            putClassDiscriminatorIfRequired(config, descriptor, childState)
+            SavedStateEncoder(childState, config)
+        }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private fun putClassDiscriminatorIfRequired(
+        config: SavedStateConfig,
+        descriptor: SerialDescriptor,
+        savedState: SavedState,
+    ) {
+        if (savedState.read { contains(CLASS_DISCRIMINATOR_KEY) }) {
+            return
+        }
+
+        // POLYMORPHIC is handled by kotlinx.serialization.PolymorphicSerializer.
+        if (config.classDiscriminatorMode != ClassDiscriminatorMode.ALL_OBJECTS) {
+            return
+        }
+
+        if (descriptor.kind == StructureKind.CLASS || descriptor.kind == StructureKind.OBJECT) {
+            savedState.write { putString(CLASS_DISCRIMINATOR_KEY, descriptor.serialName) }
         }
     }
 
