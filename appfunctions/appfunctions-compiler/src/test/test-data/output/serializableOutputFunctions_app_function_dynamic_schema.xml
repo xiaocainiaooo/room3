@@ -91,23 +91,18 @@
             </dataTypes>
             <id>unused</id>
         </components>
-        <id>com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList</id>
+        <id>com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable</id>
         <enabledByDefault>true</enabledByDefault>
         <response>
             <id>unused</id>
             <valueType>
+                <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
                 <id>unused</id>
-                <isNullable>false</isNullable>
-                <itemType>
-                    <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>3</type>
-                </itemType>
-                <type>10</type>
+                <isNullable>true</isNullable>
+                <type>3</type>
             </valueType>
         </response>
-        <functionId>com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList</functionId>
+        <functionId>com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable</functionId>
     </appfunction>
     <appfunction>
         <components>
@@ -205,17 +200,22 @@
             </dataTypes>
             <id>unused</id>
         </components>
-        <id>com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable</id>
+        <id>com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList</id>
         <enabledByDefault>true</enabledByDefault>
         <response>
             <id>unused</id>
             <valueType>
-                <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
                 <id>unused</id>
-                <isNullable>true</isNullable>
-                <type>3</type>
+                <isNullable>false</isNullable>
+                <itemType>
+                    <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
+                    <id>unused</id>
+                    <isNullable>false</isNullable>
+                    <type>3</type>
+                </itemType>
+                <type>10</type>
             </valueType>
         </response>
-        <functionId>com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable</functionId>
+        <functionId>com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList</functionId>
     </appfunction>
 </appfunctions>
