@@ -16,11 +16,9 @@
 
 package androidx.appfunctions.metadata
 
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_ARRAY
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_INT
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_LONG
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_OBJECT
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_STRING
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_INT
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -57,7 +55,7 @@ class AppFunctionDataTypeMetadataTest {
         assertThat(document)
             .isEqualTo(
                 AppFunctionDataTypeMetadataDocument(
-                    type = TYPE_ARRAY,
+                    type = AppFunctionArrayTypeMetadata.TYPE,
                     itemType =
                         AppFunctionDataTypeMetadataDocument(
                             type = TYPE_INT,
@@ -119,7 +117,7 @@ class AppFunctionDataTypeMetadataTest {
             )
         val expectedAppFunctionDataTypeMetadataDocument =
             AppFunctionDataTypeMetadataDocument(
-                type = TYPE_OBJECT,
+                type = AppFunctionObjectTypeMetadata.TYPE,
                 properties =
                     listOf(
                         expectedPrimitiveDocumentProperties1,
@@ -158,7 +156,7 @@ class AppFunctionDataTypeMetadataTest {
         assertThat(document)
             .isEqualTo(
                 AppFunctionDataTypeMetadataDocument(
-                    type = TYPE_OBJECT,
+                    type = AppFunctionReferenceTypeMetadata.TYPE,
                     dataTypeReference = "#components/dataTypes/Test",
                     isNullable = true,
                 )
