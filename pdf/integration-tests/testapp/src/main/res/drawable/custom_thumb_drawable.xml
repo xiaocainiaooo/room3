@@ -19,7 +19,7 @@
         <shape xmlns:android="http://schemas.android.com/apk/res/android">
             <solid android:color="?attr/colorAccent" />
             <corners android:radius="4dp" />
-            <size android:width="14dp" android:height="64dp" />
+            <size android:width="6dp" android:height="64dp" />
         </shape>
     </item>
 </selector>

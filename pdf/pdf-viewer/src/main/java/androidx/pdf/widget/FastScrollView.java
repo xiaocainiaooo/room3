@@ -88,6 +88,8 @@ public class FastScrollView extends FrameLayout implements PaginationModelObserv
     /** Indicates the scrubber visibility */
     private boolean mIsScrubberVisible;
 
+    private int mVerticalThumbMarginRight;
+
     private final ValueObserver<ZoomView.ZoomScroll> mZoomScrollObserver =
             new ValueObserver<ZoomView.ZoomScroll>() {
                 @Override
@@ -201,7 +203,7 @@ public class FastScrollView extends FrameLayout implements PaginationModelObserv
             setScrollbarMarginTop(mZoomView.getPaddingTop());
             // Ignore ZoomView's intrinsic padding on the right side as we want it to be
             // right-anchored
-            setScrollbarMarginRight(insetsCompat.right);
+            addInsetsToScrollBarMargin(insetsCompat.right);
             setScrollbarMarginBottom(mZoomView.getPaddingBottom());
         }
         mPageIndicator.getView().setTranslationX(-insetsCompat.right);
@@ -227,9 +229,9 @@ public class FastScrollView extends FrameLayout implements PaginationModelObserv
         this.mTrackTopMargin = scrollbarMarginTop + mDragHandle.getMeasuredHeight() / 2;
     }
 
-    public void setScrollbarMarginRight(int scrollbarMarginRight) {
+    private void addInsetsToScrollBarMargin(int rightInset) {
         // This view does not support RTL so there is no reason to expose left
-        this.mTrackRightMargin = scrollbarMarginRight;
+        this.mTrackRightMargin = mVerticalThumbMarginRight + rightInset;
     }
 
     public void setScrollbarMarginBottom(int scrollbarMarginBottom) {
@@ -518,6 +520,32 @@ public class FastScrollView extends FrameLayout implements PaginationModelObserv
      */
     public void setPageIndicatorBackgroundDrawable(@Nullable Drawable pageIndicatorDrawable) {
         mPageIndicator.setBackground(pageIndicatorDrawable);
+    }
+
+    /**
+     * Sets the relative right margin for page indicator. Margin values should be positive.
+     *
+     * @param marginRight the end margin size.
+     */
+    public void setPageIndicatorMarginRight(int marginRight) {
+        mPageIndicator.setMarginRight(marginRight);
+    }
+
+    /**
+     * Sets the relative right margin for vertical scroll bar thumb. Margin values should be
+     * positive.
+     *
+     * @param marginRight the end margin size.
+     */
+    public void setVerticalThumbMarginRight(int marginRight) {
+        mVerticalThumbMarginRight = marginRight;
+        // The default trackMargin should be the value set by the developer.
+        mTrackRightMargin = mVerticalThumbMarginRight;
+    }
+
+    @VisibleForTesting
+    public int getTrackRightMargin() {
+        return mTrackRightMargin;
     }
 
     /**

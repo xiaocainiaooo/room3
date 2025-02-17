@@ -18,8 +18,8 @@
 <selector>
     <item>
         <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-            <item android:width="40dp" android:height="40dp" android:drawable="@drawable/fastscroll_background" />
-            <item android:width="24dp" android:height="24dp" android:drawable="@drawable/drag_indicator" android:gravity="center" />
+            <item android:drawable="@drawable/fastscroll_background" />
+            <item android:width="24dp" android:height="24dp" android:drawable="@drawable/drag_indicator" android:gravity="center" android:left="8dp" />
         </layer-list>
     </item>
 </selector>

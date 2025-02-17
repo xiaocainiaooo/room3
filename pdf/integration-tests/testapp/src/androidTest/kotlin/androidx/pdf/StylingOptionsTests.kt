@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.pdf.FragmentUtils.scenarioLoadDocument
 import androidx.pdf.testapp.R
 import androidx.pdf.viewer.fragment.PdfStylingOptions
+import androidx.pdf.widget.FastScrollView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.swipeDown
@@ -118,12 +119,18 @@ class StylingOptionsTests {
         onView(withId(androidx.pdf.R.id.parent_pdf_container)).perform(swipeDown())
 
         scenario.onFragment { fragment ->
+            val fastScrollView =
+                fragment.view?.findViewById<FastScrollView>(androidx.pdf.R.id.fast_scroll_view)
             val scrollHandle =
                 fragment.view?.findViewById<ImageView>(androidx.pdf.R.id.scrollHandle)
 
             // assert size of view is equivalent to what specified for drawable
             assertEquals(round(THUMB_DRAWABLE_HEIGHT.dpToPx(context)).toInt(), scrollHandle?.height)
             assertEquals(round(THUMB_DRAWABLE_WIDTH.dpToPx(context)).toInt(), scrollHandle?.width)
+            assertEquals(
+                round(THUMB_END_MARGIN.dpToPx(context)).toInt(),
+                fastScrollView?.trackRightMargin
+            )
         }
         // assert scroll handles are visible
         onView(withId(androidx.pdf.R.id.scrollHandle)).check(matches(isDisplayed()))
@@ -134,7 +141,8 @@ class StylingOptionsTests {
 
     companion object {
         private const val TEST_DOCUMENT_FILE = "sample.pdf"
-        private const val THUMB_DRAWABLE_WIDTH = 14
+        private const val THUMB_DRAWABLE_WIDTH = 6
         private const val THUMB_DRAWABLE_HEIGHT = 64
+        private const val THUMB_END_MARGIN = 8
     }
 }
