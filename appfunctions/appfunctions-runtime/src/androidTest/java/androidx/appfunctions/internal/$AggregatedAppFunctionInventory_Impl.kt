@@ -19,12 +19,12 @@ package androidx.appfunctions.internal
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appfunctions.core.AppFunctionMetadataTestHelper
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_LONG
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_STRING
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 
 /** Test implementation for [androidx.appfunctions.AppFunctionManagerCompatTest] */
