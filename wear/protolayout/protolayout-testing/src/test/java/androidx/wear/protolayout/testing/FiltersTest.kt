@@ -37,13 +37,18 @@ import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
+import androidx.wear.protolayout.expression.PlatformEventKeys
+import androidx.wear.protolayout.expression.PlatformHealthSources
+import androidx.wear.protolayout.expression.PlatformHealthSources.Keys
 import androidx.wear.protolayout.expression.dynamicDataMapOf
 import androidx.wear.protolayout.expression.intAppDataKey
 import androidx.wear.protolayout.expression.mapTo
+import androidx.wear.protolayout.expression.platformVisibilityStatus
 import androidx.wear.protolayout.layout.basicText
 import androidx.wear.protolayout.modifiers.loadAction
 import androidx.wear.protolayout.types.LayoutString
 import androidx.wear.protolayout.types.asLayoutConstraint
+import androidx.wear.protolayout.types.asLayoutString
 import androidx.wear.protolayout.types.layoutString
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -150,16 +155,75 @@ class FiltersTest {
 
     @Test
     fun hasDynamicText() {
+        val staticContent = "static content"
+        val textContent =
+            DynamicString.constant("dynamic content")
+                .asLayoutString(staticContent, staticContent.asLayoutConstraint())
+        val testElement = basicText(textContent)
+
+        assert(hasText("dynamic content").matches(testElement))
+        assert(hasText(staticContent).not().matches(testElement))
+    }
+
+    @Test
+    fun hasDynamicTextFromPlatformData() {
+        val staticContent = "static content"
+        val textContent =
+            PlatformHealthSources.heartRateBpm()
+                .format()
+                .asLayoutString(staticContent, staticContent.asLayoutConstraint())
+        val testElement = basicText(textContent)
+        val heartRateValue = 76.5F
+
+        assert(
+            hasText("$heartRateValue")
+                .matches(
+                    testElement,
+                    TestContext(dynamicDataMapOf(Keys.HEART_RATE_BPM mapTo heartRateValue))
+                )
+        )
+
+        // when the dynamic data evaluation fails, due to lack of data in the pipeline, fall back to
+        // use the static text
+        assert(hasText(staticContent).matches(testElement))
+    }
+
+    @Test
+    fun hasDynamicTextFromPlatformEvent() {
+        val staticContent = "static content"
+        val visibleContent = "visible"
+        val invisibleContent = "invisible"
         val textContent =
             LayoutString(
-                "static content",
-                DynamicString.constant("dynamic content"),
-                "static content".asLayoutConstraint()
+                staticContent,
+                DynamicString.onCondition(platformVisibilityStatus())
+                    .use(visibleContent)
+                    .elseUse(invisibleContent),
+                staticContent.asLayoutConstraint()
             )
         val testElement = basicText(textContent)
 
-        assert(hasText(textContent).matches(testElement))
-        assert(hasText("blabla").not().matches(testElement))
+        assert(
+            hasText(
+                    visibleContent,
+                )
+                .matches(
+                    testElement,
+                    TestContext(dynamicDataMapOf(PlatformEventKeys.VISIBILITY_STATUS mapTo true))
+                )
+        )
+
+        assert(
+            hasText(invisibleContent)
+                .matches(
+                    testElement,
+                    TestContext(dynamicDataMapOf(PlatformEventKeys.VISIBILITY_STATUS mapTo false))
+                )
+        )
+
+        // when the dynamic data evaluation fails, due to lack of data in the pipeline, fall back to
+        // use the static text
+        assert(hasText(staticContent).matches(testElement))
     }
 
     @Test
