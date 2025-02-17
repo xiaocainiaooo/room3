@@ -38,6 +38,7 @@ import androidx.wear.protolayout.testing.hasText
 import androidx.wear.protolayout.testing.hasWidth
 import androidx.wear.protolayout.types.argb
 import androidx.wear.protolayout.types.layoutString
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.internal.DoNotInstrument
@@ -241,6 +242,22 @@ class ButtonTest {
         LayoutElementAssertionsProvider(button)
             .onRoot()
             .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
+    }
+
+    @Test
+    fun buttonColors_copy() {
+        val color = Color.YELLOW
+        val originButtonColors = ButtonColors()
+
+        val buttonColors = originButtonColors.copy(secondaryLabelColor = color.argb)
+
+        assertThat(buttonColors.containerColor.staticArgb)
+            .isEqualTo(originButtonColors.containerColor.staticArgb)
+        assertThat(buttonColors.labelColor.staticArgb)
+            .isEqualTo(originButtonColors.labelColor.staticArgb)
+        assertThat(buttonColors.secondaryLabelColor.staticArgb).isEqualTo(color)
+        assertThat(buttonColors.iconColor.staticArgb)
+            .isEqualTo(originButtonColors.iconColor.staticArgb)
     }
 
     // TODO: b/381518061 - Add test for corner shape.
