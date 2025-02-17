@@ -29,7 +29,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Ignore
 import org.junit.Test
 
 /**
@@ -145,9 +144,8 @@ class FakeHealthConnectClientClockTest {
         assertThat(records.records.first().title).isEqualTo(record1.title)
     }
 
-    @Ignore // b/376314864
     @Test
-    fun timeRangeFilterlocalTime_noEndTime() = runTest {
+    fun timeRangeFilterLocalTime_noEndTime() = runTest {
 
         // Read records that end when record 1 ends
         val records =
@@ -205,9 +203,8 @@ class FakeHealthConnectClientClockTest {
         assertThat(recordsExcluding.records).hasSize(0)
     }
 
-    @Ignore // b/376314864
     @Test
-    fun timeRangeFilterlocalTime_noEndTimeInstant() = runTest {
+    fun timeRangeFilterLocalTime_noEndTimeInstant() = runTest {
         // Given a record with a fixed time, before the clock.
         val heightRecord =
             HeightRecord(
@@ -251,7 +248,7 @@ class FakeHealthConnectClientClockTest {
     }
 
     @Test
-    fun timeRangeFilterlocalTime_noStartTimeInstant() = runTest {
+    fun timeRangeFilterLocalTime_noStartTimeInstant() = runTest {
         // Given a record with a fixed time, before the clock.
         val heightRecord =
             HeightRecord(
