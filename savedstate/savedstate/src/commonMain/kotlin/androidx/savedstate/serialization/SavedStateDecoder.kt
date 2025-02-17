@@ -194,20 +194,32 @@ internal class SavedStateDecoder(
     // `encodeNull()` or a value from other encode functions.
     override fun decodeNotNullMark(): Boolean = savedState.read { !isNull(key) }
 
-    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return when (deserializer.descriptor) {
-            intListDescriptor -> decodeIntList()
-            stringListDescriptor -> decodeStringList()
-            booleanArrayDescriptor -> decodeBooleanArray()
-            charArrayDescriptor -> decodeCharArray()
-            doubleArrayDescriptor -> decodeDoubleArray()
-            floatArrayDescriptor -> decodeFloatArray()
-            intArrayDescriptor -> decodeIntArray()
-            longArrayDescriptor -> decodeLongArray()
-            stringArrayDescriptor -> decodeStringArray()
-            else -> super.decodeSerializableValue(deserializer)
-        }
-            as T
+        return decodeFormatSpecificTypes(deserializer)
+            ?: super.decodeSerializableValue(deserializer)
+    }
+
+    /** @return `T` if `T` has a special representation in `SavedState`, `null` otherwise. */
+    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
+    private fun <T> decodeFormatSpecificTypes(deserializer: DeserializationStrategy<T>): T? {
+        return decodeFormatSpecificTypesOnPlatform(deserializer)
+            ?: when (deserializer.descriptor) {
+                intListDescriptor -> decodeIntList()
+                stringListDescriptor -> decodeStringList()
+                booleanArrayDescriptor -> decodeBooleanArray()
+                charArrayDescriptor -> decodeCharArray()
+                doubleArrayDescriptor -> decodeDoubleArray()
+                floatArrayDescriptor -> decodeFloatArray()
+                intArrayDescriptor -> decodeIntArray()
+                longArrayDescriptor -> decodeLongArray()
+                stringArrayDescriptor -> decodeStringArray()
+                else -> null
+            }
+                as T?
     }
 }
+
+/** @return `T` if `T` has an internal representation in `SavedState`, `null` otherwise. */
+internal expect fun <T> SavedStateDecoder.decodeFormatSpecificTypesOnPlatform(
+    strategy: DeserializationStrategy<T>
+): T?
