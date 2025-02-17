@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.trace
+import androidx.compose.ui.util.traceValue
 import kotlin.time.TimeSource.Monotonic.markNow
 
 /**
@@ -344,7 +345,10 @@ internal class PrefetchHandleProvider(
         index: Int,
         prefetchMetrics: PrefetchMetrics,
     ): PrefetchHandle =
-        HandleAndRequestImpl(index, prefetchMetrics, null).also { executor.schedulePrefetch(it) }
+        HandleAndRequestImpl(index, prefetchMetrics, null).also {
+            executor.schedulePrefetch(it)
+            traceValue("compose:lazy:schedule_prefetch:index", index.toLong())
+        }
 
     fun schedulePremeasure(
         index: Int,
@@ -354,6 +358,7 @@ internal class PrefetchHandleProvider(
     ): PrefetchHandle =
         HandleAndRequestImpl(index, constraints, prefetchMetrics, onItemPremeasured).also {
             executor.schedulePrefetch(it)
+            traceValue("compose:lazy:schedule_prefetch:index", index.toLong())
         }
 
     fun createNestedPrefetchRequest(
@@ -438,8 +443,20 @@ internal class PrefetchHandleProvider(
         }
 
         override fun PrefetchRequestScope.execute(): Boolean {
-            val itemProvider = itemContentFactory.itemProvider()
+            return if (isUrgent) {
+                    trace("compose:lazy:prefetch:execute:urgent") { executeRequest() }
+                } else {
+                    executeRequest()
+                }
+                .also {
+                    // execution for this item finished, reset the trace value
+                    traceValue("compose:lazy:prefetch:execute:item", -1)
+                }
+        }
 
+        private fun PrefetchRequestScope.executeRequest(): Boolean {
+            traceValue("compose:lazy:prefetch:execute:item", index.toLong())
+            val itemProvider = itemContentFactory.itemProvider()
             val isValid = !isCanceled && index in 0 until itemProvider.itemCount
             if (!isValid) {
                 return false
@@ -450,7 +467,7 @@ internal class PrefetchHandleProvider(
             // we save the value we get from availableTimeNanos() into a local variable once
             // and manually update it later by calling updateElapsedAndAvailableTime()
             resetAvailableTimeTo(availableTimeNanos())
-
+            traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
             if (!isComposed) {
                 if (
                     shouldExecute(
@@ -473,6 +490,7 @@ internal class PrefetchHandleProvider(
             // is always an estimation and it could potentially do work we will not need in the end,
             // but the measuring will only do exactly the needed work (including composing nested
             // lazy layouts)
+            traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
             if (!isUrgent) {
                 // Nested prefetch logic is best-effort: if nested LazyLayout children are
                 // added/removed/updated after we've resolved nested prefetch states here or
@@ -488,15 +506,18 @@ internal class PrefetchHandleProvider(
                         return true
                     }
                 }
-
+                traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
                 val hasMoreWork =
                     nestedPrefetchController?.run { executeNestedPrefetches() } ?: false
                 if (hasMoreWork) {
                     return true
                 }
                 updateElapsedAndAvailableTime()
+                // set the item value again since it will have changed in the nested block.
+                traceValue("compose:lazy:prefetch:execute:item", index.toLong())
             }
 
+            traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
             val constraints = premeasureConstraints
             if (!isMeasured && constraints != null) {
                 if (
@@ -514,7 +535,7 @@ internal class PrefetchHandleProvider(
                 }
             }
 
-            // All our work is done
+            // All our work is done.
             return false
         }
 

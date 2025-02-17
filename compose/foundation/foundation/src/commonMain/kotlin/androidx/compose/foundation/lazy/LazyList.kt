@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.offset
+import androidx.compose.ui.util.trace
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -385,6 +386,7 @@ private fun rememberLazyListMeasurePolicy(
                         )
                     }
                 )
+
             state.applyMeasureResult(measureResult, isLookingAhead)
             // apply keep around after updating the strategy with measure result.
             (state.prefetchStrategy as? CacheWindowListPrefetchStrategy)?.keepAroundItems(
@@ -400,18 +402,20 @@ private fun CacheWindowListPrefetchStrategy.keepAroundItems(
     visibleItemsList: List<LazyListMeasuredItem>,
     measuredItemProvider: LazyListMeasuredItemProvider
 ) {
-    // only run if window and new layout info is available
-    if (hasValidBounds() && visibleItemsList.isNotEmpty()) {
-        val firstVisibleItemIndex = visibleItemsList.first().index
-        val lastVisibleItemIndex = visibleItemsList.last().index
-        // we must send a message in case of changing directions for items
-        // that were keep around and become prefetch forward
-        for (item in prefetchWindowStartIndex..<firstVisibleItemIndex) {
-            measuredItemProvider.keepAround(item)
-        }
+    trace("compose:lazy:cache_window:keepAroundItems") {
+        // only run if window and new layout info is available
+        if (hasValidBounds() && visibleItemsList.isNotEmpty()) {
+            val firstVisibleItemIndex = visibleItemsList.first().index
+            val lastVisibleItemIndex = visibleItemsList.last().index
+            // we must send a message in case of changing directions for items
+            // that were keep around and become prefetch forward
+            for (item in prefetchWindowStartIndex..<firstVisibleItemIndex) {
+                measuredItemProvider.keepAround(item)
+            }
 
-        for (item in (lastVisibleItemIndex + 1)..prefetchWindowEndIndex) {
-            measuredItemProvider.keepAround(item)
+            for (item in (lastVisibleItemIndex + 1)..prefetchWindowEndIndex) {
+                measuredItemProvider.keepAround(item)
+            }
         }
     }
 }

@@ -52,6 +52,7 @@ import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastRoundToInt
+import androidx.compose.ui.util.traceValue
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
@@ -518,6 +519,7 @@ constructor(
             if (visibleItemsStayedTheSame) {
                 scrollPosition.updateScrollOffset(result.firstVisibleItemScrollOffset)
             } else {
+                traceVisibleItems(result) // trace when visible window changed
                 scrollPosition.updateFromMeasureResult(result)
                 if (prefetchingEnabled) {
                     with(prefetchStrategy) { prefetchScope.onVisibleItemsUpdated(result) }
@@ -533,6 +535,13 @@ constructor(
             }
             numMeasurePasses++
         }
+    }
+
+    private fun traceVisibleItems(measureResult: LazyListMeasureResult) {
+        val firstVisibleItem = measureResult.visibleItemsInfo.firstOrNull()
+        val lastVisibleItem = measureResult.visibleItemsInfo.lastOrNull()
+        traceValue("firstVisibleItem:index", firstVisibleItem?.index?.toLong() ?: -1L)
+        traceValue("lastVisibleItem:index", lastVisibleItem?.index?.toLong() ?: -1L)
     }
 
     internal val scrollDeltaBetweenPasses: Float
