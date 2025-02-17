@@ -559,33 +559,24 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
     }
 
     /**
-     * A segment of a line, used as a building block for complex lines. Each segment has its own
-     * Paint for drawing.
+     * A segment of a line, used as a building block for complex lines.
+     *
+     * <p>Each segment can be ArcLine or straight line.
      */
-    static class ArcSegment {
-        enum CapPosition {
-            NONE,
-            START,
-            END
-        }
+    interface Segment {
+        void onDraw(@NonNull Canvas canvas);
+    }
 
-        /** The angle span of the sector that is clipped out. */
-        private static final float CLIP_OUT_PATH_SPAN_DEGREES = 90f;
+    /**
+     * A segment of an arc line that represents a straight line, perpendicular to the arc. It can be
+     * used to ensure a region in the arc has a desired color.
+     */
+    static class LineSegment implements Segment {
 
-        private final @NonNull Paint mPaint;
         private final @NonNull Path mPath;
+        private final @NonNull Paint mPaint;
 
-        /** A region to be clipped out when drawing, in order to exclude one of the stroke caps. */
-        private @Nullable Path mExcludedCapRegion = null;
-
-        /** A region to be clipped in when drawing, in order to only include this region. */
-        private @Nullable Path mMaskRegion = null;
-
-        /**
-         * Creates a segment that draws perpendicular to the arc, covering a length equivalent to
-         * the arc thickness. It can be used to ensure a region in the arc has a desired color.
-         */
-        static ArcSegment midJunction(
+        LineSegment(
                 @NonNull RectF bounds, float drawAngle, float thicknessPx, @NonNull Paint paint) {
             float innerRadius = (min(bounds.width(), bounds.height()) - thicknessPx) / 2f;
             double drawMidAngleRad = Math.toRadians(drawAngle);
@@ -602,8 +593,38 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
             // Line end
             line.rLineTo(thicknessPx * midAngleVector.x, thicknessPx * midAngleVector.y);
 
-            return new ArcSegment(line, paint);
+            this.mPath = line;
+            this.mPaint = paint;
         }
+
+        @Override
+        public void onDraw(@NonNull Canvas canvas) {
+            canvas.drawPath(mPath, mPaint);
+        }
+    }
+
+    /**
+     * A segment of a line, used as a building block for complex lines. Each segment has its own
+     * Paint for drawing.
+     */
+    static class ArcSegment implements Segment {
+        enum CapPosition {
+            NONE,
+            START,
+            END
+        }
+
+        /** The angle span of the sector that is clipped out. */
+        private static final float CLIP_OUT_PATH_SPAN_DEGREES = 90f;
+
+        private final @NonNull Paint mPaint;
+        private final @NonNull List<ArcLinePath> mPathList;
+
+        /** A region to be clipped out when drawing, in order to exclude one of the stroke caps. */
+        private @Nullable Path mExcludedCapRegion = null;
+
+        /** A region to be clipped in when drawing, in order to only include this region. */
+        private @Nullable Path mMaskRegion = null;
 
         /** A segment that draws the shadow layer that matches the path of the given segment. */
         static ArcSegment strokeCapShadowLayer(
@@ -619,7 +640,7 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
             RectF outerBounds = expandRectF(bounds, lineThicknessPx / 2f);
             maskRegion.addOval(innerBounds, Direction.CW);
             maskRegion.addOval(outerBounds, Direction.CCW);
-            return new ArcSegment(segment.mPath, paint, maskRegion, segment.mExcludedCapRegion);
+            return new ArcSegment(segment.mPathList, paint, maskRegion, segment.mExcludedCapRegion);
         }
 
         ArcSegment(
@@ -637,7 +658,6 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
             }
 
             mPaint = paint;
-            mPath = new Path();
             if (capPosition == CapPosition.NONE) {
                 mPaint.setStrokeCap(Cap.BUTT);
             }
@@ -646,7 +666,8 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
                 sweepAngle += Math.signum(sweepAngle) * 0.001f;
             }
 
-            mPath.arcTo(bounds, startAngle, sweepAngle);
+            mPathList = new ArrayList<>();
+            mPathList.add(new ArcLinePath(bounds, startAngle, sweepAngle));
 
             // If a single cap is present, we clip out the Cap that should not be included.
             if (capPosition != CapPosition.NONE) {
@@ -675,29 +696,34 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
         }
 
         ArcSegment(
-                @NonNull Path mainPath,
+                @NonNull List<ArcLinePath> mainPath,
                 @NonNull Paint paint,
                 @Nullable Path maskRegion,
                 @Nullable Path excludedCapRegion) {
-            this.mPath = mainPath;
+            this.mPathList = mainPath;
             this.mPaint = paint;
             this.mMaskRegion = maskRegion;
             this.mExcludedCapRegion = excludedCapRegion;
         }
 
-        ArcSegment(@NonNull Path mainPath, @NonNull Paint paint) {
-            this(mainPath, paint, /* maskRegion= */ null, /* excludedCapRegion= */ null);
-        }
-
+        @Override
         public void onDraw(@NonNull Canvas canvas) {
             canvas.save();
+            // TODO: b/395863595 - Handle aliasing here as these don't support it.
             if (mExcludedCapRegion != null) {
                 canvas.clipOutPath(mExcludedCapRegion);
             }
             if (mMaskRegion != null) {
                 canvas.clipPath(mMaskRegion);
             }
-            canvas.drawPath(mPath, mPaint);
+            mPathList.forEach(
+                    arc ->
+                            canvas.drawArc(
+                                    arc.getOval(),
+                                    arc.getStartAngle(),
+                                    arc.getSweepAngle(),
+                                    /* useCenter= */ false,
+                                    mPaint));
             canvas.restore();
         }
 
@@ -732,7 +758,7 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
     static class ArcDrawableImpl implements ArcDrawable {
         // The list of segments that compose the ArcDrawable, in the order that they should be
         // drawn.
-        private final @NonNull List<ArcSegment> mSegments = new ArrayList<>();
+        private final @NonNull List<Segment> mSegments = new ArrayList<>();
 
         ArcDrawableImpl(
                 @NonNull RectF bounds,
@@ -849,7 +875,7 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
             if (sweepGradHelper != null) {
                 midPaint.setColor(sweepGradHelper.getColor(Math.abs(midCursor)));
             }
-            mSegments.add(ArcSegment.midJunction(bounds, drawMidAngle, thicknessPx, midPaint));
+            mSegments.add(new LineSegment(bounds, drawMidAngle, thicknessPx, midPaint));
         }
 
         @Override
@@ -858,32 +884,34 @@ public class WearCurvedLineView extends View implements ArcLayout.Widget {
         }
     }
 
-    /** Legacy LinePath, which supports drawing the line as a single Path. */
+    /**
+     * Legacy LinePath, which supports drawing the line as a single arc.
+     *
+     * <p>Note that this needs to use {@code canvas.drawArc} instead of previous {@code
+     * canvas.drawPath}, because {@code canvas.drawPath} implementation has a bug when the path is
+     * an Arc which causes the aliasing issue (b/393971851)
+     */
     private static class ArcDrawableLegacy implements ArcDrawable {
 
         private final @NonNull Paint mPaint;
-        private final @NonNull Path mPath = new Path();
+        private final RectF mBounds;
+        private final float mStartAngle;
+        private final float mClampedLineLength;
 
         ArcDrawableLegacy(@NonNull RectF bounds, float clampedLineLength, @NonNull Paint paint) {
             this.mPaint = paint;
-
-            if (clampedLineLength >= 360f) {
-                // Android internally will take the modulus of the angle with 360, so drawing a full
-                // ring can't be done using path.arcTo. In that case, just draw a circle.
-                mPath.addOval(bounds, Direction.CW);
-            } else if (clampedLineLength != 0) {
-                mPath.moveTo(0, 0); // Work-around for b/177676885
-                mPath.arcTo(
-                        bounds,
-                        BASE_DRAW_ANGLE_SHIFT - (clampedLineLength / 2f),
-                        clampedLineLength,
-                        /* forceMoveTo= */ true);
-            }
+            this.mBounds = bounds;
+            this.mStartAngle = BASE_DRAW_ANGLE_SHIFT - (clampedLineLength / 2f);
+            this.mClampedLineLength = clampedLineLength;
         }
 
         @Override
         public void onDraw(@NonNull Canvas canvas) {
-            canvas.drawPath(mPath, mPaint);
+            if (mClampedLineLength == 0) {
+                return;
+            }
+            // drawArc will draw oval if abs(clampedLineLength) is >= 360
+            canvas.drawArc(mBounds, mStartAngle, mClampedLineLength, false, mPaint);
         }
     }
 
