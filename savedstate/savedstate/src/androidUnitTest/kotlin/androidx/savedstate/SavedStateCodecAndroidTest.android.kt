@@ -130,8 +130,8 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         val origin = bundleOf("i" to 3, "s" to "foo", "d" to 3.14)
         val restored =
             decodeFromSavedState(
-                SavedStateSerializer(),
-                encodeToSavedState(SavedStateSerializer(), origin).read {
+                SavedStateSerializer,
+                encodeToSavedState(SavedStateSerializer, origin).read {
                     assertThat(size()).isEqualTo(3)
                     assertThat(getInt("i")).isEqualTo(3)
                     assertThat(getString("s")).isEqualTo("foo")
