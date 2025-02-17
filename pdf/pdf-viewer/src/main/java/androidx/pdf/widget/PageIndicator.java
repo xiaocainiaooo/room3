@@ -180,4 +180,20 @@ public class PageIndicator extends ReusableToast {
     public void setBackground(@Nullable Drawable drawable) {
         mPageNumberView.setBackground(drawable);
     }
+
+    /**
+     * Sets the relative right margin. Margin values should be positive.
+     *
+     * @param marginRight the end margin size.
+     */
+    public void setMarginRight(int marginRight) {
+        if (mPageNumberView.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams params =
+                    (ViewGroup.MarginLayoutParams) mPageNumberView.getLayoutParams();
+            // Since FastScrollView currently doesn't support RTL mode,
+            // explicitly set it as right margin.
+            params.rightMargin = marginRight;
+            mPageNumberView.setLayoutParams(params);
+        }
+    }
 }

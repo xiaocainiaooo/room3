@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  Copyright 2024 The Android Open Source Project
+  Copyright 2025 The Android Open Source Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,16 +14,9 @@
   limitations under the License.
   -->
 
-
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="32dp"
-    android:height="40dp"
-    android:viewportHeight="40"
-    android:viewportWidth="32">
-
-    <!-- Clipped Oval Path (32 dp width instead of 40 dp) -->
-    <path
-        android:fillColor="?attr/colorSurfaceContainerHigh"
-        android:pathData="M40,20 A20,20 0 1,1 8,4 A20,20 0 0,1 40,20 Z" />
-</vector>
-
+<resources>
+    <public name="fastScrollVerticalThumbDrawable" type="attr" />
+    <public name="fastScrollPageIndicatorBackgroundDrawable" type="attr" />
+    <public name="fastScrollPageIndicatorMarginEnd" type="attr" />
+    <public name="fastScrollVerticalThumbMarginEnd" type="attr" />
+</resources>

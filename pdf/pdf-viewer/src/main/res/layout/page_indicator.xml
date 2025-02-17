@@ -31,6 +31,5 @@
     android:paddingRight="12dp"
     android:textAppearance="?attr/textAppearanceLabelMedium"
     android:textColor="?attr/colorOnSurface"
-    android:textSize="12sp"
     tools:ignore="RtlHardcoded"
     tools:text="3 of 20" />

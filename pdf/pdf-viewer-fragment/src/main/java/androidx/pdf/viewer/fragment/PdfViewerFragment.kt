@@ -490,6 +490,14 @@ public open class PdfViewerFragment constructor() : Fragment() {
                     val pageIndicatorDrawable = pdfViewStyledAttrs.getDrawable(attr)
                     fastScrollView?.setPageIndicatorBackgroundDrawable(pageIndicatorDrawable)
                 }
+                R.styleable.PdfView_fastScrollPageIndicatorMarginEnd -> {
+                    val pageIndicatorEndMargin = pdfViewStyledAttrs.getDimensionPixelSize(attr, 0)
+                    fastScrollView?.setPageIndicatorMarginRight(pageIndicatorEndMargin)
+                }
+                R.styleable.PdfView_fastScrollVerticalThumbMarginEnd -> {
+                    val verticalThumbEndMargin = pdfViewStyledAttrs.getDimensionPixelSize(attr, 0)
+                    fastScrollView?.setVerticalThumbMarginRight(verticalThumbEndMargin)
+                }
             }
         }
     }
