@@ -16,7 +16,6 @@
 
 package androidx.wear.compose.material3
 
-import androidx.annotation.FloatRange
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -36,15 +35,18 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.wear.compose.foundation.ActiveFocusListener
+import androidx.wear.compose.foundation.GestureInclusion
 import androidx.wear.compose.foundation.LocalReduceMotion
 import androidx.wear.compose.foundation.ScrollInfoProvider
 import androidx.wear.compose.foundation.pager.HorizontalPager
@@ -237,17 +239,17 @@ private fun PagerScaffoldImpl(
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions is
  *   allowed. You can still scroll programmatically using [PagerState.scroll] even when it is
  *   disabled.
+ * @param gestureInclusion When userScrollEnabled=true, this function provides more fine-grained
+ *   control so that touch gestures can be excluded when they start in a certain region. An instance
+ *   of [GestureInclusion] can be passed in here which will determine via
+ *   [GestureInclusion.allowGesture] whether the gesture should proceed or not. By default,
+ *   [gestureInclusion] allows gestures everywhere except a zone on the left edge of the first page,
+ *   which is used for swipe-to-dismiss (see [PagerDefaults.disableLeftEdgeOnFirstPage]).
  * @param reverseLayout reverse the direction of scrolling and layout.
  * @param key a stable and unique key representing the item. When you specify the key the scroll
  *   position will be maintained based on the key, which means if you add/remove items before the
  *   current visible item the item with the given key will be kept as the first visible one. If null
  *   is passed the position in the list will represent the key.
- * @param swipeToDismissEdgeZoneFraction A float which controls the size of the screen edge area
- *   used for the Wear system's swipe to dismiss gesture. This value, between 0 and 1, represents
- *   the fraction of the screen width that will be sensitive to the gesture. For example, 0.25 means
- *   the leftmost 25% of the screen will trigger the gesture. Even when RTL mode is enabled, this
- *   parameter only ever applies to the left edge of the screen. Setting this to 0 will disable the
- *   gesture.
  * @param rotaryScrollableBehavior Parameter for changing rotary behavior
  * @param content A composable function that defines the content of each page displayed by the
  *   Pager. This is where the UI elements that should appear within each page should be placed.
@@ -261,10 +263,9 @@ internal fun AnimatedHorizontalPager(
     beyondViewportPageCount: Int = PagerDefaults.BeyondViewportPageCount,
     flingBehavior: TargetedFlingBehavior = snapWithSpringBehavior(state = state),
     userScrollEnabled: Boolean = true,
+    gestureInclusion: GestureInclusion = PagerDefaults.disableLeftEdgeOnFirstPage(state),
     reverseLayout: Boolean = false,
     key: ((index: Int) -> Any)? = null,
-    @FloatRange(from = 0.0, to = 1.0)
-    swipeToDismissEdgeZoneFraction: Float = PagerDefaults.SwipeToDismissEdgeZoneFraction,
     rotaryScrollableBehavior: RotaryScrollableBehavior?,
     content: @Composable PagerScope.(page: Int) -> Unit
 ) {
@@ -278,10 +279,21 @@ internal fun AnimatedHorizontalPager(
         beyondViewportPageCount = beyondViewportPageCount,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
+        gestureInclusion =
+            object : GestureInclusion {
+                override fun allowGesture(
+                    offset: Offset,
+                    layoutCoordinates: LayoutCoordinates
+                ): Boolean {
+                    return if (touchExplorationServicesEnabled) {
+                        true
+                    } else {
+                        gestureInclusion.allowGesture(offset, layoutCoordinates)
+                    }
+                }
+            },
         reverseLayout = reverseLayout,
         key = key,
-        swipeToDismissEdgeZoneFraction =
-            if (touchExplorationServicesEnabled) 0f else swipeToDismissEdgeZoneFraction,
         rotaryScrollableBehavior = rotaryScrollableBehavior
     ) { page ->
         AnimatedPageContent(

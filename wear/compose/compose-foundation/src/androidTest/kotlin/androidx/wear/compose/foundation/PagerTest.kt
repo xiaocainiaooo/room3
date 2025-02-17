@@ -26,6 +26,9 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.RotaryInjectionScope
@@ -43,6 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.pager.HorizontalPager
+import androidx.wear.compose.foundation.pager.PagerDefaults
 import androidx.wear.compose.foundation.pager.PagerState
 import androidx.wear.compose.foundation.pager.VerticalPager
 import androidx.wear.compose.foundation.pager.rememberPagerState
@@ -84,9 +88,17 @@ class PagerTest {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.testTag(pagerTestTag),
-                swipeToDismissEdgeZoneFraction = 0f,
-            ) // disable swipe to dismiss as it conflicts with swipeRight()
-            { page ->
+                gestureInclusion =
+                    object : GestureInclusion {
+                        override fun allowGesture(
+                            offset: Offset,
+                            layoutCoordinates: LayoutCoordinates
+                        ): Boolean {
+                            return true
+                        }
+                    },
+                // disable swipe to dismiss as it conflicts with swipeRight()
+            ) { page ->
                 ScalingLazyColumn(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -124,7 +136,18 @@ class PagerTest {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.testTag(pagerTestTag),
-                swipeToDismissEdgeZoneFraction = 0.15f,
+                gestureInclusion =
+                    object : GestureInclusion {
+                        override fun allowGesture(
+                            offset: Offset,
+                            layoutCoordinates: LayoutCoordinates
+                        ): Boolean {
+                            val screenOffset = layoutCoordinates.localToScreen(offset)
+                            val screenWidth = layoutCoordinates.findRootCoordinates().size.width
+                            return screenOffset.x > screenWidth * PagerDefaults.LeftEdgeZoneFraction
+                        }
+                    },
+                // enable swipe to dismiss on each page
             ) { page ->
                 ScalingLazyColumn(
                     modifier = Modifier.fillMaxSize(),
