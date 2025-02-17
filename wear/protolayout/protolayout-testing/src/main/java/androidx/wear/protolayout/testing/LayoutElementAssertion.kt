@@ -17,7 +17,6 @@
 package androidx.wear.protolayout.testing
 
 import androidx.wear.protolayout.LayoutElementBuilders
-import java.lang.AssertionError
 
 /**
  * Represents a layout element that can be asserted on.
