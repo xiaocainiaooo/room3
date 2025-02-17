@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The Android Open Source Project
+ * Copyright (C) 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,19 @@ plugins {
 }
 
 android {
-    namespace = "androidx.privacysandbox.ui.integration.sdkproviderutils"
+    namespace = "androidx.privacysandbox.ui.integration.inappmediateeadaptersdk"
     compileSdk = 35
+    compileSdkExtension = 14
+
+    privacySandbox {
+        enable = true
+    }
 }
 
 dependencies {
-    implementation "androidx.activity:activity-ktx:1.7.2"
-    implementation project(":privacysandbox:ui:ui-client")
-    implementation project(":privacysandbox:ui:ui-provider")
-    implementation project(":privacysandbox:sdkruntime:sdkruntime-core")
-    implementation project(":privacysandbox:activity:activity-core")
-    implementation project(":privacysandbox:activity:activity-provider")
-    implementation project(":webkit:webkit")
-    implementation(libs.media3Ui)
-    implementation(libs.media3Common)
-    implementation(libs.media3Exoplayer)
+    api(libs.kotlinStdlib)
+    api("androidx.annotation:annotation:1.8.1")
+    implementation(project(":privacysandbox:ui:integration-tests:inappmediateesdk"))
+    implementation(project(":privacysandbox:ui:integration-tests:sdkproviderutils"))
+    implementation(project(":privacysandbox:ui:integration-tests:testsdkproviderwrapper"))
 }

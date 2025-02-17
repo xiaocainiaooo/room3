@@ -25,26 +25,12 @@ import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
-import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 
 @SuppressLint("NullAnnotationGroup")
 @OptIn(ExperimentalFeatures.SharedUiPresentationApi::class)
-class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub() {
-    override fun loadAd(
-        @AdFormat adFormat: Int,
-        @AdType adType: Int,
-        withSlowDraw: Boolean,
-        drawViewability: Boolean
-    ): Bundle =
-        when (adFormat) {
-            AdFormat.BANNER_AD ->
-                loadBannerAdUtil(adType, withSlowDraw, drawViewability, sdkContext)
-            AdFormat.NATIVE_AD -> loadNativeAdUtil(adType, sdkContext)
-            else -> Bundle()
-        }
-
+class MediateeSdkApiImpl() {
     companion object {
         fun loadAdUtil(
             @AdFormat adFormat: Int,

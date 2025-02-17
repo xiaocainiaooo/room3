@@ -37,7 +37,6 @@ import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.C
 import androidx.privacysandbox.ui.integration.sdkproviderutils.TestAdapters
 import androidx.privacysandbox.ui.integration.sdkproviderutils.ViewabilityHandler
 import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.FullscreenAd
-import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 import kotlinx.coroutines.MainScope
@@ -49,6 +48,8 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
     private val testAdapters = TestAdapters(sdkContext)
     private val handler = Handler(Looper.getMainLooper())
     private val nativeAdGenerator = NativeAdGenerator(sdkContext, MediationOption.NON_MEDIATED)
+
+    private lateinit var inAppMediateeAdapter: MediateeAdapterInterface
 
     override suspend fun loadAd(
         @AdFormat adFormat: Int,
@@ -156,6 +157,10 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
         coroutineScope.launch {
             FullscreenAd(sdkContext).show(launcherInfo, screenOrientation, backButtonNavigation)
         }
+    }
+
+    override fun registerInAppMediateeAdapter(mediateeAdapter: MediateeAdapterInterface) {
+        inAppMediateeAdapter = mediateeAdapter
     }
 
     @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
@@ -268,10 +273,7 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
                 )
             }
             MediationOption.IN_APP_MEDIATEE -> {
-                val appOwnedMediateeApi =
-                    maybeGetAppOwnedMediateeSdkApi()
-                        ?: return loadFallbackAd(adFormat, adType, waitInsideOnDraw)
-                return appOwnedMediateeApi.loadAd(
+                return inAppMediateeAdapter.loadAd(
                     adFormat,
                     adType,
                     waitInsideOnDraw,
@@ -299,20 +301,6 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
                 )
             else -> Bundle()
         }
-
-    private fun maybeGetAppOwnedMediateeSdkApi(): IMediateeSdkApi? {
-        val sdkSandboxControllerCompat = SdkSandboxControllerCompat.from(sdkContext)
-        val appOwnedSdkSandboxInterfaces =
-            sdkSandboxControllerCompat.getAppOwnedSdkSandboxInterfaces()
-        appOwnedSdkSandboxInterfaces.forEach { appOwnedSdkSandboxInterfaceCompat ->
-            if (appOwnedSdkSandboxInterfaceCompat.getName() == MEDIATEE_SDK) {
-                return IMediateeSdkApi.Stub.asInterface(
-                    appOwnedSdkSandboxInterfaceCompat.getInterface()
-                )
-            }
-        }
-        return null
-    }
 
     private fun maybeGetSandboxedMediateeSdkApi():
         androidx.privacysandbox.ui.integration.mediateesdkprovider.IMediateeSdkApi? {
