@@ -146,6 +146,11 @@ class AppFunctionCompilerTest {
                 "${'$'}SerializableInputFunctions_AppFunctionInventory.kt",
             goldenFileName = "${'$'}SerializableInputFunctions_AppFunctionInventory.KT",
         )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "serializableInputFunctions_app_function_dynamic_schema.xml",
+        )
     }
 
     @Test
@@ -167,6 +172,12 @@ class AppFunctionCompilerTest {
                 "${'$'}AppFunctionWithInputFromDifferentPackage_AppFunctionInventory.kt",
             goldenFileName =
                 "${'$'}AppFunctionWithInputFromDifferentPackage_AppFunctionInventory.KT",
+        )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName =
+                "appFunctionWithInputFromDifferentPackage_app_function_dynamic_schema.xml",
         )
     }
 
@@ -213,10 +224,15 @@ class AppFunctionCompilerTest {
                 "${'$'}SerializableOutputFunctions_AppFunctionInventory.kt",
             goldenFileName = "${'$'}SerializableOutputFunctions_AppFunctionInventory.KT",
         )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "serializableOutputFunctions_app_function_dynamic_schema.xml",
+        )
     }
 
     @Test
-    fun testDiffPackageSerializableOutputFunction_genAppFunctionInventory_success() {
+    fun testDiffPackageSerializableOutputFunction_genAppFunctionInventoryAndIndexXml_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames =
@@ -235,10 +251,16 @@ class AppFunctionCompilerTest {
             goldenFileName =
                 "${'$'}AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory.KT",
         )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName =
+                "appFunctionWithOutputFromDifferentPackage_app_function_dynamic_schema.xml",
+        )
     }
 
     @Test
-    fun testRecursiveSerializableInputFunctions_genAppFunctionInventoryImpl_success() {
+    fun testRecursiveSerializableInputFunctions_genAppFunctionInventoryImplAndIndexXml_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("RecursiveSerializableInputFunctions.KT")
@@ -249,6 +271,11 @@ class AppFunctionCompilerTest {
             expectGeneratedSourceFileName =
                 "${'$'}RecursiveSerializableInputFunctions_AppFunctionInventory.kt",
             goldenFileName = "${'$'}RecursiveSerializableInputFunctions_AppFunctionInventory.KT",
+        )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "recursiveSerializableInputFunctions_app_function_dynamic_schema.xml",
         )
     }
 
