@@ -23,35 +23,72 @@ import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.map
 
 /** The helper class to resolve AppFunction related symbols. */
 class AppFunctionSymbolResolver(private val resolver: Resolver) {
 
     /** Resolves valid functions annotated with @AppFunction annotation. */
     fun resolveAnnotatedAppFunctions(): List<AnnotatedAppFunctions> {
-        return buildMap<KSClassDeclaration, MutableList<KSFunctionDeclaration>>() {
-                val annotatedAppFunctions =
-                    resolver.getSymbolsWithAnnotation(
-                        AppFunctionAnnotation.CLASS_NAME.canonicalName
+        return resolver
+            .getSymbolsWithAnnotation(AppFunctionAnnotation.CLASS_NAME.canonicalName)
+            .map { declaration ->
+                if (declaration !is KSFunctionDeclaration) {
+                    throw ProcessingException(
+                        "Only functions can be annotated with @AppFunction",
+                        declaration
                     )
-                for (symbol in annotatedAppFunctions) {
-                    if (symbol !is KSFunctionDeclaration) {
-                        throw ProcessingException(
-                            "Only functions can be annotated with @AppFunction",
-                            symbol
-                        )
-                    }
-                    val functionClass = symbol.parentDeclaration as? KSClassDeclaration
-                    if (functionClass == null) {
-                        throw ProcessingException(
-                            "Top level functions cannot be annotated with @AppFunction ",
-                            symbol
-                        )
-                    }
-
-                    this.getOrPut(functionClass) { mutableListOf<KSFunctionDeclaration>() }
-                        .add(symbol)
                 }
+                declaration
+            }
+            .groupBy { declaration ->
+                declaration.parentDeclaration as? KSClassDeclaration
+                    ?: throw ProcessingException(
+                        "Top level functions cannot be annotated with @AppFunction ",
+                        declaration
+                    )
+            }
+            .map { (classDeclaration, appFunctionsDeclarations) ->
+                AnnotatedAppFunctions(classDeclaration, appFunctionsDeclarations).validate()
+            }
+    }
+
+    /**
+     * Gets all [AnnotatedAppFunctions] from all processed modules.
+     *
+     * Unlike [resolveAnnotatedAppFunctions] that resolves symbols from annotation within the same
+     * compilation unit. [getAnnotatedAppFunctionsFromAllModules] looks up all AppFunction symbols,
+     * including those are already processed.
+     */
+    fun getAnnotatedAppFunctionsFromAllModules(): List<AnnotatedAppFunctions> {
+        return filterAppFunctionComponentQualifiedNames(
+                AppFunctionComponentRegistryAnnotation.Category.FUNCTION
+            )
+            .map { componentName ->
+                val ksName = resolver.getKSNameFromString(componentName)
+                val functionDeclarations = resolver.getFunctionDeclarationsByName(ksName).toList()
+                if (functionDeclarations.isEmpty()) {
+                    throw ProcessingException(
+                        "Unable to find KSFunctionDeclaration for ${ksName.asString()}",
+                        null
+                    )
+                }
+                if (functionDeclarations.size > 1) {
+                    throw ProcessingException(
+                        "Conflicts KSFunctionDeclaration for ${ksName.asString()}",
+                        null
+                    )
+                }
+                functionDeclarations.single()
+            }
+            .groupBy { declaration ->
+                declaration.parentDeclaration as? KSClassDeclaration
+                    ?: throw ProcessingException(
+                        "Top level functions cannot be annotated with @AppFunction ",
+                        declaration
+                    )
             }
             .map { (classDeclaration, appFunctionsDeclarations) ->
                 AnnotatedAppFunctions(classDeclaration, appFunctionsDeclarations).validate()

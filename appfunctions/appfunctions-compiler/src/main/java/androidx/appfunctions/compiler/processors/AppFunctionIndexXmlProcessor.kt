@@ -46,7 +46,9 @@ class AppFunctionIndexXmlProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        generateIndexXml(AppFunctionSymbolResolver(resolver).resolveAnnotatedAppFunctions())
+        generateIndexXml(
+            AppFunctionSymbolResolver(resolver).getAnnotatedAppFunctionsFromAllModules()
+        )
         return emptyList()
     }
 
