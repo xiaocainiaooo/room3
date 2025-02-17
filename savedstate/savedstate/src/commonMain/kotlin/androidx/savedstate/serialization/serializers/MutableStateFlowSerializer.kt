@@ -24,6 +24,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -57,8 +59,14 @@ public class MutableStateFlowSerializer<T>(
     private val valueSerializer: KSerializer<T>,
 ) : KSerializer<MutableStateFlow<T>> {
     @OptIn(ExperimentalSerializationApi::class)
-    override val descriptor: SerialDescriptor =
-        SerialDescriptor("kotlinx.coroutines.flow.MutableStateFlow", valueSerializer.descriptor)
+    override val descriptor: SerialDescriptor by lazy {
+        val structureKind = valueSerializer.descriptor.kind
+        if (structureKind is PrimitiveKind) {
+            PrimitiveSerialDescriptor(SERIAL_NAME, structureKind)
+        } else {
+            SerialDescriptor(SERIAL_NAME, valueSerializer.descriptor)
+        }
+    }
 
     override fun serialize(encoder: Encoder, value: MutableStateFlow<T>) {
         valueSerializer.serialize(encoder, value.value)
@@ -68,3 +76,5 @@ public class MutableStateFlowSerializer<T>(
         return MutableStateFlow(valueSerializer.deserialize(decoder))
     }
 }
+
+private const val SERIAL_NAME = "kotlinx.coroutines.flow.MutableStateFlow"
