@@ -15,13 +15,18 @@
  */
 package androidx.camera.lifecycle
 
+import android.util.Range
+import androidx.camera.core.CameraEffect
 import androidx.camera.core.CompositionSettings
+import androidx.camera.core.UseCase
+import androidx.camera.core.ViewPort
 import androidx.camera.core.concurrent.CameraCoordinator
 import androidx.camera.core.impl.AdapterCameraInfo
 import androidx.camera.core.impl.CameraConfig
 import androidx.camera.core.impl.CameraConfigs
 import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.impl.CameraInternal
+import androidx.camera.core.impl.StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
 import androidx.camera.core.internal.CameraUseCaseAdapter
 import androidx.camera.testing.fakes.FakeCamera
 import androidx.camera.testing.impl.fakes.FakeCameraConfig
@@ -42,20 +47,20 @@ import org.junit.Test
 class LifecycleCameraRepositoryTest {
     private lateinit var lifecycleOwner: FakeLifecycleOwner
     private lateinit var repository: LifecycleCameraRepository
-    private lateinit var cameraCoordinator: FakeCameraCoordinator
+    private lateinit var defaultCameraCoordinator: FakeCameraCoordinator
     private lateinit var cameraUseCaseAdapter: CameraUseCaseAdapter
     private var cameraId = 0
     private val camera: CameraInternal = FakeCamera(cameraId.toString())
 
     @Before
     fun setUp() {
-        cameraCoordinator = FakeCameraCoordinator()
+        defaultCameraCoordinator = FakeCameraCoordinator()
         lifecycleOwner = FakeLifecycleOwner()
         repository = LifecycleCameraRepository()
         cameraUseCaseAdapter =
             CameraUseCaseAdapter(
                 camera,
-                cameraCoordinator,
+                defaultCameraCoordinator,
                 FakeCameraDeviceSurfaceManager(),
                 FakeUseCaseConfigFactory()
             )
@@ -125,13 +130,7 @@ class LifecycleCameraRepositoryTest {
     @Test
     fun lifecycleCameraIsNotActive_bindUseCase_whenLifecycleIsNotStarted() {
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(FakeUseCase()))
         // LifecycleCamera is inactive before the lifecycle state becomes ON_START.
         assertThat(lifecycleCamera.isActive).isFalse()
     }
@@ -139,13 +138,7 @@ class LifecycleCameraRepositoryTest {
     @Test
     fun lifecycleCameraIsActive_lifecycleStartedAfterBindUseCase() {
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(FakeUseCase()))
         lifecycleOwner.start()
         // LifecycleCamera is active after the lifecycle state becomes ON_START.
         assertThat(lifecycleCamera.isActive).isTrue()
@@ -155,13 +148,7 @@ class LifecycleCameraRepositoryTest {
     fun lifecycleCameraIsActive_bindToLifecycleCameraAfterLifecycleStarted() {
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         lifecycleOwner.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(FakeUseCase()))
 
         // LifecycleCamera is active after binding a use case when lifecycle state is ON_START.
         assertThat(lifecycleCamera.isActive).isTrue()
@@ -172,25 +159,13 @@ class LifecycleCameraRepositoryTest {
         // Creates first LifecycleCamera with use case bound.
         val lifecycleCamera0 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // Creates second LifecycleCamera with use case bound to the same Lifecycle.
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycleOwner, createNewCameraUseCaseAdapter())
         assertThrows(IllegalArgumentException::class.java) {
-            repository.bindToLifecycleCamera(
-                lifecycleCamera1,
-                null,
-                listOf(),
-                listOf(FakeUseCase()),
-                cameraCoordinator
-            )
+            repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(FakeUseCase()))
         }
     }
 
@@ -200,13 +175,7 @@ class LifecycleCameraRepositoryTest {
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         lifecycleOwner.start()
         val useCase = FakeUseCase()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(useCase),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(useCase))
 
         // Unbinds the use case that was bound previously.
         repository.unbind(listOf(useCase))
@@ -223,13 +192,7 @@ class LifecycleCameraRepositoryTest {
         lifecycleOwner.start()
         val useCase0 = FakeUseCase()
         val useCase1 = FakeUseCase()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(useCase0, useCase1),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(useCase0, useCase1))
 
         // Only unbinds one use case but another one is kept in the LifecycleCamera.
         repository.unbind(listOf(useCase0))
@@ -244,13 +207,7 @@ class LifecycleCameraRepositoryTest {
         // Creates LifecycleCamera with use case bound.
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         lifecycleOwner.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(FakeUseCase()))
 
         // Unbinds all use cases from all LifecycleCamera by the unbindAll() API.
         repository.unbindAll()
@@ -265,26 +222,14 @@ class LifecycleCameraRepositoryTest {
         val lifecycleCamera0 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         lifecycleOwner.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // Starts second lifecycle with use case bound.
         val lifecycle1 = FakeLifecycleOwner()
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycle1, createNewCameraUseCaseAdapter())
         lifecycle1.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera1,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(FakeUseCase()))
 
         // The previous LifecycleCamera becomes inactive after new LifecycleCamera becomes active.
         assertThat(lifecycleCamera0.isActive).isFalse()
@@ -298,35 +243,17 @@ class LifecycleCameraRepositoryTest {
         val lifecycleCamera0 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         lifecycleOwner.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // Starts second lifecycle with use case bound.
         val lifecycle1 = FakeLifecycleOwner()
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycle1, createNewCameraUseCaseAdapter())
         lifecycle1.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera1,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(FakeUseCase()))
 
         // Binds new use case to the next most recent active LifecycleCamera.
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // The next most recent active LifecycleCamera becomes active after binding new use case.
         assertThat(lifecycleCamera0.isActive).isTrue()
@@ -341,13 +268,7 @@ class LifecycleCameraRepositoryTest {
         val lifecycleCamera0 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         lifecycleOwner.start()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // Starts second lifecycle with use case bound.
         val lifecycle1 = FakeLifecycleOwner()
@@ -355,13 +276,7 @@ class LifecycleCameraRepositoryTest {
             repository.createLifecycleCamera(lifecycle1, createNewCameraUseCaseAdapter())
         lifecycle1.start()
         val useCase = FakeUseCase()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera1,
-            null,
-            listOf(),
-            listOf(useCase),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(useCase))
 
         // Unbinds use case from the most recent active LifecycleCamera.
         repository.unbind(listOf(useCase))
@@ -378,13 +293,7 @@ class LifecycleCameraRepositoryTest {
     fun useCaseIsCleared_whenLifecycleIsDestroyed() {
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
         val useCase = FakeUseCase()
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(useCase),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(useCase))
 
         assertThat(useCase.isDetached).isFalse()
 
@@ -398,13 +307,7 @@ class LifecycleCameraRepositoryTest {
         // Starts first lifecycle and check LifecycleCamera active state is true.
         val firstLifecycleCamera =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            firstLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(firstLifecycleCamera, listOf(FakeUseCase()))
         lifecycleOwner.start()
         assertThat(firstLifecycleCamera.isActive).isTrue()
 
@@ -412,13 +315,7 @@ class LifecycleCameraRepositoryTest {
         val secondLifecycle = FakeLifecycleOwner()
         val secondLifecycleCamera =
             repository.createLifecycleCamera(secondLifecycle, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            secondLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(secondLifecycleCamera, listOf(FakeUseCase()))
         secondLifecycle.start()
         assertThat(secondLifecycleCamera.isActive).isTrue()
         assertThat(firstLifecycleCamera.isActive).isFalse()
@@ -429,13 +326,7 @@ class LifecycleCameraRepositoryTest {
         // Starts first lifecycle and check LifecycleCamera active state is true.
         val firstLifecycleCamera =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            firstLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(firstLifecycleCamera, listOf(FakeUseCase()))
         lifecycleOwner.start()
         assertThat(firstLifecycleCamera.isActive).isTrue()
 
@@ -443,13 +334,7 @@ class LifecycleCameraRepositoryTest {
         val secondLifecycle = FakeLifecycleOwner()
         val secondLifecycleCamera =
             repository.createLifecycleCamera(secondLifecycle, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            secondLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(secondLifecycleCamera, listOf(FakeUseCase()))
         secondLifecycle.start()
         assertThat(secondLifecycleCamera.isActive).isTrue()
         assertThat(firstLifecycleCamera.isActive).isFalse()
@@ -465,13 +350,7 @@ class LifecycleCameraRepositoryTest {
         // Starts first LifecycleCamera with use case bound.
         val firstLifecycleCamera =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            firstLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(firstLifecycleCamera, listOf(FakeUseCase()))
         lifecycleOwner.start()
         assertThat(firstLifecycleCamera.isActive).isTrue()
 
@@ -497,13 +376,7 @@ class LifecycleCameraRepositoryTest {
         // Starts second LifecycleCamera with use case bound to the same Lifecycle.
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycleOwner, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            lifecycleCamera1,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(FakeUseCase()))
 
         // Starts third LifecycleCamera with no use case bound to the same Lifecycle.
         val lifecycleCamera2 =
@@ -584,13 +457,7 @@ class LifecycleCameraRepositoryTest {
         // Starts LifecycleCamera with use case bound.
 
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(FakeUseCase()))
         lifecycleOwner.start()
         assertThat(lifecycleCamera.isActive).isTrue()
 
@@ -603,29 +470,19 @@ class LifecycleCameraRepositoryTest {
 
     @Test
     fun concurrentModeOn_twoLifecycleCamerasControlledByOneLifecycle_start() {
-        cameraCoordinator.setCameraOperatingMode(CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT)
+        defaultCameraCoordinator.setCameraOperatingMode(
+            CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT
+        )
 
         // Starts first lifecycle camera
         val lifecycleCamera0 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // Starts second lifecycle camera
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycleOwner, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            lifecycleCamera1,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(FakeUseCase()))
 
         // Starts lifecycle
         lifecycleOwner.start()
@@ -637,18 +494,14 @@ class LifecycleCameraRepositoryTest {
 
     @Test
     fun concurrentModeOn_twoLifecycleCamerasControlledByTwoLifecycles_start() {
-        cameraCoordinator.setCameraOperatingMode(CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT)
+        defaultCameraCoordinator.setCameraOperatingMode(
+            CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT
+        )
 
         // Starts first lifecycle camera
         val lifecycleCamera0 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera0,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera0, listOf(FakeUseCase()))
 
         // Starts lifecycle
         lifecycleOwner.start()
@@ -657,13 +510,7 @@ class LifecycleCameraRepositoryTest {
         val lifecycle1 = FakeLifecycleOwner()
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycle1, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            lifecycleCamera1,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera1, listOf(FakeUseCase()))
 
         // Starts lifecycle1
         lifecycle1.start()
@@ -675,29 +522,19 @@ class LifecycleCameraRepositoryTest {
 
     @Test
     fun concurrentModeOn_twoLifecycleCamerasControlledByOneLifecycle_stop() {
-        cameraCoordinator.setCameraOperatingMode(CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT)
+        defaultCameraCoordinator.setCameraOperatingMode(
+            CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT
+        )
 
         // Starts first lifecycle camera
         val firstLifecycleCamera =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            firstLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(firstLifecycleCamera, listOf(FakeUseCase()))
 
         // Starts second lifecycle camera
         val secondLifecycleCamera =
             repository.createLifecycleCamera(lifecycleOwner, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            secondLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(secondLifecycleCamera, listOf(FakeUseCase()))
 
         // Starts lifecycle
         lifecycleOwner.start()
@@ -712,18 +549,14 @@ class LifecycleCameraRepositoryTest {
 
     @Test
     fun concurrentModeOn_twoLifecycleCamerasControlledByTwoLifecycles_stop() {
-        cameraCoordinator.setCameraOperatingMode(CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT)
+        defaultCameraCoordinator.setCameraOperatingMode(
+            CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT
+        )
 
         // Starts first lifecycle camera
         val firstLifecycleCamera =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            firstLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(firstLifecycleCamera, listOf(FakeUseCase()))
         lifecycleOwner.start()
         assertThat(firstLifecycleCamera.isActive).isTrue()
 
@@ -731,13 +564,7 @@ class LifecycleCameraRepositoryTest {
         val secondLifecycle = FakeLifecycleOwner()
         val secondLifecycleCamera =
             repository.createLifecycleCamera(secondLifecycle, createNewCameraUseCaseAdapter())
-        repository.bindToLifecycleCamera(
-            secondLifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(secondLifecycleCamera, listOf(FakeUseCase()))
         secondLifecycle.start()
         assertThat(secondLifecycleCamera.isActive).isTrue()
         assertThat(firstLifecycleCamera.isActive).isTrue()
@@ -752,13 +579,7 @@ class LifecycleCameraRepositoryTest {
     fun lifecycleCameraIsInactive_createAndBindToLifecycleCamera_AfterLifecycleDestroyed() {
         lifecycleOwner.destroy()
         val lifecycleCamera = repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
-        repository.bindToLifecycleCamera(
-            lifecycleCamera,
-            null,
-            listOf(),
-            listOf(FakeUseCase()),
-            cameraCoordinator
-        )
+        repository.bindToLifecycleCameraExt(lifecycleCamera, listOf(FakeUseCase()))
 
         assertThat(lifecycleCamera.isActive).isFalse()
     }
@@ -768,7 +589,7 @@ class LifecycleCameraRepositoryTest {
         val fakeCamera: CameraInternal = FakeCamera(cameraId)
         return CameraUseCaseAdapter(
             fakeCamera,
-            cameraCoordinator,
+            defaultCameraCoordinator,
             FakeCameraDeviceSurfaceManager(),
             FakeUseCaseConfigFactory()
         )
@@ -783,9 +604,27 @@ class LifecycleCameraRepositoryTest {
             null,
             CompositionSettings.DEFAULT,
             CompositionSettings.DEFAULT,
-            cameraCoordinator,
+            defaultCameraCoordinator,
             FakeCameraDeviceSurfaceManager(),
             FakeUseCaseConfigFactory()
+        )
+    }
+
+    private fun LifecycleCameraRepository.bindToLifecycleCameraExt(
+        lifecycleCamera: LifecycleCamera,
+        useCases: Collection<UseCase>,
+        viewPort: ViewPort? = null,
+        effects: List<CameraEffect> = emptyList(),
+        targetHighSpeedFrameRate: Range<Int> = FRAME_RATE_RANGE_UNSPECIFIED,
+        cameraCoordinator: CameraCoordinator? = defaultCameraCoordinator
+    ) {
+        bindToLifecycleCamera(
+            lifecycleCamera,
+            viewPort,
+            effects,
+            targetHighSpeedFrameRate,
+            useCases,
+            cameraCoordinator
         )
     }
 }
