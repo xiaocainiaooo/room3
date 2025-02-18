@@ -3,6 +3,9 @@ package androidx.wear.protolayout.testing {
 
   public final class Filters {
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher containsTag(String value);
+    method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasAllCorners(float radiusDp);
+    method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasBottomLeftCorner(float xRadiusDp, float yRadiusDp);
+    method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasBottomRightCorner(float xRadiusDp, float yRadiusDp);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasChild(androidx.wear.protolayout.testing.LayoutElementMatcher matcher);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasClickable();
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasClickable(optional androidx.wear.protolayout.ActionBuilders.Action action);
@@ -20,6 +23,8 @@ package androidx.wear.protolayout.testing {
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasText(String value);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasText(String value, optional boolean subString);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasText(String value, optional boolean subString, optional boolean ignoreCase);
+    method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasTopLeftCorner(float xRadiusDp, float yRadiusDp);
+    method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasTopRightCorner(float xRadiusDp, float yRadiusDp);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasWidth(androidx.wear.protolayout.DimensionBuilders.ContainerDimension width);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher hasWidth(androidx.wear.protolayout.DimensionBuilders.ProportionalDimensionProp width);
     method public static androidx.wear.protolayout.testing.LayoutElementMatcher isClickable();

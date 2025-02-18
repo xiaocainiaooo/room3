@@ -230,6 +230,76 @@ public fun hasDescendant(matcher: LayoutElementMatcher): LayoutElementMatcher =
         searchElement(element, matcher) != null
     }
 
+/**
+ * Returns a [LayoutElementMatcher] which checks whether the element has all its four corners with
+ * the given radius.
+ */
+public fun hasAllCorners(radiusDp: Float): LayoutElementMatcher =
+    hasTopLeftCorner(radiusDp, radiusDp) and
+        hasTopRightCorner(radiusDp, radiusDp) and
+        hasBottomLeftCorner(radiusDp, radiusDp) and
+        hasBottomRightCorner(radiusDp, radiusDp)
+
+/**
+ * Returns a [LayoutElementMatcher] which checks whether the element has its top left corner with
+ * the given radii.
+ */
+public fun hasTopLeftCorner(
+    xRadiusDp: Float,
+    yRadiusDp: Float,
+): LayoutElementMatcher =
+    LayoutElementMatcher(
+        "Element has its top left corner with radius of {$xRadiusDp, $yRadiusDp}"
+    ) { element ->
+        val cornerRadius = element.modifiers?.background?.corner?.topLeftRadius
+        cornerRadius?.let { it.x.value == xRadiusDp && it.y.value == yRadiusDp } == true
+    }
+
+/**
+ * Returns a [LayoutElementMatcher] which checks whether the element has its top right corner with
+ * the given radii.
+ */
+public fun hasTopRightCorner(
+    xRadiusDp: Float,
+    yRadiusDp: Float,
+): LayoutElementMatcher =
+    LayoutElementMatcher(
+        "Element has its top right corner with radius of {$xRadiusDp, $yRadiusDp}"
+    ) { element ->
+        val cornerRadius = element.modifiers?.background?.corner?.topRightRadius
+        cornerRadius?.let { it.x.value == xRadiusDp && it.y.value == yRadiusDp } == true
+    }
+
+/**
+ * Returns a [LayoutElementMatcher] which checks whether the element has its bottom left corner with
+ * the given radii.
+ */
+public fun hasBottomLeftCorner(
+    xRadiusDp: Float,
+    yRadiusDp: Float,
+): LayoutElementMatcher =
+    LayoutElementMatcher(
+        "Element has its bottom left corner with radius of {$xRadiusDp, $yRadiusDp}"
+    ) { element ->
+        val cornerRadius = element.modifiers?.background?.corner?.bottomLeftRadius
+        cornerRadius?.let { it.x.value == xRadiusDp && it.y.value == yRadiusDp } == true
+    }
+
+/**
+ * Returns a [LayoutElementMatcher] which checks whether the element has its bottom right corners
+ * with the given radii.
+ */
+public fun hasBottomRightCorner(
+    xRadiusDp: Float,
+    yRadiusDp: Float,
+): LayoutElementMatcher =
+    LayoutElementMatcher(
+        "Element has its bottom right corner with radius of {$xRadiusDp, $yRadiusDp}"
+    ) { element ->
+        val cornerRadius = element.modifiers?.background?.corner?.bottomRightRadius
+        cornerRadius?.let { it.x.value == xRadiusDp && it.y.value == yRadiusDp } == true
+    }
+
 private operator fun ByteArray.contains(subset: ByteArray): Boolean {
     if (subset.size > this.size) return false
     for (i in 0..(this.size - subset.size)) {
