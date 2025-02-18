@@ -23,9 +23,7 @@ import java.time.Instant
 /** Set of shared metadata fields for [Record]. */
 @SuppressWarnings("NewApi") // Temporary until we can enable java8 desugaring effectively.
 public class Metadata
-// TODO(b/394783116) make the constructor internal
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-public constructor(
+internal constructor(
     /**
      * Client supplied data recording method to help to understand how the data was recorded.
      *
