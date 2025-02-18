@@ -26,7 +26,9 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
@@ -41,8 +43,7 @@ object SwipeToRevealBenchmark : MacrobenchmarkScreen {
     override val content: @Composable (BoxScope.() -> Unit)
         get() = {
             SwipeToReveal(
-                modifier =
-                    Modifier.fillMaxWidth().semantics { contentDescription = CONTENT_DESCRIPTION },
+                modifier = Modifier.fillMaxWidth(),
                 // Use the double action anchor width when revealing two actions
                 revealState =
                     rememberRevealState(
@@ -53,14 +54,12 @@ object SwipeToRevealBenchmark : MacrobenchmarkScreen {
                         onClick = { /* This block is called when the primary action is executed. */
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                        text = { Text("Delete") },
-                        label = "Delete"
+                        text = { Text("Delete") }
                     )
                     secondaryAction(
                         onClick = { /* This block is called when the secondary action is executed. */
                         },
-                        icon = { Icon(Icons.Outlined.MoreVert, contentDescription = "Options") },
-                        label = "Options"
+                        icon = { Icon(Icons.Outlined.MoreVert, contentDescription = "Options") }
                     )
                     undoPrimaryAction(
                         onClick = { /* This block is called when the undo primary action is executed. */
@@ -69,7 +68,26 @@ object SwipeToRevealBenchmark : MacrobenchmarkScreen {
                     )
                 }
             ) {
-                Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+                Button(
+                    modifier =
+                        Modifier.fillMaxWidth().semantics {
+                            contentDescription = CONTENT_DESCRIPTION
+                            // Use custom actions to make the primary and secondary actions
+                            // accessible
+                            customActions =
+                                listOf(
+                                    CustomAccessibilityAction("Delete") {
+                                        /* Add the primary action click handler here */
+                                        true
+                                    },
+                                    CustomAccessibilityAction("Options") {
+                                        /* Add the secondary click handler here */
+                                        true
+                                    }
+                                )
+                        },
+                    onClick = {}
+                ) {
                     Text("This Button has two actions", modifier = Modifier.fillMaxSize())
                 }
             }
