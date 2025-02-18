@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.checkapi.CompilationInputs
 import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -27,7 +26,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
@@ -55,12 +53,7 @@ fun Project.configureErrorProneForJava() {
                 .compilations
                 .getByName(KotlinCompilation.MAIN_COMPILATION_NAME)
                 .compileJavaTaskProvider
-        val jvmJarProvider = tasks.named(kmpExtension.jvm().artifactsTaskName, Jar::class.java)
-        makeKmpErrorProneTask(
-            compileJavaTaskProvider,
-            jvmJarProvider,
-            CompilationInputs.fromKmpJvmTarget(project)
-        )
+        makeErrorProneTask(compileJavaTaskProvider)
     } else { // non-KMP project
         makeErrorProneTask(tasks.withType(JavaCompile::class.java).named(COMPILE_JAVA_TASK_NAME))
     }
@@ -278,38 +271,6 @@ private fun JavaCompile.configureWithErrorProne() {
                 )
                 .joinToString(" ")
         )
-}
-
-/**
- * Given a [JavaCompile] task, creates a task that runs the ErrorProne compiler with the same
- * settings, including any kotlin source provided by [jvmCompileInputs].
- *
- * Note: Since ErrorProne only understands Java files which may be dependent on Kotlin source, using
- * this method to register ErrorProne task causes it to be dependent on jvmJar task.
- *
- * @param jvmCompileInputs [CompilationInputs] that specifies jvm source including Kotlin sources.
- */
-private fun Project.makeKmpErrorProneTask(
-    compileTaskProvider: TaskProvider<out JavaCompile>?,
-    jvmJarTaskProvider: TaskProvider<Jar>,
-    jvmCompileInputs: CompilationInputs
-) {
-    makeErrorProneTask(compileTaskProvider) { errorProneTask ->
-        // ErrorProne doesn't understand Kotlin source, so first let kotlinCompile finish, then
-        // take the resulting jar and add it to the classpath.
-        val jvmJarTask = jvmJarTaskProvider.get()
-        val jvmJarFileCollection = files(provider { jvmJarTask.archiveFile.get().asFile })
-        errorProneTask.dependsOn(jvmJarTaskProvider.name)
-        errorProneTask.classpath = jvmCompileInputs.dependencyClasspath.plus(jvmJarFileCollection)
-        errorProneTask.source =
-            jvmCompileInputs.sourcePaths
-                // flatMap src dirs into src files so we can read the extensions.
-                .asFileTree
-                // ErrorProne normally skips non-java source, but we need to explicitly filter for
-                // it since non-empty list with no java source will throw an exception.
-                .filter { it.extension.equals("java", ignoreCase = true) }
-                .asFileTree
-    }
 }
 
 /**
