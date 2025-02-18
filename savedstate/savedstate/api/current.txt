@@ -175,6 +175,10 @@ package androidx.savedstate.serialization {
   }
 
   public final class SavedStateConfig {
+    method public int getClassDiscriminatorMode();
+    method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
+    property public int classDiscriminatorMode;
+    property public kotlinx.serialization.modules.SerializersModule serializersModule;
     field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
     field public static final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
   }
