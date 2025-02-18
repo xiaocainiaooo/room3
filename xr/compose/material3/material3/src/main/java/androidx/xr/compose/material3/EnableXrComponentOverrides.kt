@@ -50,28 +50,28 @@ public fun EnableXrComponentOverrides(
     val componentOverrides =
         buildList<ProvidedValue<*>> {
             with(overrideEnabler) {
-                if (context.shouldOverrideComponent(XrComponentOverride.NavigationRail)) {
-                    add(
-                        LocalNavigationRailComponentOverride provides
-                            XrNavigationRailComponentOverride
-                    )
-                }
-                if (context.shouldOverrideComponent(XrComponentOverride.NavigationBar)) {
-                    add(
-                        LocalNavigationBarComponentOverride provides
-                            XrNavigationBarComponentOverride
-                    )
-                }
-                if (context.shouldOverrideComponent(XrComponentOverride.NavigationSuiteScaffold)) {
+                val shouldOverrideNavigationSuiteScaffold =
+                    context.shouldOverrideComponent(XrComponentOverride.NavigationSuiteScaffold)
+                if (shouldOverrideNavigationSuiteScaffold) {
                     add(
                         LocalNavigationSuiteScaffoldComponentOverride provides
                             XrNavigationSuiteScaffoldOverride
                     )
-                    // Also enable overrides for NavBar and NavRail
+                }
+                // Automatically enable NavBar and NavRail when NavSuiteScaffold is enabled
+                if (
+                    shouldOverrideNavigationSuiteScaffold ||
+                        context.shouldOverrideComponent(XrComponentOverride.NavigationRail)
+                ) {
                     add(
                         LocalNavigationRailComponentOverride provides
                             XrNavigationRailComponentOverride
                     )
+                }
+                if (
+                    shouldOverrideNavigationSuiteScaffold ||
+                        context.shouldOverrideComponent(XrComponentOverride.NavigationBar)
+                ) {
                     add(
                         LocalNavigationBarComponentOverride provides
                             XrNavigationBarComponentOverride
