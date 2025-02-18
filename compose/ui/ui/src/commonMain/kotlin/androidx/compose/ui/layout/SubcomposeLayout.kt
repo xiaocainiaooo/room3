@@ -504,6 +504,8 @@ internal class LayoutNodeSubcompositionsState(
         }
     }
 
+    // This may be called in approach pass, if a node is only emitted in the approach pass, but
+    // not in the lookahead pass.
     private fun subcompose(node: LayoutNode, slotId: Any?, content: @Composable () -> Unit) {
         val nodeState = nodeToNodeState.getOrPut(node) { NodeState(slotId, {}) }
         val hasPendingChanges = nodeState.composition?.hasInvalidations ?: true
@@ -907,8 +909,16 @@ internal class LayoutNodeSubcompositionsState(
             // in other cases, all of them are going to be invalidated later anyways
             nodeToNodeState.forEachValue { nodeState -> nodeState.forceRecompose = true }
 
-            if (!root.measurePending) {
-                root.requestRemeasure()
+            if (root.lookaheadRoot != null) {
+                // If the SubcomposeLayout is in a LookaheadScope, request for a lookahead measure
+                // so that lookahead gets triggered again to recompose children.
+                if (!root.lookaheadMeasurePending) {
+                    root.requestLookaheadRemeasure()
+                }
+            } else {
+                if (!root.measurePending) {
+                    root.requestRemeasure()
+                }
             }
         }
     }
@@ -1028,6 +1038,13 @@ internal class LayoutNodeSubcompositionsState(
                 root.requestLookaheadRelayout(true)
             } else {
                 root.requestLookaheadRemeasure(true)
+            }
+        } else {
+            // Re-subcompose if needed based on forceRecompose
+            val node = precomposeMap[slotId]
+            val nodeState = node?.let { nodeToNodeState[it] }
+            if (nodeState?.forceRecompose == true) {
+                subcompose(node, slotId, content)
             }
         }
 
