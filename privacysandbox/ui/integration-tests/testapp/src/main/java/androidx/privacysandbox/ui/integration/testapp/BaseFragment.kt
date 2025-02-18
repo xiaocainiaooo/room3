@@ -112,8 +112,9 @@ abstract class BaseFragment : Fragment() {
     // TODO(b/343436839) : Handle this automatically
     // TODO(b/348194843): Clean up the options
     open fun handleLoadAdFromDrawer(
-        adType: Int,
-        mediationOption: Int,
+        @AdFormat adFormat: Int,
+        @AdType adType: Int,
+        @MediationOption mediationOption: Int,
         drawViewabilityLayer: Boolean
     ) {}
 
@@ -169,6 +170,7 @@ abstract class BaseFragment : Fragment() {
             "androidx.privacysandbox.ui.integration.mediateesdkproviderwrapper"
         const val TAG = "TestSandboxClient"
         var isZOrderBelowToggleChecked = false
+        @AdFormat var currentAdFormat = AdFormat.BANNER_AD
         @AdType var currentAdType = AdType.BASIC_NON_WEBVIEW
         @MediationOption var currentMediationOption = MediationOption.NON_MEDIATED
         var shouldDrawViewabilityLayer = false

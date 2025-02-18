@@ -75,10 +75,12 @@ class ResizeComposeFragment : BaseFragment() {
     }
 
     override fun handleLoadAdFromDrawer(
+        adFormat: Int,
         adType: Int,
         mediationOption: Int,
         drawViewabilityLayer: Boolean
     ) {
+        currentAdFormat = adFormat
         currentAdType = adType
         currentMediationOption = mediationOption
         shouldDrawViewabilityLayer = drawViewabilityLayer

@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import kotlin.math.max
@@ -39,20 +40,24 @@ class ResizeFragment : BaseFragment() {
     }
 
     override fun handleLoadAdFromDrawer(
+        @AdFormat adFormat: Int,
         @AdType adType: Int,
         @MediationOption mediationOption: Int,
         drawViewabilityLayer: Boolean
     ) {
+        currentAdFormat = adFormat
         currentAdType = adType
         currentMediationOption = mediationOption
         shouldDrawViewabilityLayer = drawViewabilityLayer
-        loadBannerAd(
-            adType,
-            mediationOption,
-            resizableBannerView,
-            drawViewabilityLayer,
-            waitInsideOnDraw = true
-        )
+        if (adFormat == AdFormat.BANNER_AD) {
+            loadBannerAd(
+                adType,
+                mediationOption,
+                resizableBannerView,
+                drawViewabilityLayer,
+                waitInsideOnDraw = true
+            )
+        }
     }
 
     override fun onCreateView(
@@ -65,7 +70,9 @@ class ResizeFragment : BaseFragment() {
         resizeButton = inflatedView.findViewById(R.id.resize_button)
         resizeFromSdkButton = inflatedView.findViewById(R.id.resize_sdk_button)
         setPaddingButton = inflatedView.findViewById(R.id.set_padding_button)
-        loadResizableBannerAd()
+        if (currentAdFormat == AdFormat.BANNER_AD) {
+            loadResizableBannerAd()
+        }
         return inflatedView
     }
 
