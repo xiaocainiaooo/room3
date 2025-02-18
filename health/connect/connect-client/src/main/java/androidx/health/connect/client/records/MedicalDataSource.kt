@@ -26,7 +26,7 @@ import androidx.health.connect.client.impl.platform.records.PlatformMedicalDataS
 import java.time.Instant
 
 /**
- * A class to hold the data source information of medical data. Each [FhirResource] is associated
+ * A class to hold the data source information of medical data. Each [MedicalResource] is associated
  * with a `MedicalDataSource`.
  *
  * The medical data is represented using the Fast Healthcare Interoperability Resources
@@ -40,11 +40,12 @@ import java.time.Instant
  *   creation time.
  * @property packageName The package name of the app that created this `MedicalDataSource`.
  * @property fhirBaseUri The FHIR base URI of this `MedicalDataSource`.
+ * @property displayName The display name that describes this `MedicalDataSource`.
  * @property fhirVersion The FHIR version of this `MedicalDataSource`. All [MedicalResource]s
  *   inserted under this `MedicalDataSource` must have the same FHIR version.
  * @property lastDataUpdateTime An [Instant] indicating a point in time when this
  *   `MedicalDataSource` was **last** used to update or insert any [MedicalResource]. `null` if that
- *   has never happened.
+ *   has never happened or no data is linked to this `MedicalDataSource`.
  */
 // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)

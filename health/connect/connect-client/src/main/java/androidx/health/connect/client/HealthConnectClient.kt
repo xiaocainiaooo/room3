@@ -335,6 +335,9 @@ interface HealthConnectClient {
      * whether it's updated or inserted. The order of the [MedicalResource]s in the returned list
      * will be the same as their corresponding [UpsertMedicalResourceRequest]s in the input list.
      *
+     * Note that a [MedicalDataSource] needs to be created using [createMedicalDataSource] before
+     * any [MedicalResource]s can be upserted for this source.
+     *
      * Regarding permissions:
      * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
      *   [SecurityException] will be thrown.
@@ -346,6 +349,10 @@ interface HealthConnectClient {
      * FHIR resource provided in [UpsertMedicalResourceRequest.data] is expected to be valid for the
      * specified [FHIR version][UpsertMedicalResourceRequest.fhirVersion] according to the
      * [FHIR spec](https://hl7.org/fhir/resourcelist.html).
+     *
+     * Data written to Health Connect should be for a single individual only. However, the API
+     * allows for multiple Patient resources to be written to account for the possibility of
+     * multiple Patient resources being present in one individual's medical record.
      *
      * Each [UpsertMedicalResourceRequest] also has to meet the following requirements:
      * - [UpsertMedicalResourceRequest.data] must contain an "id" field and a "resourceType" field.
@@ -505,9 +512,6 @@ interface HealthConnectClient {
     /**
      * Creates a [MedicalDataSource] using a [CreateMedicalDataSourceRequest].
      *
-     * A [MedicalDataSource] needs to be created before any [MedicalResource]s for that source can
-     * be inserted.
-     *
      * Regarding permissions:
      * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
      *   [SecurityException] will be thrown.
@@ -517,9 +521,15 @@ interface HealthConnectClient {
      * Medical data is represented using the
      * [Fast Healthcare Interoperability Resources (FHIR)](https://hl7.org/fhir/) standard.
      *
-     * The [CreateMedicalDataSourceRequest.fhirBaseUri] must be unique across all medical data
-     * sources created by an app. The FHIR base uri cannot be updated after creating the data
-     * source.
+     * A [MedicalDataSource] needs to be created before any [MedicalResource]s for that source can
+     * be inserted. Separate [MedicalDataSource]s should be created for medical records coming from
+     * different sources (e.g. different FHIR endpoints, different healthcare systems), unless the
+     * data has been reconciled and all records have a unique combination of resource type and
+     * resource id.
+     *
+     * The [CreateMedicalDataSourceRequest.displayName] must be unique across all medical data
+     * sources created by an app. See [CreateMedicalDataSourceRequest.fhirBaseUri] for more details
+     * on the FHIR base URI. The data source can not be updated after creation.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
