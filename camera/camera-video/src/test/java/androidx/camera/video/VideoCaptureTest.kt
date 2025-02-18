@@ -38,7 +38,6 @@ import android.os.Looper
 import android.util.Range
 import android.util.Size
 import android.view.Surface
-import androidx.arch.core.util.Function
 import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.core.CameraEffect
@@ -115,7 +114,6 @@ import androidx.camera.video.Quality.UHD
 import androidx.camera.video.StreamInfo.StreamState
 import androidx.camera.video.impl.VideoCaptureConfig
 import androidx.camera.video.internal.VideoValidatedEncoderProfilesProxy
-import androidx.camera.video.internal.encoder.VideoEncoderConfig
 import androidx.camera.video.internal.encoder.VideoEncoderInfo
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
@@ -775,8 +773,8 @@ class VideoCaptureTest {
             createVideoCapture(
                 videoOutput,
                 dynamicRange = DynamicRange.HDR_UNSPECIFIED_10_BIT,
-                videoEncoderInfoFinder = { config ->
-                    when (config.mimeType) {
+                videoEncoderInfoFinder = { mimeType ->
+                    when (mimeType) {
                         MIMETYPE_VIDEO_AVC -> { // SDR: H263
                             FakeVideoEncoderInfo(
                                 supportedWidths = Range.create(2, 1920),
@@ -796,7 +794,7 @@ class VideoCaptureTest {
                             )
                         }
                         else -> {
-                            throw AssertionError("Unknown mimeType: " + config.mimeType)
+                            throw AssertionError("Unknown mimeType: $mimeType")
                         }
                     }
                 }
@@ -1924,7 +1922,7 @@ class VideoCaptureTest {
         targetRotation: Int? = null,
         cropRect: Rect? = null,
         mirrorMode: Int? = null,
-        videoEncoderInfoFinder: Function<VideoEncoderConfig, VideoEncoderInfo>? = null,
+        videoEncoderInfoFinder: VideoEncoderInfo.Finder? = null,
         expectedResolution: Size,
         expectedRotationDegrees: Int,
         expectedCropRect: Rect,
@@ -2134,7 +2132,7 @@ class VideoCaptureTest {
         targetResolution: Size? = null,
         targetFrameRate: Range<Int>? = null,
         dynamicRange: DynamicRange? = null,
-        videoEncoderInfoFinder: Function<VideoEncoderConfig, VideoEncoderInfo>? = null,
+        videoEncoderInfoFinder: VideoEncoderInfo.Finder? = null,
     ): VideoCapture<VideoOutput> =
         VideoCapture.Builder(videoOutput ?: createVideoOutput())
             .setSessionOptionUnpacker { _, _, _ -> }
@@ -2145,7 +2143,8 @@ class VideoCaptureTest {
                 targetFrameRate?.let { setTargetFrameRate(it) }
                 dynamicRange?.let { setDynamicRange(it) }
                 setVideoEncoderInfoFinder(
-                    videoEncoderInfoFinder ?: Function { _ -> createVideoEncoderInfo() }
+                    videoEncoderInfoFinder
+                        ?: VideoEncoderInfo.Finder { _ -> createVideoEncoderInfo() }
                 )
             }
             .build()
@@ -2354,7 +2353,7 @@ class VideoCaptureTest {
                     quality: Quality,
                     dynamicRange: DynamicRange
                 ): Boolean {
-                    return videoCapabilitiesMap[dynamicRange]?.isQualitySupported(quality) ?: false
+                    return videoCapabilitiesMap[dynamicRange]?.isQualitySupported(quality) == true
                 }
 
                 override fun isStabilizationSupported(): Boolean {
