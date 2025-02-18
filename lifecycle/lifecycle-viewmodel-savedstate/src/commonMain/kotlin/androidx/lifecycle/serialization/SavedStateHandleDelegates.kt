@@ -18,6 +18,7 @@ package androidx.lifecycle.serialization
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.savedstate.SavedState
+import androidx.savedstate.serialization.SavedStateConfig
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import kotlin.properties.ReadWriteProperty
@@ -32,14 +33,16 @@ import kotlinx.serialization.serializer
  * @sample androidx.lifecycle.delegateExplicitKey
  * @param key An optional [String] key to use for storing the value in the [SavedStateHandle]. A
  *   default key will be generated if it's omitted or when 'null' is passed.
+ * @param config The [SavedStateConfig] to use.
  * @param init The function to provide the initial value of the property.
  * @return A property delegate that manages the saving and restoring of the value.
  */
 public inline fun <reified T : Any> SavedStateHandle.saved(
     key: String? = null,
+    config: SavedStateConfig = SavedStateConfig.DEFAULT,
     noinline init: () -> T,
 ): ReadWriteProperty<Any?, T> {
-    return saved(serializer(), key, init)
+    return saved(config.serializersModule.serializer(), key, config, init)
 }
 
 /**
@@ -49,36 +52,44 @@ public inline fun <reified T : Any> SavedStateHandle.saved(
  * @param serializer The [KSerializer] to use for serializing and deserializing the value.
  * @param key An optional [String] key to use for storing the value in the [SavedStateHandle]. A
  *   default key will be generated if it's omitted or when 'null' is passed.
+ * @param config The [SavedStateConfig] to use.
  * @param init The function to provide the initial value of the property.
  * @return A property delegate that manages the saving and restoring of the value.
  */
 public fun <T : Any> SavedStateHandle.saved(
     serializer: KSerializer<T>,
     key: String? = null,
+    config: SavedStateConfig = SavedStateConfig.DEFAULT,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> {
     return SavedStateHandleDelegate(
         savedStateHandle = this,
-        key = key,
         serializer = serializer,
+        key = key,
+        config = config,
         init = init
     )
 }
 
 private class SavedStateHandleDelegate<T : Any>(
     private val savedStateHandle: SavedStateHandle,
-    private val key: String?,
     private val serializer: KSerializer<T>,
+    private val key: String?,
+    private val config: SavedStateConfig,
     private val init: () -> T,
 ) : ReadWriteProperty<Any?, T> {
     private lateinit var value: T
 
     private fun loadValue(key: String): T? {
-        return savedStateHandle.get<SavedState>(key)?.let { decodeFromSavedState(serializer, it) }
+        return savedStateHandle.get<SavedState>(key)?.let {
+            decodeFromSavedState(deserializer = serializer, savedState = it, config = config)
+        }
     }
 
     private fun registerSave(key: String) {
-        savedStateHandle.setSavedStateProvider(key) { encodeToSavedState(serializer, this.value) }
+        savedStateHandle.setSavedStateProvider(key) {
+            encodeToSavedState(serializer, this.value, config)
+        }
     }
 
     private fun createDefaultKey(thisRef: Any?, property: KProperty<*>): String {
