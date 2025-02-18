@@ -21,7 +21,8 @@ import androidx.privacysandbox.tools.PrivacySandboxService
 
 @PrivacySandboxService
 interface ISdkApi {
-    suspend fun loadBannerAd(
+    suspend fun loadAd(
+        adFormat: Int,
         adType: Int,
         mediationOption: Int,
         waitInsideOnDraw: Boolean,
