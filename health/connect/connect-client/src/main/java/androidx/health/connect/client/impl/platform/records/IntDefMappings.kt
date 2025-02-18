@@ -132,6 +132,7 @@ internal val SDK_TO_PLATFORM_EXERCISE_SESSION_TYPE: Map<Int, Int> =
         ExerciseSessionRecord.EXERCISE_TYPE_GOLF to
             PlatformExerciseSessionType.EXERCISE_SESSION_TYPE_GOLF,
         ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING to
+            @Suppress("DEPRECATION")
             PlatformExerciseSessionType.EXERCISE_SESSION_TYPE_GUIDED_BREATHING,
         ExerciseSessionRecord.EXERCISE_TYPE_GYMNASTICS to
             PlatformExerciseSessionType.EXERCISE_SESSION_TYPE_GYMNASTICS,
