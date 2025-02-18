@@ -2299,11 +2299,9 @@ public final class JxrPlatformAdapterAxrTest {
         assertThat(stereoSurfaceEntityQuad).isNotNull();
         assertThat(stereoSurfaceEntityQuad).isInstanceOf(StereoSurfaceEntitySplitEngineImpl.class);
         FakeImpressApi.StereoSurfaceEntityData quadData =
-                mFakeImpressApi
-                        .getStereoSurfaceEntities()
-                        .get(
-                                ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntityQuad)
-                                        .getEntityImpressNode());
+                mFakeImpressApi.mStereoSurfaceEntities.get(
+                        ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntityQuad)
+                                .getEntityImpressNode());
 
         StereoSurfaceEntity stereoSurfaceEntitySphere =
                 runtime.createStereoSurfaceEntity(
@@ -2316,11 +2314,9 @@ public final class JxrPlatformAdapterAxrTest {
         assertThat(stereoSurfaceEntitySphere)
                 .isInstanceOf(StereoSurfaceEntitySplitEngineImpl.class);
         FakeImpressApi.StereoSurfaceEntityData sphereData =
-                mFakeImpressApi
-                        .getStereoSurfaceEntities()
-                        .get(
-                                ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntitySphere)
-                                        .getEntityImpressNode());
+                mFakeImpressApi.mStereoSurfaceEntities.get(
+                        ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntitySphere)
+                                .getEntityImpressNode());
 
         StereoSurfaceEntity stereoSurfaceEntityHemisphere =
                 runtime.createStereoSurfaceEntity(
@@ -2333,48 +2329,45 @@ public final class JxrPlatformAdapterAxrTest {
         assertThat(stereoSurfaceEntityHemisphere)
                 .isInstanceOf(StereoSurfaceEntitySplitEngineImpl.class);
         FakeImpressApi.StereoSurfaceEntityData hemisphereData =
-                mFakeImpressApi
-                        .getStereoSurfaceEntities()
-                        .get(
-                                ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntityHemisphere)
-                                        .getEntityImpressNode());
+                mFakeImpressApi.mStereoSurfaceEntities.get(
+                        ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntityHemisphere)
+                                .getEntityImpressNode());
 
-        assertThat(mFakeImpressApi.getStereoSurfaceEntities()).hasSize(3);
+        assertThat(mFakeImpressApi.mStereoSurfaceEntities).hasSize(3);
 
         // TODO: b/366588688 - Move these into tests for StereoSurfaceEntitySplitEngineImpl
-        assertThat(quadData.getStereoMode()).isEqualTo(StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE);
-        assertThat(quadData.getCanvasShape())
+        assertThat(quadData.stereoMode).isEqualTo(StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE);
+        assertThat(quadData.canvasShape)
                 .isEqualTo(FakeImpressApi.StereoSurfaceEntityData.CanvasShape.QUAD);
-        assertThat(sphereData.getStereoMode()).isEqualTo(StereoSurfaceEntity.StereoMode.TOP_BOTTOM);
-        assertThat(sphereData.getCanvasShape())
+        assertThat(sphereData.stereoMode).isEqualTo(StereoSurfaceEntity.StereoMode.TOP_BOTTOM);
+        assertThat(sphereData.canvasShape)
                 .isEqualTo(FakeImpressApi.StereoSurfaceEntityData.CanvasShape.VR_360_SPHERE);
-        assertThat(hemisphereData.getStereoMode()).isEqualTo(StereoSurfaceEntity.StereoMode.MONO);
-        assertThat(hemisphereData.getCanvasShape())
+        assertThat(hemisphereData.stereoMode).isEqualTo(StereoSurfaceEntity.StereoMode.MONO);
+        assertThat(hemisphereData.canvasShape)
                 .isEqualTo(FakeImpressApi.StereoSurfaceEntityData.CanvasShape.VR_180_HEMISPHERE);
 
-        assertThat(quadData.getWidth()).isEqualTo(kTestWidth);
-        assertThat(quadData.getHeight()).isEqualTo(kTestHeight);
+        assertThat(quadData.width).isEqualTo(kTestWidth);
+        assertThat(quadData.height).isEqualTo(kTestHeight);
         Dimensions quadDimensions = stereoSurfaceEntityQuad.getDimensions();
         assertThat(quadDimensions.width).isEqualTo(kTestWidth);
         assertThat(quadDimensions.height).isEqualTo(kTestHeight);
         assertThat(quadDimensions.depth).isEqualTo(0.0f);
 
-        assertThat(sphereData.getRadius()).isEqualTo(kTestSphereRadius);
+        assertThat(sphereData.radius).isEqualTo(kTestSphereRadius);
         Dimensions sphereDimensions = stereoSurfaceEntitySphere.getDimensions();
         assertThat(sphereDimensions.width).isEqualTo(kTestSphereRadius * 2.0f);
         assertThat(sphereDimensions.height).isEqualTo(kTestSphereRadius * 2.0f);
         assertThat(sphereDimensions.depth).isEqualTo(kTestSphereRadius * 2.0f);
 
-        assertThat(hemisphereData.getRadius()).isEqualTo(kTestHemisphereRadius);
+        assertThat(hemisphereData.radius).isEqualTo(kTestHemisphereRadius);
         Dimensions hemisphereDimensions = stereoSurfaceEntityHemisphere.getDimensions();
         assertThat(hemisphereDimensions.width).isEqualTo(kTestHemisphereRadius * 2.0f);
         assertThat(hemisphereDimensions.height).isEqualTo(kTestHemisphereRadius * 2.0f);
         assertThat(hemisphereDimensions.depth).isEqualTo(kTestHemisphereRadius);
 
-        assertThat(quadData.getSurface()).isEqualTo(stereoSurfaceEntityQuad.getSurface());
-        assertThat(sphereData.getSurface()).isEqualTo(stereoSurfaceEntitySphere.getSurface());
-        assertThat(hemisphereData.getSurface())
-                .isEqualTo(stereoSurfaceEntityHemisphere.getSurface());
+        assertThat(quadData.surface).isEqualTo(stereoSurfaceEntityQuad.getSurface());
+        assertThat(sphereData.surface).isEqualTo(stereoSurfaceEntitySphere.getSurface());
+        assertThat(hemisphereData.surface).isEqualTo(stereoSurfaceEntityHemisphere.getSurface());
 
         // Check that calls to set the CanvasShape and StereoMode after construction call through
         // Change the Quad to a Sphere
@@ -2383,14 +2376,12 @@ public final class JxrPlatformAdapterAxrTest {
         // change the StereoMode to Top/Bottom from Side/Side
         stereoSurfaceEntityQuad.setStereoMode(StereoSurfaceEntity.StereoMode.TOP_BOTTOM);
         quadData =
-                mFakeImpressApi
-                        .getStereoSurfaceEntities()
-                        .get(
-                                ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntityQuad)
-                                        .getEntityImpressNode());
-        assertThat(quadData.getCanvasShape())
+                mFakeImpressApi.mStereoSurfaceEntities.get(
+                        ((StereoSurfaceEntitySplitEngineImpl) stereoSurfaceEntityQuad)
+                                .getEntityImpressNode());
+        assertThat(quadData.canvasShape)
                 .isEqualTo(FakeImpressApi.StereoSurfaceEntityData.CanvasShape.VR_360_SPHERE);
-        assertThat(quadData.getStereoMode()).isEqualTo(StereoSurfaceEntity.StereoMode.TOP_BOTTOM);
+        assertThat(quadData.stereoMode).isEqualTo(StereoSurfaceEntity.StereoMode.TOP_BOTTOM);
     }
 
     @Test

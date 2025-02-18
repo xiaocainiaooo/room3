@@ -52,6 +52,7 @@ import java.util.function.Consumer;
 /** Interface for SceneCore Platform operations. This is not intended to be used by Applications. */
 // TODO Add API versioning
 // TODO: b/322549913 - Move subclasses into separate files
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface JxrPlatformAdapter {
 
     /** Returns the Environment for the Session. */
