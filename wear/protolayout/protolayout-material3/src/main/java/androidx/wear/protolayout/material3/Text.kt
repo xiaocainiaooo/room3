@@ -97,5 +97,6 @@ public fun MaterialScope.text(
             } else {
                 overflow
             },
-        modifier = modifiers
+        modifier = modifiers,
+        lineHeight = theme.getLineHeight(typography).value,
     )

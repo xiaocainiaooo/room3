@@ -45,6 +45,7 @@ import androidx.wear.protolayout.material3.TextButtonStyle.Companion.extraLargeT
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.largeTextButtonStyle
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.smallTextButtonStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.background
 import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.contentDescription
@@ -475,6 +476,19 @@ object TestCasesGenerator {
                                             onClick = clickable,
                                             backgroundContent = { backgroundImage(IMAGE_ID) },
                                             modifier = LayoutModifier.clip(shapes.extraSmall)
+                                        )
+                                    }
+                                    buttonGroupItem {
+                                        imageButton(
+                                            onClick = clickable,
+                                            backgroundContent = { icon(ICON_ID) },
+                                            modifier =
+                                                LayoutModifier.background(
+                                                    color = colorScheme.onSecondaryContainer,
+                                                    corner = shapes.extraLarge
+                                                ),
+                                            width = expand(),
+                                            height = expand()
                                         )
                                     }
                                 }

@@ -52,7 +52,7 @@ internal object DataCardDefaults {
         when (titleContentPlacement) {
             Top ->
                 ContainerWithSpacersBuilder<LayoutElement>(
-                        { it: LayoutElement? -> verticalElementBuilder.addContent(it!!) },
+                        { element: LayoutElement? -> verticalElementBuilder.addContent(element!!) },
                         title
                     )
                     .addElement(content, horizontalSpacer(style.titleToContentSpaceDp))
@@ -68,7 +68,7 @@ internal object DataCardDefaults {
                     )
             Bottom ->
                 ContainerWithSpacersBuilder<LayoutElement>(
-                        { it: LayoutElement? -> verticalElementBuilder.addContent(it!!) },
+                        { element: LayoutElement? -> verticalElementBuilder.addContent(element!!) },
                         secondaryIcon ?: secondaryText,
                     )
                     .addElement(

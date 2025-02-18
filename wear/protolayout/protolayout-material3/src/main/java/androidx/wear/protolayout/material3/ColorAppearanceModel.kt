@@ -196,8 +196,15 @@ internal class Cam(
             val atan2 = atan2(b, a)
             val atanDegrees = atan2 * 180.0f / PI.toFloat()
             val hue =
-                if (atanDegrees < 0) atanDegrees + 360.0f
-                else if (atanDegrees >= 360) atanDegrees - 360.0f else atanDegrees
+                if (atanDegrees < 0) {
+                    atanDegrees + 360.0f
+                } else {
+                    if (atanDegrees >= 360) {
+                        atanDegrees - 360.0f
+                    } else {
+                        atanDegrees
+                    }
+                }
             val hueRadians = hue * PI.toFloat() / 180.0f
             // achromatic response to color
             val ac = p2 * frame.nbb
@@ -511,16 +518,21 @@ private constructor(
             val f = 0.8f + (surround / 10.0f)
             // "Exponential non-linearity"
             val c: Float =
-                if ((f >= 0.9)) lerp(0.59f, 0.69f, ((f - 0.9f) * 10.0f))
-                else lerp(0.525f, 0.59f, ((f - 0.8f) * 10.0f))
+                if ((f >= 0.9)) {
+                    lerp(0.59f, 0.69f, ((f - 0.9f) * 10.0f))
+                } else {
+                    lerp(0.525f, 0.59f, ((f - 0.8f) * 10.0f))
+                }
             // Calculate degree of adaptation to illuminant
             var d =
-                if (discountingIlluminant) 1.0f
-                else
+                if (discountingIlluminant) {
+                    1.0f
+                } else {
                     f *
                         (1.0f -
                             ((1.0f / 3.6f) *
                                 exp(((-adaptingLuminance - 42.0f) / 92.0f).toDouble()).toFloat()))
+                }
             // Per Li et al, if D is greater than 1 or less than 0, set it to 1 or 0.
             d = if ((d > 1.0)) 1.0f else if ((d < 0.0)) 0.0f else d
             // Chromatic induction factor
