@@ -529,8 +529,8 @@ internal class SavedStateCodecTest : RobolectricTest() {
         }
         val restored =
             decodeFromSavedState(
-                SavedStateSerializer(),
-                encodeToSavedState(SavedStateSerializer(), origin).read {
+                SavedStateSerializer,
+                encodeToSavedState(SavedStateSerializer, origin).read {
                     assertThat(size()).isEqualTo(3)
                     assertThat(getInt("i")).isEqualTo(1)
                     assertThat(getString("s")).isEqualTo("foo")
