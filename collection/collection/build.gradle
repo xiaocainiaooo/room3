@@ -168,15 +168,6 @@ androidXMultiplatform {
     }
 }
 
-dependencies {
-    // Required for users who only depend on this artifact, but pull an older version of
-    // collection-ktx transitively, which would lead to duplicate definition since the -ktx
-    // extensions were moved into the main artifact.
-    constraints {
-        jvmMainImplementation("androidx.collection:collection-ktx:1.4.2")
-    }
-}
-
 androidx {
     name = "collections"
     type = SoftwareType.PUBLISHED_LIBRARY
