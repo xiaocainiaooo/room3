@@ -31,7 +31,7 @@ class AppFunctionCompilerTest {
             CompilationTestHelper(
                 testFileSrcDir = File("src/test/test-data/input"),
                 goldenFileSrcDir = File("src/test/test-data/output"),
-                symbolProcessorProviders = listOf(AppFunctionCompiler.Provider())
+                symbolProcessorProviders = listOf(AppFunctionCompiler.Provider()),
             )
     }
 
@@ -49,7 +49,7 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "SimpleFunctionIds.kt",
-            goldenFileName = "SimpleFunctionIds.KT"
+            goldenFileName = "SimpleFunctionIds.KT",
         )
     }
 
@@ -63,7 +63,7 @@ class AppFunctionCompilerTest {
             "The first parameter of an app function must be " +
                 "androidx.appfunctions.AppFunctionContext\n" +
                 "    fun missingFirstParameter() {}\n" +
-                "    ^"
+                "    ^",
         )
     }
 
@@ -77,7 +77,7 @@ class AppFunctionCompilerTest {
             "The first parameter of an app function must be " +
                 "androidx.appfunctions.AppFunctionContext\n" +
                 "    fun incorrectFirstParameter(x: Int) {}\n" +
-                "    ^"
+                "    ^",
         )
     }
 
@@ -88,7 +88,7 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "${'$'}SimpleFunction_AppFunctionInventory.kt",
-            goldenFileName = "${'$'}SimpleFunction_AppFunctionInventory.KT"
+            goldenFileName = "${'$'}SimpleFunction_AppFunctionInventory.KT",
         )
     }
 
@@ -103,7 +103,7 @@ class AppFunctionCompilerTest {
             report = report,
             expectGeneratedSourceFileName =
                 "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory.kt",
-            goldenFileName = "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory.KT"
+            goldenFileName = "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory.KT",
         )
     }
 
@@ -163,7 +163,7 @@ class AppFunctionCompilerTest {
                         "AppFunctionWithInputFromDifferentPackage.KT",
                         "DiffPackageSerializable.KT",
                         "DiffPackageSchemas.KT",
-                        "AnotherDiffPackageSerializable.KT"
+                        "AnotherDiffPackageSerializable.KT",
                     ),
                 processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
@@ -243,7 +243,7 @@ class AppFunctionCompilerTest {
                         "AppFunctionWithOutputFromDifferentPackage.KT",
                         "DiffPackageSerializable.KT",
                         "DiffPackageSchemas.KT",
-                        "AnotherDiffPackageSerializable.KT"
+                        "AnotherDiffPackageSerializable.KT",
                     ),
                 processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
@@ -300,17 +300,17 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertErrorWithMessage(
             reportListPrimitiveArrayInputFunction,
             "App function parameters must be a supported type, or a type annotated as" +
-                " @AppFunctionSerializable. See list of supported types"
+                " @AppFunctionSerializable. See list of supported types",
         )
         compilationTestHelper.assertErrorWithMessage(
             reportArrayNonPrimitiveInputFunction,
             "App function parameters must be a supported type, or a type annotated as" +
-                " @AppFunctionSerializable. See list of supported types"
+                " @AppFunctionSerializable. See list of supported types",
         )
         compilationTestHelper.assertErrorWithMessage(
             reportAnyTypedInputFunction,
             "App function parameters must be a supported type, or a type annotated as" +
-                " @AppFunctionSerializable. See list of supported types"
+                " @AppFunctionSerializable. See list of supported types",
         )
     }
 
@@ -319,13 +319,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions.xml",
-            goldenFileName = "fakeNoArgImpl_app_function.xml"
+            goldenFileName = "fakeNoArgImpl_app_function.xml",
         )
     }
 
@@ -334,13 +334,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_True.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions.xml",
-            goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function.xml"
+            goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function.xml",
         )
     }
 
@@ -349,13 +349,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_False.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions.xml",
-            goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function.xml"
+            goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function.xml",
         )
     }
 
@@ -364,13 +364,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArg_FreeForm_Function.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions.xml",
-            goldenFileName = "fakeNoArg_freeForm_function_app_function.xml"
+            goldenFileName = "fakeNoArg_freeForm_function_app_function.xml",
         )
     }
 
@@ -379,13 +379,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
-            goldenFileName = "fakeNoArgImpl_app_function_dynamic_schema.xml"
+            goldenFileName = "fakeNoArgImpl_app_function_dynamic_schema.xml",
         )
     }
 
@@ -394,13 +394,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_True.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
-            goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function_dynamic_schema.xml"
+            goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function_dynamic_schema.xml",
         )
     }
 
@@ -409,13 +409,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_False.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
-            goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function_dynamic_schema.xml"
+            goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function_dynamic_schema.xml",
         )
     }
 
@@ -424,13 +424,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArg_FreeForm_Function.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
-            goldenFileName = "fakeNoArg_freeForm_function_app_function_dynamic_schema.xml"
+            goldenFileName = "fakeNoArg_freeForm_function_app_function_dynamic_schema.xml",
         )
     }
 
@@ -439,13 +439,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeAllPrimitiveParamsImpl.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
-            goldenFileName = "fakeAllPrimitiveParams_app_function_dynamic_schema.xml"
+            goldenFileName = "fakeAllPrimitiveParams_app_function_dynamic_schema.xml",
         )
     }
 
@@ -454,13 +454,13 @@ class AppFunctionCompilerTest {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeAllPrimitiveReturnsImpl.KT", "FakeSchemas.KT"),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
-            goldenFileName = "fakeAllPrimitiveReturns_app_function_dynamic_schema.xml"
+            goldenFileName = "fakeAllPrimitiveReturns_app_function_dynamic_schema.xml",
         )
     }
 
@@ -471,16 +471,16 @@ class AppFunctionCompilerTest {
                 sourceFileNames =
                     listOf(
                         "FakeAllNullablePrimitiveParamsWithDefaultValuesImpl.KT",
-                        "FakeSchemas.KT"
+                        "FakeSchemas.KT",
                     ),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
             goldenFileName =
-                "fakeAllNullablePrimitiveParamsWithDefault_app_function_dynamic_schema.xml"
+                "fakeAllNullablePrimitiveParamsWithDefault_app_function_dynamic_schema.xml",
         )
     }
 
@@ -499,7 +499,7 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "${'$'}Main_InventoryComponentRegistry.kt",
-            goldenFileName = "${'$'}Main_InventoryComponentRegistry.KT"
+            goldenFileName = "${'$'}Main_InventoryComponentRegistry.KT",
         )
     }
 
@@ -518,7 +518,7 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "${'$'}Main_InvokerComponentRegistry.kt",
-            goldenFileName = "${'$'}Main_InvokerComponentRegistry.KT"
+            goldenFileName = "${'$'}Main_InvokerComponentRegistry.KT",
         )
     }
 
@@ -537,7 +537,7 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "${'$'}Main_FunctionComponentRegistry.kt",
-            goldenFileName = "${'$'}Main_FunctionComponentRegistry.KT"
+            goldenFileName = "${'$'}Main_FunctionComponentRegistry.KT",
         )
     }
 
@@ -552,13 +552,13 @@ class AppFunctionCompilerTest {
                         // TODO(b/395812003): Fix naming conflict issue
                         //                        "SimpleFunctionDiffPackage.KT",
                     ),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "${'$'}AggregatedAppFunctionInventory_Impl.kt",
-            goldenFileName = "${'$'}AggregatedAppFunctionInventory_Impl.KT"
+            goldenFileName = "${'$'}AggregatedAppFunctionInventory_Impl.KT",
         )
     }
 
@@ -573,13 +573,39 @@ class AppFunctionCompilerTest {
                         // TODO(b/395812003): Fix naming conflict issue
                         //                        "SimpleFunctionDiffPackage.KT",
                     ),
-                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
             )
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName = "${'$'}AggregatedAppFunctionInvoker_Impl.kt",
-            goldenFileName = "${'$'}AggregatedAppFunctionInvoker_Impl.KT"
+            goldenFileName = "${'$'}AggregatedAppFunctionInvoker_Impl.KT",
+        )
+    }
+
+    @Test
+    fun testListWithNullableByteArrayItemTypeFunction_throwsCompileError() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("ListWithNullableByteArrayItemTypeFunction.KT")
+            )
+
+        compilationTestHelper.assertErrorWithMessage(
+            report,
+            "App function parameters must be a supported type",
+        )
+    }
+
+    @Test
+    fun testListWithNullableStringItemTypeFunction_throwsCompileError() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("ListWithNullableStringItemTypeFunction.KT")
+            )
+
+        compilationTestHelper.assertErrorWithMessage(
+            report,
+            "App function parameters must be a supported type",
         )
     }
 }

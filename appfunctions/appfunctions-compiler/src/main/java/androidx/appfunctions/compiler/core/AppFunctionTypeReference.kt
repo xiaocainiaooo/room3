@@ -49,7 +49,7 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
         } else {
             throw ProcessingException(
                 "Unsupported type reference ${selfTypeReference.ensureQualifiedTypeName().asString()}",
-                selfTypeReference
+                selfTypeReference,
             )
         }
     }
@@ -64,11 +64,12 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
     /**
      * The type reference of the list element if the type reference is a list.
      *
-     * @return the type reference of the list element if the type reference is a list, null
-     *   otherwise.
+     * @return the type reference of the list element if the type reference is a list.
+     * @throws IllegalArgumentException if used for a non-list type.
      */
     val itemTypeReference: KSTypeReference by lazy { ->
-        checkNotNull(selfTypeReference.resolveItemTypeReference())
+        require(selfTypeReference.isOfType(LIST)) { "Type reference is not a list" }
+        selfTypeReference.resolveListParameterizedType()
     }
 
     /**
@@ -95,19 +96,6 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
     }
 
     /**
-     * Resolves the type reference of a parameter.
-     *
-     * If the parameter type is a list, it will resolve the type reference of the list element.
-     */
-    private fun KSTypeReference.resolveItemTypeReference(): KSTypeReference? {
-        return if (isOfType(LIST)) {
-            resolveListParameterizedType()
-        } else {
-            null
-        }
-    }
-
-    /**
      * The category of types that are supported by app functions.
      *
      * The category of a type is determined by its underlying type. For example, a type reference to
@@ -118,7 +106,7 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
         PRIMITIVE_ARRAY,
         PRIMITIVE_LIST,
         SERIALIZABLE_SINGULAR,
-        SERIALIZABLE_LIST
+        SERIALIZABLE_LIST,
     }
 
     companion object {
