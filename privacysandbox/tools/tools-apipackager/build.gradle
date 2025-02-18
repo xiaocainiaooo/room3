@@ -30,6 +30,8 @@ plugins {
 }
 
 dependencies {
+    api(project(":privacysandbox:tools:tools"))
+    api(project(":privacysandbox:tools:tools-core"))
     api(libs.kotlinStdlib)
     implementation(libs.kotlinStdlibJdk8)
     implementation(libs.asm)
@@ -37,9 +39,6 @@ dependencies {
     implementation(libs.kotlinMetadataJvm) {
         exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib"
     }
-
-    implementation(project(":privacysandbox:tools:tools"))
-    implementation(project(":privacysandbox:tools:tools-core"))
 
     testImplementation(project(":internal-testutils-truth"))
     testImplementation(project(":privacysandbox:tools:tools-testing"))
