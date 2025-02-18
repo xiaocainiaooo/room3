@@ -159,7 +159,7 @@ public fun MaterialScope.textEdgeButton(
                 defaultTextElementStyle =
                     TextElementStyle(
                         typography = Typography.LABEL_MEDIUM,
-                        color = colors.iconColor,
+                        color = colors.labelColor,
                         scalable = false
                     )
             )

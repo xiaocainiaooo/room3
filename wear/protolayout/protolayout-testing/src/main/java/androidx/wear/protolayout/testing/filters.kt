@@ -64,7 +64,8 @@ public fun hasClickable(
         if (!minClickableHeight.isNaN() && clk.minimumClickableHeight.value != minClickableHeight) {
             return@LayoutElementMatcher false
         }
-        clk.onClick?.toActionProto() == action.toActionProto() && id?.let { clk.id == it } != false
+        clk.onClick?.toActionProto() == action.toActionProto() &&
+            id?.let { id -> clk.id == id } != false
     }
 
 /**

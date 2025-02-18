@@ -18,7 +18,6 @@ package androidx.wear.protolayout.material3
 
 import android.content.Context
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
-import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.ImageDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
@@ -177,9 +176,7 @@ internal class IconStyle(
 internal class BackgroundImageStyle(
     val width: ImageDimension = expand(),
     val height: ImageDimension = expand(),
-    val overlayColor: LayoutColor = ColorTokens.BACKGROUND.argb.withOpacity(ratio = 0.6f),
-    val overlayWidth: ContainerDimension = expand(),
-    val overlayHeight: ContainerDimension = expand(),
+    val overlayColor: LayoutColor? = ColorTokens.BACKGROUND.argb.withOpacity(ratio = 0.6f),
     val shape: Corner = ShapeTokens.CORNER_LARGE,
     @ContentScaleMode
     val contentScaleMode: Int = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS

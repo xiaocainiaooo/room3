@@ -62,10 +62,12 @@ import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
  *
  * The button is usually either a circular shape with the same [width] and [height], or highly
  * recommended stadium shape occupying available space with [width] and [height] set to [expand] or
- * [weight], usually used in the [buttonGroup] to arrange them
+ * [weight], usually arranged with the [buttonGroup].
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
+ * @param iconContent The icon slot for content displayed in this button. It is recommended to use
+ *   default styling that is automatically provided by only calling [icon] with the resource ID.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
  * @param shape Defines the button's shape, in other words the corner radius for this button. If
@@ -87,8 +89,6 @@ import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
  *   overridden by each content slot.
  * @param contentPadding The inner padding used to prevent inner content from being too close to the
  *   button's edge. It's highly recommended to keep the default.
- * @param iconContent The icon slot for content displayed in this button. It is recommended to use
- *   default styling that is automatically provided by only calling [icon] with the resource ID.
  * @sample androidx.wear.protolayout.material3.samples.oneSlotButtonsSample
  */
 // TODO: b/346958146 - Link Button visuals in DAC
@@ -128,10 +128,13 @@ public fun MaterialScope.iconButton(
  *
  * The button is usually either a circular shape with the same [width] and [height], or highly
  * recommended stadium shape occupying available space with [width] and [height] set to [expand] or
- * [weight], usually used in the [buttonGroup] to arrange them.
+ * [weight], usually arranged with the [buttonGroup].
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
+ * @param labelContent The text slot for content displayed in this button. It is recommended to use
+ *   default styling that is automatically provided by only calling [text]. This should be small
+ *   text, usually up to 3 characters text.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
  * @param shape Defines the button's shape, in other words the corner radius for this button. If
@@ -153,9 +156,6 @@ public fun MaterialScope.iconButton(
  *   overridden by each content slot.
  * @param contentPadding The inner padding used to prevent inner content from being too close to the
  *   button's edge. It's highly recommended to keep the default.
- * @param labelContent The text slot for content displayed in this button. It is recommended to use
- *   default styling that is automatically provided by only calling [text]. This should be small
- *   text, usually up to 3 characters text.
  * @sample androidx.wear.protolayout.material3.samples.oneSlotButtonsSample
  */
 // TODO: b/346958146 - Link Button visuals in DAC
@@ -421,7 +421,7 @@ public fun MaterialScope.avatarButton(
 
 /**
  * ProtoLayout Material3 clickable image button that doesn't offer additional slots, only image (for
- * example [backgroundImage] as a background.
+ * example [backgroundImage] as a background).
  *
  * The button is usually stadium or circle shaped with fully rounded corners by default. It is
  * highly recommended to set its width and height to fill the available space, by [expand] or
@@ -436,7 +436,7 @@ public fun MaterialScope.avatarButton(
  *   case of the fully opaque background image, then the background color will not be shown.
  * @param backgroundContent The background object to be used behind the content in the button. It is
  *   recommended to use the default styling that is automatically provided by only calling
- *   [backgroundImage] with the content. It can be combined with the specified
+ *   [backgroundImage] with the content and optional overlay. It can be combined with the specified
  *   [LayoutModifier.background] behind it.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
@@ -456,7 +456,8 @@ public fun MaterialScope.imageButton(
         modifier = modifier,
         width = width,
         height = height,
-        backgroundContent = backgroundContent
+        backgroundContent = backgroundContent,
+        useOverlayOnBackground = false
     )
 
 /**
@@ -564,7 +565,6 @@ public fun MaterialScope.compactButton(
                                     .iconContent()
                             },
                         horizontalAlignment = horizontalAlignment,
-                        width = width
                     )
                 }
             )
@@ -619,7 +619,8 @@ internal fun MaterialScope.buttonContainer(
             wrapWithMinTapTargetDimension()
         },
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
-    contentPadding: Padding = DEFAULT_CONTENT_PADDING
+    contentPadding: Padding = DEFAULT_CONTENT_PADDING,
+    useOverlayOnBackground: Boolean = true
 ): LayoutElement =
     componentContainer(
         onClick = onClick,
@@ -629,5 +630,6 @@ internal fun MaterialScope.buttonContainer(
         backgroundContent = backgroundContent,
         contentPadding = contentPadding,
         metadataTag = METADATA_TAG_BUTTON,
-        content = content
+        content = content,
+        useOverlayOnBackground = useOverlayOnBackground
     )

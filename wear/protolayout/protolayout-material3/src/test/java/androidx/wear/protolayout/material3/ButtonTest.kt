@@ -219,6 +219,32 @@ class ButtonTest {
             }
 
         LayoutElementAssertionsProvider(button).onElement(hasImage(IMAGE_ID)).assertExists()
+        // Doesn't have the overlay
+        LayoutElementAssertionsProvider(button)
+            .onElement(hasColor(Color.BLACK.argb.withOpacity(ratio = 0.6f).staticArgb))
+            .assertDoesNotExist()
+        LayoutElementAssertionsProvider(button)
+            .onRoot()
+            .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
+    }
+
+    @Test
+    fun imageButton_hasBackgroundImage_andCustomOverlay() {
+        val color = Color.YELLOW
+        val button =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                imageButton(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                    backgroundContent = {
+                        backgroundImage(protoLayoutResourceId = IMAGE_ID, overlayColor = color.argb)
+                    }
+                )
+            }
+
+        LayoutElementAssertionsProvider(button).onElement(hasImage(IMAGE_ID)).assertExists()
+        // Has the overlay
+        LayoutElementAssertionsProvider(button).onElement(hasColor(color)).assertExists()
         LayoutElementAssertionsProvider(button)
             .onRoot()
             .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
