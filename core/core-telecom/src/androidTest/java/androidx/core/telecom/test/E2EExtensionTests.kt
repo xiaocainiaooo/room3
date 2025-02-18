@@ -148,7 +148,7 @@ class E2EExtensionTests(private val parameters: TestParameters) : BaseTelecomTes
 
     internal class CachedMeetingSummary(scope: CallExtensionScope) {
         private val participantState = MutableStateFlow<Int>(0)
-        private val activeParticipantState = MutableStateFlow<String?>("")
+        private val activeParticipantState = MutableStateFlow<CharSequence?>("")
         val extension =
             scope.addMeetingSummaryExtension(
                 onCurrentSpeakerChanged = activeParticipantState::emit,

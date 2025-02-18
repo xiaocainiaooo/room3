@@ -169,11 +169,11 @@ class MeetingSummaryExtensionDataEmitter {
      *
      * @param speaker The name or identifier of the current speaker.
      */
-    fun onCurrentSpeakerChanged(speaker: String?) {
+    fun onCurrentSpeakerChanged(speaker: CharSequence?) {
         if (speaker == null) {
             currentSpeaker.value = "no active speaker"
         } else {
-            currentSpeaker.value = speaker
+            currentSpeaker.value = speaker.toString()
         }
     }
 
