@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace.layout
 
+import androidx.annotation.RestrictTo
 import androidx.compose.ui.unit.Dp
 import androidx.xr.compose.subspace.node.SubspaceModifierElement
 import androidx.xr.compose.unit.DpVolumeSize
@@ -35,6 +36,7 @@ import androidx.xr.compose.unit.IntVolumeSize
  *   this composable will be executed. If it returns true, it is the responsibility of the callback
  *   to process the event.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SubspaceModifier.resizable(
     enabled: Boolean = true,
     minimumSize: DpVolumeSize = DpVolumeSize.Zero,

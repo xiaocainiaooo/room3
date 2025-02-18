@@ -17,6 +17,7 @@
 package androidx.xr.compose.platform
 
 import android.util.CloseGuard
+import androidx.annotation.RestrictTo
 import androidx.xr.compose.subspace.node.SubspaceSemanticsInfo
 
 /**
@@ -25,6 +26,7 @@ import androidx.xr.compose.subspace.node.SubspaceSemanticsInfo
  * Enables finding all semantic roots in a spatial scene graph.
  */
 @Suppress("NotCloseable")
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public object SceneManager : AutoCloseable {
     private val registeredScenes: MutableList<SpatialComposeScene> = mutableListOf()
     private var isRunning = false

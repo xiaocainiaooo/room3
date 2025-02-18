@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace.layout
 
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.CompositionLocalProvider
@@ -43,6 +44,7 @@ import androidx.xr.scenecore.ContentlessEntity
  */
 @SubspaceComposable
 @Composable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SubspaceLayout(
     modifier: SubspaceModifier = SubspaceModifier,
     name: String = defaultSubspaceLayoutName(),
@@ -73,6 +75,7 @@ public fun SubspaceLayout(
 @Suppress("ComposableLambdaParameterPosition")
 @SubspaceComposable
 @Composable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SubspaceLayout(
     content: @Composable @SubspaceComposable () -> Unit,
     modifier: SubspaceModifier = SubspaceModifier,
@@ -180,6 +183,7 @@ internal fun SubspaceLayout(
 
 private var subspaceLayoutNamePart: Int = 0
 
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun defaultSubspaceLayoutName(): String {
     return "SubspaceLayoutNode-${subspaceLayoutNamePart++}"
 }

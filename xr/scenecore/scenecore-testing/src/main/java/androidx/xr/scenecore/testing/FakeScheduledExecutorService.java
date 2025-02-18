@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CheckReturnValue;
@@ -51,6 +52,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * executed.
  */
 @SuppressWarnings("NotCloseable")
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeScheduledExecutorService extends AbstractExecutorService
         implements ScheduledExecutorService, AutoCloseable {
 
