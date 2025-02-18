@@ -15,7 +15,6 @@
  */
 package androidx.navigation3
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
@@ -138,7 +137,6 @@ public fun <T : Any> SinglePaneNavDisplay(
 ) {
     require(backStack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
-    BackHandler(backStack.size > 1, onBack)
     NavBackStackProvider(backStack, entryProvider, localProviders) { entries ->
         // Make a copy shallow copy so that transition.currentState and transition.targetState are
         // different backstack instances. This ensures currentState reflects the old backstack when
