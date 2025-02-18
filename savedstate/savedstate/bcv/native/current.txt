@@ -32,6 +32,8 @@ final class androidx.savedstate.serialization.serializers/SavedStateSerializer :
 }
 
 final class androidx.savedstate.serialization/SavedStateConfig { // androidx.savedstate.serialization/SavedStateConfig|null[0]
+    final val classDiscriminatorMode // androidx.savedstate.serialization/SavedStateConfig.classDiscriminatorMode|{}classDiscriminatorMode[0]
+        final fun <get-classDiscriminatorMode>(): kotlin/Int // androidx.savedstate.serialization/SavedStateConfig.classDiscriminatorMode.<get-classDiscriminatorMode>|<get-classDiscriminatorMode>(){}[0]
     final val serializersModule // androidx.savedstate.serialization/SavedStateConfig.serializersModule|{}serializersModule[0]
         final fun <get-serializersModule>(): kotlinx.serialization.modules/SerializersModule // androidx.savedstate.serialization/SavedStateConfig.serializersModule.<get-serializersModule>|<get-serializersModule>(){}[0]
 
