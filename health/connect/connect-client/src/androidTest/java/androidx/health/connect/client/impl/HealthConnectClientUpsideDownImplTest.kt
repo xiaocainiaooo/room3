@@ -44,6 +44,7 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Mass
 import androidx.health.connect.client.units.grams
+import androidx.health.connect.client.units.kilocalories
 import androidx.health.connect.client.units.millimetersOfMercury
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -373,27 +374,10 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(readResponse.records[0].count).isEqualTo(5)
     }
 
-    @Ignore("b/314092270")
     @Test
     fun aggregateRecords() = runTest {
         healthConnectClient.insertRecords(
             listOf(
-                StepsRecord(
-                    count = 10,
-                    startTime = START_TIME,
-                    startZoneOffset = ZoneOffset.UTC,
-                    endTime = START_TIME + 30.seconds,
-                    endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata.manualEntry(),
-                ),
-                StepsRecord(
-                    count = 5,
-                    startTime = START_TIME + 1.minutes,
-                    startZoneOffset = ZoneOffset.UTC,
-                    endTime = START_TIME + 1.minutes + 30.seconds,
-                    endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata.manualEntry(),
-                ),
                 HeartRateRecord(
                     startTime = START_TIME,
                     startZoneOffset = ZoneOffset.UTC,
@@ -439,7 +423,6 @@ class HealthConnectClientUpsideDownImplTest {
             healthConnectClient.aggregate(
                 AggregateRequest(
                     setOf(
-                        StepsRecord.COUNT_TOTAL,
                         HeartRateRecord.BPM_MIN,
                         HeartRateRecord.BPM_MAX,
                         NutritionRecord.ENERGY_TOTAL,
@@ -452,7 +435,6 @@ class HealthConnectClientUpsideDownImplTest {
             )
 
         with(aggregateResponse) {
-            assertThat(this[StepsRecord.COUNT_TOTAL]).isEqualTo(15L)
             assertThat(this[HeartRateRecord.BPM_MIN]).isEqualTo(47L)
             assertThat(this[HeartRateRecord.BPM_MAX]).isEqualTo(120L)
             assertThat(this[NutritionRecord.ENERGY_TOTAL]).isEqualTo(Energy.kilocalories(200.0))
@@ -553,29 +535,28 @@ class HealthConnectClientUpsideDownImplTest {
         )
     }
 
-    @Ignore("b/314092270")
     @Test
     fun aggregateRecordsGroupByDuration() = runTest {
         healthConnectClient.insertRecords(
             listOf(
-                StepsRecord(
-                    count = 1,
+                NutritionRecord(
+                    energy = 100.kilocalories,
                     startTime = START_TIME,
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 10.seconds,
                     endZoneOffset = ZoneOffset.UTC,
                     metadata = Metadata.manualEntry(),
                 ),
-                StepsRecord(
-                    count = 2,
+                NutritionRecord(
+                    energy = 200.kilocalories,
                     startTime = START_TIME + 15.seconds,
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 25.seconds,
                     endZoneOffset = ZoneOffset.UTC,
                     metadata = Metadata.manualEntry(),
                 ),
-                StepsRecord(
-                    count = 5,
+                NutritionRecord(
+                    energy = 500.kilocalories,
                     startTime = START_TIME + 40.seconds,
                     startZoneOffset = ZoneOffset.UTC,
                     endTime = START_TIME + 1.minutes,
@@ -588,7 +569,7 @@ class HealthConnectClientUpsideDownImplTest {
         val aggregateResponse =
             healthConnectClient.aggregateGroupByDuration(
                 AggregateGroupByDurationRequest(
-                    setOf(StepsRecord.COUNT_TOTAL),
+                    setOf(NutritionRecord.ENERGY_TOTAL),
                     TimeRangeFilter.between(START_TIME, START_TIME + 1.minutes),
                     Duration.ofSeconds(30),
                     setOf()
@@ -597,34 +578,33 @@ class HealthConnectClientUpsideDownImplTest {
 
         with(aggregateResponse) {
             assertThat(this).hasSize(2)
-            assertThat(this[0].result[StepsRecord.COUNT_TOTAL]).isEqualTo(3)
-            assertThat(this[1].result[StepsRecord.COUNT_TOTAL]).isEqualTo(5)
+            assertThat(this[0].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(300.kilocalories)
+            assertThat(this[1].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(500.kilocalories)
         }
     }
 
-    @Ignore("b/314092270")
     @Test
     fun aggregateRecordsGroupByPeriod() = runTest {
         healthConnectClient.insertRecords(
             listOf(
-                StepsRecord(
-                    count = 100,
+                NutritionRecord(
+                    energy = 100.kilocalories,
                     startTime = START_TIME,
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 5.minutes,
                     endZoneOffset = ZONE_OFFSET,
                     metadata = Metadata.manualEntry(),
                 ),
-                StepsRecord(
-                    count = 200,
+                NutritionRecord(
+                    energy = 200.kilocalories,
                     startTime = START_TIME + 10.minutes,
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 30.minutes,
                     endZoneOffset = ZONE_OFFSET,
                     metadata = Metadata.manualEntry(),
                 ),
-                StepsRecord(
-                    count = 50,
+                NutritionRecord(
+                    energy = 50.kilocalories,
                     startTime = START_TIME + 1.days,
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 1.days + 10.minutes,
@@ -637,7 +617,7 @@ class HealthConnectClientUpsideDownImplTest {
         val aggregateResponse =
             healthConnectClient.aggregateGroupByPeriod(
                 AggregateGroupByPeriodRequest(
-                    setOf(StepsRecord.COUNT_TOTAL),
+                    setOf(NutritionRecord.ENERGY_TOTAL),
                     TimeRangeFilter.between(
                         LocalDateTime.ofInstant(START_TIME, ZONE_ID),
                         LocalDateTime.ofInstant(START_TIME + 2.days, ZONE_ID),
@@ -648,34 +628,33 @@ class HealthConnectClientUpsideDownImplTest {
 
         with(aggregateResponse) {
             assertThat(this).hasSize(2)
-            assertThat(this[0].result[StepsRecord.COUNT_TOTAL]).isEqualTo(300)
-            assertThat(this[1].result[StepsRecord.COUNT_TOTAL]).isEqualTo(50)
+            assertThat(this[0].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(300.kilocalories)
+            assertThat(this[1].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(50.kilocalories)
         }
     }
 
-    @Ignore("b/314092270")
     @Test
     fun aggregateRecordsGroupByPeriod_monthly() = runTest {
         healthConnectClient.insertRecords(
             listOf(
-                StepsRecord(
-                    count = 100,
+                NutritionRecord(
+                    energy = 100.kilocalories,
                     startTime = START_TIME - 40.days,
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME - 40.days + 5.minutes,
                     endZoneOffset = ZONE_OFFSET,
                     metadata = Metadata.manualEntry(),
                 ),
-                StepsRecord(
-                    count = 200,
+                NutritionRecord(
+                    energy = 200.kilocalories,
                     startTime = START_TIME - 40.days + 10.minutes,
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME - 40.days + 30.minutes,
                     endZoneOffset = ZONE_OFFSET,
                     metadata = Metadata.manualEntry(),
                 ),
-                StepsRecord(
-                    count = 50,
+                NutritionRecord(
+                    energy = 50.kilocalories,
                     startTime = START_TIME,
                     startZoneOffset = ZONE_OFFSET,
                     endTime = START_TIME + 10.minutes,
@@ -691,7 +670,7 @@ class HealthConnectClientUpsideDownImplTest {
         val aggregateResponse =
             healthConnectClient.aggregateGroupByPeriod(
                 AggregateGroupByPeriodRequest(
-                    setOf(StepsRecord.COUNT_TOTAL),
+                    setOf(NutritionRecord.ENERGY_TOTAL),
                     TimeRangeFilter.between(
                         queryStartTime,
                         queryEndTime,
@@ -705,15 +684,14 @@ class HealthConnectClientUpsideDownImplTest {
 
             assertThat(this[0].startTime).isEqualTo(queryStartTime)
             assertThat(this[0].endTime).isEqualTo(queryStartTime.plus(Period.ofMonths(1)))
-            assertThat(this[0].result[StepsRecord.COUNT_TOTAL]).isEqualTo(300)
+            assertThat(this[0].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(300.kilocalories)
 
             assertThat(this[1].startTime).isEqualTo(queryStartTime.plus(Period.ofMonths(1)))
             assertThat(this[1].endTime).isEqualTo(queryEndTime)
-            assertThat(this[1].result[StepsRecord.COUNT_TOTAL]).isEqualTo(50)
+            assertThat(this[1].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(50.kilocalories)
         }
     }
 
-    @Ignore("b/314092270")
     @Test
     fun aggregateRecordsGroupByPeriod_monthly_noData() = runTest {
         val queryStartTime = LocalDateTime.ofInstant(START_TIME - 40.days, ZONE_ID)
@@ -722,7 +700,7 @@ class HealthConnectClientUpsideDownImplTest {
         val aggregateResponse =
             healthConnectClient.aggregateGroupByPeriod(
                 AggregateGroupByPeriodRequest(
-                    setOf(StepsRecord.COUNT_TOTAL),
+                    setOf(NutritionRecord.ENERGY_TOTAL),
                     TimeRangeFilter.between(
                         queryStartTime,
                         queryEndTime,
@@ -736,11 +714,11 @@ class HealthConnectClientUpsideDownImplTest {
 
             assertThat(this[0].startTime).isEqualTo(queryStartTime)
             assertThat(this[0].endTime).isEqualTo(queryStartTime.plus(Period.ofMonths(1)))
-            assertThat(this[0].result[StepsRecord.COUNT_TOTAL]).isNull()
+            assertThat(this[0].result[NutritionRecord.ENERGY_TOTAL]).isNull()
 
             assertThat(this[1].startTime).isEqualTo(queryStartTime.plus(Period.ofMonths(1)))
             assertThat(this[1].endTime).isEqualTo(queryEndTime)
-            assertThat(this[1].result[StepsRecord.COUNT_TOTAL]).isNull()
+            assertThat(this[1].result[NutritionRecord.ENERGY_TOTAL]).isNull()
         }
     }
 
