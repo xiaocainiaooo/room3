@@ -77,8 +77,6 @@ public final class VideoConfigUtil {
     private static final Map<String, Map<Integer, VideoEncoderDataSpace>> MIME_TO_DATA_SPACE_MAP =
             new HashMap<>();
 
-    private static final Timebase DEFAULT_TIME_BASE = Timebase.UPTIME;
-
     // Should not be instantiated.
     private VideoConfigUtil() {
     }
@@ -368,18 +366,5 @@ public final class VideoConfigUtil {
         Logger.w(TAG, String.format("Unsupported mime type %s or profile level %d. Data space is "
                 + "unspecified.", mimeType, codecProfileLevel));
         return ENCODER_DATA_SPACE_UNSPECIFIED;
-    }
-
-    /** Converts a {@link VideoProfileProxy} to a {@link VideoEncoderConfig}. */
-    public static @NonNull VideoEncoderConfig toVideoEncoderConfig(
-            @NonNull VideoProfileProxy videoProfile) {
-        return VideoEncoderConfig.builder()
-                .setMimeType(videoProfile.getMediaType())
-                .setProfile(videoProfile.getProfile())
-                .setResolution(new Size(videoProfile.getWidth(), videoProfile.getHeight()))
-                .setFrameRate(videoProfile.getFrameRate())
-                .setBitrate(videoProfile.getBitrate())
-                .setInputTimebase(DEFAULT_TIME_BASE)
-                .build();
     }
 }
