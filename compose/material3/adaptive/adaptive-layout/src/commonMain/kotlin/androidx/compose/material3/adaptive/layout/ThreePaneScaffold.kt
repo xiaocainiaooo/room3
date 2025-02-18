@@ -293,12 +293,10 @@ private object DefaultThreePaneScaffoldOverride : ThreePaneScaffoldOverride {
                     this.paneOrder = ltrPaneOrder
                 }
 
-        val predictiveBackScale = remember { Animatable(initialValue = 1f) }
-        PredictiveBackScaleEffect(scaffoldState, predictiveBackScale)
-
+        // TODO(b/371450910): add predictive back scaling
         Layout(
             contents = contents,
-            modifier = modifier.predictiveBackTransform(predictiveBackScale::value),
+            modifier = modifier,
             measurePolicy = measurePolicy,
         )
     }
