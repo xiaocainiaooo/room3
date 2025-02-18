@@ -694,6 +694,43 @@ internal class SavedStateCodecTest : RobolectricTest() {
             }
         }
     }
+
+    @Test
+    fun canUseBuiltInSerializersAutomatically() {
+        savedState {
+                putString("name", "foo")
+                putInt("age", 99)
+            }
+            .encodeDecode(
+                checkDecoded = { decoded, original ->
+                    assertThat(decoded.read { contentDeepEquals(original) }).isTrue()
+                },
+                checkEncoded = {
+                    assertThat(size()).isEqualTo(2)
+                    assertThat(getString("name")).isEqualTo("foo")
+                    assertThat(getInt("age")).isEqualTo(99)
+                }
+            )
+    }
+
+    @Test
+    fun canUseContextualSerializer() {
+        savedState {
+                putString("name", "foo")
+                putInt("age", 99)
+            }
+            .encodeDecode(
+                serializer = ContextualSerializer(SavedState::class),
+                checkDecoded = { decoded, original ->
+                    assertThat(decoded.read { contentDeepEquals(original) }).isTrue()
+                },
+                checkEncoded = {
+                    assertThat(size()).isEqualTo(2)
+                    assertThat(getString("name")).isEqualTo("foo")
+                    assertThat(getInt("age")).isEqualTo(99)
+                }
+            )
+    }
 }
 
 @Serializable

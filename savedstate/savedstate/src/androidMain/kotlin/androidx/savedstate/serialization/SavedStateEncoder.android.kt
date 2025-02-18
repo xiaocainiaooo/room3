@@ -16,11 +16,17 @@
 
 package androidx.savedstate.serialization
 
+import android.os.IBinder
 import android.os.Parcelable
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
 import androidx.savedstate.serialization.serializers.CharSequenceListSerializer
+import androidx.savedstate.serialization.serializers.CharSequenceSerializer
+import androidx.savedstate.serialization.serializers.DefaultJavaSerializableSerializer
+import androidx.savedstate.serialization.serializers.DefaultParcelableSerializer
+import androidx.savedstate.serialization.serializers.IBinderSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableListSerializer
+import java.io.Serializable as JavaSerializable
 import kotlinx.serialization.SerializationStrategy
 
 @Suppress("UNCHECKED_CAST")
@@ -29,6 +35,13 @@ internal actual fun <T> SavedStateEncoder.encodeFormatSpecificTypesOnPlatform(
     value: T
 ): Boolean {
     when (strategy.descriptor) {
+        polymorphicCharSequenceDescriptor ->
+            CharSequenceSerializer.serialize(this, value as CharSequence)
+        polymorphicParcelableDescriptor ->
+            DefaultParcelableSerializer.serialize(this, value as Parcelable)
+        polymorphicJavaSerializableDescriptor ->
+            DefaultJavaSerializableSerializer.serialize(this, value as JavaSerializable)
+        polymorphicIBinderDescriptor -> IBinderSerializer.serialize(this, value as IBinder)
         parcelableArrayDescriptor ->
             ParcelableArraySerializer.serialize(this, value as Array<Parcelable>)
         parcelableListDescriptor ->

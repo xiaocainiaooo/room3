@@ -17,12 +17,15 @@
 package androidx.savedstate.serialization
 
 import androidx.savedstate.serialization.SavedStateConfig.Builder
+import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmOverloads
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Polymorphic
-import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
+import kotlinx.serialization.modules.overwriteWith
+import kotlinx.serialization.modules.plus
 
 /**
  * Configuration of the current [SavedStateConfig] configured with [SavedStateConfig.Builder].
@@ -38,7 +41,7 @@ import kotlinx.serialization.modules.SerializersModule
  */
 public class SavedStateConfig
 private constructor(
-    public val serializersModule: SerializersModule = EmptySerializersModule(),
+    public val serializersModule: SerializersModule = DEFAULT_SERIALIZERS_MODULE,
     @ClassDiscriminatorMode.Definition
     public val classDiscriminatorMode: Int = ClassDiscriminatorMode.POLYMORPHIC,
 ) {
@@ -74,7 +77,7 @@ private constructor(
 
         internal fun build(): SavedStateConfig {
             return SavedStateConfig(
-                serializersModule = serializersModule,
+                serializersModule = DEFAULT_SERIALIZERS_MODULE.overwriteWith(serializersModule),
                 classDiscriminatorMode = classDiscriminatorMode,
             )
         }
@@ -111,3 +114,8 @@ public fun SavedStateConfig(
 ): SavedStateConfig {
     return Builder(from).apply(builderAction).build()
 }
+
+internal expect fun getDefaultSerializersModuleOnPlatform(): SerializersModule
+
+private val DEFAULT_SERIALIZERS_MODULE: SerializersModule =
+    SerializersModule { contextual(SavedStateSerializer) } + getDefaultSerializersModuleOnPlatform()
