@@ -51,10 +51,12 @@ class ScrollComposeFragment : BaseFragment() {
     private var scrollBannerAdapter: SandboxedUiAdapter? by mutableStateOf(null)
 
     override fun handleLoadAdFromDrawer(
+        adFormat: Int,
         adType: Int,
         mediationOption: Int,
         drawViewabilityLayer: Boolean
     ) {
+        currentAdFormat = adFormat
         currentAdType = adType
         currentMediationOption = mediationOption
         shouldDrawViewabilityLayer = drawViewabilityLayer
