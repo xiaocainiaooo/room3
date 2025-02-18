@@ -638,8 +638,6 @@ open class AndroidXMultiplatformExtension(val project: Project) {
 
     @JvmOverloads
     fun linuxX64Stubs(block: Action<KotlinNativeTarget>? = null): KotlinNativeTarget? {
-        // don't enable binary compatibility validator for stubs
-        enableBinaryCompatibilityValidator = false
         supportedPlatforms.add(PlatformIdentifier.LINUX_X_64_STUBS)
         return if (project.enableLinux()) {
             kotlinExtension.linuxX64("linuxx64Stubs") {
