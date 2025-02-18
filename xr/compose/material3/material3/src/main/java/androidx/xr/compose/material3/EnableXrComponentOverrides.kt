@@ -22,6 +22,7 @@ import androidx.compose.material3.LocalNavigationRailComponentOverride
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveComponentOverrideApi
 import androidx.compose.material3.adaptive.layout.LocalAnimatedPaneOverride
 import androidx.compose.material3.adaptive.layout.LocalThreePaneScaffoldOverride
+import androidx.compose.material3.adaptive.navigationsuite.LocalNavigationSuiteScaffoldComponentOverride
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidedValue
@@ -56,6 +57,21 @@ public fun EnableXrComponentOverrides(
                     )
                 }
                 if (context.shouldOverrideComponent(XrComponentOverride.NavigationBar)) {
+                    add(
+                        LocalNavigationBarComponentOverride provides
+                            XrNavigationBarComponentOverride
+                    )
+                }
+                if (context.shouldOverrideComponent(XrComponentOverride.NavigationSuiteScaffold)) {
+                    add(
+                        LocalNavigationSuiteScaffoldComponentOverride provides
+                            XrNavigationSuiteScaffoldOverride
+                    )
+                    // Also enable overrides for NavBar and NavRail
+                    add(
+                        LocalNavigationRailComponentOverride provides
+                            XrNavigationRailComponentOverride
+                    )
                     add(
                         LocalNavigationBarComponentOverride provides
                             XrNavigationBarComponentOverride
@@ -110,7 +126,14 @@ public value class XrComponentOverride private constructor(private val name: Str
         @ExperimentalMaterial3XrApi
         public val NavigationBar: XrComponentOverride = XrComponentOverride("NavigationBar")
 
-        /** Material3 ThreePaneScaffold. */
+        /** Material3 Adaptive NavigationSuiteScaffold. */
+        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+        @get:ExperimentalMaterial3XrApi
+        @ExperimentalMaterial3XrApi
+        public val NavigationSuiteScaffold: XrComponentOverride =
+            XrComponentOverride("NavigationSuiteScaffold")
+
+        /** Material3 Adaptive ThreePaneScaffold. */
         @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
         @get:ExperimentalMaterial3XrApi
         @ExperimentalMaterial3XrApi
@@ -129,10 +152,5 @@ private object DefaultXrComponentOverrideEnabler : XrComponentOverrideEnabler {
     @Composable
     override fun XrComponentOverrideEnablerContext.shouldOverrideComponent(
         component: XrComponentOverride
-    ): Boolean =
-        when (component) {
-            // TODO(b/388825260): Allow enabling ThreePaneScaffold once all edge-cases are fixed
-            XrComponentOverride.ThreePaneScaffold -> false
-            else -> isSpatializationEnabled
-        }
+    ): Boolean = isSpatializationEnabled
 }

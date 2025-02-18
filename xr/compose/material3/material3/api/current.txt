@@ -39,6 +39,10 @@ package androidx.xr.compose.material3 {
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.xr.compose.material3.VerticalOrbiterProperties> LocalNavigationRailOrbiterProperties;
   }
 
+  public final class NavigationSuiteScaffoldKt {
+    method @SuppressCompatibility @androidx.compose.runtime.Composable @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static void NavigationSuiteScaffold(kotlin.jvm.functions.Function1<? super androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope,kotlin.Unit> navigationSuiteItems, androidx.xr.compose.subspace.layout.SubspaceModifier modifier, String layoutType, optional androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteColors navigationSuiteColors, optional androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldState state, optional kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
   public final class ThreePaneScaffoldKt {
     method @SuppressCompatibility @androidx.compose.runtime.Composable @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static void ThreePaneScaffold(androidx.xr.compose.subspace.layout.SubspaceModifier modifier, androidx.compose.material3.adaptive.layout.PaneScaffoldDirective scaffoldDirective, androidx.compose.material3.adaptive.layout.ThreePaneScaffoldHorizontalOrder paneOrder, kotlin.jvm.functions.Function0<kotlin.Unit> secondaryPane, optional kotlin.jvm.functions.Function0<kotlin.Unit>? tertiaryPane, kotlin.jvm.functions.Function0<kotlin.Unit> primaryPane);
   }
@@ -65,9 +69,11 @@ package androidx.xr.compose.material3 {
   public static final class XrComponentOverride.Companion {
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getNavigationBar();
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getNavigationRail();
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getNavigationSuiteScaffold();
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getThreePaneScaffold();
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String NavigationBar;
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String NavigationRail;
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String NavigationSuiteScaffold;
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String ThreePaneScaffold;
   }
 

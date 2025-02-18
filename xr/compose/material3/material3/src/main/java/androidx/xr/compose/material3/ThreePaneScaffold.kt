@@ -38,6 +38,7 @@ import androidx.xr.compose.subspace.SpatialRow
 import androidx.xr.compose.subspace.layout.SubspaceModifier
 import androidx.xr.compose.subspace.layout.fillMaxHeight
 import androidx.xr.compose.subspace.layout.height
+import androidx.xr.compose.subspace.layout.offset
 import androidx.xr.compose.subspace.layout.width
 import kotlin.math.roundToInt
 
@@ -71,7 +72,12 @@ public fun ThreePaneScaffold(
     primaryPane: @Composable () -> Unit
 ) {
     Subspace {
-        SpatialRow(modifier = modifier.height(XrThreePaneScaffoldTokens.PanelHeight)) {
+        SpatialRow(
+            // Offset by 1dp as a workaround to fix b/395685251, where elements in the XR-overrides
+            // ThreePaneScaffold are not clickable when composed from within the XR-overrides
+            // NavigationSuiteScaffold.
+            modifier = modifier.offset(z = 1.dp).height(XrThreePaneScaffoldTokens.PanelHeight)
+        ) {
             var drawSpacer = false // Only draws spacers after the first pane is drawn
             paneOrder.each { role ->
                 when (role) {
