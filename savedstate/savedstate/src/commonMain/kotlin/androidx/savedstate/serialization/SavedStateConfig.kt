@@ -38,9 +38,9 @@ import kotlinx.serialization.modules.SerializersModule
  */
 public class SavedStateConfig
 private constructor(
-    @PublishedApi internal val serializersModule: SerializersModule = EmptySerializersModule(),
+    public val serializersModule: SerializersModule = EmptySerializersModule(),
     @ClassDiscriminatorMode.Definition
-    internal val classDiscriminatorMode: Int = ClassDiscriminatorMode.POLYMORPHIC,
+    public val classDiscriminatorMode: Int = ClassDiscriminatorMode.POLYMORPHIC,
 ) {
     /**
      * Builder of the [SavedStateConfig] instance provided by `SavedStateConfig { ... }` factory
