@@ -155,7 +155,7 @@ internal class CallExtensionScopeImpl(
     }
 
     override fun addMeetingSummaryExtension(
-        onCurrentSpeakerChanged: suspend (String?) -> Unit,
+        onCurrentSpeakerChanged: suspend (CharSequence?) -> Unit,
         onParticipantCountChanged: suspend (Int) -> Unit
     ): MeetingSummaryRemote {
         val extension =
