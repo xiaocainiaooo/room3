@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.ConfirmationDialog
 import androidx.wear.compose.material3.ConfirmationDialogDefaults
@@ -38,7 +39,6 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.SuccessConfirmationDialog
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.confirmationDialogCurvedText
-import androidx.wear.compose.material3.samples.icons.FavoriteIcon
 
 @Sampled
 @Composable
@@ -64,7 +64,11 @@ fun ConfirmationDialogSample() {
             onDismissRequest = { showConfirmation = false },
             curvedText = { confirmationDialogCurvedText("Confirmed", curvedTextStyle) },
         ) {
-            FavoriteIcon(ConfirmationDialogDefaults.IconSize)
+            Icon(
+                painter = painterResource(R.drawable.ic_favorite_rounded),
+                contentDescription = null,
+                modifier = Modifier.size(ConfirmationDialogDefaults.IconSize)
+            )
         }
     }
 }
