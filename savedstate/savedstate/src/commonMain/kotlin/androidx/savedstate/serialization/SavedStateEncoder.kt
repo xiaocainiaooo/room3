@@ -252,19 +252,46 @@ internal class SavedStateEncoder(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-        when (serializer.descriptor) {
-            intListDescriptor -> encodeIntList(value as List<Int>)
-            stringListDescriptor -> encodeStringList(value as List<String>)
-            booleanArrayDescriptor -> encodeBooleanArray(value as BooleanArray)
-            charArrayDescriptor -> encodeCharArray(value as CharArray)
-            doubleArrayDescriptor -> encodeDoubleArray(value as DoubleArray)
-            floatArrayDescriptor -> encodeFloatArray(value as FloatArray)
-            intArrayDescriptor -> encodeIntArray(value as IntArray)
-            longArrayDescriptor -> encodeLongArray(value as LongArray)
-            stringArrayDescriptor -> encodeStringArray(value as Array<String>)
-            else -> super.encodeSerializableValue(serializer, value)
+        val encoded = encodeFormatSpecificTypes(serializer, value)
+        if (!encoded) {
+            super.encodeSerializableValue(serializer, value)
         }
     }
+
+    /**
+     * @return `true` if [value] was encoded with SavedState's special representation, `false`
+     *   otherwise.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> encodeFormatSpecificTypes(
+        serializer: SerializationStrategy<T>,
+        value: T
+    ): Boolean {
+        val encoded = encodeFormatSpecificTypesOnPlatform(serializer, value)
+        if (!encoded) {
+            when (serializer.descriptor) {
+                intListDescriptor -> encodeIntList(value as List<Int>)
+                stringListDescriptor -> encodeStringList(value as List<String>)
+                booleanArrayDescriptor -> encodeBooleanArray(value as BooleanArray)
+                charArrayDescriptor -> encodeCharArray(value as CharArray)
+                doubleArrayDescriptor -> encodeDoubleArray(value as DoubleArray)
+                floatArrayDescriptor -> encodeFloatArray(value as FloatArray)
+                intArrayDescriptor -> encodeIntArray(value as IntArray)
+                longArrayDescriptor -> encodeLongArray(value as LongArray)
+                stringArrayDescriptor -> encodeStringArray(value as Array<String>)
+                else -> return false
+            }
+        }
+        return true
+    }
 }
+
+/**
+ * @return `true` if [value] was encoded with SavedState's special representation, `false`
+ *   otherwise.
+ */
+internal expect fun <T> SavedStateEncoder.encodeFormatSpecificTypesOnPlatform(
+    strategy: SerializationStrategy<T>,
+    value: T
+): Boolean

@@ -21,16 +21,6 @@ final class <#A: kotlin/Any?> androidx.savedstate.serialization.serializers/Muta
     final fun serialize(kotlinx.serialization.encoding/Encoder, kotlinx.coroutines.flow/MutableStateFlow<#A>) // androidx.savedstate.serialization.serializers/MutableStateFlowSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;kotlinx.coroutines.flow.MutableStateFlow<1:0>){}[0]
 }
 
-final class androidx.savedstate.serialization.serializers/SavedStateSerializer : kotlinx.serialization/KSerializer<androidx.savedstate/SavedState> { // androidx.savedstate.serialization.serializers/SavedStateSerializer|null[0]
-    constructor <init>() // androidx.savedstate.serialization.serializers/SavedStateSerializer.<init>|<init>(){}[0]
-
-    final val descriptor // androidx.savedstate.serialization.serializers/SavedStateSerializer.descriptor|{}descriptor[0]
-        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // androidx.savedstate.serialization.serializers/SavedStateSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
-
-    final fun deserialize(kotlinx.serialization.encoding/Decoder): androidx.savedstate/SavedState // androidx.savedstate.serialization.serializers/SavedStateSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
-    final fun serialize(kotlinx.serialization.encoding/Encoder, androidx.savedstate/SavedState) // androidx.savedstate.serialization.serializers/SavedStateSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;androidx.savedstate.SavedState){}[0]
-}
-
 final class androidx.savedstate.serialization/SavedStateConfig { // androidx.savedstate.serialization/SavedStateConfig|null[0]
     final val classDiscriminatorMode // androidx.savedstate.serialization/SavedStateConfig.classDiscriminatorMode|{}classDiscriminatorMode[0]
         final fun <get-classDiscriminatorMode>(): kotlin/Int // androidx.savedstate.serialization/SavedStateConfig.classDiscriminatorMode.<get-classDiscriminatorMode>|<get-classDiscriminatorMode>(){}[0]
@@ -184,6 +174,14 @@ final value class androidx.savedstate/SavedStateWriter { // androidx.savedstate/
     final inline fun putStringArray(kotlin/String, kotlin/Array<kotlin/String>) // androidx.savedstate/SavedStateWriter.putStringArray|putStringArray(kotlin.String;kotlin.Array<kotlin.String>){}[0]
     final inline fun putStringList(kotlin/String, kotlin.collections/List<kotlin/String>) // androidx.savedstate/SavedStateWriter.putStringList|putStringList(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
     final inline fun remove(kotlin/String) // androidx.savedstate/SavedStateWriter.remove|remove(kotlin.String){}[0]
+}
+
+final object androidx.savedstate.serialization.serializers/SavedStateSerializer : kotlinx.serialization/KSerializer<androidx.savedstate/SavedState> { // androidx.savedstate.serialization.serializers/SavedStateSerializer|null[0]
+    final val descriptor // androidx.savedstate.serialization.serializers/SavedStateSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // androidx.savedstate.serialization.serializers/SavedStateSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): androidx.savedstate/SavedState // androidx.savedstate.serialization.serializers/SavedStateSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, androidx.savedstate/SavedState) // androidx.savedstate.serialization.serializers/SavedStateSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;androidx.savedstate.SavedState){}[0]
 }
 
 final object androidx.savedstate.serialization/ClassDiscriminatorMode { // androidx.savedstate.serialization/ClassDiscriminatorMode|null[0]

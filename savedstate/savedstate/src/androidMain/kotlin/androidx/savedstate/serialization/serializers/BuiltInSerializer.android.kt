@@ -47,7 +47,7 @@ import kotlinx.serialization.encoding.Encoder
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class SizeSerializer : KSerializer<Size> {
+public object SizeSerializer : KSerializer<Size> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("android.util.Size")
 
     override fun serialize(encoder: Encoder, value: Size) {
@@ -77,7 +77,7 @@ public class SizeSerializer : KSerializer<Size> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class SizeFSerializer : KSerializer<SizeF> {
+public object SizeFSerializer : KSerializer<SizeF> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("android.util.SizeF")
 
     override fun serialize(encoder: Encoder, value: SizeF) {
@@ -107,7 +107,7 @@ public class SizeFSerializer : KSerializer<SizeF> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class CharSequenceSerializer : KSerializer<CharSequence> {
+public object CharSequenceSerializer : KSerializer<CharSequence> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("kotlin.CharSequence")
 
     override fun serialize(encoder: Encoder, value: CharSequence) {
@@ -202,7 +202,7 @@ public abstract class ParcelableSerializer<T : Parcelable> : KSerializer<T> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class IBinderSerializer : KSerializer<IBinder> {
+public object IBinderSerializer : KSerializer<IBinder> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("android.os.IBinder")
 
     override fun serialize(encoder: Encoder, value: IBinder) {
@@ -232,7 +232,7 @@ public class IBinderSerializer : KSerializer<IBinder> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class CharSequenceArraySerializer : KSerializer<Array<CharSequence>> {
+public object CharSequenceArraySerializer : KSerializer<Array<CharSequence>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.Array<kotlin.CharSequence>")
 
@@ -264,7 +264,7 @@ public class CharSequenceArraySerializer : KSerializer<Array<CharSequence>> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class ParcelableArraySerializer : KSerializer<Array<Parcelable>> {
+public object ParcelableArraySerializer : KSerializer<Array<Parcelable>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.Array<android.os.Parcelable>")
 
@@ -296,7 +296,7 @@ public class ParcelableArraySerializer : KSerializer<Array<Parcelable>> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class CharSequenceListSerializer : KSerializer<List<CharSequence>> {
+public object CharSequenceListSerializer : KSerializer<List<CharSequence>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.collections.List<kotlin.CharSequence>")
 
@@ -327,7 +327,7 @@ public class CharSequenceListSerializer : KSerializer<List<CharSequence>> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class ParcelableListSerializer : KSerializer<List<Parcelable>> {
+public object ParcelableListSerializer : KSerializer<List<Parcelable>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.collections.List<android.os.Parcelable>")
 
@@ -358,7 +358,7 @@ public class ParcelableListSerializer : KSerializer<List<Parcelable>> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public class SparseParcelableArraySerializer : KSerializer<SparseArray<Parcelable>> {
+public object SparseParcelableArraySerializer : KSerializer<SparseArray<Parcelable>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("android.util.SparseArray<android.os.Parcelable>")
 
