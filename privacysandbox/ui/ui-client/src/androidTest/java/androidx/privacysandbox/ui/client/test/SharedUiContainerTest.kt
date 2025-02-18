@@ -37,6 +37,7 @@ import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+// TODO(b/263460954): add session management tests
 @OptIn(ExperimentalFeatures.SharedUiPresentationApi::class)
 @RunWith(Enclosed::class)
 @LargeTest
@@ -195,8 +196,7 @@ class SharedUiContainerTest() {
                 View.MeasureSpec.makeMeasureSpec(PARENT_HEIGHT_PIXELS, View.MeasureSpec.AT_MOST)
             activityScenarioRule.withActivity {
                 // Add padding and margins to the container to make sure children are measured and
-                // laid out correctly
-                // for such cases.
+                // laid out correctly for such cases.
                 sharedUiContainer =
                     SharedUiContainer(this).apply {
                         layoutParams =
