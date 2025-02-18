@@ -45,10 +45,10 @@ import androidx.savedstate.serialization.serializers.SizeSerializer
 import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
 import java.util.UUID
 import kotlin.test.Test
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -208,59 +208,38 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
     }
 
     @Test
-    fun interfaceTypesWithoutAnnotation() {
+    fun interfaceTypesWithoutExplicitSerializer() {
         @Serializable data class CharSequenceContainer(val value: CharSequence)
-        assertThrows<SerializationException> {
-                CharSequenceContainer("value" as CharSequence).encodeDecode {}
-            }
-            .hasMessageThat()
-            .contains(
-                "Serializer for subclass 'String' is not found in the polymorphic scope of 'CharSequence'"
-            )
+        CharSequenceContainer("foo").encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getCharSequence("value")).isEqualTo("foo")
+        }
 
         @Serializable data class SerializableContainer(val value: java.io.Serializable)
-        assertThrows<SerializationException> {
-                SerializableContainer(MyJavaSerializable(3, "foo", 3.14) as java.io.Serializable)
-                    .encodeDecode {}
-            }
-            .hasMessageThat()
-            .contains(
-                "Serializer for subclass 'MyJavaSerializable' is not found in the polymorphic scope of 'Serializable'"
-            )
+        val myJavaSerializable = MyJavaSerializable(3, "foo", 3.14)
+        SerializableContainer(myJavaSerializable).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getJavaSerializable<MyJavaSerializable>("value"))
+                .isEqualTo(myJavaSerializable)
+        }
 
         @Serializable data class ParcelableContainer(val value: Parcelable)
-        assertThrows<SerializationException> {
-                ParcelableContainer(MyParcelable(3, "foo", 3.14) as Parcelable).encodeDecode {}
-            }
-            .hasMessageThat()
-            .contains(
-                "Serializer for subclass 'MyParcelable' is not found in the polymorphic scope of 'Parcelable'"
-            )
+        val myParcelable = MyParcelable(3, "foo", 3.14)
+        ParcelableContainer(myParcelable).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getParcelable<MyParcelable>("value")).isEqualTo(myParcelable)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             @Serializable data class IBinderContainer(val value: IBinder)
-            assertThrows<SerializationException> {
-                    IBinderContainer(Binder("foo") as IBinder).encodeDecode {}
-                }
-                .hasMessageThat()
-                .contains(
-                    "Serializer for subclass 'Binder' is not found in the polymorphic scope of 'IBinder'"
-                )
+            val binder = Binder("foo")
+            IBinderContainer(binder).encodeDecode {
+                assertThat(size()).isEqualTo(1)
+                assertThat(getBinder("value")).isEqualTo(binder)
+            }
         } else {
             error("VERSION.SDK_INT < Q")
         }
-
-        @Suppress("ArrayInDataClass")
-        @Serializable
-        data class CharSequenceArrayContainer(val value: Array<out CharSequence>)
-        CharSequenceArrayContainer(arrayOf("foo", "bar"))
-            .encodeDecode(
-                checkDecoded = { decoded, original -> decoded.value.contentEquals(original.value) },
-                checkEncoded = {
-                    assertThat(size()).isEqualTo(1)
-                    getCharSequenceArray("value").contentEquals(arrayOf("foo", "bar"))
-                }
-            )
     }
 
     @Test
@@ -363,6 +342,42 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         data class SparseParcelableArrayContainer(
             @Serializable(with = SparseParcelableArraySerializer::class)
             val value: SparseArray<out Parcelable>
+        )
+        val mySparseParcelableArray =
+            SparseArray<MyParcelable>().apply {
+                append(1, MyParcelable(3, "foo", 3.14))
+                append(3, MyParcelable(4, "bar", 1.73))
+            }
+        SparseParcelableArrayContainer(mySparseParcelableArray)
+            .encodeDecode(
+                checkDecoded = { decoded, original ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        decoded.value.contentEquals(original.value)
+                    } else {
+                        error("VERSION.SDK_INT < S")
+                    }
+                },
+                checkEncoded = {
+                    assertThat(size()).isEqualTo(1)
+                    assertThat(getSparseParcelableArray<Parcelable>("value"))
+                        .isEqualTo(mySparseParcelableArray)
+                }
+            )
+    }
+
+    @Test
+    fun concreteTypesWithContextualSerializer() {
+        @Serializable data class MyModel(@Contextual val size: Size, @Contextual val sizeF: SizeF)
+
+        MyModel(Size(128, 256), SizeF(1.23f, 4.56f)).encodeDecode {
+            assertThat(size()).isEqualTo(2)
+            assertThat(getSize("size")).isEqualTo(Size(128, 256))
+            assertThat(getSizeF("sizeF")).isEqualTo(SizeF(1.23f, 4.56f))
+        }
+
+        @Serializable
+        data class SparseParcelableArrayContainer(
+            @Contextual val value: SparseArray<out Parcelable>
         )
         val mySparseParcelableArray =
             SparseArray<MyParcelable>().apply {
@@ -573,7 +588,96 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
                 }
             )
     }
+
+    @Test
+    fun canUseBuiltInSerializersAutomatically() {
+        Size(3, 5).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getSize("")).isEqualTo(Size(3, 5))
+        }
+        SizeF(3.14f, 4.732f).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getSizeF("")).isEqualTo(SizeF(3.14f, 4.732f))
+        }
+        StringBuilder("foo")
+            .encodeDecode<CharSequence>(
+                checkDecoded = { decoded, original ->
+                    assertThat(decoded.toString()).isEqualTo(original.toString())
+                },
+                checkEncoded = {
+                    assertThat(size()).isEqualTo(1)
+                    assertThat(getCharSequence("").toString()).isEqualTo("foo")
+                }
+            )
+        MyParcelable(3, "foo", 3.14).encodeDecode<Parcelable> {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getParcelable<MyParcelable>("")).isEqualTo(MyParcelable(3, "foo", 3.14))
+        }
+        arrayOf<CharSequence>("foo", "bar").encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getCharSequenceArray("")).isEqualTo(arrayOf<CharSequence>("foo", "bar"))
+        }
+        arrayOf<Parcelable>(MyParcelable(3, "foo", 3.14), MyParcelable(4, "bar", 1.73))
+            .encodeDecode {
+                assertThat(size()).isEqualTo(1)
+                assertThat(getParcelableArray<MyParcelable>(""))
+                    .isEqualTo(
+                        arrayOf<Parcelable>(
+                            MyParcelable(3, "foo", 3.14),
+                            MyParcelable(4, "bar", 1.73)
+                        )
+                    )
+            }
+        listOf<CharSequence>("foo", "bar").encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getCharSequenceList("")).isEqualTo(listOf<CharSequence>("foo", "bar"))
+        }
+        listOf<Parcelable>(MyParcelable(3, "foo", 3.14), MyParcelable(4, "bar", 1.73))
+            .encodeDecode {
+                assertThat(size()).isEqualTo(1)
+                assertThat(getParcelableList<MyParcelable>(""))
+                    .isEqualTo(
+                        listOf<Parcelable>(
+                            MyParcelable(3, "foo", 3.14),
+                            MyParcelable(4, "bar", 1.73)
+                        )
+                    )
+            }
+        SparseArray<Parcelable>()
+            .apply {
+                append(1, MyParcelable(3, "foo", 3.14))
+                append(3, MyParcelable(4, "bar", 1.73))
+            }
+            .encodeDecode(
+                checkDecoded = { decoded, original ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        assertThat(decoded.contentEquals(original)).isTrue()
+                    } else {
+                        error("VERSION.SDK_INT < S")
+                    }
+                },
+                checkEncoded = {
+                    assertThat(size()).isEqualTo(1)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        assertThat(
+                                getSparseParcelableArray<Parcelable>("")
+                                    .contentEquals(
+                                        SparseArray<Parcelable>().apply {
+                                            append(1, MyParcelable(3, "foo", 3.14))
+                                            append(3, MyParcelable(4, "bar", 1.73))
+                                        }
+                                    )
+                            )
+                            .isTrue()
+                    } else {
+                        error("VERSION.SDK_INT < S")
+                    }
+                }
+            )
+    }
 }
+
+private class MyParcelableSerializer : ParcelableSerializer<Parcelable>()
 
 private class MyUUIDSerializer : KSerializer<UUID> {
     override val descriptor: SerialDescriptor

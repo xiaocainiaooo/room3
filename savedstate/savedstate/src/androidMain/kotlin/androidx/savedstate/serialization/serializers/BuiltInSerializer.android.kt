@@ -125,6 +125,8 @@ public object CharSequenceSerializer : KSerializer<CharSequence> {
     }
 }
 
+internal object DefaultJavaSerializableSerializer : JavaSerializableSerializer<JavaSerializable>()
+
 /**
  * A serializer for [java.io.Serializable]. This serializer uses [SavedState]'s API directly to
  * save/load a [java.io.Serializable]. You must extend this serializer for each of your
@@ -157,6 +159,8 @@ public abstract class JavaSerializableSerializer<T : JavaSerializable> : KSerial
         return decoder.run { savedState.read { getJavaSerializable<JavaSerializable>(key) as T } }
     }
 }
+
+internal object DefaultParcelableSerializer : ParcelableSerializer<Parcelable>()
 
 /**
  * A serializer for [Parcelable]. This serializer uses [SavedState]'s API directly to save/load a

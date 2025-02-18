@@ -16,10 +16,19 @@
 
 package androidx.savedstate.serialization
 
+import android.os.IBinder
 import android.os.Parcelable
+import java.io.Serializable as JavaSerializable
+import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.serializer
 
 internal val parcelableArrayDescriptor = serializer<Array<Parcelable>>().descriptor
 internal val parcelableListDescriptor = serializer<List<Parcelable>>().descriptor
 internal val charSequenceArrayDescriptor = serializer<Array<CharSequence>>().descriptor
 internal val charSequenceListDescriptor = serializer<List<CharSequence>>().descriptor
+internal val polymorphicCharSequenceDescriptor =
+    PolymorphicSerializer(CharSequence::class).descriptor
+internal val polymorphicParcelableDescriptor = PolymorphicSerializer(Parcelable::class).descriptor
+internal val polymorphicJavaSerializableDescriptor =
+    PolymorphicSerializer(JavaSerializable::class).descriptor
+internal val polymorphicIBinderDescriptor = PolymorphicSerializer(IBinder::class).descriptor

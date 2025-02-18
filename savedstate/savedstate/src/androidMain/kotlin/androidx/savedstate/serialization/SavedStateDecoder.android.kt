@@ -18,6 +18,10 @@ package androidx.savedstate.serialization
 
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
 import androidx.savedstate.serialization.serializers.CharSequenceListSerializer
+import androidx.savedstate.serialization.serializers.CharSequenceSerializer
+import androidx.savedstate.serialization.serializers.DefaultJavaSerializableSerializer
+import androidx.savedstate.serialization.serializers.DefaultParcelableSerializer
+import androidx.savedstate.serialization.serializers.IBinderSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableListSerializer
 import kotlinx.serialization.DeserializationStrategy
@@ -27,6 +31,10 @@ internal actual fun <T> SavedStateDecoder.decodeFormatSpecificTypesOnPlatform(
     strategy: DeserializationStrategy<T>
 ): T? {
     return when (strategy.descriptor) {
+        polymorphicCharSequenceDescriptor -> CharSequenceSerializer.deserialize(this)
+        polymorphicParcelableDescriptor -> DefaultParcelableSerializer.deserialize(this)
+        polymorphicJavaSerializableDescriptor -> DefaultJavaSerializableSerializer.deserialize(this)
+        polymorphicIBinderDescriptor -> IBinderSerializer.deserialize(this)
         parcelableArrayDescriptor -> ParcelableArraySerializer.deserialize(this)
         parcelableListDescriptor -> ParcelableListSerializer.deserialize(this)
         charSequenceArrayDescriptor -> CharSequenceArraySerializer.deserialize(this)
