@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace.layout
 
+import androidx.annotation.RestrictTo
 import androidx.xr.compose.subspace.node.SubspaceModifierElement
 import androidx.xr.compose.unit.IntVolumeSize
 import androidx.xr.runtime.math.Pose
@@ -47,6 +48,7 @@ import androidx.xr.runtime.math.Pose
  *   width, height and depth of the composable; that factors in shrinking or stretching due to
  *   [PoseChangeEvent.scale]
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SubspaceModifier.movable(
     enabled: Boolean = true,
     stickyPose: Boolean = false,
@@ -55,6 +57,7 @@ public fun SubspaceModifier.movable(
 ): SubspaceModifier =
     this.then(MovableElement(enabled, onPoseChange, stickyPose, scaleWithDistance))
 
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class PoseChangeEvent(
     public var pose: Pose = Pose.Identity,
     public var scale: Float = 1.0F,
