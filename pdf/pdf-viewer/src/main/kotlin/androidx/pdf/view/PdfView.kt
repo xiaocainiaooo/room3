@@ -543,7 +543,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         if (changed) {
             val localScrollPositionToRestore = scrollPositionToRestore
             if (awaitingFirstLayout && localScrollPositionToRestore != null) {
-                var newZoom = (zoomToRestore ?: zoom) * (width.toFloat() / (oldWidth ?: width))
+                var newZoom = (zoomToRestore ?: zoom)
                 newZoom = MathUtils.clamp(newZoom, minZoom, maxZoom)
                 this.zoom = newZoom
                 scrollToRestoredPosition(localScrollPositionToRestore, zoom)
