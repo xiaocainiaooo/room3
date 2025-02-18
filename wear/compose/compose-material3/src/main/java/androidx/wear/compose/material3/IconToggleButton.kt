@@ -45,9 +45,9 @@ import androidx.wear.compose.materialcore.animateSelectionColor
  *
  * Set the size of the [IconToggleButton] with Modifier.[touchTargetAwareSize] to ensure that the
  * background padding will correctly reach the edge of the minimum touch target. The recommended
- * icon toggle button sizes are [IconToggleButtonDefaults.DefaultButtonSize],
- * [IconToggleButtonDefaults.SmallButtonSize], [IconToggleButtonDefaults.LargeButtonSize] and
- * [IconToggleButtonDefaults.ExtraLargeButtonSize].
+ * icon toggle button sizes are [IconToggleButtonDefaults.Size],
+ * [IconToggleButtonDefaults.SmallSize], [IconToggleButtonDefaults.LargeSize] and
+ * [IconToggleButtonDefaults.ExtraLargeSize].
  *
  * Use [IconToggleButtonDefaults.iconSizeFor] to determine the icon size for a given
  * [IconToggleButton] size, or refer to icon sizes, [IconToggleButtonDefaults.DefaultIconSize],
@@ -87,7 +87,7 @@ public fun IconToggleButton(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: IconToggleButtonColors = IconToggleButtonDefaults.iconToggleButtonColors(),
+    colors: IconToggleButtonColors = IconToggleButtonDefaults.colors(),
     interactionSource: MutableInteractionSource? = null,
     shapes: IconToggleButtonShapes = IconToggleButtonDefaults.shapes(),
     border: BorderStroke? = null,
@@ -114,7 +114,7 @@ public fun IconToggleButton(
             colors.containerColor(enabled = isEnabled, checked = isChecked)
         },
         border = { _, _ -> border },
-        toggleButtonSize = IconToggleButtonDefaults.DefaultButtonSize,
+        toggleButtonSize = IconToggleButtonDefaults.Size,
         interactionSource = finalInteractionSource,
         shape = finalShape,
         ripple = ripple(),
@@ -139,8 +139,8 @@ public object IconToggleButtonDefaults {
         @Composable get() = MaterialTheme.shapes.medium
 
     /**
-     * The recommended size of an icon when used inside an icon toggle button with size
-     * [SmallButtonSize]. Use [iconSizeFor] to easily determine the icon size.
+     * The recommended size of an icon when used inside an icon toggle button with size [SmallSize].
+     * Use [iconSizeFor] to easily determine the icon size.
      */
     public val SmallIconSize: Dp = IconToggleButtonTokens.IconSmallSize
 
@@ -151,14 +151,14 @@ public object IconToggleButtonDefaults {
     public val DefaultIconSize: Dp = IconToggleButtonTokens.IconDefaultSize
 
     /**
-     * The size of an icon when used inside an icon toggle button with size [LargeButtonSize]. Use
+     * The size of an icon when used inside an icon toggle button with size [LargeSize]. Use
      * [iconSizeFor] to easily determine the icon size.
      */
     public val LargeIconSize: Dp = IconToggleButtonTokens.IconLargeSize
 
     /**
-     * The size of an icon when used inside an icon toggle button with size [ExtraLargeButtonSize].
-     * Use [iconSizeFor] to easily determine the icon size.
+     * The size of an icon when used inside an icon toggle button with size [ExtraLargeSize]. Use
+     * [iconSizeFor] to easily determine the icon size.
      */
     public val ExtraLargeIconSize: Dp = IconToggleButtonTokens.IconExtraLargeSize
 
@@ -166,38 +166,38 @@ public object IconToggleButtonDefaults {
      * The recommended size for a small button. It is recommended to apply this size using
      * Modifier.touchTargetAwareSize.
      */
-    public val SmallButtonSize: Dp = IconToggleButtonTokens.ContainerSmallSize
+    public val SmallSize: Dp = IconToggleButtonTokens.ContainerSmallSize
 
     /**
      * The default size applied for icon toggle buttons. It is recommended to apply this size using
      * Modifier.touchTargetAwareSize.
      */
-    public val DefaultButtonSize: Dp = IconToggleButtonTokens.ContainerDefaultSize
+    public val Size: Dp = IconToggleButtonTokens.ContainerDefaultSize
 
     /**
      * The recommended size for a large icon toggle button. It is recommended to apply this size
      * using Modifier.touchTargetAwareSize.
      */
-    public val LargeButtonSize: Dp = IconToggleButtonTokens.ContainerLargeSize
+    public val LargeSize: Dp = IconToggleButtonTokens.ContainerLargeSize
 
     /**
      * The recommended size for an extra icon large toggle button. It is recommended to apply this
      * size using Modifier.touchTargetAwareSize.
      */
-    public val ExtraLargeButtonSize: Dp = IconToggleButtonTokens.ContainerExtraLargeSize
+    public val ExtraLargeSize: Dp = IconToggleButtonTokens.ContainerExtraLargeSize
 
     /**
      * Recommended icon size for a given icon toggle button size.
      *
      * Ensures that the minimum recommended icon size is applied.
      *
-     * Examples: for size [SmallButtonSize], returns [SmallIconSize], for size
-     * [ExtraLargeButtonSize] returns [ExtraLargeIconSize].
+     * Examples: for size [SmallSize], returns [SmallIconSize], for size [ExtraLargeSize] returns
+     * [ExtraLargeIconSize].
      *
      * @param buttonSize The size of the icon toggle button
      */
     public fun iconSizeFor(buttonSize: Dp): Dp =
-        if (buttonSize >= LargeButtonSize) {
+        if (buttonSize >= LargeSize) {
             max(LargeIconSize, buttonSize / 2f)
         } else {
             max(SmallIconSize, buttonSize / 2f)
@@ -296,7 +296,7 @@ public object IconToggleButtonDefaults {
      * [DisabledContainerAlpha]) value applied.
      */
     @Composable
-    public fun iconToggleButtonColors(): IconToggleButtonColors =
+    public fun colors(): IconToggleButtonColors =
         MaterialTheme.colorScheme.defaultIconToggleButtonColors
 
     /**
@@ -324,7 +324,7 @@ public object IconToggleButtonDefaults {
      *   unchecked and not enabled
      */
     @Composable
-    public fun iconToggleButtonColors(
+    public fun colors(
         checkedContainerColor: Color = Color.Unspecified,
         checkedContentColor: Color = Color.Unspecified,
         uncheckedContainerColor: Color = Color.Unspecified,
