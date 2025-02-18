@@ -20,16 +20,20 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.serialization.SavedStateConfig
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 import org.junit.Rule
 import org.junit.Test
@@ -94,6 +98,43 @@ class SavedStateHandleDelegatesTest {
                     error("Unexpected initializer call")
                 }
             assertThat(value).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun explicitConfig() {
+        data class User(val name: String)
+        class UserSerializer : KSerializer<User> {
+            override val descriptor: SerialDescriptor =
+                PrimitiveSerialDescriptor("User", PrimitiveKind.STRING)
+
+            override fun serialize(encoder: Encoder, value: User) {
+                encoder.encodeString(value.name)
+            }
+
+            override fun deserialize(decoder: Decoder): User {
+                return User(decoder.decodeString())
+            }
+        }
+
+        val config = SavedStateConfig {
+            serializersModule = SerializersModule { contextual(User::class, UserSerializer()) }
+        }
+
+        val user = User("foo")
+        activityTestRuleScenario.scenario.onActivity { activity ->
+            val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
+            val value by viewModel.savedStateHandle.saved(config = config) { user }
+            assertThat(value).isEqualTo(user)
+        }
+        activityTestRuleScenario.scenario.recreate()
+        activityTestRuleScenario.scenario.onActivity { activity ->
+            val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
+            val value: User by
+                viewModel.savedStateHandle.saved(config = config) {
+                    error("Unexpected initializer call")
+                }
+            assertThat(value).isEqualTo(user)
         }
     }
 
