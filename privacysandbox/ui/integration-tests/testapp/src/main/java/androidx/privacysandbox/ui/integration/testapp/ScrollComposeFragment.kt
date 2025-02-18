@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUi
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -99,7 +100,8 @@ class ScrollComposeFragment : BaseFragment() {
             bottomBannerAdapter =
                 SandboxedUiAdapterFactory.createFromCoreLibInfo(
                     getSdkApi()
-                        .loadBannerAd(
+                        .loadAd(
+                            AdFormat.BANNER_AD,
                             currentAdType,
                             currentMediationOption,
                             false,
@@ -109,7 +111,8 @@ class ScrollComposeFragment : BaseFragment() {
             scrollBannerAdapter =
                 SandboxedUiAdapterFactory.createFromCoreLibInfo(
                     getSdkApi()
-                        .loadBannerAd(
+                        .loadAd(
+                            AdFormat.BANNER_AD,
                             currentAdType,
                             currentMediationOption,
                             false,
