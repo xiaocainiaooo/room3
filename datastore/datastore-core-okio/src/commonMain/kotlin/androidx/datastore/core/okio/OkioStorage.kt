@@ -165,9 +165,14 @@ internal open class OkioReadScope<T>(
             fileSystem.read(file = path) { serializer.readFrom(this) }
         } catch (ex: FileNotFoundException) {
             if (fileSystem.exists(path)) {
-                throw ex
+                // Attempt a second read in case a race condition resulted in the file being created
+                // by a different process. If we can't read again, a FileNotFoundException is
+                // thrown.
+                fileSystem.read(file = path) { serializer.readFrom(this) }
+            } else {
+                // File does not exist, return default value.
+                serializer.defaultValue
             }
-            serializer.defaultValue
         }
     }
 
