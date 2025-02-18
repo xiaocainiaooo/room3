@@ -93,7 +93,6 @@ public class PageIndicator extends ReusableToast {
             mPageNumberView.setContentDescription(desc);
             if (mCurrentRange != null) {
                 // Do not show on the first time, only when updating
-                show();
                 shown = true;
             }
 
