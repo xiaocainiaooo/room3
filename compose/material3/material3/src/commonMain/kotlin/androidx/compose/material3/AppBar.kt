@@ -46,6 +46,7 @@ import androidx.compose.material3.BottomAppBarState.Companion.Saver
 import androidx.compose.material3.TopAppBarState.Companion.Saver
 import androidx.compose.material3.internal.FloatProducer
 import androidx.compose.material3.internal.ProvideContentColorTextStyle
+import androidx.compose.material3.internal.rememberAccessibilityServiceState
 import androidx.compose.material3.internal.systemBarsForVisualComponents
 import androidx.compose.material3.tokens.AppBarLargeFlexibleTokens
 import androidx.compose.material3.tokens.AppBarLargeTokens
@@ -1146,7 +1147,8 @@ fun BottomAppBar(
  * @param scrollBehavior a [BottomAppBarScrollBehavior] which holds various offset values that will
  *   be applied by this bottom app bar to set up its height. A scroll behavior is designed to work
  *   in conjunction with a scrolled content to change the bottom app bar appearance as the content
- *   scrolls. See [BottomAppBarScrollBehavior.nestedScrollConnection].
+ *   scrolls. Note that the bottom app bar will not react to scrolling in case a touch exploration
+ *   service (e.g., TalkBack) is active. See [BottomAppBarScrollBehavior.nestedScrollConnection].
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -1263,7 +1265,8 @@ fun BottomAppBar(
  * @param scrollBehavior a [BottomAppBarScrollBehavior] which holds various offset values that will
  *   be applied by this bottom app bar to set up its height. A scroll behavior is designed to work
  *   in conjunction with a scrolled content to change the bottom app bar appearance as the content
- *   scrolls. See [BottomAppBarScrollBehavior.nestedScrollConnection].
+ *   scrolls. Note that the bottom app bar will not react to scrolling in case a touch exploration
+ *   service (e.g., TalkBack) is active. See [BottomAppBarScrollBehavior.nestedScrollConnection].
  * @param content the content of this BottomAppBar. The default layout here is a [Row], so content
  *   inside will be placed horizontally.
  */
@@ -1336,7 +1339,8 @@ fun BottomAppBar(
  * @param scrollBehavior a [BottomAppBarScrollBehavior] which holds various offset values that will
  *   be applied by this bottom app bar to set up its height. A scroll behavior is designed to work
  *   in conjunction with a scrolled content to change the bottom app bar appearance as the content
- *   scrolls. See [BottomAppBarScrollBehavior.nestedScrollConnection].
+ *   scrolls. Note that the bottom app bar will not react to scrolling in case a touch exploration
+ *   service (e.g., TalkBack) is active. See [BottomAppBarScrollBehavior.nestedScrollConnection].
  * @param content the content of this BottomAppBar. The default layout here is a [Row], so content
  *   inside will be placed horizontally.
  */
@@ -1388,19 +1392,23 @@ private fun BottomAppBarLayout(
     scrollBehavior: BottomAppBarScrollBehavior?,
     content: @Composable RowScope.() -> Unit
 ) {
+    val touchExplorationServiceEnabled by rememberTouchExplorationService()
+    val activeScrollBehavior = if (!touchExplorationServiceEnabled) scrollBehavior else null
     // Set up support for resizing the bottom app bar when vertically dragging the bar itself.
     val appBarDragModifier =
-        if (scrollBehavior != null && !scrollBehavior.isPinned) {
+        if (activeScrollBehavior != null && !activeScrollBehavior.isPinned) {
             Modifier.draggable(
                 orientation = Orientation.Vertical,
                 state =
-                    rememberDraggableState { delta -> scrollBehavior.state.heightOffset -= delta },
+                    rememberDraggableState { delta ->
+                        activeScrollBehavior.state.heightOffset -= delta
+                    },
                 onDragStopped = { velocity ->
                     settleAppBarBottom(
-                        scrollBehavior.state,
+                        activeScrollBehavior.state,
                         velocity,
-                        scrollBehavior.flingAnimationSpec,
-                        scrollBehavior.snapAnimationSpec
+                        activeScrollBehavior.flingAnimationSpec,
+                        activeScrollBehavior.snapAnimationSpec
                     )
                 }
             )
@@ -1424,9 +1432,10 @@ private fun BottomAppBarLayout(
 
                     // Sets the app bar's height offset to collapse the entire bar's height when
                     // content is scrolled.
-                    scrollBehavior?.state?.heightOffsetLimit = -placeable.height.toFloat()
+                    activeScrollBehavior?.state?.heightOffsetLimit = -placeable.height.toFloat()
 
-                    val height = placeable.height + (scrollBehavior?.state?.heightOffset ?: 0f)
+                    val height =
+                        placeable.height + (activeScrollBehavior?.state?.heightOffset ?: 0f)
                     layout(placeable.width, height.roundToInt()) { placeable.place(0, 0) }
                 }
                 .then(appBarDragModifier)
@@ -3359,6 +3368,15 @@ private suspend fun settleAppBar(
 
     return Velocity(0f, remainingVelocity)
 }
+
+/** Returns the current accessibility touch exploration service [State]. */
+@Composable
+private fun rememberTouchExplorationService() =
+    rememberAccessibilityServiceState(
+        listenToTouchExplorationState = true,
+        listenToSwitchAccessState = false,
+        listenToVoiceAccessState = false
+    )
 
 // An easing function used to compute the alpha value that is applied to the top title part of a
 // Medium or Large app bar.
