@@ -16,6 +16,7 @@
 
 package androidx.appfunctions
 
+import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.test.filters.SdkSuppress
 import com.android.extensions.appfunctions.ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE
@@ -23,8 +24,8 @@ import com.google.common.truth.Truth
 import org.junit.Assert
 import org.junit.Test
 
-@RequiresApi(35)
-@SdkSuppress(minSdkVersion = 31)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 class AppFunctionDataTest {
     @Test
     fun getSingleProperty_shouldThrowsException_ifNotExist() {

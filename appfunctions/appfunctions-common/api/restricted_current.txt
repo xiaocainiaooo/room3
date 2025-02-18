@@ -21,7 +21,7 @@ package androidx.appfunctions {
     property public abstract android.content.Context context;
   }
 
-  @RequiresApi(35) public final class AppFunctionData {
+  @RequiresApi(android.os.Build.VERSION_CODES.TIRAMISU) public final class AppFunctionData {
     method public androidx.appfunctions.AppFunctionData getAppFunctionData(String key);
     method public java.util.List<androidx.appfunctions.AppFunctionData>? getAppFunctionDataList(String key);
     method public boolean getBoolean(String key);
