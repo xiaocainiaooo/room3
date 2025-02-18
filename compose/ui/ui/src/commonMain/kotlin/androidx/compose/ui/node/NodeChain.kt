@@ -25,13 +25,13 @@ import androidx.compose.ui.internal.checkPreconditionNotNull
 import androidx.compose.ui.internal.throwIllegalStateException
 import androidx.compose.ui.layout.ModifierInfo
 
-private val SentinelHead =
-    object : Modifier.Node() {
-            override fun toString() = "<Head>"
-        }
-        .apply { aggregateChildKindSet = 0.inv() }
-
 internal class NodeChain(val layoutNode: LayoutNode) {
+    private val sentinelHead =
+        object : Modifier.Node() {
+                override fun toString() = "<Head>"
+            }
+            .apply { aggregateChildKindSet = 0.inv() }
+
     internal val innerCoordinator = InnerNodeCoordinator(layoutNode)
     internal var outerCoordinator: NodeCoordinator = innerCoordinator
         private set
@@ -41,7 +41,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         private set
 
     internal val isUpdating: Boolean
-        get() = SentinelHead.child != null
+        get() = sentinelHead.child != null
 
     private val aggregateChildKindSet: Int
         get() = head.aggregateChildKindSet
@@ -66,23 +66,23 @@ internal class NodeChain(val layoutNode: LayoutNode) {
      *   owner or one per chain.
      */
     private fun padChain(): Modifier.Node {
-        checkPrecondition(head !== SentinelHead) { "padChain called on already padded chain" }
+        checkPrecondition(head !== sentinelHead) { "padChain called on already padded chain" }
         val currentHead = head
-        currentHead.parent = SentinelHead
-        SentinelHead.child = currentHead
-        return SentinelHead
+        currentHead.parent = sentinelHead
+        sentinelHead.child = currentHead
+        return sentinelHead
     }
 
     private fun trimChain(paddedHead: Modifier.Node): Modifier.Node {
-        checkPrecondition(paddedHead === SentinelHead) {
+        checkPrecondition(paddedHead === sentinelHead) {
             "trimChain called on already trimmed chain"
         }
-        val result = SentinelHead.child ?: tail
+        val result = sentinelHead.child ?: tail
         result.parent = null
-        SentinelHead.child = null
-        SentinelHead.aggregateChildKindSet = 0.inv()
-        SentinelHead.updateCoordinator(null)
-        checkPrecondition(result !== SentinelHead) { "trimChain did not update the head" }
+        sentinelHead.child = null
+        sentinelHead.aggregateChildKindSet = 0.inv()
+        sentinelHead.updateCoordinator(null)
+        checkPrecondition(result !== sentinelHead) { "trimChain did not update the head" }
         return result
     }
 
@@ -267,7 +267,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
     private fun syncAggregateChildKindSet() {
         var node: Modifier.Node? = tail.parent
         var aggregateChildKindSet = 0
-        while (node != null && node !== SentinelHead) {
+        while (node != null && node !== sentinelHead) {
             aggregateChildKindSet = aggregateChildKindSet or node.kindSet
             node.aggregateChildKindSet = aggregateChildKindSet
             node = node.parent
@@ -412,7 +412,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
     private fun propagateCoordinator(start: Modifier.Node, coordinator: NodeCoordinator) {
         var node = start.parent
         while (node != null) {
-            if (node === SentinelHead) {
+            if (node === sentinelHead) {
                 coordinator.wrappedBy = layoutNode.parent?.innerCoordinator
                 outerCoordinator = coordinator
                 break
