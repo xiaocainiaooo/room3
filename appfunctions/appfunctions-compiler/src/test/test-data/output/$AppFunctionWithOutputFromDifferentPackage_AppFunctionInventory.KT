@@ -4,13 +4,13 @@ import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
 import kotlin.collections.List
@@ -26,7 +26,7 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
     AppFunctionInventory {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+  override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
     "com.testdata.AppFunctionWithOutputFromDifferentPackage#functionWithDiffPackageOutput" to
         ComTestdataAppFunctionWithOutputFromDifferentPackageFunctionWithDiffPackageOutputMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.AppFunctionWithOutputFromDifferentPackage#functionWithAnotherDiffPackageOutput" to
@@ -125,7 +125,8 @@ public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id =
             "com.testdata.AppFunctionWithOutputFromDifferentPackage#functionWithDiffPackageOutput",
             isEnabledByDefault = true,
@@ -235,7 +236,8 @@ public class `$AppFunctionWithOutputFromDifferentPackage_AppFunctionInventory` :
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id =
             "com.testdata.AppFunctionWithOutputFromDifferentPackage#functionWithAnotherDiffPackageOutput",
             isEnabledByDefault = true,

@@ -24,13 +24,13 @@ import androidx.appfunctions.internal.AggregatedAppFunctionInventory
 import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.AppFunctionInventory
 import androidx.appfunctions.internal.AppFunctionInvoker
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -90,7 +90,7 @@ class AppFunctionServiceDelegateTest {
     @Test
     fun testOnExecuteFunction_invalidParameter() {
         fakeAggregatedInventory.setAppFunctionMetadata(
-            AppFunctionMetadata(
+            CompileTimeAppFunctionMetadata(
                 id = "invaliadParameterFunction",
                 isEnabledByDefault = true,
                 schema = null,
@@ -132,7 +132,7 @@ class AppFunctionServiceDelegateTest {
     @Test
     fun testOnExecuteFunction_buildReturnValueFail() {
         fakeAggregatedInventory.setAppFunctionMetadata(
-            AppFunctionMetadata(
+            CompileTimeAppFunctionMetadata(
                 id = "returnIncorrectResultFunction",
                 isEnabledByDefault = true,
                 schema = null,
@@ -164,7 +164,7 @@ class AppFunctionServiceDelegateTest {
     @Test
     fun testOnExecuteFunction_succeed_noArg() {
         fakeAggregatedInventory.setAppFunctionMetadata(
-            AppFunctionMetadata(
+            CompileTimeAppFunctionMetadata(
                 id = "succeedFunction",
                 isEnabledByDefault = true,
                 schema = null,
@@ -201,7 +201,7 @@ class AppFunctionServiceDelegateTest {
     @Test
     fun testOnExecuteFunction_succeed_withArg() {
         fakeAggregatedInventory.setAppFunctionMetadata(
-            AppFunctionMetadata(
+            CompileTimeAppFunctionMetadata(
                 id = "succeedFunction",
                 isEnabledByDefault = true,
                 schema = null,
@@ -300,12 +300,12 @@ class AppFunctionServiceDelegateTest {
         private val internalInventory =
             object : AppFunctionInventory {
 
-                private val internalMap = mutableMapOf<String, AppFunctionMetadata>()
+                private val internalMap = mutableMapOf<String, CompileTimeAppFunctionMetadata>()
 
-                override val functionIdToMetadataMap: Map<String, AppFunctionMetadata>
+                override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata>
                     get() = internalMap
 
-                fun setAppFunctionMetadata(metadata: AppFunctionMetadata) {
+                fun setAppFunctionMetadata(metadata: CompileTimeAppFunctionMetadata) {
                     internalMap[metadata.id] = metadata
                 }
             }
@@ -313,7 +313,7 @@ class AppFunctionServiceDelegateTest {
         override val inventories: List<AppFunctionInventory>
             get() = listOf(internalInventory)
 
-        fun setAppFunctionMetadata(metadata: AppFunctionMetadata) {
+        fun setAppFunctionMetadata(metadata: CompileTimeAppFunctionMetadata) {
             internalInventory.setAppFunctionMetadata(metadata)
         }
     }

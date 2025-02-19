@@ -17,14 +17,14 @@
 package androidx.appfunctions.internal
 
 import androidx.annotation.RestrictTo
-import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 
 /**
  * An [AppFunctionInventory] that aggregates the function metadata from multiple
  * [AppFunctionInventory] instances.
  *
  * AppFunction compiler will automatically generate the implementation of this class to access all
- * generated [AppFunctionMetadata] exposed by the application.
+ * generated [CompileTimeAppFunctionMetadata] exposed by the application.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public abstract class AggregatedAppFunctionInventory : AppFunctionInventory {
@@ -32,7 +32,8 @@ public abstract class AggregatedAppFunctionInventory : AppFunctionInventory {
     /** The list of [AppFunctionInventory] instances that contribute to this aggregate. */
     public abstract val inventories: List<AppFunctionInventory>
 
-    final override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> by lazy {
+    final override val functionIdToMetadataMap:
+        Map<String, CompileTimeAppFunctionMetadata> by lazy {
         // Empty collection can't be reduced
         if (inventories.isEmpty()) return@lazy emptyMap()
         inventories.map(AppFunctionInventory::functionIdToMetadataMap).reduce { acc, map ->

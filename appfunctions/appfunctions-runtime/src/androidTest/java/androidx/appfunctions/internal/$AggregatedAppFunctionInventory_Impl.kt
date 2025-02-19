@@ -19,13 +19,13 @@ package androidx.appfunctions.internal
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appfunctions.core.AppFunctionMetadataTestHelper
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 
 /** Test implementation for [androidx.appfunctions.AppFunctionManagerCompatTest] */
 @RequiresApi(Build.VERSION_CODES.S)
@@ -34,11 +34,11 @@ class `$AggregatedAppFunctionInventory_Impl` : AggregatedAppFunctionInventory() 
         get() = listOf(InternalAppFunctionInventory())
 
     private class InternalAppFunctionInventory : AppFunctionInventory {
-        override val functionIdToMetadataMap: Map<String, AppFunctionMetadata>
+        override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata>
             get() =
                 mapOf(
                     AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED to
-                        AppFunctionMetadata(
+                        CompileTimeAppFunctionMetadata(
                             id =
                                 AppFunctionMetadataTestHelper.FunctionIds
                                     .NO_SCHEMA_EXECUTION_SUCCEED,
@@ -55,7 +55,7 @@ class `$AggregatedAppFunctionInventory_Impl` : AggregatedAppFunctionInventory() 
                                 )
                         ),
                     AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_FAIL to
-                        AppFunctionMetadata(
+                        CompileTimeAppFunctionMetadata(
                             id = AppFunctionMetadataTestHelper.FunctionIds.NO_SCHEMA_EXECUTION_FAIL,
                             isEnabledByDefault = true,
                             schema = null,

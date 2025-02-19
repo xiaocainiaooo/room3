@@ -191,17 +191,19 @@ package androidx.appfunctions.metadata {
   }
 
   public final class AppFunctionMetadata {
-    ctor public AppFunctionMetadata(String id, boolean isEnabledByDefault, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, java.util.List<androidx.appfunctions.metadata.AppFunctionParameterMetadata> parameters, androidx.appfunctions.metadata.AppFunctionResponseMetadata response);
-    ctor public AppFunctionMetadata(String id, boolean isEnabledByDefault, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, java.util.List<androidx.appfunctions.metadata.AppFunctionParameterMetadata> parameters, androidx.appfunctions.metadata.AppFunctionResponseMetadata response, optional androidx.appfunctions.metadata.AppFunctionComponentsMetadata components);
+    ctor public AppFunctionMetadata(String id, String packageName, boolean isEnabled, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, java.util.List<androidx.appfunctions.metadata.AppFunctionParameterMetadata> parameters, androidx.appfunctions.metadata.AppFunctionResponseMetadata response);
+    ctor public AppFunctionMetadata(String id, String packageName, boolean isEnabled, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, java.util.List<androidx.appfunctions.metadata.AppFunctionParameterMetadata> parameters, androidx.appfunctions.metadata.AppFunctionResponseMetadata response, optional androidx.appfunctions.metadata.AppFunctionComponentsMetadata components);
     method public androidx.appfunctions.metadata.AppFunctionComponentsMetadata getComponents();
     method public String getId();
+    method public String getPackageName();
     method public java.util.List<androidx.appfunctions.metadata.AppFunctionParameterMetadata> getParameters();
     method public androidx.appfunctions.metadata.AppFunctionResponseMetadata getResponse();
     method public androidx.appfunctions.metadata.AppFunctionSchemaMetadata? getSchema();
-    method public boolean isEnabledByDefault();
+    method public boolean isEnabled();
     property public androidx.appfunctions.metadata.AppFunctionComponentsMetadata components;
     property public String id;
-    property public boolean isEnabledByDefault;
+    property public boolean isEnabled;
+    property public String packageName;
     property public java.util.List<androidx.appfunctions.metadata.AppFunctionParameterMetadata> parameters;
     property public androidx.appfunctions.metadata.AppFunctionResponseMetadata response;
     property public androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema;

@@ -4,13 +4,13 @@ import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
 import kotlin.collections.List
@@ -22,7 +22,7 @@ import kotlin.collections.Map
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInventory {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+  override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
     "com.testdata.SerializableInputFunctions#simpleFunction" to
         ComTestdataSerializableInputFunctionsSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.SerializableInputFunctions#simpleFunctionSerializableList" to
@@ -117,7 +117,8 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunction",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
@@ -212,7 +213,8 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunctionSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
@@ -308,7 +310,8 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunctionNullableSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
@@ -398,7 +401,8 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id = "com.testdata.SerializableInputFunctions#simpleFunctionNullableSerializable",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
@@ -495,7 +499,8 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id =
             "com.testdata.SerializableInputFunctions#simpleFunctionSerializableListItemNullable",
             isEnabledByDefault = true,
@@ -593,7 +598,8 @@ public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInv
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id =
             "com.testdata.SerializableInputFunctions#simpleFunctionBothSerializableListAndListItemNullable",
             isEnabledByDefault = true,
