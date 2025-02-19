@@ -165,8 +165,9 @@ internal open class FileReadScope<T>(
                     // is called. Otherwise file exists but we can't read it; throw
                     // FileNotFoundException because something is wrong.
                     FileInputStream(file).use { stream -> serializer.readFrom(stream) }
+                } else {
+                    serializer.defaultValue
                 }
-                serializer.defaultValue
             }
         }
     }
