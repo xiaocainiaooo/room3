@@ -130,8 +130,8 @@ data class PropertyAccessor(
             val isBooleanField =
                 helper.isFieldOfExactType(
                     privateField.element,
-                    helper.mBooleanPrimitiveType,
-                    helper.mBooleanBoxType
+                    helper.booleanPrimitiveType,
+                    helper.booleanBoxType
                 )
             if (isBooleanField && privateField.elementTypeCategory == ElementTypeCategory.SINGLE) {
                 getterNames.add("is$upperCamelCase")
