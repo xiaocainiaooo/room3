@@ -25,6 +25,9 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.Icon
@@ -46,13 +49,11 @@ fun SwipeToRevealSample() {
             primaryAction(
                 onClick = { /* This block is called when the primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                text = { Text("Delete") },
-                label = "Delete"
+                text = { Text("Delete") }
             )
             secondaryAction(
                 onClick = { /* This block is called when the secondary action is executed. */ },
-                icon = { Icon(Icons.Outlined.MoreVert, contentDescription = "Options") },
-                label = "Options"
+                icon = { Icon(Icons.Outlined.MoreVert, contentDescription = "Options") }
             )
             undoPrimaryAction(
                 onClick = { /* This block is called when the undo primary action is executed. */ },
@@ -60,7 +61,24 @@ fun SwipeToRevealSample() {
             )
         }
     ) {
-        Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+        Button(
+            modifier =
+                Modifier.fillMaxWidth().semantics {
+                    // Use custom actions to make the primary and secondary actions accessible
+                    customActions =
+                        listOf(
+                            CustomAccessibilityAction("Delete") {
+                                /* Add the primary action click handler here */
+                                true
+                            },
+                            CustomAccessibilityAction("Options") {
+                                /* Add the secondary click handler here */
+                                true
+                            }
+                        )
+                },
+            onClick = {}
+        ) {
             Text("This Button has two actions", modifier = Modifier.fillMaxSize())
         }
     }
@@ -75,8 +93,7 @@ fun SwipeToRevealSingleActionCardSample() {
             primaryAction(
                 onClick = { /* This block is called when the primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                text = { Text("Delete") },
-                label = "Delete"
+                text = { Text("Delete") }
             )
             undoPrimaryAction(
                 onClick = { /* This block is called when the undo primary action is executed. */ },
@@ -84,7 +101,20 @@ fun SwipeToRevealSingleActionCardSample() {
             )
         }
     ) {
-        Card(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+        Card(
+            modifier =
+                Modifier.fillMaxWidth().semantics {
+                    // Use custom actions to make the primary action accessible
+                    customActions =
+                        listOf(
+                            CustomAccessibilityAction("Delete") {
+                                /* Add the primary action click handler here */
+                                true
+                            },
+                        )
+                },
+            onClick = {}
+        ) {
             Text(
                 "This Card has one action, and the revealed button is taller",
                 modifier = Modifier.fillMaxSize()
@@ -102,8 +132,7 @@ fun SwipeToRevealNonAnchoredSample() {
             primaryAction(
                 onClick = { /* This block is called when the primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                text = { Text("Delete") },
-                label = "Delete"
+                text = { Text("Delete") }
             )
             undoPrimaryAction(
                 onClick = { /* This block is called when the undo primary action is executed. */ },
@@ -112,7 +141,20 @@ fun SwipeToRevealNonAnchoredSample() {
             )
         }
     ) {
-        Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+        Button(
+            modifier =
+                Modifier.fillMaxWidth().semantics {
+                    // Use custom actions to make the primary action accessible
+                    customActions =
+                        listOf(
+                            CustomAccessibilityAction("Delete") {
+                                /* Add the primary action click handler here */
+                                true
+                            },
+                        )
+                },
+            onClick = {}
+        ) {
             Text("Swipe to execute the primary action.", modifier = Modifier.fillMaxSize())
         }
     }

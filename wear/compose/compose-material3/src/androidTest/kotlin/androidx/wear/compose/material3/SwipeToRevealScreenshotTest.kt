@@ -69,8 +69,7 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {},
                             { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                            { Text("Clear") },
-                            "Clear"
+                            { Text("Clear") }
                         )
                     }
                 ) {
@@ -97,13 +96,11 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {},
                             { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                            { Text("Clear") },
-                            "Clear"
+                            { Text("Clear") }
                         )
                         secondaryAction(
                             {},
-                            { Icon(Icons.Outlined.MoreVert, contentDescription = "More") },
-                            "More"
+                            { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
                         )
                     }
                 ) {
@@ -126,8 +123,7 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
-                            {} /* Empty for testing */,
-                            ""
+                            {} /* Empty for testing */
                         )
                         undoPrimaryAction({}, { Text("Undo Primary") })
                     }
@@ -149,8 +145,7 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
-                            {} /* Empty for testing */,
-                            ""
+                            {} /* Empty for testing */
                         )
                         undoPrimaryAction(
                             {},
@@ -182,14 +177,13 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
-                            {}, /* Empty for testing */
-                            ""
+                            {} /* Empty for testing */
                         )
                         undoPrimaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
                         )
-                        secondaryAction({}, /* Empty for testing */ {}, /* Empty for testing */ "")
+                        secondaryAction({}, /* Empty for testing */ {} /* Empty for testing */)
                         undoSecondaryAction({}, { Text("Undo Secondary") })
                     }
                 ) {
@@ -213,14 +207,13 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
-                            {}, /* Empty for testing */
-                            ""
+                            {} /* Empty for testing */
                         )
                         undoPrimaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
                         )
-                        secondaryAction({}, /* Empty for testing */ {}, /* Empty for testing */ "")
+                        secondaryAction({}, /* Empty for testing */ {} /* Empty for testing */)
                         undoSecondaryAction(
                             {},
                             {
@@ -247,8 +240,7 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {}, /* Empty for testing */
                             {}, /* Empty for testing */
-                            {}, /* Empty for testing */
-                            ""
+                            {} /* Empty for testing */
                         )
                     }
                 ) {
@@ -272,8 +264,7 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {},
                             { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                            { Text("Clear") },
-                            "Clear"
+                            { Text("Clear") }
                         )
                     }
                 ) {
@@ -303,13 +294,11 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {},
                             { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                            { Text("Clear") },
-                            "Clear"
+                            { Text("Clear") }
                         )
                         secondaryAction(
                             {},
-                            { Icon(Icons.Outlined.MoreVert, contentDescription = "More") },
-                            "More"
+                            { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
                         )
                     }
                 ) {
@@ -337,13 +326,11 @@ class SwipeToRevealScreenshotTest {
                         primaryAction(
                             {},
                             { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                            { Text("Clear") },
-                            "Clear"
+                            { Text("Clear") }
                         )
                         secondaryAction(
                             {},
-                            { Icon(Icons.Outlined.MoreVert, contentDescription = "More") },
-                            "More"
+                            { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
                         )
                     }
                 ) {
@@ -390,13 +377,11 @@ class SwipeToRevealScreenshotTest {
                             primaryAction(
                                 {},
                                 { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                                { Text("Clear") },
-                                "Clear"
+                                { Text("Clear") }
                             )
                             secondaryAction(
                                 {},
-                                { Icon(Icons.Outlined.MoreVert, contentDescription = "More") },
-                                "More"
+                                { Icon(Icons.Outlined.MoreVert, contentDescription = "More") }
                             )
                         }
                     ) {

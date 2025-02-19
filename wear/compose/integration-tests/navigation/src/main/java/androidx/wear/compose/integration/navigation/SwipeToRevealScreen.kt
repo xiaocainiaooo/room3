@@ -25,6 +25,9 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.material3.Button
@@ -50,8 +53,7 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
                 primaryAction(
                     onClick = { /* This block is called when the primary action is executed. */ },
                     icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                    text = { Text("Delete") },
-                    label = "Delete"
+                    text = { Text("Delete") }
                 )
                 undoPrimaryAction(
                     onClick = { /* This block is called when the undo primary action is executed. */
@@ -60,7 +62,20 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
                 )
             }
         ) {
-            Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+            Button(
+                modifier =
+                    Modifier.fillMaxWidth().semantics {
+                        // Use custom actions to make the primary action accessible
+                        customActions =
+                            listOf(
+                                CustomAccessibilityAction("Delete") {
+                                    /* Add the primary action click handler here */
+                                    true
+                                },
+                            )
+                    },
+                onClick = {}
+            ) {
                 Text("This Button has only one action", modifier = Modifier.fillMaxWidth())
             }
         }
@@ -83,8 +98,7 @@ fun SwipeToRevealBothDirectionsNonAnchoring() {
                 primaryAction(
                     onClick = { /* This block is called when the primary action is executed. */ },
                     icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                    text = { Text("Delete") },
-                    label = "Delete"
+                    text = { Text("Delete") }
                 )
                 undoPrimaryAction(
                     onClick = { /* This block is called when the undo primary action is executed. */
@@ -93,7 +107,20 @@ fun SwipeToRevealBothDirectionsNonAnchoring() {
                 )
             }
         ) {
-            Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+            Button(
+                modifier =
+                    Modifier.fillMaxWidth().semantics {
+                        // Use custom actions to make the primary action accessible
+                        customActions =
+                            listOf(
+                                CustomAccessibilityAction("Delete") {
+                                    /* Add the primary action click handler here */
+                                    true
+                                },
+                            )
+                    },
+                onClick = {}
+            ) {
                 Text("This Button has only one action", modifier = Modifier.fillMaxWidth())
             }
         }
