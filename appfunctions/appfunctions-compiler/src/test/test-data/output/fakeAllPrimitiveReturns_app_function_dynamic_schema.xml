@@ -352,6 +352,33 @@
         <components>
             <id>unused</id>
         </components>
+        <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayItemListReturn</id>
+        <enabledByDefault>true</enabledByDefault>
+        <response>
+            <id>unused</id>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <itemType>
+                    <id>unused</id>
+                    <isNullable>true</isNullable>
+                    <type>2</type>
+                </itemType>
+                <type>10</type>
+            </valueType>
+        </response>
+        <schema>
+            <id>unused</id>
+            <schemaCategory>fake_schema_category</schemaCategory>
+            <schemaName>allPrimitiveReturns</schemaName>
+            <schemaVersion>1</schemaVersion>
+        </schema>
+        <functionId>com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayItemListReturn</functionId>
+    </appfunction>
+    <appfunction>
+        <components>
+            <id>unused</id>
+        </components>
         <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayListReturn</id>
         <enabledByDefault>true</enabledByDefault>
         <response>
@@ -597,6 +624,33 @@
             <schemaVersion>1</schemaVersion>
         </schema>
         <functionId>com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongReturn</functionId>
+    </appfunction>
+    <appfunction>
+        <components>
+            <id>unused</id>
+        </components>
+        <id>com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringItemListReturn</id>
+        <enabledByDefault>true</enabledByDefault>
+        <response>
+            <id>unused</id>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <itemType>
+                    <id>unused</id>
+                    <isNullable>true</isNullable>
+                    <type>8</type>
+                </itemType>
+                <type>10</type>
+            </valueType>
+        </response>
+        <schema>
+            <id>unused</id>
+            <schemaCategory>fake_schema_category</schemaCategory>
+            <schemaName>allPrimitiveReturns</schemaName>
+            <schemaVersion>1</schemaVersion>
+        </schema>
+        <functionId>com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringItemListReturn</functionId>
     </appfunction>
     <appfunction>
         <components>

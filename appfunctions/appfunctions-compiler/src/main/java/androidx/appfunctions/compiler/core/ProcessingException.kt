@@ -23,4 +23,4 @@ class ProcessingException(
     message: String,
     val symbol: KSNode?,
     val throwable: Throwable? = null,
-) : Exception(message)
+) : Exception(message, throwable)
