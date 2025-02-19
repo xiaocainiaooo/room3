@@ -55,7 +55,7 @@ public fun EnableXrComponentOverrides(
                 if (shouldOverrideNavigationSuiteScaffold) {
                     add(
                         LocalNavigationSuiteScaffoldComponentOverride provides
-                            XrNavigationSuiteScaffoldOverride
+                            XrNavigationSuiteScaffoldComponentOverride
                     )
                 }
                 // Automatically enable NavBar and NavRail when NavSuiteScaffold is enabled
