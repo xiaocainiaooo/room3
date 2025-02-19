@@ -32,6 +32,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.Row
 import androidx.wear.protolayout.LayoutElementBuilders.Spacer
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
+import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
@@ -439,5 +440,90 @@ class FiltersTest {
         assert(hasDescendant(hasImage("image")).matches(testLayout))
         assert(hasDescendant(hasText("text")).matches(testLayout))
         assert(hasDescendant(hasImage("image") and isClickable()).not().matches(testLayout))
+    }
+
+    @Test
+    fun hasSymmetricCorner() {
+        val cornerRadius = 8.5F
+        val testLayout =
+            Box.Builder()
+                .setModifiers(
+                    Modifiers.Builder()
+                        .setBackground(
+                            Background.Builder()
+                                .setCorner(Corner.Builder().setRadius(dp(cornerRadius)).build())
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+        assert(hasAllCorners(cornerRadius).matches(testLayout))
+        assert(hasAllCorners(cornerRadius + 1F).not().matches(testLayout))
+    }
+
+    @Test
+    fun hasAsymmetricCorner() {
+        val radii = floatArrayOf(1F, 2F, 3F, 4F, 5F, 6F, 7F, 8F)
+        val testLayout =
+            Box.Builder()
+                .setModifiers(
+                    Modifiers.Builder()
+                        .setBackground(
+                            Background.Builder()
+                                .setCorner(
+                                    Corner.Builder()
+                                        .setTopLeftRadius(dp(radii[0]), dp(radii[1]))
+                                        .setTopRightRadius(dp(radii[2]), dp(radii[3]))
+                                        .setBottomLeftRadius(dp(radii[4]), dp(radii[5]))
+                                        .setBottomRightRadius(dp(radii[6]), dp(radii[7]))
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+        assert(hasTopLeftCorner(radii[0], radii[1]).matches(testLayout))
+        assert(hasTopRightCorner(radii[2], radii[3]).matches(testLayout))
+        assert(hasBottomLeftCorner(radii[4], radii[5]).matches(testLayout))
+        assert(hasBottomRightCorner(radii[6], radii[7]).matches(testLayout))
+    }
+
+    @Test
+    fun hasOneOverrideCorner() {
+        val cornerRadius = 8.5F
+        val bottomLeftXRadius = 9.5F
+        val bottomLeftYRadius = 9.5F
+        val testLayout =
+            Box.Builder()
+                .setModifiers(
+                    Modifiers.Builder()
+                        .setBackground(
+                            Background.Builder()
+                                .setCorner(
+                                    Corner.Builder()
+                                        .setRadius(dp(cornerRadius))
+                                        .setBottomLeftRadius(
+                                            dp(bottomLeftXRadius),
+                                            dp(bottomLeftYRadius)
+                                        )
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
+
+        assert(hasAllCorners(cornerRadius).not().matches(testLayout))
+        assert(
+            (hasTopLeftCorner(cornerRadius, cornerRadius) and
+                    hasTopRightCorner(cornerRadius, cornerRadius) and
+                    hasBottomLeftCorner(bottomLeftXRadius, bottomLeftYRadius) and
+                    hasBottomRightCorner(cornerRadius, cornerRadius))
+                .matches(testLayout)
+        )
     }
 }
