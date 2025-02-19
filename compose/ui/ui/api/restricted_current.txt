@@ -3929,6 +3929,7 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> getHorizontalScrollAxisRange();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> getImeAction();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Integer>> getIndexForKey();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> getInputText();
     method @Deprecated public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getInvisibleToUser();
     method @Deprecated public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getIsContainer();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> getIsDialog();
@@ -3967,6 +3968,7 @@ package androidx.compose.ui.semantics {
     property public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.ScrollAxisRange> HorizontalScrollAxisRange;
     property public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.input.ImeAction> ImeAction;
     property public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Integer>> IndexForKey;
+    property public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.text.AnnotatedString> InputText;
     property @Deprecated public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> InvisibleToUser;
     property @Deprecated public androidx.compose.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> IsContainer;
     property public androidx.compose.ui.semantics.SemanticsPropertyKey<kotlin.Unit> IsDialog;
@@ -4020,6 +4022,7 @@ package androidx.compose.ui.semantics {
     method public static boolean getFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static androidx.compose.ui.semantics.ScrollAxisRange getHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method @Deprecated public static int getImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.compose.ui.text.AnnotatedString getInputText(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static int getLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static int getMaxTextLength(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static String getPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
@@ -4074,6 +4077,7 @@ package androidx.compose.ui.semantics {
     method public static void setFocused(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
     method public static void setHorizontalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange);
     method @Deprecated public static void setImeAction(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int);
+    method public static void setInputText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.text.AnnotatedString);
     method public static void setLiveRegion(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int);
     method public static void setMaxTextLength(androidx.compose.ui.semantics.SemanticsPropertyReceiver, int);
     method public static void setPaneTitle(androidx.compose.ui.semantics.SemanticsPropertyReceiver, String);
@@ -4105,6 +4109,7 @@ package androidx.compose.ui.semantics {
     property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.focused;
     property public static androidx.compose.ui.semantics.ScrollAxisRange androidx.compose.ui.semantics.SemanticsPropertyReceiver.horizontalScrollAxisRange;
     property @Deprecated public static int androidx.compose.ui.semantics.SemanticsPropertyReceiver.imeAction;
+    property public static androidx.compose.ui.text.AnnotatedString androidx.compose.ui.semantics.SemanticsPropertyReceiver.inputText;
     property @Deprecated public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isContainer;
     property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isEditable;
     property public static boolean androidx.compose.ui.semantics.SemanticsPropertyReceiver.isShowingTextSubstitution;
