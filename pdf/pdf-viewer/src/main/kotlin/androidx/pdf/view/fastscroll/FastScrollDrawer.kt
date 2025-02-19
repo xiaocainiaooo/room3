@@ -21,6 +21,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.Range
@@ -79,6 +80,8 @@ public class FastScrollDrawer(
                 )
             textSize = pageIndicatorTextSize.dpToPx(context)
             textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+            typeface = Typeface.DEFAULT_BOLD
         }
 
     private val thumbShadowDrawable: Drawable? =
@@ -142,34 +145,43 @@ public class FastScrollDrawer(
         thumbDrawable.draw(canvas)
 
         drawDragHandle(canvas, thumbRightPx, thumbTopPx)
-        drawPageIndicator(canvas, thumbLeftPx, thumbTopPx, visiblePages)
+        drawPageIndicator(canvas, zoom, thumbTopPx, visiblePages, visibleAreaPx)
     }
 
     private fun drawPageIndicator(
         canvas: Canvas,
-        thumbLeftPx: Int,
+        zoom: Float,
         thumbTopPx: Int,
-        visiblePages: Range<Int>
+        visiblePages: Range<Int>,
+        visibleAreaPx: Rect,
     ) {
         currentPageIndicatorLabel = generateLabel(visiblePages)
-        val labelWidth = textPaint.measureText(currentPageIndicatorLabel).toInt()
-        val pageIndicatorWidthPx = labelWidth + (2 * pageIndicatorTextOffsetDp.dpToPx(context))
+        val labelWidth = textPaint.measureText(currentPageIndicatorLabel)
+        val pageIndicatorWidthPx =
+            (labelWidth + (2 * pageIndicatorTextOffsetDp.dpToPx(context))).toInt()
 
-        val indicatorLeftPx =
-            thumbLeftPx - pageIndicatorWidthPx - pageIndicatorRightMarginDp.dpToPx(context)
+        val viewRightPx =
+            (PdfView.toViewCoord(visibleAreaPx.right.toFloat(), zoom, scroll = 0)).toInt()
+        val pageIndicatorHeightPx = pageIndicatorHeightDp.dpToPx(context)
+
+        val indicatorRightPx = viewRightPx - pageIndicatorRightMarginDp.dpToPx(context)
+        val indicatorLeftPx = indicatorRightPx - pageIndicatorWidthPx
         val indicatorTopPx =
-            thumbTopPx +
-                ((thumbHeightDp.dpToPx(context) - pageIndicatorHeightDp.dpToPx(context)) / 2)
+            thumbTopPx + ((thumbHeightDp.dpToPx(context) - pageIndicatorHeightPx) / 2)
+        val indicatorBottomPx = indicatorTopPx + pageIndicatorHeightPx
+
         pageIndicatorBackground.setBounds(
             /* left= */ indicatorLeftPx,
             /* top= */ indicatorTopPx,
-            /* right= */ indicatorLeftPx + pageIndicatorWidthPx,
-            /* bottom= */ indicatorTopPx + pageIndicatorHeightDp.dpToPx(context)
+            /* right= */ indicatorRightPx,
+            /* bottom= */ indicatorBottomPx
         )
         pageIndicatorBackground.draw(canvas)
 
         val xPos = indicatorLeftPx + (pageIndicatorWidthPx / 2)
-        val yPos = indicatorTopPx + pageIndicatorTextYOffsetDp
+        val yPos =
+            (indicatorTopPx + (pageIndicatorHeightPx / 2) -
+                ((textPaint.descent() + textPaint.ascent()) / 2))
         canvas.drawText(currentPageIndicatorLabel, xPos.toFloat(), yPos.toFloat(), textPaint)
     }
 
