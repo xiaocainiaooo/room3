@@ -52,7 +52,6 @@ import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -1607,14 +1606,14 @@ public final class ProtoLayoutInflater {
         }
     }
 
-    private GradientDrawable applyBackground(
+    private BackgroundDrawable applyBackground(
             View view,
             Background background,
-            @Nullable GradientDrawable drawable,
+            @Nullable BackgroundDrawable drawable,
             String posId,
             Optional<ProtoLayoutDynamicDataPipeline.PipelineMaker> pipelineMaker) {
         if (drawable == null) {
-            drawable = new GradientDrawable();
+            drawable = new BackgroundDrawable();
         }
 
         if (background.hasColor()) {
@@ -1627,7 +1626,7 @@ public final class ProtoLayoutInflater {
     }
 
     private void applyCornerToBackground(
-            View view, @NonNull Background background, @NonNull GradientDrawable drawable) {
+            View view, @NonNull Background background, @NonNull BackgroundDrawable drawable) {
         if (!background.hasCorner()) {
             return;
         }
@@ -1654,7 +1653,7 @@ public final class ProtoLayoutInflater {
             if (radii[0] == 0) {
                 return;
             }
-            // The implementation in GradientDrawable is more efficient by calling setCornerRadius
+            // The implementation in BackgroundDrawable is more efficient by calling setCornerRadius
             // than calling setCornerRadii with an array of all equal items.
             drawable.setCornerRadius(radii[0]);
         } else {
@@ -1684,16 +1683,16 @@ public final class ProtoLayoutInflater {
         return true;
     }
 
-    private GradientDrawable applyBorder(
+    private BackgroundDrawable applyBorder(
             Border border,
-            @Nullable GradientDrawable drawable,
+            @Nullable BackgroundDrawable drawable,
             String posId,
             Optional<ProtoLayoutDynamicDataPipeline.PipelineMaker> pipelineMaker) {
         if (drawable == null) {
-            drawable = new GradientDrawable();
+            drawable = new BackgroundDrawable();
         }
 
-        GradientDrawable finalDrawable = drawable;
+        BackgroundDrawable finalDrawable = drawable;
         int width = safeDpToPx(border.getWidth());
         handleProp(
                 border.getColor(),
@@ -1852,7 +1851,7 @@ public final class ProtoLayoutInflater {
             applyPadding(view, modifiers.getPadding());
         }
 
-        GradientDrawable backgroundDrawable = null;
+        BackgroundDrawable backgroundDrawable = null;
 
         if (modifiers.hasBackground()) {
             backgroundDrawable =
