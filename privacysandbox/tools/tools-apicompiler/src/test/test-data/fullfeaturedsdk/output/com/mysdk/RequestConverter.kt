@@ -16,6 +16,8 @@ public class RequestConverter(
                 myInterface = (parcelable.myInterface as MyInterfaceStubDelegate).delegate,
                 myUiInterface = (parcelable.myUiInterface.binder as
                         MyUiInterfaceStubDelegate).delegate,
+                mySharedUiInterface = (parcelable.mySharedUiInterface.binder as
+                        MySharedUiInterfaceStubDelegate).delegate,
                 activityLauncher = SdkActivityLauncherAndBinderWrapper(parcelable.activityLauncher),
                 flag = RequestFlagConverter(context).fromParcelable(parcelable.flag))
         return annotatedValue
@@ -32,6 +34,9 @@ public class RequestConverter(
         parcelable.myUiInterface =
                 IMyUiInterfaceCoreLibInfoAndBinderWrapperConverter.toParcelable(annotatedValue.myUiInterface.toCoreLibInfo(context),
                 MyUiInterfaceStubDelegate(annotatedValue.myUiInterface, context))
+        parcelable.mySharedUiInterface =
+                IMySharedUiInterfaceCoreLibInfoAndBinderWrapperConverter.toParcelable(annotatedValue.mySharedUiInterface.toCoreLibInfo(),
+                MySharedUiInterfaceStubDelegate(annotatedValue.mySharedUiInterface, context))
         parcelable.activityLauncher =
                 SdkActivityLauncherAndBinderWrapper.getLauncherInfo(annotatedValue.activityLauncher)
         parcelable.flag = RequestFlagConverter(context).toParcelable(annotatedValue.flag)
