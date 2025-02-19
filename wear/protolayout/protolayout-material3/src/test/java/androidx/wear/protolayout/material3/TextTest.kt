@@ -50,7 +50,7 @@ class TextTest {
 
         // Underlying implementation is just calling androidx.wear.protolayout.layout.basicText
         // which is fully tested for all fields
-        provider.onElement(hasText(TEXT)).assertExists()
+        provider.onElement(hasText(TEXT.staticValue)).assertExists()
         provider.onElement(hasColor(COLOR)).assertExists()
         assertThat((text as Text).fontStyle!!.settings).hasSize(3)
         assertThat(text.fontStyle!!.settings[0].toFontSettingProto())
