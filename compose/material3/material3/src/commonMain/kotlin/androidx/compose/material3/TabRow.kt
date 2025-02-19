@@ -16,6 +16,7 @@
 
 package androidx.compose.material3
 
+import androidx.collection.mutableIntListOf
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -146,7 +147,6 @@ import kotlinx.coroutines.launch
  *   inside this lambda will be measured and placed evenly across the row, each taking up equal
  *   space.
  */
-@ExperimentalMaterial3Api
 @Composable
 fun PrimaryTabRow(
     selectedTabIndex: Int,
@@ -199,7 +199,6 @@ fun PrimaryTabRow(
  *   inside this lambda will be measured and placed evenly across the row, each taking up equal
  *   space.
  */
-@ExperimentalMaterial3Api
 @Composable
 fun SecondaryTabRow(
     selectedTabIndex: Int,
@@ -343,11 +342,11 @@ fun TabRow(
  *   modifier to animate its position.
  * @param divider the divider displayed at the bottom of the tab row. This provides a layer of
  *   separation between the tab row and the content displayed underneath.
+ * @param minTabWidth the minimum width for a [Tab] in this tab row regardless of content size.
  * @param tabs the tabs inside this tab row. Typically this will be multiple [Tab]s. Each element
  *   inside this lambda will be measured and placed evenly across the row, each taking up equal
  *   space.
  */
-@ExperimentalMaterial3Api
 @Composable
 fun PrimaryScrollableTabRow(
     selectedTabIndex: Int,
@@ -364,6 +363,7 @@ fun PrimaryScrollableTabRow(
             )
         },
     divider: @Composable () -> Unit = @Composable { HorizontalDivider() },
+    minTabWidth: Dp = TabRowDefaults.ScrollableTabRowMinTabWidth,
     tabs: @Composable () -> Unit
 ) {
     ScrollableTabRowImpl(
@@ -373,6 +373,7 @@ fun PrimaryScrollableTabRow(
         containerColor = containerColor,
         contentColor = contentColor,
         edgePadding = edgePadding,
+        minTabWidth = minTabWidth,
         divider = divider,
         tabs = tabs,
         scrollState = scrollState,
@@ -413,11 +414,11 @@ fun PrimaryScrollableTabRow(
  *   drawn indicator inside this space, and provide an offset from the start.
  * @param divider the divider displayed at the bottom of the tab row. This provides a layer of
  *   separation between the tab row and the content displayed underneath.
+ * @param minTabWidth the minimum width for a [Tab] in this tab row regardless of content size.
  * @param tabs the tabs inside this tab row. Typically this will be multiple [Tab]s. Each element
  *   inside this lambda will be measured and placed evenly across the row, each taking up equal
  *   space.
  */
-@ExperimentalMaterial3Api
 @Composable
 fun SecondaryScrollableTabRow(
     selectedTabIndex: Int,
@@ -433,6 +434,7 @@ fun SecondaryScrollableTabRow(
             )
         },
     divider: @Composable () -> Unit = @Composable { HorizontalDivider() },
+    minTabWidth: Dp = TabRowDefaults.ScrollableTabRowMinTabWidth,
     tabs: @Composable () -> Unit
 ) {
     ScrollableTabRowImpl(
@@ -442,6 +444,7 @@ fun SecondaryScrollableTabRow(
         containerColor = containerColor,
         contentColor = contentColor,
         edgePadding = edgePadding,
+        minTabWidth = minTabWidth,
         divider = divider,
         tabs = tabs,
         scrollState = scrollState
@@ -520,7 +523,6 @@ fun ScrollableTabRow(
  * indicators requiring layout information about the tabs like [TabRowDefaults.PrimaryIndicator] and
  * [TabRowDefaults.SecondaryIndicator]
  */
-@ExperimentalMaterial3Api
 interface TabIndicatorScope {
 
     /**
@@ -696,6 +698,7 @@ private fun ScrollableTabRowImpl(
     containerColor: Color,
     contentColor: Color,
     edgePadding: Dp,
+    minTabWidth: Dp,
     scrollState: ScrollState,
     indicator: @Composable TabIndicatorScope.() -> Unit,
     divider: @Composable () -> Unit,
@@ -776,7 +779,6 @@ private fun ScrollableTabRowImpl(
         ) { (tabMeasurables, dividerMeasurables, indicatorMeasurables), constraints ->
             val padding = edgePadding.roundToPx()
             val tabCount = tabMeasurables.size
-            val minTabWidth = ScrollableTabRowMinimumTabWidth.roundToPx()
             val layoutHeight =
                 tabMeasurables.fastFold(initial = 0) { curr, measurable ->
                     maxOf(curr, measurable.maxIntrinsicHeight(Constraints.Infinity))
@@ -784,21 +786,27 @@ private fun ScrollableTabRowImpl(
             var layoutWidth = padding * 2
             val tabConstraints =
                 constraints.copy(
-                    minWidth = minTabWidth,
+                    minWidth = minTabWidth.roundToPx(),
                     minHeight = layoutHeight,
                     maxHeight = layoutHeight,
                 )
 
             var left = edgePadding
             val tabPlaceables = tabMeasurables.fastMap { it.measure(tabConstraints) }
+            // Get indicator widths based on incoming content size, not based on forced minimum
+            // width applied below.
+            val indicatorWidth = mutableIntListOf()
+            tabMeasurables.fastForEach {
+                indicatorWidth.add(it.maxIntrinsicWidth(Constraints.Infinity))
+            }
 
             val positions =
                 List(tabCount) { index ->
-                    val tabWidth =
-                        maxOf(ScrollableTabRowMinimumTabWidth, tabPlaceables[index].width.toDp())
+                    val tabWidth = maxOf(minTabWidth, tabPlaceables[index].width.toDp())
                     layoutWidth += tabWidth.roundToPx()
                     // Enforce minimum touch target of 24.dp
-                    val contentWidth = maxOf(tabWidth - (HorizontalTextPadding * 2), 24.dp)
+                    val contentWidth =
+                        maxOf(indicatorWidth[index].toDp() - (HorizontalTextPadding * 2), 24.dp)
                     val tabPosition =
                         TabPosition(left = left, width = tabWidth, contentWidth = contentWidth)
                     left += tabWidth
@@ -822,7 +830,7 @@ private fun ScrollableTabRowImpl(
                     it.measure(
                         constraints.copy(
                             minWidth = 0,
-                            maxWidth = positions[selectedTabIndex].width.roundToPx(),
+                            maxWidth = positions[selectedTabIndex].contentWidth.roundToPx(),
                             minHeight = 0,
                             maxHeight = layoutHeight
                         )
@@ -1058,7 +1066,7 @@ private fun ScrollableTabRowWithSubcomposeImpl(
                 .selectableGroup()
                 .clipToBounds()
         ) { constraints ->
-            val minTabWidth = ScrollableTabRowMinimumTabWidth.roundToPx()
+            val minTabWidth = TabRowDefaults.ScrollableTabRowMinTabWidth.roundToPx()
             val padding = edgePadding.roundToPx()
 
             val tabMeasurables = subcompose(TabSlots.Tabs, tabs)
@@ -1180,7 +1188,16 @@ class TabPosition internal constructor(val left: Dp, val width: Dp, val contentW
 
 /** Contains default implementations and values used for TabRow. */
 object TabRowDefaults {
-    /** The default padding from the starting edge before a tab in a [ScrollableTabRow]. */
+    /**
+     * The default minimum width for a tab in a [PrimaryScrollableTabRow] or
+     * [SecondaryScrollableTabRow].
+     */
+    val ScrollableTabRowMinTabWidth = 90.dp
+
+    /**
+     * The default padding from the starting edge before a tab in a [PrimaryScrollableTabRow] or
+     * [SecondaryScrollableTabRow].
+     */
     val ScrollableTabRowEdgeStartPadding = 52.dp
 
     /** Default container color of a tab row. */
@@ -1374,4 +1391,65 @@ private class ScrollableTabData(
         }
 }
 
-private val ScrollableTabRowMinimumTabWidth = 90.dp
+@Deprecated(level = DeprecationLevel.HIDDEN, message = "Maintained for Binary Compatibility.")
+@Composable
+fun PrimaryScrollableTabRow(
+    selectedTabIndex: Int,
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
+    containerColor: Color = TabRowDefaults.primaryContainerColor,
+    contentColor: Color = TabRowDefaults.primaryContentColor,
+    edgePadding: Dp = TabRowDefaults.ScrollableTabRowEdgeStartPadding,
+    indicator: @Composable TabIndicatorScope.() -> Unit =
+        @Composable {
+            TabRowDefaults.PrimaryIndicator(
+                Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = true),
+                width = Dp.Unspecified,
+            )
+        },
+    divider: @Composable () -> Unit = @Composable { HorizontalDivider() },
+    tabs: @Composable () -> Unit
+) =
+    PrimaryScrollableTabRow(
+        selectedTabIndex = selectedTabIndex,
+        modifier = modifier,
+        scrollState = scrollState,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        edgePadding = edgePadding,
+        indicator = indicator,
+        divider = divider,
+        minTabWidth = TabRowDefaults.ScrollableTabRowMinTabWidth,
+        tabs = tabs,
+    )
+
+@Deprecated(level = DeprecationLevel.HIDDEN, message = "Maintained for Binary Compatibility.")
+@Composable
+fun SecondaryScrollableTabRow(
+    selectedTabIndex: Int,
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
+    containerColor: Color = TabRowDefaults.secondaryContainerColor,
+    contentColor: Color = TabRowDefaults.secondaryContentColor,
+    edgePadding: Dp = TabRowDefaults.ScrollableTabRowEdgeStartPadding,
+    indicator: @Composable TabIndicatorScope.() -> Unit =
+        @Composable {
+            TabRowDefaults.SecondaryIndicator(
+                Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = false)
+            )
+        },
+    divider: @Composable () -> Unit = @Composable { HorizontalDivider() },
+    tabs: @Composable () -> Unit
+) =
+    SecondaryScrollableTabRow(
+        selectedTabIndex = selectedTabIndex,
+        modifier = modifier,
+        scrollState = scrollState,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        edgePadding = edgePadding,
+        indicator = indicator,
+        divider = divider,
+        minTabWidth = TabRowDefaults.ScrollableTabRowMinTabWidth,
+        tabs = tabs
+    )
