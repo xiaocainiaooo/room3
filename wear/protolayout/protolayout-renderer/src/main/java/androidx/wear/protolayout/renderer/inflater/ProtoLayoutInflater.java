@@ -844,6 +844,7 @@ public final class ProtoLayoutInflater {
                 if (mLoadActionListener == null) {
                     mLoadActionListener = p -> {};
                 }
+
                 if (mProtoLayoutTheme == null) {
                     this.mProtoLayoutTheme = ProtoLayoutThemeImpl.defaultTheme(mUiContext);
                 }
@@ -851,11 +852,13 @@ public final class ProtoLayoutInflater {
                 if (mClickableIdExtra == null) {
                     mClickableIdExtra = DEFAULT_CLICKABLE_ID_EXTRA;
                 }
+
                 if (mInflaterStatsLogger == null) {
                     mInflaterStatsLogger =
                             new NoOpProviderStatsLogger("No implementation was provided")
                                     .createInflaterStatsLogger();
                 }
+
                 return new Config(
                         mUiContext,
                         mLayout,
@@ -1151,13 +1154,12 @@ public final class ProtoLayoutInflater {
      */
     private static boolean isBold(FontStyle fontStyle) {
         // Even though we have weight axis too, this concept of bold and bold flag in Typeface is
-        // different, so we only look at the FontWeight enum API here.
-        // Although this method could be a simple equality check against FONT_WEIGHT_BOLD, we list
-        // all current cases here so that this will become a compile time error as soon as a new
-        // FontWeight value is added to the schema. If this fails to build, then this means that an
-        // int typeface style is no longer enough to represent all FontWeight values and a
-        // customizable, per-weight text style must be introduced to ProtoLayoutInflater to handle
-        // this. See b/176980535
+        // different, so we only look at the FontWeight enum API here. Although this method could be
+        // a simple equality check against FONT_WEIGHT_BOLD, we list all current cases here so that
+        // this will become a compile time error as soon as a new FontWeight value is added to the
+        // schema. If this fails to build, then this means that an int typeface style is no longer
+        // enough to represent all FontWeight values and a customizable, per-weight text style must
+        // be introduced to ProtoLayoutInflater to handle this. See b/176980535
         switch (fontStyle.getWeight().getValue()) {
             case FONT_WEIGHT_BOLD:
                 return true;
@@ -1254,10 +1256,10 @@ public final class ProtoLayoutInflater {
 
         // Need to supply typefaceStyle when creating the typeface (will select specialist
         // bold/italic typefaces), *and* when setting the typeface (will set synthetic bold/italic
-        // flags in Paint if they're not supported by the given typeface).
-        // This is fine to do even for variable fonts with weight axis, as if their weight axis is
-        // larger than 700 and BOLD flag is on, it should be "bolded" two times - one for Typeface
-        // selection, one for axis value.
+        // flags in Paint if they're not supported by the given typeface). This is fine to do even
+        // for variable fonts with weight axis, as if their weight axis is larger than 700 and BOLD
+        // flag is on, it should be "bolded" two times - one for Typeface selection, one for axis
+        // value.
         textView.setTypeface(createTypeface(style), fontStyleToTypefaceStyle(style));
 
         if (fontStyleHasSize(style)) {
@@ -1308,9 +1310,8 @@ public final class ProtoLayoutInflater {
                             TAG,
                             "More than "
                                     + TEXT_AUTOSIZES_LIMIT
-                                    + " sizes has been added for the "
-                                    + "text autosizing. Ignoring all other sizes and using the last"
-                                    + "one.");
+                                    + " sizes has been added for the text autosizing. Ignoring all"
+                                    + " other sizes and using the last one.");
                 }
 
                 textView.setTextSize(COMPLEX_UNIT_SP, sizes.get(sizesCnt - 1).getValue());
@@ -1608,6 +1609,7 @@ public final class ProtoLayoutInflater {
 
     private BackgroundDrawable applyBackground(
             View view,
+            @Nullable View wrapper,
             Background background,
             @Nullable BackgroundDrawable drawable,
             String posId,
@@ -1616,7 +1618,20 @@ public final class ProtoLayoutInflater {
             drawable = new BackgroundDrawable();
         }
 
-        if (background.hasColor()) {
+        if (background.hasBrush() && background.getBrush().hasLinearGradient()) {
+            try {
+                LinearGradientHelper linearGradientHelper =
+                        new LinearGradientHelper(
+                                background.getBrush().getLinearGradient(),
+                                wrapper != null ? wrapper : view,
+                                pipelineMaker,
+                                posId,
+                                view::invalidate);
+                drawable.setLinearGradientHelper(linearGradientHelper);
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Failed to apply linear gradient to background", e);
+            }
+        } else if (background.hasColor()) {
             handleProp(background.getColor(), drawable::setColor, posId, pipelineMaker);
         }
 
@@ -1857,6 +1872,7 @@ public final class ProtoLayoutInflater {
             backgroundDrawable =
                     applyBackground(
                             view,
+                            wrapper,
                             modifiers.getBackground(),
                             backgroundDrawable,
                             posId,
@@ -3360,8 +3376,18 @@ public final class ProtoLayoutInflater {
         try {
             lineView.setUpdatesEnabled(false);
 
-            if (line.hasBrush()) {
-                lineView.setBrush(line.getBrush());
+            if (line.hasBrush() && line.getBrush().hasSweepGradient()) {
+                try {
+                    SweepGradientHelper sweepGradientHelper =
+                            SweepGradientHelper.create(
+                                    line.getBrush().getSweepGradient(),
+                                    posId,
+                                    pipelineMaker,
+                                    lineView::triggerRefresh);
+                    lineView.setSweepGradient(sweepGradientHelper);
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "Invalid SweepGradient definition: " + e.getMessage());
+                }
             } else if (line.hasColor()) {
                 handleProp(line.getColor(), lineView::setColor, posId, pipelineMaker);
             } else {
