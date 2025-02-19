@@ -35,22 +35,19 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
      * a list of strings will have a category of PRIMITIVE_LIST.
      */
     val typeCategory: AppFunctionSupportedTypeCategory by lazy {
-        val typeName = selfTypeReference.toTypeName().ignoreNullable().toString()
-        if (typeName in SUPPORTED_COLLECTION_TYPES) {
-            PRIMITIVE_LIST
-        } else if (typeName in SUPPORTED_SINGLE_PRIMITIVE_TYPES) {
-            PRIMITIVE_SINGULAR
-        } else if (typeName in SUPPORTED_ARRAY_PRIMITIVE_TYPES) {
-            PRIMITIVE_ARRAY
-        } else if (isAppFunctionSerializableListType(selfTypeReference)) {
-            SERIALIZABLE_LIST
-        } else if (isAppFunctionSerializableType(selfTypeReference)) {
-            SERIALIZABLE_SINGULAR
-        } else {
-            throw ProcessingException(
-                "Unsupported type reference ${selfTypeReference.ensureQualifiedTypeName().asString()}",
-                selfTypeReference,
-            )
+        when {
+            selfTypeReference.asStringWithoutNullQualifier() in SUPPORTED_SINGLE_PRIMITIVE_TYPES ->
+                PRIMITIVE_SINGULAR
+            selfTypeReference.asStringWithoutNullQualifier() in SUPPORTED_ARRAY_PRIMITIVE_TYPES ->
+                PRIMITIVE_ARRAY
+            isSupportedPrimitiveListType(selfTypeReference) -> PRIMITIVE_LIST
+            isAppFunctionSerializableListType(selfTypeReference) -> SERIALIZABLE_LIST
+            isAppFunctionSerializableType(selfTypeReference) -> SERIALIZABLE_SINGULAR
+            else ->
+                throw ProcessingException(
+                    "Unsupported type reference ${selfTypeReference.ensureQualifiedTypeName().asString()}",
+                    selfTypeReference,
+                )
         }
     }
 
@@ -117,12 +114,17 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
          * list of a supported type.
          */
         fun isSupportedType(typeReferenceArgument: KSTypeReference): Boolean {
-            return SUPPORTED_TYPES.contains(
-                typeReferenceArgument.toTypeName().ignoreNullable().toString()
-            ) ||
-                isAppFunctionSerializableListType(typeReferenceArgument) ||
-                isAppFunctionSerializableType(typeReferenceArgument)
+            return typeReferenceArgument.asStringWithoutNullQualifier() in SUPPORTED_TYPES ||
+                isSupportedPrimitiveListType(typeReferenceArgument) ||
+                isAppFunctionSerializableType(typeReferenceArgument) ||
+                isAppFunctionSerializableListType(typeReferenceArgument)
         }
+
+        private fun isSupportedPrimitiveListType(typeReferenceArgument: KSTypeReference) =
+            typeReferenceArgument.isOfType(LIST) &&
+                typeReferenceArgument
+                    .resolveListParameterizedType()
+                    .asStringWithoutNullQualifier() in SUPPORTED_PRIMITIVE_TYPES_IN_LIST
 
         private fun isAppFunctionSerializableListType(
             typeReferenceArgument: KSTypeReference
@@ -143,6 +145,9 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
         private fun TypeName.ignoreNullable(): TypeName {
             return copy(nullable = false)
         }
+
+        private fun KSTypeReference.asStringWithoutNullQualifier(): String =
+            toTypeName().ignoreNullable().toString()
 
         private val SUPPORTED_ARRAY_PRIMITIVE_TYPES =
             setOf(
@@ -165,16 +170,14 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
                 Unit::class.ensureQualifiedName(),
             )
 
-        const val STRING_LIST_TYPE = "kotlin.collections.List<kotlin.String>"
-        const val BYTE_ARRAY_LIST_TYPE = "kotlin.collections.List<kotlin.ByteArray>"
-
-        private val SUPPORTED_COLLECTION_TYPES = setOf(STRING_LIST_TYPE, BYTE_ARRAY_LIST_TYPE)
+        private val SUPPORTED_PRIMITIVE_TYPES_IN_LIST =
+            setOf(String::class.ensureQualifiedName(), ByteArray::class.ensureQualifiedName())
 
         private val SUPPORTED_TYPES =
-            SUPPORTED_SINGLE_PRIMITIVE_TYPES +
-                SUPPORTED_ARRAY_PRIMITIVE_TYPES +
-                SUPPORTED_COLLECTION_TYPES
+            SUPPORTED_SINGLE_PRIMITIVE_TYPES + SUPPORTED_ARRAY_PRIMITIVE_TYPES
 
-        val SUPPORTED_TYPES_STRING: String = SUPPORTED_TYPES.joinToString(",\n")
+        val SUPPORTED_TYPES_STRING: String =
+            SUPPORTED_TYPES.joinToString(",\n") +
+                "\nLists of ${SUPPORTED_PRIMITIVE_TYPES_IN_LIST.joinToString(", ")}"
     }
 }

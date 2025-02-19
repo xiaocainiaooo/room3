@@ -146,4 +146,14 @@ class FakeAllPrimitiveReturnsImpl : FakeAllPrimitiveReturns {
     override fun nullableFloatArrayReturn(
         appFunctionContext: AppFunctionContext,
     ): FloatArray? = null
+
+    @AppFunction
+    override fun nullableByteArrayItemListReturn(
+        appFunctionContext: AppFunctionContext,
+    ): List<ByteArray?> = emptyList()
+
+    @AppFunction
+    override fun nullableStringItemListReturn(
+        appFunctionContext: AppFunctionContext,
+    ): List<String?> = emptyList()
 }

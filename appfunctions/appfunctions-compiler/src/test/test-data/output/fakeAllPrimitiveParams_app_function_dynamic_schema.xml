@@ -126,6 +126,36 @@
             <isRequired>true</isRequired>
             <name>arg8</name>
         </parameters>
+        <parameters>
+            <dataTypeMetadata>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <itemType>
+                    <id>unused</id>
+                    <isNullable>true</isNullable>
+                    <type>8</type>
+                </itemType>
+                <type>10</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg9</name>
+        </parameters>
+        <parameters>
+            <dataTypeMetadata>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <itemType>
+                    <id>unused</id>
+                    <isNullable>true</isNullable>
+                    <type>2</type>
+                </itemType>
+                <type>10</type>
+            </dataTypeMetadata>
+            <id>unused</id>
+            <isRequired>true</isRequired>
+            <name>arg10</name>
+        </parameters>
         <response>
             <id>unused</id>
             <valueType>
