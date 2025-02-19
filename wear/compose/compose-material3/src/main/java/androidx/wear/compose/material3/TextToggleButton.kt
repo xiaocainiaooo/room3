@@ -47,12 +47,11 @@ import androidx.wear.compose.materialcore.animateSelectionColor
  *
  * Set the size of the [TextToggleButton] with Modifier.[touchTargetAwareSize] to ensure that the
  * background padding will correctly reach the edge of the minimum touch target. The recommended
- * [TextToggleButton] sizes are [TextToggleButtonDefaults.DefaultButtonSize],
- * [TextToggleButtonDefaults.LargeButtonSize] and [TextToggleButtonDefaults.ExtraLargeButtonSize].
- * The recommended text styles for each corresponding button size are
- * [TextToggleButtonDefaults.defaultButtonTextStyle],
- * [TextToggleButtonDefaults.largeButtonTextStyle] and
- * [TextToggleButtonDefaults.extraLargeButtonTextStyle].
+ * [TextToggleButton] sizes are [TextToggleButtonDefaults.Size],
+ * [TextToggleButtonDefaults.LargeSize] and [TextToggleButtonDefaults.ExtraLargeSize]. The
+ * recommended text styles for each corresponding button size are
+ * [TextToggleButtonDefaults.textStyle], [TextToggleButtonDefaults.largeTextStyle] and
+ * [TextToggleButtonDefaults.extraLargeTextStyle].
  *
  * [TextToggleButton] can be enabled or disabled. A disabled button will not respond to click
  * events. When enabled, the checked and unchecked events are propagated by [onCheckedChange].
@@ -92,7 +91,7 @@ public fun TextToggleButton(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: TextToggleButtonColors = TextToggleButtonDefaults.textToggleButtonColors(),
+    colors: TextToggleButtonColors = TextToggleButtonDefaults.colors(),
     interactionSource: MutableInteractionSource? = null,
     shapes: TextToggleButtonShapes = TextToggleButtonDefaults.shapes(),
     border: BorderStroke? = null,
@@ -119,7 +118,7 @@ public fun TextToggleButton(
             colors.containerColor(enabled = isEnabled, checked = isChecked)
         },
         border = { _, _ -> border },
-        toggleButtonSize = TextToggleButtonDefaults.DefaultButtonSize,
+        toggleButtonSize = TextToggleButtonDefaults.Size,
         interactionSource = finalInteractionSource,
         shape = finalShape,
         ripple = ripple(),
@@ -151,30 +150,30 @@ public object TextToggleButtonDefaults {
      * The default size applied for text toggle buttons. It is recommended to apply this size using
      * [Modifier.touchTargetAwareSize].
      */
-    public val DefaultButtonSize: Dp = TextToggleButtonTokens.ContainerDefaultSize
+    public val Size: Dp = TextToggleButtonTokens.ContainerDefaultSize
 
     /**
      * The recommended size for a large text toggle button. It is recommended to apply this size
      * using [Modifier.touchTargetAwareSize].
      */
-    public val LargeButtonSize: Dp = TextToggleButtonTokens.ContainerLargeSize
+    public val LargeSize: Dp = TextToggleButtonTokens.ContainerLargeSize
 
     /**
      * The recommended size for an extra large text toggle button. It is recommended to apply this
      * size using [Modifier.touchTargetAwareSize].
      */
-    public val ExtraLargeButtonSize: Dp = TextToggleButtonTokens.ContainerExtraLargeSize
+    public val ExtraLargeSize: Dp = TextToggleButtonTokens.ContainerExtraLargeSize
 
     /** The default text style applied for text toggle buttons. */
-    public val defaultButtonTextStyle: TextStyle
+    public val textStyle: TextStyle
         @ReadOnlyComposable @Composable get() = TextToggleButtonTokens.ContentDefaultFont.value
 
     /** The recommended text style for a large text toggle button. */
-    public val largeButtonTextStyle: TextStyle
+    public val largeTextStyle: TextStyle
         @ReadOnlyComposable @Composable get() = TextToggleButtonTokens.ContentLargeFont.value
 
     /** The recommended text style for an extra large text toggle button. */
-    public val extraLargeButtonTextStyle: TextStyle
+    public val extraLargeTextStyle: TextStyle
         @ReadOnlyComposable @Composable get() = TextToggleButtonTokens.ContentExtraLargeFont.value
 
     /**
@@ -273,7 +272,7 @@ public object TextToggleButtonDefaults {
      *   [DisabledContentAlpha]) value applied.
      */
     @Composable
-    public fun textToggleButtonColors(): TextToggleButtonColors =
+    public fun colors(): TextToggleButtonColors =
         MaterialTheme.colorScheme.defaultTextToggleButtonColors
 
     /**
@@ -300,7 +299,7 @@ public object TextToggleButtonDefaults {
      *   unchecked and not enabled
      */
     @Composable
-    public fun textToggleButtonColors(
+    public fun colors(
         checkedContainerColor: Color = Color.Unspecified,
         checkedContentColor: Color = Color.Unspecified,
         uncheckedContainerColor: Color = Color.Unspecified,
