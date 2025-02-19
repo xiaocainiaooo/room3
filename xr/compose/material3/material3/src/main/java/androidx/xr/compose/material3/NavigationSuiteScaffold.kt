@@ -99,7 +99,8 @@ public fun NavigationSuiteScaffold(
  */
 @ExperimentalMaterial3XrApi
 @OptIn(ExperimentalMaterial3AdaptiveComponentOverrideApi::class)
-internal object XrNavigationSuiteScaffoldOverride : NavigationSuiteScaffoldComponentOverride {
+internal object XrNavigationSuiteScaffoldComponentOverride :
+    NavigationSuiteScaffoldComponentOverride {
     @Composable
     override fun NavigationSuiteScaffoldComponentOverrideContext.NavigationSuiteScaffold() {
         NavigationSuiteScaffold(
