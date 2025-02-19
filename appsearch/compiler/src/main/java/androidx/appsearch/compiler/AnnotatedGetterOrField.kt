@@ -195,12 +195,12 @@ data class AnnotatedGetterOrField(
             val jvmType = IntrospectionHelper.getPropertyType(getterOrField)
             val typeUtils = env.typeUtils
             val helper = IntrospectionHelper(env)
-            return if (typeUtils.isAssignable(typeUtils.erasure(jvmType), helper.mCollectionType)) {
+            return if (typeUtils.isAssignable(typeUtils.erasure(jvmType), helper.collectionType)) {
                 ElementTypeCategory.COLLECTION
             } else if (
                 jvmType.kind == TypeKind.ARRAY &&
-                    !typeUtils.isSameType(jvmType, helper.mBytePrimitiveArrayType) &&
-                    !typeUtils.isSameType(jvmType, helper.mByteBoxArrayType)
+                    !typeUtils.isSameType(jvmType, helper.bytePrimitiveArrayType) &&
+                    !typeUtils.isSameType(jvmType, helper.byteBoxArrayType)
             ) {
                 // byte[] has a native representation in Icing and should be considered a
                 // primitive by itself.
@@ -379,7 +379,7 @@ data class AnnotatedGetterOrField(
                 MetadataPropertyAnnotation.NAMESPACE ->
                     requireTypeIsOneOf(
                         getterOrField,
-                        listOf(helper.mStringType),
+                        listOf(helper.stringType),
                         env,
                         allowRepeated = false
                     )
@@ -388,10 +388,10 @@ data class AnnotatedGetterOrField(
                     requireTypeIsOneOf(
                         getterOrField,
                         listOf(
-                            helper.mLongPrimitiveType,
-                            helper.mIntPrimitiveType,
-                            helper.mLongBoxType,
-                            helper.mIntegerBoxType
+                            helper.longPrimitiveType,
+                            helper.intPrimitiveType,
+                            helper.longBoxType,
+                            helper.integerBoxType
                         ),
                         env,
                         allowRepeated = false
@@ -399,7 +399,7 @@ data class AnnotatedGetterOrField(
                 MetadataPropertyAnnotation.SCORE ->
                     requireTypeIsOneOf(
                         getterOrField,
-                        listOf(helper.mIntPrimitiveType, helper.mIntegerBoxType),
+                        listOf(helper.intPrimitiveType, helper.integerBoxType),
                         env,
                         allowRepeated = false
                     )
@@ -433,7 +433,7 @@ data class AnnotatedGetterOrField(
                     } else {
                         requireTypeIsOneOf(
                             getterOrField,
-                            listOf(helper.mStringType),
+                            listOf(helper.stringType),
                             env,
                             allowRepeated = true
                         )
@@ -453,10 +453,10 @@ data class AnnotatedGetterOrField(
                         requireTypeIsOneOf(
                             getterOrField,
                             listOf(
-                                helper.mLongPrimitiveType,
-                                helper.mIntPrimitiveType,
-                                helper.mLongBoxType,
-                                helper.mIntegerBoxType
+                                helper.longPrimitiveType,
+                                helper.intPrimitiveType,
+                                helper.longBoxType,
+                                helper.integerBoxType
                             ),
                             env,
                             allowRepeated = true
@@ -467,10 +467,10 @@ data class AnnotatedGetterOrField(
                     requireTypeIsOneOf(
                         getterOrField,
                         listOf(
-                            helper.mDoublePrimitiveType,
-                            helper.mFloatPrimitiveType,
-                            helper.mDoubleBoxType,
-                            helper.mFloatBoxType
+                            helper.doublePrimitiveType,
+                            helper.floatPrimitiveType,
+                            helper.doubleBoxType,
+                            helper.floatBoxType
                         ),
                         env,
                         allowRepeated = true
@@ -478,28 +478,28 @@ data class AnnotatedGetterOrField(
                 DataPropertyAnnotation.Kind.BOOLEAN_PROPERTY ->
                     requireTypeIsOneOf(
                         getterOrField,
-                        listOf(helper.mBooleanPrimitiveType, helper.mBooleanBoxType),
+                        listOf(helper.booleanPrimitiveType, helper.booleanBoxType),
                         env,
                         allowRepeated = true
                     )
                 DataPropertyAnnotation.Kind.BYTES_PROPERTY ->
                     requireTypeIsOneOf(
                         getterOrField,
-                        listOf(helper.mBytePrimitiveArrayType),
+                        listOf(helper.bytePrimitiveArrayType),
                         env,
                         allowRepeated = true
                     )
                 DataPropertyAnnotation.Kind.EMBEDDING_PROPERTY ->
                     requireTypeIsOneOf(
                         getterOrField,
-                        listOf(helper.mEmbeddingType),
+                        listOf(helper.embeddingType),
                         env,
                         allowRepeated = true
                     )
                 DataPropertyAnnotation.Kind.BLOB_HANDLE_PROPERTY ->
                     requireTypeIsOneOf(
                         getterOrField,
-                        listOf(helper.mBlobHandleType),
+                        listOf(helper.blobHandleType),
                         env,
                         allowRepeated = true
                     )
