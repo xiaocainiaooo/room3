@@ -633,10 +633,11 @@ class SearchBarTest {
     fun newSearchBar_expansionBehavior_inNonTouchMode() {
         val focusRequester = FocusRequester()
         var softwareKeyboardController: SoftwareKeyboardController? = null
+        lateinit var searchBarState: SearchBarState
         var isInKeyboardMode = false
         rule.setMaterialContent(lightColorScheme()) {
             val textFieldState = rememberTextFieldState()
-            val searchBarState = rememberSearchBarState()
+            searchBarState = rememberSearchBarState()
             val inputModeManager = LocalInputModeManager.current
 
             SideEffect { isInKeyboardMode = inputModeManager.requestInputMode(InputMode.Keyboard) }
@@ -693,7 +694,7 @@ class SearchBarTest {
 
         // Dismiss search bar
         Espresso.pressBack()
-        rule.waitForIdle()
+        rule.waitUntil { searchBarState.currentValue == SearchBarValue.Collapsed }
 
         // Focused and collapsed
         rule.onNodeWithTag(CollapsedInputFieldTestTag).assertIsFocused()
