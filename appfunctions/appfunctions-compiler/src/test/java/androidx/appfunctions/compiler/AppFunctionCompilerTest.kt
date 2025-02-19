@@ -582,30 +582,4 @@ class AppFunctionCompilerTest {
             goldenFileName = "${'$'}AggregatedAppFunctionInvoker_Impl.KT",
         )
     }
-
-    @Test
-    fun testListWithNullableByteArrayItemTypeFunction_throwsCompileError() {
-        val report =
-            compilationTestHelper.compileAll(
-                sourceFileNames = listOf("ListWithNullableByteArrayItemTypeFunction.KT")
-            )
-
-        compilationTestHelper.assertErrorWithMessage(
-            report,
-            "App function parameters must be a supported type",
-        )
-    }
-
-    @Test
-    fun testListWithNullableStringItemTypeFunction_throwsCompileError() {
-        val report =
-            compilationTestHelper.compileAll(
-                sourceFileNames = listOf("ListWithNullableStringItemTypeFunction.KT")
-            )
-
-        compilationTestHelper.assertErrorWithMessage(
-            report,
-            "App function parameters must be a supported type",
-        )
-    }
 }

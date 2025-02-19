@@ -26,5 +26,7 @@ class FakeAllPrimitiveParamsImpl : FakeAllPrimitiveParams {
         arg6: BooleanArray,
         arg7: ByteArray,
         arg8: List<ByteArray>,
+        arg9: List<String?>,
+        arg10: List<ByteArray?>,
     ) {}
 }

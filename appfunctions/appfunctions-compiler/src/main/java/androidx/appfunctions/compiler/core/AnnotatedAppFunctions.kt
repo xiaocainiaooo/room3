@@ -273,15 +273,23 @@ data class AnnotatedAppFunctions(
                     type = appFunctionTypeReference.toAppFunctionDataType(),
                     isNullable = appFunctionTypeReference.isNullable,
                 )
-            PRIMITIVE_ARRAY,
-            PRIMITIVE_LIST ->
-                // TODO: Build array type metadata separately for PRIMITIVE_LIST to support
-                // List<String?> and List<ByteArray?>.
+            PRIMITIVE_ARRAY ->
                 AppFunctionArrayTypeMetadata(
                     itemType =
                         AppFunctionPrimitiveTypeMetadata(
                             type = appFunctionTypeReference.determineArrayItemType(),
                             isNullable = false,
+                        ),
+                    isNullable = appFunctionTypeReference.isNullable,
+                )
+            PRIMITIVE_LIST ->
+                AppFunctionArrayTypeMetadata(
+                    itemType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = appFunctionTypeReference.determineArrayItemType(),
+                            isNullable =
+                                AppFunctionTypeReference(appFunctionTypeReference.itemTypeReference)
+                                    .isNullable,
                         ),
                     isNullable = appFunctionTypeReference.isNullable,
                 )
