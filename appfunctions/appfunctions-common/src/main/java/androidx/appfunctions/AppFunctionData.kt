@@ -17,6 +17,7 @@
 package androidx.appfunctions
 
 import android.app.appsearch.GenericDocument
+import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
@@ -51,7 +52,7 @@ import kotlin.collections.isEmpty
  *  }
  * ```
  */
-@RequiresApi(35)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 public class AppFunctionData
 internal constructor(internal val genericDocument: GenericDocument, internal val extras: Bundle) {
 
