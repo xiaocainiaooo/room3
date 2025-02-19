@@ -86,69 +86,82 @@ public interface CameraMetadata : Metadata, UnsafeWrapper {
         public const val CAPABILITIES_OFFLINE_REPROCESSING: Int = 15
 
         public val CameraMetadata.availableCapabilities: IntArray
+            @JvmStatic
             get() = this[CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES] ?: EMPTY_INT_ARRAY
 
         public val CameraMetadata.isHardwareLevelExternal: Boolean
+            @JvmStatic
             get() = this[INFO_SUPPORTED_HARDWARE_LEVEL] == INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL
 
         public val CameraMetadata.isHardwareLevelLegacy: Boolean
+            @JvmStatic
             get() = this[INFO_SUPPORTED_HARDWARE_LEVEL] == INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY
 
         public val CameraMetadata.isHardwareLevelLimited: Boolean
+            @JvmStatic
             get() = this[INFO_SUPPORTED_HARDWARE_LEVEL] == INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
 
         public val CameraMetadata.isHardwareLevelFull: Boolean
+            @JvmStatic
             get() = this[INFO_SUPPORTED_HARDWARE_LEVEL] == INFO_SUPPORTED_HARDWARE_LEVEL_FULL
 
         public val CameraMetadata.isHardwareLevel3: Boolean
+            @JvmStatic
             get() = this[INFO_SUPPORTED_HARDWARE_LEVEL] == INFO_SUPPORTED_HARDWARE_LEVEL_3
 
         public val CameraMetadata.supportsManualSensor: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_MANUAL_SENSOR)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_MANUAL_SENSOR)
 
         public val CameraMetadata.supportsManualPostProcessing: Boolean
+            @JvmStatic
             get() = this.availableCapabilities.contains(CAPABILITIES_MANUAL_POST_PROCESSING)
 
         public val CameraMetadata.supportsRaw: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_RAW)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_RAW)
 
         public val CameraMetadata.supportsPrivateReprocessing: Boolean
+            @JvmStatic
             get() = this.availableCapabilities.contains(CAPABILITIES_PRIVATE_REPROCESSING)
 
         public val CameraMetadata.supportsSensorSettings: Boolean
+            @JvmStatic
             get() = this.availableCapabilities.contains(CAPABILITIES_READ_SENSOR_SETTINGS)
 
         public val CameraMetadata.supportsBurstCapture: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_BURST_CAPTURE)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_BURST_CAPTURE)
 
         public val CameraMetadata.supportsYuvReprocessing: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_YUV_REPROCESSING)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_YUV_REPROCESSING)
 
         public val CameraMetadata.supportsDepthOutput: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_DEPTH_OUTPUT)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_DEPTH_OUTPUT)
 
         public val CameraMetadata.supportsHighSpeedVideo: Boolean
+            @JvmStatic
             get() = this.availableCapabilities.contains(CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO)
 
         public val CameraMetadata.supportsMotionTracking: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_MOTION_TRACKING)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_MOTION_TRACKING)
 
         public val CameraMetadata.supportsLogicalMultiCamera: Boolean
+            @JvmStatic
             get() = this.availableCapabilities.contains(CAPABILITIES_LOGICAL_MULTI_CAMERA)
 
         public val CameraMetadata.supportsMonochrome: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_MONOCHROME)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_MONOCHROME)
 
         public val CameraMetadata.supportsSecureImageData: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_SECURE_IMAGE_DATA)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_SECURE_IMAGE_DATA)
 
         public val CameraMetadata.supportsSystemCamera: Boolean
-            get() = this.availableCapabilities.contains(CAPABILITIES_SYSTEM_CAMERA)
+            @JvmStatic get() = this.availableCapabilities.contains(CAPABILITIES_SYSTEM_CAMERA)
 
         public val CameraMetadata.supportsOfflineReprocessing: Boolean
+            @JvmStatic
             get() = this.availableCapabilities.contains(CAPABILITIES_OFFLINE_REPROCESSING)
 
         public val CameraMetadata.supportsAutoFocusTrigger: Boolean
+            @JvmStatic
             get() {
                 val minFocusDistance = this[CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE]
                 if (minFocusDistance != null) {
