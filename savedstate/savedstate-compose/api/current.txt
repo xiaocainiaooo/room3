@@ -22,5 +22,17 @@ package androidx.savedstate.compose.serialization.serializers {
     method public static inline <reified T> androidx.savedstate.compose.serialization.serializers.MutableStateSerializer<T> MutableStateSerializer();
   }
 
+  public final class SnapshotStateListSerializer<T> implements kotlinx.serialization.KSerializer<androidx.compose.runtime.snapshots.SnapshotStateList<T>> {
+    ctor public SnapshotStateListSerializer(kotlinx.serialization.KSerializer<T> elementSerializer);
+    method public androidx.compose.runtime.snapshots.SnapshotStateList<T> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, androidx.compose.runtime.snapshots.SnapshotStateList<T> value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
+  }
+
+  public final class SnapshotStateListSerializerKt {
+    method public static inline <reified T> androidx.savedstate.compose.serialization.serializers.SnapshotStateListSerializer<T> SnapshotStateListSerializer();
+  }
+
 }
 
