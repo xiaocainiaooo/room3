@@ -56,8 +56,7 @@ class SwipeToRevealTest {
                             primaryAction(
                                 {},
                                 { Icon(Icons.Outlined.Close, contentDescription = "Clear") },
-                                { Text("Clear") },
-                                "Clear"
+                                { Text("Clear") }
                             )
                         }
                     ) {
