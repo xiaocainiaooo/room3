@@ -3376,8 +3376,18 @@ public final class ProtoLayoutInflater {
         try {
             lineView.setUpdatesEnabled(false);
 
-            if (line.hasBrush()) {
-                lineView.setBrush(line.getBrush());
+            if (line.hasBrush() && line.getBrush().hasSweepGradient()) {
+                try {
+                    SweepGradientHelper sweepGradientHelper =
+                            SweepGradientHelper.create(
+                                    line.getBrush().getSweepGradient(),
+                                    posId,
+                                    pipelineMaker,
+                                    lineView::triggerRefresh);
+                    lineView.setSweepGradient(sweepGradientHelper);
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "Invalid SweepGradient definition: " + e.getMessage());
+                }
             } else if (line.hasColor()) {
                 handleProp(line.getColor(), lineView::setColor, posId, pipelineMaker);
             } else {
