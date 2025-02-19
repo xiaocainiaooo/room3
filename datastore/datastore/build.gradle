@@ -120,5 +120,5 @@ androidx {
     description = "Android DataStore - contains the underlying store used by each serialization " +
             "method along with components that require an Android dependency"
     legacyDisableKotlinStrictApiMode = true
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }

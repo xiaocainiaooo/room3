@@ -158,5 +158,5 @@ androidx {
     description = "Android DataStore Core - contains the underlying store used by each serialization method"
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }
