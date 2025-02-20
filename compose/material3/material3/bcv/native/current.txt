@@ -796,6 +796,23 @@ final class androidx.compose.material3/DrawerState { // androidx.compose.materia
     }
 }
 
+final class androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior : androidx.compose.material3/FloatingToolbarScrollBehavior { // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior|null[0]
+    constructor <init>(androidx.compose.material3/FloatingToolbarExitDirection, androidx.compose.material3/FloatingToolbarState, androidx.compose.animation.core/AnimationSpec<kotlin/Float>, androidx.compose.animation.core/DecayAnimationSpec<kotlin/Float>) // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.<init>|<init>(androidx.compose.material3.FloatingToolbarExitDirection;androidx.compose.material3.FloatingToolbarState;androidx.compose.animation.core.AnimationSpec<kotlin.Float>;androidx.compose.animation.core.DecayAnimationSpec<kotlin.Float>){}[0]
+
+    final val exitDirection // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.exitDirection|{}exitDirection[0]
+        final fun <get-exitDirection>(): androidx.compose.material3/FloatingToolbarExitDirection // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.exitDirection.<get-exitDirection>|<get-exitDirection>(){}[0]
+    final val flingAnimationSpec // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.flingAnimationSpec|{}flingAnimationSpec[0]
+        final fun <get-flingAnimationSpec>(): androidx.compose.animation.core/DecayAnimationSpec<kotlin/Float> // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.flingAnimationSpec.<get-flingAnimationSpec>|<get-flingAnimationSpec>(){}[0]
+    final val snapAnimationSpec // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.snapAnimationSpec|{}snapAnimationSpec[0]
+        final fun <get-snapAnimationSpec>(): androidx.compose.animation.core/AnimationSpec<kotlin/Float> // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.snapAnimationSpec.<get-snapAnimationSpec>|<get-snapAnimationSpec>(){}[0]
+    final val state // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.state|{}state[0]
+        final fun <get-state>(): androidx.compose.material3/FloatingToolbarState // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.state.<get-state>|<get-state>(){}[0]
+
+    final fun (androidx.compose.ui/Modifier).floatingScrollBehavior(): androidx.compose.ui/Modifier // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.floatingScrollBehavior|floatingScrollBehavior@androidx.compose.ui.Modifier(){}[0]
+    final fun onPostScroll(androidx.compose.ui.geometry/Offset, androidx.compose.ui.geometry/Offset, androidx.compose.ui.input.nestedscroll/NestedScrollSource): androidx.compose.ui.geometry/Offset // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.onPostScroll|onPostScroll(androidx.compose.ui.geometry.Offset;androidx.compose.ui.geometry.Offset;androidx.compose.ui.input.nestedscroll.NestedScrollSource){}[0]
+    final suspend fun onPostFling(androidx.compose.ui.unit/Velocity, androidx.compose.ui.unit/Velocity): androidx.compose.ui.unit/Velocity // androidx.compose.material3/ExitAlwaysFloatingToolbarScrollBehavior.onPostFling|onPostFling(androidx.compose.ui.unit.Velocity;androidx.compose.ui.unit.Velocity){}[0]
+}
+
 final class androidx.compose.material3/FloatingToolbarColors { // androidx.compose.material3/FloatingToolbarColors|null[0]
     constructor <init>(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color) // androidx.compose.material3/FloatingToolbarColors.<init>|<init>(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color){}[0]
 
