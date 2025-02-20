@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.SoftwareType
 import androidx.build.AndroidXComposePlugin
 
@@ -93,5 +95,6 @@ androidx {
             "gestures. It builds upon the Jetpack Compose libraries."
     samples(project(":wear:compose:compose-foundation-samples"))
     metalavaK2UastEnabled = false
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
     addGoldenImageAssets()
 }
