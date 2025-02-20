@@ -238,7 +238,6 @@ data class AnnotatedGetterOrField(
                     typeArguments.first()
                 }
                 ElementTypeCategory.ARRAY -> (jvmType as ArrayType).componentType
-                else -> throw IllegalStateException("Unhandled type-category: $typeCategory")
             }
         }
 
@@ -273,7 +272,6 @@ data class AnnotatedGetterOrField(
                         annotation as DataPropertyAnnotation,
                         env
                     )
-                else -> throw IllegalStateException("Unhandled annotation: $annotation")
             }
         }
 
@@ -403,7 +401,6 @@ data class AnnotatedGetterOrField(
                         env,
                         allowRepeated = false
                     )
-                else -> throw IllegalStateException("Unhandled annotation: $annotation")
             }
         }
 
@@ -503,7 +500,6 @@ data class AnnotatedGetterOrField(
                         env,
                         allowRepeated = true
                     )
-                else -> throw IllegalStateException("Unhandled annotation: $annotation")
             }
         }
 
