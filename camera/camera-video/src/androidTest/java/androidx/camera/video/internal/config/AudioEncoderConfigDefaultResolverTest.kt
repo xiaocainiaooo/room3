@@ -42,7 +42,7 @@ class AudioEncoderConfigDefaultResolverTest {
     }
 
     private val defaultAudioSpec = AudioSpec.builder().build()
-    private val defaultAudioSettings = AudioSettingsDefaultResolver(defaultAudioSpec).get()
+    private val defaultAudioSettings = AudioSettingsDefaultResolver(defaultAudioSpec, null).get()
 
     @Test
     fun defaultAudioSpecProducesValidSettings() {

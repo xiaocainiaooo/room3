@@ -61,7 +61,7 @@ class VideoEncoderConfigDefaultResolverTest {
         val surfaceSize720p = EncoderProfilesUtil.RESOLUTION_720P
         val surfaceSize1080p = EncoderProfilesUtil.RESOLUTION_1080P
 
-        val expectedFrameRateRange = Range(FRAME_RATE_30, FRAME_RATE_30)
+        val expectedCaptureFrameRateRange = Range(FRAME_RATE_30, FRAME_RATE_30)
 
         val configSupplierCif =
             VideoEncoderConfigDefaultResolver(
@@ -70,7 +70,7 @@ class VideoEncoderConfigDefaultResolverTest {
                 DEFAULT_VIDEO_SPEC,
                 surfaceSizeCif,
                 DynamicRange.SDR,
-                expectedFrameRateRange
+                expectedCaptureFrameRateRange
             )
         val configSupplier720p =
             VideoEncoderConfigDefaultResolver(
@@ -79,7 +79,7 @@ class VideoEncoderConfigDefaultResolverTest {
                 DEFAULT_VIDEO_SPEC,
                 surfaceSize720p,
                 DynamicRange.SDR,
-                expectedFrameRateRange
+                expectedCaptureFrameRateRange
             )
         val configSupplier1080p =
             VideoEncoderConfigDefaultResolver(
@@ -88,7 +88,7 @@ class VideoEncoderConfigDefaultResolverTest {
                 DEFAULT_VIDEO_SPEC,
                 surfaceSize1080p,
                 DynamicRange.SDR,
-                expectedFrameRateRange
+                expectedCaptureFrameRateRange
             )
 
         val configCif = configSupplierCif.get()
@@ -194,7 +194,7 @@ class VideoEncoderConfigDefaultResolverTest {
                     .get()
                     .encodeFrameRate
             )
-            .isEqualTo(VideoEncoderConfigDefaultResolver.VIDEO_FRAME_RATE_FIXED_DEFAULT)
+            .isEqualTo(VideoConfigUtil.VIDEO_FRAME_RATE_FIXED_DEFAULT)
     }
 
     @Test
@@ -206,7 +206,7 @@ class VideoEncoderConfigDefaultResolverTest {
         )
         val size = EncoderProfilesUtil.RESOLUTION_1080P
 
-        val expectedFrameRateRange = Range(FRAME_RATE_30, FRAME_RATE_45)
+        val expectedCaptureFrameRateRange = Range(FRAME_RATE_30, FRAME_RATE_45)
 
         // Expected frame rate range takes precedence over VideoSpec
         assertThat(
@@ -216,12 +216,12 @@ class VideoEncoderConfigDefaultResolverTest {
                         DEFAULT_VIDEO_SPEC,
                         size,
                         DynamicRange.SDR,
-                        expectedFrameRateRange
+                        expectedCaptureFrameRateRange
                     )
                     .get()
                     .encodeFrameRate
             )
-            .isEqualTo(FRAME_RATE_45)
+            .isEqualTo(expectedCaptureFrameRateRange.upper)
     }
 
     @Test

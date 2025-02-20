@@ -38,7 +38,7 @@ public abstract class AudioSettings {
 
     // Common sample rate options to choose from in descending order.
     public static final List<Integer> COMMON_SAMPLE_RATES = Collections.unmodifiableList(
-            Arrays.asList(48000, 44100, 22050, 11025, 8000, 4800));
+            Arrays.asList(192000, 48000, 44100, 24000, 22050, 16000, 12000, 11025, 8000, 4800));
 
     /** Creates a builder for these settings. */
     @SuppressLint("Range") // Need to initialize as invalid values
