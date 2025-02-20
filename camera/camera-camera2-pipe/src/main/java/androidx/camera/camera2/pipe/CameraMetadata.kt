@@ -27,6 +27,7 @@ import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
 import android.os.Build
 import androidx.annotation.RestrictTo
+import androidx.camera.camera2.pipe.compat.Api34Compat
 import androidx.camera.camera2.pipe.compat.Api35Compat
 
 /**
@@ -176,6 +177,15 @@ public interface CameraMetadata : Metadata, UnsafeWrapper {
                     availableAfModes.contains(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) ||
                     availableAfModes.contains(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO)
             }
+
+        /**
+         * Returns `true` if overriding zoom settings is supported on the device, otherwise `false`.
+         */
+        public val CameraMetadata.supportsZoomOverride: Boolean
+            @JvmStatic
+            get() =
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                    Api34Compat.isZoomOverrideSupported(this)
 
         /**
          * Returns `true` if configuring torch strength is supported on the device, otherwise
