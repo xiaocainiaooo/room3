@@ -38,13 +38,12 @@ import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
-import androidx.wear.protolayout.expression.PlatformEventKeys
+import androidx.wear.protolayout.expression.PlatformEventSources
 import androidx.wear.protolayout.expression.PlatformHealthSources
 import androidx.wear.protolayout.expression.PlatformHealthSources.Keys
 import androidx.wear.protolayout.expression.dynamicDataMapOf
 import androidx.wear.protolayout.expression.intAppDataKey
 import androidx.wear.protolayout.expression.mapTo
-import androidx.wear.protolayout.expression.platformVisibilityStatus
 import androidx.wear.protolayout.layout.basicText
 import androidx.wear.protolayout.modifiers.loadAction
 import androidx.wear.protolayout.types.LayoutString
@@ -197,7 +196,7 @@ class FiltersTest {
         val textContent =
             LayoutString(
                 staticContent,
-                DynamicString.onCondition(platformVisibilityStatus())
+                DynamicString.onCondition(PlatformEventSources.isLayoutVisible())
                     .use(visibleContent)
                     .elseUse(invisibleContent),
                 staticContent.asLayoutConstraint()
@@ -210,7 +209,9 @@ class FiltersTest {
                 )
                 .matches(
                     testElement,
-                    TestContext(dynamicDataMapOf(PlatformEventKeys.VISIBILITY_STATUS mapTo true))
+                    TestContext(
+                        dynamicDataMapOf(PlatformEventSources.Keys.LAYOUT_VISIBILITY mapTo true)
+                    )
                 )
         )
 
@@ -218,7 +219,9 @@ class FiltersTest {
             hasText(invisibleContent)
                 .matches(
                     testElement,
-                    TestContext(dynamicDataMapOf(PlatformEventKeys.VISIBILITY_STATUS mapTo false))
+                    TestContext(
+                        dynamicDataMapOf(PlatformEventSources.Keys.LAYOUT_VISIBILITY mapTo false)
+                    )
                 )
         )
 

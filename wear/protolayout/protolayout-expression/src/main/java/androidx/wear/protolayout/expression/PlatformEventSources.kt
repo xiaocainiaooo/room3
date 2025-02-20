@@ -14,31 +14,60 @@
  * limitations under the License.
  */
 
-@file:JvmName("PlatformEventSources")
-
 package androidx.wear.protolayout.expression
 
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool
 
-/**
- * Creates a [DynamicBool] which receives the current visibility status from platform.
- *
- * The visibility status value is `true` when layout is visible, and `false` when invisible.
- */
-@RequiresSchemaVersion(major = 1, minor = 500)
-public fun platformVisibilityStatus(): DynamicBool =
-    DynamicBuilders.StateBoolSource.Builder()
-        .setSourceKey(PlatformEventKeys.VISIBILITY_STATUS.key)
-        .setSourceNamespace(PlatformEventKeys.VISIBILITY_STATUS.namespace)
-        .build()
+/** Dynamic types for platform events */
+public object PlatformEventSources {
 
-/** Data sources keys for platform event. */
-public object PlatformEventKeys {
     /**
-     * The data source key for visibility status from platform sources. The visibility status value
-     * is `true` when layout is visible, and `false` when invisible.
+     * Creates a [DynamicBool] which receives the current visibility status from platform.
+     *
+     * The visibility status value is `true` when layout is visible, and `false` when invisible.
      */
-    @JvmField
-    public val VISIBILITY_STATUS: PlatformDataKey<DynamicBool> =
-        PlatformDataKey<DynamicBool>("VisibilityStatus")
+    @JvmStatic
+    @RequiresSchemaVersion(major = 1, minor = 500)
+    public fun isLayoutVisible(): DynamicBool =
+        DynamicBuilders.StateBoolSource.Builder()
+            .setSourceKey(Keys.LAYOUT_VISIBILITY.key)
+            .setSourceNamespace(Keys.LAYOUT_VISIBILITY.namespace)
+            .build()
+
+    /**
+     * Creates a [DynamicBool] which receives the current state of any pending updates for the
+     * current layout.
+     *
+     * The layout update pending status is `true` from when a new layout is requested until it is
+     * received and inflated or the request fails. In all other cases, it is false.
+     */
+    @JvmStatic
+    @ProtoLayoutExperimental
+    @RequiresSchemaVersion(major = 1, minor = 600)
+    public fun isLayoutUpdatePending(): DynamicBool =
+        DynamicBuilders.StateBoolSource.Builder()
+            .setSourceKey(Keys.LAYOUT_UPDATE_PENDING.key)
+            .setSourceNamespace(Keys.LAYOUT_UPDATE_PENDING.namespace)
+            .build()
+
+    /** Data sources keys for platform event. */
+    public object Keys {
+        /**
+         * The data source key for visibility status from platform sources. The visibility status
+         * value is `true` when layout is visible, and `false` when invisible.
+         */
+        @JvmField
+        public val LAYOUT_VISIBILITY: PlatformDataKey<DynamicBool> =
+            PlatformDataKey<DynamicBool>("VisibilityStatus")
+
+        /**
+         * The data source key for layout update pending status from platform sources. The layout
+         * update pending status is `true` from when a new layout is requested until it is received
+         * and inflated or the request fails. In all other cases, it is false.
+         */
+        @ProtoLayoutExperimental
+        @JvmField
+        public val LAYOUT_UPDATE_PENDING: PlatformDataKey<DynamicBool> =
+            PlatformDataKey<DynamicBool>("LayoutUpdatePending")
+    }
 }

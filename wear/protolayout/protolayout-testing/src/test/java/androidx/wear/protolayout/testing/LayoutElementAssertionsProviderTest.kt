@@ -23,7 +23,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.Image
 import androidx.wear.protolayout.LayoutElementBuilders.Layout
 import androidx.wear.protolayout.LayoutElementBuilders.Row
 import androidx.wear.protolayout.LayoutElementBuilders.Text
-import androidx.wear.protolayout.expression.PlatformEventKeys
+import androidx.wear.protolayout.expression.PlatformEventSources
 import androidx.wear.protolayout.expression.PlatformHealthSources
 import androidx.wear.protolayout.expression.intAppDataKey
 import androidx.wear.protolayout.expression.mapTo
@@ -103,7 +103,7 @@ class LayoutElementAssertionsProviderTest {
                     intAppKey mapTo intAppValue,
                     PlatformHealthSources.Keys.DAILY_STEPS mapTo dailySteps
                 )
-                .withDynamicData(PlatformEventKeys.VISIBILITY_STATUS mapTo visibility)
+                .withDynamicData(PlatformEventSources.Keys.LAYOUT_VISIBILITY mapTo visibility)
 
         val appDataMatcher =
             LayoutElementMatcher("app data") { _, context ->
@@ -115,7 +115,7 @@ class LayoutElementAssertionsProviderTest {
             }
         val platformEventMatcher =
             LayoutElementMatcher("platform event") { _, context ->
-                context.dynamicData[PlatformEventKeys.VISIBILITY_STATUS] == visibility
+                context.dynamicData[PlatformEventSources.Keys.LAYOUT_VISIBILITY] == visibility
             }
 
         provider.onRoot().assert(appDataMatcher)
