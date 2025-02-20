@@ -164,6 +164,18 @@ package androidx.appfunctions {
 
 package androidx.appfunctions.metadata {
 
+  public final class AppFunctionAllOfTypeMetadata extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata {
+    ctor public AppFunctionAllOfTypeMetadata(java.util.List<? extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> matchAll, String? qualifiedName, boolean isNullable);
+    method public java.util.List<androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> getMatchAll();
+    method public String? getQualifiedName();
+    property public java.util.List<androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> matchAll;
+    property public String? qualifiedName;
+    field public static final androidx.appfunctions.metadata.AppFunctionAllOfTypeMetadata.Companion Companion;
+  }
+
+  public static final class AppFunctionAllOfTypeMetadata.Companion {
+  }
+
   public final class AppFunctionArrayTypeMetadata extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata {
     ctor public AppFunctionArrayTypeMetadata(androidx.appfunctions.metadata.AppFunctionDataTypeMetadata itemType, boolean isNullable);
     method public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata getItemType();

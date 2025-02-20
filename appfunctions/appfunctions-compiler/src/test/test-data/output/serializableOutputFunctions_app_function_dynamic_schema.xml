@@ -47,7 +47,7 @@
                 <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
                 <id>unused</id>
                 <isNullable>false</isNullable>
-                <type>3</type>
+                <type>11</type>
             </valueType>
         </response>
         <functionId>com.testdata.SerializableOutputFunctions#simpleFunction</functionId>
@@ -99,7 +99,7 @@
                 <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
                 <id>unused</id>
                 <isNullable>true</isNullable>
-                <type>3</type>
+                <type>11</type>
             </valueType>
         </response>
         <functionId>com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable</functionId>
@@ -154,7 +154,7 @@
                     <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
                     <id>unused</id>
                     <isNullable>false</isNullable>
-                    <type>3</type>
+                    <type>11</type>
                 </itemType>
                 <type>10</type>
             </valueType>
@@ -211,7 +211,7 @@
                     <dataTypeReference>com.testdata.SampleSerializable</dataTypeReference>
                     <id>unused</id>
                     <isNullable>false</isNullable>
-                    <type>3</type>
+                    <type>11</type>
                 </itemType>
                 <type>10</type>
             </valueType>

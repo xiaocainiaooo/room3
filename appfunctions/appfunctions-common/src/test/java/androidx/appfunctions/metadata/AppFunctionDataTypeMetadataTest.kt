@@ -67,6 +67,67 @@ class AppFunctionDataTypeMetadataTest {
     }
 
     @Test
+    fun appFunctionAllOfTypeMetadata_equalsAndHashCode() {
+        val properties1 = mapOf("prop1" to AppFunctionPrimitiveTypeMetadata(TYPE_INT, false))
+        val objectType =
+            AppFunctionObjectTypeMetadata(properties1, listOf("prop1"), "qualifiedName", false)
+        val referenceType = AppFunctionReferenceTypeMetadata("type1", false)
+        val allOfDataType1 =
+            AppFunctionAllOfTypeMetadata(
+                matchAll = listOf(objectType),
+                isNullable = true,
+                qualifiedName = null
+            )
+        val allOfDataType2 =
+            AppFunctionAllOfTypeMetadata(
+                matchAll = listOf(objectType, referenceType),
+                isNullable = true,
+                qualifiedName = "allOf1"
+            )
+        val allOfDataType2a =
+            AppFunctionAllOfTypeMetadata(
+                matchAll = listOf(objectType, referenceType),
+                isNullable = true,
+                qualifiedName = "allOf1"
+            )
+
+        assertThat(allOfDataType1).isNotEqualTo(allOfDataType2)
+        assertThat(allOfDataType1.hashCode()).isNotEqualTo(allOfDataType2.hashCode())
+
+        assertThat(allOfDataType2).isEqualTo(allOfDataType2a)
+        assertThat(allOfDataType2.hashCode()).isEqualTo(allOfDataType2a.hashCode())
+    }
+
+    @Test
+    fun appFunctionAllOfTypeMetadata_toAppFunctionDatatypeMetadataDocument_returnsCorrectDocument() {
+        val properties1 = mapOf("prop1" to AppFunctionPrimitiveTypeMetadata(TYPE_INT, false))
+        val objectType =
+            AppFunctionObjectTypeMetadata(properties1, listOf("prop1"), "qualifiedName", false)
+        val referenceType = AppFunctionReferenceTypeMetadata("type1", false)
+        val allOfDataType =
+            AppFunctionAllOfTypeMetadata(
+                matchAll = listOf(referenceType, objectType),
+                isNullable = true,
+                qualifiedName = "allOf1"
+            )
+
+        val document = allOfDataType.toAppFunctionDataTypeMetadataDocument()
+
+        assertThat(document.allOf)
+            .containsExactly(
+                referenceType.toAppFunctionDataTypeMetadataDocument(),
+                objectType.toAppFunctionDataTypeMetadataDocument()
+            )
+        assertThat(document.type).isEqualTo(AppFunctionAllOfTypeMetadata.TYPE)
+        assertThat(document.isNullable).isTrue()
+        assertThat(document.dataTypeReference).isNull()
+        assertThat(document.itemType).isNull()
+        assertThat(document.properties).isEmpty()
+        assertThat(document.objectQualifiedName).isNotEmpty()
+        assertThat(document.objectQualifiedName).isEqualTo("allOf1")
+    }
+
+    @Test
     fun appFunctionObjectTypeMetadata_equalsAndHashCode() {
         val properties1 = mapOf("prop1" to AppFunctionPrimitiveTypeMetadata(TYPE_INT, false))
         val properties2 = mapOf("prop2" to AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true))
