@@ -515,7 +515,6 @@ private fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
     }
 }
 
-@Suppress("UnstableApiUsage") // HasDeviceTests is @Incubating b/372495504
 fun Project.configureTestConfigGeneration(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
     projectIsolationEnabled: Boolean,
@@ -570,7 +569,8 @@ fun Project.configureTestConfigGeneration(
     }
 }
 
-@Suppress("UnstableApiUsage") // HasDeviceTests is @Incubating b/372495504
+// KotlinMultiplatformAndroidComponentsExtension is @Incubating b/393137152
+@Suppress("UnstableApiUsage")
 fun Project.configureTestConfigGeneration(
     kotlinMultiplatformAndroidTarget: KotlinMultiplatformAndroidLibraryTarget,
     componentsExtension: KotlinMultiplatformAndroidComponentsExtension,
