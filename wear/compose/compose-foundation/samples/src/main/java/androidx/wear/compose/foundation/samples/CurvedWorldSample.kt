@@ -57,7 +57,6 @@ import androidx.wear.compose.foundation.radialGradientBackground
 import androidx.wear.compose.foundation.radialSize
 import androidx.wear.compose.foundation.size
 import androidx.wear.compose.foundation.weight
-import androidx.wear.compose.material.curvedText
 
 @Sampled
 @Composable
@@ -252,10 +251,15 @@ fun CurvedBoxSample() {
 @Sampled
 @Composable
 fun CurvedLetterSpacingSample() {
-    val style = CurvedTextStyle(letterSpacing = 0.6.sp, letterSpacingCounterClockwise = 1.4.sp)
+    val style =
+        CurvedTextStyle(
+            letterSpacing = 0.6.sp,
+            letterSpacingCounterClockwise = 1.4.sp,
+            color = Color.White
+        )
     Box {
         CurvedLayout(modifier = Modifier.fillMaxSize()) {
-            curvedText(
+            basicCurvedText(
                 "Clockwise",
                 style = style,
             )
@@ -265,7 +269,7 @@ fun CurvedLetterSpacingSample() {
             angularDirection = CurvedDirection.Angular.CounterClockwise,
             anchor = 90f
         ) {
-            curvedText(
+            basicCurvedText(
                 "Counter Clockwise",
                 style = style,
             )
