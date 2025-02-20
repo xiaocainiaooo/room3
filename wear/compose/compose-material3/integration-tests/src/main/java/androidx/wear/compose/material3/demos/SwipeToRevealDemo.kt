@@ -40,8 +40,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealActionType
-import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealValue
+import androidx.wear.compose.foundation.rememberRevealState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.Icon
@@ -50,7 +50,6 @@ import androidx.wear.compose.material3.SplitSwitchButton
 import androidx.wear.compose.material3.SwipeToReveal
 import androidx.wear.compose.material3.SwipeToRevealDefaults
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.rememberRevealState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -61,8 +60,10 @@ fun SwipeToRevealBothDirectionsNonAnchoring() {
             SwipeToReveal(
                 revealState =
                     rememberRevealState(
-                        revealDirection = RevealDirection.Both,
-                        useAnchoredActions = false,
+                        anchors =
+                            SwipeToRevealDefaults.bidirectionalAnchors(
+                                useAnchoredActions = false,
+                            )
                     ),
                 actions = {
                     primaryAction(
@@ -106,9 +107,11 @@ fun SwipeToRevealBothDirections() {
             SwipeToReveal(
                 revealState =
                     rememberRevealState(
-                        // Use the double action anchor width when revealing two actions
-                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
-                        revealDirection = RevealDirection.Both
+                        anchors =
+                            SwipeToRevealDefaults.bidirectionalAnchors(
+                                // Use the double action anchor width when revealing two actions
+                                anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                            )
                     ),
                 actions = {
                     primaryAction(
@@ -169,10 +172,13 @@ fun SwipeToRevealTwoActionsWithUndo() {
         item { ListHeader { Text("Two Undo Actions") } }
         item {
             SwipeToReveal(
-                // Use the double action anchor width when revealing two actions
                 revealState =
                     rememberRevealState(
-                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth
+                        anchors =
+                            SwipeToRevealDefaults.anchors(
+                                // Use the double action anchor width when revealing two actions
+                                anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth
+                            )
                     ),
                 actionButtonHeight = SwipeToRevealDefaults.LargeActionButtonHeight,
                 actions = {
@@ -275,8 +281,10 @@ fun SwipeToRevealInList() {
         items(namesList.size, key = { namesList[it] }) {
             val revealState =
                 rememberRevealState(
-                    revealDirection = RevealDirection.Both,
-                    anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth
+                    anchors =
+                        SwipeToRevealDefaults.bidirectionalAnchors(
+                            anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth
+                        )
                 )
             val name = remember { namesList[it] }
             SwipeToReveal(
@@ -340,11 +348,7 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
     ScalingLazyDemo {
         item {
             SwipeToReveal(
-                revealState =
-                    rememberRevealState(
-                        revealDirection = RevealDirection.RightToLeft,
-                        anchorWidth = SwipeToRevealDefaults.SingleActionAnchorWidth,
-                    ),
+                revealState = rememberRevealState(anchors = SwipeToRevealDefaults.anchors()),
                 actions = {
                     primaryAction(
                         onClick = { /* This block is called when the primary action is executed. */
@@ -385,10 +389,13 @@ fun SwipeToRevealWithLongLabels() {
     ScalingLazyDemo {
         item {
             SwipeToReveal(
-                // Use the double action anchor width when revealing two actions
                 revealState =
                     rememberRevealState(
-                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                        anchors =
+                            SwipeToRevealDefaults.anchors(
+                                // Use the double action anchor width when revealing two actions
+                                anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                            )
                     ),
                 actions = {
                     primaryAction(
@@ -458,10 +465,13 @@ fun SwipeToRevealWithCustomIcons() {
     ScalingLazyDemo {
         item {
             SwipeToReveal(
-                // Use the double action anchor width when revealing two actions
                 revealState =
                     rememberRevealState(
-                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                        anchors =
+                            SwipeToRevealDefaults.anchors(
+                                // Use the double action anchor width when revealing two actions
+                                anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                            )
                     ),
                 actions = {
                     primaryAction(
