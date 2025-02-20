@@ -28,13 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.wear.compose.foundation.rememberRevealState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.SwipeToReveal
 import androidx.wear.compose.material3.SwipeToRevealDefaults
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.rememberRevealState
 
 @Composable
 @Sampled
@@ -43,7 +43,10 @@ fun SwipeToRevealSample() {
         // Use the double action anchor width when revealing two actions
         revealState =
             rememberRevealState(
-                anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                anchors =
+                    SwipeToRevealDefaults.anchors(
+                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                    )
             ),
         actions = {
             primaryAction(
@@ -127,7 +130,10 @@ fun SwipeToRevealSingleActionCardSample() {
 @Sampled
 fun SwipeToRevealNonAnchoredSample() {
     SwipeToReveal(
-        revealState = rememberRevealState(useAnchoredActions = false),
+        revealState =
+            rememberRevealState(
+                anchors = SwipeToRevealDefaults.anchors(useAnchoredActions = false)
+            ),
         actions = {
             primaryAction(
                 onClick = { /* This block is called when the primary action is executed. */ },
