@@ -22,8 +22,8 @@ import androidx.xr.extensions.XrExtensions;
 import androidx.xr.extensions.node.NodeTransaction;
 import androidx.xr.scenecore.JxrPlatformAdapter.Dimensions;
 import androidx.xr.scenecore.JxrPlatformAdapter.Entity;
-import androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity;
-import androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape;
+import androidx.xr.scenecore.JxrPlatformAdapter.SurfaceEntity;
+import androidx.xr.scenecore.JxrPlatformAdapter.SurfaceEntity.CanvasShape;
 
 import com.google.androidxr.splitengine.SplitEngineSubspaceManager;
 import com.google.androidxr.splitengine.SubspaceNode;
@@ -37,18 +37,17 @@ import java.util.concurrent.ScheduledExecutorService;
  * <p>This is used to create an entity that contains a StereoSurfacePanel using the Split Engine
  * route.
  */
-final class StereoSurfaceEntitySplitEngineImpl extends AndroidXrEntity
-        implements StereoSurfaceEntity {
+final class SurfaceEntityImpl extends AndroidXrEntity implements SurfaceEntity {
     private final ImpressApi mImpressApi;
     private final SplitEngineSubspaceManager mSplitEngineSubspaceManager;
     private final SubspaceNode mSubspace;
     // TODO: b/362520810 - Wrap impress nodes w/ Java class.
     private final int mEntityImpressNode;
     private final int mSubspaceImpressNode;
-    @StereoMode private int mStereoMode = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE;
+    @StereoMode private int mStereoMode = SurfaceEntity.StereoMode.SIDE_BY_SIDE;
     private CanvasShape mCanvasShape;
 
-    StereoSurfaceEntitySplitEngineImpl(
+    SurfaceEntityImpl(
             Entity parentEntity,
             ImpressApi impressApi,
             SplitEngineSubspaceManager splitEngineSubspaceManager,
