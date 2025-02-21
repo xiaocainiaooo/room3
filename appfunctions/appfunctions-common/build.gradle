@@ -41,6 +41,10 @@ dependencies {
     compileOnly(project(":appfunctions:appfunctions-stubs"))
 
     // Test dependencies
+    testImplementation(libs.junit)
+    testImplementation(libs.truth)
+
+    // Test dependencies
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testRunner)
