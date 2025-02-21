@@ -157,6 +157,20 @@ package androidx.wear.compose.foundation {
   @androidx.compose.foundation.layout.LayoutScopeMarker public final class CurvedScope {
   }
 
+  public final class CurvedSemanticsKt {
+    method public static androidx.wear.compose.foundation.CurvedModifier semantics(androidx.wear.compose.foundation.CurvedModifier, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedSemanticsScope,kotlin.Unit> properties);
+  }
+
+  public final class CurvedSemanticsScope {
+    ctor public CurvedSemanticsScope();
+    method public String? getContentDescription();
+    method public float getTraversalIndex();
+    method public void setContentDescription(String?);
+    method public void setTraversalIndex(float);
+    property public String? contentDescription;
+    property public float traversalIndex;
+  }
+
   public final class CurvedSizeKt {
     method public static androidx.wear.compose.foundation.CurvedModifier angularSize(androidx.wear.compose.foundation.CurvedModifier, float sweepDegrees);
     method public static androidx.wear.compose.foundation.CurvedModifier angularSizeDp(androidx.wear.compose.foundation.CurvedModifier, float angularWidth);
