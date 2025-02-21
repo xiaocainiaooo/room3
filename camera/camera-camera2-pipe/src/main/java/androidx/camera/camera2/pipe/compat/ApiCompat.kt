@@ -526,3 +526,24 @@ internal object Api34Compat {
         extensionSessionConfiguration.postviewOutputConfiguration = postviewOutputConfiguration
     }
 }
+
+@RequiresApi(35)
+internal object Api35Compat {
+    @JvmStatic
+    fun isTorchStrengthSupported(cameraMetadata: CameraMetadata): Boolean {
+        val maxLevel = cameraMetadata[CameraCharacteristics.FLASH_TORCH_STRENGTH_MAX_LEVEL]
+        return maxLevel != null && maxLevel > 1
+    }
+
+    @JvmStatic
+    fun getDefaultTorchStrengthLevel(cameraMetadata: CameraMetadata): Int {
+        val defaultLevel = cameraMetadata[CameraCharacteristics.FLASH_TORCH_STRENGTH_DEFAULT_LEVEL]
+        return defaultLevel ?: 1
+    }
+
+    @JvmStatic
+    fun getMaxTorchStrengthLevel(cameraMetadata: CameraMetadata): Int {
+        val maxLevel = cameraMetadata[CameraCharacteristics.FLASH_TORCH_STRENGTH_MAX_LEVEL]
+        return maxLevel ?: 1
+    }
+}

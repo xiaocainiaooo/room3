@@ -41,6 +41,9 @@ constructor(
     public val torchStateLiveData: LiveData<Int>
         get() = torchControl.torchStateLiveData
 
+    public val torchStrengthLiveData: LiveData<Int>
+        get() = torchControl.torchStrengthLiveData
+
     public val zoomStateLiveData: LiveData<ZoomState>
         get() = zoomControl.zoomStateLiveData
 
