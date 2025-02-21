@@ -25,7 +25,9 @@ import android.hardware.camera2.CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_FUL
 import android.hardware.camera2.CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
+import android.os.Build
 import androidx.annotation.RestrictTo
+import androidx.camera.camera2.pipe.compat.Api35Compat
 
 /**
  * [CameraMetadata] is a compatibility wrapper around [CameraCharacteristics].
@@ -174,5 +176,49 @@ public interface CameraMetadata : Metadata, UnsafeWrapper {
                     availableAfModes.contains(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) ||
                     availableAfModes.contains(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO)
             }
+
+        /**
+         * Returns `true` if configuring torch strength is supported on the device, otherwise
+         * `false`.
+         */
+        public val CameraMetadata.supportsTorchStrength: Boolean
+            @JvmStatic
+            get() =
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM &&
+                    Api35Compat.isTorchStrengthSupported(this)
+
+        /**
+         * Returns the maximum torch strength level supported by the device.
+         *
+         * The torch strength is applied only when [CaptureRequest.CONTROL_AE_MODE] is set to
+         * [CaptureRequest.CONTROL_AE_MODE_ON] and [CaptureRequest.FLASH_MODE] is set to
+         * [CaptureRequest.FLASH_MODE_TORCH].
+         *
+         * Framework returns `1` when configuring torch strength is not supported on the device.
+         * This method also returns `1` when the API level doesn't met to align the behavior.
+         */
+        public val CameraMetadata.maxTorchStrengthLevel: Int
+            @JvmStatic
+            get() =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM)
+                    Api35Compat.getMaxTorchStrengthLevel(this)
+                else 1
+
+        /**
+         * Returns the default torch strength level.
+         *
+         * The torch strength is applied only when [CaptureRequest.CONTROL_AE_MODE] is set to
+         * [CaptureRequest.CONTROL_AE_MODE_ON] and [CaptureRequest.FLASH_MODE] is set to
+         * [CaptureRequest.FLASH_MODE_TORCH].
+         *
+         * Framework returns `1` when configuring torch strength is not supported on the device.
+         * This method also returns `1` when the API level doesn't met to align the behavior.
+         */
+        public val CameraMetadata.defaultTorchStrengthLevel: Int
+            @JvmStatic
+            get() =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM)
+                    Api35Compat.getDefaultTorchStrengthLevel(this)
+                else 1
     }
 }

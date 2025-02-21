@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.graphics.Rect
 import android.hardware.camera2.CameraCharacteristics
 import android.os.Build
-import androidx.arch.core.util.Function
 import androidx.camera.camera2.pipe.CameraPipe
 import androidx.camera.camera2.pipe.core.Log.warn
 import androidx.camera.camera2.pipe.integration.config.CameraScope
@@ -49,8 +48,6 @@ import androidx.camera.core.impl.CameraControlInternal
 import androidx.camera.core.impl.CaptureConfig
 import androidx.camera.core.impl.Config
 import androidx.camera.core.impl.SessionConfig
-import androidx.camera.core.impl.utils.executor.CameraXExecutors
-import androidx.camera.core.impl.utils.futures.FutureChain
 import androidx.camera.core.impl.utils.futures.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import javax.inject.Inject
@@ -108,13 +105,12 @@ constructor(
 
     override fun enableTorch(torch: Boolean): ListenableFuture<Void> =
         Futures.nonCancellationPropagating(
-            FutureChain.from(torchControl.setTorchAsync(torch).asListenableFuture())
-                .transform(
-                    Function {
-                        return@Function null
-                    },
-                    CameraXExecutors.directExecutor()
-                )
+            torchControl.setTorchAsync(torch).asVoidListenableFuture()
+        )
+
+    override fun setTorchStrengthLevel(torchStrengthLevel: Int): ListenableFuture<Void> =
+        Futures.nonCancellationPropagating(
+            torchControl.setTorchStrengthLevelAsync(torchStrengthLevel).asVoidListenableFuture()
         )
 
     override fun startFocusAndMetering(
