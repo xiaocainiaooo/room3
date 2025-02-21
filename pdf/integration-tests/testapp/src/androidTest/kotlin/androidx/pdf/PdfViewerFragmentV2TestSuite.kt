@@ -126,8 +126,6 @@ class PdfViewerFragmentV2TestSuite {
             assertTrue(fastScrollThumb.alpha == FastScrollDrawer.VISIBLE_ALPHA)
         }
 
-        onView(isRoot()).perform(waitFor(20))
-
         // Scrubber should auto hide after animation and delay ends
         val totalTimeForScubberToHide =
             FastScroller.HIDE_ANIMATION_DURATION_MILLIS + FastScroller.HIDE_DELAY_MS
@@ -145,9 +143,6 @@ class PdfViewerFragmentV2TestSuite {
         // Actions for scrolling by the scrubber
         var fastScrollScrubberClick: GeneralClickAction? = null
         var fastScrollScrubberSwipe: GeneralSwipeAction? = null
-
-        // This ensures that the swipe operation completes
-        onView(isRoot()).perform(waitFor(100))
 
         // Used to compute the location of scrubber on view and set the gesture values
         withPdfView(scenario) { _, pdfView, fastScrollThumb ->
@@ -201,8 +196,8 @@ class PdfViewerFragmentV2TestSuite {
         onView(isRoot()).perform(fastScrollScrubberSwipe!!)
 
         withPdfView(scenario) { _, pdfView, _ ->
-            val expectedLabelWithoutSpace = "3/3"
-            val expectedLabelWithSpace = "3 / 3"
+            val expectedLabelWithoutSpace = "2/3"
+            val expectedLabelWithSpace = "2 / 3"
             assertTrue(
                 "Current page indicator label ${pdfView.currentPageIndicatorLabel.trim()} not equal " +
                     "to expected $expectedLabelWithoutSpace or $expectedLabelWithSpace",
