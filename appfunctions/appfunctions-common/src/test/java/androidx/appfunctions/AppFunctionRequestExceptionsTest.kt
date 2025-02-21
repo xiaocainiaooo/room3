@@ -16,45 +16,46 @@
 
 package androidx.appfunctions
 
+import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class AppFunctionRequestExceptionsTest {
     @Test
     fun testErrorCategory_RequestError() {
-        assertThat(AppFunctionDeniedException().internalErrorCode)
+        assertThat(AppFunctionDeniedException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_DENIED)
-        assertThat(AppFunctionDeniedException().errorCategory)
+        assertThat(AppFunctionDeniedException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
 
-        assertThat(AppFunctionInvalidArgumentException().internalErrorCode)
+        assertThat(AppFunctionInvalidArgumentException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_INVALID_ARGUMENT)
-        assertThat(AppFunctionInvalidArgumentException().errorCategory)
+        assertThat(AppFunctionInvalidArgumentException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
 
-        assertThat(AppFunctionDisabledException().internalErrorCode)
+        assertThat(AppFunctionDisabledException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_DISABLED)
-        assertThat(AppFunctionDisabledException().errorCategory)
+        assertThat(AppFunctionDisabledException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
 
-        assertThat(AppFunctionFunctionNotFoundException().internalErrorCode)
+        assertThat(AppFunctionFunctionNotFoundException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_FUNCTION_NOT_FOUND)
-        assertThat(AppFunctionFunctionNotFoundException().errorCategory)
+        assertThat(AppFunctionFunctionNotFoundException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
 
-        assertThat(AppFunctionElementNotFoundException().internalErrorCode)
+        assertThat(AppFunctionElementNotFoundException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_RESOURCE_NOT_FOUND)
-        assertThat(AppFunctionElementNotFoundException().errorCategory)
+        assertThat(AppFunctionElementNotFoundException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
 
-        assertThat(AppFunctionLimitExceededException().internalErrorCode)
+        assertThat(AppFunctionLimitExceededException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_LIMIT_EXCEEDED)
-        assertThat(AppFunctionLimitExceededException().errorCategory)
+        assertThat(AppFunctionLimitExceededException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
 
-        assertThat(AppFunctionElementAlreadyExistsException().internalErrorCode)
+        assertThat(AppFunctionElementAlreadyExistsException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_RESOURCE_ALREADY_EXISTS)
-        assertThat(AppFunctionElementAlreadyExistsException().errorCategory)
+        assertThat(AppFunctionElementAlreadyExistsException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
     }
 }

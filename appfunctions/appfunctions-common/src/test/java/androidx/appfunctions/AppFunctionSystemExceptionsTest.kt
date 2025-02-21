@@ -16,20 +16,21 @@
 
 package androidx.appfunctions
 
+import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class AppFunctionSystemExceptionsTest {
     @Test
     fun testErrorCategory_SystemError() {
-        assertThat(AppFunctionSystemUnknownException().internalErrorCode)
+        assertThat(AppFunctionSystemUnknownException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_SYSTEM_ERROR)
-        assertThat(AppFunctionSystemUnknownException().errorCategory)
+        assertThat(AppFunctionSystemUnknownException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_SYSTEM)
 
-        assertThat(AppFunctionCancelledException().internalErrorCode)
+        assertThat(AppFunctionCancelledException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_CANCELLED)
-        assertThat(AppFunctionCancelledException().errorCategory)
+        assertThat(AppFunctionCancelledException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_SYSTEM)
     }
 }

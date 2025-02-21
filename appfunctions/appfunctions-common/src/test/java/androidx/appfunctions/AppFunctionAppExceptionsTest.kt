@@ -16,25 +16,26 @@
 
 package androidx.appfunctions
 
+import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class AppFunctionAppExceptionsTest {
     @Test
     fun testErrorCategory_AppError() {
-        assertThat(AppFunctionAppUnknownException().internalErrorCode)
+        assertThat(AppFunctionAppUnknownException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_APP_UNKNOWN_ERROR)
-        assertThat(AppFunctionAppUnknownException().errorCategory)
+        assertThat(AppFunctionAppUnknownException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
 
-        assertThat(AppFunctionPermissionRequiredException().internalErrorCode)
+        assertThat(AppFunctionPermissionRequiredException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_PERMISSION_REQUIRED)
-        assertThat(AppFunctionPermissionRequiredException().errorCategory)
+        assertThat(AppFunctionPermissionRequiredException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
 
-        assertThat(AppFunctionNotSupportedException().internalErrorCode)
+        assertThat(AppFunctionNotSupportedException(null, Bundle()).internalErrorCode)
             .isEqualTo(AppFunctionException.ERROR_NOT_SUPPORTED)
-        assertThat(AppFunctionNotSupportedException().errorCategory)
+        assertThat(AppFunctionNotSupportedException(null, Bundle()).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
     }
 }
