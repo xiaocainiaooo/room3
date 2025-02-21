@@ -382,8 +382,8 @@ interface HealthConnectClient {
      * @throws IllegalArgumentException if any request is failed to be processed for any reason such
      *   as invalid [UpsertMedicalResourceRequest.dataSourceId]
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     * @sample androidx.health.connect.client.samples.UpsertMedicalResourcesSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
@@ -430,8 +430,9 @@ interface HealthConnectClient {
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
      * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
      * thrown if the feature is not available.
+     *
+     * @sample androidx.health.connect.client.samples.ReadMedicalResourcesByRequestSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     suspend fun readMedicalResources(
@@ -475,8 +476,8 @@ interface HealthConnectClient {
      *
      * @throws IllegalArgumentException if the size of [ids] is too large or any ID is deemed as
      *   invalid.
+     * @sample androidx.health.connect.client.samples.ReadMedicalResourcesByIdsSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
@@ -505,8 +506,8 @@ interface HealthConnectClient {
      *
      * @param ids The ids to delete.
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     * @sample androidx.health.connect.client.samples.DeleteMedicalResourcesSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
@@ -532,8 +533,8 @@ interface HealthConnectClient {
      *
      * @param request The request that contains the filters to delete.
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     * @sample androidx.health.connect.client.samples.DeleteMedicalResourcesByRequestSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
@@ -607,8 +608,8 @@ interface HealthConnectClient {
      *
      * @param id The id of the data source to delete.
      * @throws IllegalArgumentException if [id] is invalid, does not exist, or owned by another app.
+     * @sample androidx.health.connect.client.samples.DeleteMedicalDataSourceWithDataSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     @ExperimentalPersonalHealthRecordApi
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     suspend fun deleteMedicalDataSourceWithData(id: String) {
@@ -658,8 +659,8 @@ interface HealthConnectClient {
      *
      * @param request containing details of the [MedicalDataSource]s to retrieve
      * @return [MedicalDataSource]s matching the provided request
+     * @sample androidx.health.connect.client.samples.GetMedicalDataSourcesByRequestSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     @ExperimentalPersonalHealthRecordApi
     suspend fun getMedicalDataSources(
         request: GetMedicalDataSourcesRequest
@@ -711,8 +712,8 @@ interface HealthConnectClient {
      *
      * @param ids ids of the [MedicalDataSource]s to retrieve
      * @return [MedicalDataSource]s matching the provided [ids]
+     * @sample androidx.health.connect.client.samples.GetMedicalDataSourcesByIdsSample
      */
-    // TODO: b/394856391 - add sample to kdoc
     @ExperimentalPersonalHealthRecordApi
     suspend fun getMedicalDataSources(ids: List<String>): List<MedicalDataSource> {
         throw createExceptionDueToFeatureUnavailable(
