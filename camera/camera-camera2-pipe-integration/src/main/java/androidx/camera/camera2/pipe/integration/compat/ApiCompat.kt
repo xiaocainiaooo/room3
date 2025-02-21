@@ -17,12 +17,10 @@
 package androidx.camera.camera2.pipe.integration.compat
 
 import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CaptureRequest
 import android.os.Build
 import android.view.Surface
 import androidx.annotation.RequiresApi
-import androidx.camera.camera2.pipe.integration.impl.CameraProperties
 
 @RequiresApi(Build.VERSION_CODES.N)
 internal object Api24Compat {
@@ -50,11 +48,6 @@ internal object Api34Compat {
     ) {
         callback.onReadoutStarted(session, request, timestamp, frameNumber)
     }
-
-    @JvmStatic
-    fun isZoomOverrideAvailable(cameraProperties: CameraProperties): Boolean =
-        cameraProperties.metadata[CameraCharacteristics.CONTROL_AVAILABLE_SETTINGS_OVERRIDES]
-            ?.contains(CameraCharacteristics.CONTROL_SETTINGS_OVERRIDE_ZOOM) == true
 
     @JvmStatic
     fun setSettingsOverrideZoom(parameters: MutableMap<CaptureRequest.Key<*>, Any>) {

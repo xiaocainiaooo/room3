@@ -525,6 +525,12 @@ internal object Api34Compat {
     ) {
         extensionSessionConfiguration.postviewOutputConfiguration = postviewOutputConfiguration
     }
+
+    @JvmStatic
+    fun isZoomOverrideSupported(cameraMetadata: CameraMetadata): Boolean =
+        cameraMetadata[CameraCharacteristics.CONTROL_AVAILABLE_SETTINGS_OVERRIDES]?.contains(
+            android.hardware.camera2.CameraMetadata.CONTROL_SETTINGS_OVERRIDE_ZOOM
+        ) == true
 }
 
 @RequiresApi(35)
