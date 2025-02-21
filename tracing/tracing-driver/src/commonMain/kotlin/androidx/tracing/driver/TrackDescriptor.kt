@@ -16,20 +16,19 @@
 
 package androidx.tracing.driver
 
-/** The entry point for the tracing API. */
-public class TraceDriver(private val sink: TraceSink, private val isEnabled: Boolean = true) {
-    public val context: TraceContext =
-        if (isEnabled) {
-            TraceContext(sink = sink, isEnabled = true)
-        } else {
-            EmptyTraceContext
-        }
+internal const val TRACK_DESCRIPTOR_TYPE_COUNTER: Int = 1
+internal const val TRACK_DESCRIPTOR_TYPE_THREAD: Int = 2
+internal const val TRACK_DESCRIPTOR_TYPE_PROCESS: Int = 3
 
+internal class TrackDescriptor(
+    var name: String,
+    var uuid: Long,
+    var parentUuid: Long,
     /**
-     * @param id is the Process id.
-     * @param name is the name of the Process.
-     * @return a [ProcessTrack] instance that we can associate trace packets to.
+     * One of [TRACK_DESCRIPTOR_TYPE_THREAD], [TRACK_DESCRIPTOR_TYPE_COUNTER],
+     * [TRACK_DESCRIPTOR_TYPE_PROCESS]
      */
-    public fun ProcessTrack(id: Int, name: String): ProcessTrack =
-        context.getOrCreateProcessTrack(id, name)
-}
+    var type: Int,
+    var pid: Int,
+    var tid: Int,
+)
