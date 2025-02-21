@@ -16,6 +16,7 @@
 
 package androidx.tracing.driver
 
+import androidx.tracing.driver.wire.WireTraceEventSerializer
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull

@@ -1,15 +1,6 @@
 // Signature format: 4.0
 package androidx.tracing.driver {
 
-  public final class AndroidTraceSink extends androidx.tracing.driver.TraceSink {
-    ctor public AndroidTraceSink(android.content.Context context, int sequenceId);
-    ctor public AndroidTraceSink(android.content.Context context, int sequenceId, java.io.File traceFile);
-    ctor public AndroidTraceSink(android.content.Context context, int sequenceId, okio.BufferedSink bufferedSink, optional kotlin.coroutines.CoroutineContext coroutineContext);
-    method public void close();
-    method public void enqueue(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
-    method public void flush();
-  }
-
   public final class ClockSource_androidKt {
     method public static inline long nanoTime();
   }
@@ -48,7 +39,7 @@ package androidx.tracing.driver {
     ctor public ThreadTrack(int id, String name, androidx.tracing.driver.ProcessTrack process);
   }
 
-  public class TraceContext implements java.io.Closeable {
+  public class TraceContext implements java.lang.AutoCloseable {
     ctor public TraceContext(androidx.tracing.driver.TraceSink sink, boolean isEnabled);
     method public void close();
     method public final void flush();
@@ -66,7 +57,7 @@ package androidx.tracing.driver {
     property public androidx.tracing.driver.TraceContext context;
   }
 
-  public abstract class TraceSink implements java.io.Closeable {
+  public abstract class TraceSink implements java.lang.AutoCloseable {
     ctor public TraceSink();
     method public abstract void enqueue(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
     method public abstract void flush();
@@ -78,6 +69,21 @@ package androidx.tracing.driver {
 
   public abstract class Track {
     ctor public Track(androidx.tracing.driver.TraceContext context, long uuid);
+  }
+
+}
+
+package androidx.tracing.driver.wire {
+
+  public final class WireTraceSink extends androidx.tracing.driver.TraceSink {
+    ctor public WireTraceSink(int sequenceId, okio.BufferedSink bufferedSink, optional kotlin.coroutines.CoroutineContext coroutineContext);
+    method public void close();
+    method public void enqueue(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
+    method public void flush();
+  }
+
+  public final class WireTraceSink_androidKt {
+    method public static androidx.tracing.driver.wire.WireTraceSink WireTraceSink(android.content.Context context, int sequenceId, optional kotlin.coroutines.CoroutineContext coroutineContext);
   }
 
 }
