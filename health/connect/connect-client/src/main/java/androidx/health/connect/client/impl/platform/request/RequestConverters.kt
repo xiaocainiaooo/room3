@@ -76,6 +76,13 @@ fun TimeRangeFilter.toPlatformTimeRangeFilter(): PlatformTimeRangeFilter {
     }
 }
 
+fun TimeRangeFilter.toPlatformLocalTimeRangeFilter(): LocalTimeRangeFilter {
+    return LocalTimeRangeFilter.Builder()
+        .setStartTime(localStartTime)
+        .setEndTime(localEndTime)
+        .build()
+}
+
 fun ChangesTokenRequest.toPlatformRequest(): ChangeLogTokenRequest {
     return ChangeLogTokenRequest.Builder()
         .apply {
@@ -129,11 +136,4 @@ fun AggregateMetric<Any>.toAggregationType(): AggregationType<Any> {
         ?: VELOCITY_AGGREGATION_METRIC_TYPE_MAP[this] as AggregationType<Any>?
         ?: VOLUME_AGGREGATION_METRIC_TYPE_MAP[this] as AggregationType<Any>?
         ?: throw IllegalArgumentException("Unsupported aggregation type $metricKey")
-}
-
-private fun TimeRangeFilter.toPlatformLocalTimeRangeFilter(): LocalTimeRangeFilter {
-    return LocalTimeRangeFilter.Builder()
-        .setStartTime(localStartTime)
-        .setEndTime(localEndTime)
-        .build()
 }

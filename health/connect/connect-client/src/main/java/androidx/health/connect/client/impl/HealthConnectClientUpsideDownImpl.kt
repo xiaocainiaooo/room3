@@ -22,7 +22,6 @@ import android.content.pm.PackageManager.GET_PERMISSIONS
 import android.content.pm.PackageManager.PackageInfoFlags
 import android.health.connect.HealthConnectException
 import android.health.connect.HealthConnectManager
-import android.health.connect.LocalTimeRangeFilter
 import android.health.connect.ReadRecordsRequestUsingIds
 import android.health.connect.RecordIdFilter
 import android.health.connect.changelog.ChangeLogsRequest
@@ -54,6 +53,7 @@ import androidx.health.connect.client.impl.platform.records.toPlatformRecordClas
 import androidx.health.connect.client.impl.platform.records.toSdkMedicalDataSource
 import androidx.health.connect.client.impl.platform.records.toSdkMedicalResource
 import androidx.health.connect.client.impl.platform.records.toSdkRecord
+import androidx.health.connect.client.impl.platform.request.toPlatformLocalTimeRangeFilter
 import androidx.health.connect.client.impl.platform.request.toPlatformRequest
 import androidx.health.connect.client.impl.platform.request.toPlatformTimeRangeFilter
 import androidx.health.connect.client.impl.platform.response.toKtResponse
@@ -294,10 +294,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                     // Handle bug in the Platform for versions of module before SDK extensions 10,
                     // where bucket endTime < bucket startTime (b/298290400)
                     val requestTimeRangeFilter =
-                        LocalTimeRangeFilter.Builder()
-                            .setStartTime(request.timeRangeFilter.localStartTime)
-                            .setEndTime(request.timeRangeFilter.localEndTime)
-                            .build()
+                        request.timeRangeFilter.toPlatformLocalTimeRangeFilter()
                     val bucketStartTime =
                         requestTimeRangeFilter.startTime!! +
                             request.timeRangeSlicer.multipliedBy(index)
