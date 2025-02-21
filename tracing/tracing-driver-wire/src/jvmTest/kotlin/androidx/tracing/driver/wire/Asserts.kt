@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.driver.wire
 
 import kotlin.test.assertNotNull
 import perfetto.protos.MutableTracePacket

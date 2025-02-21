@@ -16,19 +16,21 @@
 
 package androidx.tracing.driver
 
-internal const val TRACK_DESCRIPTOR_TYPE_COUNTER: Int = 1
-internal const val TRACK_DESCRIPTOR_TYPE_THREAD: Int = 2
-internal const val TRACK_DESCRIPTOR_TYPE_PROCESS: Int = 3
+import androidx.annotation.RestrictTo
 
-internal class TrackDescriptor(
-    var name: String,
-    var uuid: Long,
-    var parentUuid: Long,
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACK_DESCRIPTOR_TYPE_COUNTER: Int = 1
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACK_DESCRIPTOR_TYPE_THREAD: Int = 2
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACK_DESCRIPTOR_TYPE_PROCESS: Int = 3
+
+public class TrackDescriptor(
+    public var name: String,
+    public var uuid: Long,
+    public var parentUuid: Long,
     /**
      * One of [TRACK_DESCRIPTOR_TYPE_THREAD], [TRACK_DESCRIPTOR_TYPE_COUNTER],
      * [TRACK_DESCRIPTOR_TYPE_PROCESS]
      */
-    var type: Int,
-    var pid: Int,
-    var tid: Int,
+    public var type: Int,
+    public var pid: Int,
+    public var tid: Int,
 )

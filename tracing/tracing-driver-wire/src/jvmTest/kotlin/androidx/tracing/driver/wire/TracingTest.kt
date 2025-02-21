@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.driver.wire
 
-import androidx.tracing.driver.wire.WireTraceEventSerializer
+import androidx.tracing.driver.INVALID_LONG
+import androidx.tracing.driver.PooledTracePacketArray
+import androidx.tracing.driver.TraceContext
+import androidx.tracing.driver.TraceSink
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull

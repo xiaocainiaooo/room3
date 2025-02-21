@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.driver.wire
 
-import androidx.tracing.driver.wire.WireTraceSink
+import androidx.tracing.driver.ProcessTrack
+import androidx.tracing.driver.TraceDriver
 import java.io.File
 import kotlin.random.Random
 import kotlin.test.Test

@@ -16,7 +16,12 @@ package androidx.tracing.driver {
   }
 
   public final class PooledTracePacketArray extends androidx.tracing.driver.Poolable<androidx.tracing.driver.PooledTracePacketArray> {
+    method public inline void forEach(kotlin.jvm.functions.Function1<? super androidx.tracing.driver.TraceEvent,kotlin.Unit> block);
     method public void recycle();
+    property public int fillCount;
+    property public androidx.tracing.driver.TraceEvent[] packets;
+    field public int fillCount;
+    field public final androidx.tracing.driver.TraceEvent[] packets;
   }
 
   public class ProcessTrack extends androidx.tracing.driver.SliceTrack {
@@ -57,6 +62,27 @@ package androidx.tracing.driver {
     property public androidx.tracing.driver.TraceContext context;
   }
 
+  public final class TraceEvent {
+    ctor public TraceEvent();
+    method public void reset();
+    property public Double? counterDoubleValue;
+    property public Long? counterLongValue;
+    property public java.util.List<? extends java.lang.Long> flowIds;
+    property public String? name;
+    property public long timestamp;
+    property public androidx.tracing.driver.TrackDescriptor? trackDescriptor;
+    property public long trackUuid;
+    property public int type;
+    field public Double? counterDoubleValue;
+    field public Long? counterLongValue;
+    field public java.util.List<java.lang.Long> flowIds;
+    field public String? name;
+    field public long timestamp;
+    field public androidx.tracing.driver.TrackDescriptor? trackDescriptor;
+    field public long trackUuid;
+    field public int type;
+  }
+
   public abstract class TraceSink implements java.lang.AutoCloseable {
     ctor public TraceSink();
     method public abstract void enqueue(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
@@ -71,19 +97,26 @@ package androidx.tracing.driver {
     ctor public Track(androidx.tracing.driver.TraceContext context, long uuid);
   }
 
-}
-
-package androidx.tracing.driver.wire {
-
-  public final class WireTraceSink extends androidx.tracing.driver.TraceSink {
-    ctor public WireTraceSink(int sequenceId, okio.BufferedSink bufferedSink, optional kotlin.coroutines.CoroutineContext coroutineContext);
-    method public void close();
-    method public void enqueue(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
-    method public void flush();
-  }
-
-  public final class WireTraceSink_androidKt {
-    method public static androidx.tracing.driver.wire.WireTraceSink WireTraceSink(android.content.Context context, int sequenceId, optional kotlin.coroutines.CoroutineContext coroutineContext);
+  public final class TrackDescriptor {
+    ctor public TrackDescriptor(String name, long uuid, long parentUuid, int type, int pid, int tid);
+    method public String getName();
+    method public long getParentUuid();
+    method public int getPid();
+    method public int getTid();
+    method public int getType();
+    method public long getUuid();
+    method public void setName(String);
+    method public void setParentUuid(long);
+    method public void setPid(int);
+    method public void setTid(int);
+    method public void setType(int);
+    method public void setUuid(long);
+    property public String name;
+    property public long parentUuid;
+    property public int pid;
+    property public int tid;
+    property public int type;
+    property public long uuid;
   }
 
 }
