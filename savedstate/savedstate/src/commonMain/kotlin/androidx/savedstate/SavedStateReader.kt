@@ -24,13 +24,6 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-@PublishedApi internal const val DEFAULT_BOOLEAN: Boolean = false
-@PublishedApi internal const val DEFAULT_CHAR: Char = 0.toChar()
-@PublishedApi internal const val DEFAULT_FLOAT: Float = 0F
-@PublishedApi internal const val DEFAULT_DOUBLE: Double = 0.0
-@PublishedApi internal const val DEFAULT_INT: Int = 0
-@PublishedApi internal const val DEFAULT_LONG: Long = 0L
-
 /**
  * An inline class that encapsulates an opaque [SavedState], and provides an API for reading the
  * platform specific state.
