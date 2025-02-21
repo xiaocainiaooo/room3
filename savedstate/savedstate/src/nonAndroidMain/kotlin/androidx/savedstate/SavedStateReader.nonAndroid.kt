@@ -37,7 +37,6 @@ internal actual constructor(
     }
 
     public actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
-        if (key !in this) defaultValue()
         return source.map[key] as? Boolean ?: defaultValue()
     }
 
@@ -47,7 +46,6 @@ internal actual constructor(
     }
 
     public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
-        if (key !in this) defaultValue()
         return source.map[key] as? Char ?: defaultValue()
     }
 
@@ -60,7 +58,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> CharSequence
     ): CharSequence {
-        if (key !in this) defaultValue()
         return source.map[key] as? CharSequence ?: defaultValue()
     }
 
@@ -70,7 +67,6 @@ internal actual constructor(
     }
 
     public actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
-        if (key !in this) defaultValue()
         return source.map[key] as? Double ?: defaultValue()
     }
 
@@ -80,7 +76,6 @@ internal actual constructor(
     }
 
     public actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
-        if (key !in this) defaultValue()
         return source.map[key] as? Float ?: defaultValue()
     }
 
@@ -90,7 +85,6 @@ internal actual constructor(
     }
 
     public actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
-        if (key !in this) defaultValue()
         return source.map[key] as? Int ?: defaultValue()
     }
 
@@ -100,7 +94,6 @@ internal actual constructor(
     }
 
     public actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
-        if (key !in this) defaultValue()
         return source.map[key] as? Long ?: defaultValue()
     }
 
@@ -110,7 +103,6 @@ internal actual constructor(
     }
 
     public actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
-        if (key !in this) defaultValue()
         return source.map[key] as? String ?: defaultValue()
     }
 
@@ -124,7 +116,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> List<CharSequence>
     ): List<CharSequence> {
-        if (key !in this) defaultValue()
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<CharSequence> ?: defaultValue()
     }
 
@@ -137,7 +128,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> List<Int>
     ): List<Int> {
-        if (key !in this) defaultValue()
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int> ?: defaultValue()
     }
 
@@ -151,7 +141,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> List<SavedState>
     ): List<SavedState> {
-        if (key !in this) defaultValue()
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<SavedState> ?: defaultValue()
     }
 
@@ -165,7 +154,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> List<String>
     ): List<String> {
-        if (key !in this) defaultValue()
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<String> ?: defaultValue()
     }
 
@@ -178,7 +166,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> CharArray
     ): CharArray {
-        if (key !in this) defaultValue()
         return source.map[key] as? CharArray ?: defaultValue()
     }
 
@@ -192,7 +179,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> Array<CharSequence>
     ): Array<CharSequence> {
-        if (key !in this) defaultValue()
         @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<CharSequence> ?: defaultValue()
     }
 
@@ -205,7 +191,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> BooleanArray
     ): BooleanArray {
-        if (key !in this) defaultValue()
         return source.map[key] as? BooleanArray ?: defaultValue()
     }
 
@@ -218,7 +203,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> DoubleArray,
     ): DoubleArray {
-        if (key !in this) defaultValue()
         return source.map[key] as? DoubleArray ?: defaultValue()
     }
 
@@ -231,7 +215,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> FloatArray
     ): FloatArray {
-        if (key !in this) defaultValue()
         return source.map[key] as? FloatArray ?: defaultValue()
     }
 
@@ -244,7 +227,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> IntArray
     ): IntArray {
-        if (key !in this) defaultValue()
         return source.map[key] as? IntArray ?: defaultValue()
     }
 
@@ -257,7 +239,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> LongArray
     ): LongArray {
-        if (key !in this) defaultValue()
         return source.map[key] as? LongArray ?: defaultValue()
     }
 
@@ -272,7 +253,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> Array<SavedState>
     ): Array<SavedState> {
-        if (key !in this) defaultValue()
         return source.map[key] as? Array<SavedState> ?: defaultValue()
     }
 
@@ -287,7 +267,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> Array<String>
     ): Array<String> {
-        if (key !in this) defaultValue()
         return source.map[key] as? Array<String> ?: defaultValue()
     }
 
@@ -300,7 +279,6 @@ internal actual constructor(
         key: String,
         defaultValue: () -> SavedState
     ): SavedState {
-        if (key !in this) defaultValue()
         return source.map[key] as? SavedState ?: defaultValue()
     }
 
