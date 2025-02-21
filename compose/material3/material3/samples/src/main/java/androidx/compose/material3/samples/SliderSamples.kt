@@ -43,12 +43,12 @@ import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.RangeSliderState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalSlider
+import androidx.compose.material3.rememberRangeSliderState
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,6 +56,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,7 +79,7 @@ import kotlinx.coroutines.launch
 @Sampled
 @Composable
 fun SliderSample() {
-    var sliderPosition by remember { mutableStateOf(0f) }
+    var sliderPosition by rememberSaveable { mutableStateOf(0f) }
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(text = "%.2f".format(sliderPosition))
         Slider(value = sliderPosition, onValueChange = { sliderPosition = it })
@@ -89,7 +90,7 @@ fun SliderSample() {
 @Preview
 @Composable
 fun LegacySliderSample() {
-    var sliderPosition by remember { mutableStateOf(0f) }
+    var sliderPosition by rememberSaveable { mutableStateOf(0f) }
     val interactionSource = remember { MutableInteractionSource() }
     val trackHeight = 4.dp
     val thumbSize = DpSize(20.dp, 20.dp)
@@ -128,7 +129,7 @@ fun LegacySliderSample() {
 @Sampled
 @Composable
 fun StepsSliderSample() {
-    var sliderPosition by remember { mutableStateOf(0f) }
+    var sliderPosition by rememberSaveable { mutableStateOf(0f) }
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(text = sliderPosition.roundToInt().toString())
         Slider(
@@ -151,7 +152,7 @@ fun StepsSliderSample() {
 @Sampled
 @Composable
 fun SliderWithCustomThumbSample() {
-    var sliderPosition by remember { mutableStateOf(0f) }
+    var sliderPosition by rememberSaveable { mutableStateOf(0f) }
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Slider(
@@ -189,15 +190,14 @@ fun SliderWithCustomThumbSample() {
 @Sampled
 @Composable
 fun SliderWithCustomTrackAndThumbSample() {
-    val sliderState = remember {
-        SliderState(
+    val sliderState =
+        rememberSliderState(
             valueRange = 0f..100f,
             onValueChangeFinished = {
                 // launch some business logic update with the state you hold
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             }
         )
-    }
     val interactionSource = remember { MutableInteractionSource() }
     val colors = SliderDefaults.colors(thumbColor = Color.Red, activeTrackColor = Color.Red)
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -218,15 +218,14 @@ fun SliderWithCustomTrackAndThumbSample() {
 @Sampled
 @Composable
 fun SliderWithTrackIconsSample() {
-    val sliderState = remember {
-        SliderState(
+    val sliderState =
+        rememberSliderState(
             valueRange = 0f..100f,
             onValueChangeFinished = {
                 // launch some business logic update with the state you hold
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             }
         )
-    }
     val interactionSource = remember { MutableInteractionSource() }
     val startIcon = rememberVectorPainter(Icons.Filled.MusicNote)
     val endIcon = rememberVectorPainter(Icons.Filled.MusicOff)
@@ -303,8 +302,8 @@ fun SliderWithTrackIconsSample() {
 @Composable
 fun VerticalSliderSample() {
     val coroutineScope = rememberCoroutineScope()
-    val sliderState = remember {
-        SliderState(
+    val sliderState =
+        rememberSliderState(
             steps = 9,
             valueRange = 0f..100f,
             onValueChangeFinished = {
@@ -312,9 +311,8 @@ fun VerticalSliderSample() {
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             }
         )
-    }
     val snapAnimationSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
-    var currentValue by remember { mutableFloatStateOf(sliderState.value) }
+    var currentValue by rememberSaveable { mutableFloatStateOf(sliderState.value) }
     var animateJob: Job? by remember { mutableStateOf(null) }
     sliderState.shouldAutoSnap = false
     sliderState.onValueChange = { newValue ->
@@ -365,8 +363,8 @@ fun VerticalSliderSample() {
 @Sampled
 @Composable
 fun RangeSliderSample() {
-    val rangeSliderState = remember {
-        RangeSliderState(
+    val rangeSliderState =
+        rememberRangeSliderState(
             0f,
             100f,
             valueRange = 0f..100f,
@@ -375,7 +373,6 @@ fun RangeSliderSample() {
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             }
         )
-    }
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         val rangeStart = "%.2f".format(rangeSliderState.activeRangeStart)
         val rangeEnd = "%.2f".format(rangeSliderState.activeRangeEnd)
@@ -388,8 +385,8 @@ fun RangeSliderSample() {
 @Preview
 @Composable
 fun LegacyRangeSliderSample() {
-    val rangeSliderState = remember {
-        RangeSliderState(
+    val rangeSliderState =
+        rememberRangeSliderState(
             0f,
             100f,
             valueRange = 0f..100f,
@@ -398,7 +395,6 @@ fun LegacyRangeSliderSample() {
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             }
         )
-    }
     val startInteractionSource = remember { MutableInteractionSource() }
     val endInteractionSource = remember { MutableInteractionSource() }
     val trackHeight = 4.dp
@@ -454,8 +450,8 @@ fun LegacyRangeSliderSample() {
 @Sampled
 @Composable
 fun StepRangeSliderSample() {
-    val rangeSliderState = remember {
-        RangeSliderState(
+    val rangeSliderState =
+        rememberRangeSliderState(
             0f,
             100f,
             valueRange = 0f..100f,
@@ -467,7 +463,6 @@ fun StepRangeSliderSample() {
             // there are 9 steps (10, 20, ..., 90).
             steps = 9
         )
-    }
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         val rangeStart = rangeSliderState.activeRangeStart.roundToInt()
         val rangeEnd = rangeSliderState.activeRangeEnd.roundToInt()
@@ -481,8 +476,8 @@ fun StepRangeSliderSample() {
 @Sampled
 @Composable
 fun RangeSliderWithCustomComponents() {
-    val rangeSliderState = remember {
-        RangeSliderState(
+    val rangeSliderState =
+        rememberRangeSliderState(
             0f,
             100f,
             valueRange = 0f..100f,
@@ -491,7 +486,6 @@ fun RangeSliderWithCustomComponents() {
                 // viewModel.updateSelectedSliderValue(sliderPosition)
             }
         )
-    }
     val startInteractionSource = remember { MutableInteractionSource() }
     val endInteractionSource = remember { MutableInteractionSource() }
     val startThumbAndTrackColors =

@@ -48,6 +48,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.progressSemantics
+import androidx.compose.material3.RangeSliderState.Companion.Saver
+import androidx.compose.material3.SliderState.Companion.Saver
 import androidx.compose.material3.internal.IncreaseHorizontalSemanticsBounds
 import androidx.compose.material3.internal.Strings
 import androidx.compose.material3.internal.awaitHorizontalPointerSlopOrCancellation
@@ -64,6 +66,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -2525,6 +2530,71 @@ class SliderState(
 
     private fun scaleToOffset(minPx: Float, maxPx: Float, userValue: Float) =
         scale(valueRange.start, valueRange.endInclusive, userValue, minPx, maxPx)
+
+    companion object {
+        /**
+         * The default [Saver] implementation for [SliderState].
+         *
+         * @param onValueChangeFinished lambda to be invoked when value change has ended. This
+         *   callback shouldn't be used to update the range slider values (use [onValueChange] for
+         *   that), but rather to know when the user has completed selecting a new value by ending a
+         *   drag or a click.
+         * @param valueRange range of values that Slider values can take. [value] will be coerced to
+         *   this range.
+         */
+        fun Saver(
+            onValueChangeFinished: (() -> Unit)?,
+            valueRange: ClosedFloatingPointRange<Float>
+        ): Saver<SliderState, *> =
+            listSaver(
+                save = { listOf(it.value, it.steps) },
+                restore = {
+                    SliderState(
+                        value = it[0] as Float,
+                        steps = it[1] as Int,
+                        onValueChangeFinished = onValueChangeFinished,
+                        valueRange = valueRange
+                    )
+                }
+            )
+    }
+}
+
+/**
+ * Creates a [SliderState] that is remembered across compositions.
+ *
+ * Changes to the provided initial values will **not** result in the state being recreated or
+ * changed in any way if it has already been created.
+ *
+ * @param value [Float] that indicates the initial position of the thumb. If outside of [valueRange]
+ *   provided, value will be coerced to this range.
+ * @param steps if positive, specifies the amount of discrete allowable values between the endpoints
+ *   of [valueRange]. For example, a range from 0 to 10 with 4 [steps] allows 4 values evenly
+ *   distributed between 0 and 10 (i.e., 2, 4, 6, 8). If [steps] is 0, the slider will behave
+ *   continuously and allow any value from the range. Must not be negative.
+ * @param onValueChangeFinished lambda to be invoked when value change has ended. This callback
+ *   shouldn't be used to update the range slider values (use [SliderState.onValueChange] for that),
+ *   but rather to know when the user has completed selecting a new value by ending a drag or a
+ *   click.
+ * @param valueRange range of values that Slider values can take. [value] will be coerced to this
+ *   range.
+ */
+@ExperimentalMaterial3Api
+@Composable
+fun rememberSliderState(
+    value: Float = 0f,
+    @IntRange(from = 0) steps: Int = 0,
+    onValueChangeFinished: (() -> Unit)? = null,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f
+): SliderState {
+    return rememberSaveable(saver = SliderState.Saver(onValueChangeFinished, valueRange)) {
+        SliderState(
+            value = value,
+            steps = steps,
+            onValueChangeFinished = onValueChangeFinished,
+            valueRange = valueRange
+        )
+    }
 }
 
 /**
@@ -2663,6 +2733,76 @@ class RangeSliderState(
             rawOffsetStart = scaleToOffset(minPx, maxPx, activeRangeStart)
             rawOffsetEnd = scaleToOffset(minPx, maxPx, activeRangeEnd)
         }
+    }
+
+    companion object {
+        /**
+         * The default [Saver] implementation for [RangeSliderState].
+         *
+         * @param onValueChangeFinished lambda to be invoked when value change has ended. This
+         *   callback shouldn't be used to update the range slider values (use [onValueChange] for
+         *   that), but rather to know when the user has completed selecting a new value by ending a
+         *   drag or a click.
+         * @param valueRange range of values that Range Slider values can take. [activeRangeStart]
+         *   and [activeRangeEnd] will be coerced to this range.
+         */
+        fun Saver(
+            onValueChangeFinished: (() -> Unit)?,
+            valueRange: ClosedFloatingPointRange<Float>
+        ): Saver<RangeSliderState, *> =
+            listSaver(
+                save = { listOf(it.activeRangeStart, it.activeRangeEnd, it.steps) },
+                restore = {
+                    RangeSliderState(
+                        activeRangeStart = it[0] as Float,
+                        activeRangeEnd = it[1] as Float,
+                        steps = it[2] as Int,
+                        onValueChangeFinished = onValueChangeFinished,
+                        valueRange = valueRange
+                    )
+                }
+            )
+    }
+}
+
+/**
+ * Creates a [SliderState] that is remembered across compositions.
+ *
+ * Changes to the provided initial values will **not** result in the state being recreated or
+ * changed in any way if it has already been created.
+ *
+ * @param activeRangeStart [Float] that indicates the initial start of the active range of the
+ *   slider. If outside of [valueRange] provided, value will be coerced to this range.
+ * @param activeRangeEnd [Float] that indicates the initial end of the active range of the slider.
+ *   If outside of [valueRange] provided, value will be coerced to this range.
+ * @param steps if positive, specifies the amount of discrete allowable values between the endpoints
+ *   of [valueRange]. For example, a range from 0 to 10 with 4 [steps] allows 4 values evenly
+ *   distributed between 0 and 10 (i.e., 2, 4, 6, 8). If [steps] is 0, the slider will behave
+ *   continuously and allow any value from the range. Must not be negative.
+ * @param onValueChangeFinished lambda to be invoked when value change has ended. This callback
+ *   shouldn't be used to update the range slider values (use [RangeSliderState.onValueChange] for
+ *   that), but rather to know when the user has completed selecting a new value by ending a drag or
+ *   a click.
+ * @param valueRange range of values that Range Slider values can take. [activeRangeStart] and
+ *   [activeRangeEnd] will be coerced to this range.
+ */
+@ExperimentalMaterial3Api
+@Composable
+fun rememberRangeSliderState(
+    activeRangeStart: Float = 0f,
+    activeRangeEnd: Float = 1f,
+    @IntRange(from = 0) steps: Int = 0,
+    onValueChangeFinished: (() -> Unit)? = null,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f
+): RangeSliderState {
+    return rememberSaveable(saver = RangeSliderState.Saver(onValueChangeFinished, valueRange)) {
+        RangeSliderState(
+            activeRangeStart = activeRangeStart,
+            activeRangeEnd = activeRangeEnd,
+            steps = steps,
+            onValueChangeFinished = onValueChangeFinished,
+            valueRange = valueRange
+        )
     }
 }
 
