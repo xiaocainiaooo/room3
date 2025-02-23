@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.privacysandbox.ui.core
+package androidx.privacysandbox.ui.core.test
 
 import androidx.annotation.RestrictTo
 
-/**
- * List of all supported internal API versions (Client-Core communication).
- *
- * NEVER REMOVE / MODIFY RELEASED VERSIONS: That could break compatibility of client library built
- * with previous/future library version.
- */
-// TODO(b/406975359): Add min_supported_version
+/** Constants used for testing of UI library artifacts. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-enum class SdkRuntimeUiLibVersions(
-    val apiLevel: Int,
-) {
-
-    V1(apiLevel = 1);
-
-    companion object {
-        val CURRENT_VERSION = values().maxBy { v -> v.apiLevel }
-    }
+object TestProtocolConstants {
+    const val testOnlyUseRemoteAdapterKey = "testOnlyUseRemoteAdapter"
 }

@@ -26,4 +26,6 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 object ProtocolConstants {
     const val delegateKey = "delegate"
+    const val uiAdapterBinderKey = "uiAdapterBinder"
+    const val uiProviderVersionKey = "uiProviderVersion"
 }

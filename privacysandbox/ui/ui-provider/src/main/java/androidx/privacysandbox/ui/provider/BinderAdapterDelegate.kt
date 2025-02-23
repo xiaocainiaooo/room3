@@ -41,9 +41,12 @@ import androidx.privacysandbox.ui.core.IMotionEventTransferCallback
 import androidx.privacysandbox.ui.core.IRemoteSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
+import androidx.privacysandbox.ui.core.LocalUiAdapter
 import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.core.SandboxedUiAdapter.SessionClient
+import androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions
 import androidx.privacysandbox.ui.core.SessionData
 import androidx.privacysandbox.ui.core.SessionObserver
 import androidx.privacysandbox.ui.core.SessionObserverContext
@@ -64,8 +67,12 @@ fun SandboxedUiAdapter.toCoreLibInfo(@Suppress("ContextFirst") context: Context)
     if (this is ClientAdapterWrapper) {
         return this.getSourceBundle()
     }
-    // TODO: Add version info
+
     val bundle = Bundle()
+    bundle.putInt(
+        ProtocolConstants.uiProviderVersionKey,
+        SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel
+    )
     val binderAdapter =
         if (this is DelegatingSandboxedUiAdapter) {
             bundle.putBundle(ProtocolConstants.delegateKey, this.getDelegate())
@@ -74,8 +81,7 @@ fun SandboxedUiAdapter.toCoreLibInfo(@Suppress("ContextFirst") context: Context)
             BinderAdapterDelegate(context, this)
         }
     // Bundle key is a binary compatibility requirement
-    // TODO(b/375389719): Move key to ProtocolConstants
-    bundle.putBinder("uiAdapterBinder", binderAdapter)
+    bundle.putBinder(ProtocolConstants.uiAdapterBinderKey, binderAdapter)
     return bundle
 }
 
@@ -121,7 +127,7 @@ private class BinderDelegatingAdapter(private var adapter: DelegatingSandboxedUi
 private class BinderAdapterDelegate(
     private val sandboxContext: Context,
     private val adapter: SandboxedUiAdapter
-) : ISandboxedUiAdapter.Stub(), SandboxedUiAdapter {
+) : LocalUiAdapter, ISandboxedUiAdapter.Stub() {
 
     companion object {
         private const val TAG = "BinderAdapterDelegate"
@@ -129,14 +135,15 @@ private class BinderAdapterDelegate(
     }
 
     /** Called in local mode via reflection. */
-    override fun openSession(
+    override fun openLocalSession(
+        clientVersion: Int,
         context: Context,
         sessionData: SessionData,
         initialWidth: Int,
         initialHeight: Int,
         isZOrderOnTop: Boolean,
         clientExecutor: Executor,
-        client: SandboxedUiAdapter.SessionClient
+        client: SessionClient
     ) {
         MainThreadExecutor.execute {
             val displayManager =
@@ -157,6 +164,7 @@ private class BinderAdapterDelegate(
 
     /** Called in remote mode via binder call. */
     override fun openRemoteSession(
+        clientVersion: Int,
         sessionData: Bundle,
         displayId: Int,
         initialWidth: Int,
@@ -171,6 +179,7 @@ private class BinderAdapterDelegate(
             return
         }
         val constants = SessionData.fromBundle(sessionData)
+
         MainThreadExecutor.execute {
             try {
                 val displayManager =

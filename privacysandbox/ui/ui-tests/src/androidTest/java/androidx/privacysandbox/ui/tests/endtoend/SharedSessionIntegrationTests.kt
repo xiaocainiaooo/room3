@@ -24,6 +24,7 @@ import androidx.privacysandbox.ui.client.view.SharedUiContainer
 import androidx.privacysandbox.ui.core.BackwardCompatUtil
 import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.SharedUiAdapter
+import androidx.privacysandbox.ui.core.test.TestProtocolConstants
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.MediumTest
@@ -48,7 +49,6 @@ import org.junit.runners.Parameterized
 class SharedSessionIntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
     companion object {
         const val TIMEOUT = 1000L
-        const val TEST_ONLY_USE_REMOTE_ADAPTER = "testOnlyUseRemoteAdapter"
         const val CONTAINER_WIDTH = 100
         const val CONTAINER_HEIGHT = 100
 
@@ -187,7 +187,10 @@ class SharedSessionIntegrationTests(private val invokeBackwardsCompatFlow: Boole
 
     private fun getCoreLibInfoFromAdapter(sdkAdapter: SharedUiAdapter): Bundle {
         val bundle = sdkAdapter.toCoreLibInfo()
-        bundle.putBoolean(TEST_ONLY_USE_REMOTE_ADAPTER, !invokeBackwardsCompatFlow)
+        bundle.putBoolean(
+            TestProtocolConstants.testOnlyUseRemoteAdapterKey,
+            !invokeBackwardsCompatFlow
+        )
         return bundle
     }
 

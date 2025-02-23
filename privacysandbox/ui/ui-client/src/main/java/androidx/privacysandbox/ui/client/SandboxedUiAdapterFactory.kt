@@ -36,6 +36,7 @@ import androidx.privacysandbox.ui.core.RemoteCallManager.addBinderDeathListener
 import androidx.privacysandbox.ui.core.RemoteCallManager.closeRemoteSession
 import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions
 import androidx.privacysandbox.ui.core.SessionData
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
@@ -48,12 +49,9 @@ import java.util.concurrent.Executor
  */
 object SandboxedUiAdapterFactory {
 
-    // Bundle key is a binary compatibility requirement
-    private const val UI_ADAPTER_BINDER = "uiAdapterBinder"
-
     private val uiAdapterFactoryDelegate =
         object : UiAdapterFactoryDelegate() {
-            override val uiAdapterBinderKey: String = UI_ADAPTER_BINDER
+            override val uiAdapterBinderKey: String = ProtocolConstants.uiAdapterBinderKey
             override val adapterDescriptor: String = ISandboxedUiAdapter.DESCRIPTOR
         }
 
@@ -94,13 +92,17 @@ object SandboxedUiAdapterFactory {
 
     /**
      * [LocalAdapter] fetches UI from a provider living on same process as the client but on a
-     * different class loader.
+     * different class loader. We should also perform ui-provider version check before calling any
+     * newly introduced api / modified api.
      */
     @SuppressLint("BanUncheckedReflection") // using reflection on library classes
     private class LocalAdapter(adapterBundle: Bundle) :
         SandboxedUiAdapter, ClientAdapter(adapterBundle) {
 
         val uiProviderBinder = uiAdapterFactoryDelegate.requireNotNullAdapterBinder(adapterBundle)
+
+        val uiProviderVersion =
+            uiAdapterFactoryDelegate.requireNotNullUiProviderVersion(adapterBundle)
 
         private val targetSessionClientClass =
             Class.forName(
@@ -122,14 +124,15 @@ object SandboxedUiAdapterFactory {
         // The adapterInterface provided must have a openSession method on its class.
         // Since the object itself has been instantiated on a different classloader, we
         // need reflection to get hold of it.
-        private val openSessionMethod: Method =
+        private val openLocalSessionMethod: Method =
             Class.forName(
-                    "androidx.privacysandbox.ui.core.SandboxedUiAdapter",
+                    "androidx.privacysandbox.ui.core.LocalUiAdapter",
                     /*initialize=*/ false,
                     uiProviderBinder.javaClass.classLoader
                 )
                 .getMethod(
-                    "openSession",
+                    "openLocalSession",
+                    Int::class.java,
                     Context::class.java,
                     targetSessionDataClass,
                     Int::class.java,
@@ -160,8 +163,10 @@ object SandboxedUiAdapterFactory {
                         arrayOf(targetSessionClientClass),
                         SessionClientProxyHandler(client)
                     )
-                openSessionMethod.invoke(
+
+                openLocalSessionMethod.invoke(
                     uiProviderBinder,
+                    SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel,
                     context,
                     fromBundleMethod.invoke(
                         targetSessionDataCompanionObject,
@@ -281,7 +286,10 @@ object SandboxedUiAdapterFactory {
         }
     }
 
-    /** [RemoteAdapter] fetches content from a provider living on a different process. */
+    /**
+     * [RemoteAdapter] fetches content from a provider living on a different process. We should also
+     * perform ui-provider version check before calling any newly introduced api / modified api.
+     */
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private class RemoteAdapter(adapterBundle: Bundle) :
         SandboxedUiAdapter, ClientAdapter(adapterBundle) {
@@ -289,6 +297,9 @@ object SandboxedUiAdapterFactory {
         val uiAdapterBinder = uiAdapterFactoryDelegate.requireNotNullAdapterBinder(adapterBundle)
         val adapterInterface: ISandboxedUiAdapter =
             ISandboxedUiAdapter.Stub.asInterface(uiAdapterBinder)
+
+        val uiProviderVersion =
+            uiAdapterFactoryDelegate.requireNotNullUiProviderVersion(adapterBundle)
 
         override fun openSession(
             context: Context,
@@ -305,6 +316,7 @@ object SandboxedUiAdapterFactory {
 
             tryToCallRemoteObject(adapterInterface) {
                 this.openRemoteSession(
+                    SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel,
                     SessionData.toBundle(sessionData),
                     displayId,
                     initialWidth,
