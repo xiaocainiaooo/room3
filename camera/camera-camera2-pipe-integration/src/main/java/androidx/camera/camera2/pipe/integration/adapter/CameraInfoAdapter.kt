@@ -31,6 +31,7 @@ import androidx.camera.camera2.pipe.CameraMetadata.Companion.isHardwareLevelLega
 import androidx.camera.camera2.pipe.CameraMetadata.Companion.maxTorchStrengthLevel
 import androidx.camera.camera2.pipe.CameraMetadata.Companion.supportsHighSpeedVideo
 import androidx.camera.camera2.pipe.CameraMetadata.Companion.supportsLogicalMultiCamera
+import androidx.camera.camera2.pipe.CameraMetadata.Companion.supportsLowLightBoost
 import androidx.camera.camera2.pipe.CameraMetadata.Companion.supportsPrivateReprocessing
 import androidx.camera.camera2.pipe.CameraMetadata.Companion.supportsTorchStrength
 import androidx.camera.camera2.pipe.CameraPipe
@@ -191,6 +192,12 @@ constructor(
     override fun getTorchStrengthLevel(): LiveData<Int> =
         if (isTorchStrengthSupported) cameraControlStateAdapter.torchStrengthLiveData
         else MutableLiveData(CameraInfo.TORCH_STRENGTH_LEVEL_UNSUPPORTED)
+
+    override fun isLowLightBoostSupported(): Boolean =
+        cameraProperties.metadata.supportsLowLightBoost
+
+    override fun getLowLightBoostState(): LiveData<Int> =
+        cameraControlStateAdapter.lowLightBoostState
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun getExposureState(): ExposureState = cameraControlStateAdapter.exposureState

@@ -230,5 +230,14 @@ public interface CameraMetadata : Metadata, UnsafeWrapper {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM)
                     Api35Compat.getDefaultTorchStrengthLevel(this)
                 else 1
+
+        public val CameraMetadata.supportsLowLightBoost: Boolean
+            get() {
+                val availableAeModes =
+                    this[CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES] ?: return false
+                return availableAeModes.contains(
+                    AeMode.CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY
+                )
+            }
     }
 }
