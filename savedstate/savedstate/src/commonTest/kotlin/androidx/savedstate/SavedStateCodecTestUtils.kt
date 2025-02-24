@@ -17,7 +17,7 @@
 package androidx.savedstate
 
 import androidx.kruth.assertThat
-import androidx.savedstate.serialization.SavedStateConfig
+import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import kotlinx.serialization.KSerializer
@@ -39,7 +39,7 @@ internal object SavedStateCodecTestUtils {
      */
     inline fun <reified T : Any> T.encodeDecode(
         serializer: KSerializer<T>? = null,
-        config: SavedStateConfig? = null,
+        configuration: SavedStateConfiguration? = null,
         checkDecoded: (T, T) -> Unit = { decoded, original ->
             assertThat(decoded).isEqualTo(original)
         },
@@ -47,16 +47,16 @@ internal object SavedStateCodecTestUtils {
     ) {
         val encoded =
             if (serializer == null) {
-                if (config == null) {
+                if (configuration == null) {
                     encodeToSavedState(this)
                 } else {
-                    encodeToSavedState(this, config)
+                    encodeToSavedState(this, configuration)
                 }
             } else {
-                if (config == null) {
+                if (configuration == null) {
                     encodeToSavedState(serializer, this)
                 } else {
-                    encodeToSavedState(serializer, this, config)
+                    encodeToSavedState(serializer, this, configuration)
                 }
             }
         encoded.read { checkEncoded() }
@@ -65,16 +65,16 @@ internal object SavedStateCodecTestUtils {
 
         val decoded =
             if (serializer == null) {
-                if (config == null) {
+                if (configuration == null) {
                     decodeFromSavedState(restored)
                 } else {
-                    decodeFromSavedState(restored, config)
+                    decodeFromSavedState(restored, configuration)
                 }
             } else {
-                if (config == null) {
+                if (configuration == null) {
                     decodeFromSavedState(serializer, restored)
                 } else {
-                    decodeFromSavedState(serializer, restored, config)
+                    decodeFromSavedState(serializer, restored, configuration)
                 }
             }
 

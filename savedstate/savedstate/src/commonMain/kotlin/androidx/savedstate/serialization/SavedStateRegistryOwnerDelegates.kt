@@ -30,7 +30,7 @@ import kotlinx.serialization.serializer
  * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withKey
  * @param key An optional [String] key to use for storing the value in the [SavedStateRegistry]. A
  *   default key will be generated if it's omitted or when 'null' is passed.
- * @param config The [SavedStateConfig] to use.
+ * @param configuration The [SavedStateConfiguration] to use.
  * @param init The function to provide the initial value of the property.
  * @return A property delegate provider that manages the saving and restoring of the value.
  * @see encodeToSavedState
@@ -39,10 +39,10 @@ import kotlinx.serialization.serializer
  */
 public inline fun <reified T : Any> SavedStateRegistryOwner.saved(
     key: String? = null,
-    config: SavedStateConfig = SavedStateConfig.DEFAULT,
+    configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
     noinline init: () -> T,
 ): ReadWriteProperty<Any?, T> =
-    saved(config.serializersModule.serializer(), key, config, init)
+    saved(configuration.serializersModule.serializer(), key, configuration, init)
 
 /**
  * Returns a property delegate provider that manages the saving and restoring of a value of type [T]
@@ -52,7 +52,7 @@ public inline fun <reified T : Any> SavedStateRegistryOwner.saved(
  * @param serializer The [KSerializer] to use for serializing and deserializing the value.
  * @param key An optional [String] key to use for storing the value in the [SavedStateRegistry]. A
  *   default key will be generated if it's omitted or when 'null' is passed.
- * @param config The [SavedStateConfig] to use.
+ * @param configuration The [SavedStateConfiguration] to use.
  * @param init The function to provide the initial value of the property.
  * @return A property delegate provider that manages the saving and restoring of the value.
  * @see encodeToSavedState
@@ -61,16 +61,16 @@ public inline fun <reified T : Any> SavedStateRegistryOwner.saved(
 public fun <T : Any> SavedStateRegistryOwner.saved(
     serializer: KSerializer<T>,
     key: String? = null,
-    config: SavedStateConfig = SavedStateConfig.DEFAULT,
+    configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> =
-    SavedStateRegistryOwnerDelegate(savedStateRegistry, serializer, key, config, init)
+    SavedStateRegistryOwnerDelegate(savedStateRegistry, serializer, key, configuration, init)
 
 private class SavedStateRegistryOwnerDelegate<T : Any>(
     private val registry: SavedStateRegistry,
     private val serializer: KSerializer<T>,
     private val key: String?,
-    private val config: SavedStateConfig,
+    private val configuration: SavedStateConfiguration,
     private val init: () -> T,
 ) : ReadWriteProperty<Any?, T> {
 
@@ -78,13 +78,17 @@ private class SavedStateRegistryOwnerDelegate<T : Any>(
 
     private fun loadValue(key: String): T? {
         return registry.consumeRestoredStateForKey(key)?.let {
-            decodeFromSavedState(deserializer = serializer, savedState = it, config = config)
+            decodeFromSavedState(
+                deserializer = serializer,
+                savedState = it,
+                configuration = configuration
+            )
         }
     }
 
     private fun registerSave(key: String) {
         registry.registerSavedStateProvider(key) {
-            encodeToSavedState(serializer, this.value, config)
+            encodeToSavedState(serializer, this.value, configuration)
         }
     }
 

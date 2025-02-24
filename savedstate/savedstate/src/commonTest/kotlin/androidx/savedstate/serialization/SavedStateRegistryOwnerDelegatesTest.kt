@@ -294,7 +294,7 @@ internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
             }
         }
 
-        val config = SavedStateConfig {
+        val config = SavedStateConfiguration {
             serializersModule = SerializersModule { contextual(User::class, UserSerializer()) }
         }
         val owner =
@@ -304,7 +304,7 @@ internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
                 lifecycleRegistry.currentState = State.CREATED
             }
         val original = User("foo")
-        var property: User by owner.saved(config = config) { original }
+        var property: User by owner.saved(configuration = config) { original }
         @Suppress("UNUSED_VARIABLE") // We have to access the property to trigger saving later.
         val temp = property
 
@@ -318,7 +318,7 @@ internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
                 lifecycleRegistry.currentState = State.CREATED
             }
         var newProperty: User by
-            newOwner.saved(config = config, key = "property") {
+            newOwner.saved(configuration = config, key = "property") {
                 error("Unexpected initializer call")
             }
 

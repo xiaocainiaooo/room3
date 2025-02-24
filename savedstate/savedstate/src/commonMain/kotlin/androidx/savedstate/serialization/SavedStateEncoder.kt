@@ -36,15 +36,15 @@ import kotlinx.serialization.serializer
  *
  * @sample androidx.savedstate.encode
  * @param value The serializable object to encode.
- * @param config The [SavedStateConfig] to use.
+ * @param configuration The [SavedStateConfiguration] to use.
  * @return The encoded [SavedState].
  * @throws SerializationException in case of any encoding-specific error.
  */
 public inline fun <reified T : Any> encodeToSavedState(
     value: T,
-    config: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
+    configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
 ): SavedState =
-    encodeToSavedState(config.serializersModule.serializer(), value, config)
+    encodeToSavedState(configuration.serializersModule.serializer(), value, configuration)
 
 /**
  * Serializes and encodes the given [value] to [SavedState] using the given [serializer].
@@ -52,7 +52,7 @@ public inline fun <reified T : Any> encodeToSavedState(
  * @sample androidx.savedstate.encodeWithExplicitSerializerAndConfig
  * @param serializer The serializer to use.
  * @param value The serializable object to encode.
- * @param config The [SavedStateConfig] to use.
+ * @param configuration The [SavedStateConfiguration] to use.
  * @return The encoded [SavedState].
  * @throws SerializationException in case of any encoding-specific error.
  */
@@ -60,10 +60,10 @@ public inline fun <reified T : Any> encodeToSavedState(
 public fun <T : Any> encodeToSavedState(
     serializer: SerializationStrategy<T>,
     value: T,
-    config: SavedStateConfig = SavedStateConfig.DEFAULT,
+    configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
 ): SavedState {
     val result = savedState()
-    SavedStateEncoder(result, config).encodeSerializableValue(serializer, value)
+    SavedStateEncoder(result, configuration).encodeSerializableValue(serializer, value)
     return result
 }
 
@@ -76,16 +76,16 @@ public fun <T : Any> encodeToSavedState(
 @OptIn(ExperimentalSerializationApi::class)
 internal class SavedStateEncoder(
     internal val savedState: SavedState,
-    private val config: SavedStateConfig
+    private val configuration: SavedStateConfiguration
 ) : AbstractEncoder() {
 
     internal var key: String = ""
         private set
 
-    override val serializersModule = config.serializersModule
+    override val serializersModule = configuration.serializersModule
 
     override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int): Boolean {
-        return config.encodeDefaults
+        return configuration.encodeDefaults
     }
 
     override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
@@ -102,7 +102,7 @@ internal class SavedStateEncoder(
         savedState: SavedState,
         elementName: String,
     ) {
-        if (config.classDiscriminatorMode == ClassDiscriminatorMode.ALL_OBJECTS) {
+        if (configuration.classDiscriminatorMode == ClassDiscriminatorMode.ALL_OBJECTS) {
             val hasClassDiscriminator = savedState.read { contains(CLASS_DISCRIMINATOR_KEY) }
             val hasConflictingElementName = elementName == CLASS_DISCRIMINATOR_KEY
             if (hasClassDiscriminator && hasConflictingElementName) {
@@ -203,19 +203,19 @@ internal class SavedStateEncoder(
         // `{{"first" = 3, "second" = 5}}`, which is more consistent but less
         // efficient.
         return if (key == "") {
-            putClassDiscriminatorIfRequired(config, descriptor, savedState)
+            putClassDiscriminatorIfRequired(configuration, descriptor, savedState)
             this
         } else {
             val childState = savedState()
             savedState.write { putSavedState(key, childState) } // Link child to parent.
-            putClassDiscriminatorIfRequired(config, descriptor, childState)
-            SavedStateEncoder(childState, config)
+            putClassDiscriminatorIfRequired(configuration, descriptor, childState)
+            SavedStateEncoder(childState, configuration)
         }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
     private fun putClassDiscriminatorIfRequired(
-        config: SavedStateConfig,
+        configuration: SavedStateConfiguration,
         descriptor: SerialDescriptor,
         savedState: SavedState,
     ) {
@@ -224,7 +224,7 @@ internal class SavedStateEncoder(
         }
 
         // POLYMORPHIC is handled by kotlinx.serialization.PolymorphicSerializer.
-        if (config.classDiscriminatorMode != ClassDiscriminatorMode.ALL_OBJECTS) {
+        if (configuration.classDiscriminatorMode != ClassDiscriminatorMode.ALL_OBJECTS) {
             return
         }
 

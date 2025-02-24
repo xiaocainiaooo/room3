@@ -34,15 +34,15 @@ import kotlinx.serialization.serializer
  *
  * @sample androidx.savedstate.decode
  * @param savedState The [SavedState] to decode from.
- * @param config The [SavedStateConfig] to use.
+ * @param configuration The [SavedStateConfiguration] to use.
  * @return The decoded object.
  * @throws SerializationException in case of any decoding-specific error.
  * @throws IllegalArgumentException if the decoded input is not a valid instance of [T].
  */
 public inline fun <reified T : Any> decodeFromSavedState(
     savedState: SavedState,
-    config: SavedStateConfig = SavedStateConfig.DEFAULT
-): T = decodeFromSavedState(config.serializersModule.serializer(), savedState, config)
+    configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT
+): T = decodeFromSavedState(configuration.serializersModule.serializer(), savedState, configuration)
 
 /**
  * Decodes and deserializes the given [SavedState] to the value of type [T] using the given
@@ -51,7 +51,7 @@ public inline fun <reified T : Any> decodeFromSavedState(
  * @sample androidx.savedstate.decodeWithExplicitSerializerAndConfig
  * @param deserializer The deserializer to use.
  * @param savedState The [SavedState] to decode from.
- * @param config The [SavedStateConfig] to use.
+ * @param configuration The [SavedStateConfiguration] to use.
  * @return The deserialized object.
  * @throws SerializationException in case of any decoding-specific error.
  * @throws IllegalArgumentException if the decoded input is not a valid instance of [T].
@@ -60,9 +60,9 @@ public inline fun <reified T : Any> decodeFromSavedState(
 public fun <T : Any> decodeFromSavedState(
     deserializer: DeserializationStrategy<T>,
     savedState: SavedState,
-    config: SavedStateConfig = SavedStateConfig.DEFAULT,
+    configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
 ): T {
-    return SavedStateDecoder(savedState, config).decodeSerializableValue(deserializer)
+    return SavedStateDecoder(savedState, configuration).decodeSerializableValue(deserializer)
 }
 
 /**
@@ -74,14 +74,14 @@ public fun <T : Any> decodeFromSavedState(
 @OptIn(ExperimentalSerializationApi::class)
 internal class SavedStateDecoder(
     internal val savedState: SavedState,
-    private val config: SavedStateConfig
+    private val configuration: SavedStateConfiguration
 ) : AbstractDecoder() {
     internal var key: String = ""
         private set
 
     private var index = 0
 
-    override val serializersModule: SerializersModule = config.serializersModule
+    override val serializersModule: SerializersModule = configuration.serializersModule
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         val size =
@@ -171,7 +171,10 @@ internal class SavedStateDecoder(
         if (key == "") {
             this
         } else {
-            SavedStateDecoder(savedState = savedState.read { getSavedState(key) }, config = config)
+            SavedStateDecoder(
+                savedState = savedState.read { getSavedState(key) },
+                configuration = configuration
+            )
         }
 
     // We don't encode NotNullMark so this will actually read either a `null` from
