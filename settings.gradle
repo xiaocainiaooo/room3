@@ -1324,3 +1324,4 @@ void includeRequestedProjectsAndDependencies() {
     }
 }
 includeRequestedProjectsAndDependencies()
+gradle.ext.allProjectConsumers = allProjectsConsumers(projectDependencyGraph)

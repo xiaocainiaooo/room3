@@ -63,6 +63,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
         configureKtfmtCheckFile()
         maybeRegisterFilterableTask()
+        registerListAffectedProjectsTask()
 
         // If we're running inside Studio, validate the Android Gradle Plugin version.
         val expectedAgpVersion = System.getenv("EXPECTED_AGP_VERSION")
