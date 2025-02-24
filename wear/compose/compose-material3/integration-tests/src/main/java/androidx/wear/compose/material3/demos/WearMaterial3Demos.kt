@@ -38,6 +38,7 @@ import androidx.wear.compose.material3.samples.StatefulSwipeToDismissBox
 import androidx.wear.compose.material3.samples.SwipeToRevealNonAnchoredSample
 import androidx.wear.compose.material3.samples.SwipeToRevealSample
 import androidx.wear.compose.material3.samples.SwipeToRevealSingleActionCardSample
+import androidx.wear.compose.material3.samples.SwipeToRevealWithTransformingLazyColumnSample
 import androidx.wear.compose.material3.samples.TransformingLazyColumnScalingMorphingEffectSample
 import androidx.wear.compose.material3.samples.TransformingLazyColumnScrollingSample
 
@@ -169,7 +170,12 @@ val WearMaterial3Demos =
                         ComposableDemo("Single action with Card") {
                             ScalingLazyDemo { item { SwipeToRevealSingleActionCardSample() } }
                         },
-                        ComposableDemo("In a list") { SwipeToRevealInList() },
+                        ComposableDemo("In ScalingLazyColumn") {
+                            SwipeToRevealInScalingLazyColumn()
+                        },
+                        ComposableDemo("In TransformingLazyColumn") {
+                            SwipeToRevealWithTransformingLazyColumnSample()
+                        },
                         ComposableDemo("Non-anchoring") {
                             ScalingLazyDemo { item { SwipeToRevealNonAnchoredSample() } }
                         },

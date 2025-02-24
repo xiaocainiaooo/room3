@@ -98,6 +98,10 @@ import kotlinx.coroutines.launch
  * fully swiped or bounces back to its initial state.
  *
  * @sample androidx.wear.compose.material3.samples.SwipeToRevealNonAnchoredSample
+ *
+ * Example of [SwipeToReveal] with a [TransformingLazyColumn]
+ *
+ * @sample androidx.wear.compose.material3.samples.SwipeToRevealWithTransformingLazyColumnSample
  * @param actions Actions of the [SwipeToReveal] composable, such as
  *   [SwipeToRevealScope.primaryAction]. [actions] should always include exactly one
  *   [SwipeToRevealScope.primaryAction]. [SwipeToRevealScope.secondaryAction],
