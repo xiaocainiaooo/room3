@@ -67,6 +67,41 @@ class AppFunctionSerializableProcessorTest {
     }
 
     @Test
+    fun testProcessor_validInheritedProperties_success() {
+        val report =
+            compilationTestHelper.compileAll(sourceFileNames = listOf("DerivedSerializable.KT"))
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$DerivedSerializableFactory.kt",
+            goldenFileName = "\$DerivedSerializableFactory.KT"
+        )
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$StringBaseSerializableFactory.kt",
+            goldenFileName = "\$StringBaseSerializableFactory.KT"
+        )
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$LongBaseSerializableFactory.kt",
+            goldenFileName = "\$LongBaseSerializableFactory.KT"
+        )
+    }
+
+    @Test
+    fun testProcessor_badlyInheritedProperties_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("SubClassRenamedPropertySerializable.KT")
+            )
+
+        compilationTestHelper.assertErrorWithMessage(
+            report,
+            "App parameters in @AppFunctionSerializable supertypes must be present in subtype"
+        )
+    }
+
+    @Test
     fun testProcessor_differentPackageSerializableProperty_success() {
         val report =
             compilationTestHelper.compileAll(
