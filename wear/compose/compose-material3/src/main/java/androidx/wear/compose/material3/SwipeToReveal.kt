@@ -53,6 +53,7 @@ import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.GestureInclusion
 import androidx.wear.compose.foundation.RevealActionType
 import androidx.wear.compose.foundation.RevealDirection
 import androidx.wear.compose.foundation.RevealDirection.Companion.Both
@@ -60,6 +61,8 @@ import androidx.wear.compose.foundation.RevealDirection.Companion.RightToLeft
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
 import androidx.wear.compose.foundation.SwipeToReveal
+import androidx.wear.compose.foundation.SwipeToRevealDefaults.allowAllGestures
+import androidx.wear.compose.foundation.SwipeToRevealDefaults.ignoreLeftEdge
 import androidx.wear.compose.foundation.createRevealAnchors
 import androidx.wear.compose.foundation.rememberRevealState
 import androidx.wear.compose.material3.ButtonDefaults.buttonColors
@@ -105,6 +108,13 @@ import kotlinx.coroutines.launch
  * @param actionButtonHeight Desired height of the revealed action buttons. In case the content is a
  *   Button composable, it's suggested to use [SwipeToRevealDefaults.SmallActionButtonHeight], and
  *   for a Card composable, it's suggested to use [SwipeToRevealDefaults.LargeActionButtonHeight].
+ * @param gestureInclusion Provides fine-grained control so that touch gestures can be excluded when
+ *   they start in a certain region. An instance of [GestureInclusion] can be passed in here which
+ *   will determine via [GestureInclusion.allowGesture] whether the gesture should proceed or not.
+ *   By default, [gestureInclusion] allows gestures everywhere for when [revealState] contains
+ *   anchors for both directions (see [allowAllGestures]). If it doesn't, then it allows gestures
+ *   everywhere, except a zone on the left edge, which is used for swipe-to-dismiss (see
+ *   [ignoreLeftEdge]).
  * @param content The content that will be initially displayed over the other actions provided.
  * @see [androidx.wear.compose.foundation.SwipeToReveal]
  */
@@ -114,6 +124,12 @@ public fun SwipeToReveal(
     modifier: Modifier = Modifier,
     revealState: RevealState = rememberRevealState(anchors = SwipeToRevealDefaults.anchors()),
     actionButtonHeight: Dp = SwipeToRevealDefaults.SmallActionButtonHeight,
+    gestureInclusion: GestureInclusion =
+        if (revealState.hasBidirectionalAnchors()) {
+            allowAllGestures()
+        } else {
+            ignoreLeftEdge()
+        },
     content: @Composable () -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -201,6 +217,7 @@ public fun SwipeToReveal(
             primaryAction.onClick()
         },
         state = revealState,
+        gestureInclusion = gestureInclusion,
         content = content,
     )
 
@@ -213,6 +230,9 @@ public fun SwipeToReveal(
         }
     }
 }
+
+internal fun RevealState.hasBidirectionalAnchors(): Boolean =
+    this.swipeAnchors.keys.contains(RevealValue.LeftRevealed)
 
 /**
  * Scope for the actions of a [SwipeToReveal] composable. Used to define the primary, secondary,
