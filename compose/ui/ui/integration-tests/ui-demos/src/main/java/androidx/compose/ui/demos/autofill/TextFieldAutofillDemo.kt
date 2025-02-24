@@ -143,8 +143,6 @@ fun BasicSecureTextFieldAutofillDemo() {
             textStyle = MaterialTheme.typography.body1.copy(color = Color.LightGray),
             cursorBrush = SolidColor(Color.White)
         )
-        // TODO(mnuzen): Check if `Password` ContentType should automatically
-        //  be applied to a BasicSecureTextField.
         BasicSecureTextField(
             state = remember { TextFieldState() },
             textObfuscationMode =
