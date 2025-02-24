@@ -14,12 +14,12 @@ public class `$EntityWithValidNullablePropertiesFactory` :
     val longParam = appFunctionData.getLongOrNull("longParam")
     val doubleParam = appFunctionData.getDoubleOrNull("doubleParam")
     val boolParam = appFunctionData.getBooleanOrNull("boolParam")
-    val stringParam = appFunctionData.getStringOrNull("stringParam")
+    val stringParam = appFunctionData.getString("stringParam")
     val longArray = appFunctionData.getLongArray("longArray")
     val doubleArray = appFunctionData.getDoubleArray("doubleArray")
     val boolArray = appFunctionData.getBooleanArray("boolArray")
     val stringList = appFunctionData.getStringList("stringList")
-    val inputSerializableData = appFunctionData.getAppFunctionDataOrNull("inputSerializable")
+    val inputSerializableData = appFunctionData.getAppFunctionData("inputSerializable")
     var inputSerializable: InputSerializable? = null
     if (inputSerializableData != null) {
       inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData) as

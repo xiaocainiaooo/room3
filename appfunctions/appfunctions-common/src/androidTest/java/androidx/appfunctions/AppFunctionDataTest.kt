@@ -37,7 +37,7 @@ import org.junit.Test
 class AppFunctionDataTest {
 
     @Test
-    fun testWrite_asParameters_conformSpec() {
+    fun testReadWrite_asParameters_conformSpec() {
         val builder =
             AppFunctionData.Builder(
                 TEST_PARAMETER_METADATA,
@@ -122,7 +122,49 @@ class AppFunctionDataTest {
     }
 
     @Test
-    fun testWrite_asObject_conformSpec() {
+    fun testRead_asParameters_notConformSpec() {
+        val builder =
+            AppFunctionData.Builder(
+                TEST_PARAMETER_METADATA,
+                AppFunctionComponentsMetadata(),
+            )
+        builder.setLong("long", 123L)
+        builder.setDouble("double", 50.0)
+        builder.setBoolean("boolean", true)
+        builder.setString("string", "testString")
+        builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
+        builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setStringList("stringList", listOf("1", "2", "3"))
+        val data = builder.build()
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDouble("long") }
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("long") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("double") }
+        assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("double") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getString("boolean") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBooleanArray("boolean") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getLong("string") }
+        assertThrows(IllegalArgumentException::class.java) { data.getStringList("string") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("longArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getLong("longArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getBooleanArray("doubleArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getDouble("doubleArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getStringList("booleanArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("boolean Array") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("stringList") }
+        assertThrows(IllegalArgumentException::class.java) { data.getString("stringList") }
+    }
+
+    @Test
+    fun testReadWrite_asObject_conformSpec() {
         val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
 
         builder.setLong("long", 123L)
@@ -199,7 +241,45 @@ class AppFunctionDataTest {
     }
 
     @Test
-    fun testWrite_nestedObjectParameter() {
+    fun testRead_asObject_notConformSpec() {
+        val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
+        builder.setLong("long", 123L)
+        builder.setDouble("double", 50.0)
+        builder.setBoolean("boolean", true)
+        builder.setString("string", "testString")
+        builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
+        builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setStringList("stringList", listOf("1", "2", "3"))
+        val data = builder.build()
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDouble("long") }
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("long") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("double") }
+        assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("double") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getString("boolean") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBooleanArray("boolean") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getLong("string") }
+        assertThrows(IllegalArgumentException::class.java) { data.getStringList("string") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("longArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getLong("longArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getBooleanArray("doubleArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getDouble("doubleArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getStringList("booleanArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("boolean Array") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("stringList") }
+        assertThrows(IllegalArgumentException::class.java) { data.getString("stringList") }
+    }
+
+    @Test
+    fun testReadWrite_nestedObjectParameter() {
         val data =
             AppFunctionData.Builder(TEST_NESTED_PARAMETER_METADATA, AppFunctionComponentsMetadata())
                 .setAppFunctionData(
@@ -227,12 +307,51 @@ class AppFunctionDataTest {
                 )
                 .build()
 
-        assertThat(data.getAppFunctionData("data").getLong("long")).isEqualTo(100)
+        assertThat(data.getAppFunctionData("data")?.getLong("long")).isEqualTo(100)
         assertThat(data.getAppFunctionDataList("dataList")).hasSize(2)
         assertThat(data.getAppFunctionDataList("dataList")?.get(0)?.getDouble("double"))
             .isEqualTo(20.0)
         assertThat(data.getAppFunctionDataList("dataList")?.get(1)?.getString("string"))
             .isEqualTo("testString")
+    }
+
+    @Test
+    fun testReadWrite_nestedAppFunctionData_conformSpec() {
+        val innerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf(
+                        "innerDouble" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = TYPE_DOUBLE,
+                                isNullable = false,
+                            )
+                    ),
+                required = emptyList(),
+                qualifiedName = "innerData",
+                isNullable = false,
+            )
+        val outerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties = mapOf("nestedData" to innerObjectType),
+                required = emptyList(),
+                qualifiedName = "outerData",
+                isNullable = false,
+            )
+        val innerDataBuilder =
+            AppFunctionData.Builder(innerObjectType, AppFunctionComponentsMetadata())
+        val outerDataBuilder =
+            AppFunctionData.Builder(
+                outerObjectType,
+                AppFunctionComponentsMetadata(),
+            )
+
+        innerDataBuilder.setDouble("innerDouble", 500.0)
+        outerDataBuilder.setAppFunctionData("nestedData", innerDataBuilder.build())
+        val outerData = outerDataBuilder.build()
+
+        assertThat(outerData.getAppFunctionData("nestedData")?.getDouble("innerDouble"))
+            .isEqualTo(500.0)
     }
 
     @Test
@@ -242,7 +361,7 @@ class AppFunctionDataTest {
         val data = AppFunctionData.serialize(note, Note::class.java)
 
         assertThat(data.getString("title")).isEqualTo("Test Title")
-        assertThat(data.getAppFunctionData("attachment").getString("uri")).isEqualTo("Test Uri")
+        assertThat(data.getAppFunctionData("attachment")?.getString("uri")).isEqualTo("Test Uri")
     }
 
     @Test
@@ -252,7 +371,7 @@ class AppFunctionDataTest {
         val data = AppFunctionData.serialize(note, "androidx.appfunctions.Note")
 
         assertThat(data.getString("title")).isEqualTo("Test Title")
-        assertThat(data.getAppFunctionData("attachment").getString("uri")).isEqualTo("Test Uri")
+        assertThat(data.getAppFunctionData("attachment")?.getString("uri")).isEqualTo("Test Uri")
     }
 
     @Test

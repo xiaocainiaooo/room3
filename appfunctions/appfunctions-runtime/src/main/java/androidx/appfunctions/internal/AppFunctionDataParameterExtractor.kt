@@ -47,42 +47,40 @@ internal fun AppFunctionData.unsafeGetParameterValue(
     parameterMetadata: AppFunctionParameterMetadata,
 ): Any? =
     try {
-        when (val castDataType = parameterMetadata.dataType) {
-            is AppFunctionPrimitiveTypeMetadata -> {
-                unsafeGetSingleProperty(parameterMetadata.name, castDataType.type)
+        val value =
+            when (val castDataType = parameterMetadata.dataType) {
+                is AppFunctionPrimitiveTypeMetadata -> {
+                    unsafeGetSingleProperty(parameterMetadata.name, castDataType.type)
+                }
+                is AppFunctionObjectTypeMetadata -> {
+                    unsafeGetSingleProperty(
+                        parameterMetadata.name,
+                        TYPE_OBJECT,
+                        castDataType.qualifiedName
+                    )
+                }
+                is AppFunctionArrayTypeMetadata -> {
+                    getArrayTypeParameterValue(parameterMetadata.name, castDataType)
+                }
+                is AppFunctionReferenceTypeMetadata -> {
+                    unsafeGetSingleProperty(
+                        parameterMetadata.name,
+                        TYPE_OBJECT,
+                        castDataType.referenceDataType
+                    )
+                }
+                else ->
+                    throw IllegalStateException(
+                        "Unknown DataTypeMetadata: ${castDataType::class.java}"
+                    )
             }
-            is AppFunctionObjectTypeMetadata -> {
-                unsafeGetSingleProperty(
-                    parameterMetadata.name,
-                    TYPE_OBJECT,
-                    castDataType.qualifiedName
-                )
-            }
-            is AppFunctionArrayTypeMetadata -> {
-                getArrayTypeParameterValue(
-                    parameterMetadata.name,
-                    parameterMetadata.isRequired,
-                    castDataType
-                )
-            }
-            is AppFunctionReferenceTypeMetadata -> {
-                unsafeGetSingleProperty(
-                    parameterMetadata.name,
-                    TYPE_OBJECT,
-                    castDataType.referenceDataType
-                )
-            }
-            else ->
-                throw IllegalStateException("Unknown DataTypeMetadata: ${castDataType::class.java}")
-        }
-    } catch (e: NoSuchElementException) {
-        if (parameterMetadata.isRequired) {
-            Log.d(APP_FUNCTIONS_TAG, "Parameter ${parameterMetadata.name} is required", e)
-            throw AppFunctionInvalidArgumentException(
+        if (value == null) {
+            require(!parameterMetadata.isRequired) {
+                Log.d(APP_FUNCTIONS_TAG, "Parameter ${parameterMetadata.name} is required")
                 "Parameter ${parameterMetadata.name} is required"
-            )
+            }
         }
-        null
+        value
     } catch (e: IllegalArgumentException) {
         Log.d(
             APP_FUNCTIONS_TAG,
@@ -97,32 +95,18 @@ internal fun AppFunctionData.unsafeGetParameterValue(
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun AppFunctionData.getArrayTypeParameterValue(
     key: String,
-    isRequired: Boolean,
     arrayDataTypeMetadata: AppFunctionArrayTypeMetadata
 ): Any? {
     val itemType = arrayDataTypeMetadata.itemType
     return when (itemType) {
         is AppFunctionPrimitiveTypeMetadata -> {
-            val parameter = unsafeGetCollectionProperty(key, itemType.type)
-            if (parameter == null && isRequired) {
-                throw NoSuchElementException("Parameter $key is required")
-            }
-            parameter
+            unsafeGetCollectionProperty(key, itemType.type)
         }
         is AppFunctionObjectTypeMetadata -> {
-            val parameter = unsafeGetCollectionProperty(key, TYPE_OBJECT, itemType.qualifiedName)
-            if (parameter == null && isRequired) {
-                throw NoSuchElementException("Parameter $key is required")
-            }
-            parameter
+            unsafeGetCollectionProperty(key, TYPE_OBJECT, itemType.qualifiedName)
         }
         is AppFunctionReferenceTypeMetadata -> {
-            val parameter =
-                unsafeGetCollectionProperty(key, TYPE_OBJECT, itemType.referenceDataType)
-            if (parameter == null && isRequired) {
-                throw NoSuchElementException("Parameter $key is required")
-            }
-            parameter
+            unsafeGetCollectionProperty(key, TYPE_OBJECT, itemType.referenceDataType)
         }
         else ->
             throw IllegalStateException("Unknown item DataTypeMetadata: ${itemType::class.java}")
@@ -140,16 +124,16 @@ private fun AppFunctionData.unsafeGetSingleProperty(
             TODO("Not implement yet - clarify AppFunctionData#getInt API")
         }
         TYPE_LONG -> {
-            getLong(key)
+            getLongOrNull(key)
         }
         TYPE_FLOAT -> {
             TODO("Not implement yet - clarify AppFunctionData#getFloat API")
         }
         TYPE_DOUBLE -> {
-            getDouble(key)
+            getDoubleOrNull(key)
         }
         TYPE_BOOLEAN -> {
-            getBoolean(key)
+            getBooleanOrNull(key)
         }
         TYPE_BYTES -> {
             TODO("Not implement yet - clarify AppFunctionData#getBytes API")
@@ -158,7 +142,7 @@ private fun AppFunctionData.unsafeGetSingleProperty(
             getString(key)
         }
         TYPE_OBJECT -> {
-            getAppFunctionData(key).deserialize(checkNotNull(objectQualifiedName))
+            getAppFunctionData(key)?.deserialize(checkNotNull(objectQualifiedName))
         }
         else -> throw IllegalStateException("Unknown data type $type")
     }

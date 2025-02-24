@@ -40,6 +40,13 @@ internal abstract class AppFunctionDataSpec {
 
     internal abstract fun getDataType(key: String): AppFunctionDataTypeMetadata?
 
+    internal abstract fun isRequired(key: String): Boolean
+
+    /** Checks if there is a metadata for [key]. */
+    fun containsMetadata(key: String): Boolean {
+        return getDataType(key) != null
+    }
+
     /**
      * Validates if a write request to set a value of type [targetClass] to [targetKey] is valid.
      *
@@ -66,6 +73,32 @@ internal abstract class AppFunctionDataSpec {
         }
     }
 
+    /**
+     * Validates if a read request to get a value of type [targetClass] from [targetKey] is valid.
+     *
+     * @param isCollection Indicates if the write request is a collection of [targetClass].
+     * @throws IllegalArgumentException If the request is invalid.
+     */
+    fun validateReadRequest(
+        targetKey: String,
+        targetClass: Class<*>,
+        isCollection: Boolean,
+    ) {
+        val targetDataTypeMetadata = getDataType(targetKey)
+        if (targetDataTypeMetadata == null) {
+            throw IllegalArgumentException("No value should be set at $targetKey")
+        }
+        require(targetDataTypeMetadata.conform(targetClass, isCollection)) {
+            if (isCollection) {
+                "Unexpected read for $targetKey: expecting collection of $targetClass, " +
+                    "the actual value should be $targetDataTypeMetadata"
+            } else {
+                "Unexpected read for $targetKey: expecting $targetClass, " +
+                    "the actual value should be $targetDataTypeMetadata"
+            }
+        }
+    }
+
     private class ObjectSpec(
         private val objectTypeMetadata: AppFunctionObjectTypeMetadata,
         private val componentMetadata: AppFunctionComponentsMetadata
@@ -75,6 +108,10 @@ internal abstract class AppFunctionDataSpec {
 
         override fun getDataType(key: String): AppFunctionDataTypeMetadata? {
             return objectTypeMetadata.properties[key]
+        }
+
+        override fun isRequired(key: String): Boolean {
+            return objectTypeMetadata.required.contains(key)
         }
 
         override fun getChildSpec(key: String): AppFunctionDataSpec? {
@@ -95,6 +132,10 @@ internal abstract class AppFunctionDataSpec {
 
         override fun getDataType(key: String): AppFunctionDataTypeMetadata? {
             return parameterMetadataList.firstOrNull { it.name == key }?.dataType
+        }
+
+        override fun isRequired(key: String): Boolean {
+            return parameterMetadataList.firstOrNull { it.name == key }?.isRequired ?: false
         }
 
         override fun getChildSpec(key: String): AppFunctionDataSpec? {

@@ -31,7 +31,7 @@ class Note(val title: String, val attachment: Attachment)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class `$AttachmentFactory` : AppFunctionSerializableFactory<Attachment> {
     override fun fromAppFunctionData(appFunctionData: AppFunctionData): Attachment {
-        return Attachment(appFunctionData.getString("uri"))
+        return Attachment(checkNotNull(appFunctionData.getString("uri")))
     }
 
     override fun toAppFunctionData(appFunctionSerializable: Attachment): AppFunctionData {
@@ -45,9 +45,10 @@ class `$AttachmentFactory` : AppFunctionSerializableFactory<Attachment> {
 class `$NoteFactory` : AppFunctionSerializableFactory<Note> {
     override fun fromAppFunctionData(appFunctionData: AppFunctionData): Note {
         return Note(
-            title = appFunctionData.getString("title"),
+            title = checkNotNull(appFunctionData.getString("title")),
             attachment =
-                appFunctionData.getAppFunctionData("attachment").deserialize(Attachment::class.java)
+                checkNotNull(appFunctionData.getAppFunctionData("attachment"))
+                    .deserialize(Attachment::class.java)
         )
     }
 

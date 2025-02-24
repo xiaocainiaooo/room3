@@ -34,318 +34,392 @@ import kotlin.collections.isEmpty
  * A data class to contain information to be communicated between AppFunctions apps and agents.
  *
  * This class can be logically viewed as a mapping from [String] keys to properties of various
- * supported types, or arrays of supported types. For each supported type, two separate getters are
- * provided: one without a defaultValue, typically useful for mandatory parameter, and one with a
- * defaultValue, geared towards optional parameters. To check whether a key with a property of
- * expected type exists, the caller must call the appropriate version of the getter and handle
- * corresponding exceptions, see documentation for individual methods for details.
+ * supported types, or arrays of supported types.
  *
- * **Examples:**
+ * When trying to retrieve an associated value, [AppFunctionData] would validate the request against
+ * the predefined metadata specification provided from [Builder].
  *
+ * For example,
  * ```
- * // Handle optional boolean parameter with default value of false.
- * val value = try {
- *     data.getBoolean("keyForOptional", false)
- * } catch (e: IllegalArgumentException) {
- *     // data is malformed: the value under "keyForOptional" is not of type Boolean.
- * }
+ * fun callCreateNoteFunction(
+ *   metadata: AppFunctionMetadata,
+ *   request: ExecuteAppFunctionRequest,
+ * ) {
+ *   val response = appFunctionManager.executeAppFunction(request)
  *
- * // Handle a mandatory boolean parameter
- * val value = try {
- *     data.getBoolean("keyForMandatory")
- *  } catch (e: IllegalArgumentException | NoSuchElementException) {
- *      // either there is no property under "keyForMandatory", or it is not of type Boolean.
- *  }
+ *   if (metadata.response.valueType is AppFunctionObjectTypeMetadata) {
+ *     val returnData = response.returnValue.getAppFunctionData(
+ *       ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE
+ *     )
+ *     val title = returnData.getString("title")
+ *     // Throws an error if "owner" doesn't exist according to the metadata
+ *     val owner = returnData.getString("owner")
+ *     // Throws an error if "content" is String.
+ *     val content = returnData.getInt("content")
+ *   }
+ * }
  * ```
  */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 public class AppFunctionData
-internal constructor(internal val genericDocument: GenericDocument, internal val extras: Bundle) {
+internal constructor(
+    // TODO: Make it non-null once the constructor that takes qualifiedName has removed
+    internal val spec: AppFunctionDataSpec?,
+    internal val genericDocument: GenericDocument,
+    internal val extras: Bundle
+) {
+
+    // TODO: Remove this constructor
+    internal constructor(
+        genericDocument: GenericDocument,
+        extras: Bundle,
+    ) : this(null, genericDocument, extras)
 
     /** Qualified name of the underlying object */
     public val qualifiedName: String
         get() = genericDocument.schemaType
 
     /**
-     * Retrieve the boolean property in [key].
+     * Checks if [AppFunctionData] has an associated value with the specified [key].
      *
-     * @return [Boolean] property if the value exists under [key].
-     * @throws NoSuchElementException if the property under [key] does not exist.
-     * @throws IllegalArgumentException if the property under [key] is not a boolean.
+     * @param key The key to checks for.
+     * @return True if there is an associated value. Otherwise, false.
+     * @throws IllegalArgumentException If there is no metadata related to [key].
+     */
+    public fun containsKey(key: String): Boolean {
+        if (spec != null && !spec.containsMetadata(key)) {
+            throw IllegalArgumentException("There is no metadata associated with $key")
+        }
+        return genericDocument.getProperty(key) != null || extras.containsKey(key)
+    }
+
+    /**
+     * Retrieves a [Boolean] value associated with the specified [key].
+     *
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. It would return a default value false if the
+     *   associated value is not required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getBoolean(key: String): Boolean {
-        val array = getBooleanArray(key)
-        if (array == null || array.isEmpty()) {
-            throw NoSuchElementException("No elements found under [$key]")
-        } else if (array.size > 1) { // TODO(b/390453916): properly handle single object vs. array
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+        return getBoolean(key, DEFAULT_BOOLEAN)
     }
 
     /**
-     * Retrieve the boolean property in [key] if available, or [defaultValue] otherwise.
+     * Retrieves a [Boolean] value associated with the specified [key], or returns [defaultValue] if
+     * the associated value is not required and it is not found.
      *
-     * @return [Boolean] property if a single value exists under [key], otherwise return
-     *   [defaultValue].
-     * @throws IllegalArgumentException if the property under [key] is not a boolean.
+     * @param key The key to retrieve the value for.
+     * @param defaultValue The default value if the associated value is not required and it is not
+     *   found.
+     * @return The value associated with the [key], or the [defaultValue] if the associated value is
+     *   not required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getBoolean(key: String, defaultValue: Boolean): Boolean {
-        val array = getBooleanArray(key)
-        if (array == null || array.isEmpty()) {
-            return defaultValue
-        } else if (array.size > 1) {
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+        return getBooleanOrNull(key) ?: defaultValue
     }
 
     /**
-     * Retrieve the boolean property in [key] if available, or null otherwise.
+     * Retrieves a [Boolean] value associated with the specified [key].
      *
-     * @return [Boolean] property if a single value exists under [key], otherwise return null.
-     * @throws IllegalArgumentException if the property under [key] is not a boolean.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key], or the null if the associated value is not
+     *   required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     @RestrictTo(LIBRARY_GROUP)
     public fun getBooleanOrNull(key: String): Boolean? {
-        return try {
-            getBoolean(key)
-        } catch (unused: NoSuchElementException) {
-            null
-        }
+        val array = unsafeGetProperty(key, BooleanArray::class.java)
+        val booleanValue =
+            if (array == null || array.isEmpty()) {
+                null
+            } else {
+                array[0]
+            }
+        spec?.validateReadRequest(
+            key,
+            Boolean::class.java,
+            isCollection = false,
+        )
+        return booleanValue
     }
 
     /**
-     * Retrieve the double property in [key].
+     * Retrieves a [Double] value associated with the specified [key].
      *
-     * @return [Double] property if the value exists under [key].
-     * @throws NoSuchElementException if the property under [key] does not exist.
-     * @throws IllegalArgumentException if the property under [key] is not a double.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. It would return a default value 0.0 if the
+     *   associated value is not required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getDouble(key: String): Double {
-        val array = getDoubleArray(key)
-        if (array == null || array.isEmpty()) {
-            throw NoSuchElementException("No elements found under [$key]")
-        } else if (array.size > 1) { // TODO(b/390453916): properly handle single object vs. array
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+        return getDouble(key, DEFAULT_DOUBLE)
     }
 
     /**
-     * Retrieve the double property in [key] if available, or [defaultValue] otherwise.
+     * Retrieves a [Double] value associated with the specified [key], or returns [defaultValue] if
+     * the associated value is not required and it is not found.
      *
-     * @return [Double] property if a single value exists under [key], otherwise return
-     *   [defaultValue].
-     * @throws IllegalArgumentException if the property under [key] is not a double.
+     * @param key The key to retrieve the value for.
+     * @param defaultValue The default value if the associated value is not required and it is not
+     *   found.
+     * @return The value associated with the [key], or the [defaultValue] if the associated value is
+     *   not required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getDouble(key: String, defaultValue: Double): Double {
-        val array = getDoubleArray(key)
-        if (array == null || array.isEmpty()) {
-            return defaultValue
-        } else if (array.size > 1) {
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+        return getDoubleOrNull(key) ?: defaultValue
     }
 
     /**
-     * Retrieve the double property in [key] if available, or null otherwise.
+     * Retrieves a [Double] value associated with the specified [key].
      *
-     * @return [Double] property if a single value exists under [key], otherwise return null.
-     * @throws IllegalArgumentException if the property under [key] is not a double.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key], or the null if the associated value is not
+     *   required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     @RestrictTo(LIBRARY_GROUP)
     public fun getDoubleOrNull(key: String): Double? {
-        return try {
-            getDouble(key)
-        } catch (unused: NoSuchElementException) {
-            null
-        }
+        val array = unsafeGetProperty(key, DoubleArray::class.java)
+        val doubleValue =
+            if (array == null || array.isEmpty()) {
+                null
+            } else {
+                array[0]
+            }
+        spec?.validateReadRequest(
+            key,
+            Double::class.java,
+            isCollection = false,
+        )
+        return doubleValue
     }
 
     /**
-     * Retrieve the long property in [key].
+     * Retrieves a [Long] value associated with the specified [key].
      *
-     * @return [Long] property if the value exist under [key].
-     * @throws NoSuchElementException if the property under [key] does not exist.
-     * @throws IllegalArgumentException if the property under [key] is not a long.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. It would return a default value 0L if the
+     *   associated value is not required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getLong(key: String): Long {
-        val array = getLongArray(key)
-        if (array == null || array.isEmpty()) {
-            throw NoSuchElementException("No elements found under [$key]")
-        } else if (array.size > 1) { // TODO(b/390453916): properly handle single object vs. array
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+        return getLong(key, DEFAULT_LONG)
     }
 
     /**
-     * Retrieve the long property in [key] if available, or [defaultValue] otherwise.
+     * Retrieves a [Long] value associated with the specified [key], or returns [defaultValue] if
+     * the associated value is not required and it is not found.
      *
-     * @return [Long] property if the value exists under [key], otherwise return [defaultValue].
-     * @throws IllegalArgumentException if the property under [key] is not a long.
+     * @param key The key to retrieve the value for.
+     * @param defaultValue The default value if the associated value is not required and it is not
+     *   found.
+     * @return The value associated with the [key], or the [defaultValue] if the associated value is
+     *   not required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getLong(key: String, defaultValue: Long): Long {
-        val array = getLongArray(key)
-        if (array == null || array.isEmpty()) {
-            return defaultValue
-        } else if (array.size > 1) {
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+        return getLongOrNull(key) ?: defaultValue
     }
 
     /**
-     * Retrieve the long property in [key] if available, or null otherwise.
+     * Retrieves a [Long] value associated with the specified [key].
      *
-     * @return [Long] property if the value exists under [key], otherwise return null.
-     * @throws IllegalArgumentException if the property under [key] is not a long.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key], or the null if the associated value is not
+     *   required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     @RestrictTo(LIBRARY_GROUP)
     public fun getLongOrNull(key: String): Long? {
-        return try {
-            getLong(key)
-        } catch (unused: NoSuchElementException) {
-            null
-        }
+        val array = unsafeGetProperty(key, LongArray::class.java)
+        val longValue =
+            if (array == null || array.isEmpty()) {
+                null
+            } else {
+                array[0]
+            }
+        spec?.validateReadRequest(
+            key,
+            Long::class.java,
+            isCollection = false,
+        )
+        return longValue
     }
 
     /**
-     * Retrieve the string property in [key].
+     * Retrieves a [String] value associated with the specified [key].
      *
-     * @return [String] property if the value exist under [key].
-     * @throws NoSuchElementException if the property under [key] does not exist.
-     * @throws IllegalArgumentException if the property under [key] is not a string.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key], or the null if the associated value is not
+     *   required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
-    public fun getString(key: String): String {
-        val array = getStringList(key)
-        if (array == null || array.isEmpty()) {
-            throw NoSuchElementException("No elements found under [$key]")
-        } else if (array.size > 1) { // TODO(b/390453916): properly handle single object vs. array
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+    public fun getString(key: String): String? {
+        val array = unsafeGetProperty(key, Array<String>::class.java)
+        val stringValue =
+            if (array == null || array.isEmpty()) {
+                null
+            } else {
+                array[0]
+            }
+        spec?.validateReadRequest(
+            key,
+            String::class.java,
+            isCollection = false,
+        )
+        return stringValue
     }
 
     /**
-     * Retrieve the string property in [key] if available, or [defaultValue] otherwise.
+     * Retrieves an [AppFunctionData] value associated with the specified [key].
      *
-     * @return [String] property if the value exists under [key], otherwise return [defaultValue].
-     * @throws IllegalArgumentException if the property under [key] is not a string.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key], or the null if the associated value is not
+     *   required and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
-    public fun getString(key: String, defaultValue: String): String {
-        val array = getStringList(key)
-        if (array == null || array.isEmpty()) {
-            return defaultValue
-        } else if (array.size > 1) {
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
+    public fun getAppFunctionData(
+        key: String,
+    ): AppFunctionData? {
+        val array = unsafeGetProperty(key, Array<GenericDocument>::class.java)
+        val dataValue =
+            if (array == null || array.isEmpty()) {
+                null
+            } else {
+                AppFunctionData(
+                    spec?.getChildSpec(key),
+                    array[0],
+                    extras.getBundle(extrasKey(key)) ?: Bundle.EMPTY
+                )
+            }
+        spec?.validateReadRequest(
+            key,
+            AppFunctionData::class.java,
+            isCollection = false,
+        )
+        return dataValue
     }
 
     /**
-     * Retrieve the string property in [key] if available, or null otherwise.
+     * Retrieves a [BooleanArray] value associated with the specified [key].
      *
-     * @return [String] property if the value exists under [key], otherwise return null.
-     * @throws IllegalArgumentException if the property under [key] is not a string.
-     */
-    @RestrictTo(LIBRARY_GROUP)
-    public fun getStringOrNull(key: String): String? {
-        return try {
-            getString(key)
-        } catch (unused: NoSuchElementException) {
-            null
-        }
-    }
-
-    /**
-     * Retrieve the [AppFunctionData] property in [key].
-     *
-     * @return [AppFunctionData] property if the value exists under [key].
-     * @throws NoSuchElementException if the property under [key] does not exist.
-     * @throws IllegalArgumentException if the property under [key] is not an [AppFunctionData].
-     */
-    public fun getAppFunctionData(key: String): AppFunctionData {
-        val array = getAppFunctionDataList(key)
-        if (array == null || array.isEmpty()) {
-            throw NoSuchElementException("No elements found under [$key]")
-        } else if (array.size > 1) { // TODO(b/390453916): properly handle single object vs. array
-            throw IllegalArgumentException("Property under [$key] does not match request")
-        }
-        return array[0]
-    }
-
-    /**
-     * Retrieve the [AppFunctionData] property in [key] if available, or null otherwise.
-     *
-     * @return [AppFunctionData] property if the value exists under [key], otherwise return null.
-     * @throws IllegalArgumentException if the property under [key] is not an [AppFunctionData].
-     */
-    @RestrictTo(LIBRARY_GROUP)
-    public fun getAppFunctionDataOrNull(key: String): AppFunctionData? {
-        return try {
-            getAppFunctionData(key)
-        } catch (unused: NoSuchElementException) {
-            null
-        }
-    }
-
-    /**
-     * Retrieve the boolean array property in [key].
-     *
-     * @return [BooleanArray] property if the value exist under [key].
-     * @throws IllegalArgumentException if the property under [key] is not boolean array.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. Or null if the associated value is not required
+     *   and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getBooleanArray(key: String): BooleanArray? {
-        return unsafeGetProperty(key, BooleanArray::class.java)
+        val booleanArrayValue = unsafeGetProperty(key, BooleanArray::class.java)
+        spec?.validateReadRequest(
+            key,
+            Boolean::class.java,
+            isCollection = true,
+        )
+        return booleanArrayValue
     }
 
     /**
-     * Retrieve the double array property in [key].
+     * Retrieves a [DoubleArray] value associated with the specified [key].
      *
-     * @return [DoubleArray] property if the value exist under [key].
-     * @throws IllegalArgumentException if the property under [key] is not double array.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. Or null if the associated value is not required
+     *   and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getDoubleArray(key: String): DoubleArray? {
-        return unsafeGetProperty(key, DoubleArray::class.java)
+        val doubleArrayValue = unsafeGetProperty(key, DoubleArray::class.java)
+        spec?.validateReadRequest(
+            key,
+            Double::class.java,
+            isCollection = true,
+        )
+        return doubleArrayValue
     }
 
     /**
-     * Retrieve the long array property in [key].
+     * Retrieves a [LongArray] value associated with the specified [key].
      *
-     * @return [LongArray] property if the value exist under [key].
-     * @throws IllegalArgumentException if the property under [key] is not long array.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. Or null if the associated value is not required
+     *   and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     public fun getLongArray(key: String): LongArray? {
-        return unsafeGetProperty(key, LongArray::class.java)
+        val longArrayValue = unsafeGetProperty(key, LongArray::class.java)
+        spec?.validateReadRequest(
+            key,
+            Long::class.java,
+            isCollection = true,
+        )
+        return longArrayValue
     }
 
     /**
-     * Retrieve the string list property in [key].
+     * Retrieves a [List] of [String] value associated with the specified [key].
      *
-     * @return [List<String>] property if the value exist under [key].
-     * @throws IllegalArgumentException if the property under [key] is not string array.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. Or null if the associated value is not required
+     *   and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     @Suppress("NullableCollection")
     public fun getStringList(key: String): List<String>? {
-        return unsafeGetProperty(key, Array<String>::class.java)?.asList()
+        val stringArrayValue = unsafeGetProperty(key, Array<String>::class.java)
+        spec?.validateReadRequest(
+            key,
+            String::class.java,
+            isCollection = true,
+        )
+        return stringArrayValue?.asList()
     }
 
     /**
-     * Retrieve the appfunction data list property in [key].
+     * Retrieves a [List] of [AppFunctionData] value associated with the specified [key].
      *
-     * @return [List<AppFunctionData>] property if the value exist under [key].
-     * @throws IllegalArgumentException if the property under [key] is not [AppFunctionData] array.
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. Or null if the associated value is not required
+     *   and it is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
      */
     @Suppress("NullableCollection")
-    public fun getAppFunctionDataList(key: String): List<AppFunctionData>? {
-        return unsafeGetProperty(key, Array<GenericDocument>::class.java)?.mapIndexed {
-            index,
-            element ->
-            AppFunctionData(element, extras.getBundle(extrasKey(key, index)) ?: Bundle.EMPTY)
-        }
+    public fun getAppFunctionDataList(
+        key: String,
+    ): List<AppFunctionData>? {
+        val internalSpec = spec?.getChildSpec(key)
+        val dataArrayValue =
+            unsafeGetProperty(key, Array<GenericDocument>::class.java)?.mapIndexed { index, element
+                ->
+                AppFunctionData(
+                    internalSpec,
+                    element,
+                    extras.getBundle(extrasKey(key, index)) ?: Bundle.EMPTY
+                )
+            }
+        spec?.validateReadRequest(
+            key,
+            AppFunctionData::class.java,
+            isCollection = true,
+        )
+        return dataArrayValue
     }
 
     override fun toString(): String {
@@ -649,11 +723,17 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
         /** Builds [AppFunctionData] */
         public fun build(): AppFunctionData {
             // TODO(b/399823985): validate required fields.
-            return AppFunctionData(genericDocumentBuilder.build(), extrasBuilder)
+            return AppFunctionData(spec, genericDocumentBuilder.build(), extrasBuilder)
         }
     }
 
     public companion object {
+        private const val DEFAULT_BOOLEAN: Boolean = false
+        private const val DEFAULT_FLOAT: Float = 0F
+        private const val DEFAULT_DOUBLE: Double = 0.0
+        private const val DEFAULT_INT: Int = 0
+        private const val DEFAULT_LONG: Long = 0L
+
         private fun extrasKey(key: String) = "property/$key"
 
         private fun extrasKey(key: String, index: Int) = "property/$key[$index]"
