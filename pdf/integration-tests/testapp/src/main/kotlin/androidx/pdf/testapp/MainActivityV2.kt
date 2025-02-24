@@ -32,14 +32,15 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.button.MaterialButton
 
+// TODO(b/386721657): Remove this activity once the switch to V2 completes
 @SuppressLint("RestrictedApiAndroidX")
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class MainActivityV2 : AppCompatActivity() {
 
-    private var pdfViewerFragment: PdfViewerFragmentV2? = null
+    private var pdfViewerFragment: PdfViewerFragment? = null
 
     @VisibleForTesting
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
@@ -61,7 +62,7 @@ class MainActivityV2 : AppCompatActivity() {
         if (pdfViewerFragment == null) {
             pdfViewerFragment =
                 supportFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG)
-                    as PdfViewerFragmentV2?
+                    as PdfViewerFragment?
         }
 
         val getContentButton: MaterialButton = findViewById(R.id.launch_button)
@@ -86,7 +87,7 @@ class MainActivityV2 : AppCompatActivity() {
         val fragmentManager: FragmentManager = supportFragmentManager
 
         // Fragment initialization
-        pdfViewerFragment = PdfViewerFragmentV2()
+        pdfViewerFragment = PdfViewerFragment()
         val transaction: FragmentTransaction = fragmentManager.beginTransaction()
 
         // Replace an existing fragment in a container with an instance of a new fragment

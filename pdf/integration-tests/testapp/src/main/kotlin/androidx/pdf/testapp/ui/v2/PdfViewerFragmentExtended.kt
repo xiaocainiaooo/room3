@@ -27,7 +27,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.OperationCanceledException
 import androidx.pdf.testapp.R
 import androidx.pdf.testapp.ui.OpCancellationHandler
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
@@ -36,7 +36,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  * immersive mode state.
  */
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-class PdfViewerFragmentExtended : PdfViewerFragmentV2() {
+class PdfViewerFragmentExtended : PdfViewerFragment() {
     private var hostView: FrameLayout? = null
     private var search: FloatingActionButton? = null
 

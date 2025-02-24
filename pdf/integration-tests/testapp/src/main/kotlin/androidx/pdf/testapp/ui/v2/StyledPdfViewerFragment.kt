@@ -22,10 +22,10 @@ import androidx.core.os.OperationCanceledException
 import androidx.pdf.testapp.R
 import androidx.pdf.testapp.ui.OpCancellationHandler
 import androidx.pdf.viewer.fragment.PdfStylingOptions
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-class StyledPdfViewerFragment : PdfViewerFragmentV2 {
+class StyledPdfViewerFragment : PdfViewerFragment {
 
     constructor() : super()
 

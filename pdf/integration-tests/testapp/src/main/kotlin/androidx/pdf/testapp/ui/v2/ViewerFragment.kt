@@ -36,14 +36,14 @@ import androidx.fragment.app.FragmentManager
 import androidx.pdf.testapp.R
 import androidx.pdf.testapp.databinding.BasicPdfFragmentBinding
 import androidx.pdf.testapp.ui.OpCancellationHandler
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.button.MaterialButton
 
 @SuppressLint("RestrictedApiAndroidX")
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class ViewerFragment : Fragment(), OpCancellationHandler {
 
-    private var pdfViewerFragment: PdfViewerFragmentV2? = null
+    private var pdfViewerFragment: PdfViewerFragment? = null
     private var isPdfViewInitialized = false
 
     @VisibleForTesting

@@ -28,7 +28,7 @@ import androidx.pdf.matchers.PdfViewAssertions
 import androidx.pdf.util.AnnotationUtils
 import androidx.pdf.view.ToolBoxView
 import androidx.pdf.view.ToolBoxView.Companion.EXTRA_STARTING_PAGE
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -57,13 +57,13 @@ import org.junit.runner.RunWith
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 class ToolBoxViewTest {
 
-    private lateinit var scenario: FragmentScenario<PdfViewerFragmentV2>
+    private lateinit var scenario: FragmentScenario<PdfViewerFragment>
 
     @Before
     fun setup() {
         Intents.init()
         scenario =
-            launchFragmentInContainer<PdfViewerFragmentV2>(
+            launchFragmentInContainer<PdfViewerFragment>(
                 themeResId =
                     com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar,
                 initialState = Lifecycle.State.INITIALIZED
@@ -80,7 +80,7 @@ class ToolBoxViewTest {
         filename: String,
         nextState: Lifecycle.State,
         orientation: Int
-    ): FragmentScenario<PdfViewerFragmentV2> {
+    ): FragmentScenario<PdfViewerFragment> {
         val context = InstrumentationRegistry.getInstrumentation().context
         val inputStream = context.assets.open(filename)
 

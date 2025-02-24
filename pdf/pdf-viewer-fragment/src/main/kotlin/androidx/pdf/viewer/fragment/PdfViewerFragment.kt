@@ -68,7 +68,7 @@ import kotlinx.coroutines.launch
 /**
  * A Fragment that renders a PDF document.
  *
- * <p>A [PdfViewerFragmentV2] that can display paginated PDFs. The viewer includes a FAB for
+ * <p>A [PdfViewerFragment] that can display paginated PDFs. The viewer includes a FAB for
  * annotation support and a search menu. Each page is rendered in its own View. Upon creation, this
  * fragment displays a loading spinner.
  *
@@ -88,9 +88,8 @@ import kotlinx.coroutines.launch
  *
  * @see documentUri
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-public open class PdfViewerFragmentV2 constructor() : Fragment() {
+public open class PdfViewerFragment constructor() : Fragment() {
 
     /**
      * Protected constructor for instantiating a [PdfViewerFragment] with the specified styling
@@ -322,7 +321,7 @@ public open class PdfViewerFragmentV2 constructor() : Fragment() {
     /**
      * Called from Fragment.onViewCreated(). This gives subclasses a chance to customize component.
      */
-    protected fun onPdfSearchViewCreated(searchView: PdfSearchView) {
+    private fun onPdfSearchViewCreated(searchView: PdfSearchView) {
         setupSearchViewListeners(searchView)
         val windowManager = activity?.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
@@ -557,14 +556,14 @@ public open class PdfViewerFragmentV2 constructor() : Fragment() {
         private const val KEY_PDF_VIEW_STYLE = "keyPdfViewStyle"
 
         /**
-         * Creates a new instance of [PdfViewerFragmentV2] with the specified styling options.
+         * Creates a new instance of [PdfViewerFragment] with the specified styling options.
          *
          * @param pdfStylingOptions The styling options to be applied.
-         * @return A new instance of [PdfViewerFragmentV2] with the provided styling options.
+         * @return A new instance of [PdfViewerFragment] with the provided styling options.
          */
         @JvmStatic
-        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragmentV2 {
-            val fragment = PdfViewerFragmentV2()
+        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragment {
+            val fragment = PdfViewerFragment()
             val args =
                 Bundle().also {
                     it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId)

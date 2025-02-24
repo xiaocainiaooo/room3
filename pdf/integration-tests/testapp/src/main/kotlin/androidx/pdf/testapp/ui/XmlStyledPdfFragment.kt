@@ -16,6 +16,7 @@
 
 package androidx.pdf.testapp.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -30,9 +31,10 @@ import androidx.annotation.RequiresExtension
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.pdf.testapp.databinding.FragmentXmlStyledPdfBinding
-import androidx.pdf.viewer.fragment.PdfViewerFragment
+import androidx.pdf.viewer.fragment.PdfViewerFragmentV1
 import com.google.android.material.button.MaterialButton
 
+@SuppressLint("RestrictedApiAndroidX")
 class XmlStyledPdfFragment : Fragment() {
 
     private lateinit var binding: FragmentXmlStyledPdfBinding
@@ -62,7 +64,7 @@ class XmlStyledPdfFragment : Fragment() {
 
     private fun setDocumentUri(uri: Uri) {
         if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13) {
-            binding.pdfStyledFragment.getFragment<PdfViewerFragment>().documentUri = uri
+            binding.pdfStyledFragment.getFragment<PdfViewerFragmentV1>().documentUri = uri
         } else {
             /**
              * Send an intent to other apps who support opening PDFs in case PdfViewer library is
@@ -84,7 +86,7 @@ class XmlStyledPdfFragment : Fragment() {
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     private fun setFindInFileViewVisible() {
-        binding.pdfStyledFragment.getFragment<PdfViewerFragment>().isTextSearchActive = true
+        binding.pdfStyledFragment.getFragment<PdfViewerFragmentV1>().isTextSearchActive = true
     }
 
     companion object {

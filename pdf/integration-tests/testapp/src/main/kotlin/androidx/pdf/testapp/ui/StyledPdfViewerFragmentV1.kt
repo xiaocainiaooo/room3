@@ -16,15 +16,17 @@
 
 package androidx.pdf.testapp.ui
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.core.os.OperationCanceledException
 import androidx.pdf.testapp.R
 import androidx.pdf.viewer.fragment.PdfStylingOptions
-import androidx.pdf.viewer.fragment.PdfViewerFragment
+import androidx.pdf.viewer.fragment.PdfViewerFragmentV1
 
+@SuppressLint("RestrictedApiAndroidX")
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-class StyledPdfViewerFragment : PdfViewerFragment {
+class StyledPdfViewerFragmentV1 : PdfViewerFragmentV1 {
 
     constructor() : super()
 
@@ -39,10 +41,10 @@ class StyledPdfViewerFragment : PdfViewerFragment {
     }
 
     companion object {
-        fun newInstance(): StyledPdfViewerFragment {
+        fun newInstance(): StyledPdfViewerFragmentV1 {
             val stylingOptions = PdfStylingOptions(R.style.PdfViewCustomization)
 
-            return StyledPdfViewerFragment(stylingOptions)
+            return StyledPdfViewerFragmentV1(stylingOptions)
         }
     }
 }
