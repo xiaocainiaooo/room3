@@ -54,3 +54,9 @@ internal typealias PlatformReadMedicalResourcesPageRequest =
 
 internal typealias PlatformReadMedicalResourcesPageRequestBuilder =
     android.health.connect.ReadMedicalResourcesPageRequest.Builder
+
+internal typealias PlatformDeleteMedicalResourcesRequest =
+    android.health.connect.DeleteMedicalResourcesRequest
+
+internal typealias PlatformDeleteMedicalResourcesRequestBuilder =
+    android.health.connect.DeleteMedicalResourcesRequest.Builder

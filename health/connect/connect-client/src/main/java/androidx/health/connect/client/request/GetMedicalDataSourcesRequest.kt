@@ -21,6 +21,7 @@ import androidx.annotation.RestrictTo
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.request.PlatformGetMedicalDataSourcesRequest
 import androidx.health.connect.client.impl.platform.request.PlatformGetMedicalDataSourcesRequestBuilder
+import androidx.health.connect.client.records.MedicalDataSource
 import androidx.health.connect.client.records.toString
 
 /**
