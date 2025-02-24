@@ -48,8 +48,8 @@ dependencies {
     testImplementation(libs.mockitoCore4)
 
     androidTestCompileOnly(project(":appfunctions:appfunctions-stubs"))
-    androidTestImplementation("androidx.appsearch:appsearch:1.1.0-alpha07")
-    androidTestImplementation("androidx.appsearch:appsearch-platform-storage:1.1.0-alpha07")
+    androidTestImplementation("androidx.appsearch:appsearch:1.1.0-beta01")
+    androidTestImplementation("androidx.appsearch:appsearch-platform-storage:1.1.0-beta01")
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.kotlinCoroutinesTest)
