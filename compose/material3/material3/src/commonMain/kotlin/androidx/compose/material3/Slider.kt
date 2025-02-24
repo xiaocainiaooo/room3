@@ -112,6 +112,7 @@ import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmName
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
@@ -2401,7 +2402,12 @@ class SliderState(
     /** [Float] that indicates the value that the thumb currently is in respect to the track. */
     var value: Float
         set(newVal) {
-            valueState = calculateSnappedValue(newVal)
+            valueState =
+                if (shouldAutoSnap) {
+                    calculateSnappedValue(newVal)
+                } else {
+                    newVal
+                }
         }
         get() = valueState
 
@@ -2449,6 +2455,9 @@ class SliderState(
 
     /** Callback in which value should be updated. */
     var onValueChange: ((Float) -> Unit)? = null
+
+    /** Controls the auto-snapping mechanism, disabling it may be useful for custom animations. */
+    @get:JvmName("shouldAutoSnap") var shouldAutoSnap: Boolean = true
 
     internal val tickFractions = stepsToTickFractions(steps)
     private var totalWidth by mutableIntStateOf(0)
