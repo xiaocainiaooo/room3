@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    id("AndroidXPlugin")
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
-}
 
-android {
-    namespace = "androidx.appfunctions.integration.testapp.shared_library"
-    compileSdk = 35
+package androidx.appfunctions.integration.testapp
 
-    defaultConfig {
-        minSdk = 33
+import androidx.appfunctions.AppFunction
+import androidx.appfunctions.AppFunctionContext
+import androidx.appfunctions.AppFunctionInvalidArgumentException
+
+@Suppress("UNUSED_PARAMETER")
+class TestFunctions {
+    @AppFunction
+    fun add(appFunctionContext: AppFunctionContext, num1: Long, num2: Long) = num1 + num2
+
+    @AppFunction
+    fun doThrow(appFunctionContext: AppFunctionContext) {
+        throw AppFunctionInvalidArgumentException("invalid")
     }
-}
-
-dependencies {
-    api(libs.kotlinStdlib)
-    implementation(project(":appfunctions:appfunctions-common"))
-    implementation(project(":appfunctions:appfunctions-runtime"))
-    ksp(project(":appfunctions:appfunctions-compiler"))
 }
