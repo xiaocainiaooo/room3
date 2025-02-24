@@ -305,6 +305,7 @@ fun VerticalSliderSample() {
     val coroutineScope = rememberCoroutineScope()
     val sliderState = remember {
         SliderState(
+            steps = 9,
             valueRange = 0f..100f,
             onValueChangeFinished = {
                 // launch some business logic update with the state you hold
@@ -315,6 +316,7 @@ fun VerticalSliderSample() {
     val snapAnimationSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
     var currentValue by remember { mutableFloatStateOf(sliderState.value) }
     var animateJob: Job? by remember { mutableStateOf(null) }
+    sliderState.shouldAutoSnap = false
     sliderState.onValueChange = { newValue ->
         currentValue = newValue
         // only update the sliderState instantly if dragging

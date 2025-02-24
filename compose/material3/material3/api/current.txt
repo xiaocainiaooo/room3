@@ -2347,11 +2347,14 @@ package androidx.compose.material3 {
     method public boolean isDragging();
     method public void setOnValueChange(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>?);
     method public void setOnValueChangeFinished(kotlin.jvm.functions.Function0<kotlin.Unit>?);
+    method public void setShouldAutoSnap(boolean);
     method public void setValue(float);
+    method public boolean shouldAutoSnap();
     property public float coercedValueAsFraction;
     property public boolean isDragging;
     property public kotlin.jvm.functions.Function1<java.lang.Float,kotlin.Unit>? onValueChange;
     property public kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished;
+    property public boolean shouldAutoSnap;
     property @IntRange(from=0L) public int steps;
     property public float value;
     property public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange;
