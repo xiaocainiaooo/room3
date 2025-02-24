@@ -388,7 +388,7 @@ public class AnimatedTextFontRegistry(
 @RequiresApi(31)
 public object AnimatedTextDefaults {
     /** Default font cache size to be used in AnimatedTextFontRegistry. */
-    public const val CacheSize: Int = 5
+    public val CacheSize: Int = 5
 
     /**
      * Default step size used to snap progress fractions. Progress fractions will be rounded down to
@@ -396,7 +396,7 @@ public object AnimatedTextDefaults {
      *
      * 0.016f is chosen to divide a 1 second animation into 60 animation steps.
      */
-    internal const val FractionStep = 0.016f
+    internal val FractionStep = 0.016f
 }
 
 /**
