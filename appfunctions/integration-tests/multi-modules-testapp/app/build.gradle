@@ -25,17 +25,28 @@ android {
     defaultConfig {
         applicationId = "androidx.appfunctions.integration.testapp"
         minSdk = 33
+        ksp {
+            arg("appfunctions:aggregateAppFunctions", "true")
+        }
     }
 }
 dependencies {
     api(libs.kotlinStdlib)
-    // AppFunctions libs
+    api(libs.kotlinCoroutinesAndroid)
     implementation(project(":appfunctions:appfunctions-common"))
     implementation(project(":appfunctions:appfunctions-runtime"))
-    // AppFunction compiler
     ksp(project(":appfunctions:appfunctions-compiler"))
-
-    // shared integration test module
     implementation(project(":appfunctions:integration-tests:multi-modules-testapp:shared-library"))
+    implementation('androidx.concurrent:concurrent-futures-ktx:1.1.0')
 
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.kotlinCoroutinesTest)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.guavaAndroid)
+    androidTestImplementation(libs.testMonitor)
+    androidTestImplementation(libs.kotlinTest)
+    androidTestImplementation("androidx.appsearch:appsearch:1.1.0-beta01")
+    androidTestImplementation("androidx.appsearch:appsearch-platform-storage:1.1.0-beta01")
+    androidTestImplementation('androidx.concurrent:concurrent-futures-ktx:1.1.0')
 }
