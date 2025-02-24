@@ -39,8 +39,11 @@ import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.GestureInclusion
 import androidx.wear.compose.foundation.RevealActionType
 import androidx.wear.compose.foundation.RevealValue
+import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import androidx.wear.compose.foundation.edgeSwipeToDismiss
 import androidx.wear.compose.foundation.rememberRevealState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Card
@@ -555,6 +558,55 @@ fun SwipeToRevealWithCustomIcons() {
                     onClick = {}
                 ) {
                     Text("This Button has two actions.", modifier = Modifier.fillMaxSize())
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Usage of [edgeSwipeToDismiss] modifier with [SwipeToReveal] is discouraged. Instead, the
+ * [GestureInclusion] parameter should be used.
+ *
+ * This demo is to check compatibility with code that is still using [edgeSwipeToDismiss] after
+ * [GestureInclusion] was introduced.
+ */
+@Composable
+fun SwipeToRevealWithEdgeSwipeToDismiss(swipeToDismissBoxState: SwipeToDismissBoxState) {
+    ScalingLazyDemo {
+        item {
+            SwipeToReveal(
+                revealState = rememberRevealState(anchors = SwipeToRevealDefaults.anchors()),
+                actions = {
+                    primaryAction(
+                        onClick = { /* This block is called when the primary action is executed. */
+                        },
+                        icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") }
+                    )
+                    undoPrimaryAction(
+                        onClick = { /* This block is called when the undo primary action is executed. */
+                        },
+                        text = { Text("Undo Delete") },
+                    )
+                },
+                modifier = Modifier.edgeSwipeToDismiss(swipeToDismissBoxState),
+            ) {
+                Button(
+                    modifier =
+                        Modifier.fillMaxWidth().semantics {
+                            // Use custom actions to make the primary action accessible
+                            customActions =
+                                listOf(
+                                    CustomAccessibilityAction("Delete") {
+                                        /* Add the primary action click handler here */
+                                        true
+                                    },
+                                )
+                        },
+                    onClick = {}
+                ) {
+                    Text("This Button has only one action", modifier = Modifier.fillMaxSize())
                 }
             }
         }

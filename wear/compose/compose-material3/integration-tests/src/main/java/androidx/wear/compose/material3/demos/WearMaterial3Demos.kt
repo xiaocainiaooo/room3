@@ -181,6 +181,9 @@ val WearMaterial3Demos =
                         },
                         ComposableDemo("Long labels") { SwipeToRevealWithLongLabels() },
                         ComposableDemo("Custom Icons") { SwipeToRevealWithCustomIcons() },
+                        ComposableDemo("With edgeSwipeToDismiss") { params ->
+                            SwipeToRevealWithEdgeSwipeToDismiss(params.swipeToDismissBoxState)
+                        },
                     )
                 ),
                 Material3DemoCategory(
