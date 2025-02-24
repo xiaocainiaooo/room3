@@ -59,6 +59,10 @@ class ProjectDependencyGraph {
         return allProjects.keySet()
     }
 
+    Map<String, Set<String>> allProjectConsumers() {
+        return projectConsumers
+    }
+
     /**
      * Adds the given pair to the list of known projects
      *
@@ -311,3 +315,7 @@ ProjectDependencyGraph createProjectDependencyGraph(Settings settings, boolean c
 }
 // export a function to create ProjectDependencyGraph
 ext.createProjectDependencyGraph = this.&createProjectDependencyGraph
+
+ext.allProjectsConsumers = { ProjectDependencyGraph graph ->
+    graph.allProjectConsumers()
+}
