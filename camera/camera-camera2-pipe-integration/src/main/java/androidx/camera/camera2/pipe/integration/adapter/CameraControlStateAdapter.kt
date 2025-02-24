@@ -19,6 +19,7 @@ package androidx.camera.camera2.pipe.integration.adapter
 import android.annotation.SuppressLint
 import androidx.camera.camera2.pipe.integration.config.CameraScope
 import androidx.camera.camera2.pipe.integration.impl.EvCompControl
+import androidx.camera.camera2.pipe.integration.impl.LowLightBoostControl
 import androidx.camera.camera2.pipe.integration.impl.TorchControl
 import androidx.camera.camera2.pipe.integration.impl.ZoomControl
 import androidx.camera.core.ExposureState
@@ -37,6 +38,7 @@ constructor(
     private val zoomControl: ZoomControl,
     private val evCompControl: EvCompControl,
     private val torchControl: TorchControl,
+    private val lowLightBoostControl: LowLightBoostControl,
 ) {
     public val torchStateLiveData: LiveData<Int>
         get() = torchControl.torchStateLiveData
@@ -49,4 +51,7 @@ constructor(
 
     public val exposureState: ExposureState
         get() = evCompControl.exposureState
+
+    public val lowLightBoostState: LiveData<Int>
+        get() = lowLightBoostControl.lowLightBoostStateLiveData
 }
