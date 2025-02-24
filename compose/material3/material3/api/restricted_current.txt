@@ -20,6 +20,8 @@ package androidx.compose.material3 {
   public final class AlertDialogKt {
     method @Deprecated @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void AlertDialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.window.DialogProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void BasicAlertDialog(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.window.DialogProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.BasicAlertDialogOverride> getLocalBasicAlertDialogOverride();
+    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.BasicAlertDialogOverride> LocalBasicAlertDialogOverride;
   }
 
   public final class AndroidAlertDialog_androidKt {
@@ -83,6 +85,21 @@ package androidx.compose.material3 {
   public final class BadgeKt {
     method @androidx.compose.runtime.Composable public static void Badge(optional androidx.compose.ui.Modifier modifier, optional long containerColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit>? content);
     method @androidx.compose.runtime.Composable public static void BadgedBox(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> badge, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> content);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public interface BasicAlertDialogOverride {
+    method @androidx.compose.runtime.Composable public void BasicAlertDialog(androidx.compose.material3.BasicAlertDialogOverrideScope);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class BasicAlertDialogOverrideScope {
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> getContent();
+    method public androidx.compose.ui.Modifier getModifier();
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> getOnDismissRequest();
+    method public androidx.compose.ui.window.DialogProperties getProperties();
+    property public kotlin.jvm.functions.Function0<kotlin.Unit> content;
+    property public androidx.compose.ui.Modifier modifier;
+    property public kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest;
+    property public androidx.compose.ui.window.DialogProperties properties;
   }
 
   public final class BottomAppBarDefaults {
@@ -719,6 +736,11 @@ package androidx.compose.material3 {
     property public abstract Long? selectedEndDateMillis;
     property public abstract Long? selectedStartDateMillis;
     property public abstract kotlin.ranges.IntRange yearRange;
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class DefaultBasicAlertDialogOverride implements androidx.compose.material3.BasicAlertDialogOverride {
+    method @androidx.compose.runtime.Composable public void BasicAlertDialog(androidx.compose.material3.BasicAlertDialogOverrideScope);
+    field public static final androidx.compose.material3.DefaultBasicAlertDialogOverride INSTANCE;
   }
 
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class DefaultNavigationBarComponentOverride implements androidx.compose.material3.NavigationBarComponentOverride {
