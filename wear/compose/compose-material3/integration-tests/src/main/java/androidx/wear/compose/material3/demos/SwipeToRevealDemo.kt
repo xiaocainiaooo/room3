@@ -274,7 +274,7 @@ fun SwipeToRevealTwoActionsWithUndo() {
 }
 
 @Composable
-fun SwipeToRevealInList() {
+fun SwipeToRevealInScalingLazyColumn() {
     val namesList = remember { mutableStateListOf("Alice", "Bob", "Charlie", "Dave", "Eve") }
     val coroutineScope = rememberCoroutineScope()
     ScalingLazyDemo(contentPadding = PaddingValues(0.dp)) {
