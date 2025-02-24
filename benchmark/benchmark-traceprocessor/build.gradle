@@ -140,4 +140,5 @@ androidx {
     description = "AndroidX Benchmark TraceProcessor"
     metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_2_0
+    samples(project(":benchmark:benchmark-samples"))
 }
