@@ -18,420 +18,221 @@ package androidx.appfunctions
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_BOOLEAN
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_DOUBLE
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.test.filters.SdkSuppress
-import com.android.extensions.appfunctions.ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE
-import com.google.common.truth.Truth
-import org.junit.Assert
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 class AppFunctionDataTest {
-    @Test
-    fun getSingleProperty_shouldThrowsException_ifNotExist() {
-        val appFunctionData = AppFunctionData.EMPTY
 
-        Assert.assertThrows(
-            "No elements found under [testLong]",
-            NoSuchElementException::class.java,
-        ) {
-            appFunctionData.getLong("testLong")
+    @Test
+    fun testWrite_asParameters_conformSpec() {
+        val builder =
+            AppFunctionData.Builder(
+                TEST_PARAMETER_METADATA,
+                AppFunctionComponentsMetadata(),
+            )
+
+        builder.setLong("long", 123L)
+        builder.setDouble("double", 50.0)
+        builder.setBoolean("boolean", true)
+        builder.setString("string", "testString")
+        builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
+        builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setStringList("stringList", listOf("1", "2", "3"))
+        val data = builder.build()
+
+        assertThat(data.getLong("long")).isEqualTo(123L)
+        assertThat(data.getDouble("double")).isEqualTo(50.0)
+        assertThat(data.getBoolean("boolean")).isTrue()
+        assertThat(data.getString("string")).isEqualTo("testString")
+        assertThat(data.getLongArray("longArray")).asList().containsExactly(1L, 2L, 3L)
+        assertThat(data.getDoubleArray("doubleArray"))
+            .usingExactEquality()
+            .containsExactly(4.0, 5.0, 6.0)
+        assertThat(data.getBooleanArray("booleanArray"))
+            .asList()
+            .containsExactly(false, true, false)
+        assertThat(data.getStringList("stringList")).containsExactly("1", "2", "3")
+    }
+
+    @Test
+    fun testWrite_asParameters_notConformSpec() {
+        val builder =
+            AppFunctionData.Builder(
+                TEST_PARAMETER_METADATA,
+                AppFunctionComponentsMetadata(),
+            )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setLongArray("long", longArrayOf(100, 200))
         }
-        Assert.assertThrows(
-            "No elements found under [testDouble]",
-            NoSuchElementException::class.java,
-        ) {
-            appFunctionData.getDouble("testDouble")
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("long", 50.0) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setDoubleArray("double", doubleArrayOf(50.0, 100.0))
         }
-        Assert.assertThrows(
-            "No elements found under [testBoolean]",
-            NoSuchElementException::class.java,
-        ) {
-            appFunctionData.getBoolean("testBoolean")
+        assertThrows(IllegalArgumentException::class.java) { builder.setBoolean("double", true) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBooleanArray("boolean", booleanArrayOf(false, true))
         }
-        Assert.assertThrows(
-            "No elements found under [testString]",
-            NoSuchElementException::class.java,
-        ) {
-            appFunctionData.getString("testString")
+        assertThrows(IllegalArgumentException::class.java) { builder.setLong("boolean", 100) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setStringList("string", listOf("test"))
         }
-        Assert.assertThrows(
-            "No elements found under [testData]",
-            NoSuchElementException::class.java,
-        ) {
-            appFunctionData.getAppFunctionData("testData")
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("string", 100.0) }
+
+        assertThrows(IllegalArgumentException::class.java) { builder.setLong("longArray", 100L) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setDoubleArray("longArray", doubleArrayOf(2.0))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("doubleArray", 1.0) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBooleanArray("doubleArray", booleanArrayOf(false))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBoolean("booleanArray", false)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setStringList("booleanArray", listOf("test1"))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setString("stringList", "test1")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setLongArray("stringList", longArrayOf(1))
         }
     }
 
     @Test
-    fun getSingleProperty_shouldReturnDefaultValue_ifNotExist() {
-        val appFunctionData = AppFunctionData.EMPTY
+    fun testWrite_asObject_conformSpec() {
+        val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
 
-        val longProperty = appFunctionData.getLong("testLong", 2L)
-        val doubleProperty = appFunctionData.getDouble("testDouble", 4.0)
-        val booleanProperty = appFunctionData.getBoolean("testBoolean", true)
-        val stringProperty = appFunctionData.getString("testString", "test")
+        builder.setLong("long", 123L)
+        builder.setDouble("double", 50.0)
+        builder.setBoolean("boolean", true)
+        builder.setString("string", "testString")
+        builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
+        builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setStringList("stringList", listOf("1", "2", "3"))
+        val data = builder.build()
 
-        Truth.assertThat(longProperty).isEqualTo(2L)
-        Truth.assertThat(doubleProperty).isEqualTo(4.0)
-        Truth.assertThat(booleanProperty).isEqualTo(true)
-        Truth.assertThat(stringProperty).isEqualTo("test")
+        assertThat(data.getLong("long")).isEqualTo(123L)
+        assertThat(data.getDouble("double")).isEqualTo(50.0)
+        assertThat(data.getBoolean("boolean")).isTrue()
+        assertThat(data.getString("string")).isEqualTo("testString")
+        assertThat(data.getLongArray("longArray")).asList().containsExactly(1L, 2L, 3L)
+        assertThat(data.getDoubleArray("doubleArray"))
+            .usingExactEquality()
+            .containsExactly(4.0, 5.0, 6.0)
+        assertThat(data.getBooleanArray("booleanArray"))
+            .asList()
+            .containsExactly(false, true, false)
+        assertThat(data.getStringList("stringList")).containsExactly("1", "2", "3")
     }
 
     @Test
-    fun getSinglePropertyOrNull_shouldReturnResult_ifExist() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLong("testLong", 2L)
-                .setDouble("testDouble", 4.0)
-                .setBoolean("testBoolean", true)
-                .setString("testString", "test")
+    fun testWrite_asObject_notConformSpec() {
+        val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setLongArray("long", longArrayOf(100, 200))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("long", 50.0) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setDoubleArray("double", doubleArrayOf(50.0, 100.0))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setBoolean("double", true) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBooleanArray("boolean", booleanArrayOf(false, true))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setLong("boolean", 100) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setStringList("string", listOf("test"))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("string", 100.0) }
+
+        assertThrows(IllegalArgumentException::class.java) { builder.setLong("longArray", 100L) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setDoubleArray("longArray", doubleArrayOf(2.0))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("doubleArray", 1.0) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBooleanArray("doubleArray", booleanArrayOf(false))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBoolean("booleanArray", false)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setStringList("booleanArray", listOf("test1"))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setString("stringList", "test1")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setLongArray("stringList", longArrayOf(1))
+        }
+    }
+
+    @Test
+    fun testWrite_nestedObjectParameter() {
+        val data =
+            AppFunctionData.Builder(TEST_NESTED_PARAMETER_METADATA, AppFunctionComponentsMetadata())
                 .setAppFunctionData(
-                    "testData",
-                    AppFunctionData.Builder("type").setLong("nestedInt", 10).build(),
+                    "data",
+                    AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
+                        .setLong("long", 100)
+                        .build()
                 )
-                .build()
-
-        val longProperty = appFunctionData.getLongOrNull("testLong")
-        val doubleProperty = appFunctionData.getDoubleOrNull("testDouble")
-        val booleanProperty = appFunctionData.getBooleanOrNull("testBoolean")
-        val stringProperty = appFunctionData.getStringOrNull("testString")
-        val dataProperty = appFunctionData.getAppFunctionDataOrNull("testData")
-
-        Truth.assertThat(longProperty).isEqualTo(2L)
-        Truth.assertThat(doubleProperty).isEqualTo(4.0)
-        Truth.assertThat(booleanProperty).isEqualTo(true)
-        Truth.assertThat(stringProperty).isEqualTo("test")
-        Truth.assertThat(dataProperty?.qualifiedName).isEqualTo("type")
-        Truth.assertThat(dataProperty?.genericDocument?.schemaType).isEqualTo("type")
-        Truth.assertThat(dataProperty?.getLong("nestedInt")).isEqualTo(10)
-    }
-
-    @Test
-    fun getSinglePropertyOrNull_shouldReturnNull_ifNotExist() {
-        val appFunctionData = AppFunctionData.EMPTY
-
-        val longProperty = appFunctionData.getLongOrNull("testLong")
-        val doubleProperty = appFunctionData.getDoubleOrNull("testDouble")
-        val booleanProperty = appFunctionData.getBooleanOrNull("testBoolean")
-        val stringProperty = appFunctionData.getStringOrNull("testString")
-        val dataProperty = appFunctionData.getAppFunctionDataOrNull("testData")
-
-        Truth.assertThat(longProperty).isEqualTo(null)
-        Truth.assertThat(doubleProperty).isEqualTo(null)
-        Truth.assertThat(booleanProperty).isEqualTo(null)
-        Truth.assertThat(stringProperty).isEqualTo(null)
-        Truth.assertThat(dataProperty).isEqualTo(null)
-    }
-
-    @Test
-    fun getSingleProperty_shouldReturnResult_ifExist() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLong("testLong", 2L)
-                .setDouble("testDouble", 4.0)
-                .setBoolean("testBoolean", true)
-                .setString("testString", "test")
-                .setAppFunctionData(
-                    "testData",
-                    AppFunctionData.Builder("type").setLong("nestedInt", 10).build(),
-                )
-                .build()
-
-        val longProperty = appFunctionData.getLong("testLong")
-        val doubleProperty = appFunctionData.getDouble("testDouble")
-        val booleanProperty = appFunctionData.getBoolean("testBoolean")
-        val stringProperty = appFunctionData.getString("testString")
-        val dataProperty = appFunctionData.getAppFunctionData("testData")
-
-        Truth.assertThat(longProperty).isEqualTo(2L)
-        Truth.assertThat(doubleProperty).isEqualTo(4.0)
-        Truth.assertThat(booleanProperty).isEqualTo(true)
-        Truth.assertThat(stringProperty).isEqualTo("test")
-        Truth.assertThat(dataProperty.qualifiedName).isEqualTo("type")
-        Truth.assertThat(dataProperty.genericDocument.schemaType).isEqualTo("type")
-        Truth.assertThat(dataProperty.getLong("nestedInt")).isEqualTo(10)
-    }
-
-    @Test
-    fun getSingleProperty_shouldThrowException_ifContainsMoreThanOneProperty() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLongArray("testLong", longArrayOf(3, 4))
-                .setDoubleArray("testDouble", doubleArrayOf(7.0, 8.0))
-                .setBooleanArray("testBoolean", booleanArrayOf(false, true))
-                .setStringList("testString", listOf("test1", "test2"))
                 .setAppFunctionDataList(
-                    "testData",
-                    listOf(AppFunctionData.EMPTY, AppFunctionData.EMPTY),
-                )
-                .build()
-
-        Assert.assertThrows(
-            "Property under [testLong] does not match request",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getLong("testLong")
-        }
-        Assert.assertThrows(
-            "Property under [testDouble] does not match request",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getDouble("testDouble")
-        }
-        Assert.assertThrows(
-            "Property under [testBoolean] does not match request",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getBoolean("testBoolean")
-        }
-        Assert.assertThrows(
-            "Property under [testString] does not match request",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getString("testString")
-        }
-        Assert.assertThrows(
-            "Property under [testData] does not match request",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getAppFunctionData("testData")
-        }
-    }
-
-    @Test
-    fun getSingleProperty_shouldThrowException_ifTypeMismatched() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLongArray("testLong", longArrayOf(3, 4))
-                .setDoubleArray("testDouble", doubleArrayOf(7.0, 8.0))
-                .setBooleanArray("testBoolean", booleanArrayOf(false, true))
-                .setStringList("testString", listOf("test1", "test2"))
-                .setAppFunctionDataList(
-                    "testData",
-                    listOf(AppFunctionData.EMPTY, AppFunctionData.EMPTY),
-                )
-                .build()
-
-        Assert.assertThrows(
-            "Found the property under [testLong] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getDouble("testLong")
-        }
-        Assert.assertThrows(
-            "Found the property under [testDouble] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getLong("testDouble")
-        }
-        Assert.assertThrows(
-            "Found the property under [testBoolean] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getString("testBoolean")
-        }
-        Assert.assertThrows(
-            "Found the property under [testString] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getBoolean("testString")
-        }
-        Assert.assertThrows(
-            "Found the property under [testData] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getAppFunctionData("testData")
-        }
-    }
-
-    @Test
-    fun getResultSingleProperty_shouldReturnResult_ifExist() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setAppFunctionData(
-                    PROPERTY_RETURN_VALUE,
-                    AppFunctionData.Builder("type")
-                        .setLong("nestedLong", 20L)
-                        .setString("nestedString", "testString")
-                        .build(),
-                )
-                .build()
-
-        val resultProperty = appFunctionData.getAppFunctionData(PROPERTY_RETURN_VALUE)
-
-        Truth.assertThat(resultProperty.getLong("nestedLong")).isEqualTo(20L)
-        Truth.assertThat(resultProperty.getString("nestedString")).isEqualTo("testString")
-    }
-
-    @Test
-    fun getResultSingleProperty_shouldThrowException_ifContainsMoreThanOneProperty() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setStringList(PROPERTY_RETURN_VALUE, listOf("string1", "string2"))
-                .build()
-
-        Assert.assertThrows(
-            "Property under [$PROPERTY_RETURN_VALUE] does not match request",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getString(PROPERTY_RETURN_VALUE)
-        }
-    }
-
-    @Test
-    fun getProperties_shouldReturnNull_ifNotSet() {
-        val appFunctionData = AppFunctionData.EMPTY
-
-        val longProperty = appFunctionData.getLongArray("testLongArray")
-        val doubleProperty = appFunctionData.getDoubleArray("testDoubleArray")
-        val booleanProperty = appFunctionData.getBooleanArray("testBooleanArray")
-        val stringProperty = appFunctionData.getStringList("testStringArray")
-        val dataProperty = appFunctionData.getAppFunctionDataList("testDataList")
-
-        Truth.assertThat(longProperty).isNull()
-        Truth.assertThat(doubleProperty).isNull()
-        Truth.assertThat(booleanProperty).isNull()
-        Truth.assertThat(stringProperty).isNull()
-        Truth.assertThat(dataProperty).isNull()
-    }
-
-    @Test
-    fun getProperties_shouldReturnEmpty_ifSetEmpty() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLongArray("testLongArray", longArrayOf())
-                .setDoubleArray("testDoubleArray", doubleArrayOf())
-                .setBooleanArray("testBooleanArray", booleanArrayOf())
-                .setStringList("testStringArray", listOf())
-                .setAppFunctionDataList("testDataList", listOf())
-                .build()
-
-        val longProperty = appFunctionData.getLongArray("testLongArray")
-        val doubleProperty = appFunctionData.getDoubleArray("testDoubleArray")
-        val booleanProperty = appFunctionData.getBooleanArray("testBooleanArray")
-        val stringProperty = appFunctionData.getStringList("testStringArray")
-        val dataProperty = appFunctionData.getAppFunctionDataList("testDataList")
-
-        Truth.assertThat(longProperty).isEmpty()
-        Truth.assertThat(doubleProperty).isEmpty()
-        Truth.assertThat(booleanProperty).isEmpty()
-        Truth.assertThat(stringProperty).isEmpty()
-        Truth.assertThat(dataProperty).isEmpty()
-    }
-
-    @Test
-    fun getProperties_shouldThrowException_ifTypeMismatched() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLongArray("testLongArray", longArrayOf(4L, 5L, 6L))
-                .setDoubleArray("testDoubleArray", doubleArrayOf(10.0, 11.0, 12.0))
-                .setBooleanArray("testBooleanArray", booleanArrayOf(true, false, true))
-                .setStringList("testStringArray", listOf("test1", "test2", "test3"))
-                .setAppFunctionDataList(
-                    "testDataList",
+                    "dataList",
                     listOf(
-                        AppFunctionData.Builder("type").setLong("nestedIntArray", 10).build(),
-                        AppFunctionData.Builder("type").setLong("nestedIntArray", 20).build(),
-                    ),
-                )
-                .build()
-
-        Assert.assertThrows(
-            "Found the property under [testLongArray] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getDoubleArray("testLongArray")
-        }
-        Assert.assertThrows(
-            "Found the property under [testDoubleArray] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getLongArray("testDoubleArray")
-        }
-        Assert.assertThrows(
-            "Found the property under [testBooleanArray] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getStringList("testBooleanArray")
-        }
-        Assert.assertThrows(
-            "Found the property under [testStringArray] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getBooleanArray("testStringArray")
-        }
-        Assert.assertThrows(
-            "Found the property under [testStringArray] but the data type does not match with the request.",
-            IllegalArgumentException::class.java,
-        ) {
-            appFunctionData.getAppFunctionDataList("testStringArray")
-        }
-    }
-
-    @Test
-    fun getProperties_shouldReturnResult_ifExist() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setLongArray("testLongArray", longArrayOf(4L, 5L, 6L))
-                .setDoubleArray("testDoubleArray", doubleArrayOf(10.0, 11.0, 12.0))
-                .setBooleanArray("testBooleanArray", booleanArrayOf(true, false, true))
-                .setStringList("testStringArray", listOf("test1", "test2", "test3"))
-                .setAppFunctionDataList(
-                    "testDataList",
-                    listOf(
-                        AppFunctionData.Builder("type").setLong("nestedInt", 10).build(),
-                        AppFunctionData.Builder("type").setLong("nestedInt", 20).build(),
-                    ),
-                )
-                .build()
-
-        val longArray = appFunctionData.getLongArray("testLongArray")
-        val doubleArray = appFunctionData.getDoubleArray("testDoubleArray")
-        val booleanArray = appFunctionData.getBooleanArray("testBooleanArray")
-        val stringArray = appFunctionData.getStringList("testStringArray")
-        val dataList = appFunctionData.getAppFunctionDataList("testDataList")
-
-        Truth.assertThat(longArray!!.map { it }).containsExactly(4L, 5L, 6L)
-        Truth.assertThat(doubleArray!!.map { it }).containsExactly(10.0, 11.0, 12.0)
-        Truth.assertThat(booleanArray!!.map { it }).containsExactly(true, false, true)
-        Truth.assertThat(stringArray!!.map { it }).containsExactly("test1", "test2", "test3")
-        Truth.assertThat(dataList!![0].getLong("nestedInt")).isEqualTo(10)
-        Truth.assertThat(dataList[1].getLong("nestedInt")).isEqualTo(20)
-    }
-
-    @Test
-    fun getResultProperties_shouldReturnEmpty_ifEmpty() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setDoubleArray(PROPERTY_RETURN_VALUE, doubleArrayOf())
-                .build()
-
-        val doubleArray = appFunctionData.getDoubleArray(PROPERTY_RETURN_VALUE)
-
-        Truth.assertThat(doubleArray).isEmpty()
-    }
-
-    @Test
-    fun getResultProperties_shouldReturnResult_ifExist() {
-        val appFunctionData =
-            AppFunctionData.Builder("type")
-                .setAppFunctionDataList(
-                    PROPERTY_RETURN_VALUE,
-                    listOf(
-                        AppFunctionData.Builder("type").setDouble("nestedDouble", 25.0).build(),
-                        AppFunctionData.Builder("type")
-                            .setString("nestedString", "testString")
+                        AppFunctionData.Builder(
+                                TEST_OBJECT_METADATA,
+                                AppFunctionComponentsMetadata()
+                            )
+                            .setDouble("double", 20.0)
                             .build(),
-                    ),
+                        AppFunctionData.Builder(
+                                TEST_OBJECT_METADATA,
+                                AppFunctionComponentsMetadata()
+                            )
+                            .setString("string", "testString")
+                            .build()
+                    )
                 )
                 .build()
 
-        val resultProperties = appFunctionData.getAppFunctionDataList(PROPERTY_RETURN_VALUE)
-
-        Truth.assertThat(resultProperties!![0].getDouble("nestedDouble")).isEqualTo(25.0)
-        Truth.assertThat(resultProperties[1].getString("nestedString")).isEqualTo("testString")
+        assertThat(data.getAppFunctionData("data").getLong("long")).isEqualTo(100)
+        assertThat(data.getAppFunctionDataList("dataList")).hasSize(2)
+        assertThat(data.getAppFunctionDataList("dataList")?.get(0)?.getDouble("double"))
+            .isEqualTo(20.0)
+        assertThat(data.getAppFunctionDataList("dataList")?.get(1)?.getString("string"))
+            .isEqualTo("testString")
     }
 
     @Test
@@ -440,9 +241,8 @@ class AppFunctionDataTest {
 
         val data = AppFunctionData.serialize(note, Note::class.java)
 
-        Truth.assertThat(data.getString("title")).isEqualTo("Test Title")
-        Truth.assertThat(data.getAppFunctionData("attachment").getString("uri"))
-            .isEqualTo("Test Uri")
+        assertThat(data.getString("title")).isEqualTo("Test Title")
+        assertThat(data.getAppFunctionData("attachment").getString("uri")).isEqualTo("Test Uri")
     }
 
     @Test
@@ -451,9 +251,8 @@ class AppFunctionDataTest {
 
         val data = AppFunctionData.serialize(note, "androidx.appfunctions.Note")
 
-        Truth.assertThat(data.getString("title")).isEqualTo("Test Title")
-        Truth.assertThat(data.getAppFunctionData("attachment").getString("uri"))
-            .isEqualTo("Test Uri")
+        assertThat(data.getString("title")).isEqualTo("Test Title")
+        assertThat(data.getAppFunctionData("attachment").getString("uri")).isEqualTo("Test Uri")
     }
 
     @Test
@@ -471,8 +270,8 @@ class AppFunctionDataTest {
 
         val note = data.deserialize(Note::class.java)
 
-        Truth.assertThat(note.title).isEqualTo("Test Title")
-        Truth.assertThat(note.attachment.uri).isEqualTo("Test Uri")
+        assertThat(note.title).isEqualTo("Test Title")
+        assertThat(note.attachment.uri).isEqualTo("Test Uri")
     }
 
     @Test
@@ -490,8 +289,8 @@ class AppFunctionDataTest {
 
         val note = data.deserialize<Note>("androidx.appfunctions.Note")
 
-        Truth.assertThat(note.title).isEqualTo("Test Title")
-        Truth.assertThat(note.attachment.uri).isEqualTo("Test Uri")
+        assertThat(note.title).isEqualTo("Test Title")
+        assertThat(note.attachment.uri).isEqualTo("Test Uri")
     }
 
     @Test
@@ -513,5 +312,150 @@ class AppFunctionDataTest {
         assertThrows(IllegalArgumentException::class.java) {
             data.deserialize(MissingFactoryClass::class.java)
         }
+    }
+
+    companion object {
+        val TEST_OBJECT_METADATA =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf(
+                        "long" to AppFunctionPrimitiveTypeMetadata(TYPE_LONG, false),
+                        "double" to AppFunctionPrimitiveTypeMetadata(TYPE_DOUBLE, false),
+                        "boolean" to AppFunctionPrimitiveTypeMetadata(TYPE_BOOLEAN, false),
+                        "string" to AppFunctionPrimitiveTypeMetadata(TYPE_STRING, false),
+                        "longArray" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_LONG, false),
+                                isNullable = false,
+                            ),
+                        "doubleArray" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_DOUBLE, false),
+                                isNullable = false,
+                            ),
+                        "booleanArray" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_BOOLEAN, false),
+                                isNullable = false,
+                            ),
+                        "stringList" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, false),
+                                isNullable = false,
+                            ),
+                    ),
+                required = emptyList(),
+                qualifiedName = "test",
+                isNullable = false,
+            )
+
+        val TEST_PARAMETER_METADATA =
+            listOf(
+                AppFunctionParameterMetadata(
+                    name = "long",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_LONG,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "double",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_DOUBLE,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "boolean",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_BOOLEAN,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "string",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_STRING,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "longArray",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_LONG,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "doubleArray",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_DOUBLE,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "booleanArray",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_BOOLEAN,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "stringList",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_STRING,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+            )
+        val TEST_NESTED_PARAMETER_METADATA =
+            listOf(
+                AppFunctionParameterMetadata(
+                    name = "data",
+                    isRequired = true,
+                    dataType = TEST_OBJECT_METADATA
+                ),
+                AppFunctionParameterMetadata(
+                    name = "dataList",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType = TEST_OBJECT_METADATA,
+                            isNullable = false
+                        )
+                )
+            )
     }
 }

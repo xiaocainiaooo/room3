@@ -25,6 +25,10 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
 import androidx.appfunctions.internal.AppFunctionSerializableFactory
 import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
+import kotlin.collections.isEmpty
 
 /**
  * A data class to contain information to be communicated between AppFunctions apps and agents.
@@ -409,39 +413,153 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
     /**
      * Builder for constructing [AppFunctionData]
      *
-     * @param qualifiedName the data object qualified name
+     * For example, to write an [AppFunctionData] for calling an AppFunction
+     *
+     * ```
+     * fun callCreateNoteFunction(metadata: AppFunctionMetadata) {
+     *   val appFunctionData = AppFunctionData.Builder(
+     *     metadata.parameters,
+     *     metadata.components,
+     *   ).apply {
+     *     setString("title", "Note Title")
+     *     // If the function doesn't accept "owner" as parameter, it would throw an error
+     *     setString("owner", "Me")
+     *     // If the function actually expects "content" as String, it would throw an error
+     *     setInt("content", 100)
+     *   }
+     *    .build()
+     * }
+     * ```
      */
-    public class Builder(qualifiedName: String) {
-        private val genericDocumentBuilder =
-            GenericDocument.Builder<GenericDocument.Builder<*>>("", "", qualifiedName)
+    public class Builder {
+
+        // TODO(b/399823985): Remove this once the constructor that takes qualifiedName has removed
+        private val qualifiedName: String
+        // TODO(b/399823985): Make it non-null once the constructor that takes qualifiedName has
+        // removed
+        private val spec: AppFunctionDataSpec?
+        private var genericDocumentBuilder: GenericDocument.Builder<*>
         private val extrasBuilder = Bundle()
 
-        /** Sets a boolean property [value] under [key] */
+        // TODO(b/399823985): Clean up the usage without providing metadata.
+        @RestrictTo(LIBRARY_GROUP)
+        public constructor(qualifiedName: String) {
+            this.qualifiedName = qualifiedName
+            spec = null
+            genericDocumentBuilder =
+                GenericDocument.Builder<GenericDocument.Builder<*>>("", "", qualifiedName)
+        }
+
+        /**
+         * Constructs a [Builder] to create input data for an AppFunction execution call.
+         *
+         * This constructor is used when you need to write data that will be passed as input when
+         * executing an AppFunction. The [parameterMetadataList] defines the expected input
+         * parameters for that function.
+         *
+         * @param parameterMetadataList List of [AppFunctionParameterMetadata] defining the input
+         *   parameters.
+         * @param componentMetadata [AppFunctionComponentsMetadata] that has the shared data type.
+         */
+        public constructor(
+            parameterMetadataList: List<AppFunctionParameterMetadata>,
+            componentMetadata: AppFunctionComponentsMetadata,
+        ) : this(AppFunctionDataSpec.create(parameterMetadataList, componentMetadata))
+
+        /**
+         * Constructs a [Builder] to create [AppFunctionData] representing an object.
+         *
+         * This constructor is used when you need to create [AppFunctionData] that represents an
+         * object used as either function parameters or return values, as defined by an
+         * [AppFunctionObjectTypeMetadata]. This metadata specifies the properties and their types
+         * for the object.
+         *
+         * @param objectTypeMetadata [AppFunctionObjectTypeMetadata] defining the object structure.
+         * @param componentMetadata [AppFunctionComponentsMetadata] that has the shared data type.
+         */
+        public constructor(
+            objectTypeMetadata: AppFunctionObjectTypeMetadata,
+            componentMetadata: AppFunctionComponentsMetadata,
+        ) : this(AppFunctionDataSpec.create(objectTypeMetadata, componentMetadata))
+
+        private constructor(spec: AppFunctionDataSpec) {
+            this.spec = spec
+            this.qualifiedName = spec.objectQualifiedName
+            genericDocumentBuilder =
+                GenericDocument.Builder<GenericDocument.Builder<*>>(
+                    "",
+                    "",
+                    spec.objectQualifiedName
+                )
+        }
+
+        /**
+         * Sets a [Boolean] value for the given [key].
+         *
+         * @param key The key to set the [Boolean] value for.
+         * @param value The [Boolean] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setBoolean(key: String, value: Boolean): Builder {
+            spec?.validateWriteRequest(key, Boolean::class.java, isCollection = false)
             genericDocumentBuilder.setPropertyBoolean(key, value)
             return this
         }
 
-        /** Sets a double property [value] under [key] */
+        /**
+         * Sets a [Double] value for the given [key].
+         *
+         * @param key The key to set the [Double] value for.
+         * @param value The [Double] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setDouble(key: String, value: Double): Builder {
+            spec?.validateWriteRequest(key, Double::class.java, isCollection = false)
             genericDocumentBuilder.setPropertyDouble(key, value)
             return this
         }
 
-        /** Sets a long property [value] under [key] */
+        /**
+         * Sets a [Long] value for the given [key].
+         *
+         * @param key The key to set the [Long] value for.
+         * @param value The [Long] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setLong(key: String, value: Long): Builder {
+            spec?.validateWriteRequest(key, Long::class.java, isCollection = false)
             genericDocumentBuilder.setPropertyLong(key, value)
             return this
         }
 
-        /** Sets a string property [value] under [key] */
+        /**
+         * Sets a [String] value for the given [key].
+         *
+         * @param key The key to set the [String] value for.
+         * @param value The [String] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setString(key: String, value: String): Builder {
+            spec?.validateWriteRequest(key, String::class.java, isCollection = false)
             genericDocumentBuilder.setPropertyString(key, value)
             return this
         }
 
-        /** Sets a document property [value] under [key] */
+        /**
+         * Sets an [AppFunctionData] value for the given [key].
+         *
+         * @param key The key to set the [AppFunctionData] value for.
+         * @param value The [AppFunctionData] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setAppFunctionData(key: String, value: AppFunctionData): Builder {
+            // TODO(b/399823985): Validate value conforms the metadata as well
+            spec?.validateWriteRequest(key, AppFunctionData::class.java, isCollection = false)
             genericDocumentBuilder.setPropertyDocument(key, value.genericDocument)
             if (!value.extras.isEmpty()) {
                 extrasBuilder.putBundle(extrasKey(key), value.extras)
@@ -449,32 +567,73 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
             return this
         }
 
-        /** Sets boolean properties [value] under [key] */
+        /**
+         * Sets an [BooleanArray] value for the given [key].
+         *
+         * @param key The key to set the [BooleanArray] value for.
+         * @param value The [BooleanArray] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setBooleanArray(key: String, value: BooleanArray): Builder {
+            spec?.validateWriteRequest(key, Boolean::class.java, isCollection = true)
             genericDocumentBuilder.setPropertyBoolean(key, *value)
             return this
         }
 
-        /** Sets double properties [value] under [key] */
+        /**
+         * Sets an [DoubleArray] value for the given [key].
+         *
+         * @param key The key to set the [DoubleArray] value for.
+         * @param value The [DoubleArray] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setDoubleArray(key: String, value: DoubleArray): Builder {
+            spec?.validateWriteRequest(key, Double::class.java, isCollection = true)
             genericDocumentBuilder.setPropertyDouble(key, *value)
             return this
         }
 
-        /** Sets long properties [value] under [key] */
+        /**
+         * Sets an [LongArray] value for the given [key].
+         *
+         * @param key The key to set the [LongArray] value for.
+         * @param value The [LongArray] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setLongArray(key: String, value: LongArray): Builder {
+            spec?.validateWriteRequest(key, Long::class.java, isCollection = true)
             genericDocumentBuilder.setPropertyLong(key, *value)
             return this
         }
 
-        /** Sets string properties [value] under [key] */
+        /**
+         * Sets an [List] of [String] value for the given [key].
+         *
+         * @param key The key to set the [List] of [String] value for.
+         * @param value The [List] of [String] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setStringList(key: String, value: List<String>): Builder {
+            spec?.validateWriteRequest(key, String()::class.java, isCollection = true)
             genericDocumentBuilder.setPropertyString(key, *value.toTypedArray())
             return this
         }
 
-        /** Sets appfunction data properties [value] under [key] */
+        /**
+         * Sets an [List] of [AppFunctionData] value for the given [key].
+         *
+         * @param key The key to set the [List] of [AppFunctionData] value for.
+         * @param value The [List] of [AppFunctionData] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the value type is
+         *   incorrect according to the metadata specification.
+         */
         public fun setAppFunctionDataList(key: String, value: List<AppFunctionData>): Builder {
+            // TODO(b/399823985): Validate value conforms the metadata as well
+            spec?.validateWriteRequest(key, AppFunctionData::class.java, isCollection = true)
             genericDocumentBuilder.setPropertyDocument(
                 key,
                 *value.map { it.genericDocument }.toTypedArray(),
@@ -488,8 +647,10 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
         }
 
         /** Builds [AppFunctionData] */
-        public fun build(): AppFunctionData =
-            AppFunctionData(genericDocumentBuilder.build(), extrasBuilder)
+        public fun build(): AppFunctionData {
+            // TODO(b/399823985): validate required fields.
+            return AppFunctionData(genericDocumentBuilder.build(), extrasBuilder)
+        }
     }
 
     public companion object {
@@ -497,7 +658,7 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
 
         private fun extrasKey(key: String, index: Int) = "property/$key[$index]"
 
-        // TODO: Codegen the mapping table to prevent using reflection
+        // TODO(b/399823985): Codegen the mapping table to prevent using reflection
         private fun <T : Any> getSerializableClass(qualifiedName: String): Class<T> {
             return try {
                 @Suppress("UNCHECKED_CAST")
@@ -508,7 +669,7 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
             }
         }
 
-        // TODO: Codegen the mapping table to prevent using reflection
+        // TODO(b/399823985): Codegen the mapping table to prevent using reflection
         private fun <T : Any> getSerializableFactory(
             serializableClass: Class<T>
         ): AppFunctionSerializableFactory<T> {

@@ -48,6 +48,7 @@ dependencies {
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.testParameterInjector)
     androidTestCompileOnly(project(":appfunctions:appfunctions-stubs"))
 }
 
