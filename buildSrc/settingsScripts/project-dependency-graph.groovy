@@ -271,6 +271,10 @@ class ProjectDependencyGraph {
                 if (publishedLibrary.matcher(line).find()) {
                     publishedLibraryProjects.add(projectPath)
                 }
+                Matcher publishProject = publishProjectReference.matcher(line)
+                if (publishProject.find()) {
+                    links.add(publishProject.group(1))
+                }
             }
         } else if (!projectDir.exists()) {
             // Remove file existence checking when https://github.com/gradle/gradle/issues/25531 is
@@ -298,6 +302,7 @@ class ProjectDependencyGraph {
                     "|PUBLISHED_TEST_LIBRARY|PUBLISHED_PROTO_LIBRARY|PUBLISHED_KOTLIN_ONLY_TEST_LIBRARY)|" +
                     "publish = Publish\\.SNAPSHOT_AND_RELEASE)"
     )
+    private static Pattern publishProjectReference = Pattern.compile("\"(.*):publish\"")
     private static List<String> buildFileNames = ["build.gradle", "build.gradle.kts"]
 }
 
