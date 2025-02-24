@@ -27,35 +27,6 @@ import kotlinx.serialization.serializer
  * Returns a property delegate provider that manages the saving and restoring of a value of type [T]
  * within the [SavedStateRegistry] of this [SavedStateRegistryOwner].
  *
- * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withKey_withSerializer
- * @param serializer The [KSerializer] to use for serializing and deserializing the value.
- * @param key An optional [String] key to use for storing the value in the [SavedStateRegistry]. A
- *   default key will be generated if it's omitted or when 'null' is passed.
- * @param config The [SavedStateConfig] to use.
- * @param init The function to provide the initial value of the property.
- * @return A property delegate provider that manages the saving and restoring of the value.
- * @see encodeToSavedState
- * @see decodeFromSavedState
- */
-public fun <T : Any> SavedStateRegistryOwner.saved(
-    serializer: KSerializer<T>,
-    key: String? = null,
-    config: SavedStateConfig = SavedStateConfig.DEFAULT,
-    init: () -> T,
-): ReadWriteProperty<Any?, T> {
-    return SavedStateRegistryOwnerDelegate(
-        registry = savedStateRegistry,
-        serializer = serializer,
-        key = key,
-        config = config,
-        init = init
-    )
-}
-
-/**
- * Returns a property delegate provider that manages the saving and restoring of a value of type [T]
- * within the [SavedStateRegistry] of this [SavedStateRegistryOwner].
- *
  * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withKey
  * @param key An optional [String] key to use for storing the value in the [SavedStateRegistry]. A
  *   default key will be generated if it's omitted or when 'null' is passed.
@@ -71,12 +42,29 @@ public inline fun <reified T : Any> SavedStateRegistryOwner.saved(
     config: SavedStateConfig = SavedStateConfig.DEFAULT,
     noinline init: () -> T,
 ): ReadWriteProperty<Any?, T> =
-    saved(
-        serializer = config.serializersModule.serializer(),
-        key = key,
-        config = config,
-        init = init
-    )
+    saved(config.serializersModule.serializer(), key, config, init)
+
+/**
+ * Returns a property delegate provider that manages the saving and restoring of a value of type [T]
+ * within the [SavedStateRegistry] of this [SavedStateRegistryOwner].
+ *
+ * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withKey_withSerializer
+ * @param serializer The [KSerializer] to use for serializing and deserializing the value.
+ * @param key An optional [String] key to use for storing the value in the [SavedStateRegistry]. A
+ *   default key will be generated if it's omitted or when 'null' is passed.
+ * @param config The [SavedStateConfig] to use.
+ * @param init The function to provide the initial value of the property.
+ * @return A property delegate provider that manages the saving and restoring of the value.
+ * @see encodeToSavedState
+ * @see decodeFromSavedState
+ */
+public fun <T : Any> SavedStateRegistryOwner.saved(
+    serializer: KSerializer<T>,
+    key: String? = null,
+    config: SavedStateConfig = SavedStateConfig.DEFAULT,
+    init: () -> T,
+): ReadWriteProperty<Any?, T> =
+    SavedStateRegistryOwnerDelegate(savedStateRegistry, serializer, key, config, init)
 
 private class SavedStateRegistryOwnerDelegate<T : Any>(
     private val registry: SavedStateRegistry,

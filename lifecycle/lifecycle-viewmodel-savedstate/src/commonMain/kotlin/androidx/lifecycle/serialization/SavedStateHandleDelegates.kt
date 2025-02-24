@@ -41,9 +41,8 @@ public inline fun <reified T : Any> SavedStateHandle.saved(
     key: String? = null,
     config: SavedStateConfig = SavedStateConfig.DEFAULT,
     noinline init: () -> T,
-): ReadWriteProperty<Any?, T> {
-    return saved(config.serializersModule.serializer(), key, config, init)
-}
+): ReadWriteProperty<Any?, T> =
+    saved(config.serializersModule.serializer(), key, config, init)
 
 /**
  * Returns a property delegate that uses [SavedStateHandle] to save and restore a value of type [T].
@@ -61,15 +60,8 @@ public fun <T : Any> SavedStateHandle.saved(
     key: String? = null,
     config: SavedStateConfig = SavedStateConfig.DEFAULT,
     init: () -> T,
-): ReadWriteProperty<Any?, T> {
-    return SavedStateHandleDelegate(
-        savedStateHandle = this,
-        serializer = serializer,
-        key = key,
-        config = config,
-        init = init
-    )
-}
+): ReadWriteProperty<Any?, T> =
+    SavedStateHandleDelegate(this, serializer, key, config, init)
 
 private class SavedStateHandleDelegate<T : Any>(
     private val savedStateHandle: SavedStateHandle,

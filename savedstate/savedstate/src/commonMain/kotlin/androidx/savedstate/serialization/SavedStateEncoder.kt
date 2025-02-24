@@ -20,6 +20,7 @@ import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.savedState
 import androidx.savedstate.write
+import kotlin.jvm.JvmOverloads
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
@@ -30,61 +31,40 @@ import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.serializer
 
 /**
- * Encode a serializable object to a [SavedState] with an explicit serializer, which can be a custom
- * or third-party one.
+ * Serializes the [value] of type [T] into an equivalent [SavedState] using [KSerializer] retrieved
+ * from the reified type parameter.
  *
- * @sample androidx.savedstate.encodeWithExplicitSerializer
- * @param serializer The serializer to use.
+ * @sample androidx.savedstate.encode
  * @param value The serializable object to encode.
+ * @param config The [SavedStateConfig] to use.
  * @return The encoded [SavedState].
- * @throws SerializationException if [value] cannot be serialized.
+ * @throws SerializationException in case of any encoding-specific error.
  */
-public fun <T : Any> encodeToSavedState(
-    serializer: SerializationStrategy<T>,
-    value: T
-): SavedState {
-    return encodeToSavedState(serializer, value, SavedStateConfig.DEFAULT)
-}
+public inline fun <reified T : Any> encodeToSavedState(
+    value: T,
+    config: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
+): SavedState =
+    encodeToSavedState(config.serializersModule.serializer(), value, config)
 
 /**
- * Encode a serializable object to a [SavedState] with an explicit serializer, which can be a custom
- * or third-party one.
+ * Serializes and encodes the given [value] to [SavedState] using the given [serializer].
  *
  * @sample androidx.savedstate.encodeWithExplicitSerializerAndConfig
  * @param serializer The serializer to use.
  * @param value The serializable object to encode.
  * @param config The [SavedStateConfig] to use.
  * @return The encoded [SavedState].
- * @throws SerializationException if [value] cannot be serialized.
+ * @throws SerializationException in case of any encoding-specific error.
  */
+@JvmOverloads
 public fun <T : Any> encodeToSavedState(
     serializer: SerializationStrategy<T>,
     value: T,
-    config: SavedStateConfig,
-): SavedState {
-    return savedState().apply {
-        SavedStateEncoder(this, config).encodeSerializableValue(serializer, value)
-    }
-}
-
-/**
- * Encode a serializable object to a [SavedState] with the default serializer.
- *
- * @sample androidx.savedstate.encode
- * @param value The serializable object to encode.
- * @param config The [SavedStateConfig] to use.
- * @return The encoded [SavedState].
- * @throws SerializationException if [value] cannot be serialized.
- */
-public inline fun <reified T : Any> encodeToSavedState(
-    value: T,
     config: SavedStateConfig = SavedStateConfig.DEFAULT,
 ): SavedState {
-    return encodeToSavedState(
-        serializer = config.serializersModule.serializer<T>(),
-        config = config,
-        value = value
-    )
+    val result = savedState()
+    SavedStateEncoder(result, config).encodeSerializableValue(serializer, value)
+    return result
 }
 
 /**

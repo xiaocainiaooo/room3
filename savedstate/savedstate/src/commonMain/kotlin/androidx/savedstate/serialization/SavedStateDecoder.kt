@@ -18,6 +18,7 @@ package androidx.savedstate.serialization
 
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
+import kotlin.jvm.JvmOverloads
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -29,57 +30,40 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
 /**
- * Decode a serializable object from a [SavedState] with an explicit deserializer, which can be a
- * custom or third-party one.
- *
- * @sample androidx.savedstate.decodeWithExplicitSerializer
- * @param deserializer The deserializer to use.
- * @param savedState The [SavedState] to decode from.
- * @return The deserialized object.
- * @throws SerializationException for any deserialization error.
- * @throws IllegalArgumentException if [savedState] is not valid.
- */
-public fun <T : Any> decodeFromSavedState(
-    deserializer: DeserializationStrategy<T>,
-    savedState: SavedState
-): T {
-    return decodeFromSavedState(deserializer, savedState, SavedStateConfig.DEFAULT)
-}
-
-/**
- * Decode a serializable object from a [SavedState] with an explicit deserializer, which can be a
- * custom or third-party one.
- *
- * @sample androidx.savedstate.decodeWithExplicitSerializerAndConfig
- * @param deserializer The deserializer to use.
- * @param savedState The [SavedState] to decode from.
- * @param config The [SavedStateConfig] to use.
- * @return The deserialized object.
- * @throws SerializationException for any deserialization error.
- * @throws IllegalArgumentException if [savedState] is not valid.
- */
-public fun <T : Any> decodeFromSavedState(
-    deserializer: DeserializationStrategy<T>,
-    savedState: SavedState,
-    config: SavedStateConfig
-): T {
-    return SavedStateDecoder(savedState, config).decodeSerializableValue(deserializer)
-}
-
-/**
  * Decode a serializable object from a [SavedState] with the default deserializer.
  *
  * @sample androidx.savedstate.decode
  * @param savedState The [SavedState] to decode from.
  * @param config The [SavedStateConfig] to use.
  * @return The decoded object.
- * @throws SerializationException for any deserialization error.
- * @throws IllegalArgumentException if [savedState] is not valid.
+ * @throws SerializationException in case of any decoding-specific error.
+ * @throws IllegalArgumentException if the decoded input is not a valid instance of [T].
  */
 public inline fun <reified T : Any> decodeFromSavedState(
     savedState: SavedState,
     config: SavedStateConfig = SavedStateConfig.DEFAULT
-): T = decodeFromSavedState(config.serializersModule.serializer<T>(), savedState, config)
+): T = decodeFromSavedState(config.serializersModule.serializer(), savedState, config)
+
+/**
+ * Decodes and deserializes the given [SavedState] to the value of type [T] using the given
+ * [deserializer].
+ *
+ * @sample androidx.savedstate.decodeWithExplicitSerializerAndConfig
+ * @param deserializer The deserializer to use.
+ * @param savedState The [SavedState] to decode from.
+ * @param config The [SavedStateConfig] to use.
+ * @return The deserialized object.
+ * @throws SerializationException in case of any decoding-specific error.
+ * @throws IllegalArgumentException if the decoded input is not a valid instance of [T].
+ */
+@JvmOverloads
+public fun <T : Any> decodeFromSavedState(
+    deserializer: DeserializationStrategy<T>,
+    savedState: SavedState,
+    config: SavedStateConfig = SavedStateConfig.DEFAULT,
+): T {
+    return SavedStateDecoder(savedState, config).decodeSerializableValue(deserializer)
+}
 
 /**
  * A [kotlinx.serialization.encoding.Decoder] that can decode a serializable object from a
