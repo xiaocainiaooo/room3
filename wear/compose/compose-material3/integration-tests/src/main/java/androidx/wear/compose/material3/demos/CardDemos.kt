@@ -52,6 +52,7 @@ import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.samples.AppCardSample
 import androidx.wear.compose.material3.samples.AppCardWithIconSample
 import androidx.wear.compose.material3.samples.AppCardWithImageSample
+import androidx.wear.compose.material3.samples.CardFillContentSample
 import androidx.wear.compose.material3.samples.CardSample
 import androidx.wear.compose.material3.samples.CardWithOnLongClickSample
 import androidx.wear.compose.material3.samples.OutlinedAppCardSample
@@ -74,6 +75,7 @@ fun CardDemo() {
         item { CardWithMultipleImagesDemo() }
         item { OutlinedCardSample() }
         item { VerticallyCenteredBaseCard() }
+        item { CardFillContentSample() }
     }
 }
 
