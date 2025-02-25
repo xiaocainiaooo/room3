@@ -35,6 +35,7 @@ import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_INT
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 
@@ -139,6 +140,9 @@ private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionDat
         }
         TYPE_OBJECT -> {
             TODO("Not implemented yet - require AppFunctionSerializableFactory")
+        }
+        TYPE_UNIT -> {
+            // no-op
         }
         else -> {
             throw IllegalStateException("Unknown data type $type")

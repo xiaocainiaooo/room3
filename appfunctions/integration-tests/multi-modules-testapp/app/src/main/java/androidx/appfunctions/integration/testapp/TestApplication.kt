@@ -18,11 +18,18 @@ package androidx.appfunctions.integration.testapp
 
 import android.app.Application
 import android.util.Log
+import androidx.appfunctions.AppFunctionConfiguration
 
-class TestApplication : Application() {
+class TestApplication : Application(), AppFunctionConfiguration.Provider {
 
     override fun onCreate() {
         super.onCreate()
         Log.d("AppFunctionIntegrationTestApp", "Test Application created")
     }
+
+    override val appFunctionConfiguration: AppFunctionConfiguration
+        get() =
+            AppFunctionConfiguration.Builder()
+                .addEnclosingClassFactory(TestFactory::class.java) { TestFactory(true) }
+                .build()
 }
