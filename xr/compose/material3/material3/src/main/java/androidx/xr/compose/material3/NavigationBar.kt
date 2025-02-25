@@ -28,10 +28,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.NavigationBarComponentOverride
-import androidx.compose.material3.NavigationBarComponentOverrideContext
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarOverride
+import androidx.compose.material3.NavigationBarOverrideScope
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -42,7 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.xr.compose.material3.XrNavigationBarComponentOverride.NavigationBar
+import androidx.xr.compose.material3.XrNavigationBarOverride.NavigationBar
 import androidx.xr.compose.spatial.EdgeOffset
 import androidx.xr.compose.spatial.Orbiter
 import androidx.xr.compose.spatial.OrbiterDefaults
@@ -118,12 +118,12 @@ private object XrNavigationBarTokens {
     val ContainerHeight = 80.0.dp
 }
 
-/** [NavigationBarComponentOverride] that uses the XR-specific [NavigationBar]. */
+/** [NavigationBarOverride] that uses the XR-specific [NavigationBar]. */
 @ExperimentalMaterial3XrApi
 @OptIn(ExperimentalMaterial3ComponentOverrideApi::class)
-internal object XrNavigationBarComponentOverride : NavigationBarComponentOverride {
+internal object XrNavigationBarOverride : NavigationBarOverride {
     @Composable
-    override fun NavigationBarComponentOverrideContext.NavigationBar() {
+    override fun NavigationBarOverrideScope.NavigationBar() {
         NavigationBar(
             modifier = modifier,
             containerColor = containerColor,

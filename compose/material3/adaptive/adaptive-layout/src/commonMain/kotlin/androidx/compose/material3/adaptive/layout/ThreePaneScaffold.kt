@@ -57,61 +57,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Interface that allows libraries to override the behavior of [ThreePaneScaffold].
- *
- * To override this component, implement the member function of this interface, then provide the
- * implementation to [LocalThreePaneScaffoldComponentOverride] in the Compose hierarchy.
- */
-@ExperimentalMaterial3AdaptiveComponentOverrideApi
-interface ThreePaneScaffoldComponentOverride {
-    /** Behavior function that is called by the [ThreePaneScaffold] composable. */
-    @Composable fun ThreePaneScaffoldComponentOverrideContext.ThreePaneScaffold()
-}
-
-/**
- * Parameters available to [ThreePaneScaffold].
- *
- * @property modifier The modifier to be applied to the layout.
- * @property scaffoldDirective The top-level directives about how the scaffold should arrange its
- *   panes.
- * @property scaffoldState The current state of the scaffold, containing information about the
- *   adapted value of each pane of the scaffold and the transitions/animations in progress.
- * @property paneOrder The horizontal order of the panes from start to end in the scaffold.
- * @property secondaryPane The content of the secondary pane that has a priority lower then the
- *   primary pane but higher than the tertiary pane.
- * @property tertiaryPane The content of the tertiary pane that has the lowest priority.
- * @property primaryPane The content of the primary pane that has the highest priority.
- * @property paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
- *   pane expansion state, `null` by default.
- * @property paneExpansionState the state object of pane expansion state.
- */
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@ExperimentalMaterial3AdaptiveComponentOverrideApi
-class ThreePaneScaffoldComponentOverrideContext
-internal constructor(
-    val modifier: Modifier,
-    val scaffoldDirective: PaneScaffoldDirective,
-    val scaffoldState: ThreePaneScaffoldState,
-    val paneOrder: ThreePaneScaffoldHorizontalOrder,
-    val primaryPane: @Composable () -> Unit,
-    val secondaryPane: @Composable () -> Unit,
-    val tertiaryPane: (@Composable () -> Unit)?,
-    val paneExpansionState: PaneExpansionState,
-    val paneExpansionDragHandle: (@Composable (PaneExpansionState) -> Unit)?,
-    internal val motionDataProvider: ThreePaneScaffoldMotionDataProvider
-)
-
-/** CompositionLocal containing the currently-selected [ThreePaneScaffoldComponentOverride]. */
-@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-@get:ExperimentalMaterial3AdaptiveComponentOverrideApi
-@ExperimentalMaterial3AdaptiveComponentOverrideApi
-val LocalThreePaneScaffoldComponentOverride:
-    ProvidableCompositionLocal<ThreePaneScaffoldComponentOverride> =
-    compositionLocalOf {
-        DefaultThreePaneScaffoldComponentOverride
-    }
-
-/**
  * A pane scaffold composable that can display up to three panes according to the instructions
  * provided by [ThreePaneScaffoldValue] in the order that [ThreePaneScaffoldHorizontalOrder]
  * specifies, and allocate margins and spacers according to [PaneScaffoldDirective].
@@ -208,8 +153,8 @@ internal fun ThreePaneScaffold(
             remember(currentTransition, this) {
                 ThreePaneScaffoldScopeImpl(transitionScope, this, stateHolder)
             }
-        with(LocalThreePaneScaffoldComponentOverride.current) {
-            ThreePaneScaffoldComponentOverrideContext(
+        with(LocalThreePaneScaffoldOverride.current) {
+            ThreePaneScaffoldOverrideScope(
                     modifier = modifier,
                     scaffoldDirective = scaffoldDirective,
                     scaffoldState = scaffoldState,
@@ -258,15 +203,15 @@ internal fun ThreePaneScaffold(
 }
 
 /**
- * [ThreePaneScaffoldComponentOverride] used when no override is specified.
- *
  * This override provides the default behavior of the [ThreePaneScaffold] component.
+ *
+ * [ThreePaneScaffoldOverride] used when no override is specified.
  */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @ExperimentalMaterial3AdaptiveComponentOverrideApi
-private object DefaultThreePaneScaffoldComponentOverride : ThreePaneScaffoldComponentOverride {
+private object DefaultThreePaneScaffoldOverride : ThreePaneScaffoldOverride {
     @Composable
-    override fun ThreePaneScaffoldComponentOverrideContext.ThreePaneScaffold() {
+    override fun ThreePaneScaffoldOverrideScope.ThreePaneScaffold() {
         val layoutDirection = LocalLayoutDirection.current
         val ltrPaneOrder =
             remember(paneOrder, layoutDirection) { paneOrder.toLtrOrder(layoutDirection) }
@@ -944,3 +889,57 @@ private fun Modifier.predictiveBackTransform(scale: () -> Float): Modifier = gra
 
 // TODO(371450910): Investigate why animation fails if transform origin has y != 0.
 private val TransformOriginTopCenter = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0f)
+
+/**
+ * Interface that allows libraries to override the behavior of [ThreePaneScaffold].
+ *
+ * To override this component, implement the member function of this interface, then provide the
+ * implementation to [LocalThreePaneScaffoldOverride] in the Compose hierarchy.
+ */
+@ExperimentalMaterial3AdaptiveComponentOverrideApi
+interface ThreePaneScaffoldOverride {
+    /** Behavior function that is called by the [ThreePaneScaffold] composable. */
+    @Composable fun ThreePaneScaffoldOverrideScope.ThreePaneScaffold()
+}
+
+/**
+ * Parameters available to [ThreePaneScaffold].
+ *
+ * @property modifier The modifier to be applied to the layout.
+ * @property scaffoldDirective The top-level directives about how the scaffold should arrange its
+ *   panes.
+ * @property scaffoldState The current state of the scaffold, containing information about the
+ *   adapted value of each pane of the scaffold and the transitions/animations in progress.
+ * @property paneOrder The horizontal order of the panes from start to end in the scaffold.
+ * @property secondaryPane The content of the secondary pane that has a priority lower then the
+ *   primary pane but higher than the tertiary pane.
+ * @property tertiaryPane The content of the tertiary pane that has the lowest priority.
+ * @property primaryPane The content of the primary pane that has the highest priority.
+ * @property paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
+ *   pane expansion state, `null` by default.
+ * @property paneExpansionState the state object of pane expansion state.
+ */
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@ExperimentalMaterial3AdaptiveComponentOverrideApi
+class ThreePaneScaffoldOverrideScope
+internal constructor(
+    val modifier: Modifier,
+    val scaffoldDirective: PaneScaffoldDirective,
+    val scaffoldState: ThreePaneScaffoldState,
+    val paneOrder: ThreePaneScaffoldHorizontalOrder,
+    val primaryPane: @Composable () -> Unit,
+    val secondaryPane: @Composable () -> Unit,
+    val tertiaryPane: (@Composable () -> Unit)?,
+    val paneExpansionState: PaneExpansionState,
+    val paneExpansionDragHandle: (@Composable (PaneExpansionState) -> Unit)?,
+    internal val motionDataProvider: ThreePaneScaffoldMotionDataProvider
+)
+
+/** CompositionLocal containing the currently-selected [ThreePaneScaffoldOverride]. */
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+@get:ExperimentalMaterial3AdaptiveComponentOverrideApi
+@ExperimentalMaterial3AdaptiveComponentOverrideApi
+val LocalThreePaneScaffoldOverride: ProvidableCompositionLocal<ThreePaneScaffoldOverride> =
+    compositionLocalOf {
+        DefaultThreePaneScaffoldOverride
+    }
