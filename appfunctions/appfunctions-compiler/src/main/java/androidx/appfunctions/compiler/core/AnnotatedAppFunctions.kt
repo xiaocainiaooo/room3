@@ -29,13 +29,13 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchema
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
@@ -204,10 +204,10 @@ data class AnnotatedAppFunctions(
     }
 
     /**
-     * Creates a list of [AppFunctionMetadata] instances for each of the app functions defined in
-     * this class.
+     * Creates a list of [CompileTimeAppFunctionMetadata]] instances for each of the app functions
+     * defined in this class.
      */
-    fun createAppFunctionMetadataList(): List<AppFunctionMetadata> {
+    fun createAppFunctionMetadataList(): List<CompileTimeAppFunctionMetadata> {
         val sharedDataTypeMap: MutableMap<String, AppFunctionObjectTypeMetadata> = mutableMapOf()
         val seenDataTypeQualifiers: MutableSet<String> = mutableSetOf()
         return appFunctionDeclarations.map { functionDeclaration ->
@@ -222,7 +222,7 @@ data class AnnotatedAppFunctions(
                 checkNotNull(functionDeclaration.returnType)
                     .toAppFunctionDataTypeMetadata(sharedDataTypeMap, seenDataTypeQualifiers)
 
-            AppFunctionMetadata(
+            CompileTimeAppFunctionMetadata(
                 id = getAppFunctionIdentifier(functionDeclaration),
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
                 schema = appFunctionAnnotationProperties.toAppFunctionSchemaMetadata(),

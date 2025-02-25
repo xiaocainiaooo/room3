@@ -4,13 +4,13 @@ import androidx.appfunctions.`internal`.AppFunctionInventory
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import javax.`annotation`.processing.Generated
 import kotlin.String
 import kotlin.collections.List
@@ -23,7 +23,7 @@ import kotlin.collections.Map
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFunctionInventory {
-  override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf(
+  override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
     "com.testdata.RecursiveSerializableInputFunctions#simpleFunction" to
         ComTestdataRecursiveSerializableInputFunctionsSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionSerializableList" to
@@ -97,7 +97,8 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id = "com.testdata.RecursiveSerializableInputFunctions#simpleFunction",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
@@ -177,7 +178,8 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id = "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionSerializableList",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
@@ -258,7 +260,8 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id =
             "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializableList",
             isEnabledByDefault = true,
@@ -334,7 +337,8 @@ public class `$RecursiveSerializableInputFunctions_AppFunctionInventory` : AppFu
             dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
         )
 
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
             id =
             "com.testdata.RecursiveSerializableInputFunctions#simpleFunctionNullableSerializable",
             isEnabledByDefault = true,

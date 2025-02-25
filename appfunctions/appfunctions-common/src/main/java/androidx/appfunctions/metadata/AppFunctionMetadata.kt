@@ -43,7 +43,70 @@ constructor(
      * AppFunction.
      */
     public val id: String,
+    /** The package name of the Android app called to execute the app function. */
+    public val packageName: String,
+    /** Indicates whether the function is enabled currently or not. */
+    public val isEnabled: Boolean,
+    /**
+     * The predefined schema of the AppFunction. If null, it indicates this function is not
+     * implement a particular predefined schema.
+     */
+    public val schema: AppFunctionSchemaMetadata?,
+    /** The parameters of the AppFunction. */
+    public val parameters: List<AppFunctionParameterMetadata>,
+    /** The response of the AppFunction. */
+    public val response: AppFunctionResponseMetadata,
+    /** Reusable components that could be shared within the function specification. */
+    public val components: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(),
+) {
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AppFunctionMetadata
+
+        if (id != other.id) return false
+        if (isEnabled != other.isEnabled) return false
+        if (packageName != other.packageName) return false
+        if (schema != other.schema) return false
+        if (parameters != other.parameters) return false
+        if (response != other.response) return false
+        if (components != other.components) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(isEnabled, id, packageName, schema, parameters, response, components)
+    }
+
+    override fun toString(): String = buildString {
+        append("AppFunctionMetadata(")
+        append("id='$id', ")
+        append("packageName='$packageName', ")
+        append("isEnabled=$isEnabled, ")
+        append("schema=$schema, ")
+        append("parameters=$parameters, ")
+        append("response=$response, ")
+        append("components=$components")
+        append(")")
+    }
+}
+
+/**
+ * Represents the computed compile-time metadata of an AppFunction.
+ *
+ * This class is used to generate AppFunctionInventory and an intermediate representation to persist
+ * the metadata in AppSearch.
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+public data class CompileTimeAppFunctionMetadata(
+    /**
+     * The ID used in an [androidx.appfunctions.ExecuteAppFunctionRequest] to refer to this
+     * AppFunction.
+     */
+    public val id: String,
     /**
      * Indicates whether the function is enabled by default.
      *
@@ -63,33 +126,10 @@ constructor(
     /** Reusable components that could be shared within the function specification. */
     public val components: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(),
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AppFunctionMetadata
-
-        if (id != other.id) return false
-        if (isEnabledByDefault != other.isEnabledByDefault) return false
-        if (schema != other.schema) return false
-        if (parameters != other.parameters) return false
-        if (response != other.response) return false
-        if (components != other.components) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int =
-        Objects.hash(id, isEnabledByDefault, schema, parameters, response, components)
-
-    override fun toString(): String {
-        return "AppFunctionMetadata(isEnabledByDefault=$isEnabledByDefault, schema=$schema, parameters=$parameters, response=$response, components=$components)"
-    }
-
     /**
-     * Converts the [AppFunctionMetadata] to an [AppFunctionMetadataDocument].
+     * Converts the [CompileTimeAppFunctionMetadata] to an [AppFunctionMetadataDocument].
      *
-     * This method is used to persist the [AppFunctionMetadata] in a database.
+     * This method is used to persist the [CompileTimeAppFunctionMetadata] in a database.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionMetadataDocument(): AppFunctionMetadataDocument {
