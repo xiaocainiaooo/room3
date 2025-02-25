@@ -496,12 +496,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             view.localToScreen(Offset(boundsInRoot.left.toFloat(), boundsInRoot.top.toFloat()))
         val bottomRightInScreen =
             view.localToScreen(Offset(boundsInRoot.right.toFloat(), boundsInRoot.bottom.toFloat()))
-
+        // Due to rotation, the top left corner of the local bounds may not be the top left corner
+        // of the screen bounds.
         return android.graphics.Rect(
-            floor(topLeftInScreen.x).toInt(),
-            floor(topLeftInScreen.y).toInt(),
-            ceil(bottomRightInScreen.x).toInt(),
-            ceil(bottomRightInScreen.y).toInt()
+            floor(min(topLeftInScreen.x, bottomRightInScreen.x)).toInt(),
+            floor(min(topLeftInScreen.y, bottomRightInScreen.y)).toInt(),
+            ceil(max(topLeftInScreen.x, bottomRightInScreen.x)).toInt(),
+            ceil(max(topLeftInScreen.y, bottomRightInScreen.y)).toInt()
         )
     }
 
@@ -1665,11 +1666,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val topLeftInScreen = view.localToScreen(Offset(visibleBounds.left, visibleBounds.top))
             val bottomRightInScreen =
                 view.localToScreen(Offset(visibleBounds.right, visibleBounds.bottom))
+            // Due to rotation, the top left corner of the local bounds may not be the top left
+            // corner of the screen bounds.
             RectF(
-                topLeftInScreen.x,
-                topLeftInScreen.y,
-                bottomRightInScreen.x,
-                bottomRightInScreen.y
+                min(topLeftInScreen.x, bottomRightInScreen.x),
+                min(topLeftInScreen.y, bottomRightInScreen.y),
+                max(topLeftInScreen.x, bottomRightInScreen.x),
+                max(topLeftInScreen.y, bottomRightInScreen.y)
             )
         } else {
             null
