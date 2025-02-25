@@ -56,6 +56,7 @@ import androidx.compose.ui.util.fastRoundToInt
  * proportion of how the screen is being split. Note that a vertically oriented drag handle is meant
  * to convey horizontal drag motions.
  *
+ * @sample androidx.compose.material3.samples.VerticalDragHandleSample
  * @param modifier the [Modifier] to be applied to this drag handle.
  * @param sizes sizes of this drag handle; see [VerticalDragHandleDefaults.sizes] for the default
  *   values.
