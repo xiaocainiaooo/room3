@@ -170,8 +170,7 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
                 Unit::class.ensureQualifiedName(),
             )
 
-        private val SUPPORTED_PRIMITIVE_TYPES_IN_LIST =
-            setOf(String::class.ensureQualifiedName(), ByteArray::class.ensureQualifiedName())
+        private val SUPPORTED_PRIMITIVE_TYPES_IN_LIST = setOf(String::class.ensureQualifiedName())
 
         private val SUPPORTED_TYPES =
             SUPPORTED_SINGLE_PRIMITIVE_TYPES + SUPPORTED_ARRAY_PRIMITIVE_TYPES
