@@ -560,12 +560,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onWindowVisibilityChanged(visibility: Int) {
         super.onWindowVisibilityChanged(visibility)
-        if (visibility == VISIBLE) startCollectingData() else stopCollectingData()
+        if (visibility == VISIBLE) {
+            startCollectingData()
+            // Show selection action mode if selection is visible
+            updateSelectionActionModeVisibility()
+        } else {
+            stopCollectingData()
+            onSelectionUiSignal(SelectionUiSignal.ToggleActionMode(show = false))
+        }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stopCollectingData()
+        onSelectionUiSignal(SelectionUiSignal.ToggleActionMode(show = false))
         awaitingFirstLayout = true
         pageManager?.cleanup()
     }
