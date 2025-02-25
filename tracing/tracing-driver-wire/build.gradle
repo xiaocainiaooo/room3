@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
+    id("com.squareup.wire")
 }
 
 androidXMultiplatform {
@@ -33,10 +34,9 @@ androidXMultiplatform {
     sourceSets {
         commonMain {
             dependencies {
-                api(libs.kotlinStdlib)
-                api(libs.kotlinCoroutinesCore)
-                api(libs.androidx.annotation)
-                implementation("androidx.collection:collection:1.4.5")
+                api(project(":tracing:tracing-driver"))
+                implementation(libs.wireRuntime)
+                implementation(libs.okio)
             }
         }
         commonTest {
@@ -77,6 +77,21 @@ androidXMultiplatform {
     }
 }
 
+// Workarounds for Wire's plugin not setting code generation directory as task output correctly
+// See https://github.com/square/wire/issues/3199
+tasks.named("multiplatformSourceJar").configure {
+    dependsOn(tasks.named("generateCommonMainProtos"))
+}
+
+wire {
+    kotlin {
+        mutableTypes = true
+    }
+    sourcePath {
+        srcDir("src/commonMain/proto")
+    }
+}
+
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         // Make sure to opt-in to expect-actual classes.
@@ -88,14 +103,14 @@ tasks.withType(KotlinCompile).configureEach {
 }
 
 androidx {
-    name = "Tracing Driver"
+    name = "Tracing Driver Wire"
     type = SoftwareType.SNAPSHOT_ONLY_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
     inceptionYear = "2024"
-    description = "AndroidX Tracing Driver"
+    description = "AndroidX Tracing Driver Wire"
     metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_2_0
 }
 
 android {
-    namespace = "androidx.tracing.driver"
+    namespace = "androidx.tracing.driver.wire"
 }

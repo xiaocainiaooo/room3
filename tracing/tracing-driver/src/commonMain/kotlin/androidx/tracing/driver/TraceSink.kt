@@ -16,10 +16,8 @@
 
 package androidx.tracing.driver
 
-import okio.Closeable
-
 /** A sink that we can write [PooledTracePacketArray]s to. */
-public abstract class TraceSink : Closeable {
+public abstract class TraceSink : AutoCloseable {
     public abstract fun enqueue(pooledPacketArray: PooledTracePacketArray)
 
     public abstract fun flush()

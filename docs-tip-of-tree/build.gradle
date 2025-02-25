@@ -334,6 +334,7 @@ dependencies {
     docs(project(":text:text-vertical"))
     kmpDocs(project(":tracing:tracing"))
     kmpDocs(project(":tracing:tracing-driver"))
+    kmpDocs(project(":tracing:tracing-driver-wire"))
     docs(project(":tracing:tracing-ktx"))
     docs(project(":tracing:tracing-perfetto"))
     docs(project(":tracing:tracing-perfetto-handshake"))

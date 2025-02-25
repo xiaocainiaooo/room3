@@ -16,8 +16,6 @@
 
 package androidx.tracing.driver
 
-import perfetto.protos.MutableTracePacket
-
 public class PooledTracePacketArray
 internal constructor(
     owner: Pool<PooledTracePacketArray>,
@@ -27,16 +25,17 @@ internal constructor(
      *
      * This is an Array to simplify data access.
      */
-    @JvmField internal val packets: Array<TraceEvent>,
+    @JvmField public val packets: Array<TraceEvent>,
 
     /**
-     * Number of items present in [packets] with valid data - all others vhave been reset with
-     * [MutableTracePacket.reset]
+     * Number of items present in [packets] with valid data - all others have been reset with
+     * [TraceEvent.reset]
      */
-    // @Suppress("MutableBareField") // internal, on critical tracing path
-    @JvmField internal var fillCount: Int,
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var fillCount: Int,
 ) : Poolable<PooledTracePacketArray>(owner) {
-    internal inline fun forEach(block: (packet: TraceEvent) -> Unit) {
+    public inline fun forEach(block: (packet: TraceEvent) -> Unit) {
         repeat(fillCount) { block(packets[it]) }
     }
 

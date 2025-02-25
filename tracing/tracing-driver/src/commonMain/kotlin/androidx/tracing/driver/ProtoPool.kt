@@ -24,8 +24,9 @@ import androidx.annotation.RestrictTo
 // The size of the pool
 private const val TRACE_PACKET_POOL_ARRAY_POOL_SIZE = 32
 
-internal const val INVALID_INT = -1
-internal const val INVALID_LONG = -1L
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val INVALID_INT: Int = -1
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val INVALID_LONG: Long = -1L
 
 /** The uber proto pool that knows how to create all the necessary protos. */
 internal class ProtoPool(internal val isDebug: Boolean) {

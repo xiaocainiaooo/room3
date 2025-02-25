@@ -32,7 +32,7 @@ plugins {
 
 dependencies {
     androidTestImplementation(project(":benchmark:benchmark-junit4"))
-    androidTestImplementation(project(":tracing:tracing-driver"))
+    androidTestImplementation(project(":tracing:tracing-driver-wire"))
     androidTestImplementation(project(":tracing:tracing-ktx"))
     androidTestImplementation(project(":tracing:tracing-perfetto"))
     androidTestImplementation(project(":tracing:tracing-perfetto-binary"))

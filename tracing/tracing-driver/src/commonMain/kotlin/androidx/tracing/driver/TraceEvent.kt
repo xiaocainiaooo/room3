@@ -34,21 +34,46 @@ internal const val TRACE_EVENT_TYPE_COUNTER: Int = 4
  * them.
  */
 @Suppress("NOTHING_TO_INLINE")
-internal class TraceEvent(
+public class TraceEvent
+internal constructor(
     /**
      * Must be one of [TRACE_EVENT_TYPE_UNDEFINED], [TRACE_EVENT_TYPE_INSTANT],
      * [TRACE_EVENT_TYPE_BEGIN], [TRACE_EVENT_TYPE_END], [TRACE_EVENT_TYPE_COUNTER]
      */
-    @JvmField var type: Int,
-    @JvmField var trackUuid: Long,
-    @JvmField var timestamp: Long,
-    @JvmField var name: String?,
-    @JvmField var counterDoubleValue: Double?,
-    @JvmField var counterLongValue: Long?,
-    @JvmField var flowIds: List<Long>,
-    @JvmField var trackDescriptor: TrackDescriptor?,
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var type: Int,
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var trackUuid: Long,
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var timestamp: Long,
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var name: String?,
+    @field:Suppress(
+        "MutableBareField", // public / mutable to minimize overhead
+        "AutoBoxing", // temporary
+    )
+    @JvmField
+    public var counterDoubleValue: Double?,
+    @field:Suppress(
+        "MutableBareField", // public / mutable to minimize overhead
+        "AutoBoxing", // temporary
+    )
+    @JvmField
+    public var counterLongValue: Long?,
+
+    // ideally this would be a array to avoid boxing, but proto libs consume longs anyway :|
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var flowIds: List<Long>,
+    @field:Suppress("MutableBareField") // public / mutable to minimize overhead
+    @JvmField
+    public var trackDescriptor: TrackDescriptor?,
 ) {
-    internal constructor() :
+    public constructor() :
         this(
             type = INVALID_INT,
             trackUuid = INVALID_LONG,
@@ -114,7 +139,7 @@ internal class TraceEvent(
         counterDoubleValue = value
     }
 
-    fun reset() {
+    public fun reset() {
         type = INVALID_INT
         trackUuid = INVALID_LONG
         timestamp = INVALID_LONG
