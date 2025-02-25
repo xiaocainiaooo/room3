@@ -654,10 +654,10 @@ package androidx.wear.compose.foundation.lazy {
 package androidx.wear.compose.foundation.pager {
 
   public final class PagerDefaults {
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.foundation.GestureInclusion gestureInclusion(androidx.wear.compose.foundation.pager.PagerState pagerState, optional float edgeZoneFraction);
     method public int getBeyondViewportPageCount();
     method public float getLeftEdgeZoneFraction();
     method public androidx.compose.animation.core.AnimationSpec<java.lang.Float> getSnapAnimationSpec();
-    method public androidx.wear.compose.foundation.GestureInclusion ignoreLeftEdgeOnFirstPage(androidx.wear.compose.foundation.pager.PagerState pagerState, optional float edgeZoneFraction);
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.TargetedFlingBehavior snapFlingBehavior(androidx.wear.compose.foundation.pager.PagerState state, optional int maxFlingPages, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, optional @FloatRange(from=0.0, to=1.0) float snapPositionalThreshold);
     property public int BeyondViewportPageCount;
     property public float LeftEdgeZoneFraction;
