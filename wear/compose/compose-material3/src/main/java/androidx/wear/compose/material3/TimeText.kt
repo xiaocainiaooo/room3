@@ -164,7 +164,7 @@ public object TimeTextDefaults {
     @Composable
     public fun timeTextStyle(
         background: Color = Color.Unspecified,
-        color: Color = MaterialTheme.colorScheme.onBackground,
+        color: Color = MaterialTheme.colorScheme.onBackground.setLuminance(80f),
         fontSize: TextUnit = TextUnit.Unspecified,
     ): CurvedTextStyle =
         MaterialTheme.typography.arcMedium +
