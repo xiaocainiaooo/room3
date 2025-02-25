@@ -26,10 +26,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.NavigationRailComponentOverride
-import androidx.compose.material3.NavigationRailComponentOverrideContext
 import androidx.compose.material3.NavigationRailDefaults
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailOverride
+import androidx.compose.material3.NavigationRailOverrideScope
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -40,7 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.xr.compose.material3.XrNavigationRailComponentOverride.NavigationRail
+import androidx.xr.compose.material3.XrNavigationRailOverride.NavigationRail
 import androidx.xr.compose.spatial.EdgeOffset
 import androidx.xr.compose.spatial.Orbiter
 import androidx.xr.compose.spatial.OrbiterDefaults
@@ -133,12 +133,12 @@ private object XrNavigationRailTokens {
     val ContainerWidth = 96.0.dp
 }
 
-/** [NavigationRailComponentOverride] that uses the XR-specific [NavigationRail]. */
+/** [NavigationRailOverride] that uses the XR-specific [NavigationRail]. */
 @ExperimentalMaterial3XrApi
 @OptIn(ExperimentalMaterial3ComponentOverrideApi::class)
-internal object XrNavigationRailComponentOverride : NavigationRailComponentOverride {
+internal object XrNavigationRailOverride : NavigationRailOverride {
     @Composable
-    override fun NavigationRailComponentOverrideContext.NavigationRail() {
+    override fun NavigationRailOverrideScope.NavigationRail() {
         NavigationRail(
             modifier = modifier,
             containerColor = containerColor,

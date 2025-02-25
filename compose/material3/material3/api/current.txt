@@ -743,14 +743,14 @@ package androidx.compose.material3 {
     field public static final androidx.compose.material3.DefaultBasicAlertDialogOverride INSTANCE;
   }
 
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class DefaultNavigationBarComponentOverride implements androidx.compose.material3.NavigationBarComponentOverride {
-    method @androidx.compose.runtime.Composable public void NavigationBar(androidx.compose.material3.NavigationBarComponentOverrideContext);
-    field public static final androidx.compose.material3.DefaultNavigationBarComponentOverride INSTANCE;
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class DefaultNavigationBarOverride implements androidx.compose.material3.NavigationBarOverride {
+    method @androidx.compose.runtime.Composable public void NavigationBar(androidx.compose.material3.NavigationBarOverrideScope);
+    field public static final androidx.compose.material3.DefaultNavigationBarOverride INSTANCE;
   }
 
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class DefaultNavigationRailComponentOverride implements androidx.compose.material3.NavigationRailComponentOverride {
-    method @androidx.compose.runtime.Composable public void NavigationRail(androidx.compose.material3.NavigationRailComponentOverrideContext);
-    field public static final androidx.compose.material3.DefaultNavigationRailComponentOverride INSTANCE;
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class DefaultNavigationRailOverride implements androidx.compose.material3.NavigationRailOverride {
+    method @androidx.compose.runtime.Composable public void NavigationRail(androidx.compose.material3.NavigationRailOverrideScope);
+    field public static final androidx.compose.material3.DefaultNavigationRailOverride INSTANCE;
   }
 
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class DisplayMode {
@@ -1652,25 +1652,6 @@ package androidx.compose.material3 {
   public interface MultiChoiceSegmentedButtonRowScope extends androidx.compose.foundation.layout.RowScope {
   }
 
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public interface NavigationBarComponentOverride {
-    method @androidx.compose.runtime.Composable public void NavigationBar(androidx.compose.material3.NavigationBarComponentOverrideContext);
-  }
-
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class NavigationBarComponentOverrideContext {
-    method public long getContainerColor();
-    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.RowScope,kotlin.Unit> getContent();
-    method public long getContentColor();
-    method public androidx.compose.ui.Modifier getModifier();
-    method public float getTonalElevation();
-    method public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
-    property public long containerColor;
-    property public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.RowScope,kotlin.Unit> content;
-    property public long contentColor;
-    property public androidx.compose.ui.Modifier modifier;
-    property public float tonalElevation;
-    property public androidx.compose.foundation.layout.WindowInsets windowInsets;
-  }
-
   public final class NavigationBarDefaults {
     method @androidx.compose.runtime.Composable public long getContainerColor();
     method public float getElevation();
@@ -1710,8 +1691,27 @@ package androidx.compose.material3 {
   public final class NavigationBarKt {
     method @androidx.compose.runtime.Composable public static void NavigationBar(optional androidx.compose.ui.Modifier modifier, optional long containerColor, optional long contentColor, optional float tonalElevation, optional androidx.compose.foundation.layout.WindowInsets windowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void NavigationBarItem(androidx.compose.foundation.layout.RowScope, boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional boolean alwaysShowLabel, optional androidx.compose.material3.NavigationBarItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationBarComponentOverride> getLocalNavigationBarComponentOverride();
-    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationBarComponentOverride> LocalNavigationBarComponentOverride;
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationBarOverride> getLocalNavigationBarOverride();
+    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationBarOverride> LocalNavigationBarOverride;
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public interface NavigationBarOverride {
+    method @androidx.compose.runtime.Composable public void NavigationBar(androidx.compose.material3.NavigationBarOverrideScope);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class NavigationBarOverrideScope {
+    method public long getContainerColor();
+    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.RowScope,kotlin.Unit> getContent();
+    method public long getContentColor();
+    method public androidx.compose.ui.Modifier getModifier();
+    method public float getTonalElevation();
+    method public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
+    property public long containerColor;
+    property public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.RowScope,kotlin.Unit> content;
+    property public long contentColor;
+    property public androidx.compose.ui.Modifier modifier;
+    property public float tonalElevation;
+    property public androidx.compose.foundation.layout.WindowInsets windowInsets;
   }
 
   @androidx.compose.runtime.Stable public interface NavigationDrawerItemColors {
@@ -1773,25 +1773,6 @@ package androidx.compose.material3 {
     property public int Top;
   }
 
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public interface NavigationRailComponentOverride {
-    method @androidx.compose.runtime.Composable public void NavigationRail(androidx.compose.material3.NavigationRailComponentOverrideContext);
-  }
-
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class NavigationRailComponentOverrideContext {
-    method public long getContainerColor();
-    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> getContent();
-    method public long getContentColor();
-    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? getHeader();
-    method public androidx.compose.ui.Modifier getModifier();
-    method public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
-    property public long containerColor;
-    property public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content;
-    property public long contentColor;
-    property public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? header;
-    property public androidx.compose.ui.Modifier modifier;
-    property public androidx.compose.foundation.layout.WindowInsets windowInsets;
-  }
-
   public final class NavigationRailDefaults {
     method @androidx.compose.runtime.Composable public long getContainerColor();
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
@@ -1829,8 +1810,27 @@ package androidx.compose.material3 {
   public final class NavigationRailKt {
     method @androidx.compose.runtime.Composable public static void NavigationRail(optional androidx.compose.ui.Modifier modifier, optional long containerColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void NavigationRailItem(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional boolean alwaysShowLabel, optional androidx.compose.material3.NavigationRailItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationRailComponentOverride> getLocalNavigationRailComponentOverride();
-    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationRailComponentOverride> LocalNavigationRailComponentOverride;
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationRailOverride> getLocalNavigationRailOverride();
+    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationRailOverride> LocalNavigationRailOverride;
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public interface NavigationRailOverride {
+    method @androidx.compose.runtime.Composable public void NavigationRail(androidx.compose.material3.NavigationRailOverrideScope);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi public final class NavigationRailOverrideScope {
+    method public long getContainerColor();
+    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> getContent();
+    method public long getContentColor();
+    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? getHeader();
+    method public androidx.compose.ui.Modifier getModifier();
+    method public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
+    property public long containerColor;
+    property public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content;
+    property public long contentColor;
+    property public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? header;
+    property public androidx.compose.ui.Modifier modifier;
+    property public androidx.compose.foundation.layout.WindowInsets windowInsets;
   }
 
   @androidx.compose.runtime.Immutable public final class OutlinedTextFieldDefaults {

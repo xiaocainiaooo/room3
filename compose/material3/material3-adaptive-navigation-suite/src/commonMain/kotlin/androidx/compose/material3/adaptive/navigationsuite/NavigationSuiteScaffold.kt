@@ -171,19 +171,71 @@ fun NavigationSuiteScaffold(
     state: NavigationSuiteScaffoldState = rememberNavigationSuiteScaffoldState(),
     content: @Composable () -> Unit = {},
 ) {
-    val context =
-        NavigationSuiteScaffoldComponentOverrideContext(
-            navigationSuiteItems = navigationSuiteItems,
-            modifier = modifier,
-            layoutType = layoutType,
-            navigationSuiteColors = navigationSuiteColors,
-            containerColor = containerColor,
-            contentColor = contentColor,
-            state = state,
-            content = content
-        )
-    with(LocalNavigationSuiteScaffoldComponentOverride.current) {
-        context.NavigationSuiteScaffold()
+    with(LocalNavigationSuiteScaffoldOverride.current) {
+        NavigationSuiteScaffoldOverrideScope(
+                navigationSuiteItems = navigationSuiteItems,
+                modifier = modifier,
+                layoutType = layoutType,
+                navigationSuiteColors = navigationSuiteColors,
+                containerColor = containerColor,
+                contentColor = contentColor,
+                state = state,
+                content = content
+            )
+            .NavigationSuiteScaffold()
+    }
+}
+
+/**
+ * This override provides the default behavior of the [NavigationSuiteScaffold] component.
+ *
+ * [NavigationSuiteScaffoldOverride] used when no override is specified.
+ */
+@ExperimentalMaterial3AdaptiveComponentOverrideApi
+object DefaultNavigationSuiteScaffoldOverride : NavigationSuiteScaffoldOverride {
+    @Composable
+    override fun NavigationSuiteScaffoldOverrideScope.NavigationSuiteScaffold() {
+        Surface(modifier = modifier, color = containerColor, contentColor = contentColor) {
+            NavigationSuiteScaffoldLayout(
+                navigationSuite = {
+                    NavigationSuite(
+                        layoutType = layoutType,
+                        colors = navigationSuiteColors,
+                        content = navigationSuiteItems
+                    )
+                },
+                state = state,
+                layoutType = layoutType,
+                content = {
+                    Box(
+                        Modifier.consumeWindowInsets(
+                            if (
+                                state.currentValue == NavigationSuiteScaffoldValue.Hidden &&
+                                    !state.isAnimating
+                            ) {
+                                NoWindowInsets
+                            } else {
+                                when (layoutType) {
+                                    NavigationSuiteType.NavigationBar ->
+                                        NavigationBarDefaults.windowInsets.only(
+                                            WindowInsetsSides.Bottom
+                                        )
+                                    NavigationSuiteType.NavigationRail ->
+                                        NavigationRailDefaults.windowInsets.only(
+                                            WindowInsetsSides.Start
+                                        )
+                                    NavigationSuiteType.NavigationDrawer ->
+                                        DrawerDefaults.windowInsets.only(WindowInsetsSides.Start)
+                                    else -> NoWindowInsets
+                                }
+                            }
+                        )
+                    ) {
+                        content()
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -858,12 +910,12 @@ private val AnimationSpec: SpringSpec<Float> =
  * component.
  *
  * To override this component, implement the member function of this interface, then provide the
- * implementation to [LocalNavigationSuiteScaffoldComponentOverride] in the Compose hierarchy.
+ * implementation to [LocalNavigationSuiteScaffoldOverride] in the Compose hierarchy.
  */
 @ExperimentalMaterial3AdaptiveComponentOverrideApi
-interface NavigationSuiteScaffoldComponentOverride {
+interface NavigationSuiteScaffoldOverride {
     /** Behavior function that is called by the [NavigationSuiteScaffold] component. */
-    @Composable fun NavigationSuiteScaffoldComponentOverrideContext.NavigationSuiteScaffold()
+    @Composable fun NavigationSuiteScaffoldOverrideScope.NavigationSuiteScaffold()
 }
 
 /**
@@ -884,7 +936,7 @@ interface NavigationSuiteScaffoldComponentOverride {
  * @param content the content of your screen
  */
 @ExperimentalMaterial3AdaptiveComponentOverrideApi
-class NavigationSuiteScaffoldComponentOverrideContext
+class NavigationSuiteScaffoldOverrideScope
 internal constructor(
     val navigationSuiteItems: NavigationSuiteScope.() -> Unit,
     val modifier: Modifier = Modifier,
@@ -896,67 +948,12 @@ internal constructor(
     val content: @Composable () -> Unit = {},
 )
 
-/**
- * [NavigationSuiteScaffoldComponentOverride] used when no override is specified.
- *
- * This override provides the default behavior of the [NavigationSuiteScaffold] component.
- */
-@ExperimentalMaterial3AdaptiveComponentOverrideApi
-object DefaultNavigationSuiteScaffoldComponentOverride : NavigationSuiteScaffoldComponentOverride {
-    @Composable
-    override fun NavigationSuiteScaffoldComponentOverrideContext.NavigationSuiteScaffold() {
-        Surface(modifier = modifier, color = containerColor, contentColor = contentColor) {
-            NavigationSuiteScaffoldLayout(
-                navigationSuite = {
-                    NavigationSuite(
-                        layoutType = layoutType,
-                        colors = navigationSuiteColors,
-                        content = navigationSuiteItems
-                    )
-                },
-                state = state,
-                layoutType = layoutType,
-                content = {
-                    Box(
-                        Modifier.consumeWindowInsets(
-                            if (
-                                state.currentValue == NavigationSuiteScaffoldValue.Hidden &&
-                                    !state.isAnimating
-                            ) {
-                                NoWindowInsets
-                            } else {
-                                when (layoutType) {
-                                    NavigationSuiteType.NavigationBar ->
-                                        NavigationBarDefaults.windowInsets.only(
-                                            WindowInsetsSides.Bottom
-                                        )
-                                    NavigationSuiteType.NavigationRail ->
-                                        NavigationRailDefaults.windowInsets.only(
-                                            WindowInsetsSides.Start
-                                        )
-                                    NavigationSuiteType.NavigationDrawer ->
-                                        DrawerDefaults.windowInsets.only(WindowInsetsSides.Start)
-                                    else -> NoWindowInsets
-                                }
-                            }
-                        )
-                    ) {
-                        content()
-                    }
-                }
-            )
-        }
-    }
-}
-
-/**
- * CompositionLocal containing the currently-selected [NavigationSuiteScaffoldComponentOverride].
- */
+/** CompositionLocal containing the currently-selected [NavigationSuiteScaffoldOverride]. */
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalMaterial3AdaptiveComponentOverrideApi
 @ExperimentalMaterial3AdaptiveComponentOverrideApi
-val LocalNavigationSuiteScaffoldComponentOverride:
-    ProvidableCompositionLocal<NavigationSuiteScaffoldComponentOverride> =
+val LocalNavigationSuiteScaffoldOverride:
+    ProvidableCompositionLocal<NavigationSuiteScaffoldOverride> =
     compositionLocalOf {
-        DefaultNavigationSuiteScaffoldComponentOverride
+        DefaultNavigationSuiteScaffoldOverride
     }
