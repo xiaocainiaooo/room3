@@ -623,7 +623,8 @@ public fun ScalingLazyColumn(
                 modifier.rotaryScrollable(
                     behavior = rotaryScrollableBehavior,
                     focusRequester = rememberActiveFocusRequester(),
-                    reverseDirection = reverseLayout
+                    reverseDirection = reverseLayout,
+                    overscrollEffect = overscrollEffect
                 )
             else modifier,
         propagateMinConstraints = true

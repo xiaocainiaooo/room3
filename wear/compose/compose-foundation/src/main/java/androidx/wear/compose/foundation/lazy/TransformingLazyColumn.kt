@@ -161,6 +161,7 @@ public fun TransformingLazyColumn(
                         Modifier.rotaryScrollable(
                             behavior = rotaryScrollableBehavior,
                             focusRequester = rememberActiveFocusRequester(),
+                            overscrollEffect = overscrollEffect
                         )
                     else Modifier
                 )
