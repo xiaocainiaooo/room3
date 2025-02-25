@@ -3,7 +3,7 @@ package androidx.camera.viewfinder.compose {
 
   public interface CoordinateTransformer {
     method public float[] getTransformMatrix();
-    method public long transform(long);
+    method public default long transform(long);
     property public abstract float[] transformMatrix;
   }
 
@@ -12,6 +12,7 @@ package androidx.camera.viewfinder.compose {
   }
 
   public final class IdentityCoordinateTransformer implements androidx.camera.viewfinder.compose.CoordinateTransformer {
+    method public float[] getTransformMatrix();
     property public float[] transformMatrix;
     field public static final androidx.camera.viewfinder.compose.IdentityCoordinateTransformer INSTANCE;
   }
