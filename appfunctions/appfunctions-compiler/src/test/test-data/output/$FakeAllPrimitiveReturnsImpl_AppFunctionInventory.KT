@@ -54,8 +54,6 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
         ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#intArrayReturn" to
         ComTestdataFakeAllPrimitiveReturnsImplIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#byteArrayListReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplByteArrayListReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#longArrayReturn" to
         ComTestdataFakeAllPrimitiveReturnsImplLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#floatArrayReturn" to
@@ -68,8 +66,6 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
         ComTestdataFakeAllPrimitiveReturnsImplBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringListReturn" to
         ComTestdataFakeAllPrimitiveReturnsImplNullableStringListReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayListReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayListReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntArrayReturn" to
         ComTestdataFakeAllPrimitiveReturnsImplNullableIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongArrayReturn" to
@@ -80,8 +76,6 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
         ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatArrayReturn" to
         ComTestdataFakeAllPrimitiveReturnsImplNullableFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayItemListReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayItemListReturnMetadataObject.APP_FUNCTION_METADATA,
     "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringItemListReturn" to
         ComTestdataFakeAllPrimitiveReturnsImplNullableStringItemListReturnMetadataObject.APP_FUNCTION_METADATA,
   )
@@ -664,47 +658,6 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
         )
   }
 
-  private object ComTestdataFakeAllPrimitiveReturnsImplByteArrayListReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
-
-    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
-    )
-
-    private val ARRAY_RESPONSE_VALUE_TYPE_PRIMITIVE_ITEM_TYPE: AppFunctionPrimitiveTypeMetadata =
-        AppFunctionPrimitiveTypeMetadata(
-            type = 2,
-            isNullable = false
-        )
-
-    private val ARRAY_RESPONSE_VALUE_TYPE: AppFunctionArrayTypeMetadata =
-        AppFunctionArrayTypeMetadata(
-            itemType = ARRAY_RESPONSE_VALUE_TYPE_PRIMITIVE_ITEM_TYPE,
-            isNullable = false
-        )
-
-    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
-            valueType = ARRAY_RESPONSE_VALUE_TYPE
-        )
-
-    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
-        mapOf(
-      )
-
-    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
-            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
-        )
-
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
-            id = "com.testdata.FakeAllPrimitiveReturnsImpl#byteArrayListReturn",
-            isEnabledByDefault = true,
-            schema =  SCHEMA_METADATA,
-            parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA,
-            components = COMPONENTS_METADATA
-        )
-  }
-
   private object ComTestdataFakeAllPrimitiveReturnsImplLongArrayReturnMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
         "fake_schema_category", name="allPrimitiveReturns", version=1)
@@ -951,47 +904,6 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
         )
   }
 
-  private object ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayListReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
-
-    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
-    )
-
-    private val ARRAY_RESPONSE_VALUE_TYPE_PRIMITIVE_ITEM_TYPE: AppFunctionPrimitiveTypeMetadata =
-        AppFunctionPrimitiveTypeMetadata(
-            type = 2,
-            isNullable = false
-        )
-
-    private val ARRAY_RESPONSE_VALUE_TYPE: AppFunctionArrayTypeMetadata =
-        AppFunctionArrayTypeMetadata(
-            itemType = ARRAY_RESPONSE_VALUE_TYPE_PRIMITIVE_ITEM_TYPE,
-            isNullable = true
-        )
-
-    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
-            valueType = ARRAY_RESPONSE_VALUE_TYPE
-        )
-
-    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
-        mapOf(
-      )
-
-    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
-            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
-        )
-
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
-            id = "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayListReturn",
-            isEnabledByDefault = true,
-            schema =  SCHEMA_METADATA,
-            parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA,
-            components = COMPONENTS_METADATA
-        )
-  }
-
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableIntArrayReturnMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
         "fake_schema_category", name="allPrimitiveReturns", version=1)
@@ -1189,48 +1101,6 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
 
     public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
             id = "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatArrayReturn",
-            isEnabledByDefault = true,
-            schema =  SCHEMA_METADATA,
-            parameters = PARAMETER_METADATA_LIST,
-            response = RESPONSE_METADATA,
-            components = COMPONENTS_METADATA
-        )
-  }
-
-  private object ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayItemListReturnMetadataObject
-      {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
-
-    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
-    )
-
-    private val ARRAY_RESPONSE_VALUE_TYPE_PRIMITIVE_ITEM_TYPE: AppFunctionPrimitiveTypeMetadata =
-        AppFunctionPrimitiveTypeMetadata(
-            type = 2,
-            isNullable = true
-        )
-
-    private val ARRAY_RESPONSE_VALUE_TYPE: AppFunctionArrayTypeMetadata =
-        AppFunctionArrayTypeMetadata(
-            itemType = ARRAY_RESPONSE_VALUE_TYPE_PRIMITIVE_ITEM_TYPE,
-            isNullable = false
-        )
-
-    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
-            valueType = ARRAY_RESPONSE_VALUE_TYPE
-        )
-
-    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
-        mapOf(
-      )
-
-    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
-            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
-        )
-
-    public val APP_FUNCTION_METADATA: AppFunctionMetadata = AppFunctionMetadata(
-            id = "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayItemListReturn",
             isEnabledByDefault = true,
             schema =  SCHEMA_METADATA,
             parameters = PARAMETER_METADATA_LIST,
