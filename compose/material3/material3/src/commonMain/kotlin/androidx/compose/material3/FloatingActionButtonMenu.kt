@@ -41,6 +41,7 @@ import androidx.compose.material3.tokens.FabPrimaryContainerTokens
 import androidx.compose.material3.tokens.MotionSchemeKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +50,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
@@ -63,15 +65,21 @@ import androidx.compose.ui.layout.HorizontalRuler
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.ParentDataModifierNode
+import androidx.compose.ui.node.SemanticsModifierNode
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
@@ -168,7 +176,8 @@ private fun FloatingActionButtonMenuItemColumn(
 
     Layout(
         modifier =
-            Modifier.semantics {
+            Modifier.clipToBounds()
+                .semantics {
                     isTraversalGroup = true
                     traversalIndex = -0.9f
                 }
@@ -231,12 +240,13 @@ private fun FloatingActionButtonMenuItemColumn(
                 }
             }
         }
-        layout(width, height, rulers = { MenuItemRuler provides height - visibleHeight }) {
+
+        val finalHeight = if (placeables.fastAny { item -> item.isVisible }) height else 0
+        layout(width, finalHeight, rulers = { MenuItemRuler provides height - visibleHeight }) {
             var y = 0
             placeables.fastForEachIndexed { index, placeable ->
                 val x = horizontalAlignment.align(placeable.width, width, layoutDirection)
                 placeable.place(x, y)
-
                 y += placeable.height
                 if (index < placeables.size - 1) {
                     y += verticalSpacing
@@ -285,19 +295,12 @@ fun FloatingActionButtonMenuScope.FloatingActionButtonMenuItem(
     val coroutineScope = rememberCoroutineScope()
 
     var isVisible by remember { mutableStateOf(false) }
-    val hideSemantics =
-        if (isVisible) {
-            Modifier
-        } else {
-            Modifier.clearAndSetSemantics {}
-        }
-
     // Disable min interactive component size because it interferes with the item expand
     // animation and we know we are meeting the size requirements below.
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
         Surface(
             modifier =
-                modifier.then(hideSemantics).layout { measurable, constraints ->
+                modifier.itemVisible({ isVisible }).layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
 
                     layout(placeable.width, placeable.height) {
@@ -604,6 +607,56 @@ interface ToggleFloatingActionButtonScope {
 
     val checkedProgress: Float
 }
+
+@Stable
+private fun Modifier.itemVisible(isVisible: () -> Boolean) =
+    this then MenuItemVisibleElement(isVisible = isVisible)
+
+private class MenuItemVisibleElement(private val isVisible: () -> Boolean) :
+    ModifierNodeElement<MenuItemVisibilityModifier>() {
+    override fun create() = MenuItemVisibilityModifier(isVisible)
+
+    override fun update(node: MenuItemVisibilityModifier) {
+        node.visible = isVisible
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "itemVisible"
+        value = isVisible()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as MenuItemVisibleElement
+
+        return isVisible === other.isVisible
+    }
+
+    override fun hashCode(): Int {
+        return isVisible.hashCode()
+    }
+}
+
+private class MenuItemVisibilityModifier(
+    isVisible: () -> Boolean,
+) : ParentDataModifierNode, SemanticsModifierNode, Modifier.Node() {
+
+    var visible: () -> Boolean = isVisible
+
+    override fun Density.modifyParentData(parentData: Any?): Any? {
+        return this@MenuItemVisibilityModifier
+    }
+
+    override val shouldClearDescendantSemantics: Boolean
+        get() = !visible()
+
+    override fun SemanticsPropertyReceiver.applySemantics() {}
+}
+
+private val Placeable.isVisible: Boolean
+    get() = (this.parentData as? MenuItemVisibilityModifier)?.visible?.invoke() != false
 
 private val FabInitialSize = FabBaselineTokens.ContainerHeight
 private val FabInitialCornerRadius = 16.dp
