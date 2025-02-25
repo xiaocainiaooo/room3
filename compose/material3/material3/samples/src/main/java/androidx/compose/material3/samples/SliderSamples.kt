@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -302,15 +303,7 @@ fun SliderWithTrackIconsSample() {
 @Composable
 fun VerticalSliderSample() {
     val coroutineScope = rememberCoroutineScope()
-    val sliderState =
-        rememberSliderState(
-            steps = 9,
-            valueRange = 0f..100f,
-            onValueChangeFinished = {
-                // launch some business logic update with the state you hold
-                // viewModel.updateSelectedSliderValue(sliderPosition)
-            }
-        )
+    val sliderState = rememberSliderState(steps = 9, valueRange = 0f..100f)
     val snapAnimationSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
     var currentValue by rememberSaveable { mutableFloatStateOf(sliderState.value) }
     var animateJob: Job? by remember { mutableStateOf(null) }
@@ -344,7 +337,14 @@ fun VerticalSliderSample() {
         Spacer(Modifier.height(16.dp))
         VerticalSlider(
             state = sliderState,
-            modifier = Modifier.height(300.dp).align(Alignment.CenterHorizontally),
+            modifier =
+                Modifier.height(300.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .progressSemantics(
+                        currentValue,
+                        sliderState.valueRange.start..sliderState.valueRange.endInclusive,
+                        sliderState.steps
+                    ),
             interactionSource = interactionSource,
             track = {
                 SliderDefaults.Track(
