@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
-import androidx.privacysandbox.ui.core.SessionConstants
+import androidx.privacysandbox.ui.core.SessionData
 import java.util.concurrent.Executor
 
 public class MyUiInterfaceClientProxy(
@@ -20,14 +20,14 @@ public class MyUiInterfaceClientProxy(
 
     public override fun openSession(
         context: Context,
-        sessionConstants: SessionConstants,
+        sessionData: SessionData,
         initialWidth: Int,
         initialHeight: Int,
         isZOrderOnTop: Boolean,
         clientExecutor: Executor,
         client: SandboxedUiAdapter.SessionClient,
     ) {
-        sandboxedUiAdapter.openSession(context, sessionConstants, initialWidth, initialHeight,
+        sandboxedUiAdapter.openSession(context, sessionData, initialWidth, initialHeight,
                 isZOrderOnTop, clientExecutor, client)
     }
 }

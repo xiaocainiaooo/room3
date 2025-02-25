@@ -207,8 +207,8 @@ interface UiAdapterSpecs {
                             listOf(
                                 ParameterSpec(contextPropertyName, contextClass),
                                 ParameterSpec(
-                                    "sessionConstants",
-                                    ClassName("androidx.privacysandbox.ui.core", "SessionConstants")
+                                    "sessionData",
+                                    ClassName("androidx.privacysandbox.ui.core", "SessionData")
                                 ),
                                 ParameterSpec("initialWidth", Types.int.poetClassName()),
                                 ParameterSpec("initialHeight", Types.int.poetClassName()),
@@ -228,7 +228,7 @@ interface UiAdapterSpecs {
                             )
                         )
                         addStatement(
-                            "${adapterPropertyName}.openSession(%N, sessionConstants, initialWidth, " +
+                            "${adapterPropertyName}.openSession(%N, sessionData, initialWidth, " +
                                 "initialHeight, isZOrderOnTop, clientExecutor, client)",
                             contextPropertyName,
                         )
