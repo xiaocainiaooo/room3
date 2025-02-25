@@ -30,7 +30,9 @@ import androidx.appsearch.annotation.Document
     AppFunctionDataTypeMetadata.TYPE_LONG,
     AppFunctionDataTypeMetadata.TYPE_INT,
     AppFunctionDataTypeMetadata.TYPE_STRING,
-    AppFunctionDataTypeMetadata.TYPE_ARRAY
+    AppFunctionDataTypeMetadata.TYPE_ARRAY,
+    AppFunctionDataTypeMetadata.TYPE_REFERENCE,
+    AppFunctionDataTypeMetadata.TYPE_ALL_OF
 )
 @Retention(AnnotationRetention.SOURCE)
 internal annotation class AppFunctionDataType
@@ -81,6 +83,15 @@ internal constructor(
         internal const val TYPE_STRING: Int = 8
         /** Array type. The schema of the array is defined in a [AppFunctionArrayTypeMetadata] */
         internal const val TYPE_ARRAY: Int = 10
+        /**
+         * Reference type. The schema of the reference is defined in a
+         * [AppFunctionReferenceTypeMetadata]
+         */
+        internal const val TYPE_REFERENCE: Int = 11
+        /**
+         * All of type. The schema of the all of type is defined in a [AppFunctionAllOfTypeMetadata]
+         */
+        internal const val TYPE_ALL_OF: Int = 12
     }
 
     override fun equals(other: Any?): Boolean {
@@ -89,9 +100,7 @@ internal constructor(
 
         other as AppFunctionDataTypeMetadata
 
-        if (isNullable != other.isNullable) return false
-
-        return true
+        return isNullable == other.isNullable
     }
 
     override fun hashCode(): Int {
@@ -113,10 +122,7 @@ public class AppFunctionArrayTypeMetadata(
     override fun equals(other: Any?): Boolean {
         if (!super.equals(other)) return false
         if (other !is AppFunctionArrayTypeMetadata) return false
-
-        if (itemType != other.itemType) return false
-
-        return true
+        return itemType == other.itemType
     }
 
     override fun hashCode(): Int {
@@ -145,6 +151,131 @@ public class AppFunctionArrayTypeMetadata(
     public companion object {
         /** Array type. The schema of the array is defined in a [AppFunctionArrayTypeMetadata] */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_ARRAY
+    }
+}
+
+/**
+ * Defines the schema of a single object data type that is a composition of all of the other types
+ * in the [matchAll] list.
+ *
+ * An object of this type must match all of the [AppFunctionDataTypeMetadata] in the [matchAll]
+ * list. [matchAll] takes an array of object definitions that are composed together to a single
+ * object to form this type. Note that while this composition offers object type extensibility, it
+ * does not imply a hierarchy between the objects matched in [matchAll] i.e. the resulting single
+ * object is a flattened representation of all the other matched objects.
+ *
+ * For example, consider the following objects:
+ * ```
+ * open class Address (
+ *     open val street: String,
+ *     open val city: String,
+ *     open val state: String,
+ *     open val zipCode: String,
+ * )
+ *
+ * class PersonWithAddress (
+ *     override val street: String,
+ *     override val city: String,
+ *     override val state: String,
+ *     override val zipCode: String,
+ *     val name: String,
+ *     val age: Int,
+ * ) : Address(street, city, state, zipCode)
+ * ```
+ *
+ * The following [AppFunctionAllOfTypeMetadata] can be used to define a data type that matches
+ * PersonWithAddress.
+ *
+ * ```
+ * val personWithAddressType = AppFunctionAllOfTypeMetadata(
+ *     qualifiedName = "androidx.appfunctions.metadata.PersonWithAddress",
+ *     matchAll = listOf(
+ *         AppFunctionObjectTypeMetadata(
+ *             properties = mapOf(
+ *                 "street" to AppFunctionPrimitiveTypeMetadata(...),
+ *                 "city" to AppFunctionPrimitiveTypeMetadata(...),
+ *                 "state" to AppFunctionPrimitiveTypeMetadata(...),
+ *                 "zipCode" to AppFunctionPrimitiveTypeMetadata(...),
+ *             ),
+ *             required = listOf("street", "city", "state", "zipCode"),
+ *             qualifiedName = "androidx.appfunctions.metadata.Address",
+ *             isNullable = false,
+ *         ),
+ *         AppFunctionObjectTypeMetadata(
+ *             properties = mapOf(
+ *                 "name" to AppFunctionPrimitiveTypeMetadata(...),
+ *                 "age" to AppFunctionPrimitiveTypeMetadata(...),
+ *             ),
+ *             required = listOf("name", "age"),
+ *             qualifiedName = "androidx.appfunctions.metadata.PersonWithAddress",
+ *             isNullable = false,
+ *         ),
+ *     ),
+ *     isNullable = false,
+ * )
+ * ```
+ *
+ * This data type can be used to define the schema of an input or output type.
+ */
+public class AppFunctionAllOfTypeMetadata(
+    /** The list of data types that are composed. */
+    public val matchAll: List<AppFunctionDataTypeMetadata>,
+    /**
+     * The composed object's qualified name if available. For example,
+     * "androidx.appfunctions.metadata.PersonWithAddress".
+     *
+     * Use this value to set [androidx.appfunctions.AppFunctionData.qualifiedName] when trying to
+     * build the parameters for [androidx.appfunctions.ExecuteAppFunctionRequest].
+     */
+    public val qualifiedName: String?,
+
+    /** Whether this data type is nullable. */
+    isNullable: Boolean,
+) : AppFunctionDataTypeMetadata(isNullable = isNullable) {
+
+    override fun equals(other: Any?): Boolean {
+        if (!super.equals(other)) return false
+        if (other !is AppFunctionAllOfTypeMetadata) return false
+        if (qualifiedName != other.qualifiedName) return false
+        return matchAll == other.matchAll
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + matchAll.hashCode()
+        if (qualifiedName != null) {
+            result = 31 * result + qualifiedName.hashCode()
+        }
+        return result
+    }
+
+    override fun toString(): String {
+        return "AppFunctionAllOfTypeMetadata(matchAll=$matchAll, isNullable=$isNullable)"
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+        val allOfDocuments = matchAll.map { it.toAppFunctionDataTypeMetadataDocument() }
+        return AppFunctionDataTypeMetadataDocument(
+            type = TYPE,
+            allOf = allOfDocuments,
+            isNullable = isNullable,
+            objectQualifiedName = qualifiedName
+        )
+    }
+
+    public companion object {
+        /**
+         * All Of type.
+         *
+         * The [AppFunctionAllOfTypeMetadata] is used to define a component only data type object
+         * that is a composition of all of the types in the list.
+         *
+         * The [AppFunctionAllOfTypeMetadata] can contain either:
+         * * Top level [AppFunctionObjectTypeMetadata]
+         * * An [AppFunctionReferenceTypeMetadata] to an outer object metadata.
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_ALL_OF
     }
 }
 
@@ -235,10 +366,7 @@ public class AppFunctionReferenceTypeMetadata(
     override fun equals(other: Any?): Boolean {
         if (!super.equals(other)) return false
         if (other !is AppFunctionReferenceTypeMetadata) return false
-
-        if (referenceDataType != other.referenceDataType) return false
-
-        return true
+        return referenceDataType == other.referenceDataType
     }
 
     override fun hashCode(): Int {
@@ -267,7 +395,7 @@ public class AppFunctionReferenceTypeMetadata(
         /**
          * Object type. The schema of the object is defined in a [AppFunctionObjectTypeMetadata].
          */
-        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_OBJECT
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TYPE: Int = TYPE_REFERENCE
     }
 }
 
@@ -357,6 +485,14 @@ public data class AppFunctionDataTypeMetadataDocument(
      */
     @Document.DocumentProperty
     public val properties: List<AppFunctionNamedDataTypeMetadataDocument> = emptyList(),
+
+    /**
+     * If the [type] is [AppFunctionDataTypeMetadata.TYPE_ALL_OF], this specified the object's
+     * properties.
+     */
+    @Document.DocumentProperty
+    public val allOf: List<AppFunctionDataTypeMetadataDocument> = emptyList(),
+
     /**
      * If the [type] is [AppFunctionDataTypeMetadata.TYPE_OBJECT], this specified the object's
      * required properties' names.

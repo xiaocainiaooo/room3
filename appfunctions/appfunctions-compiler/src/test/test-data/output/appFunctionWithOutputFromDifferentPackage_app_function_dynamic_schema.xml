@@ -55,7 +55,7 @@
                     <dataTypeReference>com.testdata.anotherDifferentPackage.AnotherDiffPackageSerializable</dataTypeReference>
                     <id>unused</id>
                     <isNullable>false</isNullable>
-                    <type>3</type>
+                    <type>11</type>
                 </itemType>
                 <type>10</type>
             </valueType>
@@ -120,7 +120,7 @@
                 <dataTypeReference>com.testdata.differentPackage.DiffPackageSerializable</dataTypeReference>
                 <id>unused</id>
                 <isNullable>false</isNullable>
-                <type>3</type>
+                <type>11</type>
             </valueType>
         </response>
         <schema>
