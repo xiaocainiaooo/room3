@@ -115,7 +115,7 @@ private object ResourceHelper {
  *
  * @param newLuminance 0 <= newLuminance <= 100; invalid values are corrected.
  */
-private fun Color.setLuminance(@FloatRange(from = 0.0, to = 100.0) newLuminance: Float): Color {
+internal fun Color.setLuminance(@FloatRange(from = 0.0, to = 100.0) newLuminance: Float): Color {
     if ((newLuminance < 0.0001) or (newLuminance > 99.9999)) {
         return Color(CamUtils.argbFromLstar(newLuminance.toDouble()))
     }

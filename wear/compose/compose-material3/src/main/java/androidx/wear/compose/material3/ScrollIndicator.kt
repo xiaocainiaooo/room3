@@ -334,9 +334,9 @@ public object ScrollIndicatorDefaults {
         get() {
             return defaultScrollIndicatorColorsCached
                 ?: ScrollIndicatorColors(
-                        indicatorColor = fromToken(ColorSchemeKeyTokens.OnBackground),
-                        trackColor =
-                            fromToken(ColorSchemeKeyTokens.OnBackground).copy(alpha = 0.3f),
+                        indicatorColor =
+                            fromToken(ColorSchemeKeyTokens.OnBackground).setLuminance(80f),
+                        trackColor = fromToken(ColorSchemeKeyTokens.OnBackground).setLuminance(20f),
                     )
                     .also { defaultScrollIndicatorColorsCached = it }
         }
