@@ -33,9 +33,13 @@
       <item quantity="one">%d წამი</item>
     </plurals>
     <string name="wear_m3c_time_picker_period" msgid="5567285614451063120">"პერიოდი"</string>
+    <!-- no translation found for wear_m3c_time_picker_heading (1741225633698384262) -->
+    <skip />
     <string name="wear_m3c_date_picker_day" msgid="8932770593644830235">"დღე"</string>
     <string name="wear_m3c_date_picker_month" msgid="5962969526377479136">"თვე"</string>
     <string name="wear_m3c_date_picker_year" msgid="4697690064312147449">"წელი"</string>
+    <!-- no translation found for wear_m3c_date_picker_heading (1824308273028674826) -->
+    <skip />
     <string name="wear_m3c_picker_confirm_button_content_description" msgid="8440144719909288057">"დადასტურება"</string>
     <string name="wear_m3c_picker_next_button_content_description" msgid="3346011303652897029">"შემდეგი"</string>
     <string name="wear_m3c_slider_decrease_content_description" msgid="8242572466064289486">"შემცირება"</string>
