@@ -139,6 +139,8 @@ dependencies {
     docs(project(":credentials:credentials-play-services-auth"))
     docs(project(":credentials:credentials-e2ee"))
     docs(project(":credentials:credentials-play-services-e2ee"))
+    docs(project(":credentials:providerevents:providerevents"))
+    docs(project(":credentials:providerevents:providerevents-play-services"))
     docs(project(":credentials:registry:registry-digitalcredentials-mdoc"))
     docs(project(":credentials:registry:registry-digitalcredentials-preview"))
     docs(project(":credentials:registry:registry-provider"))
