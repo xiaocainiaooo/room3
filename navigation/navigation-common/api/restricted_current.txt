@@ -550,6 +550,10 @@ package androidx.navigation {
     property public String name;
   }
 
+  public final class NavUriKt {
+    method public static android.net.Uri parseStringAsNavUri(String uriString);
+  }
+
   public abstract class Navigator<D extends androidx.navigation.NavDestination> {
     ctor public Navigator();
     method public abstract D createDestination();
