@@ -36,7 +36,8 @@ class AppFunctionMetadataTest {
         val metadata1 =
             AppFunctionMetadata(
                 id = " id",
-                isEnabledByDefault = true,
+                packageName = "testPackage",
+                isEnabled = true,
                 schema = schema,
                 parameters = parameters,
                 response = response,
@@ -44,7 +45,8 @@ class AppFunctionMetadataTest {
         val metadata2 =
             AppFunctionMetadata(
                 id = " id",
-                isEnabledByDefault = true,
+                packageName = "testPackage",
+                isEnabled = true,
                 schema = schema,
                 parameters = parameters,
                 response = response,
@@ -52,7 +54,8 @@ class AppFunctionMetadataTest {
         val metadata3 =
             AppFunctionMetadata(
                 id = " id",
-                isEnabledByDefault = false,
+                packageName = "testPackage",
+                isEnabled = false,
                 schema = schema,
                 parameters = parameters,
                 response = response,
@@ -99,7 +102,7 @@ class AppFunctionMetadataTest {
                 )
             )
         val appFunctionMetadata =
-            AppFunctionMetadata(
+            CompileTimeAppFunctionMetadata(
                 id = id,
                 isEnabledByDefault = isEnabledByDefault,
                 schema = schemaMetadata,

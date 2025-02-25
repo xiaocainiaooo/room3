@@ -17,9 +17,9 @@
 package androidx.appfunctions.internal
 
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -67,10 +67,10 @@ class AggregatedAppFunctionInventoryTest {
     }
 
     private class Inventory1 : AppFunctionInventory {
-        override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> =
+        override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> =
             mapOf(
                 "androix.appfunctions.internal#test1" to
-                    AppFunctionMetadata(
+                    CompileTimeAppFunctionMetadata(
                         id = "androix.appfunctions.internal#test1",
                         isEnabledByDefault = false,
                         schema = null,
@@ -89,10 +89,10 @@ class AggregatedAppFunctionInventoryTest {
     }
 
     private class Inventory2 : AppFunctionInventory {
-        override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> =
+        override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> =
             mapOf(
                 "androix.appfunctions.internal#test2" to
-                    AppFunctionMetadata(
+                    CompileTimeAppFunctionMetadata(
                         id = "androix.appfunctions.internal#test2",
                         isEnabledByDefault = false,
                         schema = null,

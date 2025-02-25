@@ -27,13 +27,13 @@ import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -166,7 +166,7 @@ class AppFunctionInventoryProcessor(
 
     private fun addPropertyForAppFunctionMetadata(
         functionMetadataObjectClassBuilder: TypeSpec.Builder,
-        functionMetadata: AppFunctionMetadata
+        functionMetadata: CompileTimeAppFunctionMetadata
     ) {
         functionMetadataObjectClassBuilder.addProperty(
             PropertySpec.builder(
@@ -767,7 +767,7 @@ class AppFunctionInventoryProcessor(
     /** Creates the `functionIdToMetadataMap` property of the `AppFunctionInventory`. */
     private fun addFunctionIdToMetadataMapProperty(
         inventoryClassBuilder: TypeSpec.Builder,
-        appFunctionMetadataList: List<AppFunctionMetadata>
+        appFunctionMetadataList: List<CompileTimeAppFunctionMetadata>
     ) {
         inventoryClassBuilder.addProperty(
             PropertySpec.builder(
