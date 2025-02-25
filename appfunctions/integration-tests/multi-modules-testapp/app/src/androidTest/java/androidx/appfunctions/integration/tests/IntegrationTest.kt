@@ -68,6 +68,46 @@ class IntegrationTest {
     }
 
     @Test
+    fun executeAppFunction_voidReturnType_success() = doBlocking {
+        val response =
+            appFunctionManager.executeAppFunction(
+                request =
+                    ExecuteAppFunctionRequest(
+                        targetContext.packageName,
+                        VOID_FUNCTION_ID,
+                        AppFunctionData.Builder("").build()
+                    )
+            )
+
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
+    }
+
+    @Test
+    fun executeAppFunction_setFactory_success() = doBlocking {
+        // A factory is set to create the enclosing class of the function.
+        // See [TestApplication.appFunctionConfiguration].
+        var response =
+            appFunctionManager.executeAppFunction(
+                request =
+                    ExecuteAppFunctionRequest(
+                        targetContext.packageName,
+                        IS_CREATED_BY_FACTORY_FUNCTION_ID,
+                        AppFunctionData.Builder("").build()
+                    )
+            )
+
+        // If the enclosing class was created by the provided factory, the secondary constructor
+        // should be called and so the return value would be `true`.
+        val successResponse = assertIs<ExecuteAppFunctionResponse.Success>(response)
+        assertThat(
+                successResponse.returnValue.getBoolean(
+                    ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE
+                )
+            )
+            .isEqualTo(true)
+    }
+
+    @Test
     fun executeAppFunction_functionNotFound_fail() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -114,6 +154,16 @@ class IntegrationTest {
         const val APP_FUNCTION_ID = "androidx.appfunctions.integration.testapp.TestFunctions#add"
         const val DO_THROW_FUNCTION_ID =
             "androidx.appfunctions.integration.testapp.TestFunctions#doThrow"
-        val FUNCTION_IDS = setOf(APP_FUNCTION_ID, DO_THROW_FUNCTION_ID)
+        const val VOID_FUNCTION_ID =
+            "androidx.appfunctions.integration.testapp.TestFunctions#voidFunction"
+        const val IS_CREATED_BY_FACTORY_FUNCTION_ID =
+            "androidx.appfunctions.integration.testapp.TestFactory#isCreatedByFactory"
+        val FUNCTION_IDS =
+            setOf(
+                APP_FUNCTION_ID,
+                DO_THROW_FUNCTION_ID,
+                VOID_FUNCTION_ID,
+                IS_CREATED_BY_FACTORY_FUNCTION_ID
+            )
     }
 }

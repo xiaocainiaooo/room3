@@ -29,4 +29,20 @@ class TestFunctions {
     fun doThrow(appFunctionContext: AppFunctionContext) {
         throw AppFunctionInvalidArgumentException("invalid")
     }
+
+    @AppFunction fun voidFunction(appFunctionContext: AppFunctionContext) {}
+}
+
+@Suppress("UNUSED_PARAMETER")
+class TestFactory {
+    private val createdByFactory: Boolean
+
+    constructor() : this(false)
+
+    constructor(createdByFactory: Boolean) {
+        this.createdByFactory = createdByFactory
+    }
+
+    @AppFunction
+    fun isCreatedByFactory(appFunctionContext: AppFunctionContext): Boolean = createdByFactory
 }
