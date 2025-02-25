@@ -43,6 +43,7 @@ import androidx.health.connect.client.aggregate.AggregationResultGroupedByDurati
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByPeriod
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.HealthConnectFeaturesPlatformImpl
 import androidx.health.connect.client.feature.withPhrFeatureCheckSuspend
 import androidx.health.connect.client.impl.platform.aggregate.AGGREGATE_METRICS_ADDED_IN_SDK_EXT_10
@@ -393,6 +394,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
         }
     }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 16)
     override suspend fun createMedicalDataSource(
@@ -414,6 +416,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .toSdkMedicalDataSource()
         }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 16)
     override suspend fun deleteMedicalDataSourceWithData(id: String) {
@@ -430,6 +433,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
         }
     }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 16)
     override suspend fun getMedicalDataSources(
         request: GetMedicalDataSourcesRequest
@@ -450,6 +454,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .map { it.toSdkMedicalDataSource() }
         }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 16)
     override suspend fun getMedicalDataSources(ids: List<String>): List<MedicalDataSource> =
         withPhrFeatureCheckSuspend(this::class, "getMedicalDataSources(ids: List<String>)") {
@@ -465,6 +470,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .map { it.toSdkMedicalDataSource() }
         }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
     override suspend fun upsertMedicalResources(
@@ -483,6 +489,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .map { it.toSdkMedicalResource() }
         }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
     override suspend fun readMedicalResources(
         request: ReadMedicalResourcesRequest
@@ -509,6 +516,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 }
         }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
     override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
         withPhrFeatureCheckSuspend(
@@ -527,6 +535,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .map { it.toSdkMedicalResource() }
         }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
     override suspend fun deleteMedicalResources(ids: List<MedicalResourceId>) {
@@ -546,6 +555,7 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
         }
     }
 
+    @ExperimentalPersonalHealthRecordApi
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
     override suspend fun deleteMedicalResources(request: DeleteMedicalResourcesRequest) {

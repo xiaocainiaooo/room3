@@ -17,6 +17,7 @@
 package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.records.FhirResource
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PATIENT
@@ -33,6 +34,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalPersonalHealthRecordApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class MedicalResourceTest {

@@ -16,12 +16,9 @@
 
 package androidx.health.connect.client.feature
 
-import androidx.annotation.RestrictTo
-
 @RequiresOptIn(
     message =
         "This is a part of the Personal Health Record experimental Health Connect APIs and could change in the future."
 )
 @Retention(AnnotationRetention.BINARY)
-@RestrictTo(RestrictTo.Scope.LIBRARY)
 annotation class ExperimentalPersonalHealthRecordApi

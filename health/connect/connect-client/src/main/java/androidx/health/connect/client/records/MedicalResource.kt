@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.records.PlatformMedicalResource
 import androidx.health.connect.client.impl.platform.records.PlatformMedicalResourceBuilder
@@ -44,7 +45,8 @@ import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An
+ * [UnsupportedOperationException] would be thrown if the feature is not available.
  *
  * @property type The [MedicalResourceType] of this `MedicalResource`, this is assigned by Health
  *   Connect at insertion time. Clients should be aware that this list is non exhaustive and may
@@ -56,7 +58,9 @@ import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class MedicalResource(
+@OptIn(ExperimentalPersonalHealthRecordApi::class)
+class MedicalResource
+constructor(
     @MedicalResourceType val type: Int,
     val id: MedicalResourceId,
     val dataSourceId: String,

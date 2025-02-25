@@ -16,11 +16,13 @@
 
 package androidx.health.connect.client.impl.platform.phr
 
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.records.FhirVersion
 
 // Note: lazy must be used to avoid crashes when tests are run on a device where PHR is not
 // available. In tests where these constants are used, assumeTrue() is used to make sure PHR is
 // available.
 internal object PhrConstants {
+    @OptIn(ExperimentalPersonalHealthRecordApi::class)
     val FHIR_VERSION_4_0_1 by lazy { FhirVersion.Companion.parseFhirVersion("4.0.1") }
 }

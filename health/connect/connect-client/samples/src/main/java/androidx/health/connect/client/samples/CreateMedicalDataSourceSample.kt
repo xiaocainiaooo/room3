@@ -21,9 +21,11 @@ package androidx.health.connect.client.samples
 import android.net.Uri
 import androidx.annotation.Sampled
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.records.FhirVersion
 import androidx.health.connect.client.request.CreateMedicalDataSourceRequest
 
+@OptIn(ExperimentalPersonalHealthRecordApi::class)
 @Sampled
 suspend fun CreateMedicalDataSourceSample(healthConnectClient: HealthConnectClient) {
     val medicalDataSource =

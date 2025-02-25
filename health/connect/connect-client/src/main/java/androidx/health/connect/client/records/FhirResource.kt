@@ -34,7 +34,8 @@ import androidx.health.connect.client.impl.platform.records.toPlatformFhirResour
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An
+ * [UnsupportedOperationException] would be thrown if the feature is not available.
  *
  * @property type The type of this FHIR resource. This is extracted from the `resourceType` field in
  *   [data]. The list of supported types is a subset of the resource list on

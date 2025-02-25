@@ -17,6 +17,7 @@
 package androidx.health.connect.client.impl.platform.requests
 
 import android.annotation.SuppressLint
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.impl.platform.request.PlatformUpsertMedicalResourceRequestBuilder
 import androidx.health.connect.client.records.FhirVersion
@@ -30,6 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalPersonalHealthRecordApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class UpsertMedicalResourceRequestTest {

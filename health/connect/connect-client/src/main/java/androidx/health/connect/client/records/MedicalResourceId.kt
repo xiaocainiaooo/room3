@@ -35,7 +35,8 @@ import androidx.health.connect.client.records.FhirResource.Companion.FhirResourc
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An
+ * [UnsupportedOperationException] would be thrown if the feature is not available.
  *
  * @property dataSourceId The ID of the [MedicalDataSource] where the data comes from.
  * @property fhirResourceType The type of the FHIR resource. It should be one of the values in
