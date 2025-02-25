@@ -194,6 +194,22 @@ internal constructor(
         }
 
         /**
+         * Specifies that we need to apply the standard backoff policy when work is interrupted by
+         * the system without the app requesting it. This might happen when the [ListenableWorker]
+         * runs longer than it should, or when constraints defined for a given [ListenableWorker]
+         * are unmet.
+         *
+         * @return The current [Builder]
+         */
+        @ExperimentalWorkRequestBuilderApi
+        @Suppress("MissingGetterMatchingBuilder")
+        @SuppressWarnings("SetterReturnsThis")
+        fun setBackOffForSystemInterruptions(): B {
+            workSpec.backOffOnSystemInterruptions = true
+            return thisObject
+        }
+
+        /**
          * Specifies that the results of this work should be kept for at least the specified amount
          * of time. After this time has elapsed, the results may be pruned at the discretion of
          * WorkManager when this WorkRequest has reached a finished state (see
