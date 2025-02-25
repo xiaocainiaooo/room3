@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -30,9 +31,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Rule
@@ -48,17 +55,17 @@ class FloatingActionButtonMenuTest {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     @Test
     fun fabMenu_childrenCount_collapsed() {
-        rule.setContent {
-            val items =
-                listOf(
-                    Icons.Filled.Add to "Reply",
-                    Icons.Filled.Add to "Reply all",
-                    Icons.Filled.Add to "Forward",
-                    Icons.Filled.Add to "Snooze",
-                )
+        val items =
+            listOf(
+                Icons.Filled.Add to "Reply",
+                Icons.Filled.Add to "Reply all",
+                Icons.Filled.Add to "Forward",
+                Icons.Filled.Add to "Snooze",
+            )
 
+        rule.setContent {
             var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
-            Box {
+            Box(modifier = Modifier.fillMaxSize()) {
                 FloatingActionButtonMenu(
                     modifier = Modifier.align(Alignment.BottomEnd),
                     expanded = fabMenuExpanded,
@@ -81,8 +88,9 @@ class FloatingActionButtonMenuTest {
                         }
                     }
                 ) {
-                    items.forEach { item ->
+                    items.forEachIndexed { index, item ->
                         FloatingActionButtonMenuItem(
+                            modifier = Modifier.testTag("button_$index"),
                             onClick = { fabMenuExpanded = false },
                             icon = { Icon(item.first, contentDescription = null) },
                             text = { Text(text = item.second) },
@@ -93,22 +101,26 @@ class FloatingActionButtonMenuTest {
         }
 
         rule.onAllNodes(isFocusable()).assertCountEquals(1)
+
+        repeat(items.size) {
+            rule.onNodeWithTag("button_$it").assertIsNotDisplayed().assertHasNoClickAction()
+        }
     }
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     @Test
     fun fabMenu_childrenCount_expanded() {
-        rule.setContent {
-            val items =
-                listOf(
-                    Icons.Filled.Add to "Reply",
-                    Icons.Filled.Add to "Reply all",
-                    Icons.Filled.Add to "Forward",
-                    Icons.Filled.Add to "Snooze",
-                )
+        val items =
+            listOf(
+                Icons.Filled.Add to "Reply",
+                Icons.Filled.Add to "Reply all",
+                Icons.Filled.Add to "Forward",
+                Icons.Filled.Add to "Snooze",
+            )
 
+        rule.setContent {
             var fabMenuExpanded by rememberSaveable { mutableStateOf(true) }
-            Box {
+            Box(Modifier.fillMaxSize()) {
                 FloatingActionButtonMenu(
                     modifier = Modifier.align(Alignment.BottomEnd),
                     expanded = fabMenuExpanded,
@@ -131,8 +143,9 @@ class FloatingActionButtonMenuTest {
                         }
                     }
                 ) {
-                    items.forEach { item ->
+                    items.forEachIndexed { index, item ->
                         FloatingActionButtonMenuItem(
+                            modifier = Modifier.testTag("button_$index"),
                             onClick = { fabMenuExpanded = false },
                             icon = { Icon(item.first, contentDescription = null) },
                             text = { Text(text = item.second) },
@@ -143,5 +156,9 @@ class FloatingActionButtonMenuTest {
         }
 
         rule.onAllNodes(isFocusable()).assertCountEquals(5)
+
+        repeat(items.size) {
+            rule.onNodeWithTag("button_$it").assertIsDisplayed().assertHasClickAction()
+        }
     }
 }
