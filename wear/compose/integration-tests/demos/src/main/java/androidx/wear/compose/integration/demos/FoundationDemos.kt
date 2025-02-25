@@ -36,6 +36,7 @@ import androidx.wear.compose.foundation.samples.ExpandableWithItemsSample
 import androidx.wear.compose.foundation.samples.HierarchicalFocusCoordinatorSample
 import androidx.wear.compose.foundation.samples.OversizeComposable
 import androidx.wear.compose.foundation.samples.RotaryScrollSample
+import androidx.wear.compose.foundation.samples.RotaryScrollWithOverscrollSample
 import androidx.wear.compose.foundation.samples.RotarySnapSample
 import androidx.wear.compose.foundation.samples.ScalingLazyColumnEdgeAnchoredAndAnimatedScrollTo
 import androidx.wear.compose.foundation.samples.SimpleCurvedWorld
@@ -151,11 +152,27 @@ val WearFoundationDemos =
                         listOf(
                             ComposableDemo(".rotary with scroll") { RotaryScrollSample() },
                             ComposableDemo(".rotary with snap") { RotarySnapSample() },
+                            ComposableDemo(".rotary with overscroll") {
+                                RotaryScrollWithOverscrollSample()
+                            },
                             ComposableDemo("RotaryEvent") { ScrollUsingRotatingCrownDemo() },
                             ComposableDemo("PreRotaryEvent") { InterceptScrollDemo() }
                         )
                     ),
-                    DemoCategory("Demos", listOf())
+                    DemoCategory(
+                        "Demos",
+                        listOf(
+                            ComposableDemo("Nested scroll with Pager") { NestedScrollPagerDemo() },
+                            ComposableDemo("Nested scroll with Lazy Column") {
+                                NestedScrollLazyColumnDemo(false)
+                            },
+                            ComposableDemo("Nested scroll with Reversed Lazy Column") {
+                                NestedScrollLazyColumnDemo(true)
+                            },
+                            ComposableDemo("Nested scroll with TLC") { NestedScrollTLCDemo() },
+                            ComposableDemo("Nested scroll with SLC") { NestedScrollSLCDemo() },
+                        )
+                    )
                 )
             ),
             ComposableDemo("Focus Sample") { HierarchicalFocusCoordinatorSample() },

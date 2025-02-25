@@ -700,7 +700,8 @@ package androidx.wear.compose.foundation.rotary {
   }
 
   public final class RotaryScrollableKt {
-    method public static androidx.compose.ui.Modifier rotaryScrollable(androidx.compose.ui.Modifier, androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior behavior, androidx.compose.ui.focus.FocusRequester focusRequester, optional boolean reverseDirection);
+    method @Deprecated public static androidx.compose.ui.Modifier rotaryScrollable(androidx.compose.ui.Modifier, androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior behavior, androidx.compose.ui.focus.FocusRequester focusRequester, optional boolean reverseDirection);
+    method public static androidx.compose.ui.Modifier rotaryScrollable(androidx.compose.ui.Modifier, androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior behavior, androidx.compose.ui.focus.FocusRequester focusRequester, optional boolean reverseDirection, optional androidx.compose.foundation.OverscrollEffect? overscrollEffect);
   }
 
   public interface RotarySnapLayoutInfoProvider {
