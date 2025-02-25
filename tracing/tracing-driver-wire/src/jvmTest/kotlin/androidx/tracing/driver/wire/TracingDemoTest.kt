@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.driver.wire
 
+import androidx.tracing.driver.ProcessTrack
+import androidx.tracing.driver.TraceDriver
 import java.io.File
 import kotlin.random.Random
 import kotlin.test.Test
@@ -38,8 +40,11 @@ class TracingDemoTest {
 
     // Tracks the number of batches completed
     internal var count = 0L
-    internal val driver: TraceDriver =
-        TraceDriver(sink = JvmTraceSink(sequenceId = 1, File("/tmp")), isEnabled = true)
+    internal val driver =
+        TraceDriver(
+            sink = WireTraceSink(sequenceId = 1, directory = File("/tmp")),
+            isEnabled = true
+        )
 
     @Test
     internal fun testTracingEndToEnd() = runBlocking {

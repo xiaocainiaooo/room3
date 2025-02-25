@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.driver.wire
 
+import androidx.tracing.driver.INVALID_LONG
+import androidx.tracing.driver.TRACK_DESCRIPTOR_TYPE_COUNTER
+import androidx.tracing.driver.TRACK_DESCRIPTOR_TYPE_PROCESS
+import androidx.tracing.driver.TRACK_DESCRIPTOR_TYPE_THREAD
+import androidx.tracing.driver.TraceEvent
 import com.squareup.wire.ProtoWriter
 import perfetto.protos.MutableCounterDescriptor
 import perfetto.protos.MutableProcessDescriptor
@@ -25,8 +30,8 @@ import perfetto.protos.MutableTrackDescriptor
 import perfetto.protos.MutableTrackEvent
 
 /**
- * Optimized serializer of [TraceEvent], which writes out binary Perfetto trace_packet.proto with
- * minimal allocations
+ * Optimized serializer of [androidx.tracing.driver.TraceEvent], which writes out binary Perfetto
+ * trace_packet.proto with minimal allocations
  *
  * Internally uses mutable protos to avoid allocations / GC churn.
  */
@@ -53,7 +58,7 @@ internal class WireTraceEventSerializer(sequenceId: Int, val protoWriter: ProtoW
             scratchTrackDescriptor,
             scratchTrackEvent
         )
-        MutableTracePacket.ADAPTER.encodeWithTag(protoWriter, 1, scratchTracePacket)
+        MutableTracePacket.Companion.ADAPTER.encodeWithTag(protoWriter, 1, scratchTracePacket)
     }
 
     companion object {

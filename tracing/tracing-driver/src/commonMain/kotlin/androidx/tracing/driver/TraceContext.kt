@@ -17,7 +17,6 @@
 package androidx.tracing.driver
 
 import androidx.collection.mutableIntObjectMapOf
-import okio.Closeable
 
 /**
  * This is something that is only typically created once per process. All the traces emitted are
@@ -33,7 +32,7 @@ internal constructor(
     // When debugging is on, we keep track of outstanding allocations in the pool,
     // and provide useful logging to help with debugging & testing.
     internal val isDebug: Boolean,
-) : Closeable {
+) : AutoCloseable {
 
     public constructor(sink: TraceSink, isEnabled: Boolean) : this(sink, isEnabled, isDebug = false)
 
@@ -107,8 +106,6 @@ internal constructor(
 }
 
 // An empty trace context when tracing is disabled.
-
-private const val EMPTY_TRACE_CONTEXT_SEQUENCE_ID = -1
 
 internal object EmptyTraceContext : TraceContext(sink = EmptyTraceSink(), isEnabled = false) {
     internal val process = EmptyProcessTrack(this)

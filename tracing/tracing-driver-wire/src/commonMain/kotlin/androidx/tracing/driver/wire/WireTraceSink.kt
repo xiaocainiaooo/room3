@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.tracing.driver
+package androidx.tracing.driver.wire
 
+import androidx.tracing.driver.AtomicBoolean
+import androidx.tracing.driver.PooledTracePacketArray
+import androidx.tracing.driver.Queue
+import androidx.tracing.driver.TraceSink
 import com.squareup.wire.ProtoWriter
-import java.io.Closeable
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -32,17 +30,13 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import okio.BufferedSink
-import okio.appendingSink
-import okio.buffer
 
 /** The trace sink that writes to a new file per trace session. */
-public class JvmTraceSink(
+public class WireTraceSink(
     sequenceId: Int,
-    @Suppress("UNUSED") private val baseDir: File,
+    private val bufferedSink: BufferedSink,
     private val coroutineContext: CoroutineContext = Dispatchers.IO
-) : TraceSink(), Closeable {
-    internal val traceFile = baseDir.perfettoTraceFile()
-    private val bufferedSink: BufferedSink = traceFile.appendingSink().buffer()
+) : TraceSink() {
     private val wireTraceEventSerializer =
         WireTraceEventSerializer(sequenceId, ProtoWriter(bufferedSink))
 
@@ -100,9 +94,7 @@ public class JvmTraceSink(
         while (queue.isNotEmpty()) {
             val pooledPacketArray = queue.removeFirstOrNull()
             if (pooledPacketArray != null) {
-                pooledPacketArray.forEach { event ->
-                    wireTraceEventSerializer.writeTraceEvent(event)
-                }
+                pooledPacketArray.forEach { wireTraceEventSerializer.writeTraceEvent(it) }
                 pooledPacketArray.recycle()
             }
         }
@@ -117,11 +109,4 @@ public class JvmTraceSink(
         flush()
         bufferedSink.close()
     }
-}
-
-private fun File.perfettoTraceFile(): File {
-    val formatter = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-    formatter.timeZone = TimeZone.getTimeZone("UTC")
-    val traceFile = File(this, "perfetto-${formatter.format(Date())}.perfetto-trace")
-    return traceFile
 }
