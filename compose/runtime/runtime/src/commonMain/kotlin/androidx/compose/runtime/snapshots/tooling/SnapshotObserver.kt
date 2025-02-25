@@ -50,25 +50,7 @@ interface SnapshotObserver {
      * @param readonly whether the snapshot being created will be read-only.
      * @return optional read and write observers that will be added to the snapshot created.
      */
-    @Deprecated(
-        "Deprecated and renamed to onPreCreate. This method will be removed before 1.8.0 stable",
-        ReplaceWith("onPreCreate")
-    )
-    fun onCreating(parent: Snapshot?, readonly: Boolean): SnapshotInstanceObservers? = null
-
-    /**
-     * Called before a snapshot is created allowing reads and writes to the snapshot to be observed.
-     *
-     * This method is called in the same thread that creates the snapshot.
-     *
-     * @param parent the parent snapshot for the new snapshot if it is a nested snapshot or null
-     *   otherwise.
-     * @param readonly whether the snapshot being created will be read-only.
-     * @return optional read and write observers that will be added to the snapshot created.
-     */
-    @Suppress("DEPRECATION")
-    fun onPreCreate(parent: Snapshot?, readonly: Boolean): SnapshotInstanceObservers? =
-        onCreating(parent, readonly)
+    fun onPreCreate(parent: Snapshot?, readonly: Boolean): SnapshotInstanceObservers? = null
 
     /**
      * Called after snapshot is created.
@@ -82,7 +64,7 @@ interface SnapshotObserver {
      * @param parent the parent snapshot for the new snapshot if it is a nested snapshot or null if
      *   it is a root snapshot.
      * @param observers the read and write observers that were installed by the value returned by
-     *   [onCreated]. This allows correlating which snapshot observers returned by [onCreating] to
+     *   [onCreated]. This allows correlating which snapshot observers returned by [onPreCreate] to
      *   the [snapshot] that was created.
      */
     fun onCreated(snapshot: Snapshot, parent: Snapshot?, observers: SnapshotInstanceObservers?) {}
@@ -94,20 +76,7 @@ interface SnapshotObserver {
      *
      * @param snapshot information about the snapshot that was created.
      */
-    @Deprecated(
-        "Deprecated and renamed to onPreDispose. This method will be removed before 1.8.0 stable",
-        ReplaceWith("onPreDispose")
-    )
-    fun onDisposing(snapshot: Snapshot) {}
-
-    /**
-     * Called while a snapshot is being disposed.
-     *
-     * This method is called in the same thread that disposes the snapshot.
-     *
-     * @param snapshot information about the snapshot that was created.
-     */
-    @Suppress("DEPRECATION") fun onPreDispose(snapshot: Snapshot) = onDisposing(snapshot)
+    fun onPreDispose(snapshot: Snapshot) {}
 
     /**
      * Called after a snapshot is applied.
@@ -127,8 +96,8 @@ interface SnapshotObserver {
 }
 
 /**
- * The return result of [SnapshotObserver.onCreating] allowing the reads and writes performed in the
- * newly created snapshot to be observed
+ * The return result of [SnapshotObserver.onPreCreate] allowing the reads and writes performed in
+ * the newly created snapshot to be observed
  */
 @ExperimentalComposeRuntimeApi
 class SnapshotInstanceObservers(
