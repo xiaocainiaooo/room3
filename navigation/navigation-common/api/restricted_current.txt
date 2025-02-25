@@ -275,10 +275,10 @@ package androidx.navigation {
     method public D build();
     method public final void deepLink(androidx.navigation.NavDeepLink navDeepLink);
     method public final void deepLink(String uriPattern);
-    method public inline <reified T> void deepLink(String basePath, kotlin.jvm.functions.Function1<? super androidx.navigation.NavDeepLinkDslBuilder,kotlin.Unit> navDeepLink);
+    method public final inline <reified T> void deepLink(String basePath, kotlin.jvm.functions.Function1<? super androidx.navigation.NavDeepLinkDslBuilder,kotlin.Unit> navDeepLink);
     method public final void deepLink(kotlin.jvm.functions.Function1<? super androidx.navigation.NavDeepLinkDslBuilder,kotlin.Unit> navDeepLink);
     method public final <T> void deepLink(kotlin.reflect.KClass<T> route, String basePath, kotlin.jvm.functions.Function1<? super androidx.navigation.NavDeepLinkDslBuilder,kotlin.Unit> navDeepLink);
-    method public inline <reified T> void deepLinkSafeArgs(String basePath);
+    method public final inline <reified T> void deepLinkSafeArgs(String basePath);
     method public final int getId();
     method public final CharSequence? getLabel();
     method protected final androidx.navigation.Navigator<? extends D> getNavigator();
@@ -308,7 +308,7 @@ package androidx.navigation {
     method public final void addDestinations(androidx.navigation.NavDestination... nodes);
     method public final void addDestinations(java.util.Collection<? extends androidx.navigation.NavDestination?> nodes);
     method public final void clear();
-    method public inline <reified T> androidx.navigation.NavDestination? findNode();
+    method public final inline <reified T> androidx.navigation.NavDestination? findNode();
     method public final androidx.navigation.NavDestination? findNode(@IdRes int resId);
     method public final androidx.navigation.NavDestination? findNode(String? route);
     method public final androidx.navigation.NavDestination? findNode(kotlin.reflect.KClass<? extends java.lang.Object?> route);
@@ -319,11 +319,11 @@ package androidx.navigation {
     method public final String? getStartDestinationRoute();
     method public final java.util.Iterator<androidx.navigation.NavDestination> iterator();
     method public final void remove(androidx.navigation.NavDestination node);
-    method public inline <reified T> void setStartDestination();
+    method public final inline <reified T> void setStartDestination();
     method public final void setStartDestination(int startDestId);
     method public final void setStartDestination(String startDestRoute);
-    method @kotlin.jvm.JvmSynthetic public <T> void setStartDestination(kotlin.reflect.KClass<T> startDestRoute);
-    method @kotlin.jvm.JvmSynthetic public <T> void setStartDestination(T startDestRoute);
+    method @kotlin.jvm.JvmSynthetic public final <T> void setStartDestination(kotlin.reflect.KClass<T> startDestRoute);
+    method @kotlin.jvm.JvmSynthetic public final <T> void setStartDestination(T startDestRoute);
     property @IdRes public final int startDestinationId;
     property public final String? startDestinationRoute;
     field public static final androidx.navigation.NavGraph.Companion Companion;
