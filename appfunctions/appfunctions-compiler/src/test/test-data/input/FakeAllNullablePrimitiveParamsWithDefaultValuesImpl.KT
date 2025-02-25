@@ -26,6 +26,5 @@ class FakeAllNullablePrimitiveParamsWithDefaultValuesImpl :
         arg5: List<String>,
         arg6: BooleanArray?,
         arg7: ByteArray?,
-        arg8: List<ByteArray>?,
     ) {}
 }

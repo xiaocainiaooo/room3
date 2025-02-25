@@ -111,21 +111,6 @@
             <isRequired>true</isRequired>
             <name>arg7</name>
         </parameters>
-        <parameters>
-            <dataTypeMetadata>
-                <id>unused</id>
-                <isNullable>true</isNullable>
-                <itemType>
-                    <id>unused</id>
-                    <isNullable>false</isNullable>
-                    <type>2</type>
-                </itemType>
-                <type>10</type>
-            </dataTypeMetadata>
-            <id>unused</id>
-            <isRequired>true</isRequired>
-            <name>arg8</name>
-        </parameters>
         <response>
             <id>unused</id>
             <valueType>
