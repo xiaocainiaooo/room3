@@ -115,16 +115,6 @@ class CameraControlDeviceTest(
         ProcessCameraProvider.configureInstance(cameraConfig)
         cameraProvider = ProcessCameraProvider.awaitInstance(context)
         assumeTrue(cameraProvider.hasCamera(cameraSelector))
-
-        instrumentation.runOnMainSync {
-            try {
-                val useCase = ImageAnalysis.Builder().build()
-                useCase.setAnalyzer(CameraXExecutors.ioExecutor(), analyzer)
-                camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
-            } catch (e: CameraException) {
-                throw IllegalArgumentException(e)
-            }
-        }
     }
 
     @After
@@ -137,6 +127,8 @@ class CameraControlDeviceTest(
     @Test
     fun enableTorch_futureCompletes() {
         assumeTrue(CameraUtil.hasFlashUnitWithLensFacing(cameraSelector.lensFacing!!))
+
+        bindUseCases()
 
         assertFutureCompletes(camera.cameraControl.enableTorch(true))
     }
@@ -168,6 +160,8 @@ class CameraControlDeviceTest(
     fun setTorchStrengthLevel_torchEnabled_futureCompletes() {
         assumeTrue(CameraUtil.hasFlashUnitWithLensFacing(cameraSelector.lensFacing!!))
 
+        bindUseCases()
+
         camera.cameraControl.enableTorch(true).get()
         assertFutureCompletes(
             camera.cameraControl.setTorchStrengthLevel(camera.cameraInfo.maxTorchStrengthLevel)
@@ -179,6 +173,8 @@ class CameraControlDeviceTest(
     fun setTorchStrengthLevel_torchDisabled_futureCompletes() {
         assumeTrue(CameraUtil.hasFlashUnitWithLensFacing(cameraSelector.lensFacing!!))
 
+        bindUseCases()
+
         assertFutureCompletes(
             camera.cameraControl.setTorchStrengthLevel(camera.cameraInfo.maxTorchStrengthLevel)
         )
@@ -188,6 +184,8 @@ class CameraControlDeviceTest(
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun setTorchStrengthLevel_throwExceptionIfLessThanOne() {
         assumeTrue(CameraUtil.hasFlashUnitWithLensFacing(cameraSelector.lensFacing!!))
+
+        bindUseCases()
 
         try {
             camera.cameraControl.setTorchStrengthLevel(0).get()
@@ -205,6 +203,8 @@ class CameraControlDeviceTest(
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun setTorchStrengthLevel_throwExceptionIfLargerThanMax() {
         assumeTrue(CameraUtil.hasFlashUnitWithLensFacing(cameraSelector.lensFacing!!))
+
+        bindUseCases()
 
         try {
             camera.cameraControl
@@ -225,6 +225,8 @@ class CameraControlDeviceTest(
     fun setTorchStrengthLevel_throwExceptionWhenApiNotMet() {
         assumeTrue(CameraUtil.hasFlashUnitWithLensFacing(cameraSelector.lensFacing!!))
 
+        bindUseCases()
+
         try {
             camera.cameraControl
                 .setTorchStrengthLevel(camera.cameraInfo.maxTorchStrengthLevel)
@@ -237,6 +239,18 @@ class CameraControlDeviceTest(
         Assert.fail(
             "setTorchStrength didn't fail with an UnsupportedOperationException when the API level is lower than the requirement."
         )
+    }
+
+    private fun bindUseCases() {
+        instrumentation.runOnMainSync {
+            try {
+                val useCase = ImageAnalysis.Builder().build()
+                useCase.setAnalyzer(CameraXExecutors.ioExecutor(), analyzer)
+                camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
+            } catch (e: CameraException) {
+                throw IllegalArgumentException(e)
+            }
+        }
     }
 
     private fun <T> assertFutureCompletes(future: ListenableFuture<T>) {
