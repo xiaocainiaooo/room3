@@ -33,9 +33,13 @@
       <item quantity="one">%d giây</item>
     </plurals>
     <string name="wear_m3c_time_picker_period" msgid="5567285614451063120">"Khoảng thời gian"</string>
+    <!-- no translation found for wear_m3c_time_picker_heading (1741225633698384262) -->
+    <skip />
     <string name="wear_m3c_date_picker_day" msgid="8932770593644830235">"Ngày"</string>
     <string name="wear_m3c_date_picker_month" msgid="5962969526377479136">"Tháng"</string>
     <string name="wear_m3c_date_picker_year" msgid="4697690064312147449">"Năm"</string>
+    <!-- no translation found for wear_m3c_date_picker_heading (1824308273028674826) -->
+    <skip />
     <string name="wear_m3c_picker_confirm_button_content_description" msgid="8440144719909288057">"Xác nhận"</string>
     <string name="wear_m3c_picker_next_button_content_description" msgid="3346011303652897029">"Tiếp theo"</string>
     <string name="wear_m3c_slider_decrease_content_description" msgid="8242572466064289486">"Giảm"</string>
