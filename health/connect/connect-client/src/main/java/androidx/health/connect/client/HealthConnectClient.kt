@@ -54,6 +54,7 @@ import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.CreateMedicalDataSourceRequest
+import androidx.health.connect.client.request.DeleteMedicalResourcesRequest
 import androidx.health.connect.client.request.GetMedicalDataSourcesRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesInitialRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
@@ -487,7 +488,6 @@ interface HealthConnectClient {
      *   will be performed.
      *
      * Regarding permissions:
-     * - Only apps with the system permission can delete data written by apps other than themselves.
      * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, even then, it
      *   can only delete its own data. If any of the items in [ids] belongs to another app, they
      *   will be ignored.
@@ -506,7 +506,32 @@ interface HealthConnectClient {
     suspend fun deleteMedicalResources(ids: List<MedicalResourceId>): Unit =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
-            "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"
+            "HealthConnectClient#deleteMedicalResources(ids: List<MedicalResourceId>)"
+        )
+
+    /**
+     * Deletes [MedicalResource]s based on given filters in
+     * [request][DeleteMedicalResourcesRequest].
+     *
+     * Regarding permissions:
+     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, even then, it
+     *   can only delete its own data.
+     * - Deletes are permitted in the foreground or background.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param request The request that contains the filters to delete.
+     * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     * @sample // TODO: b/394856391 - add sample
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun deleteMedicalResources(request: DeleteMedicalResourcesRequest): Unit =
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#deleteMedicalResources(request: DeleteMedicalResourcesRequest)"
         )
 
     /**
