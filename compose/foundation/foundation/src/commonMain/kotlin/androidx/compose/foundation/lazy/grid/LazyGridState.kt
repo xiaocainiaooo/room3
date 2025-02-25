@@ -285,7 +285,10 @@ constructor(
                     layoutInfo?.let {
                         it.prefetchInfoRetriever(lineIndex).fastForEach { lineInfo ->
                             prefetchHandles.add(
-                                prefetchState.schedulePremeasure(lineInfo.first, lineInfo.second)
+                                prefetchState.schedulePrecompositionAndPremeasure(
+                                    lineInfo.first,
+                                    lineInfo.second
+                                )
                             )
                         }
                     }
