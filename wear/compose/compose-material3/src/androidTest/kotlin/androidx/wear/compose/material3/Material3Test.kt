@@ -76,6 +76,8 @@ import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.toSize
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import androidx.test.screenshot.matchers.BitmapMatcher
+import androidx.test.screenshot.matchers.MSSIMMatcher
 import kotlin.math.abs
 import org.junit.Assert
 import org.junit.rules.TestName
@@ -382,6 +384,7 @@ internal fun ComposeContentTestRule.verifyScreenshot(
     screenshotRule: AndroidXScreenshotTestRule,
     testTag: String = TEST_TAG,
     layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+    matcher: BitmapMatcher = MSSIMMatcher(),
     content: @Composable () -> Unit
 ) {
     setContentWithTheme {
@@ -394,7 +397,9 @@ internal fun ComposeContentTestRule.verifyScreenshot(
         }
     }
 
-    onNodeWithTag(testTag).captureToImage().assertAgainstGolden(screenshotRule, methodName)
+    onNodeWithTag(testTag)
+        .captureToImage()
+        .assertAgainstGolden(screenshotRule, methodName, matcher = matcher)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
