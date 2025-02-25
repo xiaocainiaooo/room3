@@ -38,11 +38,11 @@ def buildToolsVersion = AndroidXConfig.getDefaultAndroidConfig(project).getBuild
 def compileSdk = AndroidXConfig.getDefaultAndroidConfig(project).getCompileSdk()
 
 dependencies {
+    api(project(":privacysandbox:tools:tools"))
+    api(project(":privacysandbox:tools:tools-core"))
     api(libs.kotlinStdlib)
     implementation(libs.kspApi)
     implementation(libs.kotlinPoet)
-    implementation(project(":privacysandbox:tools:tools"))
-    implementation(project(":privacysandbox:tools:tools-core"))
 
     testImplementation(project(":privacysandbox:tools:tools-testing"))
     testImplementation(project(":room:room-compiler-processing-testing"))
