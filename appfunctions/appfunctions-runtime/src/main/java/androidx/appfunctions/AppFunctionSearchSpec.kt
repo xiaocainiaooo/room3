@@ -16,6 +16,8 @@
 
 package androidx.appfunctions
 
+import androidx.appfunctions.metadata.AppFunctionMetadataDocument
+
 /**
  * Defines the specifications for filtering and searching app function snapshots.
  *
@@ -49,4 +51,18 @@ constructor(
             "The minimum schema version must be a non-negative integer."
         }
     }
+
+    /** Creates a search query for searching [AppFunctionMetadataDocument] from App Search. */
+    internal fun toStaticMetadataAppSearchQuery(): String =
+        // TODO: Add search for schema fields.
+        if (packageNames != null) {
+            check(packageNames.isNotEmpty()) { "Package names cannot be empty at this stage." }
+            "packageName:(${getOrQueryExpression(packageNames)
+            })"
+        } else {
+            ""
+        }
+
+    private fun getOrQueryExpression(elements: Set<String>) =
+        elements.joinToString(" OR ") { "\"$it\"" }
 }
