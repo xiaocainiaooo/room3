@@ -53,7 +53,7 @@ public final class AndroidUtil {
     }
 
     /**
-     * Checks if the current device is emulator with API 21.
+     * Checks if the current device is emulator with specific API level.
      */
     public static boolean isEmulator(int apiLevel) {
         return Build.VERSION.SDK_INT == apiLevel && isEmulator();
@@ -78,7 +78,7 @@ public final class AndroidUtil {
                 "Emulator API 28 crashes running this test.",
                 Build.VERSION.SDK_INT == 28 && isEmulator()
         );
-        // Skip test for b/331618729
+        // Skip test for b/264902324, b/331618729
         assumeFalse(
                 "Emulator API 30 crashes running this test.",
                 Build.VERSION.SDK_INT == 30 && isEmulator()
