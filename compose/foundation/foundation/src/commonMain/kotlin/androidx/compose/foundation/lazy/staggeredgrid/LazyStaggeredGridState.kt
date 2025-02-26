@@ -509,7 +509,10 @@ internal constructor(
                     }
 
                 currentItemPrefetchHandles[targetIndex] =
-                    prefetchState.schedulePremeasure(index = targetIndex, constraints = constraints)
+                    prefetchState.schedulePrecompositionAndPremeasure(
+                        index = targetIndex,
+                        constraints = constraints
+                    )
             }
 
             clearLeftoverPrefetchHandles(prefetchHandlesUsed)

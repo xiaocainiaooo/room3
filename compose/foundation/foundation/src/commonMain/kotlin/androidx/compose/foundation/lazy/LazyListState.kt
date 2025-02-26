@@ -276,7 +276,10 @@ constructor(
                 // cause us to recompose when the measure result changes. We don't care since the
                 // prefetch is best effort.
                 val lastMeasureResult = Snapshot.withoutReadObservation { layoutInfoState.value }
-                return prefetchState.schedulePremeasure(index, lastMeasureResult.childConstraints) {
+                return prefetchState.schedulePrecompositionAndPremeasure(
+                    index,
+                    lastMeasureResult.childConstraints
+                ) {
                     if (onPrefetchFinished != null) {
                         var mainAxisItemSize = 0
                         repeat(placeablesCount) {
