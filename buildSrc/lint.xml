@@ -45,6 +45,7 @@
     <issue id="IgnoreClassLevelDetector" severity="fatal" />
     <issue id="WithPluginClasspathUsage" severity="fatal" />
     <issue id="AutoValueNullnessOverride" severity="fatal" />
+    <issue id="UnexpectedTestSizeAnnotation" severity="fatal" />
     <!-- Disable all lint checks on transformed classes by default. b/283812176 -->
     <issue id="all">
         <ignore path="**/.transforms/**" />
