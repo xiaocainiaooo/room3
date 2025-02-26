@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
 import androidx.compose.material3.LocalContentColor
@@ -47,6 +47,7 @@ import androidx.xr.compose.spatial.EdgeOffset
 import androidx.xr.compose.spatial.Orbiter
 import androidx.xr.compose.spatial.OrbiterDefaults
 import androidx.xr.compose.spatial.OrbiterEdge
+import androidx.xr.compose.subspace.layout.SpatialRoundedCornerShape
 
 /**
  * <a href="https://m3.material.io/components/navigation-bar/overview" class="external"
@@ -87,7 +88,6 @@ public fun NavigationBar(
 ) {
     HorizontalOrbiter(LocalNavigationBarOrbiterProperties.current) {
         Surface(
-            shape = CircleShape,
             color = containerColor,
             contentColor = contentColor,
             tonalElevation = tonalElevation,
@@ -147,7 +147,7 @@ public val DefaultNavigationBarOrbiterProperties: HorizontalOrbiterProperties =
         offset = XrNavigationBarTokens.OrbiterEdgeOffset,
         alignment = Alignment.CenterHorizontally,
         settings = OrbiterDefaults.orbiterSettings,
-        shape = OrbiterDefaults.shape,
+        shape = SpatialRoundedCornerShape(CornerSize(50)),
     )
 
 /** The [HorizontalOrbiterProperties] used by [NavigationBar]. */
