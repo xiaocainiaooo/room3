@@ -22,6 +22,7 @@ import androidx.test.filters.SdkSuppress
 import com.android.extensions.appfunctions.ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE
 import com.google.common.truth.Truth
 import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -431,5 +432,56 @@ class AppFunctionDataTest {
 
         Truth.assertThat(resultProperties!![0].getDouble("nestedDouble")).isEqualTo(25.0)
         Truth.assertThat(resultProperties[1].getString("nestedString")).isEqualTo("testString")
+    }
+
+    @Test
+    fun testSerialize() {
+        val note = Note(title = "Test Title", attachment = Attachment(uri = "Test Uri"))
+
+        val data = AppFunctionData.serialize(note, Note::class.java)
+
+        Truth.assertThat(data.getString("title")).isEqualTo("Test Title")
+        Truth.assertThat(data.getAppFunctionData("attachment").getString("uri"))
+            .isEqualTo("Test Uri")
+    }
+
+    @Test
+    fun testDeserialize() {
+        val data =
+            AppFunctionData.Builder("androidx.appfunctions.Note")
+                .setString("title", "Test Title")
+                .setAppFunctionData(
+                    "attachment",
+                    AppFunctionData.Builder("androidx.appfunctions.Attachment")
+                        .setString("uri", "Test Uri")
+                        .build()
+                )
+                .build()
+
+        val note = data.deserialize(Note::class.java)
+
+        Truth.assertThat(note.title).isEqualTo("Test Title")
+        Truth.assertThat(note.attachment.uri).isEqualTo("Test Uri")
+    }
+
+    @Test
+    fun testSerialize_missingFactory() {
+        val missingFactoryClass = MissingFactoryClass("test")
+
+        assertThrows(IllegalArgumentException::class.java) {
+            AppFunctionData.serialize(missingFactoryClass, MissingFactoryClass::class.java)
+        }
+    }
+
+    @Test
+    fun testDeserialize_missingFactory() {
+        val data =
+            AppFunctionData.Builder("androidx.appfunctions-MissingFactoryClass")
+                .setString("item", "test")
+                .build()
+
+        assertThrows(IllegalArgumentException::class.java) {
+            data.deserialize(MissingFactoryClass::class.java)
+        }
     }
 }
