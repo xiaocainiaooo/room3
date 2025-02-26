@@ -954,11 +954,19 @@ internal class LayoutNode(
         }
 
     private fun applyModifier(modifier: Modifier) {
+        val hadPointerInput = nodes.has(Nodes.PointerInput)
+        val hadFocusTarget = nodes.has(Nodes.FocusTarget)
         _modifier = modifier
         nodes.updateFrom(modifier)
+        val hasPointerInput = nodes.has(Nodes.PointerInput)
+        val hasFocusTarget = nodes.has(Nodes.FocusTarget)
         layoutDelegate.updateParentData()
         if (lookaheadRoot == null && nodes.has(Nodes.ApproachMeasure)) {
             lookaheadRoot = this
+        }
+
+        if (hadPointerInput != hasPointerInput || hadFocusTarget != hasFocusTarget) {
+            requireOwner().rectManager.updateFlagsFor(this, hasFocusTarget, hasPointerInput)
         }
     }
 
