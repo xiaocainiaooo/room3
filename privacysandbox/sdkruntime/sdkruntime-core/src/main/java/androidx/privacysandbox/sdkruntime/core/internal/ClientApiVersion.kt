@@ -52,7 +52,18 @@ enum class ClientApiVersion(
     FUTURE_VERSION(apiLevel = Int.MAX_VALUE);
 
     companion object {
-        val MIN_SUPPORTED = values().minBy { v -> v.apiLevel }
+        /**
+         * Minimal version of sdkruntime-client lib that could load SDK built with current version
+         * of sdkruntime-provider lib.
+         */
+        val MIN_SUPPORTED_CLIENT_VERSION = V5__1_0_ALPHA13
+
+        /**
+         * Minimal version of sdkruntime-provider lib that could be loaded by current version of
+         * sdkruntime-client lib.
+         */
+        val MIN_SUPPORTED_SDK_VERSION = values().minBy { v -> v.apiLevel }
+
         val CURRENT_VERSION = values().filter { v -> v != FUTURE_VERSION }.maxBy { v -> v.apiLevel }
 
         private val FEATURE_TO_VERSION_MAP = buildFeatureMap()
