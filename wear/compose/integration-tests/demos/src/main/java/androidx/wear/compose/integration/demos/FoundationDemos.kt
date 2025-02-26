@@ -192,11 +192,12 @@ val WearFoundationDemos =
             DemoCategory(
                 "Swipe To Reveal",
                 listOf(
-                    ComposableDemo("S2R") { Centralize { SwipeToRevealSample() } },
-                    ComposableDemo("S2R With Delayed Text") {
+                    ComposableDemo("One Action") { Centralize { SwipeToRevealSample() } },
+                    ComposableDemo("Two Actions") { Centralize { SwipeToRevealDemoTwoActions() } },
+                    ComposableDemo("With Delayed Text") {
                         Centralize { SwipeToRevealWithDelayedText() }
                     },
-                    ComposableDemo("S2R With Expandables") {
+                    ComposableDemo("With Expandables") {
                         Centralize { SwipeToRevealWithExpandables() }
                     },
                     ComposableDemo("Bi-directional") {
