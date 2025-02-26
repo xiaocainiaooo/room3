@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.layout.NestedPrefetchScope
 import androidx.compose.foundation.lazy.layout.PrefetchScheduler
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.traceValue
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.sign
@@ -82,8 +83,17 @@ internal class CacheWindowListPrefetchStrategy(
     private var itemsCount = 0
 
     override fun LazyListPrefetchScope.onScroll(delta: Float, layoutInfo: LazyListLayoutInfo) {
+        traceWindowInfo()
         updateCacheWindow(delta, layoutInfo)
         previousPassDelta = delta
+        traceWindowInfo()
+    }
+
+    private fun traceWindowInfo() {
+        traceValue("prefetchWindowStartExtraSpace", prefetchWindowStartExtraSpace.toLong())
+        traceValue("prefetchWindowEndExtraSpace", prefetchWindowEndExtraSpace.toLong())
+        traceValue("prefetchWindowStartIndex", prefetchWindowStartIndex.toLong())
+        traceValue("prefetchWindowEndIndex", prefetchWindowEndIndex.toLong())
     }
 
     override fun LazyListPrefetchScope.onVisibleItemsUpdated(layoutInfo: LazyListLayoutInfo) {
@@ -222,7 +232,7 @@ internal class CacheWindowListPrefetchStrategy(
                 prefetchWindowEndIndex++
                 prefetchWindowEndExtraSpace -= itemSize
             }
-            remoteOutOfBoundsItems(0, prefetchWindowStartIndex - 1)
+            removeOutOfBoundsItems(0, prefetchWindowStartIndex - 1)
         } else { // scrolling backwards, starting on first visible
 
             if (changedScrollDirection || shouldRefillWindow) {
@@ -248,7 +258,7 @@ internal class CacheWindowListPrefetchStrategy(
                 prefetchWindowStartIndex--
                 prefetchWindowStartExtraSpace -= itemSize
             }
-            remoteOutOfBoundsItems(prefetchWindowEndIndex + 1, itemsCount - 1)
+            removeOutOfBoundsItems(prefetchWindowEndIndex + 1, itemsCount - 1)
         }
     }
 
@@ -283,7 +293,7 @@ internal class CacheWindowListPrefetchStrategy(
                 prefetchWindowStartIndex--
                 prefetchWindowStartExtraSpace -= item
             }
-            remoteOutOfBoundsItems(0, prefetchWindowStartIndex - 1)
+            removeOutOfBoundsItems(0, prefetchWindowStartIndex - 1)
         } else { // scrolling backwards, keep around from last visible
             prefetchWindowEndExtraSpace = (keepAroundWindow - mainAxisExtraSpaceEnd)
             prefetchWindowEndIndex = visibleWindowEnd
@@ -297,7 +307,7 @@ internal class CacheWindowListPrefetchStrategy(
                 prefetchWindowEndIndex++
                 prefetchWindowEndExtraSpace -= item
             }
-            remoteOutOfBoundsItems(prefetchWindowEndIndex + 1, itemsCount - 1)
+            removeOutOfBoundsItems(prefetchWindowEndIndex + 1, itemsCount - 1)
         }
     }
 
@@ -346,7 +356,7 @@ internal class CacheWindowListPrefetchStrategy(
     }
 
     /** Takes care of removing caches and canceling handles for items that we won't use anymore. */
-    private fun remoteOutOfBoundsItems(start: Int, end: Int) {
+    private fun removeOutOfBoundsItems(start: Int, end: Int) {
         indicesToRemove.clear()
         prefetchWindowHandles.forEachKey { if (it in start..end) indicesToRemove.add(it) }
 
@@ -365,6 +375,7 @@ internal class CacheWindowListPrefetchStrategy(
     private fun LazyListPrefetchScope.onItemPrefetched(index: Int, itemSize: Int) {
         cachePrefetchedItem(index, itemSize)
         scheduleNextItemIfNeeded()
+        traceWindowInfo()
     }
 
     private fun LazyListPrefetchScope.scheduleNextItemIfNeeded() {
