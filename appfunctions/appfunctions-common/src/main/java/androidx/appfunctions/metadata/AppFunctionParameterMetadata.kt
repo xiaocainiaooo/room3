@@ -75,4 +75,11 @@ public data class AppFunctionParameterMetadataDocument(
     @Document.StringProperty public val name: String,
     @Document.BooleanProperty public val isRequired: Boolean,
     @Document.DocumentProperty public val dataTypeMetadata: AppFunctionDataTypeMetadataDocument
-)
+) {
+    public fun toAppFunctionParameterMetadata(): AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = name,
+            isRequired = isRequired,
+            dataType = dataTypeMetadata.toAppFunctionDataTypeMetadata()
+        )
+}

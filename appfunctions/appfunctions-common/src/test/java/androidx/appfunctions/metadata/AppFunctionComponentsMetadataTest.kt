@@ -78,4 +78,50 @@ class AppFunctionComponentsMetadataTest {
                 ),
             )
     }
+
+    @Test
+    fun componentsMetadataDocument_toAppFunctionComponentsMetadata_returnsCorrectMetadata() {
+        val appFunctionComponentsMetadataDocument =
+            AppFunctionComponentsMetadataDocument(
+                dataTypes =
+                    listOf(
+                        AppFunctionNamedDataTypeMetadataDocument(
+                            name = "dataType1",
+                            dataTypeMetadata =
+                                AppFunctionDataTypeMetadataDocument(
+                                    type = AppFunctionDataTypeMetadata.TYPE_INT,
+                                    isNullable = false,
+                                )
+                        ),
+                        AppFunctionNamedDataTypeMetadataDocument(
+                            name = "dataType2",
+                            dataTypeMetadata =
+                                AppFunctionDataTypeMetadataDocument(
+                                    type = AppFunctionDataTypeMetadata.TYPE_STRING,
+                                    isNullable = true,
+                                )
+                        )
+                    )
+            )
+
+        val components = appFunctionComponentsMetadataDocument.toAppFunctionComponentsMetadata()
+
+        assertThat(components)
+            .isEqualTo(
+                AppFunctionComponentsMetadata(
+                    mapOf(
+                        "dataType1" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                AppFunctionDataTypeMetadata.TYPE_INT,
+                                false
+                            ),
+                        "dataType2" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                AppFunctionDataTypeMetadata.TYPE_STRING,
+                                true
+                            )
+                    )
+                )
+            )
+    }
 }

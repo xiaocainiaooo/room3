@@ -88,4 +88,7 @@ public data class AppFunctionSchemaMetadataDocument(
     @Document.StringProperty public val schemaName: String,
     /** The version of the schema. This is used to track the changes to the schema over time. */
     @Document.LongProperty public val schemaVersion: Long
-)
+) {
+    public fun toAppFunctionSchemaMetadata(): AppFunctionSchemaMetadata =
+        AppFunctionSchemaMetadata(schemaCategory, schemaName, schemaVersion)
+}
