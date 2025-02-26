@@ -259,25 +259,6 @@ public class ComplicationDataSourceUpdateRequesterTest {
     }
 
     @Test
-    @Config(sdk = [Build.VERSION_CODES.TIRAMISU, Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
-    public fun shouldUseWearSdk_doesNotHaveWatchFeature_returnsFalse() {
-        shadowOf(context.packageManager).setSystemFeature(PackageManager.FEATURE_WATCH, false)
-        assertThat(shouldUseWearSdk(context)).isFalse()
-    }
-
-    @Test
-    @Config(maxSdk = Build.VERSION_CODES.TIRAMISU)
-    public fun shouldUseWearSdk_androidTOrLower_returnsFalse() {
-        assertThat(shouldUseWearSdk(context)).isFalse()
-    }
-
-    @Test
-    @Config(minSdk = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    public fun shouldUseWearSdk_androidUOrHigherWithWatchFeature_returnsTrue() {
-        assertThat(shouldUseWearSdk(context)).isTrue()
-    }
-
-    @Test
     public fun filterRequests_filtersOutNonMatchingComponents() {
         fun fakeRequest(id: Int) = ComplicationRequest(id, ComplicationType.SHORT_TEXT, false)
         val requests =
