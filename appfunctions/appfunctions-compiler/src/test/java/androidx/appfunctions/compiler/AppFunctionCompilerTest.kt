@@ -155,6 +155,50 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testDerivedSerializableInputFunctions_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf("DerivedSerializableInputFunctions.KT", "DerivedSerializable.KT"),
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}DerivedSerializableInputFunctions_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}DerivedSerializableInputFunctions_AppFunctionInventory.KT",
+        )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
+            goldenFileName = "derivedSerializableInputFunctions_app_function_dynamic_schema.xml",
+        )
+    }
+
+    @Test
+    fun testDerivedSerializableOutputFunctions_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf("DerivedSerializableOutputFunctions.KT", "DerivedSerializable.KT"),
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}DerivedSerializableOutputFunctions_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}DerivedSerializableOutputFunctions_AppFunctionInventory.KT",
+        )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
+            goldenFileName = "derivedSerializableOutputFunctions_app_function_dynamic_schema.xml",
+        )
+    }
+
+    @Test
     fun testDiffPackageSerializableInputFunction_genAppFunctionInventory_success() {
         val report =
             compilationTestHelper.compileAll(
