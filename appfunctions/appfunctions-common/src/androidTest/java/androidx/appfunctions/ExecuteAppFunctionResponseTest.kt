@@ -16,6 +16,7 @@
 
 package androidx.appfunctions
 
+import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.test.filters.SdkSuppress
@@ -23,8 +24,8 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.AssumptionViolatedException
 import org.junit.Test
 
-@RequiresApi(36)
-@SdkSuppress(minSdkVersion = 31)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 class ExecuteAppFunctionResponseTest {
     @Test
     fun toPlatformExtensionClass_success() {

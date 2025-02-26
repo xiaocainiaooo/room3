@@ -35,8 +35,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// TODO: Update the RequiresApi in AppFunctionData to be T.
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 internal class AppFunctionServiceDelegate(
     context: Context,
     workerCoroutineContext: CoroutineContext,
