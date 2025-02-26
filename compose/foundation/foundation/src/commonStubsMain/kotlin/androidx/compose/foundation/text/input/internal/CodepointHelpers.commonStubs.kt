@@ -23,5 +23,3 @@ internal actual fun CharSequence.codePointAt(index: Int): Int = implementedInJet
 internal actual fun charCount(codePoint: Int): Int = implementedInJetBrainsFork()
 
 internal actual fun CharSequence.codePointBefore(index: Int): Int = implementedInJetBrainsFork()
-
-internal actual fun CharSequence.findCodePointBefore(index: Int): Int = implementedInJetBrainsFork()
