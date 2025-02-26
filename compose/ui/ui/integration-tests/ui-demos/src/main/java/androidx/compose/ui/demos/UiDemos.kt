@@ -282,14 +282,12 @@ private val AutofillDemos =
     DemoCategory(
         "Autofill",
         listOf(
-            ComposableDemo("S: New login") { BTFResetCredentialsDemo() },
-            ComposableDemo("S: BasicTextField Autofill") { BasicTextFieldAutofill() },
-            ComposableDemo("S: BasicSecureTextField Autofill") {
-                BasicSecureTextFieldAutofillDemo()
-            },
-            ComposableDemo("S: TextField Autofill") { LegacyTextFieldAutofillDemo() },
-            ComposableDemo("S: OutlinedTextField Autofill") { OutlinedTextFieldAutofillDemo() },
-            ComposableDemo("S: OutlinedTextField with Visual Transformation Autofill") {
+            ComposableDemo("New login") { BTFResetCredentialsDemo() },
+            ComposableDemo("BasicTextField Autofill") { BasicTextFieldAutofill() },
+            ComposableDemo("BasicSecureTextField Autofill") { BasicSecureTextFieldAutofillDemo() },
+            ComposableDemo("TextField Autofill") { LegacyTextFieldAutofillDemo() },
+            ComposableDemo("OutlinedTextField Autofill") { OutlinedTextFieldAutofillDemo() },
+            ComposableDemo("OutlinedTextField with Visual Transformation Autofill") {
                 OutlinedTextFieldVisualTransformationAutofillDemo()
             },
             ComposableDemo("Navigation Sample") { AutofillNavigation() },
