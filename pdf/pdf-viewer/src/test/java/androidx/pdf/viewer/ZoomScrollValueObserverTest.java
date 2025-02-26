@@ -33,7 +33,6 @@ import androidx.pdf.select.SelectionActionMode;
 import androidx.pdf.util.ObservableValue;
 import androidx.pdf.util.Observables;
 import androidx.pdf.widget.ZoomView;
-import androidx.test.filters.SmallTest;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -47,7 +46,6 @@ import org.robolectric.RobolectricTestRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-@SmallTest
 @RunWith(RobolectricTestRunner.class)
 public class ZoomScrollValueObserverTest {
     private static final ObservableValue<ViewState>

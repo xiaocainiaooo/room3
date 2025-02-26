@@ -22,7 +22,6 @@ import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import org.junit.Before
@@ -41,7 +40,6 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
-@SmallTest
 @RunWith(RobolectricTestRunner::class)
 class GestureTrackerTest {
     private val gestureHandlerSpy =

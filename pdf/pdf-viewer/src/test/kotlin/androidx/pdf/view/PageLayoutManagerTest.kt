@@ -19,7 +19,6 @@ package androidx.pdf.view
 import android.graphics.Point
 import android.util.Range
 import androidx.pdf.PdfDocument
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,7 +41,6 @@ import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-@SmallTest
 class PageLayoutManagerTest {
     private val pdfDocument =
         mock<PdfDocument> {
