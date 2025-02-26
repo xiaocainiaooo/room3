@@ -654,18 +654,18 @@ public fun ScreenScaffold(
     val key = remember { Any() }
 
     key(scrollInfoProvider) {
-        DisposableEffect(key) { onDispose { scaffoldState.removeScreen(key) } }
+        DisposableEffect(key) { onDispose { scaffoldState.screenContent.removeScreen(key) } }
 
         ActiveFocusListener { focused ->
             if (focused) {
-                scaffoldState.addScreen(key, timeText, scrollInfoProvider)
+                scaffoldState.screenContent.addScreen(key, timeText, scrollInfoProvider)
             } else {
-                scaffoldState.removeScreen(key)
+                scaffoldState.screenContent.removeScreen(key)
             }
         }
     }
 
-    scaffoldState.UpdateIdlingDetectorIfNeeded()
+    scaffoldState.screenContent.UpdateIdlingDetectorIfNeeded()
 
     Box(modifier = modifier.fillMaxSize()) {
         Box(modifier = Modifier.overscroll(overscrollEffect)) { content(contentPadding) }
@@ -673,7 +673,7 @@ public fun ScreenScaffold(
         scrollInfoProvider?.let {
             AnimatedIndicator(
                 isVisible = {
-                    scaffoldState.screenStage.value != ScreenStage.Idle &&
+                    scaffoldState.screenContent.screenStage.value != ScreenStage.Idle &&
                         scrollInfoProvider.isScrollable
                 },
                 content = scrollIndicator,

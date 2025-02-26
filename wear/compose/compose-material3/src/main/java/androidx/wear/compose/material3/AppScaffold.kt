@@ -63,9 +63,10 @@ public fun AppScaffold(
                     }
             ) {
                 content()
-                scaffoldState.timeText()
+                scaffoldState.screenContent.timeText()
             }
-            scaffoldState.fullScreenContent?.let { it() }
+
+            scaffoldState.fullScreenContent.OverlayContent()
         }
     }
 }

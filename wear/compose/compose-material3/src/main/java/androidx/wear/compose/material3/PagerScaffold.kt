@@ -190,25 +190,26 @@ private fun PagerScaffoldImpl(
     val key = remember { Any() }
 
     key(scrollInfoProvider) {
-        DisposableEffect(key) { onDispose { scaffoldState.removeScreen(key) } }
+        DisposableEffect(key) { onDispose { scaffoldState.screenContent.removeScreen(key) } }
 
         ActiveFocusListener { focused ->
             if (focused) {
-                scaffoldState.addScreen(key, null, scrollInfoProvider)
+                scaffoldState.screenContent.addScreen(key, null, scrollInfoProvider)
             } else {
-                scaffoldState.removeScreen(key)
+                scaffoldState.screenContent.removeScreen(key)
             }
         }
     }
 
-    scaffoldState.UpdateIdlingDetectorIfNeeded()
+    scaffoldState.screenContent.UpdateIdlingDetectorIfNeeded()
 
     Box(modifier = modifier.fillMaxSize()) {
         pagerContent()
 
         AnimatedIndicator(
             isVisible = {
-                scaffoldState.screenStage.value != ScreenStage.Idle || pagerState.isScrollInProgress
+                scaffoldState.screenContent.screenStage.value != ScreenStage.Idle ||
+                    pagerState.isScrollInProgress
             },
             animationSpec = pageIndicatorAnimationSpec,
             content = pageIndicator,
