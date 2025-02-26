@@ -302,7 +302,6 @@ fun FloatingActionButtonMenuScope.FloatingActionButtonMenuItem(
             modifier =
                 modifier.itemVisible({ isVisible }).layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
-
                     layout(placeable.width, placeable.height) {
                         val target =
                             if (MenuItemRuler.current(Float.POSITIVE_INFINITY) <= 0) 1f else 0f
@@ -322,7 +321,9 @@ fun FloatingActionButtonMenuScope.FloatingActionButtonMenuItem(
                             } ?: Animatable(target, Float.VectorConverter)
                         alphaAnim = tempAlphaAnim
                         isVisible = tempAlphaAnim.value != 0f
-                        placeable.placeWithLayer(0, 0) { alpha = tempAlphaAnim.value }
+                        if (isVisible) {
+                            placeable.placeWithLayer(0, 0) { alpha = tempAlphaAnim.value }
+                        }
                     }
                 },
             shape = FabMenuBaselineTokens.ListItemContainerShape.value,
