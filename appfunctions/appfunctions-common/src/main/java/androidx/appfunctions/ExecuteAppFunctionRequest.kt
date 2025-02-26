@@ -54,8 +54,7 @@ public class ExecuteAppFunctionRequest(
     }
 
     public companion object {
-        // TODO: Update this API requirement once AppFunctionData requirement updated.
-        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         public fun fromPlatformExtensionClass(
             request: com.android.extensions.appfunctions.ExecuteAppFunctionRequest

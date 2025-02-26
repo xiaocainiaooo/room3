@@ -169,8 +169,7 @@ public class AppFunctionManagerCompat(private val context: Context) {
                         com.android.extensions.appfunctions.ExecuteAppFunctionResponse,
                         com.android.extensions.appfunctions.AppFunctionException
                     > {
-                    // TODO: Remove this API requirement once AppFunctionData requirement updated.
-                    @RequiresApi(36)
+                    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
                     override fun onResult(
                         result: com.android.extensions.appfunctions.ExecuteAppFunctionResponse
                     ) {
