@@ -34,7 +34,7 @@ import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
-import androidx.camera.core.DynamicRange
+import androidx.camera.core.DynamicRange.SDR
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
 import androidx.camera.core.impl.CameraControlInternal
@@ -64,6 +64,7 @@ import androidx.camera.testing.impl.video.Recording
 import androidx.camera.testing.impl.video.RecordingSession
 import androidx.camera.video.VideoRecordEvent.Finalize.ERROR_SOURCE_INACTIVE
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertThat
@@ -145,8 +146,7 @@ abstract class VideoRecordingTestBase(
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context: Context = ApplicationProvider.getApplicationContext()
-    // TODO(b/278168212): Only SDR is checked by now. Need to extend to HDR dynamic ranges.
-    private val dynamicRange = DynamicRange.SDR
+    private val defaultDynamicRange = SDR
     private lateinit var cameraProvider: ProcessCameraProviderWrapper
     private lateinit var lifecycleOwner: FakeLifecycleOwner
     private lateinit var preview: Preview
@@ -285,7 +285,7 @@ abstract class VideoRecordingTestBase(
     private fun testGetCorrectResolution_when_setAspectRatio(aspectRatio: Int) {
         // Pre-arrange.
         assumeExtraCroppingQuirk()
-        assumeTrue(videoCapabilities.getSupportedQualities(dynamicRange).isNotEmpty())
+        assumeTrue(videoCapabilities.getSupportedQualities(defaultDynamicRange).isNotEmpty())
 
         // Arrange.
         val recorder = Recorder.Builder().setAspectRatio(aspectRatio).build()
@@ -314,12 +314,13 @@ abstract class VideoRecordingTestBase(
         assumeExtraCroppingQuirk()
 
         // Arrange.
-        assumeTrue(videoCapabilities.getSupportedQualities(dynamicRange).isNotEmpty())
+        assumeTrue(videoCapabilities.getSupportedQualities(defaultDynamicRange).isNotEmpty())
         val quality = Quality.LOWEST
         val recorder = Recorder.Builder().setQualitySelector(QualitySelector.from(quality)).build()
         val videoCapture = VideoCapture.withOutput(recorder)
         // Arbitrary cropping
-        val profile = videoCapabilities.getProfiles(quality, dynamicRange)!!.defaultVideoProfile
+        val profile =
+            videoCapabilities.getProfiles(quality, defaultDynamicRange)!!.defaultVideoProfile
         val targetResolution = Size(profile.width, profile.height)
         val cropRect = Rect(6, 6, targetResolution.width - 7, targetResolution.height - 7)
         videoCapture.setViewPortCropRect(cropRect)
@@ -474,6 +475,24 @@ abstract class VideoRecordingTestBase(
         recordingSession.createRecording().recordAndVerify()
         recordingSession.createRecording().recordAndVerify()
         recordingSession.createRecording().recordAndVerify()
+    }
+
+    @SdkSuppress(minSdkVersion = 33)
+    @Test
+    fun canRecordMultipleFilesInARow_whenHdr() {
+        val recorder = Recorder.Builder().build()
+        val highDynamicRanges = videoCapabilities.supportedDynamicRanges.filter { it != SDR }
+        assumeTrue(highDynamicRanges.isNotEmpty())
+
+        highDynamicRanges.forEach { dynamicRange ->
+            assumeTrue(videoCapabilities.getSupportedQualities(dynamicRange).isNotEmpty())
+
+            val videoCapture = VideoCapture.Builder(recorder).setDynamicRange(dynamicRange).build()
+            checkAndBindUseCases(preview, videoCapture)
+            recordingSession.createRecording(recorder = recorder).recordAndVerify()
+            recordingSession.createRecording(recorder = recorder).recordAndVerify()
+            recordingSession.createRecording(recorder = recorder).recordAndVerify()
+        }
     }
 
     @Test
