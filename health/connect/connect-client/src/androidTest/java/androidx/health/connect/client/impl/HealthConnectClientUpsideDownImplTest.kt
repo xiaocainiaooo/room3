@@ -51,6 +51,7 @@ import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.CreateMedicalDataSourceRequest
+import androidx.health.connect.client.request.DeleteMedicalResourcesRequest
 import androidx.health.connect.client.request.GetMedicalDataSourcesRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesInitialRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
@@ -1270,7 +1271,7 @@ class HealthConnectClientUpsideDownImplTest {
     }
 
     @Test
-    fun insertMedicalResourcesThenDelete_expectSuccessfulDeletion() = runTest {
+    fun insertMedicalResourcesThenDeleteByIds_expectSuccessfulDeletion() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
@@ -1299,7 +1300,41 @@ class HealthConnectClientUpsideDownImplTest {
 
         val medicalResources =
             healthConnectClient.readMedicalResources(insertResponse.map { it.id })
+        assertThat(medicalResources).isEmpty()
+    }
 
+    @Test
+    fun insertMedicalResourcesThenDeleteByRequest_expectSuccessfulDeletion() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+        val dataSourceId =
+            healthConnectClient
+                .createMedicalDataSource(
+                    CreateMedicalDataSourceRequest(
+                        fhirBaseUri = FHIR_BASE_URI,
+                        displayName = MEDICAL_DATA_SOURCE_DISPLAY_NAME,
+                        fhirVersion = FHIR_VERSION_4_0_1
+                    )
+                )
+                .id
+        val fhirResourceId = "immunization-101"
+        val requests =
+            listOf(
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = fhirResourceId
+                )
+            )
+        val insertResponse = healthConnectClient.upsertMedicalResources(requests)
+
+        healthConnectClient.deleteMedicalResources(
+            DeleteMedicalResourcesRequest(setOf(dataSourceId))
+        )
+
+        val medicalResources =
+            healthConnectClient.readMedicalResources(insertResponse.map { it.id })
         assertThat(medicalResources).isEmpty()
     }
 

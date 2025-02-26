@@ -69,6 +69,7 @@ import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.CreateMedicalDataSourceRequest
+import androidx.health.connect.client.request.DeleteMedicalResourcesRequest
 import androidx.health.connect.client.request.GetMedicalDataSourcesRequest
 import androidx.health.connect.client.request.ReadMedicalResourcesRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
@@ -537,6 +538,25 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 suspendCancellableCoroutine { continuation ->
                     healthConnectManager.deleteMedicalResources(
                         ids.map { it.platformMedicalResourceId },
+                        executor,
+                        continuation.asOutcomeReceiver()
+                    )
+                }
+            }
+        }
+    }
+
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
+    override suspend fun deleteMedicalResources(request: DeleteMedicalResourcesRequest) {
+        withPhrFeatureCheckSuspend(
+            HealthConnectClientUpsideDownImpl::class,
+            "deleteMedicalResources(request: DeleteMedicalResourcesRequest)"
+        ) {
+            wrapPlatformException {
+                suspendCancellableCoroutine { continuation ->
+                    healthConnectManager.deleteMedicalResources(
+                        request.platformReadMedicalResourcesRequest,
                         executor,
                         continuation.asOutcomeReceiver()
                     )
