@@ -76,7 +76,10 @@ class LazyLayoutPrefetchState(
 
     /**
      * Schedules precomposition for the new item. If you also want to premeasure the item please use
-     * [schedulePremeasure] instead.
+     * [schedulePrecompositionAndPremeasure] instead. This function should only be called once per
+     * item. If the item has already been composed at the time this request executes, either from a
+     * previous call to this function or because the item is already visible, this request should
+     * have no meaningful effect.
      *
      * @param index item index to prefetch.
      */
@@ -98,11 +101,14 @@ class LazyLayoutPrefetchState(
         level = DeprecationLevel.WARNING
     )
     fun schedulePrefetch(index: Int, constraints: Constraints): PrefetchHandle =
-        schedulePremeasure(index, constraints, null)
+        schedulePrecompositionAndPremeasure(index, constraints, null)
 
     /**
      * Schedules precomposition and premeasure for the new item. This should be used instead of
-     * [schedulePrecomposition] if you also want to premeasure the item.
+     * [schedulePrecomposition] if you also want to premeasure the item. This function should only
+     * be called once per item. If the item has already been composed / measured at the time this
+     * request executes, either from a previous call to this function or because the item is already
+     * visible, this request should have no meaningful effect.
      *
      * @param index item index to prefetch.
      * @param constraints [Constraints] to use for premeasuring.
@@ -110,7 +116,7 @@ class LazyLayoutPrefetchState(
      *   the request is canceled or no measuring is performed this callback won't be called. Use
      *   [LazyLayoutPrefetchResultScope.getSize] to get the item's size.
      */
-    fun schedulePremeasure(
+    fun schedulePrecompositionAndPremeasure(
         index: Int,
         constraints: Constraints,
         onItemPremeasured: (LazyLayoutPrefetchResultScope.() -> Unit)? = null
@@ -176,7 +182,7 @@ class LazyLayoutPrefetchState(
             )
         }
 
-        override fun schedulePremeasure(index: Int, constraints: Constraints) {
+        override fun schedulePrecompositionAndPremeasure(index: Int, constraints: Constraints) {
             val prefetchHandleProvider = prefetchHandleProvider ?: return
             _requests.add(
                 prefetchHandleProvider.createNestedPrefetchRequest(
@@ -213,7 +219,7 @@ sealed interface NestedPrefetchScope {
      * Requests a child index to be precomposed as part of the prefetch of a parent LazyLayout.
      *
      * The prefetch will only do the precomposition for the new item. If you also want to premeasure
-     * please use [schedulePremeasure].
+     * please use [schedulePrecompositionAndPremeasure].
      *
      * @param index item index to prefetch.
      */
@@ -230,7 +236,7 @@ sealed interface NestedPrefetchScope {
         level = DeprecationLevel.WARNING
     )
     fun schedulePrefetch(index: Int, constraints: Constraints) =
-        schedulePremeasure(index, constraints)
+        schedulePrecompositionAndPremeasure(index, constraints)
 
     /**
      * Requests a child index to be precomposed and premeasured as part of the prefetch of a parent
@@ -239,7 +245,7 @@ sealed interface NestedPrefetchScope {
      * @param index the index of the child to prefetch.
      * @param constraints [Constraints] to use for premeasuring.
      */
-    fun schedulePremeasure(index: Int, constraints: Constraints)
+    fun schedulePrecompositionAndPremeasure(index: Int, constraints: Constraints)
 }
 
 /**
