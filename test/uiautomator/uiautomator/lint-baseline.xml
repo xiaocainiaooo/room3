@@ -13,8 +13,8 @@
     <issue
         id="BanUncheckedReflection"
         message="Method.invoke requires both an upper and lower SDK bounds checks to be safe, and the upper bound must be below SdkVersionInfo.HIGHEST_KNOWN_API."
-        errorLine1="                return (boolean) mXrUiAutomation_injectMotionEventToWindow.invoke("
-        errorLine2="                                 ^">
+        errorLine1="                        mInjectMotionEventToWindow.invoke(mXrUiAutomation, event, windowId, sync);"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/androidx/test/uiautomator/GestureController.java"/>
     </issue>
@@ -26,6 +26,15 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/androidx/test/uiautomator/GestureController.java"/>
+    </issue>
+
+    <issue
+        id="QueryAllPackagesPermission"
+        message="A `&lt;queries>` declaration should generally be used instead of QUERY_ALL_PACKAGES; see https://g.co/dev/packagevisibility for details"
+        errorLine1="    &lt;uses-permission android:name=&quot;android.permission.QUERY_ALL_PACKAGES&quot; />"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"/>
     </issue>
 
     <issue
@@ -51,6 +60,15 @@
         message="Functional interface parameters (such as parameter 1, &quot;condition&quot;, in androidx.test.uiautomator.UiObject2.wait) should be last to improve Kotlin interoperability; see https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions"
         errorLine1="    public &lt;U> U wait(@NonNull Condition&lt;? super UiObject2, U> condition, long timeout) {"
         errorLine2="                                                                          ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/test/uiautomator/UiObject2.java"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://developer.android.com/kotlin/interop#nullability_annotations"
+        errorLine1="    public AccessibilityNodeInfo getAccessibilityNodeInfo() {"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/androidx/test/uiautomator/UiObject2.java"/>
     </issue>
