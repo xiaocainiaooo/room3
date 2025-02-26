@@ -24,6 +24,7 @@ import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionComponentRegistryAnnotation
 import androidx.appfunctions.compiler.core.ProcessingException
+import androidx.appfunctions.metadata.AppFunctionAllOfTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
@@ -269,6 +270,18 @@ class AppFunctionInventoryProcessor(
                                             componentReferenceTypeMetadata
                                         )
                                         objectTypeMetadataPropertyName
+                                    }
+                                    is AppFunctionAllOfTypeMetadata -> {
+                                        val allOfTypeMetadataPropertyName =
+                                            getAllOfTypeMetadataPropertyNameForComponent(
+                                                componentReferenceKey
+                                            )
+                                        addPropertyForAllOfTypeMetadata(
+                                            allOfTypeMetadataPropertyName,
+                                            functionMetadataObjectClassBuilder,
+                                            componentReferenceTypeMetadata
+                                        )
+                                        allOfTypeMetadataPropertyName
                                     }
                                     else -> {
                                         // TODO provide KSNode to improve error message
@@ -665,6 +678,45 @@ class AppFunctionInventoryProcessor(
         )
     }
 
+    private fun addPropertyForAllOfTypeMetadata(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        allOfTypeMetadata: AppFunctionAllOfTypeMetadata,
+    ) {
+        val matchAllListPropertyName = propertyName + "_MATCH_ALL_LIST"
+        addPropertyForMatchAllList(
+            matchAllListPropertyName,
+            functionMetadataObjectClassBuilder,
+            allOfTypeMetadata.matchAll
+        )
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    IntrospectionHelper.APP_FUNCTION_ALL_OF_TYPE_METADATA_CLASS
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement(
+                            """
+                            %T(
+                                matchAll = %L,
+                                qualifiedName = %S,
+                                isNullable = %L
+                            )
+                            """
+                                .trimIndent(),
+                            IntrospectionHelper.APP_FUNCTION_ALL_OF_TYPE_METADATA_CLASS,
+                            matchAllListPropertyName,
+                            allOfTypeMetadata.qualifiedName,
+                            allOfTypeMetadata.isNullable
+                        )
+                    }
+                )
+                .build()
+        )
+    }
+
     private fun addPropertyForListOfRequiredObjectProperties(
         propertyName: String,
         functionMetadataObjectClassBuilder: TypeSpec.Builder,
@@ -762,6 +814,67 @@ class AppFunctionInventoryProcessor(
                 )
                 .build()
         )
+    }
+
+    private fun addPropertyForMatchAllList(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        matchAllList: List<AppFunctionDataTypeMetadata>,
+    ) {
+        functionMetadataObjectClassBuilder.addProperty(
+            PropertySpec.builder(
+                    propertyName,
+                    List::class.asClassName()
+                        .parameterizedBy(IntrospectionHelper.APP_FUNCTION_DATA_TYPE_METADATA)
+                )
+                .addModifiers(KModifier.PRIVATE)
+                .initializer(
+                    buildCodeBlock {
+                        addStatement("listOf(")
+                        indent()
+                        for ((index, dataTypeToMatch) in matchAllList.withIndex()) {
+                            val dataTypeToMatchPropertyName = propertyName + "_ITEM_${index}"
+                            addPropertyForDataTypeToMatch(
+                                dataTypeToMatchPropertyName,
+                                functionMetadataObjectClassBuilder,
+                                dataTypeToMatch
+                            )
+                            addStatement("%L,", dataTypeToMatchPropertyName)
+                        }
+                        unindent()
+                        addStatement(")")
+                    }
+                )
+                .build()
+        )
+    }
+
+    private fun addPropertyForDataTypeToMatch(
+        propertyName: String,
+        functionMetadataObjectClassBuilder: TypeSpec.Builder,
+        dataTypeToMatch: AppFunctionDataTypeMetadata
+    ) {
+        when (dataTypeToMatch) {
+            is AppFunctionReferenceTypeMetadata ->
+                addPropertyForReferenceTypeMetadata(
+                    propertyName,
+                    functionMetadataObjectClassBuilder,
+                    dataTypeToMatch
+                )
+            is AppFunctionObjectTypeMetadata ->
+                addPropertyForObjectTypeMetadata(
+                    propertyName,
+                    functionMetadataObjectClassBuilder,
+                    dataTypeToMatch
+                )
+            else ->
+                // TODO provide KSNode to improve error message
+                throw ProcessingException(
+                    "Invalid datatype metadata to match in allOf type. Only object and reference " +
+                        "types are supported: $dataTypeToMatch",
+                    null
+                )
+        }
     }
 
     /** Creates the `functionIdToMetadataMap` property of the `AppFunctionInventory`. */
@@ -913,6 +1026,16 @@ class AppFunctionInventoryProcessor(
      */
     private fun getObjectTypeMetadataPropertyNameForComponent(componentName: String): String {
         return "${componentName.uppercase().replace(".", "_")}_OBJECT_DATA_TYPE"
+    }
+
+    /**
+     * Generates the name of the property for the all of type metadata of a component.
+     *
+     * @param componentName The name of the component.
+     * @return The name of the property.
+     */
+    private fun getAllOfTypeMetadataPropertyNameForComponent(componentName: String): String {
+        return "${componentName.uppercase().replace(".", "_")}_ALL_OF_DATA_TYPE"
     }
 
     companion object {
