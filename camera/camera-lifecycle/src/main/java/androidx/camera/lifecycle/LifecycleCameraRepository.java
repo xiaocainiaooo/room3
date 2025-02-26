@@ -16,6 +16,8 @@
 
 package androidx.camera.lifecycle;
 
+import android.util.Range;
+
 import androidx.annotation.GuardedBy;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.CameraEffect;
@@ -280,6 +282,7 @@ final class LifecycleCameraRepository {
      * @param lifecycleCamera The LifecycleCamera which the use cases will be bound to.
      * @param viewPort The viewport which represents the visible camera sensor rect.
      * @param effects The effects applied to the camera outputs.
+     * @param targetHighSpeedFrameRate The target high speed frame rate.
      * @param useCases The use cases to bind to a lifecycle.
      * @param cameraCoordinator The {@link CameraCoordinator} for concurrent camera mode.
      *
@@ -291,6 +294,7 @@ final class LifecycleCameraRepository {
             @NonNull LifecycleCamera lifecycleCamera,
             @Nullable ViewPort viewPort,
             @NonNull List<CameraEffect> effects,
+            @NonNull Range<Integer> targetHighSpeedFrameRate,
             @NonNull Collection<UseCase> useCases,
             @Nullable CameraCoordinator cameraCoordinator) {
         synchronized (mLock) {
@@ -325,6 +329,8 @@ final class LifecycleCameraRepository {
             try {
                 lifecycleCamera.getCameraUseCaseAdapter().setViewPort(viewPort);
                 lifecycleCamera.getCameraUseCaseAdapter().setEffects(effects);
+                lifecycleCamera.getCameraUseCaseAdapter()
+                        .setTargetHighSpeedFrameRate(targetHighSpeedFrameRate);
                 lifecycleCamera.bind(useCases);
             } catch (CameraUseCaseAdapter.CameraException e) {
                 throw new IllegalArgumentException(e);
