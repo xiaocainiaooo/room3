@@ -29,7 +29,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertIs
-import kotlinx.coroutines.delay
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
@@ -108,6 +107,30 @@ class IntegrationTest {
     }
 
     @Test
+    fun executeAppFunction_functionInLibraryModule_success() = doBlocking {
+        var response =
+            appFunctionManager.executeAppFunction(
+                request =
+                    ExecuteAppFunctionRequest(
+                        targetContext.packageName,
+                        CONCAT_FUNCTION_ID,
+                        AppFunctionData.Builder("")
+                            .setString("str1", "log")
+                            .setString("str2", "cat")
+                            .build()
+                    )
+            )
+
+        val successResponse = assertIs<ExecuteAppFunctionResponse.Success>(response)
+        assertThat(
+                successResponse.returnValue.getString(
+                    ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE
+                )
+            )
+            .isEqualTo("logcat")
+    }
+
+    @Test
     fun executeAppFunction_functionNotFound_fail() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -126,7 +149,6 @@ class IntegrationTest {
 
     @Test
     fun executeAppFunction_appThrows_fail() = doBlocking {
-        delay(5)
         val response =
             appFunctionManager.executeAppFunction(
                 request =
@@ -151,6 +173,7 @@ class IntegrationTest {
     }
 
     private companion object {
+        // AppFunctions that are defined in the top-level module.
         const val APP_FUNCTION_ID = "androidx.appfunctions.integration.testapp.TestFunctions#add"
         const val DO_THROW_FUNCTION_ID =
             "androidx.appfunctions.integration.testapp.TestFunctions#doThrow"
@@ -158,12 +181,17 @@ class IntegrationTest {
             "androidx.appfunctions.integration.testapp.TestFunctions#voidFunction"
         const val IS_CREATED_BY_FACTORY_FUNCTION_ID =
             "androidx.appfunctions.integration.testapp.TestFactory#isCreatedByFactory"
+
+        // AppFunctions that are defined in a library module.
+        const val CONCAT_FUNCTION_ID =
+            "androidx.appfunctions.integration.testapp.library.TestFunctions2#concat"
         val FUNCTION_IDS =
             setOf(
                 APP_FUNCTION_ID,
                 DO_THROW_FUNCTION_ID,
                 VOID_FUNCTION_ID,
-                IS_CREATED_BY_FACTORY_FUNCTION_ID
+                IS_CREATED_BY_FACTORY_FUNCTION_ID,
+                CONCAT_FUNCTION_ID
             )
     }
 }
