@@ -647,27 +647,38 @@ class TabTest {
 
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
         val tabRowPadding = 52.dp
+
         // Indicator should be placed in the bottom left of the first tab
-        rule
-            .onNodeWithTag("indicator", true)
-            .assertPositionInRootIsEqualTo(
-                // Tabs in a scrollable tab row are offset 52.dp from each end
-                expectedLeft = tabRowBounds.width - tabRowPadding - minimumTabWidth,
-                expectedTop = tabRowBounds.height - indicatorHeight,
-            )
+        var indicatorBounds = rule.onNodeWithTag("indicator", true).getUnclippedBoundsInRoot()
+
+        // Split assertions to up tolerance to 1.dp
+        indicatorBounds.left.assertIsEqualTo(
+            expected = tabRowBounds.width - tabRowPadding - minimumTabWidth,
+            subject = "left",
+            tolerance = 1.dp
+        )
+        indicatorBounds.top.assertIsEqualTo(
+            expected = tabRowBounds.height - indicatorHeight,
+            subject = "top",
+            tolerance = 1.dp
+        )
 
         // Click the second tab
         rule.onAllNodes(isSelectable())[1].performClick()
 
         // Indicator should now be placed in the bottom left of the second tab.
         // For RTL layout, its x coordinate should be at the start of the TabRow.
-        rule
-            .onNodeWithTag("indicator", true)
-            .assertPositionInRootIsEqualTo(
-                expectedLeft =
-                    tabRowBounds.width - tabRowPadding - minimumTabWidth - minimumTabWidth,
-                expectedTop = tabRowBounds.height - indicatorHeight,
-            )
+        indicatorBounds = rule.onNodeWithTag("indicator", true).getUnclippedBoundsInRoot()
+        indicatorBounds.left.assertIsEqualTo(
+            expected = tabRowBounds.width - tabRowPadding - minimumTabWidth - minimumTabWidth,
+            subject = "left",
+            tolerance = 1.dp
+        )
+        indicatorBounds.top.assertIsEqualTo(
+            expected = tabRowBounds.height - indicatorHeight,
+            subject = "top",
+            tolerance = 1.dp
+        )
     }
 
     @Test
