@@ -42,8 +42,7 @@ import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
  * @throws [androidx.appfunctions.AppFunctionInvalidArgumentException] if the parameter in
  *   [AppFunctionData] is not valid according to [parameterMetadata].
  */
-// TODO: Update the RequiresApi in AppFunctionData to be T.
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 internal fun AppFunctionData.unsafeGetParameterValue(
     parameterMetadata: AppFunctionParameterMetadata,
 ): Any? =
@@ -87,7 +86,7 @@ internal fun AppFunctionData.unsafeGetParameterValue(
         )
     }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun AppFunctionData.getArrayTypeParameterValue(
     key: String,
     isRequired: Boolean,
@@ -117,7 +116,7 @@ private fun AppFunctionData.getArrayTypeParameterValue(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun AppFunctionData.unsafeGetSingleProperty(
     key: String,
     type: Int,
@@ -151,7 +150,7 @@ private fun AppFunctionData.unsafeGetSingleProperty(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun AppFunctionData.unsafeGetCollectionProperty(
     key: String,
     type: Int,

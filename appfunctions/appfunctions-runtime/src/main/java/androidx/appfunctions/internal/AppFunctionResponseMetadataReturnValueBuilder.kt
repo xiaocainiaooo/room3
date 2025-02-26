@@ -45,8 +45,7 @@ import androidx.appfunctions.metadata.AppFunctionResponseMetadata
  * @throws [AppFunctionAppUnknownException] if unable to build the return value based on
  *   [AppFunctionResponseMetadata].
  */
-// TODO: Update the RequiresApi in AppFunctionData to be T.
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 internal fun AppFunctionResponseMetadata.unsafeBuildReturnValue(result: Any?): AppFunctionData =
     try {
         if (result == null) {
@@ -60,7 +59,7 @@ internal fun AppFunctionResponseMetadata.unsafeBuildReturnValue(result: Any?): A
         throw AppFunctionAppUnknownException("Something went wrong when executing an app function")
     }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun AppFunctionDataTypeMetadata.unsafeBuildReturnValue(result: Any): AppFunctionData {
     return when (this) {
         is AppFunctionPrimitiveTypeMetadata -> {
@@ -81,7 +80,7 @@ private fun AppFunctionDataTypeMetadata.unsafeBuildReturnValue(result: Any): App
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun AppFunctionArrayTypeMetadata.unsafeBuildReturnValue(result: Any): AppFunctionData {
     return when (val castItemType = itemType) {
         is AppFunctionPrimitiveTypeMetadata -> {
@@ -101,7 +100,7 @@ private fun AppFunctionArrayTypeMetadata.unsafeBuildReturnValue(result: Any): Ap
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionData {
     val builder = AppFunctionData.Builder("")
     when (type) {
@@ -151,7 +150,7 @@ private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionDat
     return builder.build()
 }
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun unsafeBuildCollectionReturnValue(type: Int, result: Any): AppFunctionData {
     val builder = AppFunctionData.Builder("")
     when (type) {

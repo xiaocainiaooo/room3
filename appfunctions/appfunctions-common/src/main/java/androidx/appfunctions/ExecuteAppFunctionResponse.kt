@@ -49,8 +49,7 @@ public sealed interface ExecuteAppFunctionResponse {
             public const val PROPERTY_RETURN_VALUE: String =
                 com.android.extensions.appfunctions.ExecuteAppFunctionResponse.PROPERTY_RETURN_VALUE
 
-            // TODO: Update this API requirement once AppFunctionData requirement updated.
-            @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+            @RequiresApi(Build.VERSION_CODES.TIRAMISU)
             @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
             public fun fromPlatformExtensionClass(
                 response: com.android.extensions.appfunctions.ExecuteAppFunctionResponse
