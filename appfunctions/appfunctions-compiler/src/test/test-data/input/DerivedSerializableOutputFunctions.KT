@@ -3,28 +3,30 @@ package com.testdata
 import androidx.appfunctions.AppFunction
 import androidx.appfunctions.AppFunctionContext
 
-class RecursiveSerializableInputFunctions {
+class DerivedSerializableOutputFunctions {
     @AppFunction
-    fun simpleFunction(
-        appFunctionContext: AppFunctionContext,
-        serializable: RecursiveSerializable
-    ) {}
+    fun simpleFunction(appFunctionContext: AppFunctionContext): DerivedSerializable {
+        return DerivedSerializable("testValue", 1L)
+    }
 
     @AppFunction
     fun simpleFunctionSerializableList(
         appFunctionContext: AppFunctionContext,
-        serializable: List<RecursiveSerializable>
-    ) {}
+    ): List<DerivedSerializable> {
+        return listOf(DerivedSerializable("testValue", 1L))
+    }
 
     @AppFunction
     fun simpleFunctionNullableSerializableList(
         appFunctionContext: AppFunctionContext,
-        serializable: List<RecursiveSerializable>?
-    ) {}
+    ): List<DerivedSerializable>? {
+        return null
+    }
 
     @AppFunction
     fun simpleFunctionNullableSerializable(
         appFunctionContext: AppFunctionContext,
-        serializable: RecursiveSerializable?
-    ) {}
+    ): DerivedSerializable? {
+        return null
+    }
 }
