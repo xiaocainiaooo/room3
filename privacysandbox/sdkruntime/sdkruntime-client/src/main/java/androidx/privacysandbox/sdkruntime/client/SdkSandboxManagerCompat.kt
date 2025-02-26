@@ -129,7 +129,8 @@ private constructor(
         params: Bundle,
         apiVersion: Int
     ): SandboxedSdkCompat {
-        val customHandshake = VersionHandshake(overrideApiVersion = apiVersion)
+        val customHandshake =
+            VersionHandshake(overrideClientVersion = apiVersion, overrideSdkVersion = apiVersion)
         return localSdkRegistry.loadSdk(sdkName, params, customHandshake)
     }
 

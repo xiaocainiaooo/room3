@@ -20,8 +20,6 @@ import android.content.Context
 import android.os.Bundle
 import android.os.IBinder
 import androidx.privacysandbox.sdkruntime.core.AppOwnedSdkSandboxInterfaceCompat
-import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException
-import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException.Companion.LOAD_SDK_NOT_FOUND
 import androidx.privacysandbox.sdkruntime.core.SandboxedSdkCompat
 import androidx.privacysandbox.sdkruntime.core.SdkSandboxClientImportanceListenerCompat
 import androidx.privacysandbox.sdkruntime.core.activity.SdkSandboxActivityHandlerCompat
@@ -46,18 +44,7 @@ internal class LocalImpl(
         executor: Executor,
         callback: LoadSdkCallback
     ) {
-        if (ClientFeature.LOAD_SDK.isAvailable(clientVersion)) {
-            implFromClient.loadSdk(sdkName, params, executor, callback)
-        } else {
-            executor.execute {
-                callback.onError(
-                    LoadSdkCompatException(
-                        LOAD_SDK_NOT_FOUND,
-                        "Client library version doesn't support locally loaded SDKs"
-                    )
-                )
-            }
-        }
+        implFromClient.loadSdk(sdkName, params, executor, callback)
     }
 
     override fun getSandboxedSdks(): List<SandboxedSdkCompat> {
@@ -65,35 +52,19 @@ internal class LocalImpl(
     }
 
     override fun getAppOwnedSdkSandboxInterfaces(): List<AppOwnedSdkSandboxInterfaceCompat> {
-        return if (ClientFeature.APP_OWNED_INTERFACES.isAvailable(clientVersion)) {
-            implFromClient.getAppOwnedSdkSandboxInterfaces()
-        } else {
-            emptyList()
-        }
+        return implFromClient.getAppOwnedSdkSandboxInterfaces()
     }
 
     override fun registerSdkSandboxActivityHandler(
         handlerCompat: SdkSandboxActivityHandlerCompat
     ): IBinder {
-        if (ClientFeature.SDK_ACTIVITY_HANDLER.isAvailable(clientVersion)) {
-            return implFromClient.registerSdkSandboxActivityHandler(handlerCompat)
-        } else {
-            throw UnsupportedOperationException(
-                "Client library version doesn't support SdkActivities"
-            )
-        }
+        return implFromClient.registerSdkSandboxActivityHandler(handlerCompat)
     }
 
     override fun unregisterSdkSandboxActivityHandler(
         handlerCompat: SdkSandboxActivityHandlerCompat
     ) {
-        if (ClientFeature.SDK_ACTIVITY_HANDLER.isAvailable(clientVersion)) {
-            implFromClient.unregisterSdkSandboxActivityHandler(handlerCompat)
-        } else {
-            throw UnsupportedOperationException(
-                "Client library version doesn't support SdkActivities"
-            )
-        }
+        implFromClient.unregisterSdkSandboxActivityHandler(handlerCompat)
     }
 
     override fun getClientPackageName(): String {

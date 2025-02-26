@@ -72,7 +72,10 @@ internal class LocalSdkProviderTest(
 
         val overrideVersionHandshake =
             if (originalSdkVersion != forcedSdkVersion) {
-                VersionHandshake(forcedSdkVersion)
+                VersionHandshake(
+                    overrideClientVersion = forcedSdkVersion,
+                    overrideSdkVersion = forcedSdkVersion
+                )
             } else {
                 null
             }
