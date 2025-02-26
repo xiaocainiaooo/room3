@@ -383,9 +383,6 @@ class VideoCaptureDeviceTest(
     @SdkSuppress(minSdkVersion = 33) // HLG10 only supported on API 33+
     @Test
     fun dynamicRange_isSetInSessionConfig(): Unit = runBlocking {
-        // TODO(b/275632219): Disabled on camera-pipe until automatic dynamic range
-        //  selection is supported
-        assumeTrue(implName != CameraPipeConfig::class.simpleName)
         assumeTrue(
             "Device does not support HLG10",
             cameraInfo.supportedDynamicRanges.contains(HLG_10_BIT)
@@ -424,9 +421,6 @@ class VideoCaptureDeviceTest(
     @SdkSuppress(minSdkVersion = 33) // 10-bit HDR only supported on API 33+
     @Test
     fun dynamicRangeHlg_selectsAndAppliesHlgForConcurrentPreview(): Unit = runBlocking {
-        // TODO(b/275632219): Disabled on camera-pipe until automatic dynamic range
-        //  selection is supported
-        assumeTrue(implName != CameraPipeConfig::class.simpleName)
         assumeTrue(
             "Device does not support HLG10",
             cameraInfo.supportedDynamicRanges.contains(HLG_10_BIT)
@@ -463,9 +457,6 @@ class VideoCaptureDeviceTest(
         requestedDynamicRange: DynamicRange? = null,
         assertBlock: (selectedDynamicRange: DynamicRange) -> Unit
     ) {
-        // TODO(b/275632219): Disabled on camera-pipe until automatic dynamic range
-        //  selection is supported
-        assumeTrue(implName != CameraPipeConfig::class.simpleName)
         // Arrange.
         val videoOutput = createTestVideoOutput()
         val videoCapture =
