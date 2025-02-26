@@ -267,6 +267,10 @@ abstract interface androidx.compose.material3/SelectableDates { // androidx.comp
 
 abstract interface androidx.compose.material3/SingleChoiceSegmentedButtonRowScope : androidx.compose.foundation.layout/RowScope // androidx.compose.material3/SingleChoiceSegmentedButtonRowScope|null[0]
 
+abstract interface androidx.compose.material3/SingleRowTopAppBarOverride { // androidx.compose.material3/SingleRowTopAppBarOverride|null[0]
+    abstract fun (androidx.compose.material3/SingleRowTopAppBarOverrideScope).SingleRowTopAppBar() // androidx.compose.material3/SingleRowTopAppBarOverride.SingleRowTopAppBar|SingleRowTopAppBar@androidx.compose.material3.SingleRowTopAppBarOverrideScope(){}[0]
+}
+
 abstract interface androidx.compose.material3/SnackbarData { // androidx.compose.material3/SnackbarData|null[0]
     abstract val visuals // androidx.compose.material3/SnackbarData.visuals|{}visuals[0]
         abstract fun <get-visuals>(): androidx.compose.material3/SnackbarVisuals // androidx.compose.material3/SnackbarData.visuals.<get-visuals>|<get-visuals>(){}[0]
@@ -340,6 +344,10 @@ abstract interface androidx.compose.material3/TopAppBarScrollBehavior { // andro
         abstract fun <get-snapAnimationSpec>(): androidx.compose.animation.core/AnimationSpec<kotlin/Float>? // androidx.compose.material3/TopAppBarScrollBehavior.snapAnimationSpec.<get-snapAnimationSpec>|<get-snapAnimationSpec>(){}[0]
     abstract val state // androidx.compose.material3/TopAppBarScrollBehavior.state|{}state[0]
         abstract fun <get-state>(): androidx.compose.material3/TopAppBarState // androidx.compose.material3/TopAppBarScrollBehavior.state.<get-state>|<get-state>(){}[0]
+}
+
+abstract interface androidx.compose.material3/TwoRowsTopAppBarOverride { // androidx.compose.material3/TwoRowsTopAppBarOverride|null[0]
+    abstract fun (androidx.compose.material3/TwoRowsTopAppBarOverrideScope).TwoRowsTopAppBar() // androidx.compose.material3/TwoRowsTopAppBarOverride.TwoRowsTopAppBar|TwoRowsTopAppBar@androidx.compose.material3.TwoRowsTopAppBarOverrideScope(){}[0]
 }
 
 abstract interface androidx.compose.material3/WideNavigationRailState { // androidx.compose.material3/WideNavigationRailState|null[0]
@@ -1304,6 +1312,33 @@ final class androidx.compose.material3/SheetState { // androidx.compose.material
     }
 }
 
+final class androidx.compose.material3/SingleRowTopAppBarOverrideScope { // androidx.compose.material3/SingleRowTopAppBarOverrideScope|null[0]
+    final val actions // androidx.compose.material3/SingleRowTopAppBarOverrideScope.actions|{}actions[0]
+        final fun <get-actions>(): kotlin/Function1<androidx.compose.foundation.layout/RowScope, kotlin/Unit> // androidx.compose.material3/SingleRowTopAppBarOverrideScope.actions.<get-actions>|<get-actions>(){}[0]
+    final val colors // androidx.compose.material3/SingleRowTopAppBarOverrideScope.colors|{}colors[0]
+        final fun <get-colors>(): androidx.compose.material3/TopAppBarColors // androidx.compose.material3/SingleRowTopAppBarOverrideScope.colors.<get-colors>|<get-colors>(){}[0]
+    final val expandedHeight // androidx.compose.material3/SingleRowTopAppBarOverrideScope.expandedHeight|{}expandedHeight[0]
+        final fun <get-expandedHeight>(): androidx.compose.ui.unit/Dp // androidx.compose.material3/SingleRowTopAppBarOverrideScope.expandedHeight.<get-expandedHeight>|<get-expandedHeight>(){}[0]
+    final val modifier // androidx.compose.material3/SingleRowTopAppBarOverrideScope.modifier|{}modifier[0]
+        final fun <get-modifier>(): androidx.compose.ui/Modifier // androidx.compose.material3/SingleRowTopAppBarOverrideScope.modifier.<get-modifier>|<get-modifier>(){}[0]
+    final val navigationIcon // androidx.compose.material3/SingleRowTopAppBarOverrideScope.navigationIcon|{}navigationIcon[0]
+        final fun <get-navigationIcon>(): kotlin/Function0<kotlin/Unit> // androidx.compose.material3/SingleRowTopAppBarOverrideScope.navigationIcon.<get-navigationIcon>|<get-navigationIcon>(){}[0]
+    final val scrollBehavior // androidx.compose.material3/SingleRowTopAppBarOverrideScope.scrollBehavior|{}scrollBehavior[0]
+        final fun <get-scrollBehavior>(): androidx.compose.material3/TopAppBarScrollBehavior? // androidx.compose.material3/SingleRowTopAppBarOverrideScope.scrollBehavior.<get-scrollBehavior>|<get-scrollBehavior>(){}[0]
+    final val subtitle // androidx.compose.material3/SingleRowTopAppBarOverrideScope.subtitle|{}subtitle[0]
+        final fun <get-subtitle>(): kotlin/Function0<kotlin/Unit>? // androidx.compose.material3/SingleRowTopAppBarOverrideScope.subtitle.<get-subtitle>|<get-subtitle>(){}[0]
+    final val subtitleTextStyle // androidx.compose.material3/SingleRowTopAppBarOverrideScope.subtitleTextStyle|{}subtitleTextStyle[0]
+        final fun <get-subtitleTextStyle>(): androidx.compose.ui.text/TextStyle // androidx.compose.material3/SingleRowTopAppBarOverrideScope.subtitleTextStyle.<get-subtitleTextStyle>|<get-subtitleTextStyle>(){}[0]
+    final val title // androidx.compose.material3/SingleRowTopAppBarOverrideScope.title|{}title[0]
+        final fun <get-title>(): kotlin/Function0<kotlin/Unit> // androidx.compose.material3/SingleRowTopAppBarOverrideScope.title.<get-title>|<get-title>(){}[0]
+    final val titleHorizontalAlignment // androidx.compose.material3/SingleRowTopAppBarOverrideScope.titleHorizontalAlignment|{}titleHorizontalAlignment[0]
+        final fun <get-titleHorizontalAlignment>(): androidx.compose.ui/Alignment.Horizontal // androidx.compose.material3/SingleRowTopAppBarOverrideScope.titleHorizontalAlignment.<get-titleHorizontalAlignment>|<get-titleHorizontalAlignment>(){}[0]
+    final val titleTextStyle // androidx.compose.material3/SingleRowTopAppBarOverrideScope.titleTextStyle|{}titleTextStyle[0]
+        final fun <get-titleTextStyle>(): androidx.compose.ui.text/TextStyle // androidx.compose.material3/SingleRowTopAppBarOverrideScope.titleTextStyle.<get-titleTextStyle>|<get-titleTextStyle>(){}[0]
+    final val windowInsets // androidx.compose.material3/SingleRowTopAppBarOverrideScope.windowInsets|{}windowInsets[0]
+        final fun <get-windowInsets>(): androidx.compose.foundation.layout/WindowInsets // androidx.compose.material3/SingleRowTopAppBarOverrideScope.windowInsets.<get-windowInsets>|<get-windowInsets>(){}[0]
+}
+
 final class androidx.compose.material3/SliderColors { // androidx.compose.material3/SliderColors|null[0]
     constructor <init>(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color) // androidx.compose.material3/SliderColors.<init>|<init>(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color){}[0]
 
@@ -1692,6 +1727,45 @@ final class androidx.compose.material3/TopAppBarState { // androidx.compose.mate
         final val Saver // androidx.compose.material3/TopAppBarState.Companion.Saver|{}Saver[0]
             final fun <get-Saver>(): androidx.compose.runtime.saveable/Saver<androidx.compose.material3/TopAppBarState, *> // androidx.compose.material3/TopAppBarState.Companion.Saver.<get-Saver>|<get-Saver>(){}[0]
     }
+}
+
+final class androidx.compose.material3/TwoRowsTopAppBarOverrideScope { // androidx.compose.material3/TwoRowsTopAppBarOverrideScope|null[0]
+    final val actions // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.actions|{}actions[0]
+        final fun <get-actions>(): kotlin/Function1<androidx.compose.foundation.layout/RowScope, kotlin/Unit> // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.actions.<get-actions>|<get-actions>(){}[0]
+    final val collapsedHeight // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.collapsedHeight|{}collapsedHeight[0]
+        final fun <get-collapsedHeight>(): androidx.compose.ui.unit/Dp // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.collapsedHeight.<get-collapsedHeight>|<get-collapsedHeight>(){}[0]
+    final val colors // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.colors|{}colors[0]
+        final fun <get-colors>(): androidx.compose.material3/TopAppBarColors // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.colors.<get-colors>|<get-colors>(){}[0]
+    final val expandedHeight // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.expandedHeight|{}expandedHeight[0]
+        final fun <get-expandedHeight>(): androidx.compose.ui.unit/Dp // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.expandedHeight.<get-expandedHeight>|<get-expandedHeight>(){}[0]
+    final val modifier // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.modifier|{}modifier[0]
+        final fun <get-modifier>(): androidx.compose.ui/Modifier // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.modifier.<get-modifier>|<get-modifier>(){}[0]
+    final val navigationIcon // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.navigationIcon|{}navigationIcon[0]
+        final fun <get-navigationIcon>(): kotlin/Function0<kotlin/Unit> // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.navigationIcon.<get-navigationIcon>|<get-navigationIcon>(){}[0]
+    final val scrollBehavior // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.scrollBehavior|{}scrollBehavior[0]
+        final fun <get-scrollBehavior>(): androidx.compose.material3/TopAppBarScrollBehavior? // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.scrollBehavior.<get-scrollBehavior>|<get-scrollBehavior>(){}[0]
+    final val smallSubtitle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallSubtitle|{}smallSubtitle[0]
+        final fun <get-smallSubtitle>(): kotlin/Function0<kotlin/Unit>? // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallSubtitle.<get-smallSubtitle>|<get-smallSubtitle>(){}[0]
+    final val smallSubtitleTextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallSubtitleTextStyle|{}smallSubtitleTextStyle[0]
+        final fun <get-smallSubtitleTextStyle>(): androidx.compose.ui.text/TextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallSubtitleTextStyle.<get-smallSubtitleTextStyle>|<get-smallSubtitleTextStyle>(){}[0]
+    final val smallTitle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallTitle|{}smallTitle[0]
+        final fun <get-smallTitle>(): kotlin/Function0<kotlin/Unit> // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallTitle.<get-smallTitle>|<get-smallTitle>(){}[0]
+    final val smallTitleTextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallTitleTextStyle|{}smallTitleTextStyle[0]
+        final fun <get-smallTitleTextStyle>(): androidx.compose.ui.text/TextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.smallTitleTextStyle.<get-smallTitleTextStyle>|<get-smallTitleTextStyle>(){}[0]
+    final val subtitle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.subtitle|{}subtitle[0]
+        final fun <get-subtitle>(): kotlin/Function0<kotlin/Unit>? // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.subtitle.<get-subtitle>|<get-subtitle>(){}[0]
+    final val subtitleTextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.subtitleTextStyle|{}subtitleTextStyle[0]
+        final fun <get-subtitleTextStyle>(): androidx.compose.ui.text/TextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.subtitleTextStyle.<get-subtitleTextStyle>|<get-subtitleTextStyle>(){}[0]
+    final val title // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.title|{}title[0]
+        final fun <get-title>(): kotlin/Function0<kotlin/Unit> // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.title.<get-title>|<get-title>(){}[0]
+    final val titleBottomPadding // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.titleBottomPadding|{}titleBottomPadding[0]
+        final fun <get-titleBottomPadding>(): androidx.compose.ui.unit/Dp // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.titleBottomPadding.<get-titleBottomPadding>|<get-titleBottomPadding>(){}[0]
+    final val titleHorizontalAlignment // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.titleHorizontalAlignment|{}titleHorizontalAlignment[0]
+        final fun <get-titleHorizontalAlignment>(): androidx.compose.ui/Alignment.Horizontal // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.titleHorizontalAlignment.<get-titleHorizontalAlignment>|<get-titleHorizontalAlignment>(){}[0]
+    final val titleTextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.titleTextStyle|{}titleTextStyle[0]
+        final fun <get-titleTextStyle>(): androidx.compose.ui.text/TextStyle // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.titleTextStyle.<get-titleTextStyle>|<get-titleTextStyle>(){}[0]
+    final val windowInsets // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.windowInsets|{}windowInsets[0]
+        final fun <get-windowInsets>(): androidx.compose.foundation.layout/WindowInsets // androidx.compose.material3/TwoRowsTopAppBarOverrideScope.windowInsets.<get-windowInsets>|<get-windowInsets>(){}[0]
 }
 
 final class androidx.compose.material3/Typography { // androidx.compose.material3/Typography|null[0]
@@ -2325,6 +2399,14 @@ final object androidx.compose.material3/DefaultNavigationBarOverride : androidx.
 
 final object androidx.compose.material3/DefaultNavigationRailOverride : androidx.compose.material3/NavigationRailOverride { // androidx.compose.material3/DefaultNavigationRailOverride|null[0]
     final fun (androidx.compose.material3/NavigationRailOverrideScope).NavigationRail() // androidx.compose.material3/DefaultNavigationRailOverride.NavigationRail|NavigationRail@androidx.compose.material3.NavigationRailOverrideScope(){}[0]
+}
+
+final object androidx.compose.material3/DefaultSingleRowTopAppBarOverride : androidx.compose.material3/SingleRowTopAppBarOverride { // androidx.compose.material3/DefaultSingleRowTopAppBarOverride|null[0]
+    final fun (androidx.compose.material3/SingleRowTopAppBarOverrideScope).SingleRowTopAppBar() // androidx.compose.material3/DefaultSingleRowTopAppBarOverride.SingleRowTopAppBar|SingleRowTopAppBar@androidx.compose.material3.SingleRowTopAppBarOverrideScope(){}[0]
+}
+
+final object androidx.compose.material3/DefaultTwoRowsTopAppBarOverride : androidx.compose.material3/TwoRowsTopAppBarOverride { // androidx.compose.material3/DefaultTwoRowsTopAppBarOverride|null[0]
+    final fun (androidx.compose.material3/TwoRowsTopAppBarOverrideScope).TwoRowsTopAppBar() // androidx.compose.material3/DefaultTwoRowsTopAppBarOverride.TwoRowsTopAppBar|TwoRowsTopAppBar@androidx.compose.material3.TwoRowsTopAppBarOverrideScope(){}[0]
 }
 
 final object androidx.compose.material3/DividerDefaults { // androidx.compose.material3/DividerDefaults|null[0]
@@ -3241,10 +3323,14 @@ final val androidx.compose.material3/LocalNavigationRailOverride // androidx.com
     final fun <get-LocalNavigationRailOverride>(): androidx.compose.runtime/ProvidableCompositionLocal<androidx.compose.material3/NavigationRailOverride> // androidx.compose.material3/LocalNavigationRailOverride.<get-LocalNavigationRailOverride>|<get-LocalNavigationRailOverride>(){}[0]
 final val androidx.compose.material3/LocalRippleConfiguration // androidx.compose.material3/LocalRippleConfiguration|{}LocalRippleConfiguration[0]
     final fun <get-LocalRippleConfiguration>(): androidx.compose.runtime/ProvidableCompositionLocal<androidx.compose.material3/RippleConfiguration?> // androidx.compose.material3/LocalRippleConfiguration.<get-LocalRippleConfiguration>|<get-LocalRippleConfiguration>(){}[0]
+final val androidx.compose.material3/LocalSingleRowTopAppBarOverride // androidx.compose.material3/LocalSingleRowTopAppBarOverride|{}LocalSingleRowTopAppBarOverride[0]
+    final fun <get-LocalSingleRowTopAppBarOverride>(): androidx.compose.runtime/ProvidableCompositionLocal<androidx.compose.material3/SingleRowTopAppBarOverride> // androidx.compose.material3/LocalSingleRowTopAppBarOverride.<get-LocalSingleRowTopAppBarOverride>|<get-LocalSingleRowTopAppBarOverride>(){}[0]
 final val androidx.compose.material3/LocalTextStyle // androidx.compose.material3/LocalTextStyle|{}LocalTextStyle[0]
     final fun <get-LocalTextStyle>(): androidx.compose.runtime/ProvidableCompositionLocal<androidx.compose.ui.text/TextStyle> // androidx.compose.material3/LocalTextStyle.<get-LocalTextStyle>|<get-LocalTextStyle>(){}[0]
 final val androidx.compose.material3/LocalTonalElevationEnabled // androidx.compose.material3/LocalTonalElevationEnabled|{}LocalTonalElevationEnabled[0]
     final fun <get-LocalTonalElevationEnabled>(): androidx.compose.runtime/ProvidableCompositionLocal<kotlin/Boolean> // androidx.compose.material3/LocalTonalElevationEnabled.<get-LocalTonalElevationEnabled>|<get-LocalTonalElevationEnabled>(){}[0]
+final val androidx.compose.material3/LocalTwoRowsTopAppBarOverride // androidx.compose.material3/LocalTwoRowsTopAppBarOverride|{}LocalTwoRowsTopAppBarOverride[0]
+    final fun <get-LocalTwoRowsTopAppBarOverride>(): androidx.compose.runtime/ProvidableCompositionLocal<androidx.compose.material3/TwoRowsTopAppBarOverride> // androidx.compose.material3/LocalTwoRowsTopAppBarOverride.<get-LocalTwoRowsTopAppBarOverride>|<get-LocalTwoRowsTopAppBarOverride>(){}[0]
 final val androidx.compose.material3/isPm // androidx.compose.material3/isPm|@androidx.compose.material3.TimePickerState{}isPm[0]
     final fun (androidx.compose.material3/TimePickerState).<get-isPm>(): kotlin/Boolean // androidx.compose.material3/isPm.<get-isPm>|<get-isPm>@androidx.compose.material3.TimePickerState(){}[0]
 
