@@ -104,7 +104,7 @@ class ComposableLifecycleCurrentStateDetectorTest : LintDetectorTest() {
         lint()
             .files(
                 kotlin(
-                    """
+                        """
                 package androidx.lifecycle.foo
 
                 import androidx.compose.runtime.Composable
@@ -150,8 +150,8 @@ class ComposableLifecycleCurrentStateDetectorTest : LintDetectorTest() {
                     }
                 }
             """
-                        .trimIndent()
-                ),
+                    )
+                    .indented(),
                 Stubs.Composable,
                 lifecycleStub
             )
@@ -236,7 +236,7 @@ Fix for src/androidx/lifecycle/foo/test.kt line 42: Replace with currentStateAsS
         lint()
             .files(
                 kotlin(
-                    """
+                        """
                 package androidx.lifecycle.foo
 
                 import androidx.compose.runtime.Composable
@@ -279,8 +279,8 @@ Fix for src/androidx/lifecycle/foo/test.kt line 42: Replace with currentStateAsS
                     }
                 }
             """
-                        .trimIndent()
-                ),
+                    )
+                    .indented(),
                 Stubs.Composable,
                 lifecycleStub
             )

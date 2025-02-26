@@ -101,7 +101,7 @@ class ComposableStateFlowValueDetectorTest : LintDetectorTest() {
         lint()
             .files(
                 kotlin(
-                    """
+                        """
                 package androidx.compose.runtime.foo
 
                 import androidx.compose.runtime.Composable
@@ -160,8 +160,8 @@ class ComposableStateFlowValueDetectorTest : LintDetectorTest() {
                     }
                 }
             """
-                        .trimIndent()
-                ),
+                    )
+                    .indented(),
                 Stubs.Composable,
                 stateFlowStub
             )
@@ -309,7 +309,7 @@ Fix for src/androidx/compose/runtime/foo/TestFlow.kt line 55: Replace with colle
         lint()
             .files(
                 kotlin(
-                    """
+                        """
                 package androidx.compose.runtime.foo
 
                 import androidx.compose.runtime.Composable
@@ -365,8 +365,8 @@ Fix for src/androidx/compose/runtime/foo/TestFlow.kt line 55: Replace with colle
                     }
                 }
             """
-                        .trimIndent()
-                ),
+                    )
+                    .indented(),
                 Stubs.Composable,
                 stateFlowStub
             )
