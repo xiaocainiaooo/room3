@@ -413,6 +413,17 @@ class LifecycleCameraRepositoryTest {
     }
 
     @Test
+    fun removeLifecycleCameras_removedFromRepository() {
+        repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)
+        val key =
+            LifecycleCameraRepository.Key.create(lifecycleOwner, cameraUseCaseAdapter.cameraId)
+        repository.removeLifecycleCameras(setOf(key))
+
+        assertThat(repository.getLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter.cameraId))
+            .isNull()
+    }
+
+    @Test
     fun lifecycleCameraWithDifferentCameraConfig_returnDifferentInstance() {
         val lifecycleCamera1 =
             repository.createLifecycleCamera(lifecycleOwner, cameraUseCaseAdapter)

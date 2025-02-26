@@ -21,10 +21,10 @@ import android.util.Range;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.CameraEffect;
+import androidx.camera.core.Logger;
 import androidx.camera.core.UseCase;
 import androidx.camera.core.ViewPort;
 import androidx.camera.core.concurrent.CameraCoordinator;
-import androidx.camera.core.impl.AdapterCameraInfo;
 import androidx.camera.core.impl.CameraInternal;
 import androidx.camera.core.internal.CameraUseCaseAdapter;
 import androidx.core.util.Preconditions;
@@ -73,6 +73,7 @@ import java.util.Set;
  * LifecycleCamera will be released.
  */
 final class LifecycleCameraRepository {
+    private static final String TAG = "LifecycleCameraRepository";
     private static final Object INSTANCE_LOCK = new Object();
     @GuardedBy("INSTANCE_LOCK")
     private static LifecycleCameraRepository sInstance = null;
@@ -148,7 +149,7 @@ final class LifecycleCameraRepository {
     }
 
     /**
-     * Get the LifecycleCamera which contains the same LifecycleOwner and a
+     * Get the {@link LifecycleCamera} which contains the same LifecycleOwner and a
      * CameraUseCaseAdapter.CameraId.
      *
      * @return null if no such LifecycleCamera exists.
@@ -162,8 +163,8 @@ final class LifecycleCameraRepository {
     }
 
     /**
-     * Returns all the LifecycleCamera that have been created by the repository which haven't
-     * been destroyed yet.
+     * Returns all the {@link LifecycleCamera}s that have been created by the repository which
+     * haven't been destroyed yet.
      */
     Collection<LifecycleCamera> getLifecycleCameras() {
         synchronized (mLock) {
@@ -172,7 +173,23 @@ final class LifecycleCameraRepository {
     }
 
     /**
-     * Clears out all of the cameras from the repository.
+     * Removes the {@link LifecycleCamera} from the repository.
+     */
+    void removeLifecycleCameras(@Nullable Set<Key> lifecycleCameraKeys) {
+        synchronized (mLock) {
+            Set<Key> keysToUnbind =
+                    lifecycleCameraKeys == null ? mCameraMap.keySet() : lifecycleCameraKeys;
+
+            for (Key key : keysToUnbind) {
+                if (mCameraMap.containsKey(key)) {
+                    unregisterCamera(mCameraMap.get(key));
+                }
+            }
+        }
+    }
+
+    /**
+     * Clears out all of the {@link LifecycleCamera}s from the repository.
      */
     void clear() {
         synchronized (mLock) {
@@ -185,21 +202,19 @@ final class LifecycleCameraRepository {
     }
 
     /**
-     * Registers the LifecycleCamera in the repository so that the repository ensures that only
-     * one camera is active at one time.
+     * Registers the {@link LifecycleCamera} in the repository so that the repository ensures that
+     * only one camera is active at one time.
      *
-     * <p>Multiple LifecycleCameras may be controlled by a single LifecycleOwner. Only one
-     * lifecycle event observer will be created to monitor a LifecycleOwner's state events. When
-     * receiving a state event, the corresponding operations will be applied onto all
-     * LifecycleCameras controlled by the same LifecycleOwner.
+     * <p>Multiple {@link LifecycleCamera}s may be controlled by a single {@link LifecycleOwner}.
+     * Only one lifecycle event observer will be created to monitor a LifecycleOwner's state events.
+     * When receiving a state event, the corresponding operations will be applied onto all
+     * {@link LifecycleCamera}s controlled by the same {@link LifecycleOwner}.
      */
-    private void registerCamera(LifecycleCamera lifecycleCamera) {
+    private void registerCamera(@NonNull LifecycleCamera lifecycleCamera) {
         synchronized (mLock) {
             LifecycleOwner lifecycleOwner = lifecycleCamera.getLifecycleOwner();
             Key key = Key.create(lifecycleOwner,
-                    CameraUseCaseAdapter.generateCameraId(
-                            (AdapterCameraInfo) lifecycleCamera.getCameraInfo(),
-                            (AdapterCameraInfo) lifecycleCamera.getSecondaryCameraInfo()));
+                    lifecycleCamera.getCameraUseCaseAdapter().getCameraId());
 
             LifecycleCameraRepositoryObserver observer =
                     getLifecycleCameraRepositoryObserver(lifecycleOwner);
@@ -220,6 +235,29 @@ final class LifecycleCameraRepository {
                 observer = new LifecycleCameraRepositoryObserver(lifecycleOwner, this);
                 mLifecycleObserverMap.put(observer, lifecycleCameraKeySet);
                 lifecycleOwner.getLifecycle().addObserver(observer);
+            }
+        }
+    }
+
+    private void unregisterCamera(@NonNull LifecycleCamera lifecycleCamera) {
+        synchronized (mLock) {
+            LifecycleOwner lifecycleOwner = lifecycleCamera.getLifecycleOwner();
+            Key key = Key.create(lifecycleOwner,
+                    lifecycleCamera.getCameraUseCaseAdapter().getCameraId());
+            mCameraMap.remove(key);
+
+            Set<LifecycleOwner> lifecycleOwnerToUnregister = new HashSet<>();
+            for (LifecycleCameraRepositoryObserver observer : mLifecycleObserverMap.keySet()) {
+                if (lifecycleOwner.equals(observer.getLifecycleOwner())) {
+                    Set<Key> keySet = mLifecycleObserverMap.get(observer);
+                    keySet.remove(key);
+                    if (keySet.isEmpty()) {
+                        lifecycleOwnerToUnregister.add(observer.getLifecycleOwner());
+                    }
+                }
+            }
+            for (LifecycleOwner owner : lifecycleOwnerToUnregister) {
+                unregisterLifecycle(owner);
             }
         }
     }
@@ -357,17 +395,39 @@ final class LifecycleCameraRepository {
      * @param useCases The collection of use cases to remove.
      */
     void unbind(@NonNull Collection<UseCase> useCases) {
-        synchronized (mLock) {
-            for (Key key : mCameraMap.keySet()) {
-                LifecycleCamera lifecycleCamera = mCameraMap.get(key);
-                boolean hasUseCase = !lifecycleCamera.getUseCases().isEmpty();
-                lifecycleCamera.unbind(useCases);
+        unbind(useCases, null);
+    }
 
-                // For a LifecycleOwner, there can be only one LifecycleCamera with use cases bound.
-                // Set the target LifecycleOwner as inactive if the LifecycleCamera originally had
-                // use cases bound but now all use cases have been unbound.
-                if (hasUseCase && lifecycleCamera.getUseCases().isEmpty()) {
-                    setInactive(lifecycleCamera.getLifecycleOwner());
+    /**
+     * Unbinds all specified use cases from the given {@link LifecycleCamera}s.
+     *
+     * <p>If the given {@link LifecycleCamera} set is {@code null}, this method will unbind the use
+     * cases from all the {@link LifecycleCamera}s managed by the repository.
+     *
+     * <p>If the {@link LifecycleCamera} isn't contained in the repository, it will be no-op for
+     * that {@link LifecycleCamera}.
+     *
+     * @param useCases The collection of use cases to remove.
+     * @param lifecycleCameraKeys The keys of {@link LifecycleCamera} to unbind the use cases from.
+     */
+    void unbind(@NonNull Collection<UseCase> useCases, @Nullable Set<Key> lifecycleCameraKeys) {
+        synchronized (mLock) {
+            Set<Key> keysToUnbind =
+                    lifecycleCameraKeys == null ? mCameraMap.keySet() : lifecycleCameraKeys;
+            for (Key key : keysToUnbind) {
+                if (mCameraMap.containsKey(key)) {
+                    LifecycleCamera lifecycleCamera = mCameraMap.get(key);
+                    boolean hasUseCase = !lifecycleCamera.getUseCases().isEmpty();
+                    lifecycleCamera.unbind(useCases);
+
+                    // For a LifecycleOwner, there can be only one LifecycleCamera with use cases
+                    // bound. Set the target LifecycleOwner as inactive if the LifecycleCamera
+                    // originally had use cases bound but now all use cases have been unbound.
+                    if (hasUseCase && lifecycleCamera.getUseCases().isEmpty()) {
+                        setInactive(lifecycleCamera.getLifecycleOwner());
+                    }
+                } else {
+                    Logger.w(TAG, "Attempt to unbind use cases from an invalid camera.");
                 }
             }
         }
@@ -383,11 +443,27 @@ final class LifecycleCameraRepository {
      * <p>This will initiate a close of the existing open camera.
      */
     void unbindAll() {
+        unbindAll(null);
+    }
+
+    /**
+     * Unbinds all use cases from the given {@link LifecycleCamera}s.
+     *
+     * <p>If the given {@link LifecycleCamera} set is {@code null}, this method will unbind all use
+     * cases from all the {@link LifecycleCamera}s managed by the repository.
+     *
+     * @param lifecycleCameraKeys The keys of {@link LifecycleCamera} to unbind all use cases from.
+     */
+    void unbindAll(@Nullable Set<Key> lifecycleCameraKeys) {
         synchronized (mLock) {
-            for (Key key : mCameraMap.keySet()) {
+            Set<Key> keysToUnbind =
+                    lifecycleCameraKeys == null ? mCameraMap.keySet() : lifecycleCameraKeys;
+            for (Key key : keysToUnbind) {
                 LifecycleCamera lifecycleCamera = mCameraMap.get(key);
-                lifecycleCamera.unbindAll();
-                setInactive(lifecycleCamera.getLifecycleOwner());
+                if (lifecycleCamera != null) {
+                    lifecycleCamera.unbindAll();
+                    setInactive(lifecycleCamera.getLifecycleOwner());
+                }
             }
         }
     }
