@@ -19,7 +19,7 @@ import android.util.Log;
 
 import androidx.wear.protolayout.expression.DynamicDataBuilders;
 import androidx.wear.protolayout.expression.PlatformDataValues;
-import androidx.wear.protolayout.expression.PlatformEventKeys;
+import androidx.wear.protolayout.expression.PlatformEventSources;
 import androidx.wear.protolayout.expression.pipeline.PlatformDataProvider;
 import androidx.wear.protolayout.expression.pipeline.PlatformDataReceiver;
 
@@ -91,7 +91,7 @@ class VisibilityStatusDataProvider implements PlatformDataProvider {
                     }
                     mReceiver.onData(
                             PlatformDataValues.of(
-                                    PlatformEventKeys.VISIBILITY_STATUS,
+                                    PlatformEventSources.Keys.LAYOUT_VISIBILITY,
                                     DynamicDataBuilders.DynamicDataValue.fromBool(isVisible)));
                 });
     }

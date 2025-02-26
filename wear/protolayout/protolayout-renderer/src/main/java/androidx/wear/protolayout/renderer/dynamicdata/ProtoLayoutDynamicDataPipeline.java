@@ -40,7 +40,7 @@ import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable;
 import androidx.wear.protolayout.expression.PlatformDataKey;
-import androidx.wear.protolayout.expression.PlatformEventKeys;
+import androidx.wear.protolayout.expression.PlatformEventSources;
 import androidx.wear.protolayout.expression.pipeline.BoundDynamicType;
 import androidx.wear.protolayout.expression.pipeline.DynamicTypeAnimator;
 import androidx.wear.protolayout.expression.pipeline.DynamicTypeBindingRequest;
@@ -166,7 +166,7 @@ public class ProtoLayoutDynamicDataPipeline {
         mVisibilityStatusDataProvider = new VisibilityStatusDataProvider(mFullyVisible);
         evaluatorConfigBuilder.addPlatformDataProvider(
                 mVisibilityStatusDataProvider,
-                ImmutableSet.of(PlatformEventKeys.VISIBILITY_STATUS));
+                ImmutableSet.of(PlatformEventSources.Keys.LAYOUT_VISIBILITY));
 
         // Time data.
         this.mTimeNotifier = new PlatformTimeUpdateNotifierImpl();
