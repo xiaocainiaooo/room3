@@ -196,7 +196,7 @@ class AppFunctionIndexXmlProcessor(
 
     private companion object {
         const val XML_PACKAGE_NAME = "assets"
-        const val XML_FILE_NAME = "app_functions_dynamic_schema"
+        const val XML_FILE_NAME = "app_functions_v2"
         const val XML_EXTENSION = "xml"
         const val APP_FUNCTIONS_ELEMENTS_TAG = "appfunctions"
         const val APP_FUNCTION_ITEM_TAG = "appfunction"

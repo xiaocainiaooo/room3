@@ -149,7 +149,7 @@ class AppFunctionCompilerTest {
         )
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "serializableInputFunctions_app_function_dynamic_schema.xml",
         )
     }
@@ -177,7 +177,7 @@ class AppFunctionCompilerTest {
         )
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName =
                 "appFunctionWithInputFromDifferentPackage_app_function_dynamic_schema.xml",
         )
@@ -229,7 +229,7 @@ class AppFunctionCompilerTest {
         )
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "serializableOutputFunctions_app_function_dynamic_schema.xml",
         )
     }
@@ -257,7 +257,7 @@ class AppFunctionCompilerTest {
         )
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName =
                 "appFunctionWithOutputFromDifferentPackage_app_function_dynamic_schema.xml",
         )
@@ -280,7 +280,7 @@ class AppFunctionCompilerTest {
         )
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "recursiveSerializableInputFunctions_app_function_dynamic_schema.xml",
         )
     }
@@ -385,7 +385,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "fakeNoArgImpl_app_function_dynamic_schema.xml",
         )
     }
@@ -400,7 +400,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function_dynamic_schema.xml",
         )
     }
@@ -415,7 +415,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function_dynamic_schema.xml",
         )
     }
@@ -430,7 +430,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "fakeNoArg_freeForm_function_app_function_dynamic_schema.xml",
         )
     }
@@ -445,7 +445,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "fakeAllPrimitiveParams_app_function_dynamic_schema.xml",
         )
     }
@@ -460,7 +460,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName = "fakeAllPrimitiveReturns_app_function_dynamic_schema.xml",
         )
     }
@@ -479,7 +479,7 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
             goldenFileName =
                 "fakeAllNullablePrimitiveParamsWithDefault_app_function_dynamic_schema.xml",
         )
