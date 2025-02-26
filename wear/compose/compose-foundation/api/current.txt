@@ -158,6 +158,7 @@ package androidx.wear.compose.foundation {
   }
 
   public final class CurvedSemanticsKt {
+    method public static androidx.wear.compose.foundation.CurvedModifier clearAndSetSemantics(androidx.wear.compose.foundation.CurvedModifier, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedSemanticsScope,kotlin.Unit> properties);
     method public static androidx.wear.compose.foundation.CurvedModifier semantics(androidx.wear.compose.foundation.CurvedModifier, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedSemanticsScope,kotlin.Unit> properties);
   }
 

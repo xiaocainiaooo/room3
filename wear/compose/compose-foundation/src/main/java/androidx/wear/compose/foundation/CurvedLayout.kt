@@ -267,18 +267,26 @@ internal class CurvedMeasureScope(
 
 internal class CurvedSemanticProperties(
     val contentDescription: String? = null,
-    val traversalIndex: Float = Float.NaN
+    val traversalIndex: Float = Float.NaN,
+    val isClearingSemantics: Boolean = false
 ) {
     fun copy(
         contentDescription: String? = this.contentDescription,
-        traversalIndex: Float = this.traversalIndex
-    ) = CurvedSemanticProperties(contentDescription, traversalIndex)
+        traversalIndex: Float = this.traversalIndex,
+        isClearingSemantics: Boolean = this.isClearingSemantics
+    ) = CurvedSemanticProperties(contentDescription, traversalIndex, isClearingSemantics)
 
-    fun merge(other: CurvedSemanticProperties) =
-        copy(
-            other.contentDescription ?: contentDescription,
-            if (other.traversalIndex.fastIsFinite()) other.traversalIndex else traversalIndex
-        )
+    fun merge(other: CurvedSemanticProperties): CurvedSemanticProperties =
+        if (this.isClearingSemantics) {
+            this
+        } else {
+            // Merge these properties with the other properties
+            copy(
+                contentDescription ?: other.contentDescription,
+                if (traversalIndex.fastIsFinite()) traversalIndex else other.traversalIndex,
+                isClearingSemantics or other.isClearingSemantics
+            )
+        }
 
     internal fun hasInfo() = contentDescription != null || traversalIndex.fastIsFinite()
 

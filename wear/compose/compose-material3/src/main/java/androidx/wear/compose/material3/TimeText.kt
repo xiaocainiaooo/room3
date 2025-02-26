@@ -49,6 +49,7 @@ import androidx.wear.compose.foundation.CurvedScope
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.foundation.background
 import androidx.wear.compose.foundation.basicCurvedText
+import androidx.wear.compose.foundation.clearAndSetSemantics
 import androidx.wear.compose.foundation.curvedRow
 import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.foundation.sizeIn
@@ -201,9 +202,8 @@ public object TimeTextDefaults {
  * @param style A [CurvedTextStyle] to override the style used.
  */
 public fun CurvedScope.timeTextCurvedText(time: String, style: CurvedTextStyle? = null) {
-    basicCurvedText(
-        time,
-    ) {
+    // TimeText is intended to be hidden from TalkBack, so we clear semantics.
+    basicCurvedText(time, modifier = CurvedModifier.clearAndSetSemantics {}) {
         style?.let { timeTextStyle() + it } ?: timeTextStyle()
     }
 }
@@ -218,10 +218,11 @@ public fun CurvedScope.timeTextSeparator(
     curvedTextStyle: CurvedTextStyle? = null,
     contentArcPadding: ArcPaddingValues = ArcPaddingValues(angular = 4.dp)
 ) {
+    // TimeText is intended to be hidden from TalkBack, so we clear semantics.
     curvedText(
         text = "·",
         style = curvedTextStyle,
-        modifier = CurvedModifier.padding(contentArcPadding)
+        modifier = CurvedModifier.padding(contentArcPadding).clearAndSetSemantics {}
     )
 }
 

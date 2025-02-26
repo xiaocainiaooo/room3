@@ -138,7 +138,7 @@ internal class CurvedTextChild(
         )
 
         val mergedSemantics =
-            CurvedSemanticProperties(contentDescription = text).merge(semanticProperties)
+            semanticProperties.merge(CurvedSemanticProperties(contentDescription = text))
 
         // Empty compose-ui node to attach a11y info.
         Box(Modifier.semantics { with(mergedSemantics) { applySemantics() } })
