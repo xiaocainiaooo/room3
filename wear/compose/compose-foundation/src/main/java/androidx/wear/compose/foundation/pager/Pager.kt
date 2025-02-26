@@ -51,6 +51,7 @@ import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.CustomTouchSlopProvider
+import androidx.wear.compose.foundation.DefaultTouchExplorationStateProvider
 import androidx.wear.compose.foundation.GestureInclusion
 import androidx.wear.compose.foundation.HierarchicalFocusCoordinator
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
@@ -87,7 +88,7 @@ import kotlinx.coroutines.coroutineScope
  *   of [GestureInclusion] can be passed in here which will determine via
  *   [GestureInclusion.allowGesture] whether the gesture should proceed or not. By default,
  *   [gestureInclusion] allows gestures everywhere except a zone on the left edge of the first page,
- *   which is used for swipe-to-dismiss (see [PagerDefaults.ignoreLeftEdgeOnFirstPage]).
+ *   which is used for swipe-to-dismiss (see [PagerDefaults.gestureInclusion]).
  * @param reverseLayout reverse the direction of scrolling and layout.
  * @param key a stable and unique key representing the item. When you specify the key the scroll
  *   position will be maintained based on the key, which means if you add/remove items before the
@@ -107,7 +108,7 @@ public fun HorizontalPager(
     beyondViewportPageCount: Int = PagerDefaults.BeyondViewportPageCount,
     flingBehavior: TargetedFlingBehavior = PagerDefaults.snapFlingBehavior(state = state),
     userScrollEnabled: Boolean = true,
-    gestureInclusion: GestureInclusion = PagerDefaults.ignoreLeftEdgeOnFirstPage(state),
+    gestureInclusion: GestureInclusion = PagerDefaults.gestureInclusion(state),
     reverseLayout: Boolean = false,
     key: ((index: Int) -> Any)? = null,
     rotaryScrollableBehavior: RotaryScrollableBehavior? = null,
@@ -275,27 +276,39 @@ public object PagerDefaults {
      * The default behaviour for when [HorizontalPager] should consume gestures. In this
      * implementation of [gestureInclusion], scroll events that originate in the left edge of the
      * first page of the Pager (as determined by [LeftEdgeZoneFraction]) will be ignored. This
-     * allows swipe-to-dismiss handlers (if present) to handle the gesture in this region.
+     * allows swipe-to-dismiss handlers (if present) to handle the gesture in this region. However
+     * if talkback is enabled then the Pager will always consume gestures, never allowing swipe to
+     * dismiss handlers to take over.
      *
      * @param pagerState The state of the [HorizontalPager]. Used to determine the current page.
      * @param edgeZoneFraction The fraction of the screen width from the left edge where gestures
      *   should be ignored on the first page. Defaults to [LeftEdgeZoneFraction].
      */
-    public fun ignoreLeftEdgeOnFirstPage(
+    @Composable
+    public fun gestureInclusion(
         pagerState: PagerState,
         edgeZoneFraction: Float = LeftEdgeZoneFraction
     ): GestureInclusion {
-        return object : GestureInclusion {
-            override fun allowGesture(
-                offset: Offset,
-                layoutCoordinates: LayoutCoordinates
-            ): Boolean {
-                return if (pagerState.currentPage == 0) {
+        val touchExplorationStateProvider = remember { DefaultTouchExplorationStateProvider() }
+        val touchExplorationServicesEnabled by touchExplorationStateProvider.touchExplorationState()
+
+        return remember(pagerState, touchExplorationServicesEnabled, edgeZoneFraction) {
+            object : GestureInclusion {
+                override fun allowGesture(
+                    offset: Offset,
+                    layoutCoordinates: LayoutCoordinates
+                ): Boolean {
+                    if (touchExplorationServicesEnabled || pagerState.currentPage != 0) {
+                        return true
+                    }
+
+                    // On Page 0 - only allow gestures to be consumed by Pager if they are on the
+                    // right
+                    // of edgeZoneFraction, gestures to the left of this can be consumed by swipe to
+                    // dismiss handlers
                     val screenOffset = layoutCoordinates.localToScreen(offset)
                     val screenWidth = layoutCoordinates.findRootCoordinates().size.width
                     return screenOffset.x > screenWidth * edgeZoneFraction
-                } else {
-                    true
                 }
             }
         }
