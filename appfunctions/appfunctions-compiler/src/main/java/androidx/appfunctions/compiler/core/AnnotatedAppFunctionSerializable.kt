@@ -56,10 +56,11 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                         IntrospectionHelper.AppFunctionSerializableAnnotation.CLASS_NAME
                     ) != null
                 }
-                .map { it }
                 .toSet()
         val parametersToValidate =
-            validatedPrimaryConstructor.parameters.associateBy { it.name.toString() }.toMutableMap()
+            validatedPrimaryConstructor.parameters
+                .associateBy { checkNotNull(it.name).toString() }
+                .toMutableMap()
 
         validateParameters(parametersToValidate, superTypesWithSerializableAnnotation)
 
