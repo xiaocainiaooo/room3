@@ -96,9 +96,9 @@ internal open class JankStatsApi24Impl(
     }
 
     override fun setupFrameTimer(enable: Boolean) {
-        // prevent concurrent modification of delegates list by synchronizing on
-        // Window, whose DecorView holds the delegator object
-        synchronized(window) {
+        // getting/setting the delegates list must happen on the UI thread, so post this operation
+        // to the decorview
+        window.decorView.post {
             if (enable) {
                 if (listenerAddedTime == 0L) {
                     val delegates = window.getOrCreateFrameMetricsListenerDelegator()
@@ -120,7 +120,7 @@ internal open class JankStatsApi24Impl(
 
     @RequiresApi(24)
     private fun Window.removeFrameMetricsListenerDelegate(
-        delegate: Window.OnFrameMetricsAvailableListener
+        delegate: OnFrameMetricsAvailableListener
     ) {
         val delegator = decorView.getTag(R.id.metricsDelegator) as DelegatingFrameMetricsListener?
         with(delegator) { this?.remove(delegate, this@removeFrameMetricsListenerDelegate) }
@@ -134,18 +134,18 @@ internal open class JankStatsApi24Impl(
     private fun Window.getOrCreateFrameMetricsListenerDelegator(): DelegatingFrameMetricsListener {
         var delegator = decorView.getTag(R.id.metricsDelegator) as DelegatingFrameMetricsListener?
         if (delegator == null) {
-            val delegates = mutableListOf<Window.OnFrameMetricsAvailableListener>()
+            val delegates = mutableListOf<OnFrameMetricsAvailableListener>()
             delegator = DelegatingFrameMetricsListener(delegates)
             // First listener for this window; create the delegates list and
             // add a listener to the window
-            if (frameMetricsHandler == null) {
-                val thread = HandlerThread("FrameMetricsAggregator")
-                thread.start()
-                frameMetricsHandler = Handler(thread.looper)
-            }
-            addOnFrameMetricsAvailableListener(delegator, frameMetricsHandler)
             decorView.setTag(R.id.metricsDelegator, delegator)
         }
+        if (frameMetricsHandler == null) {
+            val thread = HandlerThread("FrameMetricsAggregator")
+            thread.start()
+            frameMetricsHandler = Handler(thread.looper)
+        }
+        addOnFrameMetricsAvailableListener(delegator, frameMetricsHandler)
         return delegator
     }
 }
@@ -158,15 +158,15 @@ internal open class JankStatsApi24Impl(
  */
 @RequiresApi(24)
 private class DelegatingFrameMetricsListener(
-    val delegates: MutableList<Window.OnFrameMetricsAvailableListener>
-) : Window.OnFrameMetricsAvailableListener {
+    val delegates: MutableList<OnFrameMetricsAvailableListener>
+) : OnFrameMetricsAvailableListener {
 
     // Track whether the delegate list is being iterated, used to prevent concurrent modification
     var iterating = false
 
     // These lists cache add/remove requests to be handled after the current iteration loop
-    val toBeAdded = mutableListOf<Window.OnFrameMetricsAvailableListener>()
-    val toBeRemoved = mutableListOf<Window.OnFrameMetricsAvailableListener>()
+    val toBeAdded = mutableListOf<OnFrameMetricsAvailableListener>()
+    val toBeRemoved = mutableListOf<OnFrameMetricsAvailableListener>()
 
     /**
      * It is possible for the delegates list to be modified concurrently (adding/removing items
@@ -210,19 +210,17 @@ private class DelegatingFrameMetricsListener(
                 // Only remove delegator if we emptied the list here
                 if (delegatesNonEmpty && delegates.isEmpty()) {
                     window?.removeOnFrameMetricsAvailableListener(this)
-                    window?.decorView?.setTag(R.id.metricsDelegator, null)
+                    window?.decorView?.post {
+                        // setTag() should only be called on the UI thread
+                        window.decorView.setTag(R.id.metricsDelegator, null)
+                    }
                 }
             }
             iterating = false
         }
-        if (window != null) {
-            // Remove singleFrame states now that we are done processing this frame
-            val holder = PerformanceMetricsState.getHolderForHierarchy(window.decorView)
-            holder.state?.cleanupSingleFrameStates()
-        }
     }
 
-    fun add(delegate: Window.OnFrameMetricsAvailableListener) {
+    fun add(delegate: OnFrameMetricsAvailableListener) {
         // prevent concurrent modification of delegates list by synchronizing on
         // this delegator object while iterating and modifying
         synchronized(this) {
@@ -246,7 +244,10 @@ private class DelegatingFrameMetricsListener(
                 // Only remove delegator if we emptied the list here
                 if (delegatesNonEmpty && delegates.isEmpty()) {
                     window.removeOnFrameMetricsAvailableListener(this)
-                    window.decorView.setTag(R.id.metricsDelegator, null)
+                    window.decorView.post {
+                        // setTag() should only be called on the UI thread
+                        window.decorView.setTag(R.id.metricsDelegator, null)
+                    }
                 } else {
                     // noop - compiler requires else{} clause here for some strange reason
                 }
