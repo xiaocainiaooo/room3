@@ -25,7 +25,6 @@ import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
-import androidx.health.connect.client.impl.platform.aggregate.AGGREGATE_METRICS_ADDED_IN_SDK_EXT_10
 import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.COMPLETE
 import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.INCOMPLETE
 import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.createVaccinesUpsertMedicalResourceRequest
@@ -33,7 +32,6 @@ import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECO
 import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECORD_CLASS_EXT_13
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.readRecord
-import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_IMMUNIZATION
 import androidx.health.connect.client.records.FhirVersion
 import androidx.health.connect.client.records.HeartRateRecord
@@ -59,9 +57,7 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Mass
-import androidx.health.connect.client.units.grams
 import androidx.health.connect.client.units.kilocalories
-import androidx.health.connect.client.units.millimetersOfMercury
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -76,14 +72,10 @@ import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertThrows
-import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -484,100 +476,8 @@ class HealthConnectClientUpsideDownImplTest {
         }
     }
 
-    // TODO(b/361297592): Remove once the aggregation bug is fixed
     @Test
-    fun aggregateRecords_unsupportedMetrics_throwsUOE() = runTest {
-        for (metric in AGGREGATE_METRICS_ADDED_IN_SDK_EXT_10) {
-            assertThrows(UnsupportedOperationException::class.java) {
-                runBlocking {
-                    healthConnectClient.aggregate(
-                        AggregateRequest(setOf(metric), TimeRangeFilter.after(Instant.EPOCH))
-                    )
-                }
-            }
-
-            assertThrows(UnsupportedOperationException::class.java) {
-                runBlocking {
-                    healthConnectClient.aggregateGroupByDuration(
-                        AggregateGroupByDurationRequest(
-                            setOf(metric),
-                            TimeRangeFilter.after(Instant.EPOCH),
-                            Duration.ofDays(1)
-                        )
-                    )
-                }
-            }
-
-            assertThrows(UnsupportedOperationException::class.java) {
-                runBlocking {
-                    healthConnectClient.aggregateGroupByPeriod(
-                        AggregateGroupByPeriodRequest(
-                            setOf(metric),
-                            TimeRangeFilter.after(
-                                LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC)
-                            ),
-                            Period.ofDays(1)
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    @Ignore("b/326414908")
-    @Test
-    fun aggregateRecords_belowSdkExt10() = runTest {
-        assumeFalse(SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) >= 10)
-
-        healthConnectClient.insertRecords(
-            listOf(
-                NutritionRecord(
-                    startTime = START_TIME,
-                    startZoneOffset = ZoneOffset.UTC,
-                    endTime = START_TIME + 1.minutes,
-                    endZoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata.manualEntry(),
-                    transFat = 0.5.grams
-                ),
-                BloodPressureRecord(
-                    time = START_TIME,
-                    zoneOffset = ZoneOffset.UTC,
-                    metadata = Metadata.manualEntry(),
-                    systolic = 120.millimetersOfMercury,
-                    diastolic = 80.millimetersOfMercury
-                )
-            )
-        )
-
-        val aggregateResponse =
-            healthConnectClient.aggregate(
-                AggregateRequest(
-                    setOf(
-                        BloodPressureRecord.DIASTOLIC_AVG,
-                        BloodPressureRecord.DIASTOLIC_MAX,
-                        BloodPressureRecord.DIASTOLIC_MIN,
-                        BloodPressureRecord.SYSTOLIC_AVG,
-                        BloodPressureRecord.SYSTOLIC_MAX,
-                        BloodPressureRecord.SYSTOLIC_MIN,
-                        NutritionRecord.TRANS_FAT_TOTAL
-                    ),
-                    TimeRangeFilter.after(Instant.EPOCH)
-                )
-            )
-
-        assertEquals(
-            aggregateResponse[NutritionRecord.TRANS_FAT_TOTAL] to 0.5.grams,
-            aggregateResponse[BloodPressureRecord.SYSTOLIC_AVG] to 120.millimetersOfMercury,
-            aggregateResponse[BloodPressureRecord.SYSTOLIC_MAX] to 120.millimetersOfMercury,
-            aggregateResponse[BloodPressureRecord.SYSTOLIC_MIN] to 120.millimetersOfMercury,
-            aggregateResponse[BloodPressureRecord.DIASTOLIC_AVG] to 80.millimetersOfMercury,
-            aggregateResponse[BloodPressureRecord.DIASTOLIC_MAX] to 80.millimetersOfMercury,
-            aggregateResponse[BloodPressureRecord.DIASTOLIC_MIN] to 80.millimetersOfMercury,
-        )
-    }
-
-    @Test
-    fun aggregateRecordsGroupByDuration() = runTest {
+    fun aggregateGroupByDuration() = runTest {
         healthConnectClient.insertRecords(
             listOf(
                 NutritionRecord(
@@ -1336,10 +1236,6 @@ class HealthConnectClientUpsideDownImplTest {
         val medicalResources =
             healthConnectClient.readMedicalResources(insertResponse.map { it.id })
         assertThat(medicalResources).isEmpty()
-    }
-
-    private fun <A, E> assertEquals(vararg assertions: Pair<A, E>) {
-        assertions.forEach { (actual, expected) -> assertThat(actual).isEqualTo(expected) }
     }
 
     private val Int.seconds: Duration
