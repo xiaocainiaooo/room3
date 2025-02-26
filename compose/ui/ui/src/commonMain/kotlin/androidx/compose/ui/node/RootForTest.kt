@@ -18,6 +18,8 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.indirect.IndirectTouchEvent
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -44,6 +46,14 @@ interface RootForTest {
      * @return true if the event was consumed. False otherwise.
      */
     fun sendKeyEvent(keyEvent: KeyEvent): Boolean
+
+    /**
+     * Send this [IndirectTouchEvent] to the focused component in this [Owner].
+     *
+     * @return true if the event was consumed. False otherwise.
+     */
+    @ExperimentalComposeUiApi
+    fun sendIndirectTouchEvent(indirectTouchEvent: IndirectTouchEvent): Boolean = false
 
     /**
      * Force accessibility to be enabled for testing.
