@@ -66,25 +66,22 @@ internal fun Modifier.surface(
     painter: Painter,
     shape: Shape = RectangleShape,
     border: BorderStroke? = null
-): Modifier {
+): Modifier =
     if (transformation != null && !LocalReduceMotion.current) {
         val backgroundPainter =
             remember(transformation, painter, shape, border) {
                 transformation.createBackgroundPainter(painter, shape, border)
             }
 
-        return paintBackground(painter = backgroundPainter).graphicsLayer {
+        paintBackground(painter = backgroundPainter).graphicsLayer {
             this.shape = shape
             with(transformation) { applyTransformation() }
             clip = true
         }
     } else {
-        val borderModifier = if (border != null) border(border = border, shape = shape) else this
-        return borderModifier
-            .clip(shape = shape)
-            .paintBackground(painter = painter, contentScale = ContentScale.Crop)
+        // Delegate to LocalTransformingLazyColumnItemScope aware implementation.
+        surface(painter, shape, border)
     }
-}
 
 /**
  * Applies a surface style to the current composable and Material 3 Motion if in the scope of a
