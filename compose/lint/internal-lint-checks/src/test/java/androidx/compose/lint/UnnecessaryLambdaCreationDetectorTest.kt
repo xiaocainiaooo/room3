@@ -106,7 +106,7 @@ class UnnecessaryLambdaCreationDetectorTest(
 
     private fun check(@Language("kotlin") code: String): TestLintResult {
         return lint()
-            .files(kotlin(code.trimIndent()), stub, Stubs.Composable)
+            .files(kotlin(code).indented(), stub, Stubs.Composable)
             .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
     }
