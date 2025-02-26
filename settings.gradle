@@ -1129,6 +1129,7 @@ includeProject(":wear:watchface:watchface-editor", [BuildType.MAIN, BuildType.WE
 includeProject(":wear:watchface:watchface-editor-guava", [BuildType.MAIN, BuildType.WEAR])
 includeProject(":wear:watchface:watchface-editor-samples", "wear/watchface/watchface-editor/samples", [BuildType.MAIN, BuildType.WEAR])
 includeProject(":wear:watchface:watchface-guava", [BuildType.MAIN, BuildType.WEAR])
+includeProject(":wear:watchface:watchface-push", [BuildType.MAIN, BuildType.WEAR])
 includeProject(":wear:watchface:watchface-samples", "wear/watchface/watchface/samples", [BuildType.MAIN, BuildType.WEAR])
 includeProject(":wear:watchface:watchface-samples-app", "wear/watchface/watchface/samples/app", [BuildType.MAIN, BuildType.WEAR])
 includeProject(":wear:watchface:watchface-samples-minimal", "wear/watchface/watchface/samples/minimal", [BuildType.MAIN, BuildType.WEAR])
