@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.lerp
-import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress
 import androidx.wear.compose.foundation.lazy.inverseLerp
 import kotlin.math.ceil
@@ -246,10 +245,7 @@ public fun rememberResponsiveTransformationSpec(
     return remember { responsiveTransformationSpec(screenSizeDp, transformationSpecs) }
 }
 
-/**
- * This class contains all parameters needed to configure the transformations for a single item.
- * This is used with [Modifier#scrollTransform] inside items of a [TransformingLazyColumn]
- */
+/** This class contains all parameters needed to configure the transformations for a single item */
 internal class ResponsiveTransformationSpecImpl(
     /** The screen size of the watch. */
     val screenSizeDp: Int,
