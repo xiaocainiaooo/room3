@@ -52,6 +52,14 @@ dependencies {
     testImplementation(project(":wear:watchface:watchface"))
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.suppressWarnings = true
+}
+
+tasks.withType(JavaCompile){
+    options.compilerArgs <<"-Xlint:-deprecation"
+}
+
 android {
     buildFeatures {
         aidl = true
@@ -74,4 +82,5 @@ androidx {
     inceptionYear = "2020"
     description = "Support for rendering complications on the watch face"
     legacyDisableKotlinStrictApiMode = true
+    failOnDeprecationWarnings = false
 }

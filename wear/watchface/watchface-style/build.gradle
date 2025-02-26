@@ -90,6 +90,14 @@ afterEvaluate {
     tasks.named("generateReleaseAndroidTestAssets").configure { it.dependsOn(copyApkTaskProvider) }
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.suppressWarnings = true
+}
+
+tasks.withType(JavaCompile){
+    options.compilerArgs <<"-Xlint:-deprecation"
+}
+
 android {
     defaultConfig {
         minSdk = 26
@@ -107,4 +115,5 @@ androidx {
     inceptionYear = "2020"
     description = "Android Wear Watchface Style"
     legacyDisableKotlinStrictApiMode = true
+    failOnDeprecationWarnings = false
 }

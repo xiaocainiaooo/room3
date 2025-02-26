@@ -56,6 +56,14 @@ dependencies {
     androidTestImplementation(libs.truth)
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.suppressWarnings = true
+}
+
+tasks.withType(JavaCompile){
+    options.compilerArgs <<"-Xlint:-deprecation"
+}
+
 android {
     defaultConfig {
         minSdk = 26
@@ -70,4 +78,5 @@ androidx {
     description = "Classes for building Android Wear watchface editors"
     legacyDisableKotlinStrictApiMode = true
     samples(project(":wear:watchface:watchface-samples"))
+    failOnDeprecationWarnings = false
 }
