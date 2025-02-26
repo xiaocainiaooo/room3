@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LocalContentColor
@@ -45,6 +45,7 @@ import androidx.xr.compose.spatial.EdgeOffset
 import androidx.xr.compose.spatial.Orbiter
 import androidx.xr.compose.spatial.OrbiterDefaults
 import androidx.xr.compose.spatial.OrbiterEdge
+import androidx.xr.compose.subspace.layout.SpatialRoundedCornerShape
 
 /**
  * <a href="https://m3.material.io/components/navigation-rail/overview" class="external"
@@ -88,7 +89,6 @@ public fun NavigationRail(
     val orbiterProperties = LocalNavigationRailOrbiterProperties.current
     VerticalOrbiter(orbiterProperties) {
         Surface(
-            shape = CircleShape,
             color = containerColor,
             contentColor = contentColor,
             modifier = modifier,
@@ -162,7 +162,7 @@ public val DefaultNavigationRailOrbiterProperties: VerticalOrbiterProperties =
         offset = XrNavigationRailTokens.OrbiterEdgeOffset,
         alignment = Alignment.CenterVertically,
         settings = OrbiterDefaults.orbiterSettings,
-        shape = OrbiterDefaults.shape,
+        shape = SpatialRoundedCornerShape(CornerSize(50)),
     )
 
 /** The [VerticalOrbiterProperties] used by [NavigationRail]. */
