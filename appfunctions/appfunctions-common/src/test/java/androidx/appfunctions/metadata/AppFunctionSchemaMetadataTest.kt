@@ -74,4 +74,25 @@ class AppFunctionSchemaMetadataTest {
 
         assertThat(schemaMetadataDocument).isEqualTo(expectedSchemaMetadataDocument)
     }
+
+    @Test
+    fun appFunctionSchemaMetadataDocument_toAppFunctionSchemaMetadata_returnsCorrectMetadata() {
+        val schemaMetadataDocument =
+            AppFunctionSchemaMetadataDocument(
+                schemaCategory = "testCategory",
+                schemaVersion = 1L,
+                schemaName = "testName",
+            )
+
+        val schemaMetadata = schemaMetadataDocument.toAppFunctionSchemaMetadata()
+
+        assertThat(schemaMetadata)
+            .isEqualTo(
+                AppFunctionSchemaMetadata(
+                    category = "testCategory",
+                    name = "testName",
+                    version = 1L
+                )
+            )
+    }
 }

@@ -80,4 +80,12 @@ public data class AppFunctionComponentsMetadataDocument(
     @Document.Id public val id: String = APP_FUNCTION_ID_EMPTY,
     /** The list of data types that ban be reusable across the schema. */
     @Document.DocumentProperty public val dataTypes: List<AppFunctionNamedDataTypeMetadataDocument>,
-)
+) {
+    public fun toAppFunctionComponentsMetadata(): AppFunctionComponentsMetadata =
+        AppFunctionComponentsMetadata(
+            dataTypes =
+                dataTypes.associate {
+                    it.name to it.dataTypeMetadata.toAppFunctionDataTypeMetadata()
+                }
+        )
+}

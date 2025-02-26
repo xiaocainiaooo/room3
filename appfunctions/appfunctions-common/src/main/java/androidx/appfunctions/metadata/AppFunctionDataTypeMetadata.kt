@@ -16,6 +16,7 @@
 
 package androidx.appfunctions.metadata
 
+import android.annotation.SuppressLint
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
 import androidx.appsearch.annotation.Document
@@ -92,6 +93,19 @@ internal constructor(
          * All of type. The schema of the all of type is defined in a [AppFunctionAllOfTypeMetadata]
          */
         internal const val TYPE_ALL_OF: Int = 12
+
+        /** All primitive types used in [AppFunctionPrimitiveType] @IntDef annotation. */
+        internal val PRIMITIVE_TYPES =
+            setOf(
+                TYPE_UNIT,
+                TYPE_BOOLEAN,
+                TYPE_BYTES,
+                TYPE_DOUBLE,
+                TYPE_FLOAT,
+                TYPE_LONG,
+                TYPE_INT,
+                TYPE_STRING
+            )
     }
 
     override fun equals(other: Any?): Boolean {
@@ -498,7 +512,9 @@ public data class AppFunctionDataTypeMetadataDocument(
      * required properties' names.
      */
     @Document.StringProperty public val required: List<String> = emptyList(),
-    /** If the [type] is [AppFunctionDataTypeMetadata.TYPE_OBJECT], this specified the reference */
+    /**
+     * If the [type] is [AppFunctionDataTypeMetadata.TYPE_REFERENCE], this specified the reference.
+     */
     @Document.StringProperty public val dataTypeReference: String? = null,
     /** Whether the type is nullable. */
     @Document.BooleanProperty public val isNullable: Boolean = false,
@@ -507,4 +523,51 @@ public data class AppFunctionDataTypeMetadataDocument(
      * qualified name if available.
      */
     @Document.StringProperty public val objectQualifiedName: String? = null,
-)
+) {
+    @SuppressLint(
+        // When doesn't handle @IntDef correctly.
+        "WrongConstant"
+    )
+    public fun toAppFunctionDataTypeMetadata(): AppFunctionDataTypeMetadata =
+        when (type) {
+            AppFunctionDataTypeMetadata.TYPE_ARRAY -> {
+                val itemType = checkNotNull(itemType) { "Item type must be present for array type" }
+                AppFunctionArrayTypeMetadata(
+                    itemType = itemType.toAppFunctionDataTypeMetadata(),
+                    isNullable = isNullable
+                )
+            }
+            AppFunctionDataTypeMetadata.TYPE_OBJECT -> {
+                check(properties.isNotEmpty()) {
+                    "Properties must be present for object type can't be empty"
+                }
+                val propertiesMap =
+                    properties.associate {
+                        it.name to it.dataTypeMetadata.toAppFunctionDataTypeMetadata()
+                    }
+                AppFunctionObjectTypeMetadata(
+                    properties = propertiesMap,
+                    required = required,
+                    qualifiedName = objectQualifiedName,
+                    isNullable = isNullable
+                )
+            }
+            AppFunctionDataTypeMetadata.TYPE_REFERENCE ->
+                AppFunctionReferenceTypeMetadata(
+                    referenceDataType =
+                        checkNotNull(dataTypeReference) {
+                            "Data type reference must be present for reference type"
+                        },
+                    isNullable = isNullable
+                )
+            AppFunctionDataTypeMetadata.TYPE_ALL_OF ->
+                AppFunctionAllOfTypeMetadata(
+                    matchAll = allOf.map { it.toAppFunctionDataTypeMetadata() },
+                    qualifiedName = objectQualifiedName,
+                    isNullable = isNullable
+                )
+            in AppFunctionDataTypeMetadata.PRIMITIVE_TYPES ->
+                AppFunctionPrimitiveTypeMetadata(type = type, isNullable = isNullable)
+            else -> throw IllegalArgumentException("Unknown type: $type")
+        }
+}
