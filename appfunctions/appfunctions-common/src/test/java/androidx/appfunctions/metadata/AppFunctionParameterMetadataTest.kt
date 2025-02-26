@@ -90,4 +90,33 @@ class AppFunctionParameterMetadataTest {
                 )
             )
     }
+
+    @Test
+    fun appFunctionParameterMetadataDocument_toAppFunctionParameterMetadata_returnsCorrectMetadata() {
+        val parameterMetadataDocument =
+            AppFunctionParameterMetadataDocument(
+                name = "parameter1",
+                isRequired = false,
+                dataTypeMetadata =
+                    AppFunctionDataTypeMetadataDocument(
+                        type = TYPE_INT,
+                        isNullable = false,
+                    )
+            )
+
+        val parameterMetadata = parameterMetadataDocument.toAppFunctionParameterMetadata()
+
+        assertThat(parameterMetadata)
+            .isEqualTo(
+                AppFunctionParameterMetadata(
+                    name = "parameter1",
+                    isRequired = false,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_INT,
+                            isNullable = false,
+                        )
+                )
+            )
+    }
 }

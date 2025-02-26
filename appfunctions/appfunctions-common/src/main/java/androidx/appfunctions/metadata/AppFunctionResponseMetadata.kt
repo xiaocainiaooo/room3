@@ -60,4 +60,7 @@ public data class AppFunctionResponseMetadataDocument(
     @Document.Id public val id: String = APP_FUNCTION_ID_EMPTY,
     /** The schema of the return type. */
     @Document.DocumentProperty public val valueType: AppFunctionDataTypeMetadataDocument,
-)
+) {
+    public fun toAppFunctionResponseMetadata(): AppFunctionResponseMetadata =
+        AppFunctionResponseMetadata(valueType = valueType.toAppFunctionDataTypeMetadata())
+}
