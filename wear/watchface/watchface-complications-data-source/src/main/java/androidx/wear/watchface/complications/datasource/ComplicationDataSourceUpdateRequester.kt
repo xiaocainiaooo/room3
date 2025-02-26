@@ -20,7 +20,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.os.OutcomeReceiver
@@ -34,7 +33,6 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceSe
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceService.ComplicationDataRequester
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester.Companion.UPDATE_REQUEST_RECEIVER_PACKAGE
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester.Companion.filterRequests
-import com.google.wear.Sdk
 import com.google.wear.services.complications.ComplicationData as WearSdkComplicationData
 import com.google.wear.services.complications.ComplicationsManager
 import kotlin.coroutines.Continuation
@@ -149,9 +147,8 @@ public interface ComplicationDataSourceUpdateRequester {
  *
  * If false, we should use the legacy broadcast based system for complication updates.
  */
-internal fun shouldUseWearSdk(context: Context) =
-    context.packageManager.hasSystemFeature(PackageManager.FEATURE_WATCH) &&
-        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+// TODO: enable this once testing is complete and new API is stable.
+internal fun shouldUseWearSdk() = false
 
 /**
  * @param context The [ComplicationDataSourceService]'s [Context]
@@ -168,7 +165,7 @@ private class ComplicationDataSourceUpdateRequesterImpl(
             ?: UPDATE_REQUEST_RECEIVER_PACKAGE
 
     override fun requestUpdateAll() {
-        if (shouldUseWearSdk(context)) {
+        if (shouldUseWearSdk()) {
             requestUpdate()
             return
         }
@@ -187,12 +184,6 @@ private class ComplicationDataSourceUpdateRequesterImpl(
     }
 
     override fun requestUpdate(vararg complicationInstanceIds: Int) {
-        if (shouldUseWearSdk(context)) {
-            Sdk.getWearManager(context, ComplicationsManager::class.java)?.let {
-                updateComplicationsUsingWearSdk(complicationInstanceIds, it)
-                return
-            }
-        }
         val intent = Intent(ComplicationDataSourceUpdateRequester.ACTION_REQUEST_UPDATE)
         intent.setPackage(updateRequestReceiverPackage())
         intent.putExtra(
