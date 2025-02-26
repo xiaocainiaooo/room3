@@ -73,8 +73,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design button</a>.
+ * [Material Design button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post.
