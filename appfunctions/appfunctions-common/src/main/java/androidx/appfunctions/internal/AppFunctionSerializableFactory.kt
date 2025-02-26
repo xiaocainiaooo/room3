@@ -21,7 +21,7 @@ import androidx.appfunctions.AppFunctionData
 
 /**
  * An interface for factory classes that convert between a class annotated with
- * [androidx.appfunctions.AppFunctionSerializable] and [AppFunctionData].
+ * [androidx.appfunctions.AppFunctionSerializable] and [androidx.appfunctions.AppFunctionData].
  *
  * Each class annotated with [androidx.appfunctions.AppFunctionSerializable] will have a generated
  * class that implements this interface.
@@ -29,8 +29,8 @@ import androidx.appfunctions.AppFunctionData
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public interface AppFunctionSerializableFactory<T : Any> {
     /**
-     * Deserializes the given [AppFunctionData] into an instance of the AppFunctionSerializable
-     * annotated class.
+     * Deserializes the given [androidx.appfunctions.AppFunctionData] into an instance of the
+     * AppFunctionSerializable annotated class.
      *
      * Type mismatch: An [IllegalArgumentException] if a property is stored as a different type in
      * [appFunctionData].

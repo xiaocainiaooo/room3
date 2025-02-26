@@ -19,9 +19,12 @@ package androidx.appfunctions
 import android.app.appsearch.GenericDocument
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
+import androidx.appfunctions.internal.AppFunctionSerializableFactory
+import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
 
 /**
  * A data class to contain information to be communicated between AppFunctions apps and agents.
@@ -346,6 +349,32 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
         return "AppFunctionData(genericDocument=$genericDocument, extras=$extras)"
     }
 
+    /**
+     * Deserializes the [AppFunctionData] to an [AppFunctionSerializable] instance.
+     *
+     * @param serializableClass The AppFunctionSerializable class.
+     * @return The instance of [serializableClass].
+     * @throws IllegalArgumentException If unable to deserialize the [AppFunctionData] to an
+     *   instance of [serializableClass].
+     * @see [AppFunctionSerializable]
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun <T : Any> deserialize(serializableClass: Class<T>): T {
+        return try {
+            val factory = getSerializableFactory(serializableClass)
+            factory.fromAppFunctionData(this)
+        } catch (e: Exception) {
+            Log.d(
+                APP_FUNCTIONS_TAG,
+                "Something went wrong while deserialize $this to $serializableClass",
+                e
+            )
+            throw IllegalArgumentException(
+                "Unable to deserialize $serializableClass. Is the class annotated with @AppFunctionSerializable?"
+            )
+        }
+    }
+
     private fun <T : Any> unsafeGetProperty(key: String, arrayClass: Class<T>): T? {
         return try {
             val value = genericDocument.getProperty(key)
@@ -452,6 +481,63 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
         private fun extrasKey(key: String) = "property/$key"
 
         private fun extrasKey(key: String, index: Int) = "property/$key[$index]"
+
+        // TODO: Codegen the mapping table to prevent using reflection
+        private fun <T : Any> getSerializableFactory(
+            serializableClass: Class<T>
+        ): AppFunctionSerializableFactory<T> {
+            val packageName = serializableClass.packageName
+            val serializableSimpleName = serializableClass.simpleName
+
+            val factorySimpleName = "${'$'}${serializableSimpleName}Factory"
+            val factoryClassName = "${packageName}.${factorySimpleName}"
+
+            return try {
+                val factoryClass = Class.forName(factoryClassName)
+                @Suppress("UNCHECKED_CAST")
+                factoryClass.getDeclaredConstructor().newInstance()
+                    as AppFunctionSerializableFactory<T>
+            } catch (e: Exception) {
+                Log.d(
+                    APP_FUNCTIONS_TAG,
+                    "Unable to create AppFunctionSerializableFactory for $serializableClass",
+                    e
+                )
+                throw IllegalArgumentException(
+                    "Unable to create AppFunctionSerializableFactory for $serializableClass"
+                )
+            }
+        }
+
+        /**
+         * Serializes [serializable] to an [AppFunctionData].
+         *
+         * @param serializable The instance of [serializableClass].
+         * @param serializableClass The class of [serializable].
+         * @return [AppFunctionData] with properties from [serializable].
+         * @throws IllegalArgumentException If unable to serialize [serializable] to an
+         *   [AppFunctionData].
+         * @see [AppFunctionSerializable]
+         */
+        @RestrictTo(LIBRARY_GROUP)
+        public fun <T : Any> serialize(
+            serializable: T,
+            serializableClass: Class<T>
+        ): AppFunctionData {
+            return try {
+                val factory = getSerializableFactory(serializableClass)
+                factory.toAppFunctionData(serializable)
+            } catch (e: Exception) {
+                Log.d(
+                    APP_FUNCTIONS_TAG,
+                    "Something went wrong while serialize $serializable of class $serializableClass",
+                    e
+                )
+                throw IllegalArgumentException(
+                    "Unable to serialize $serializableClass. Is the class annotated with @AppFunctionSerializable?"
+                )
+            }
+        }
 
         /** Represents an empty [AppFunctionData]. */
         @JvmField
