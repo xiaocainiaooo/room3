@@ -26,6 +26,7 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.util.traceValue
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
@@ -129,7 +130,9 @@ internal class AndroidPrefetchScheduler(private val view: View) :
         val scope = PrefetchRequestScopeImpl(nextFrameNs)
         var scheduleForNextFrame = false
         while (prefetchRequests.isNotEmpty() && !scheduleForNextFrame) {
-            if (scope.availableTimeNanos() > 0) {
+            val availableTimeNanos = scope.availableTimeNanos()
+            traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
+            if (availableTimeNanos > 0) {
                 val request = prefetchRequests[0]
                 val hasMoreWorkToDo = with(request) { scope.execute() }
                 if (hasMoreWorkToDo) {
@@ -149,6 +152,7 @@ internal class AndroidPrefetchScheduler(private val view: View) :
         } else {
             prefetchScheduled = false
         }
+        traceValue("compose:lazy:prefetch:available_time_nanos", 0L) // reset counter
     }
 
     /**
