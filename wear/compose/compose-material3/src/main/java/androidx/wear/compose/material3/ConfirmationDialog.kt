@@ -89,7 +89,8 @@ import kotlinx.coroutines.launch
  * @sample androidx.wear.compose.material3.samples.ConfirmationDialogSample
  * @param visible A boolean indicating whether the confirmation dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
- *   swiping right or when the [durationMillis] has passed.
+ *   swiping right or when the [durationMillis] has passed. Implementation of this lambda must
+ *   remove the dialog from the composition hierarchy e.g. by setting [visible] to false.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
  *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
  *   will give the default sweep angle and padding.
@@ -187,7 +188,8 @@ public fun ConfirmationDialogContent(
  * @sample androidx.wear.compose.material3.samples.LongTextConfirmationDialogSample
  * @param visible A boolean indicating whether the confirmation dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
- *   swiping right or when the [durationMillis] has passed.
+ *   swiping right or when the [durationMillis] has passed. Implementation of this lambda must
+ *   remove the dialog from the composition hierarchy e.g. by setting [visible] to false.
  * @param text A slot for displaying text below the icon. It should not exceed 3 lines.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
@@ -311,7 +313,8 @@ public fun ConfirmationDialogContent(
  * @sample androidx.wear.compose.material3.samples.SuccessConfirmationDialogSample
  * @param visible A boolean indicating whether the confirmation dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
- *   swiping right or when the [durationMillis] has passed.
+ *   swiping right or when the [durationMillis] has passed. Implementation of this lambda must
+ *   remove the dialog from the composition hierarchy e.g. by setting [visible] to false.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
  *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
  *   will give the default sweep angle and padding, and [ConfirmationDialogDefaults.curvedTextStyle]
@@ -419,7 +422,8 @@ public fun SuccessConfirmationDialogContent(
  * @sample androidx.wear.compose.material3.samples.FailureConfirmationDialogSample
  * @param visible A boolean indicating whether the confirmation dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
- *   swiping right or when the [durationMillis] has passed.
+ *   swiping right or when the [durationMillis] has passed. Implementation of this lambda must
+ *   remove the dialog from the composition hierarchy e.g. by setting [visible] to false.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
  *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
  *   will give the default sweep angle and padding.
