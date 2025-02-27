@@ -68,7 +68,8 @@ import kotlinx.coroutines.launch
  *
  * @param visible A boolean value that determines whether the dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed by swiping
- *   right.
+ *   right. Implementation of this lambda must remove the dialog from the composition hierarchy e.g.
+ *   by setting [visible] to false.
  * @param modifier Modifier to be applied to the dialog content.
  * @param properties An optional [DialogProperties] object for configuring the dialog's behavior.
  * @param content A composable function that defines the content of the dialog.
