@@ -149,8 +149,6 @@ internal class LocalSdkProviderTest(
 
     @Test
     fun getAppOwnedSdkSandboxInterfaces_delegateToSdkController() {
-        assumeFeatureAvailable(ClientFeature.APP_OWNED_INTERFACES)
-
         val expectedResult =
             AppOwnedSdkSandboxInterfaceCompat(
                 name = "TestAppOwnedSdk",
@@ -171,8 +169,6 @@ internal class LocalSdkProviderTest(
 
     @Test
     fun registerSdkSandboxActivityHandler_delegateToSdkController() {
-        assumeFeatureAvailable(ClientFeature.SDK_ACTIVITY_HANDLER)
-
         val catchingHandler = CatchingSdkActivityHandler()
 
         val testSdk = loadedSdk.loadTestSdk()
@@ -193,8 +189,6 @@ internal class LocalSdkProviderTest(
 
     @Test
     fun sdkSandboxActivityHandler_ReceivesLifecycleEventsFromOriginalActivityHolder() {
-        assumeFeatureAvailable(ClientFeature.SDK_ACTIVITY_HANDLER)
-
         val catchingHandler = CatchingSdkActivityHandler()
 
         val testSdk = loadedSdk.loadTestSdk()
@@ -218,8 +212,6 @@ internal class LocalSdkProviderTest(
 
     @Test
     fun unregisterSdkSandboxActivityHandler_delegateToSdkController() {
-        assumeFeatureAvailable(ClientFeature.SDK_ACTIVITY_HANDLER)
-
         val handler = CatchingSdkActivityHandler()
 
         val testSdk = loadedSdk.loadTestSdk()
@@ -231,8 +223,6 @@ internal class LocalSdkProviderTest(
 
     @Test
     fun loadSdk_returnsResultFromSdkController() {
-        assumeFeatureAvailable(ClientFeature.LOAD_SDK)
-
         val sdkName = "SDK"
         val sdkParams = Bundle()
         val expectedSdkInfo = SandboxedSdkInfo(sdkName, 42)
@@ -251,8 +241,6 @@ internal class LocalSdkProviderTest(
 
     @Test
     fun loadSdk_rethrowsExceptionFromSdkController() {
-        assumeFeatureAvailable(ClientFeature.LOAD_SDK)
-
         val expectedError =
             LoadSdkCompatException(
                 LoadSdkCompatException.LOAD_SDK_INTERNAL_ERROR,
