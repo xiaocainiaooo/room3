@@ -19,8 +19,7 @@ package androidx.wear.protolayout.modifiers
 import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.ActionBuilders.LoadAction
-import androidx.wear.protolayout.DimensionBuilders.dp
-import androidx.wear.protolayout.ModifiersBuilders.Corner
+import androidx.wear.protolayout.ColorBuilders.LinearGradient
 import androidx.wear.protolayout.ModifiersBuilders.DefaultContentTransitions.fadeInSlideIn
 import androidx.wear.protolayout.ModifiersBuilders.DefaultContentTransitions.fadeOutSlideOut
 import androidx.wear.protolayout.ModifiersBuilders.FadeInTransition
@@ -109,13 +108,13 @@ class ModifiersTest {
     }
 
     @Test
-    fun background_withCorner_toModifier() {
-        val modifiers =
-            LayoutModifier.background(COLOR, Corner.Builder().setRadius(dp(CORNER_RADIUS)).build())
-                .toProtoLayoutModifiers()
+    fun backgroundBrush_toModifier() {
+        val brush = LinearGradient.Builder(COLOR.prop, COLOR1.prop).build()
+        val modifiers = LayoutModifier.background(brush).toProtoLayoutModifiers()
 
-        assertThat(modifiers.background?.color?.argb).isEqualTo(COLOR.prop.argb)
-        assertThat(modifiers.background?.corner?.radius?.value).isEqualTo(CORNER_RADIUS)
+        assertThat(modifiers.background?.brush).isInstanceOf(LinearGradient::class.java)
+        assertThat((modifiers.background?.brush as LinearGradient).colorStops.map { it.color.argb })
+            .containsExactlyElementsIn(listOf(COLOR.staticArgb, COLOR1.staticArgb))
     }
 
     @Test
@@ -287,6 +286,7 @@ class ModifiersTest {
         const val STATIC_CONTENT_DESCRIPTION = "content desc"
         val DYNAMIC_CONTENT_DESCRIPTION = DynamicString.constant("dynamic content")
         val COLOR = LayoutColor(Color.RED)
+        val COLOR1 = LayoutColor(Color.GREEN)
         const val CORNER_RADIUS_X = 1.2f
         const val CORNER_RADIUS_Y = 3.4f
         const val CORNER_RADIUS = 5.6f

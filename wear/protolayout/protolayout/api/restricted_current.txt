@@ -1541,8 +1541,8 @@ package androidx.wear.protolayout.layout {
 package androidx.wear.protolayout.modifiers {
 
   public final class BackgroundKt {
-    method public static androidx.wear.protolayout.modifiers.LayoutModifier background(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.types.LayoutColor color, optional androidx.wear.protolayout.ModifiersBuilders.Corner? corner);
-    method public static androidx.wear.protolayout.modifiers.LayoutModifier backgroundColor(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.types.LayoutColor color);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public static androidx.wear.protolayout.modifiers.LayoutModifier background(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ColorBuilders.Brush brush);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier background(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.types.LayoutColor color);
     method public static androidx.wear.protolayout.modifiers.LayoutModifier clip(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.Corner corner);
     method public static androidx.wear.protolayout.modifiers.LayoutModifier clip(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float cornerRadius);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clip(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
