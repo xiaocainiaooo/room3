@@ -33,15 +33,7 @@ enum class ClientApiVersion(
     val apiLevel: Int,
     private val newFeatures: Set<ClientFeature> = emptySet()
 ) {
-    V4__1_0_ALPHA05(
-        apiLevel = 4,
-        newFeatures =
-            setOf(
-                ClientFeature.SDK_ACTIVITY_HANDLER,
-                ClientFeature.APP_OWNED_INTERFACES,
-            )
-    ),
-    V5__1_0_ALPHA13(apiLevel = 5, newFeatures = setOf(ClientFeature.LOAD_SDK)),
+    V5__1_0_ALPHA13(apiLevel = 5),
     V6__1_0_ALPHA14(apiLevel = 6, newFeatures = setOf(ClientFeature.GET_CLIENT_PACKAGE_NAME)),
     V7__1_0_ALPHA16(apiLevel = 7, newFeatures = setOf(ClientFeature.CLIENT_IMPORTANCE_LISTENER)),
 
@@ -76,6 +68,13 @@ enum class ClientApiVersion(
         private fun buildFeatureMap(): Map<ClientFeature, ClientApiVersion> {
             if (FUTURE_VERSION.newFeatures.isNotEmpty()) {
                 throw IllegalStateException("FUTURE_VERSION MUST NOT define any features")
+            }
+            if (MIN_SUPPORTED_SDK_VERSION.newFeatures.isNotEmpty()) {
+                throw IllegalStateException(
+                    "$MIN_SUPPORTED_SDK_VERSION MUST NOT define any features. " +
+                        "Features added in this version are available without version checks because " +
+                        "it is minimum supported version."
+                )
             }
             return buildMap {
                 values().forEach { version ->
