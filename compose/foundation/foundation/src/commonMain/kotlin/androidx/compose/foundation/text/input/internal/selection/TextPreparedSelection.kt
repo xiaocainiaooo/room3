@@ -216,7 +216,7 @@ internal class TextFieldPreparedSelection(
         }
 
     fun moveCursorPrevByCodePointOrEmoji() = moveCursorTo {
-        text.findCodePointOrEmojiStartBefore(selection.end)
+        text.findCodePointOrEmojiStartBefore(selection.end, ifNotFound = NoCharacterFound)
     }
 
     fun moveCursorPrevByChar() = moveCursorTo { text.findPrecedingBreak(selection.end) }

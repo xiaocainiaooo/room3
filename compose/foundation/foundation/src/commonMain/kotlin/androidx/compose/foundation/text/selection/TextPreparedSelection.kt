@@ -141,7 +141,10 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
      * start of the emoji instead.
      */
     fun getPrecedingCodePointOrEmojiStartIndex() =
-        annotatedString.text.findCodePointOrEmojiStartBefore(selection.end)
+        annotatedString.text.findCodePointOrEmojiStartBefore(
+            index = selection.end,
+            ifNotFound = NoCharacterFound
+        )
 
     /** Returns the index of the character break preceding the end of [selection]. */
     fun getPrecedingCharacterIndex() = annotatedString.text.findPrecedingBreak(selection.end)
