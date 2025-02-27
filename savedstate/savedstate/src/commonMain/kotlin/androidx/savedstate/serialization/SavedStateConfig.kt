@@ -44,6 +44,8 @@ private constructor(
     public val serializersModule: SerializersModule = DEFAULT_SERIALIZERS_MODULE,
     @ClassDiscriminatorMode.Definition
     public val classDiscriminatorMode: Int = ClassDiscriminatorMode.POLYMORPHIC,
+    @get:Suppress("GetterSetterNames") // More idiomatic, matches KTX Serialization naming.
+    public val encodeDefaults: Boolean = false,
 ) {
     /**
      * Builder of the [SavedStateConfig] instance provided by `SavedStateConfig { ... }` factory
@@ -60,9 +62,18 @@ private constructor(
          * @see Contextual
          * @see Polymorphic
          */
-        @get:Suppress("GetterOnBuilder") // Kotlin issue: KT-3110 (private get with public set).
+        @get:Suppress("GetterOnBuilder") // KT-3110 (private get with public set).
         @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
         public var serializersModule: SerializersModule = config.serializersModule
+
+        /**
+         * Specifies whether default values of Kotlin properties should be encoded. `false` by
+         * default. This option does not affect decoding.
+         */
+        @Suppress("GetterSetterNames") // More idiomatic, matches KTX Serialization naming.
+        @get:Suppress("GetterOnBuilder") // KT-3110 (private get with public set).
+        @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
+        public var encodeDefaults: Boolean = config.encodeDefaults
 
         /**
          * Defines which classes and objects should have class discriminator added to the output.
@@ -70,7 +81,7 @@ private constructor(
          *
          * @see ClassDiscriminatorMode
          */
-        @get:Suppress("GetterOnBuilder") // Kotlin issue: KT-3110 (private get with public set).
+        @get:Suppress("GetterOnBuilder") // KT-3110 (private get with public set).
         @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
         @ClassDiscriminatorMode.Definition
         public var classDiscriminatorMode: Int = config.classDiscriminatorMode
@@ -79,6 +90,7 @@ private constructor(
             return SavedStateConfig(
                 serializersModule = DEFAULT_SERIALIZERS_MODULE.overwriteWith(serializersModule),
                 classDiscriminatorMode = classDiscriminatorMode,
+                encodeDefaults = encodeDefaults,
             )
         }
     }
