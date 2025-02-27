@@ -15,7 +15,6 @@
  */
 package androidx.privacysandbox.sdkruntime.client
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.sdksandbox.LoadSdkException
 import android.app.sdksandbox.SandboxedSdk
@@ -34,7 +33,6 @@ import androidx.privacysandbox.sdkruntime.client.controller.impl.LocalAppOwnedSd
 import androidx.privacysandbox.sdkruntime.client.controller.impl.LocalSdkRegistry
 import androidx.privacysandbox.sdkruntime.client.controller.impl.PlatformAppOwnedSdkRegistry
 import androidx.privacysandbox.sdkruntime.client.loader.VersionHandshake
-import androidx.privacysandbox.sdkruntime.core.AdServicesInfo
 import androidx.privacysandbox.sdkruntime.core.AppOwnedSdkSandboxInterfaceCompat
 import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException
 import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException.Companion.LOAD_SDK_NOT_FOUND
@@ -264,8 +262,8 @@ private constructor(
     }
 
     @RequiresApi(34)
-    private open class Api34Impl(context: Context) : PlatformApi {
-        protected val sdkSandboxManager = context.getSystemService(SdkSandboxManager::class.java)
+    private class Api34Impl(context: Context) : PlatformApi {
+        private val sdkSandboxManager = context.getSystemService(SdkSandboxManager::class.java)
 
         private val sandboxDeathCallbackDelegates:
             MutableList<SdkSandboxProcessDeathCallbackDelegate> =
@@ -336,7 +334,6 @@ private constructor(
         private class SdkSandboxProcessDeathCallbackDelegate(
             val callback: SdkSandboxProcessDeathCallbackCompat
         ) : SdkSandboxManager.SdkSandboxProcessDeathCallback {
-            @SuppressLint("Override") // b/273473397
             override fun onSdkSandboxDied() {
                 callback.onSdkSandboxDied()
             }
@@ -400,7 +397,7 @@ private constructor(
 
     private object PlatformApiFactory {
         fun create(context: Context): PlatformApi {
-            return if (Build.VERSION.SDK_INT >= 34 || AdServicesInfo.isDeveloperPreview()) {
+            return if (Build.VERSION.SDK_INT >= 34) {
                 Api34Impl(context)
             } else {
                 FailImpl()
@@ -409,11 +406,8 @@ private constructor(
     }
 
     private object AppOwnedSdkRegistryFactory {
-        @SuppressLint("NewApi") // For supporting DP Builds
         fun create(context: Context): AppOwnedSdkRegistry {
-            return if (
-                BuildCompat.AD_SERVICES_EXTENSION_INT >= 8 || AdServicesInfo.isDeveloperPreview()
-            ) {
+            return if (Build.VERSION.SDK_INT >= 34 && BuildCompat.AD_SERVICES_EXTENSION_INT >= 8) {
                 PlatformAppOwnedSdkRegistry(context)
             } else {
                 LocalAppOwnedSdkRegistry()
