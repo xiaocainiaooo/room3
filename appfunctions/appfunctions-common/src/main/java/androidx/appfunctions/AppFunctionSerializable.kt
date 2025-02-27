@@ -87,6 +87,7 @@ package androidx.appfunctions
  * )
  * ```
  */
-@Retention(AnnotationRetention.SOURCE)
+// Use BINARY here so that the annotation is kept around at the aggregation stage.
+@Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS)
 public annotation class AppFunctionSerializable
