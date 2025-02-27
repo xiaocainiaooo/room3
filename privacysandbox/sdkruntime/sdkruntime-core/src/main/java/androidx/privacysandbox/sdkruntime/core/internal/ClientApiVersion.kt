@@ -56,7 +56,7 @@ enum class ClientApiVersion(
          * Minimal version of sdkruntime-client lib that could load SDK built with current version
          * of sdkruntime-provider lib.
          */
-        val MIN_SUPPORTED_CLIENT_VERSION = V5__1_0_ALPHA13
+        val MIN_SUPPORTED_CLIENT_VERSION = V6__1_0_ALPHA14
 
         /**
          * Minimal version of sdkruntime-provider lib that could be loaded by current version of

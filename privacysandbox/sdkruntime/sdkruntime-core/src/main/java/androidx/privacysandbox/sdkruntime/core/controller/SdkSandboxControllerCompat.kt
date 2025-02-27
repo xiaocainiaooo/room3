@@ -201,7 +201,7 @@ internal constructor(private val controllerImpl: SandboxControllerImpl) {
                         ?: throw UnsupportedOperationException(
                             "Shouldn't happen: No controller implementation available"
                         )
-                return SdkSandboxControllerCompat(LocalImpl(implFromClient, context, clientVersion))
+                return SdkSandboxControllerCompat(LocalImpl(implFromClient, clientVersion))
             }
             val platformImpl = PlatformImplFactory.create(context)
             return SdkSandboxControllerCompat(platformImpl)
