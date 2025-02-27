@@ -343,6 +343,7 @@ warning: unable to find kotlin\-script\-runtime\.jar in the Kotlin home director
 \^+$
 public interface NativeAd : SharedUiAdapter
 \$OUT_DIR/tmp/extract\-shim\-transform[0-9]+/androidx/privacysandbox/tools/integration/testsdk/NativeAdClientProxy\.kt:[0-9]+:[0-9]+: warning: this API is experimental\. It may be changed in the future without notice\.
+public override fun openSession\(clientExecutor: Executor, client: SharedUiAdapter\.SessionClient\) \{
 public val sharedUiAdapter: SharedUiAdapter =
 SharedUiAdapterFactory\.createFromCoreLibInfo\(coreLibInfo\)
 client: SharedUiAdapter\.SessionClient\) \{

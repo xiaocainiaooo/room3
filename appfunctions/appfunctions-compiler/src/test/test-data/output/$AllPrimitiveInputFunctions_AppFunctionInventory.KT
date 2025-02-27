@@ -21,54 +21,30 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionInt" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLong" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloat" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDouble" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBoolean" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionString" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableInt" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLong" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloat" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDouble" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBoolean" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableString" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionIntArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLongArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloatArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDoubleArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBooleanArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionStringList" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringListMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableIntArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLongArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloatArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDoubleArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBooleanArray" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanArrayMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableStringList" to
-        ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionInt" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLong" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloat" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDouble" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBoolean" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionString" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableInt" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLong" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloat" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDouble" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBoolean" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableString" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionIntArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionLongArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionLongArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionFloatArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionFloatArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionDoubleArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionDoubleArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionBooleanArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionBooleanArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionStringList" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionStringListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableIntArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableIntArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableLongArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableFloatArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableDoubleArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableBooleanArray" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanArrayMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.AllPrimitiveInputFunctions#simpleFunctionNullableStringList" to ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject.APP_FUNCTION_METADATA,
   )
 
   private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionIntMetadataObject {
@@ -1044,8 +1020,7 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
         )
   }
 
-  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongArrayMetadataObject
-      {
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableLongArrayMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_LONGARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
@@ -1100,8 +1075,7 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
         )
   }
 
-  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject
-      {
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableFloatArrayMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_FLOATARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
@@ -1156,8 +1130,7 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
         )
   }
 
-  private object
-      ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleArrayMetadataObject {
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableDoubleArrayMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_DOUBLEARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
@@ -1212,8 +1185,7 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
         )
   }
 
-  private object
-      ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanArrayMetadataObject {
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableBooleanArrayMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_BOOLEANARRAYPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
@@ -1268,8 +1240,7 @@ public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInv
         )
   }
 
-  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject
-      {
+  private object ComTestdataAllPrimitiveInputFunctionsSimpleFunctionNullableStringListMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_STRINGLISTPARAM_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
