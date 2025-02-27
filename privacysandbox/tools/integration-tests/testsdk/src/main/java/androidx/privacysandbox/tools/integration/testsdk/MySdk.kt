@@ -27,7 +27,7 @@ import androidx.privacysandbox.tools.PrivacySandboxService
 import androidx.privacysandbox.tools.PrivacySandboxValue
 import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
-import androidx.privacysandbox.ui.core.SessionConstants
+import androidx.privacysandbox.ui.core.SessionData
 import androidx.privacysandbox.ui.core.SharedUiAdapter
 import java.util.concurrent.Executor
 
@@ -80,7 +80,7 @@ class MySdkImpl(private val context: Context) : MySdk {
 class TextViewAdImpl : TextViewAd {
     override fun openSession(
         context: Context,
-        sessionConstants: SessionConstants,
+        sessionData: SessionData,
         initialWidth: Int,
         initialHeight: Int,
         isZOrderOnTop: Boolean,

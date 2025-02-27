@@ -23,10 +23,9 @@ import android.os.SystemClock
 import android.view.View
 import androidx.privacysandbox.ui.core.SandboxedSdkViewUiInfo
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
-import androidx.privacysandbox.ui.core.SessionConstants
+import androidx.privacysandbox.ui.core.SessionData
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import com.google.common.truth.Truth
-import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
@@ -42,7 +41,7 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
     var internalClient: SandboxedUiAdapter.SessionClient? = null
     var testSession: TestSession? = null
     var isZOrderOnTop = true
-    var sessionConstants: SessionConstants? = null
+    var sessionData: SessionData? = null
 
     // When set to true, the onSessionOpened callback will only be invoked when specified
     // by the test. This is to test race conditions when the session is being loaded.
@@ -55,7 +54,7 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
 
     override fun openSession(
         context: Context,
-        sessionConstants: SessionConstants,
+        sessionData: SessionData,
         initialWidth: Int,
         initialHeight: Int,
         isZOrderOnTop: Boolean,
@@ -70,7 +69,7 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
             }
             isSessionOpened = true
             this.isZOrderOnTop = isZOrderOnTop
-            this.sessionConstants = sessionConstants
+            this.sessionData = sessionData
             openSessionLatch.countDown()
         }
     }

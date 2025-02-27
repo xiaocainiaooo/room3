@@ -27,7 +27,7 @@ import androidx.annotation.RestrictTo
  * A class containing values that will be constant for the lifetime of a
  * [SandboxedUiAdapter.Session].
  */
-class SessionConstants
+class SessionData
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 constructor(
     /**
@@ -46,8 +46,7 @@ constructor(
      */
     val inputTransferToken: InputTransferToken?
 ) {
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) constructor() : this(null, null)
+    constructor() : this(null, null)
 
     companion object {
         private const val KEY_WINDOW_INPUT_TOKEN = "windowInputToken"
@@ -55,24 +54,24 @@ constructor(
 
         @JvmStatic
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-        fun toBundle(sessionConstants: SessionConstants): Bundle {
+        fun toBundle(sessionData: SessionData): Bundle {
             val bundle = Bundle()
-            sessionConstants.windowInputToken?.let { bundle.putBinder(KEY_WINDOW_INPUT_TOKEN, it) }
-            CompatImpl.addInputTransferTokenToBundle(sessionConstants, bundle)
+            sessionData.windowInputToken?.let { bundle.putBinder(KEY_WINDOW_INPUT_TOKEN, it) }
+            CompatImpl.addInputTransferTokenToBundle(sessionData, bundle)
             return bundle
         }
 
         @JvmStatic
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-        fun fromBundle(bundle: Bundle): SessionConstants {
+        fun fromBundle(bundle: Bundle): SessionData {
             val windowInputToken = bundle.getBinder(KEY_WINDOW_INPUT_TOKEN)
             val inputTransferToken = CompatImpl.deriveInputTransferToken(bundle)
-            return SessionConstants(windowInputToken, inputTransferToken)
+            return SessionData(windowInputToken, inputTransferToken)
         }
     }
 
     override fun toString() =
-        "SessionConstants windowInputToken=$windowInputToken, inputTransferToken=$inputTransferToken"
+        "SessionData(windowInputToken=$windowInputToken, inputTransferToken=$inputTransferToken)"
 
     override fun hashCode(): Int {
         var result = windowInputToken.hashCode()
@@ -82,7 +81,7 @@ constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is SessionConstants) return false
+        if (other !is SessionData) return false
 
         return windowInputToken == other.windowInputToken &&
             inputTransferToken == other.inputTransferToken
@@ -98,9 +97,9 @@ constructor(
             }
         }
 
-        fun addInputTransferTokenToBundle(sessionConstants: SessionConstants, bundle: Bundle) {
+        fun addInputTransferTokenToBundle(sessionData: SessionData, bundle: Bundle) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                Api35PlusImpl.addInputTransferTokenToBundle(sessionConstants, bundle)
+                Api35PlusImpl.addInputTransferTokenToBundle(sessionData, bundle)
             }
         }
 
@@ -113,8 +112,8 @@ constructor(
                 )
             }
 
-            fun addInputTransferTokenToBundle(sessionConstants: SessionConstants, bundle: Bundle) {
-                bundle.putParcelable(KEY_INPUT_TRANSFER_TOKEN, sessionConstants.inputTransferToken)
+            fun addInputTransferTokenToBundle(sessionData: SessionData, bundle: Bundle) {
+                bundle.putParcelable(KEY_INPUT_TRANSFER_TOKEN, sessionData.inputTransferToken)
             }
         }
     }
