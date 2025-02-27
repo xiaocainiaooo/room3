@@ -105,17 +105,15 @@ internal fun Modifier.surface(
     shape: Shape = RectangleShape,
     border: BorderStroke? = null
 ): Modifier {
-    val borderModifier = if (border != null) border(border = border, shape = shape) else this
-    val itemScope =
-        if (LocalReduceMotion.current) {
-            null
-        } else {
-            LocalTransformingLazyColumnItemScope.current
-        }
-    return itemScope?.let { tlcScope -> scrollTransform(tlcScope, shape, painter, border) }
-        ?: borderModifier
+    val tlcScope = LocalTransformingLazyColumnItemScope.current
+    return if (tlcScope != null && !LocalReduceMotion.current) {
+        scrollTransform(tlcScope, shape, painter, border)
+    } else {
+        val borderModifier = if (border != null) border(border = border, shape = shape) else this
+        borderModifier
             .clip(shape = shape)
             .paintBackground(painter = painter, contentScale = ContentScale.Crop)
+    }
 }
 
 /**

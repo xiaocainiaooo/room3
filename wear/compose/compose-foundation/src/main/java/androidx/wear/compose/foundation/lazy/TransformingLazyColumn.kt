@@ -100,6 +100,7 @@ public fun TransformingLazyColumn(
     val graphicsContext = LocalGraphicsContext.current
     val layoutDirection = LocalLayoutDirection.current
     val density = LocalDensity.current
+    val reduceMotionEnabled = LocalReduceMotion.current
     val measurementStrategy =
         remember(contentPadding) {
             TransformingLazyColumnContentPaddingMeasurementStrategy(
@@ -114,7 +115,7 @@ public fun TransformingLazyColumn(
     val latestContent = rememberUpdatedState(newValue = content)
     val coroutineScope = rememberCoroutineScope()
     val itemProviderLambda by
-        remember(state) {
+        remember(state, reduceMotionEnabled) {
             val scope =
                 derivedStateOf(referentialEqualityPolicy()) {
                     TransformingLazyColumnScopeImpl(latestContent.value)
@@ -126,7 +127,8 @@ public fun TransformingLazyColumn(
                     TransformingLazyColumnItemProvider(
                         intervalContent = intervalContent,
                         state = state,
-                        keyIndexMap = map
+                        keyIndexMap = map,
+                        reduceMotionEnabled
                     )
                 }
             }
@@ -197,14 +199,14 @@ public val LocalTransformingLazyColumnItemScope:
 internal class TransformingLazyColumnItemProvider(
     val intervalContent: LazyLayoutIntervalContent<TransformingLazyColumnInterval>,
     val state: TransformingLazyColumnState,
-    val keyIndexMap: NearestRangeKeyIndexMap
+    val keyIndexMap: NearestRangeKeyIndexMap,
+    val reduceMotionEnabled: Boolean,
 ) : LazyLayoutItemProvider {
     override val itemCount: Int
         get() = intervalContent.itemCount
 
     @Composable
     override fun Item(index: Int, key: Any) {
-        val reduceMotionEnabled = LocalReduceMotion.current
         val itemScope =
             remember(index, reduceMotionEnabled) {
                 TransformingLazyColumnItemScopeImpl(
