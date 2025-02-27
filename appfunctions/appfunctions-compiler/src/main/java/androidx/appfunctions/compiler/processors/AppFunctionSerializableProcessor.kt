@@ -23,6 +23,7 @@ import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializable
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod.APP_FUNCTION_DATA_PARAM_NAME
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.ToAppFunctionDataMethod.APP_FUNCTION_SERIALIZABLE_PARAM_NAME
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.logException
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -41,7 +42,6 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import kotlin.text.replaceFirstChar
 
 /**
  * Generates a factory class with methods to convert classes annotated with
@@ -66,7 +66,7 @@ import kotlin.text.replaceFirstChar
  *     return Location(latitude, longitude)
  *   }
  *
- *   override fun toAppFunctionData(location: Location): AppFunctionData {
+ *   override fun toAppFunctionData(appFunctionSerializable: Location): AppFunctionData {
  *     val builder = AppFunctionData.Builder("")
  *
  *     builder.setDouble("latitude", location.latitude)
@@ -174,14 +174,16 @@ class AppFunctionSerializableProcessor(
         annotatedClass: AnnotatedAppFunctionSerializable,
         factoryCodeBuilder: AppFunctionSerializableFactoryCodeBuilder
     ): FunSpec {
-        val methodParamName =
-            annotatedClass.originalClassName.simpleName.replaceFirstChar { it -> it.lowercase() }
         return FunSpec.builder(
                 AppFunctionSerializableFactoryClass.ToAppFunctionDataMethod.METHOD_NAME
             )
             .addModifiers(KModifier.OVERRIDE)
             .addParameter(
-                ParameterSpec.builder(methodParamName, annotatedClass.originalClassName).build()
+                ParameterSpec.builder(
+                        APP_FUNCTION_SERIALIZABLE_PARAM_NAME,
+                        annotatedClass.originalClassName
+                    )
+                    .build()
             )
             .addCode(factoryCodeBuilder.appendToAppFunctionDataMethodBody())
             .returns(AppFunctionData::class.asTypeName())

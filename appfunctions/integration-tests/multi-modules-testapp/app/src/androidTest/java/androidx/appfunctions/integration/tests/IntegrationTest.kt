@@ -22,6 +22,8 @@ import androidx.appfunctions.AppFunctionInvalidArgumentException
 import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.ExecuteAppFunctionRequest
 import androidx.appfunctions.ExecuteAppFunctionResponse
+import androidx.appfunctions.integration.testapp.CreateNoteParams
+import androidx.appfunctions.integration.testapp.Note
 import androidx.appfunctions.integration.tests.AppSearchMetadataHelper
 import androidx.appfunctions.integration.tests.TestUtil.doBlocking
 import androidx.appfunctions.integration.tests.TestUtil.retryAssert
@@ -165,6 +167,41 @@ class IntegrationTest {
             .isInstanceOf(AppFunctionInvalidArgumentException::class.java)
     }
 
+    @Test
+    fun executeAppFunction_createNote() = doBlocking {
+        val response =
+            appFunctionManager.executeAppFunction(
+                request =
+                    ExecuteAppFunctionRequest(
+                        targetContext.packageName,
+                        CREATE_NOTE_FUNCTION_ID,
+                        AppFunctionData.Builder("")
+                            .setAppFunctionData(
+                                "createNoteParams",
+                                AppFunctionData.serialize(
+                                    CreateNoteParams(
+                                        title = "Test Title",
+                                    ),
+                                    CreateNoteParams::class.java
+                                )
+                            )
+                            .build()
+                    )
+            )
+
+        val successResponse = assertIs<ExecuteAppFunctionResponse.Success>(response)
+        val expectedNote =
+            Note(
+                title = "Test Title",
+            )
+        assertThat(
+                successResponse.returnValue
+                    .getAppFunctionData(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
+                    .deserialize(Note::class.java)
+            )
+            .isEqualTo(expectedNote)
+    }
+
     private suspend fun awaitAppFunctionsIndexed(expectedFunctionIds: Set<String>) {
         retryAssert {
             val functionIds = AppSearchMetadataHelper.collectSelfFunctionIds(targetContext)
@@ -179,6 +216,8 @@ class IntegrationTest {
             "androidx.appfunctions.integration.testapp.TestFunctions#doThrow"
         const val VOID_FUNCTION_ID =
             "androidx.appfunctions.integration.testapp.TestFunctions#voidFunction"
+        const val CREATE_NOTE_FUNCTION_ID =
+            "androidx.appfunctions.integration.testapp.TestFunctions#createNote"
         const val IS_CREATED_BY_FACTORY_FUNCTION_ID =
             "androidx.appfunctions.integration.testapp.TestFactory#isCreatedByFactory"
 
@@ -190,6 +229,7 @@ class IntegrationTest {
                 APP_FUNCTION_ID,
                 DO_THROW_FUNCTION_ID,
                 VOID_FUNCTION_ID,
+                CREATE_NOTE_FUNCTION_ID,
                 IS_CREATED_BY_FACTORY_FUNCTION_ID,
                 CONCAT_FUNCTION_ID
             )

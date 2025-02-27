@@ -26,16 +26,16 @@ public class `$EntityWithDiffPackageSerializablePropertyFactory` :
   }
 
   override
-      fun toAppFunctionData(entityWithDiffPackageSerializableProperty: EntityWithDiffPackageSerializableProperty):
+      fun toAppFunctionData(appFunctionSerializable: EntityWithDiffPackageSerializableProperty):
       AppFunctionData {
     val diffPackageSerializableFactory = `$DiffPackageSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.EntityWithDiffPackageSerializableProperty")
     builder.setAppFunctionData("inputSerializable",
-        diffPackageSerializableFactory.toAppFunctionData(entityWithDiffPackageSerializableProperty.inputSerializable
+        diffPackageSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable
         as DiffPackageSerializable))
-    builder.setAppFunctionDataList("serializableList",
-        entityWithDiffPackageSerializableProperty.serializableList.map{ diffPackageSerializable ->
+    builder.setAppFunctionDataList("serializableList", appFunctionSerializable.serializableList.map{
+        diffPackageSerializable ->
       diffPackageSerializableFactory.toAppFunctionData(diffPackageSerializable)
     })
 

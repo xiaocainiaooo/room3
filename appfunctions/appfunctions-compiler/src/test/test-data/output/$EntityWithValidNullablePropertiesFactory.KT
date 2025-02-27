@@ -34,44 +34,43 @@ public class `$EntityWithValidNullablePropertiesFactory` :
         longArray, doubleArray, boolArray, stringList, inputSerializable, serializableList)
   }
 
-  override
-      fun toAppFunctionData(entityWithValidNullableProperties: EntityWithValidNullableProperties):
+  override fun toAppFunctionData(appFunctionSerializable: EntityWithValidNullableProperties):
       AppFunctionData {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.EntityWithValidNullableProperties")
-    if (entityWithValidNullableProperties.longParam != null) {
-      builder.setLong("longParam", entityWithValidNullableProperties.longParam)
+    if (appFunctionSerializable.longParam != null) {
+      builder.setLong("longParam", appFunctionSerializable.longParam)
     }
-    if (entityWithValidNullableProperties.doubleParam != null) {
-      builder.setDouble("doubleParam", entityWithValidNullableProperties.doubleParam)
+    if (appFunctionSerializable.doubleParam != null) {
+      builder.setDouble("doubleParam", appFunctionSerializable.doubleParam)
     }
-    if (entityWithValidNullableProperties.boolParam != null) {
-      builder.setBoolean("boolParam", entityWithValidNullableProperties.boolParam)
+    if (appFunctionSerializable.boolParam != null) {
+      builder.setBoolean("boolParam", appFunctionSerializable.boolParam)
     }
-    if (entityWithValidNullableProperties.stringParam != null) {
-      builder.setString("stringParam", entityWithValidNullableProperties.stringParam)
+    if (appFunctionSerializable.stringParam != null) {
+      builder.setString("stringParam", appFunctionSerializable.stringParam)
     }
-    if (entityWithValidNullableProperties.longArray != null) {
-      builder.setLongArray("longArray", entityWithValidNullableProperties.longArray)
+    if (appFunctionSerializable.longArray != null) {
+      builder.setLongArray("longArray", appFunctionSerializable.longArray)
     }
-    if (entityWithValidNullableProperties.doubleArray != null) {
-      builder.setDoubleArray("doubleArray", entityWithValidNullableProperties.doubleArray)
+    if (appFunctionSerializable.doubleArray != null) {
+      builder.setDoubleArray("doubleArray", appFunctionSerializable.doubleArray)
     }
-    if (entityWithValidNullableProperties.boolArray != null) {
-      builder.setBooleanArray("boolArray", entityWithValidNullableProperties.boolArray)
+    if (appFunctionSerializable.boolArray != null) {
+      builder.setBooleanArray("boolArray", appFunctionSerializable.boolArray)
     }
-    if (entityWithValidNullableProperties.stringList != null) {
-      builder.setStringList("stringList", entityWithValidNullableProperties.stringList)
+    if (appFunctionSerializable.stringList != null) {
+      builder.setStringList("stringList", appFunctionSerializable.stringList)
     }
-    if (entityWithValidNullableProperties.inputSerializable != null) {
+    if (appFunctionSerializable.inputSerializable != null) {
       builder.setAppFunctionData("inputSerializable",
-          inputSerializableFactory.toAppFunctionData(entityWithValidNullableProperties.inputSerializable
-          as InputSerializable))
+          inputSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as
+          InputSerializable))
     }
-    if (entityWithValidNullableProperties.serializableList != null) {
+    if (appFunctionSerializable.serializableList != null) {
       builder.setAppFunctionDataList("serializableList",
-          entityWithValidNullableProperties.serializableList.map{ inputSerializable ->
+          appFunctionSerializable.serializableList.map{ inputSerializable ->
         inputSerializableFactory.toAppFunctionData(inputSerializable)
       })
     }

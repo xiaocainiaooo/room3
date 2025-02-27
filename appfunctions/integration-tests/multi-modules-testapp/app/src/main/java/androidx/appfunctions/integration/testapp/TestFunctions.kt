@@ -19,6 +19,17 @@ package androidx.appfunctions.integration.testapp
 import androidx.appfunctions.AppFunction
 import androidx.appfunctions.AppFunctionContext
 import androidx.appfunctions.AppFunctionInvalidArgumentException
+import androidx.appfunctions.AppFunctionSerializable
+
+@AppFunctionSerializable
+data class CreateNoteParams(
+    val title: String? = null,
+)
+
+@AppFunctionSerializable
+data class Note(
+    val title: String,
+)
 
 @Suppress("UNUSED_PARAMETER")
 class TestFunctions {
@@ -31,6 +42,16 @@ class TestFunctions {
     }
 
     @AppFunction fun voidFunction(appFunctionContext: AppFunctionContext) {}
+
+    @AppFunction
+    fun createNote(
+        appFunctionContext: AppFunctionContext,
+        createNoteParams: CreateNoteParams
+    ): Note {
+        return Note(
+            title = createNoteParams.title ?: "DEFAULT TITLE",
+        )
+    }
 }
 
 @Suppress("UNUSED_PARAMETER")
