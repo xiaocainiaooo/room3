@@ -137,7 +137,7 @@ class SdkSandboxManagerAppOwnedInterfacesTest {
     @Test
     fun sdkController_getAppOwnedSdkSandboxInterfaces_returnsRegisteredAppOwnedInterfaces() {
         val localSdk = runBlocking {
-            sandboxManagerCompat.loadSdk(TestSdkConfigs.forSdkName("v4").packageName, Bundle())
+            sandboxManagerCompat.loadSdk(TestSdkConfigs.CURRENT.packageName, Bundle())
         }
 
         val registeredAppOwnedSdk =
