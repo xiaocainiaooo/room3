@@ -226,6 +226,33 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testNestedDerivedSerializableOutputFunctions_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf(
+                        "NestedDerivedSerializableOutputFunctions.KT",
+                        "NestedDerivedSerializable.KT"
+                    ),
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true"),
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}NestedDerivedSerializableOutputFunctions_AppFunctionInventory.kt",
+            goldenFileName =
+                "${'$'}NestedDerivedSerializableOutputFunctions_AppFunctionInventory.KT",
+        )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
+            goldenFileName =
+                "nestedDerivedSerializableOutputFunctions_app_function_dynamic_schema.xml",
+        )
+    }
+
+    @Test
     fun testDiffPackageSerializableInputFunction_genAppFunctionInventory_success() {
         val report =
             compilationTestHelper.compileAll(
