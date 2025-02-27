@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.SoftwareType
 
 plugins {
@@ -50,6 +52,7 @@ androidx {
     type = SoftwareType.TEST_APPLICATION
     inceptionYear = "2023"
     description = "Contains the demo code for the AndroidX Wear Compose Material 3 components."
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }
 
 android {
