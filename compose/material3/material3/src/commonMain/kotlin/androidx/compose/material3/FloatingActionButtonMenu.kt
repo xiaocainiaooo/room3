@@ -181,7 +181,7 @@ private fun FloatingActionButtonMenuItemColumn(
                     isTraversalGroup = true
                     traversalIndex = -0.9f
                 }
-                .verticalScroll(state = rememberScrollState()),
+                .verticalScroll(state = rememberScrollState(), enabled = expanded),
         content = {
             val scope =
                 remember(horizontalAlignment) {
