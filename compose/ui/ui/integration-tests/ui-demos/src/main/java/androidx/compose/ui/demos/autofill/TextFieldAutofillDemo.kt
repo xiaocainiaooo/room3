@@ -70,7 +70,7 @@ fun BTFResetCredentialsDemo() {
             state = remember { TextFieldState() },
             modifier =
                 Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewUsername
+                    contentType = ContentType.NewUsername + ContentType.Username
                 },
             textStyle = MaterialTheme.typography.body1.copy(color = Color.White),
             cursorBrush = SolidColor(Color.White)
@@ -79,7 +79,7 @@ fun BTFResetCredentialsDemo() {
             state = remember { TextFieldState() },
             modifier =
                 Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewPassword
+                    contentType = ContentType.NewPassword + ContentType.Password
                 },
             textStyle = MaterialTheme.typography.body1.copy(color = Color.White),
             cursorBrush = SolidColor(Color.White)
