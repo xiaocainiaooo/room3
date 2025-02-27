@@ -18,7 +18,6 @@ package androidx.camera.viewfinder;
 
 import android.graphics.Bitmap;
 import android.os.Handler;
-import android.util.Size;
 import android.view.PixelCopy;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -29,12 +28,18 @@ import android.widget.FrameLayout;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.impl.RefCounted;
 import androidx.camera.viewfinder.internal.utils.Logger;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Preconditions;
 
+import kotlin.Unit;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * The SurfaceView implementation for {@link CameraViewfinder}.
@@ -45,47 +50,120 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
 
     // Synthetic Accessor
     @SuppressWarnings("WeakerAccess")
-    @Nullable SurfaceView mSurfaceView;
+    @Nullable
+    SurfaceView mSurfaceView;
+
+    // Target SurfaceRequest. Only complete the SurfaceResponse when the size of the Surface
+    // matches this request.
+    // Guarded by the UI thread.
+    private ViewfinderSurfaceRequest mSurfaceRequest = null;
+
+    // SurfaceRequest to check when the target size is met.
+    // Guarded by the UI thread.
+    private CallbackToFutureAdapter.Completer<RefCounted<Surface>> mSurfaceResponse = null;
+
+    // Surface that is active between the surfaceCreated and surfaceDestroyed callbacks.
+    // Guarded by the UI thread.
+    private RefCounted<Surface> mActiveSurface = null;
+
+    // The cached size of the current Surface.
+    // Guarded by the UI thread.
+    private int mCurrentSurfaceWidth = -1;
+    private int mCurrentSurfaceHeight = -1;
 
     // Synthetic Accessor
     @SuppressWarnings("WeakerAccess")
-    final @NonNull SurfaceRequestCallback mSurfaceRequestCallback = new SurfaceRequestCallback();
+    final SurfaceHolder.@NonNull Callback mSurfaceHolderCallback = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
+            Logger.d(TAG, "Surface created.");
+            // No-op. Handling surfaceChanged() is enough because it's always called afterwards.
+            mActiveSurface = new RefCounted<>(false, (surface) -> {
+                surface.release();
+                return Unit.INSTANCE;
+            });
+            mActiveSurface.initialize(surfaceHolder.getSurface());
+        }
+
+        @Override
+        public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int format, int width,
+                int height) {
+            Logger.d(TAG, "Surface changed. Size: " + width + "x" + height);
+            mCurrentSurfaceWidth = width;
+            mCurrentSurfaceHeight = height;
+            tryToComplete();
+        }
+
+        @Override
+        public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
+            Logger.d(TAG, "Surface destroyed.");
+
+            // If a surface was already provided to the camera, invalidate it so that it requests
+            // a new valid one. Otherwise, cancel the surface request.
+            if (mActiveSurface != null) {
+                invalidateSurface();
+                mActiveSurface.release();
+            } else {
+                cancelPreviousRequest();
+            }
+
+            // Reset state
+            mActiveSurface = null;
+            mCurrentSurfaceWidth = -1;
+            mCurrentSurfaceHeight = -1;
+        }
+    };
 
     SurfaceViewImplementation(@NonNull FrameLayout parent,
             @NonNull ViewfinderTransformation viewfinderTransformation) {
         super(parent, viewfinderTransformation);
     }
 
-    @Override
-    void initializeViewfinder() {
+    void initializeViewfinder(int width, int height) {
         Preconditions.checkNotNull(mParent);
-        Preconditions.checkNotNull(mResolution);
+        Preconditions.checkArgument(width > 0);
+        Preconditions.checkArgument(height > 0);
         mSurfaceView = new SurfaceView(mParent.getContext());
-        mSurfaceView.setLayoutParams(
-                new FrameLayout.LayoutParams(mResolution.getWidth(), mResolution.getHeight()));
+        mSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(width, height));
         mParent.removeAllViews();
         mParent.addView(mSurfaceView);
-        mSurfaceView.getHolder().addCallback(mSurfaceRequestCallback);
+        mSurfaceView.getHolder().addCallback(mSurfaceHolderCallback);
     }
 
     @Override
-    void onSurfaceRequested(@NonNull ViewfinderSurfaceRequest surfaceRequest) {
-        mResolution = surfaceRequest.getResolution();
-        initializeViewfinder();
-        surfaceRequest.addRequestCancellationListener(
-                ContextCompat.getMainExecutor(mSurfaceView.getContext()), () -> {
-                });
-        mSurfaceView.post(() -> mSurfaceRequestCallback.setSurfaceRequest(surfaceRequest));
+    void onSurfaceRequested(@NonNull ViewfinderSurfaceRequest surfaceRequest,
+            CallbackToFutureAdapter.Completer<RefCounted<Surface>> surfaceResponse) {
+        // Cancel the previous request, if any
+        cancelPreviousRequest();
+
+        initializeViewfinder(surfaceRequest.getWidth(), surfaceRequest.getHeight());
+
+        mSurfaceRequest = surfaceRequest;
+        mSurfaceResponse = surfaceResponse;
+        mSurfaceResponse.addCancellationListener(
+                () -> {
+                    if (Objects.equals(mSurfaceResponse, surfaceResponse)) {
+                        // Clean up the request
+                        cancelPreviousRequest();
+                    }
+                },
+                ContextCompat.getMainExecutor(
+                        Objects.requireNonNull(mSurfaceView).getContext())
+        );
+
+        if (!tryToComplete()) {
+            // The current size is incorrect. Wait for it to change.
+            Logger.d(TAG, "Wait for new Surface creation.");
+            Objects.requireNonNull(mSurfaceView).getHolder().setFixedSize(
+                    mSurfaceRequest.getWidth(),
+                    mSurfaceRequest.getHeight()
+            );
+        }
     }
 
     @Override
-    void onAttachedToWindow() {
-        // Do nothing currently.
-    }
-
-    @Override
-    void onDetachedFromWindow() {
-        // Do nothing currently.
+    void onImplementationReplaced() {
+        cancelPreviousRequest();
     }
 
     /**
@@ -95,7 +173,8 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
      */
     @RequiresApi(24)
     @Override
-    @Nullable Bitmap getViewfinderBitmap() {
+    @Nullable
+    Bitmap getViewfinderBitmap() {
         // If the viewfinder surface isn't ready yet or isn't valid, return null
         if (mSurfaceView == null || mSurfaceView.getHolder().getSurface() == null
                 || !mSurfaceView.getHolder().getSurface().isValid()) {
@@ -120,137 +199,58 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
     }
 
     @Override
-    @Nullable View getViewfinder() {
+    @Nullable
+    View getViewfinder() {
         return mSurfaceView;
     }
 
     /**
-     * The {@link SurfaceHolder.Callback} on mSurfaceView.
+     * Sets the completer if size matches.
      *
-     * <p> SurfaceView creates Surface on its own before we can do anything. This class makes
-     * sure only the Surface with correct size will be returned to viewfinder.
+     * @return true if the completer is set.
      */
-    class SurfaceRequestCallback implements SurfaceHolder.Callback {
-
-        // Target Surface size. Only complete the SurfaceRequest when the size of the Surface
-        // matches this value.
-        // Guarded by the UI thread.
-        private @Nullable Size mTargetSize;
-
-        // SurfaceRequest to set when the target size is met.
-        // Guarded by the UI thread.
-        private @Nullable ViewfinderSurfaceRequest mSurfaceRequest;
-
-        // The cached size of the current Surface.
-        // Guarded by the UI thread.
-        private @Nullable Size mCurrentSurfaceSize;
-
-        // Guarded by the UI thread.
-        private boolean mWasSurfaceProvided = false;
-
-        @Override
-        public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
-            Logger.d(TAG, "Surface created.");
-            // No-op. Handling surfaceChanged() is enough because it's always called afterwards.
+    @UiThread
+    private boolean tryToComplete() {
+        if (mSurfaceView == null || mSurfaceResponse == null) {
+            return false;
         }
+        if (canProvideSurface()) {
+            Logger.d(TAG, "Surface set on viewfinder.");
 
-        @Override
-        public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int format, int width,
-                int height) {
-            Logger.d(TAG, "Surface changed. Size: " + width + "x" + height);
-            mCurrentSurfaceSize = new Size(width, height);
-            tryToComplete();
-        }
-
-        @Override
-        public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-            Logger.d(TAG, "Surface destroyed.");
-
-            // If a surface was already provided to the camera, invalidate it so that it requests
-            // a new valid one. Otherwise, cancel the surface request.
-            if (mWasSurfaceProvided) {
-                invalidateSurface();
-            } else {
-                cancelPreviousRequest();
-            }
-
-            // Reset state
-            mWasSurfaceProvided = false;
-            mSurfaceRequest = null;
-            mCurrentSurfaceSize = null;
-            mTargetSize = null;
-        }
-
-        /**
-         * Sets the completer and the size. The completer will only be set if the current size of
-         * the Surface matches the target size.
-         */
-        @UiThread
-        void setSurfaceRequest(@NonNull ViewfinderSurfaceRequest surfaceRequest) {
-            // Cancel the previous request, if any
-            cancelPreviousRequest();
-
-            mSurfaceRequest = surfaceRequest;
-            Size targetSize = surfaceRequest.getResolution();
-            mTargetSize = targetSize;
-            mWasSurfaceProvided = false;
-
-            if (!tryToComplete()) {
-                // The current size is incorrect. Wait for it to change.
-                Logger.d(TAG, "Wait for new Surface creation.");
-                mSurfaceView.getHolder().setFixedSize(targetSize.getWidth(),
-                        targetSize.getHeight());
-            }
-        }
-
-        /**
-         * Sets the completer if size matches.
-         *
-         * @return true if the completer is set.
-         */
-        @UiThread
-        private boolean tryToComplete() {
-            if (mSurfaceView == null || mSurfaceRequest == null) {
-                return false;
-            }
-            final Surface surface = mSurfaceView.getHolder().getSurface();
-            if (canProvideSurface()) {
-                Logger.d(TAG, "Surface set on viewfinder.");
-                mSurfaceRequest.provideSurface(surface,
-                        ContextCompat.getMainExecutor(mSurfaceView.getContext()),
-                        (result) -> {
-                            Logger.d(TAG, "provide surface result = " + result);
-                        });
-                mWasSurfaceProvided = true;
+            if (mSurfaceResponse.set(mActiveSurface)) {
                 onSurfaceProvided();
                 return true;
             }
-            return false;
-        }
 
-        private boolean canProvideSurface() {
-            return !mWasSurfaceProvided && mSurfaceRequest != null && mTargetSize != null
-                    && mTargetSize.equals(mCurrentSurfaceSize);
+            mSurfaceRequest = null;
+            mSurfaceResponse = null;
         }
+        return false;
+    }
 
-        @UiThread
-        @SuppressWarnings("ObjectToString")
-        private void cancelPreviousRequest() {
-            if (mSurfaceRequest != null) {
-                Logger.d(TAG, "Request canceled: " + mSurfaceRequest);
-                mSurfaceRequest.willNotProvideSurface();
-            }
+    private boolean canProvideSurface() {
+        return mActiveSurface != null
+                && mSurfaceRequest != null
+                && mSurfaceRequest.getWidth() == mCurrentSurfaceWidth
+                && mSurfaceRequest.getHeight() == mCurrentSurfaceHeight;
+    }
+
+    @UiThread
+    private void cancelPreviousRequest() {
+        if (mSurfaceRequest != null) {
+            Logger.d(TAG, "Request canceled: " + mSurfaceRequest);
+            mSurfaceRequest = null;
+            mSurfaceResponse.setCancelled();
+            mSurfaceResponse = null;
         }
+    }
 
-        @UiThread
-        @SuppressWarnings("ObjectToString")
-        private void invalidateSurface() {
-            if (mSurfaceRequest != null) {
-                Logger.d(TAG, "Surface invalidated " + mSurfaceRequest);
-                // TODO(b/323226220): Differentiate between surface being released by consumer
-                //  vs producer
-                mSurfaceRequest.markSurfaceSafeToRelease();
-            }
+    @UiThread
+    private void invalidateSurface() {
+        if (mSurfaceRequest != null) {
+            Logger.d(TAG, "Surface invalidated: " + mSurfaceRequest);
+            // TODO(b/323226220): Differentiate between surface being released by consumer
+            //  vs producer
         }
     }
 
@@ -269,3 +269,4 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
         }
     }
 }
+

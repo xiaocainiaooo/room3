@@ -41,6 +41,15 @@ dependencies {
     implementation("androidx.test.espresso:espresso-idling-resource:3.1.0")
     implementation(libs.kotlinCoroutinesCore)
     implementation(libs.kotlinCoroutinesAndroid)
+    implementation(libs.atomicFu)
+
+    testImplementation(libs.testRunner)
+    testImplementation(libs.mockitoCore4)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.truth)
+    testImplementation(libs.testRules)
+    testImplementation(libs.testCore)
 
     annotationProcessor(libs.autoValue)
 }
