@@ -18,6 +18,7 @@ package androidx.pdf.viewer.fragment
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -33,6 +34,7 @@ import android.widget.LinearLayout.VISIBLE
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.CallSuper
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
@@ -63,8 +65,44 @@ import androidx.pdf.viewer.fragment.view.PdfViewManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+/**
+ * A Fragment that renders a PDF document.
+ *
+ * <p>A [PdfViewerFragmentV2] that can display paginated PDFs. The viewer includes a FAB for
+ * annotation support and a search menu. Each page is rendered in its own View. Upon creation, this
+ * fragment displays a loading spinner.
+ *
+ * <p>Rendering is done in 2 passes:
+ * <ol>
+ * <li>Layout: Request the page data, get the dimensions and set them as measure for the image view.
+ * <li>Render: Create bitmap(s) at adequate dimensions and attach them to the page view.
+ * </ol>
+ *
+ * <p>The layout pass is progressive: starts with a few first pages of the document, then reach
+ * further as the user scrolls down (and ultimately spans the whole document). The rendering pass is
+ * tightly limited to the currently visible pages. Pages that are scrolled past (become not visible)
+ * have their bitmaps released to free up memory.
+ *
+ * <p>Note that every activity/fragment that uses this class has to be themed with Theme.AppCompat
+ * or a theme that extends that theme.
+ *
+ * @see documentUri
+ */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public open class PdfViewerFragmentV2 : Fragment() {
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+public open class PdfViewerFragmentV2 constructor() : Fragment() {
+
+    /**
+     * Protected constructor for instantiating a [PdfViewerFragment] with the specified styling
+     * options.
+     *
+     * @param pdfStylingOptions The styling options to be applied to the PDF viewer.
+     */
+    protected constructor(pdfStylingOptions: PdfStylingOptions) : this() {
+        val args =
+            Bundle().also { it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId) }
+        arguments = args
+    }
 
     /**
      * The URI of the PDF document to display defaulting to `null`.
@@ -507,7 +545,26 @@ public open class PdfViewerFragmentV2 : Fragment() {
         }
     }
 
-    private companion object {
+    public companion object {
         private const val PASSWORD_DIALOG_TAG = "password-dialog"
+        private const val KEY_PDF_VIEW_STYLE = "keyPdfViewStyle"
+
+        /**
+         * Creates a new instance of [PdfViewerFragmentV2] with the specified styling options.
+         *
+         * @param pdfStylingOptions The styling options to be applied.
+         * @return A new instance of [PdfViewerFragmentV2] with the provided styling options.
+         */
+        @JvmStatic
+        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragmentV2 {
+            val fragment = PdfViewerFragmentV2()
+            val args =
+                Bundle().also {
+                    it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId)
+                }
+
+            fragment.arguments = args
+            return fragment
+        }
     }
 }
