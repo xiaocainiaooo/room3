@@ -158,19 +158,7 @@ class SdkSandboxControllerCompatLocalTest {
     }
 
     @Test
-    fun getClientPackageName_whenNotAvailable_returnsContextPackageName() {
-        SdkSandboxControllerCompat.injectLocalImpl(TestStubImpl())
-        val controllerCompat = SdkSandboxControllerCompat.from(context)
-
-        val result = controllerCompat.getClientPackageName()
-
-        assertThat(result).isEqualTo(context.getPackageName())
-    }
-
-    @Test
     fun getClientPackageName_returnsPackageNameFromLocalImpl() {
-        clientHandShakeForVersionIncluding(ClientFeature.GET_CLIENT_PACKAGE_NAME)
-
         val expectedResult = "test.client.package.name"
         val stubLocalImpl = TestStubImpl(clientPackageName = expectedResult)
         SdkSandboxControllerCompat.injectLocalImpl(stubLocalImpl)
