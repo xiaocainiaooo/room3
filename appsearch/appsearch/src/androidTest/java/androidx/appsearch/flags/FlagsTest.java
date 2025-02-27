@@ -186,4 +186,10 @@ public class FlagsTest {
                 .isEqualTo(
                         "com.android.appsearch.flags.enable_search_result_parent_types");
     }
+
+    @Test
+    public void testFlagValue_enableAppsearchManageBlobFiles() {
+        assertThat(Flags.FLAG_ENABLE_APPSEARCH_MANAGE_BLOB_FILES)
+                .isEqualTo("com.android.appsearch.flags.enable_appsearch_manage_blob_files");
+    }
 }
