@@ -109,7 +109,7 @@ package androidx.appfunctions {
   public abstract class AppFunctionRequestException extends androidx.appfunctions.AppFunctionException {
   }
 
-  @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface AppFunctionSerializable {
+  @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface AppFunctionSerializable {
   }
 
   public abstract class AppFunctionSystemException extends androidx.appfunctions.AppFunctionException {
