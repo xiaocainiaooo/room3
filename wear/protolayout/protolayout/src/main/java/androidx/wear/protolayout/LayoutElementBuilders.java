@@ -1150,7 +1150,7 @@ public final class LayoutElementBuilders {
          * href="https://fonts.google.com/knowledge/glossary/rond_axis">here</a>.
          *
          * @param value roundness, usually in 0..100, but actual range and availability can depend
-         *  on the font used
+         *     on the font used
          */
         @RequiresSchemaVersion(major = 1, minor = 400)
         static @NonNull FontSetting roundness(int value) {
@@ -5414,9 +5414,9 @@ public final class LayoutElementBuilders {
                 DimensionProto.AngularDimension angularDimensionProto =
                         angularLength.toAngularDimensionProto();
                 if ((angularDimensionProto.hasDegrees()
-                        && angularDimensionProto.getDegrees().hasDynamicValue())
+                                && angularDimensionProto.getDegrees().hasDynamicValue())
                         || (angularDimensionProto.hasDp()
-                        && angularDimensionProto.getDp().hasDynamicValue())) {
+                                && angularDimensionProto.getDp().hasDynamicValue())) {
                     throw new IllegalArgumentException(
                             "ArcSpacer.Builder.setAngularLength doesn't support dynamic values.");
                 }
@@ -6728,7 +6728,7 @@ public final class LayoutElementBuilders {
                 return content.getArc().hasModifiers()
                         && content.getArc().getModifiers().hasTransformation();
             case EXTENSION:
-            // fall through
+                // fall through
             case INNER_NOT_SET:
                 return false;
         }
