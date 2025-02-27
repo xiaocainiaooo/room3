@@ -55,7 +55,9 @@ import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberResponsiveTransformationSpec
 import androidx.wear.compose.material3.lazy.scrollTransform
 import kotlin.random.Random
 import kotlinx.coroutines.launch
@@ -247,18 +249,20 @@ fun TransformingLazyColumnReducedMotionSample() {
             }
         ) { contentPadding ->
             CompositionLocalProvider(LocalReduceMotion provides enableReduceMotion) {
+                val transformationSpec = rememberResponsiveTransformationSpec()
                 TransformingLazyColumn(
                     state = state,
                     contentPadding = contentPadding,
                 ) {
                     items(count = 5) {
-                        Text(
-                            "Text item $it",
-                            modifier = Modifier.scrollTransform(this).animateItem()
-                        )
-                    }
-                    items(count = 5) {
-                        Button(onClick = {}, modifier = Modifier.fillMaxWidth().animateItem()) {
+                        Button(
+                            onClick = {},
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .transformedHeight(transformationSpec::getTransformedHeight)
+                                    .animateItem(),
+                            transformation = SurfaceTransformation(transformationSpec)
+                        ) {
                             Text("Item $it")
                         }
                     }
