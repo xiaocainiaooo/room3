@@ -446,7 +446,10 @@ constructor(
             return
         }
 
-        if (sessionProcessor != null || !shouldCreateCameraGraphImmediately) {
+        val usingLegacyExtensions =
+            sessionProcessor?.implementationType?.first == SessionProcessor.TYPE_VENDOR_LIBRARY
+
+        if (usingLegacyExtensions || !shouldCreateCameraGraphImmediately) {
             // We will need to set the UseCaseCamera to null since the new UseCaseCamera along with
             // its respective CameraGraph configurations won't be ready until:
             //
@@ -458,39 +461,69 @@ constructor(
             }
         }
 
+        // Enables extensions with the vendor library approach if extension mode is requested but
+        // Camera2 Extensions doesn't support it.
         if (sessionProcessor != null) {
-            Log.debug { "Setting up UseCaseManager with SessionProcessorManager" }
-            sessionProcessorManager =
-                SessionProcessorManager(
-                        sessionProcessor!!,
-                        cameraInfoInternal.get(),
-                        useCaseThreads.get().scope,
-                    )
-                    .also { manager ->
-                        pendingSessionProcessorInitialization = true
-                        manager.initialize(this, useCases) { config ->
-                            synchronized(lock) {
-                                if (manager.isClosed()) {
-                                    // We've been cancelled by other use case transactions. This
-                                    // means the
-                                    // attached set of use cases have been updated in the meantime,
-                                    // and the
-                                    // UseCaseManagerConfig we have here is obsolete, so we can
-                                    // simply abort
-                                    // here.
-                                    return@initialize
+            if (usingLegacyExtensions) {
+                Log.debug { "Setting up UseCaseManager with SessionProcessorManager" }
+                sessionProcessorManager =
+                    SessionProcessorManager(
+                            sessionProcessor!!,
+                            cameraInfoInternal.get(),
+                            useCaseThreads.get().scope,
+                        )
+                        .also { manager ->
+                            pendingSessionProcessorInitialization = true
+                            manager.initialize(this, useCases) { config ->
+                                synchronized(lock) {
+                                    if (manager.isClosed()) {
+                                        // We've been cancelled by other use case transactions. This
+                                        // means the attached set of use cases have been updated in
+                                        // the meantime, and the UseCaseManagerConfig we have here
+                                        // is obsolete, so we can simply abort here.
+                                        return@initialize
+                                    }
+                                    if (config == null) {
+                                        Log.error { "Failed to initialize SessionProcessor" }
+                                        manager.close()
+                                        sessionProcessorManager = null
+                                        return@initialize
+                                    }
+                                    pendingSessionProcessorInitialization = false
+                                    this@UseCaseManager.tryResumeUseCaseManager(config)
                                 }
-                                if (config == null) {
-                                    Log.error { "Failed to initialize SessionProcessor" }
-                                    manager.close()
-                                    sessionProcessorManager = null
-                                    return@initialize
-                                }
-                                pendingSessionProcessorInitialization = false
-                                this@UseCaseManager.tryResumeUseCaseManager(config)
                             }
                         }
-                    }
+            } else {
+                Log.debug { "Setting up UseCaseManager with OperatingMode.EXTENSION" }
+                val sessionConfigAdapter = SessionConfigAdapter(useCases, isPrimary = isPrimary)
+                val streamConfigMap = mutableMapOf<CameraStream.Config, DeferrableSurface>()
+                val graphConfig =
+                    createCameraGraphConfig(
+                        OperatingMode.EXTENSION,
+                        sessionConfigAdapter,
+                        streamConfigMap,
+                        callbackMap,
+                        requestListener,
+                        cameraConfig,
+                        cameraQuirks,
+                        zslControl,
+                        templateParamsOverride,
+                        cameraMetadata,
+                        camera2ExtensionMode = sessionProcessor?.implementationType?.second,
+                        isExtensions = true,
+                        enableStreamUseCase = false
+                    )
+
+                val useCaseManagerConfig =
+                    UseCaseManagerConfig(
+                        useCases,
+                        sessionConfigAdapter,
+                        graphConfig,
+                        streamConfigMap
+                    )
+                this.tryResumeUseCaseManager(useCaseManagerConfig)
+            }
             return
         } else {
             val sessionConfigAdapter = SessionConfigAdapter(useCases, isPrimary = isPrimary)
@@ -673,6 +706,13 @@ constructor(
         isExtensions: Boolean = false,
     ): CameraGraph.Config {
         return createCameraGraphConfig(
+            sessionConfigAdapter.getValidSessionConfigOrNull()?.let { sessionConfig ->
+                when (sessionConfig.sessionType) {
+                    SESSION_REGULAR -> OperatingMode.NORMAL
+                    SESSION_HIGH_SPEED -> OperatingMode.HIGH_SPEED
+                    else -> OperatingMode.custom(sessionConfig.sessionType)
+                }
+            } ?: OperatingMode.NORMAL,
             sessionConfigAdapter,
             streamConfigMap,
             callbackMap,
@@ -682,7 +722,8 @@ constructor(
             zslControl,
             templateParamsOverride,
             cameraMetadata,
-            isExtensions,
+            camera2ExtensionMode = null,
+            isExtensions = isExtensions,
         )
     }
 
@@ -950,6 +991,7 @@ constructor(
         }
 
         public fun createCameraGraphConfig(
+            operatingMode: OperatingMode,
             sessionConfigAdapter: SessionConfigAdapter,
             streamConfigMap: MutableMap<CameraStream.Config, DeferrableSurface>,
             callbackMap: CameraCallbackMap,
@@ -959,27 +1001,25 @@ constructor(
             zslControl: ZslControl,
             templateParamsOverride: TemplateParamsOverride,
             cameraMetadata: CameraMetadata?,
+            camera2ExtensionMode: Int? = null,
             isExtensions: Boolean = false,
+            enableStreamUseCase: Boolean = true,
         ): CameraGraph.Config {
             var containsVideo = false
-            var operatingMode = OperatingMode.NORMAL
             val streamGroupMap = mutableMapOf<Int, MutableList<CameraStream.Config>>()
             val inputStreams = mutableListOf<InputStream.Config>()
             var sessionTemplate = RequestTemplate(TEMPLATE_PREVIEW)
-            val sessionParameters: MutableMap<CaptureRequest.Key<*>, Any> = mutableMapOf()
+            val sessionParameters: MutableMap<Any, Any> = mutableMapOf()
             sessionConfigAdapter.getValidSessionConfigOrNull()?.let { sessionConfig ->
-                operatingMode =
-                    when (sessionConfig.sessionType) {
-                        SESSION_REGULAR -> OperatingMode.NORMAL
-                        SESSION_HIGH_SPEED -> OperatingMode.HIGH_SPEED
-                        else -> OperatingMode.custom(sessionConfig.sessionType)
-                    }
-
                 if (sessionConfig.templateType != CaptureConfig.TEMPLATE_TYPE_NONE) {
                     sessionTemplate = RequestTemplate(sessionConfig.templateType)
                 }
                 sessionParameters.putAll(templateParamsOverride.getOverrideParams(sessionTemplate))
                 sessionParameters.putAll(sessionConfig.implementationOptions.toParameters())
+                if (operatingMode == OperatingMode.EXTENSION) {
+                    // camera2ExtensionMode must be non-null when operatingMode is EXTENSION
+                    sessionParameters[CameraPipeKeys.camera2ExtensionMode] = camera2ExtensionMode!!
+                }
 
                 val physicalCameraIdForAllStreams =
                     sessionConfig.toCamera2ImplConfig().getPhysicalCameraId(null)
@@ -1015,16 +1055,24 @@ constructor(
                                     else -> null
                                 },
                             streamUseCase =
-                                getStreamUseCase(
-                                    deferrableSurface,
-                                    sessionConfigAdapter.surfaceToStreamUseCaseMap,
-                                    cameraMetadata,
-                                ),
+                                if (enableStreamUseCase) {
+                                    getStreamUseCase(
+                                        deferrableSurface,
+                                        sessionConfigAdapter.surfaceToStreamUseCaseMap,
+                                        cameraMetadata,
+                                    )
+                                } else {
+                                    null
+                                },
                             streamUseHint =
-                                getStreamUseHint(
-                                    deferrableSurface,
-                                    sessionConfigAdapter.surfaceToStreamUseHintMap
-                                ),
+                                if (enableStreamUseCase) {
+                                    getStreamUseHint(
+                                        deferrableSurface,
+                                        sessionConfigAdapter.surfaceToStreamUseHintMap
+                                    )
+                                } else {
+                                    null
+                                },
                         )
                     val surfaces = outputConfig.sharedSurfaces + deferrableSurface
                     for (surface in surfaces) {
@@ -1092,6 +1140,16 @@ constructor(
                 sessionParameters[CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE] = targetFpsRange
             }
 
+            val postviewStream =
+                sessionConfigAdapter.getValidSessionConfigOrNull()?.let { sessionConfig ->
+                    val physicalCameraIdForAllStreams =
+                        sessionConfig.toCamera2ImplConfig().getPhysicalCameraId(null)
+                    sessionConfig.postviewOutputConfig?.let { postviewOutputConfig ->
+                        createPostviewStream(postviewOutputConfig, physicalCameraIdForAllStreams)
+                            ?.also { streamConfigMap[it] = postviewOutputConfig.surface }
+                    }
+                }
+
             // TODO: b/327517884 - Add a quirk to not abort captures on stop for certain OEMs during
             //   extension sessions.
 
@@ -1101,6 +1159,7 @@ constructor(
                 streams = streamConfigMap.keys.toList(),
                 exclusiveStreamGroups = streamGroupMap.values.toList(),
                 input = if (inputStreams.isEmpty()) null else inputStreams,
+                postviewStream = postviewStream,
                 sessionTemplate = sessionTemplate,
                 sessionParameters = sessionParameters,
                 sessionMode = operatingMode,
@@ -1108,6 +1167,37 @@ constructor(
                 defaultParameters = defaultParameters,
                 flags = combinedFlags,
             )
+        }
+
+        private fun createPostviewStream(
+            postviewConfig: SessionConfig.OutputConfig,
+            physicalCameraIdForAllStreams: String?
+        ): CameraStream.Config? {
+            val deferrableSurface = postviewConfig.surface
+            val physicalCameraId = physicalCameraIdForAllStreams ?: postviewConfig.physicalCameraId
+            val mirrorMode = postviewConfig.mirrorMode
+            val outputStreamConfig =
+                OutputStream.Config.create(
+                    size = deferrableSurface.prescribedSize,
+                    format = StreamFormat(deferrableSurface.prescribedStreamFormat),
+                    camera =
+                        if (physicalCameraId == null) {
+                            null
+                        } else {
+                            CameraId.fromCamera2Id(physicalCameraId)
+                        },
+                    // No need to map MIRROR_MODE_ON_FRONT_ONLY to MIRROR_MODE_AUTO
+                    // since its default value in framework
+                    mirrorMode =
+                        when (mirrorMode) {
+                            MirrorMode.MIRROR_MODE_OFF ->
+                                OutputStream.MirrorMode(OutputConfiguration.MIRROR_MODE_NONE)
+                            MirrorMode.MIRROR_MODE_ON ->
+                                OutputStream.MirrorMode(OutputConfiguration.MIRROR_MODE_H)
+                            else -> null
+                        },
+                )
+            return CameraStream.Config.create(outputStreamConfig)
         }
 
         private fun getStreamUseCase(
