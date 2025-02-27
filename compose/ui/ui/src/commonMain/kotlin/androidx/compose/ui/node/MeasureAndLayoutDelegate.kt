@@ -501,7 +501,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             try {
                 block()
             } catch (t: Throwable) {
-                uncaughtExceptionHandler?.onUncaughtLayoutException(t) ?: throw t
+                uncaughtExceptionHandler?.onUncaughtException(t) ?: throw t
             } finally {
                 duringMeasureLayout = false
                 duringFullMeasureLayoutPass = false

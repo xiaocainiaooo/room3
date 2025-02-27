@@ -833,21 +833,8 @@ abstract interface androidx.compose.ui.node/RootForTest { // androidx.compose.ui
     open fun setAccessibilityEventBatchIntervalMillis(kotlin/Long) // androidx.compose.ui.node/RootForTest.setAccessibilityEventBatchIntervalMillis|setAccessibilityEventBatchIntervalMillis(kotlin.Long){}[0]
     open fun setUncaughtExceptionHandler(androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler?) // androidx.compose.ui.node/RootForTest.setUncaughtExceptionHandler|setUncaughtExceptionHandler(androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler?){}[0]
 
-    abstract fun interface UncaughtExceptionHandler { // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler|null[0]
-        abstract fun onUncaughtException(kotlin/Throwable, androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase) // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.onUncaughtException|onUncaughtException(kotlin.Throwable;androidx.compose.ui.node.RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase){}[0]
-
-        final value class ExceptionOriginPhase { // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase|null[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.toString|toString(){}[0]
-
-            final object Companion { // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion|null[0]
-                final val Draw // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion.Draw|{}Draw[0]
-                    final fun <get-Draw>(): androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion.Draw.<get-Draw>|<get-Draw>(){}[0]
-                final val Layout // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion.Layout|{}Layout[0]
-                    final fun <get-Layout>(): androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.ExceptionOriginPhase.Companion.Layout.<get-Layout>|<get-Layout>(){}[0]
-            }
-        }
+    abstract interface UncaughtExceptionHandler { // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler|null[0]
+        abstract fun onUncaughtException(kotlin/Throwable) // androidx.compose.ui.node/RootForTest.UncaughtExceptionHandler.onUncaughtException|onUncaughtException(kotlin.Throwable){}[0]
     }
 }
 
