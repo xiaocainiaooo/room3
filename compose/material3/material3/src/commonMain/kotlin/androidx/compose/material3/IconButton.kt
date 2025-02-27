@@ -48,7 +48,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 
 /**
  * <a href="https://m3.material.io/components/icon-button/overview" class="external"
@@ -1266,29 +1265,8 @@ private fun SurfaceIconToggleButton(
         Box(
             modifier =
                 Modifier.size(
-                        IconButtonDefaults.smallContainerSize(),
-                    )
-                    .then(
-                        when (shape) {
-                            is ShapeWithHorizontalCenterOptically -> {
-                                Modifier.horizontalCenterOptically(
-                                    shape = shape,
-                                    maxStartOffset = Int.MAX_VALUE.dp,
-                                    maxEndOffset = Int.MAX_VALUE.dp
-                                )
-                            }
-                            is CornerBasedShape -> {
-                                Modifier.horizontalCenterOptically(
-                                    shape = shape,
-                                    maxStartOffset = Int.MAX_VALUE.dp,
-                                    maxEndOffset = Int.MAX_VALUE.dp
-                                )
-                            }
-                            else -> {
-                                Modifier
-                            }
-                        }
-                    ),
+                    IconButtonDefaults.smallContainerSize(),
+                ),
             contentAlignment = Alignment.Center
         ) {
             content()
