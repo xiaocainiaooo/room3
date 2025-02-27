@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.SoftwareType
 
 plugins {
@@ -83,6 +85,7 @@ androidx {
             "Material Design UX guidelines and specifications. It builds upon the Jetpack Compose" +
             " libraries."
     metalavaK2UastEnabled = false
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
     samples(project(":wear:compose:compose-material-samples"))
     addGoldenImageAssets()
 }

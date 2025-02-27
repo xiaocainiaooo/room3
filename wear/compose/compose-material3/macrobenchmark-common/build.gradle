@@ -1,3 +1,5 @@
+import androidx.build.KotlinTarget
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -34,4 +36,8 @@ dependencies {
     implementation(libs.testRules)
     implementation(libs.testExtJunit)
     implementation(libs.testCore)
+}
+
+androidx {
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }

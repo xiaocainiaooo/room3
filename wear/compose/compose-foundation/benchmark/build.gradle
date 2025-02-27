@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.SoftwareType
 
 plugins {
@@ -61,4 +63,5 @@ dependencies {
 }
 androidx {
     type = SoftwareType.BENCHMARK
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }

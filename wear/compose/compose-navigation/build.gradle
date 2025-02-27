@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.SoftwareType
 
 plugins {
@@ -75,5 +77,6 @@ androidx {
             "to write Jetpack Compose applications for Wearable devices by providing " +
             "functionality to support navigation. " +
             "It builds upon the Jetpack Compose libraries."
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
     samples(project(":wear:compose:compose-navigation-samples"))
 }
