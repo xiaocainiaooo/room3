@@ -158,8 +158,7 @@ public class QualityExploredEncoderProfilesProvider implements EncoderProfilesPr
                     continue;
                 }
                 // Add the encoderProfiles to the candidates of base EncoderProfiles.
-                areaSortedSizeToEncoderProfilesMap.put(
-                        new Size(baseVideoProfile.getWidth(), baseVideoProfile.getHeight()),
+                areaSortedSizeToEncoderProfilesMap.put(baseVideoProfile.getResolution(),
                         encoderProfiles);
                 // Generate VideoProfile from base VideoProfile and new size.
                 generatedVideoProfiles.add(

@@ -216,6 +216,7 @@ class SupportedSurfaceCombinationTest {
         whenever(mockEncoderProfilesAdapter.hasProfile(ArgumentMatchers.anyInt())).thenReturn(true)
         whenever(mockVideoProfileProxy.width).thenReturn(3840)
         whenever(mockVideoProfileProxy.height).thenReturn(2160)
+        whenever(mockVideoProfileProxy.resolution).thenReturn(Size(3840, 2160))
         whenever(mockEncoderProfilesProxy.videoProfiles).thenReturn(listOf(mockVideoProfileProxy))
         whenever(mockEncoderProfilesAdapter.getAll(ArgumentMatchers.anyInt()))
             .thenReturn(mockEncoderProfilesProxy)

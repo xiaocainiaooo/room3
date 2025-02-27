@@ -1552,7 +1552,7 @@ public class SupportedSurfaceCombination(
             if (encoderProfilesProvider.hasProfile(quality)) {
                 val profiles = encoderProfilesProvider.getAll(quality)
                 if (profiles != null && profiles.videoProfiles.isNotEmpty()) {
-                    return profiles.videoProfiles[0]!!.let { Size(it.width, it.height) }
+                    return profiles.videoProfiles[0]!!.resolution
                 }
             }
         }

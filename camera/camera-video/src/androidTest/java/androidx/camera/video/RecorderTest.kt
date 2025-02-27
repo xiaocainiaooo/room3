@@ -240,20 +240,20 @@ class RecorderTest(
                     videoCapabilities
                         .getProfiles(Quality.FHD, dynamicRange)
                         ?.defaultVideoProfile
-                        ?.let { add(Size(it.width, it.height)) }
+                        ?.let { add(it.resolution) }
                     videoCapabilities
                         .getProfiles(Quality.HD, dynamicRange)
                         ?.defaultVideoProfile
-                        ?.let { add(Size(it.width, it.height)) }
+                        ?.let { add(it.resolution) }
                     videoCapabilities
                         .getProfiles(Quality.SD, dynamicRange)
                         ?.defaultVideoProfile
-                        ?.let { add(Size(it.width, it.height)) }
+                        ?.let { add(it.resolution) }
                 }
                 videoCapabilities
                     .getProfiles(Quality.LOWEST, dynamicRange)
                     ?.defaultVideoProfile
-                    ?.let { add(Size(it.width, it.height)) }
+                    ?.let { add(it.resolution) }
             }
         assumeTrue(candidates.isNotEmpty())
 

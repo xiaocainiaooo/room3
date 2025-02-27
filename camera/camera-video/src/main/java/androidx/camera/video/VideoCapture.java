@@ -1347,9 +1347,8 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
             return null;
         }
 
-        Size profileSize = encoderProfiles != null ? new Size(
-                encoderProfiles.getDefaultVideoProfile().getWidth(),
-                encoderProfiles.getDefaultVideoProfile().getHeight()) : null;
+        Size profileSize = encoderProfiles != null
+                ? encoderProfiles.getDefaultVideoProfile().getResolution() : null;
         return VideoEncoderInfoWrapper.from(videoEncoderInfo, profileSize);
     }
 
