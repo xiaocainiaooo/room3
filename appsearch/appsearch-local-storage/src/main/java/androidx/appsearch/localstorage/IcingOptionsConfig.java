@@ -324,6 +324,7 @@ public interface IcingOptionsConfig {
                 .setEnableQualifiedIdJoinIndexV3AndDeletePropagateFrom(
                         Flags.enableDeletePropagationType())
                 .setIcuDataFileAbsolutePath(getIcuDataFileAbsolutePath())
+                .setManageBlobFiles(!Flags.enableAppSearchManageBlobFiles())
                 .build();
     }
 }

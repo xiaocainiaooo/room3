@@ -196,6 +196,10 @@ public final class Flags {
     public static final String FLAG_ENABLE_DELETE_PROPAGATION_TYPE =
             FLAG_PREFIX + "enable_delete_propagation_type";
 
+    /** Enables AppSearch to manage blob files. */
+    public static final String FLAG_ENABLE_APPSEARCH_MANAGE_BLOB_FILES =
+            FLAG_PREFIX + "enable_appsearch_manage_blob_files";
+
     // Whether the features should be enabled.
     //
     // In Jetpack, those should always return true.
@@ -328,6 +332,11 @@ public final class Flags {
 
     /**  Whether {@link androidx.appsearch.app.AppSearchBlobHandle} should be enabled. */
     public static boolean enableBlobStore() {
+        return true;
+    }
+
+    /** Whether AppSearch manages blob files. */
+    public static boolean enableAppSearchManageBlobFiles() {
         return true;
     }
 
