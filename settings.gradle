@@ -1189,6 +1189,7 @@ includeProject(":xr:compose:integration-tests:layout:modechangeapp", [BuildType.
 includeProject(":xr:compose:integration-tests:layout:modifierorderapp", [BuildType.XR])
 includeProject(":xr:compose:integration-tests:layout:movableandresizablepanelapp", [BuildType.XR])
 includeProject(":xr:compose:integration-tests:layout:movablepanelapp", [BuildType.XR])
+includeProject(":xr:compose:integration-tests:layout:movablescalableapp", [BuildType.XR])
 includeProject(":xr:compose:integration-tests:layout:movabletoggleapp", [BuildType.XR])
 includeProject(":xr:compose:integration-tests:layout:nestedsubspaceapp", [BuildType.XR])
 includeProject(":xr:compose:integration-tests:layout:nestedsubspacesetsubspacecontentactivity", [BuildType.XR])
