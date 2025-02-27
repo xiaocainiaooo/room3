@@ -180,16 +180,10 @@ class SupportedSurfaceCombinationTest {
     private val mockEmptyCamcorderProfileHelper = Mockito.mock(CamcorderProfileHelper::class.java)
     private val mockCamcorderProfile = Mockito.mock(CamcorderProfile::class.java)
     private var cameraManagerCompat: CameraManagerCompat? = null
-    private val profileUhd =
-        EncoderProfilesUtil.createFakeEncoderProfilesProxy(RECORD_SIZE.width, RECORD_SIZE.height)
-    private val profileFhd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(1920, 1080)
-    private val profileHd =
-        EncoderProfilesUtil.createFakeEncoderProfilesProxy(PREVIEW_SIZE.width, PREVIEW_SIZE.height)
-    private val profileSd =
-        EncoderProfilesUtil.createFakeEncoderProfilesProxy(
-            RESOLUTION_VGA.width,
-            RESOLUTION_VGA.height
-        )
+    private val profileUhd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(RECORD_SIZE)
+    private val profileFhd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(Size(1920, 1080))
+    private val profileHd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(PREVIEW_SIZE)
+    private val profileSd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(RESOLUTION_VGA)
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private var cameraFactory: FakeCameraFactory? = null
     private var useCaseConfigFactory: UseCaseConfigFactory? = null

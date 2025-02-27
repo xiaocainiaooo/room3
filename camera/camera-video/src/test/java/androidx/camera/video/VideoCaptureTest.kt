@@ -682,8 +682,7 @@ class VideoCaptureTest {
         // Arrange: create HD SDR VideoProfile.
         val videoProfileHdSdr =
             createFakeVideoProfileProxy(
-                RESOLUTION_720P.width,
-                RESOLUTION_720P.height,
+                RESOLUTION_720P,
                 videoMediaType = MIMETYPE_VIDEO_AVC,
                 videoBitDepth = EncoderProfilesProxy.VideoProfileProxy.BIT_DEPTH_8,
                 videoHdrFormat = EncoderProfiles.VideoProfile.HDR_NONE
@@ -691,8 +690,7 @@ class VideoCaptureTest {
         // Arrange: create HD HLG10 VideoProfile.
         val videoProfileHdHlg10 =
             createFakeVideoProfileProxy(
-                RESOLUTION_720P.width,
-                RESOLUTION_720P.height,
+                RESOLUTION_720P,
                 videoMediaType = MIMETYPE_VIDEO_HEVC,
                 videoBitDepth = EncoderProfilesProxy.VideoProfileProxy.BIT_DEPTH_10,
                 videoHdrFormat = EncoderProfiles.VideoProfile.HDR_HLG
@@ -700,8 +698,7 @@ class VideoCaptureTest {
         // Arrange: create HD HDR10 VideoProfile.
         val videoProfileHdHdr10 =
             createFakeVideoProfileProxy(
-                RESOLUTION_720P.width,
-                RESOLUTION_720P.height,
+                RESOLUTION_720P,
                 videoMediaType = MIMETYPE_VIDEO_AV1,
                 videoBitDepth = EncoderProfilesProxy.VideoProfileProxy.BIT_DEPTH_10,
                 videoHdrFormat = EncoderProfiles.VideoProfile.HDR_HDR10
