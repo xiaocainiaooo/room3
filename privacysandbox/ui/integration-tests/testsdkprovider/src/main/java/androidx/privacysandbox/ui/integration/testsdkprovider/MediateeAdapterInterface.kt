@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,23 @@
 package androidx.privacysandbox.ui.integration.testsdkprovider
 
 import android.os.Bundle
-import androidx.privacysandbox.tools.PrivacySandboxService
+import androidx.privacysandbox.tools.PrivacySandboxCallback
 
-@PrivacySandboxService
-interface ISdkApi {
+/**
+ * Common interface to be implemented by Mediation Adapters.
+ *
+ * Runtime-enabled Adapters will register an object that implements this interface with the
+ * Mediator. In-App Adapters will implement this interface and be initialised and registered with
+ * Mediator from the App.
+ *
+ * This interface will then be used by the Mediator to communicate with the Mediatees to show ads.
+ */
+@PrivacySandboxCallback
+interface MediateeAdapterInterface {
     suspend fun loadAd(
         adFormat: Int,
         adType: Int,
-        mediationOption: Int,
         waitInsideOnDraw: Boolean,
         drawViewability: Boolean
     ): Bundle
-
-    fun requestResize(width: Int, height: Int)
-
-    fun triggerProcessDeath()
-
-    fun launchFullscreenAd(launcherInfo: Bundle, screenOrientation: Int, backButtonNavigation: Int)
-
-    /**
-     * Registers the In-App mediatee adapter so that it can be used by the Mediator later to show
-     * ads.
-     */
-    fun registerInAppMediateeAdapter(mediateeAdapter: MediateeAdapterInterface)
 }

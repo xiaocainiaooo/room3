@@ -38,13 +38,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
 import androidx.privacysandbox.sdkruntime.client.SdkSandboxProcessDeathCallbackCompat
-import androidx.privacysandbox.sdkruntime.core.AppOwnedSdkSandboxInterfaceCompat
 import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException
-import androidx.privacysandbox.ui.integration.sdkproviderutils.MediateeSdkApiImpl
+import androidx.privacysandbox.ui.integration.inappmediateeadaptersdk.InAppMediateeAdapter
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import androidx.privacysandbox.ui.integration.testapp.util.DisabledItemsArrayAdapter
+import androidx.privacysandbox.ui.integration.testsdkprovider.ISdkApiFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.CoroutineScope
@@ -121,17 +121,16 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val loadedSdks = sdkSandboxManager.getSandboxedSdks()
-                val loadedSdk = loadedSdks.firstOrNull { it.getSdkInfo()?.name == SDK_NAME }
+                var loadedSdk = loadedSdks.firstOrNull { it.getSdkInfo()?.name == SDK_NAME }
                 if (loadedSdk == null) {
-                    sdkSandboxManager.loadSdk(SDK_NAME, Bundle())
+                    loadedSdk = sdkSandboxManager.loadSdk(SDK_NAME, Bundle())
                     sdkSandboxManager.loadSdk(MEDIATEE_SDK_NAME, Bundle())
-                    sdkSandboxManager.registerAppOwnedSdkSandboxInterface(
-                        AppOwnedSdkSandboxInterfaceCompat(
-                            MEDIATEE_SDK_NAME,
-                            /*version=*/ 0,
-                            MediateeSdkApiImpl(applicationContext)
+                    val sdkApi =
+                        ISdkApiFactory.wrapToISdkApi(
+                            checkNotNull(loadedSdk.getInterface()) { "Cannot find Sdk Service!" }
                         )
-                    )
+                    // Register in-app mediatee adapter with Mediator.
+                    sdkApi.registerInAppMediateeAdapter(InAppMediateeAdapter(applicationContext))
                 }
 
                 // TODO(b/337793172): Replace with a default fragment
@@ -159,11 +158,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         initializeToggles()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sdkSandboxManager.unregisterAppOwnedSdkSandboxInterface(MEDIATEE_SDK_NAME)
     }
 
     private inner class DeathCallbackImpl : SdkSandboxProcessDeathCallbackCompat {
