@@ -948,8 +948,8 @@ object ButtonDefaults {
     private val ButtonLeadingSpace = BaselineButtonTokens.LeadingSpace
     private val ButtonTrailingSpace = BaselineButtonTokens.TrailingSpace
     private val ButtonWithIconStartpadding = 16.dp
-    private val SmallButtonStartPadding = ButtonSmallTokens.LeadingSpace
-    private val SmallButtonEndPadding = ButtonSmallTokens.TrailingSpace
+    private val SmallStartPadding = ButtonSmallTokens.LeadingSpace
+    private val SmallEndPadding = ButtonSmallTokens.TrailingSpace
     private val ButtonVerticalPadding = 8.dp
 
     /**
@@ -978,13 +978,25 @@ object ButtonDefaults {
         )
 
     /** The default content padding used for small [Button] */
+    @Deprecated("For binary compatibility", level = DeprecationLevel.HIDDEN)
     @ExperimentalMaterial3ExpressiveApi
     val SmallButtonContentPadding
         get() =
             PaddingValues(
-                start = SmallButtonStartPadding,
+                start = SmallStartPadding,
                 top = ButtonVerticalPadding,
-                end = SmallButtonEndPadding,
+                end = SmallEndPadding,
+                bottom = ButtonVerticalPadding
+            )
+
+    /** The default content padding used for small [Button] */
+    @ExperimentalMaterial3ExpressiveApi
+    val SmallContentPadding
+        get() =
+            PaddingValues(
+                start = SmallStartPadding,
+                top = ButtonVerticalPadding,
+                end = SmallEndPadding,
                 bottom = ButtonVerticalPadding
             )
 

@@ -219,7 +219,8 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getOutlinedShape();
     method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getPressedShape();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getShape();
-    method public androidx.compose.foundation.layout.PaddingValues getSmallButtonContentPadding();
+    method @Deprecated public androidx.compose.foundation.layout.PaddingValues getSmallButtonContentPadding();
+    method public androidx.compose.foundation.layout.PaddingValues getSmallContentPadding();
     method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getSquareShape();
     method public androidx.compose.foundation.layout.PaddingValues getTextButtonContentPadding();
     method public androidx.compose.foundation.layout.PaddingValues getTextButtonWithIconContentPadding();
@@ -252,7 +253,8 @@ package androidx.compose.material3 {
     property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public float MediumIconSpacing;
     property public float MinHeight;
     property public float MinWidth;
-    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public androidx.compose.foundation.layout.PaddingValues SmallButtonContentPadding;
+    property @Deprecated @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public androidx.compose.foundation.layout.PaddingValues SmallButtonContentPadding;
+    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public androidx.compose.foundation.layout.PaddingValues SmallContentPadding;
     property public androidx.compose.foundation.layout.PaddingValues TextButtonContentPadding;
     property public androidx.compose.foundation.layout.PaddingValues TextButtonWithIconContentPadding;
     property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public float XLargeContainerHeight;
