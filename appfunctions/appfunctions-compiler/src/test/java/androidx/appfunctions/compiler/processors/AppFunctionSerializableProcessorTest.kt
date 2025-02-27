@@ -89,6 +89,30 @@ class AppFunctionSerializableProcessorTest {
     }
 
     @Test
+    fun testProcessor_validNestedInheritedProperties_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("NestedDerivedSerializable.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$NestedDerivedSerializableFactory.kt",
+            goldenFileName = "\$NestedDerivedSerializableFactory.KT"
+        )
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$NestedBaseSerializableFactory.kt",
+            goldenFileName = "\$NestedBaseSerializableFactory.KT"
+        )
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "\$NonNestedChildSerializableFactory.kt",
+            goldenFileName = "\$NonNestedChildSerializableFactory.KT"
+        )
+    }
+
+    @Test
     fun testProcessor_badlyInheritedProperties_success() {
         val report =
             compilationTestHelper.compileAll(
