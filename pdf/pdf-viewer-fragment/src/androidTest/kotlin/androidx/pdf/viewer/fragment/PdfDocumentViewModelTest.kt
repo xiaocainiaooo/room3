@@ -17,6 +17,7 @@
 package androidx.pdf.viewer.fragment
 
 import android.net.Uri
+import androidx.core.os.OperationCanceledException
 import androidx.lifecycle.SavedStateHandle
 import androidx.pdf.SandboxedPdfLoader
 import androidx.pdf.viewer.coroutines.collectTill
@@ -111,6 +112,24 @@ class PdfDocumentViewModelTest {
 
         // Assert fragmentUiState never set to Loading
         assertTrue(pdfViewModel.fragmentUiScreenState.value !is PdfFragmentUiState.Loading)
+    }
+
+    @Test
+    fun test_pdfDocumentViewModel_dismissPasswordDialogCheckOperationCanceledException() = runTest {
+        val savedState = SavedStateHandle()
+
+        val pdfViewModel =
+            PdfDocumentViewModel(savedState, SandboxedPdfLoader(appContext, dispatcher))
+
+        pdfViewModel.passwordDialogCancelled()
+
+        // Assert fragmentUiState is set to DocumentError
+        assertTrue(pdfViewModel.fragmentUiScreenState.value is PdfFragmentUiState.DocumentError)
+
+        val state = pdfViewModel.fragmentUiScreenState.value as PdfFragmentUiState.DocumentError
+
+        // Assert exception is OperationCanceledException
+        assertTrue(state.exception is OperationCanceledException)
     }
 
     @Test
