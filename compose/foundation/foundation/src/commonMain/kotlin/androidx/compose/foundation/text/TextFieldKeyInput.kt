@@ -180,7 +180,8 @@ internal class TextFieldKeyInput(
                     if (!singleLine) {
                         CommitTextCommand("\n", 1).apply()
                     } else {
-                        this@TextFieldKeyInput.state.onImeActionPerformed(imeAction)
+                        consumed =
+                            this@TextFieldKeyInput.state.onImeActionPerformedWithResult(imeAction)
                     }
                 KeyCommand.TAB ->
                     if (!singleLine) {

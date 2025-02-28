@@ -86,7 +86,7 @@ internal abstract class TextFieldKeyEventHandler {
         clipboardKeyCommandsHandler: ClipboardKeyCommandsHandler,
         editable: Boolean,
         singleLine: Boolean,
-        onSubmit: () -> Unit,
+        onSubmit: () -> Boolean,
     ): Boolean {
         val keyCode = event.key.keyCode
 
@@ -132,7 +132,7 @@ internal abstract class TextFieldKeyEventHandler {
         clipboardKeyCommandsHandler: ClipboardKeyCommandsHandler,
         editable: Boolean,
         singleLine: Boolean,
-        onSubmit: () -> Unit,
+        onSubmit: () -> Boolean,
     ): Boolean {
         if (event.isTypedEvent) {
             val codePoint = deadKeyCombiner.consume(event)
@@ -192,7 +192,7 @@ internal abstract class TextFieldKeyEventHandler {
                             restartImeIfContentChanges = !event.isFromSoftKeyboard
                         )
                     } else {
-                        onSubmit()
+                        consumed = onSubmit()
                     }
                 }
                 KeyCommand.TAB -> {
