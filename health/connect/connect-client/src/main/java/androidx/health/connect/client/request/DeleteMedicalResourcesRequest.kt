@@ -47,8 +47,7 @@ import androidx.health.connect.client.records.toString
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class DeleteMedicalResourcesRequest
-internal constructor(
+class DeleteMedicalResourcesRequest(
     val dataSourceIds: Set<String> = emptySet<String>(),
     val medicalResourceTypes: Set<Int> = emptySet<Int>()
 ) {
