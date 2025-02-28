@@ -84,6 +84,8 @@ class PdfViewerFragmentV2TestSuite {
             // Register idling resource
             IdlingRegistry.getInstance()
                 .register(fragment.pdfLoadingIdlingResource.countingIdlingResource)
+            IdlingRegistry.getInstance()
+                .register(fragment.pdfScrollIdlingResource.countingIdlingResource)
         }
     }
 
@@ -93,6 +95,8 @@ class PdfViewerFragmentV2TestSuite {
             // Un-register idling resource
             IdlingRegistry.getInstance()
                 .unregister(fragment.pdfLoadingIdlingResource.countingIdlingResource)
+            IdlingRegistry.getInstance()
+                .unregister(fragment.pdfScrollIdlingResource.countingIdlingResource)
         }
         scenario.close()
     }
@@ -120,7 +124,11 @@ class PdfViewerFragmentV2TestSuite {
 
         // Swipe actions
         onView(withId(PdfR.id.pdfView)).perform(swipeUp())
+        scenario.onFragment { it.pdfScrollIdlingResource.increment() }
 
+        // Espresso will wait on the idling resource on the next action performed hence adding a
+        // click which is essentially a no-op
+        onView(withId(PdfR.id.pdfView)).perform(click())
         // Check if the scrubber is visible
         withPdfView(scenario) { _, _, fastScrollThumb ->
             assertTrue(fastScrollThumb.alpha == FastScrollDrawer.VISIBLE_ALPHA)
@@ -136,6 +144,11 @@ class PdfViewerFragmentV2TestSuite {
 
         // Go back up and assert that the scrubber is visible again
         onView(withId(PdfR.id.pdfView)).perform(swipeDown())
+        scenario.onFragment { it.pdfScrollIdlingResource.increment() }
+
+        // Espresso will wait on the idling resource on the next action performed hence adding a
+        // click which is essentially a no-op
+        onView(withId(PdfR.id.pdfView)).perform(click())
         withPdfView(scenario) { _, _, fastScrollThumb ->
             assertTrue(fastScrollThumb.alpha == FastScrollDrawer.VISIBLE_ALPHA)
         }
@@ -175,20 +188,17 @@ class PdfViewerFragmentV2TestSuite {
                     Swipe.FAST,
                     { floatArrayOf(thumbCenterX.toFloat(), thumbCenterY.toFloat()) },
                     { view ->
-                        val endY = (view.height * 0.8f) + thumbCenterY.toFloat()
+                        val endY = view.height + thumbCenterY.toFloat()
                         val endX = thumbCenterX.toFloat()
                         floatArrayOf(endX, endY)
                     },
                     Press.FINGER
                 )
 
-            val expectedLabelWithoutSpace = "1/3"
-            val expectedLabelWithSpace = "1 / 3"
-            assertTrue(
-                "Current page indicator label ${pdfView.currentPageIndicatorLabel.trim()} not equal " +
-                    "to expected $expectedLabelWithoutSpace or $expectedLabelWithSpace",
-                pdfView.currentPageIndicatorLabel.trim() == expectedLabelWithoutSpace ||
-                    pdfView.currentPageIndicatorLabel.trim() == expectedLabelWithSpace
+            assertPageIndicatorLabel(
+                actualLabel = pdfView.currentPageIndicatorLabel.trim(),
+                expectedPage = 1,
+                expectedTotalPages = 3
             )
         }
 
@@ -196,13 +206,10 @@ class PdfViewerFragmentV2TestSuite {
         onView(isRoot()).perform(fastScrollScrubberSwipe!!)
 
         withPdfView(scenario) { _, pdfView, _ ->
-            val expectedLabelWithoutSpace = "2/3"
-            val expectedLabelWithSpace = "2 / 3"
-            assertTrue(
-                "Current page indicator label ${pdfView.currentPageIndicatorLabel.trim()} not equal " +
-                    "to expected $expectedLabelWithoutSpace or $expectedLabelWithSpace",
-                pdfView.currentPageIndicatorLabel.trim() == expectedLabelWithoutSpace ||
-                    pdfView.currentPageIndicatorLabel.trim() == expectedLabelWithSpace
+            assertPageIndicatorLabel(
+                actualLabel = pdfView.currentPageIndicatorLabel.trim(),
+                expectedPage = 3,
+                expectedTotalPages = 3
             )
         }
     }
@@ -304,5 +311,22 @@ class PdfViewerFragmentV2TestSuite {
         private const val TEST_CORRUPTED_DOCUMENT_FILE = "corrupted.pdf"
         private const val SEARCH_QUERY = "ipsum"
         private const val KEYBOARD_CONTENT_DESC = "keyboard"
+
+        private fun assertPageIndicatorLabel(
+            actualLabel: String,
+            expectedPage: Int,
+            expectedTotalPages: Int
+        ) {
+            TestUtils.extractFromLabel(actualLabel) { currentPage, totalPages ->
+                assertTrue(
+                    "Actual page $currentPage does not match expected $expectedPage",
+                    currentPage == expectedPage
+                )
+                assertTrue(
+                    "Actual total pages $totalPages does not match expected $expectedTotalPages",
+                    currentPage == expectedPage
+                )
+            }
+        }
     }
 }

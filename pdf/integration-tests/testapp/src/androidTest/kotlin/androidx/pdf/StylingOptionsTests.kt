@@ -30,11 +30,13 @@ import androidx.pdf.viewer.fragment.PdfStylingOptions
 import androidx.pdf.widget.FastScrollView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.swipeDown
 import androidx.test.espresso.action.ViewActions.swipeUp
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -98,6 +100,10 @@ class StylingOptionsTests {
             Lifecycle.State.STARTED,
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         )
+
+        // Espresso will wait on the idling resource on the next action performed hence adding a
+        // click which is essentially a no-op. This removes the flakiness in the load op.
+        onView(isRoot()).perform(click())
 
         // Delay required for the PDF to load
         onView(withId(androidx.pdf.R.id.loadingView))
