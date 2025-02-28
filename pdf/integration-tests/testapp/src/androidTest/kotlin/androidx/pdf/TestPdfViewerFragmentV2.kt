@@ -16,11 +16,13 @@
 
 package androidx.pdf
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.RequiresExtension
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -38,6 +40,7 @@ import java.util.UUID
  *
  * TODO(b/386721657) Remove this when PdfViewerFragment is replaced with PdfViewerFragmentV2.
  */
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
 
     val pdfLoadingIdlingResource = PdfIdlingResource(PDF_LOAD_RESOURCE_NAME)

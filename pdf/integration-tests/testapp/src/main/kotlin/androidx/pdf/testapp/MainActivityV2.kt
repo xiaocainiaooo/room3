@@ -18,10 +18,12 @@ package androidx.pdf.testapp
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +42,7 @@ class MainActivityV2 : AppCompatActivity() {
     private var pdfViewerFragment: PdfViewerFragmentV2? = null
 
     @VisibleForTesting
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     var filePicker: ActivityResultLauncher<String> =
         registerForActivityResult(GetContent()) { uri: Uri? ->
             uri?.let {
@@ -50,6 +53,7 @@ class MainActivityV2 : AppCompatActivity() {
             }
         }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,6 +81,7 @@ class MainActivityV2 : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     private fun setPdfView() {
         val fragmentManager: FragmentManager = supportFragmentManager
 

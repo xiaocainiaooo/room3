@@ -32,6 +32,7 @@ import androidx.pdf.testapp.R
 import androidx.pdf.viewer.fragment.PdfStylingOptions
 import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.UUID
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -99,7 +100,9 @@ internal class TestPdfViewerFragment : PdfViewerFragment {
     }
 
     companion object {
-        private const val PDF_LOAD_RESOURCE_NAME = "PdfLoad"
+        // It is vital to keep the resource name unique for each test scenario as it conflicts in
+        // parallel runs during increment and decrement making tests flaky.
+        private val PDF_LOAD_RESOURCE_NAME = UUID.randomUUID().toString()
     }
 }
 

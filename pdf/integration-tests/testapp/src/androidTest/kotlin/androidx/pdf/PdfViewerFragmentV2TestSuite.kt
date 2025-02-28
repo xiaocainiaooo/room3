@@ -300,6 +300,10 @@ class PdfViewerFragmentV2TestSuite {
         callback: (TestPdfViewerFragmentV2, PdfView, Drawable) -> Unit
     ) {
         scenario.onFragment { fragment ->
+            assertNotNull(
+                "Fast scroll thumb cannot be null",
+                fragment.getPdfViewInstance().fastScrollVerticalThumbDrawable
+            )
             val fastScrollThumb = fragment.getPdfViewInstance().fastScrollVerticalThumbDrawable!!
             assertNotNull("Fast scroll thumbnail cannot be null", fastScrollThumb)
             callback(fragment, fragment.getPdfViewInstance(), fastScrollThumb)
