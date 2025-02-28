@@ -64,8 +64,15 @@ class PerfettoHelperTest {
         assertNotEquals(illegal = listOf(), actual = getPerfettoPids())
         assertTrue(capture.isRunning())
 
-        // kill all...
-        PerfettoHelper.cleanupPerfettoState()
+        // Don't kill processes, just cleanup
+        PerfettoHelper.cleanupPerfettoState(killExistingPerfettoRecordings = false)
+
+        // should be at least one perfetto process
+        assertNotEquals(illegal = listOf(), actual = getPerfettoPids())
+        assertTrue(capture.isRunning())
+
+        // Actually kill all...
+        PerfettoHelper.cleanupPerfettoState(killExistingPerfettoRecordings = true)
 
         // should be none again
         assertEquals(expected = listOf(), actual = getPerfettoPids())
