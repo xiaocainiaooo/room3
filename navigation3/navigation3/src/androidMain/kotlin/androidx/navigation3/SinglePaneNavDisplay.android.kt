@@ -133,7 +133,7 @@ public fun <T : Any> SinglePaneNavDisplay(
                 )
         ),
     onBack: () -> Unit = { if (backStack is MutableList) backStack.removeAt(backStack.size - 1) },
-    entryProvider: (key: T) -> NavEntry<out T>
+    entryProvider: (key: T) -> NavEntry<T>
 ) {
     require(backStack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
