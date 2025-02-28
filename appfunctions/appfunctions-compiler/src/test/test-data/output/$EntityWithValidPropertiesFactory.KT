@@ -44,7 +44,8 @@ public class `$EntityWithValidPropertiesFactory` :
     builder.setBooleanArray("boolArray", entityWithValidProperties.boolArray)
     builder.setStringList("stringList", entityWithValidProperties.stringList)
     builder.setAppFunctionData("inputSerializable",
-        inputSerializableFactory.toAppFunctionData(entityWithValidProperties.inputSerializable))
+        inputSerializableFactory.toAppFunctionData(entityWithValidProperties.inputSerializable as
+        InputSerializable))
     builder.setAppFunctionDataList("serializableList",
         entityWithValidProperties.serializableList.map{ inputSerializable ->
       inputSerializableFactory.toAppFunctionData(inputSerializable)
