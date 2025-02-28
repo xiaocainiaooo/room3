@@ -324,6 +324,57 @@ class SinglePaneNavDisplayTest {
     }
 
     @Test
+    fun swappingBackStackClearsState() {
+        lateinit var numberOnScreen1: MutableState<Int>
+        lateinit var backStack1: MutableList<String>
+        lateinit var backStack2: MutableList<String>
+        lateinit var state: MutableState<Int>
+
+        composeTestRule.setContent {
+            backStack1 = remember { mutableStateListOf(first) }
+            backStack2 = remember { mutableStateListOf(second) }
+            state = remember { mutableStateOf(1) }
+            SinglePaneNavDisplay(
+                backStack =
+                    when (state.value) {
+                        1 -> backStack1
+                        else -> backStack2
+                    },
+                entryProvider =
+                    entryProvider {
+                        entry(first) {
+                            numberOnScreen1 = rememberSaveable { mutableStateOf(0) }
+                            Text("numberOnScreen1: ${numberOnScreen1.value}")
+                        }
+                        entry(second) { Text(second) }
+                    }
+            )
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { state.value = 2 }
+        composeTestRule.waitForIdle()
+        assertThat(composeTestRule.onNodeWithText(second).isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { state.value = 1 }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("We should have new state after backstack change")
+                .that(numberOnScreen1.value)
+                .isEqualTo(0)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 0").isDisplayed()).isTrue()
+    }
+
+    @Test
     fun testInitEmptyBackstackThrows() {
         lateinit var backStack: MutableList<Any>
         val fail =
