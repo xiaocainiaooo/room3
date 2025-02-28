@@ -41,7 +41,7 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class SavedStateHandleDelegatesTest {
+class SavedStateHandleDelegateTest {
 
     @get:Rule val activityTestRuleScenario = ActivityScenarioRule(ComponentActivity::class.java)
 

@@ -41,7 +41,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
-internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
+internal class SavedStateRegistryOwnerDelegateTest : RobolectricTest() {
 
     @Test
     fun saved_defaultKey_performSave() {
