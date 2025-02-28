@@ -27,6 +27,7 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionS
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod.APP_FUNCTION_DATA_PARAM_NAME
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
+import androidx.appfunctions.compiler.core.ignoreNullable
 import androidx.appfunctions.compiler.core.toTypeName
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
@@ -132,7 +133,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 .addNamed("if (%serializable_data_val_name:L != null) {\n", formatStringMap)
                 .indent()
                 .addNamed(
-                    "%param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L)\n",
+                    "%param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L) as %param_type:T\n",
                     formatStringMap
                 )
                 .unindent()
@@ -254,6 +255,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to checkNotNull(param.name).asString(),
+                "param_type" to param.type.toTypeName().ignoreNullable(),
                 "factory_name" to "${typeName}Factory".lowerFirstChar(),
                 "setter_name" to getAppFunctionDataSetterName(afType),
                 "annotated_class_instance" to
@@ -261,7 +263,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
             )
 
         addNamed(
-            "builder.%setter_name:L(\"%param_name:L\", %factory_name:L.toAppFunctionData(%annotated_class_instance:L.%param_name:L))\n",
+            "builder.%setter_name:L(\"%param_name:L\", %factory_name:L.toAppFunctionData(%annotated_class_instance:L.%param_name:L as %param_type:T))\n",
             formatStringMap
         )
         return this

@@ -22,7 +22,8 @@ public class `$EntityWithValidNullablePropertiesFactory` :
     val inputSerializableData = appFunctionData.getAppFunctionDataOrNull("inputSerializable")
     var inputSerializable: InputSerializable? = null
     if (inputSerializableData != null) {
-      inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData)
+      inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData) as
+          InputSerializable?
     }
     val serializableListData = appFunctionData.getAppFunctionDataList("serializableList")
     val serializableList = serializableListData?.map { data ->
@@ -65,7 +66,8 @@ public class `$EntityWithValidNullablePropertiesFactory` :
     }
     if (entityWithValidNullableProperties.inputSerializable != null) {
       builder.setAppFunctionData("inputSerializable",
-          inputSerializableFactory.toAppFunctionData(entityWithValidNullableProperties.inputSerializable))
+          inputSerializableFactory.toAppFunctionData(entityWithValidNullableProperties.inputSerializable
+          as InputSerializable))
     }
     if (entityWithValidNullableProperties.serializableList != null) {
       builder.setAppFunctionDataList("serializableList",
