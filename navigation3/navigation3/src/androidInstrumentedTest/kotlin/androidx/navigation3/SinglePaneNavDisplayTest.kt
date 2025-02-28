@@ -536,6 +536,63 @@ class SinglePaneNavDisplayTest {
 
         assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
     }
+
+    @Test
+    fun testDuplicateKeyStateIsReset() {
+        lateinit var numberOnScreen1: MutableState<Int>
+        lateinit var backStack: MutableList<Any>
+        composeTestRule.setContent {
+            backStack = remember { mutableStateListOf(first) }
+            SinglePaneNavDisplay(backStack = backStack) {
+                when (it) {
+                    first ->
+                        NavEntry(first) {
+                            numberOnScreen1 = rememberSaveable { mutableStateOf(0) }
+                            Text("numberOnScreen1: ${numberOnScreen1.value}")
+                        }
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { backStack.add(first) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 4").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { backStack.removeAt(backStack.size - 1) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be restored")
+                .that(numberOnScreen1.value)
+                .isEqualTo(2)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { backStack.add(first) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 0").isDisplayed()).isTrue()
+    }
 }
 
 private const val first = "first"
