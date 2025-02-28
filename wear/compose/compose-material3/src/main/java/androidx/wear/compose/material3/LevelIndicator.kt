@@ -16,6 +16,7 @@
 
 package androidx.wear.compose.material3
 
+import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,7 +52,7 @@ public fun LevelIndicator(
     enabled: Boolean = true,
     colors: LevelIndicatorColors = LevelIndicatorDefaults.colors(),
     strokeWidth: Dp = LevelIndicatorDefaults.StrokeWidth,
-    sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
+    @FloatRange(from = 0.0, to = 360.0) sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
     reverseDirection: Boolean = false,
 ) {
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
@@ -99,7 +100,7 @@ public fun StepperLevelIndicator(
     enabled: Boolean = true,
     colors: LevelIndicatorColors = LevelIndicatorDefaults.colors(),
     strokeWidth: Dp = LevelIndicatorDefaults.StrokeWidth,
-    sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
+    @FloatRange(from = 0.0, to = 360.0) sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
     reverseDirection: Boolean = false,
 ): Unit =
     LevelIndicator(
@@ -140,7 +141,7 @@ public fun StepperLevelIndicator(
     enabled: Boolean = true,
     colors: LevelIndicatorColors = LevelIndicatorDefaults.colors(),
     strokeWidth: Dp = LevelIndicatorDefaults.StrokeWidth,
-    sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
+    @FloatRange(from = 0.0, to = 360.0) sweepAngle: Float = LevelIndicatorDefaults.SweepAngle,
     reverseDirection: Boolean = false,
 ): Unit =
     LevelIndicator(
