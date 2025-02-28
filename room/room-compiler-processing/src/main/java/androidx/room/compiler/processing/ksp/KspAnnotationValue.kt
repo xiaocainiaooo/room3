@@ -115,6 +115,7 @@ internal fun KspAnnotation.unwrap(valueType: XType, valueArgument: KSValueArgume
 private fun convertValueToType(value: Any?, valueType: XType): Any? {
     // Unlike Javac, KSP does not convert the value to the type declared on the annotation class's
     // annotation value automatically so we have to do that conversion manually here.
+    if (value == null) return null
     return when (valueType.asTypeName()) {
         XTypeName.PRIMITIVE_BYTE -> (value as Number).toByte()
         XTypeName.PRIMITIVE_SHORT -> (value as Number).toShort()
