@@ -170,7 +170,20 @@ package androidx.health.connect.client.permission {
     field public static final androidx.health.connect.client.permission.HealthPermission.Companion Companion;
     field public static final String PERMISSION_READ_HEALTH_DATA_HISTORY = "android.permission.health.READ_HEALTH_DATA_HISTORY";
     field public static final String PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND = "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_ALLERGIES_INTOLERANCES = "android.permission.health.READ_MEDICAL_DATA_ALLERGIES_INTOLERANCES";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_CONDITIONS = "android.permission.health.READ_MEDICAL_DATA_CONDITIONS";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_LABORATORY_RESULTS = "android.permission.health.READ_MEDICAL_DATA_LABORATORY_RESULTS";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_MEDICATIONS = "android.permission.health.READ_MEDICAL_DATA_MEDICATIONS";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_PERSONAL_DETAILS = "android.permission.health.READ_MEDICAL_DATA_PERSONAL_DETAILS";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_PRACTITIONER_DETAILS = "android.permission.health.READ_MEDICAL_DATA_PRACTITIONER_DETAILS";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_PREGNANCY = "android.permission.health.READ_MEDICAL_DATA_PREGNANCY";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_PROCEDURES = "android.permission.health.READ_MEDICAL_DATA_PROCEDURES";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_SOCIAL_HISTORY = "android.permission.health.READ_MEDICAL_DATA_SOCIAL_HISTORY";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_VACCINES = "android.permission.health.READ_MEDICAL_DATA_VACCINES";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_VISITS = "android.permission.health.READ_MEDICAL_DATA_VISITS";
+    field @SuppressCompatibility public static final String PERMISSION_READ_MEDICAL_DATA_VITAL_SIGNS = "android.permission.health.READ_MEDICAL_DATA_VITAL_SIGNS";
     field public static final String PERMISSION_WRITE_EXERCISE_ROUTE = "android.permission.health.WRITE_EXERCISE_ROUTE";
+    field @SuppressCompatibility public static final String PERMISSION_WRITE_MEDICAL_DATA = "android.permission.health.WRITE_MEDICAL_DATA";
   }
 
   public static final class HealthPermission.Companion {
@@ -180,7 +193,20 @@ package androidx.health.connect.client.permission {
     method public String getWritePermission(kotlin.reflect.KClass<? extends androidx.health.connect.client.records.Record> recordType);
     property public static String PERMISSION_READ_HEALTH_DATA_HISTORY;
     property public static String PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_ALLERGIES_INTOLERANCES;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_CONDITIONS;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_LABORATORY_RESULTS;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_MEDICATIONS;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_PERSONAL_DETAILS;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_PRACTITIONER_DETAILS;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_PREGNANCY;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_PROCEDURES;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_SOCIAL_HISTORY;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_VACCINES;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_VISITS;
+    property @SuppressCompatibility public static String PERMISSION_READ_MEDICAL_DATA_VITAL_SIGNS;
     property public static String PERMISSION_WRITE_EXERCISE_ROUTE;
+    property @SuppressCompatibility public static String PERMISSION_WRITE_MEDICAL_DATA;
   }
 
 }
