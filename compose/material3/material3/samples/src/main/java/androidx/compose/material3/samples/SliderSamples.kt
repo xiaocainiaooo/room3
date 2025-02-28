@@ -126,25 +126,25 @@ fun LegacySliderSample() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled
 @Composable
 fun StepsSliderSample() {
-    var sliderPosition by rememberSaveable { mutableStateOf(0f) }
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Text(text = sliderPosition.roundToInt().toString())
-        Slider(
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it },
+    val sliderState =
+        rememberSliderState(
+            // Only allow multiples of 10. Excluding the endpoints of `valueRange`,
+            // there are 9 steps (10, 20, ..., 90).
+            steps = 9,
             valueRange = 0f..100f,
             onValueChangeFinished = {
                 // launch some business logic update with the state you hold
                 // viewModel.updateSelectedSliderValue(sliderPosition)
-            },
-            // Only allow multiples of 10. Excluding the endpoints of `valueRange`,
-            // there are 9 steps (10, 20, ..., 90).
-            steps = 9
+            }
         )
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(text = "%.2f".format(sliderState.value))
+        Slider(state = sliderState)
     }
 }
 
@@ -303,7 +303,13 @@ fun SliderWithTrackIconsSample() {
 @Composable
 fun VerticalSliderSample() {
     val coroutineScope = rememberCoroutineScope()
-    val sliderState = rememberSliderState(steps = 9, valueRange = 0f..100f)
+    val sliderState =
+        rememberSliderState(
+            // Only allow multiples of 10. Excluding the endpoints of `valueRange`,
+            // there are 9 steps (10, 20, ..., 90).
+            steps = 9,
+            valueRange = 0f..100f
+        )
     val snapAnimationSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
     var currentValue by rememberSaveable { mutableFloatStateOf(sliderState.value) }
     var animateJob: Job? by remember { mutableStateOf(null) }
