@@ -494,6 +494,7 @@ suspend fun <R> RoomDatabase.useReaderConnection(block: suspend (Transactor) -> 
  */
 suspend fun <R> RoomDatabase.useWriterConnection(block: suspend (Transactor) -> R): R =
     withContext(getCoroutineScope().coroutineContext) { useConnection(isReadOnly = false, block) }
+        .also { invalidationTracker.refreshAsync() }
 
 /**
  * Validates that no added migration start or end are also marked as fallback to destructive
