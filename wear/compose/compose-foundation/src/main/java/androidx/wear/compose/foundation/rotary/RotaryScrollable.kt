@@ -439,24 +439,24 @@ internal class ScalingLazyColumnRotarySnapLayoutInfoProvider(
 }
 
 /** An implementation of rotary scroll adapter for Pager */
-internal class PagerRotarySnapLayoutInfoProvider(private val pagerState: PagerState) :
+internal class PagerRotarySnapLayoutInfoProvider(private val state: PagerState) :
     RotarySnapLayoutInfoProvider {
 
     /** Calculates the average item height by just taking the pageSize. */
     override val averageItemSize: Float
-        get() = pagerState.layoutInfo.pageSize.toFloat()
+        get() = state.pagerState.layoutInfo.pageSize.toFloat()
 
     /** Current page */
     override val currentItemIndex: Int
-        get() = pagerState.currentPage
+        get() = state.pagerState.currentPage
 
     /** The offset from the page center. */
     override val currentItemOffset: Float
-        get() = pagerState.currentPageOffsetFraction * averageItemSize
+        get() = state.pagerState.currentPageOffsetFraction * averageItemSize
 
     /** The total count of items in Pager */
     override val totalItemCount: Int
-        get() = pagerState.pageCount
+        get() = state.pagerState.pageCount
 }
 
 internal class RotaryScrollLogic(

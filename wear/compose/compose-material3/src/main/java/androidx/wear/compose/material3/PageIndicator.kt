@@ -111,7 +111,7 @@ public fun HorizontalPageIndicator(
     backgroundColor: Color = PageIndicatorDefaults.backgroundColor,
 ) {
     PageIndicatorImpl(
-        pagerState = pagerState,
+        state = pagerState,
         selectedColor = selectedColor,
         unselectedColor = unselectedColor,
         backgroundColor = backgroundColor,
@@ -152,7 +152,7 @@ public fun VerticalPageIndicator(
     backgroundColor: Color = PageIndicatorDefaults.backgroundColor,
 ) {
     PageIndicatorImpl(
-        pagerState = pagerState,
+        state = pagerState,
         selectedColor = selectedColor,
         unselectedColor = unselectedColor,
         backgroundColor = backgroundColor,
@@ -194,7 +194,7 @@ public object PageIndicatorDefaults {
 
 @Composable
 internal fun PageIndicatorImpl(
-    pagerState: PagerState,
+    state: PagerState,
     selectedColor: Color,
     unselectedColor: Color,
     backgroundColor: Color,
@@ -208,12 +208,11 @@ internal fun PageIndicatorImpl(
     val edgePadding = PaddingDefaults.edgePadding
 
     // Converting offsetFraction into range 0..1f
-    val currentPageOffsetWithFraction =
-        pagerState.currentPage + pagerState.currentPageOffsetFraction
+    val currentPageOffsetWithFraction = state.currentPage + state.currentPageOffsetFraction
 
     val isLastPage =
         currentPageOffsetWithFraction.equalsWithTolerance(
-            number = pagerState.pageCount - 1f,
+            number = state.pageCount - 1f,
             tolerance = 0.001f
         )
 
@@ -223,11 +222,11 @@ internal fun PageIndicatorImpl(
         else currentPageOffsetWithFraction.toInt()
     val offset = currentPageOffsetWithFraction - selectedPage
 
-    val pagesOnScreen = Integer.min(MaxNumberOfIndicators, pagerState.pageCount)
+    val pagesOnScreen = Integer.min(MaxNumberOfIndicators, state.pageCount)
     val pagesState =
-        remember(pagerState.pageCount) {
+        remember(state.pageCount) {
             PagesState(
-                totalPages = pagerState.pageCount,
+                totalPages = state.pageCount,
                 pagesOnScreen = pagesOnScreen,
                 smallIndicatorSizeFraction = smallIndicatorSizeFraction,
                 shrinkThresholdStart = calculateShrinkThresholdStart(spacing, indicatorSize),
