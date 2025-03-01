@@ -18,12 +18,29 @@ package androidx.tracing.driver
 
 import androidx.annotation.RestrictTo
 
-/** Entities that we can attach traces to. */
+/**
+ * Tracks are a horizontal track of time in the trace that contains trace events - often counters
+ * (`setCounter`), or slices (`beginSection` / `endSection`) - which stack together to form the
+ * timeline view.
+ *
+ * Tracks can have parents/children, such as a [ProcessTrack] having several child [ThreadTrack]s.
+ * * Use [ProcessTrack] for trace slices and events scoped to a process, but not a specific thread.
+ * * Use [CounterTrack] (often created as a child of a [ProcessTrack]) to trace integer or floating
+ *   point values that can be updated over time.
+ * * Use [ThreadTrack] (generally created as a child of a [ProcessTrack]) to trace what is happening
+ *   on a specific thread. With synchronous (non-coroutine) code, this is where most trace events
+ *   should go.
+ */
 public abstract class Track(
     /** The [TraceContext] instance. */
     @JvmField // avoid getter generation
     internal val context: TraceContext,
-    /** The uuid for the track descriptor. */
+    /**
+     * The uuid for the track descriptor.
+     *
+     * This ID must be unique within all [Track]s in a given trace produced by [TraceDriver] - it is
+     * used to connect recorded trace events to the containing track.
+     */
     @JvmField // avoid getter generation
     internal val uuid: Long
 ) {

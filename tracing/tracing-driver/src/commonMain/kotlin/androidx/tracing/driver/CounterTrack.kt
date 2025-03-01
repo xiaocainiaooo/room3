@@ -16,7 +16,7 @@
 
 package androidx.tracing.driver
 
-/** Represents a Perfetto Counter track. */
+/** [Track] representing a numerical value that can change over the duration of the trace. */
 public open class CounterTrack(
     /** The name of the counter track */
     private val name: String,
