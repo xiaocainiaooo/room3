@@ -17,7 +17,6 @@
 package androidx.camera.viewfinder;
 
 import android.graphics.Bitmap;
-import android.os.Handler;
 import android.view.PixelCopy;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -25,10 +24,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.impl.PixelCopyCompat;
 import androidx.camera.viewfinder.core.impl.RefCounted;
+import androidx.camera.viewfinder.core.impl.SurfaceControlCompat;
 import androidx.camera.viewfinder.internal.utils.Logger;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.content.ContextCompat;
@@ -48,6 +48,8 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
 
     private static final String TAG = "SurfaceViewImpl";
 
+    private static final int SCREENSHOT_TIMEOUT_MILLIS = 500;
+
     // Synthetic Accessor
     @SuppressWarnings("WeakerAccess")
     @Nullable
@@ -66,6 +68,12 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
     // Guarded by the UI thread.
     private RefCounted<Surface> mActiveSurface = null;
 
+    // SurfaceControl that is active between the surfaceCreated and surfaceDestroyed callbacks.
+    // Allows for finer-grained control over releasing of resources. On API < 29, this is a stub
+    // and has no effect.
+    // Guarded by the UI thread.
+    private SurfaceControlCompat mActiveSurfaceControl = null;
+
     // The cached size of the current Surface.
     // Guarded by the UI thread.
     private int mCurrentSurfaceWidth = -1;
@@ -78,11 +86,6 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
         public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
             Logger.d(TAG, "Surface created.");
             // No-op. Handling surfaceChanged() is enough because it's always called afterwards.
-            mActiveSurface = new RefCounted<>(false, (surface) -> {
-                surface.release();
-                return Unit.INSTANCE;
-            });
-            mActiveSurface.initialize(surfaceHolder.getSurface());
         }
 
         @Override
@@ -91,6 +94,32 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
             Logger.d(TAG, "Surface changed. Size: " + width + "x" + height);
             mCurrentSurfaceWidth = width;
             mCurrentSurfaceHeight = height;
+
+            if (mActiveSurface == null) {
+                SurfaceControlCompat surfaceControl =
+                        mActiveSurfaceControl = SurfaceControlCompat.create(
+                                mSurfaceView,
+                                format,
+                                width,
+                                height,
+                                "SurfaceViewImplementation"
+                        );
+
+                mActiveSurface = new RefCounted<>(false, (surface) -> {
+                    surface.release();
+                    surfaceControl.release();
+                    return Unit.INSTANCE;
+                });
+
+                Surface activeSurface = surfaceControl.newSurface();
+                if (activeSurface != null) {
+                    mActiveSurface.initialize(activeSurface);
+                } else {
+                    mActiveSurface.initialize(surfaceHolder.getSurface());
+                }
+            } else if (mActiveSurfaceControl != null) {
+                mActiveSurfaceControl.setBufferSize(width, height);
+            }
             tryToComplete();
         }
 
@@ -101,6 +130,10 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
             // If a surface was already provided to the camera, invalidate it so that it requests
             // a new valid one. Otherwise, cancel the surface request.
             if (mActiveSurface != null) {
+                if (mActiveSurfaceControl != null) {
+                    mActiveSurfaceControl.detach();
+                }
+
                 invalidateSurface();
                 mActiveSurface.release();
             } else {
@@ -109,6 +142,7 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
 
             // Reset state
             mActiveSurface = null;
+            mActiveSurfaceControl = null;
             mCurrentSurfaceWidth = -1;
             mCurrentSurfaceHeight = -1;
         }
@@ -168,34 +202,39 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
 
     /**
      * Getting a Bitmap from a Surface is achieved using the `PixelCopy#request()` API, which
-     * would introduced in API level 24. CameraViewfinder doesn't currently use a SurfaceView on API
-     * levels below 24.
+     * would introduced in API level 24. Below API 24, the bitmap will be blank.
      */
-    @RequiresApi(24)
     @Override
     @Nullable
     Bitmap getViewfinderBitmap() {
         // If the viewfinder surface isn't ready yet or isn't valid, return null
-        if (mSurfaceView == null || mSurfaceView.getHolder().getSurface() == null
-                || !mSurfaceView.getHolder().getSurface().isValid()) {
+        RefCounted<Surface> activeSurface = mActiveSurface;
+        if (mSurfaceView == null || activeSurface == null) {
             return null;
         }
 
-        // Copy display contents of the surfaceView's surface into a Bitmap.
-        final Bitmap bitmap = Bitmap.createBitmap(mSurfaceView.getWidth(), mSurfaceView.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Api24Impl.pixelCopyRequest(mSurfaceView, bitmap, copyResult -> {
-            if (copyResult == PixelCopy.SUCCESS) {
+        Surface surface = activeSurface.acquire();
+        if (surface == null || mCurrentSurfaceWidth == 0 || mCurrentSurfaceHeight == 0) {
+            return null;
+        }
+
+        try {
+            // Copy display contents of the surfaceView's surface into a Bitmap.
+            final Bitmap bitmap = Bitmap.createBitmap(mCurrentSurfaceWidth, mCurrentSurfaceHeight,
+                    Bitmap.Config.ARGB_8888);
+            int copyRes = PixelCopyCompat.requestSync(surface, bitmap, SCREENSHOT_TIMEOUT_MILLIS);
+            if (copyRes == PixelCopy.SUCCESS) {
                 Logger.d(TAG,
                         "CameraViewfinder.SurfaceViewImplementation.getBitmap() succeeded");
             } else {
                 Logger.e(TAG,
-                        "CameraViewfinder.SurfaceViewImplementation.getBitmap() failed with error "
-                                + copyResult);
+                        "CameraViewfinder.SurfaceViewImplementation.getBitmap() failed with "
+                                + "error " + copyRes);
             }
-        }, mSurfaceView.getHandler());
-
-        return bitmap;
+            return bitmap;
+        } finally {
+            mActiveSurface.release();
+        }
     }
 
     @Override
@@ -251,21 +290,6 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
             Logger.d(TAG, "Surface invalidated: " + mSurfaceRequest);
             // TODO(b/323226220): Differentiate between surface being released by consumer
             //  vs producer
-        }
-    }
-
-    /**
-     * Nested class to avoid verification errors for methods introduced in Android 7.0 (API 24).
-     */
-    @RequiresApi(24)
-    private static class Api24Impl {
-
-        private Api24Impl() {
-        }
-
-        static void pixelCopyRequest(@NonNull SurfaceView source, @NonNull Bitmap dest,
-                PixelCopy.@NonNull OnPixelCopyFinishedListener listener, @NonNull Handler handler) {
-            PixelCopy.request(source, dest, listener, handler);
         }
     }
 }

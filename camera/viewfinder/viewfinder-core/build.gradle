@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.kotlinCoroutinesCore)
     implementation(libs.kotlinCoroutinesAndroid)
     implementation(libs.atomicFu)
+    implementation("androidx.tracing:tracing-ktx:1.2.0")
 
     testImplementation(libs.testRunner)
     testImplementation(libs.mockitoCore4)

@@ -15,6 +15,7 @@
  */
 package androidx.camera.viewfinder
 
+import android.os.Build
 import android.view.Surface
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
@@ -97,10 +98,13 @@ class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
     fun surfaceReleased_afterViewRemoved_thenSessionClosed() = runViewfinderTest {
         assume()
             .withMessage(
-                "SurfaceView currently does not support keeping the Surface valid" +
-                    " once the View is detached from the window."
+                "SurfaceView does not support keeping the Surface valid once the View is " +
+                    "detached from the window on API version < 29."
             )
-            .that(implementationMode != ImplementationMode.EXTERNAL)
+            .that(
+                implementationMode == ImplementationMode.EMBEDDED ||
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            )
             .isTrue()
 
         var surface: Surface
