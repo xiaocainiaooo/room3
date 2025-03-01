@@ -108,7 +108,7 @@ class WorkerWrapperTestKt {
     fun testInterruption_withBackOff(): Unit = runBlocking {
         val workRequest =
             OneTimeWorkRequestBuilder<DoWorkAwareWorker>()
-                .setBackOffForSystemInterruptions()
+                .setBackoffForSystemInterruptions()
                 .build()
 
         workRequest.workSpec.lastEnqueueTime = System.currentTimeMillis() // Simulate an enqueue()
