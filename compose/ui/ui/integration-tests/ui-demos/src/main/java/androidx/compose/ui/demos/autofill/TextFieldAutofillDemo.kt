@@ -86,7 +86,7 @@ fun BTFResetCredentialsDemo() {
         )
 
         // Submit button
-        Button(onClick = { autofillManager?.commit() }) { Text("Reset credentials") }
+        Button(onClick = { autofillManager?.commit() }) { Text("Create credentials") }
     }
 }
 
