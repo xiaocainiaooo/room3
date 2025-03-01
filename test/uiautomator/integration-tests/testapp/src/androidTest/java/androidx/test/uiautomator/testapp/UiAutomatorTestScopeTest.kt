@@ -21,11 +21,16 @@ import androidx.kruth.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.ViewNotFoundException
+import androidx.test.uiautomator.onView
+import androidx.test.uiautomator.onViewOrNull
 import androidx.test.uiautomator.scrollUntilView
 import androidx.test.uiautomator.uiAutomator
 import androidx.test.uiautomator.waitForStable
+import androidx.test.uiautomator.watcher.ScopedUiWatcher
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -105,17 +110,51 @@ class UiAutomatorTestScopeTest {
 
     @Test
     @LargeTest
-    fun composeTest() {
-        uiAutomator {
-            startActivity(ComposeTestActivity::class.java)
+    fun composeTest() = uiAutomator {
+        startActivity(ComposeTestActivity::class.java)
 
-            onView { view.id == "top-text" }
-            val button =
-                onView { view.isScrollable }
-                    .scrollUntilView(Direction.DOWN) { view.className == Button::class.java.name }
-            val textView = onView { view.textAsString == "Initial" }
-            button.click()
-            assertThat(textView.text).isEqualTo("Updated")
-        }
+        onView { view.id == "top-text" }
+        val button =
+            onView { view.isScrollable }
+                .scrollUntilView(Direction.DOWN) { view.className == Button::class.java.name }
+        val textView = onView { view.textAsString == "Initial" }
+        button.click()
+        assertThat(textView.text).isEqualTo("Updated")
+    }
+
+    @Test
+    @LargeTest
+    fun dialogActivityTest() = uiAutomator {
+
+        // Test when pressing yes
+        startActivity(DialogActivity::class.java)
+        val registrationYes = watchFor(MyDialog()) { clickYes() }
+        onView { view.textAsString == "Show Dialog" }.click()
+        onView { view.textAsString == "Dialog Result: Pressed Yes" }
+        registrationYes.unregister()
+
+        // Test when pressing no
+        startActivity(DialogActivity::class.java)
+        val registrationNo = watchFor(MyDialog()) { clickNo() }
+        onView { view.textAsString == "Show Dialog" }.click()
+        onView { view.textAsString == "Dialog Result: Pressed No" }
+        registrationNo.unregister()
+    }
+}
+
+// Define a dialog
+class MyDialog : ScopedUiWatcher<MyDialog.Scope> {
+
+    private val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
+    override fun isVisible(): Boolean =
+        uiDevice.onViewOrNull(0) { view.textAsString == "Confirmation" } != null
+
+    override fun scope() = Scope()
+
+    inner class Scope {
+        fun clickYes() = uiDevice.onView { view.textAsString == "Yes" }.click()
+
+        fun clickNo() = uiDevice.onView { view.textAsString == "No" }.click()
     }
 }

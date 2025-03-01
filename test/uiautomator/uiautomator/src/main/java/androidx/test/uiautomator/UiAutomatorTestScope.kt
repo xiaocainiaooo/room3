@@ -23,6 +23,8 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.internal.AppManager
+import androidx.test.uiautomator.watcher.ScopedUiWatcher
+import androidx.test.uiautomator.watcher.WatcherRegistration
 
 /**
  * Main entry point for ui automator tests. It creates a [UiAutomatorTestScope] in which a test can
@@ -49,7 +51,9 @@ import androidx.test.uiautomator.internal.AppManager
  * @param block A block containing the test to run within the [UiAutomatorTestScope].
  */
 public fun uiAutomator(block: UiAutomatorTestScope.() -> (Unit)) {
-    block(UiAutomatorTestScope())
+    val scope = UiAutomatorTestScope()
+    block(scope)
+    scope.afterBlock()
 }
 
 /** A UiAutomator scope that allows to easily access UiAutomator api and utils class. */
@@ -65,6 +69,62 @@ internal constructor(
     }
 
     private val appManager = AppManager(context = instrumentation.targetContext)
+    private val watcherRegistrations = mutableSetOf<WatcherRegistration>()
+
+    internal fun afterBlock() {
+        watcherRegistrations.forEach { it.unregister() }
+    }
+
+    /**
+     * Registers a watcher for this [androidx.test.uiautomator.UiAutomatorTestScope] to handle
+     * unexpected UI elements. Internally this method uses the existing [UiDevice.registerWatcher]
+     * api. When the given [androidx.test.uiautomator.watcher.ScopedUiWatcher.isVisible] condition
+     * is satisfied, then the given [block] is executed. scope. This method returns a handler with
+     * the [WatcherRegistration] to unregister it before the block is complete. Note that this api
+     * helps with unexpected ui elements, such as system dialogs, and that for expected dialogs the
+     * [onView] api should be used.
+     *
+     * Usage:
+     * ```kotlin
+     * @Test fun myTest() = uiAutomator {
+     *
+     *     // Registers a watcher for a permission dialog.
+     *     watchFor(PermissionDialog) { clickAllow() }
+     *
+     *     // Registers a watcher for a custom dialog and unregisters it.
+     *     val registration = watchFor(MyDialog) { clickSomething() }
+     *     // Do something...
+     *     registration.unregister()
+     * }
+     * ```
+     *
+     * @param watcher the dialog to watch for.
+     * @param block a block to handle.
+     * @return the dialog registration.
+     */
+    public fun <T> watchFor(
+        watcher: ScopedUiWatcher<T>,
+        block: T.() -> (Unit)
+    ): WatcherRegistration {
+        val id = watcher.toString()
+
+        uiDevice.registerWatcher(id) {
+            val visible = watcher.isVisible()
+            if (visible) block(watcher.scope())
+            visible
+        }
+
+        val registration =
+            object : WatcherRegistration {
+                override fun unregister() {
+                    uiDevice.removeWatcher(id)
+                    watcherRegistrations.remove(this)
+                }
+            }
+
+        watcherRegistrations.add(registration)
+        return registration
+    }
 
     /**
      * Performs a DFS on the accessibility tree starting from the root node in the active window and
