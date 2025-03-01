@@ -22,7 +22,8 @@ import kotlin.test.Test
 
 internal class SavedStateCodecClassDiscriminatorPolymorphicTest :
     SavedStateSerializationBaseTest(
-        config = SavedStateConfig { classDiscriminatorMode = ClassDiscriminatorMode.POLYMORPHIC }
+        configuration =
+            SavedStateConfiguration { classDiscriminatorMode = ClassDiscriminatorMode.POLYMORPHIC }
     ) {
 
     @Test

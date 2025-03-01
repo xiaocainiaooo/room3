@@ -21,7 +21,7 @@ package androidx.savedstate
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.Sampled
-import androidx.savedstate.serialization.SavedStateConfig
+import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
@@ -75,7 +75,7 @@ fun encodeWithExplicitSerializer() {
 
 @Sampled
 fun encodeWithExplicitSerializerAndConfig() {
-    val config = SavedStateConfig {
+    val config = SavedStateConfiguration {
         serializersModule = SerializersModule {
             polymorphic(Any::class) { subclass(String::class) }
         }
@@ -85,7 +85,7 @@ fun encodeWithExplicitSerializerAndConfig() {
         encodeToSavedState(
             serializer = PolymorphicSerializer(Any::class),
             value = value,
-            config = config
+            configuration = config
         )
 }
 
@@ -121,7 +121,7 @@ fun decodeWithExplicitSerializer() {
 
 @Sampled
 fun decodeWithExplicitSerializerAndConfig() {
-    val config = SavedStateConfig {
+    val config = SavedStateConfiguration {
         serializersModule = SerializersModule {
             polymorphic(Any::class) { subclass(String::class) }
         }
@@ -131,13 +131,13 @@ fun decodeWithExplicitSerializerAndConfig() {
         encodeToSavedState(
             serializer = PolymorphicSerializer(Any::class),
             value = value,
-            config = config
+            configuration = config
         )
     val decoded =
         decodeFromSavedState(
             deserializer = PolymorphicSerializer(Any::class),
             savedState = encoded,
-            config = config
+            configuration = config
         )
 }
 
@@ -257,7 +257,7 @@ fun sparseParcelableArraySerializer() {
 
 @Sampled
 fun config() {
-    val config = SavedStateConfig {
+    val config = SavedStateConfiguration {
         serializersModule = SerializersModule {
             polymorphic(Any::class) { subclass(String::class) }
         }
@@ -267,12 +267,12 @@ fun config() {
         encodeToSavedState(
             serializer = PolymorphicSerializer(Any::class),
             value = value,
-            config = config
+            configuration = config
         )
     val decoded =
         decodeFromSavedState(
             deserializer = PolymorphicSerializer(Any::class),
             savedState = encoded,
-            config = config
+            configuration = config
         )
 }
