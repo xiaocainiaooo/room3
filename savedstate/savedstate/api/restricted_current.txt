@@ -84,18 +84,6 @@ package androidx.savedstate {
   public final class SavedStateReaderKt {
     method @kotlin.PublishedApi internal static inline Void keyNotFoundError(String key);
     method @kotlin.PublishedApi internal static inline Void valueNotFoundError(String key);
-    property @kotlin.PublishedApi internal static boolean DEFAULT_BOOLEAN;
-    property @kotlin.PublishedApi internal static char DEFAULT_CHAR;
-    property @kotlin.PublishedApi internal static double DEFAULT_DOUBLE;
-    property @kotlin.PublishedApi internal static float DEFAULT_FLOAT;
-    property @kotlin.PublishedApi internal static int DEFAULT_INT;
-    property @kotlin.PublishedApi internal static long DEFAULT_LONG;
-    field @kotlin.PublishedApi internal static final boolean DEFAULT_BOOLEAN = false;
-    field @kotlin.PublishedApi internal static final char DEFAULT_CHAR = 0; // 0x0000 '\u0000'
-    field @kotlin.PublishedApi internal static final double DEFAULT_DOUBLE = 0.0;
-    field @kotlin.PublishedApi internal static final float DEFAULT_FLOAT = 0.0f;
-    field @kotlin.PublishedApi internal static final int DEFAULT_INT = 0; // 0x0
-    field @kotlin.PublishedApi internal static final long DEFAULT_LONG = 0L; // 0x0L
   }
 
   public final class SavedStateRegistry {

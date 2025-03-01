@@ -68,8 +68,18 @@ internal actual constructor(
     }
 
     public actual inline fun getBoolean(key: String): Boolean {
-        if (key !in this) keyNotFoundError(key)
-        return source.getBoolean(key, DEFAULT_BOOLEAN)
+        val result = source.getBoolean(key, false)
+        if (result == false) {
+            val reference = source.getBoolean(key, true)
+            if (reference == true) {
+                if (key in this) {
+                    valueNotFoundError(key)
+                } else {
+                    keyNotFoundError(key)
+                }
+            }
+        }
+        return result
     }
 
     public actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
@@ -78,8 +88,23 @@ internal actual constructor(
     }
 
     public actual inline fun getChar(key: String): Char {
-        if (key !in this) keyNotFoundError(key)
-        return source.getChar(key, DEFAULT_CHAR)
+        val result = source.getChar(key, Char.MIN_VALUE)
+        if (result == Char.MIN_VALUE) {
+            val reference = source.getChar(key, Char.MAX_VALUE)
+            if (reference == Char.MAX_VALUE) {
+                if (key in this) {
+                    valueNotFoundError(key)
+                } else {
+                    keyNotFoundError(key)
+                }
+            }
+        }
+        return result
+    }
+
+    public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
+        if (key !in this) defaultValue()
+        return source.getChar(key, defaultValue())
     }
 
     public actual inline fun getCharSequence(key: String): CharSequence {
@@ -95,14 +120,20 @@ internal actual constructor(
         return source.getCharSequence(key) ?: defaultValue()
     }
 
-    public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
-        if (key !in this) defaultValue()
-        return source.getChar(key, defaultValue())
-    }
-
     public actual inline fun getDouble(key: String): Double {
-        if (key !in this) keyNotFoundError(key)
-        return source.getDouble(key, DEFAULT_DOUBLE)
+        val result = source.getDouble(key, Double.MIN_VALUE)
+
+        if (result == Double.MIN_VALUE) {
+            val reference = source.getDouble(key, Double.MAX_VALUE)
+            if (reference == Double.MAX_VALUE) {
+                if (key in this) {
+                    valueNotFoundError(key)
+                } else {
+                    keyNotFoundError(key)
+                }
+            }
+        }
+        return result
     }
 
     public actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
@@ -111,8 +142,19 @@ internal actual constructor(
     }
 
     public actual inline fun getFloat(key: String): Float {
-        if (key !in this) keyNotFoundError(key)
-        return source.getFloat(key, DEFAULT_FLOAT)
+        val result = source.getFloat(key, Float.MIN_VALUE)
+
+        if (result == Float.MIN_VALUE) {
+            val reference = source.getFloat(key, Float.MAX_VALUE)
+            if (reference == Float.MAX_VALUE) {
+                if (key in this) {
+                    valueNotFoundError(key)
+                } else {
+                    keyNotFoundError(key)
+                }
+            }
+        }
+        return result
     }
 
     public actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
@@ -121,8 +163,18 @@ internal actual constructor(
     }
 
     public actual inline fun getInt(key: String): Int {
-        if (key !in this) keyNotFoundError(key)
-        return source.getInt(key, DEFAULT_INT)
+        val result = source.getInt(key, Int.MIN_VALUE)
+        if (result == Int.MIN_VALUE) {
+            val reference = source.getInt(key, Int.MAX_VALUE)
+            if (reference == Int.MAX_VALUE) {
+                if (key in this) {
+                    valueNotFoundError(key)
+                } else {
+                    keyNotFoundError(key)
+                }
+            }
+        }
+        return result
     }
 
     public actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
@@ -131,8 +183,18 @@ internal actual constructor(
     }
 
     public actual inline fun getLong(key: String): Long {
-        if (key !in this) keyNotFoundError(key)
-        return source.getLong(key, DEFAULT_LONG)
+        val result = source.getLong(key, Long.MIN_VALUE)
+        if (result == Long.MIN_VALUE) {
+            val reference = source.getLong(key, Long.MAX_VALUE)
+            if (reference == Long.MAX_VALUE) {
+                if (key in this) {
+                    valueNotFoundError(key)
+                } else {
+                    keyNotFoundError(key)
+                }
+            }
+        }
+        return result
     }
 
     public actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
