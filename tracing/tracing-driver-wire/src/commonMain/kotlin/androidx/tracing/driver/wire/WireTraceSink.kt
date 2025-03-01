@@ -16,7 +16,7 @@
 
 package androidx.tracing.driver.wire
 
-import androidx.tracing.driver.AtomicBoolean
+import androidx.annotation.GuardedBy
 import androidx.tracing.driver.PooledTracePacketArray
 import androidx.tracing.driver.Queue
 import androidx.tracing.driver.TraceSink
@@ -48,9 +48,12 @@ public class WireTraceSink(
     // No packets are lost or dropped; and therefore we are still okay with this small
     // compromise with thread safety.
     private val queue = Queue<PooledTracePacketArray>()
-    private val drainRequested = AtomicBoolean(false)
 
-    @Volatile private var resumeDrain: Continuation<Unit>? = null
+    private val drainLock = Any() // Lock used to keep drainRequested, resumeDrain in sync.
+
+    @GuardedBy("drainLock") private var drainRequested = false
+
+    @GuardedBy("drainLock") private var resumeDrain: Continuation<Unit>? = null
 
     init {
         resumeDrain =
@@ -59,7 +62,7 @@ public class WireTraceSink(
                     while (true) {
                         drainQueue() // Sets drainRequested to false on completion
                         suspendCoroutine<Unit> { continuation ->
-                            resumeDrain = continuation
+                            synchronized(drainLock) { resumeDrain = continuation }
                             COROUTINE_SUSPENDED // Suspend
                         }
                     }
@@ -77,7 +80,9 @@ public class WireTraceSink(
 
     override fun flush() {
         makeDrainRequest()
-        while (drainRequested.get()) {
+        // The queue is the actual source of truth and a lot easier to reason about
+        // that drainRequested + the Coroutines machinery. Using this consistently instead.
+        while (queue.isNotEmpty()) {
             // Await completion of the drain.
         }
         bufferedSink.flush()
@@ -85,8 +90,11 @@ public class WireTraceSink(
 
     private fun makeDrainRequest() {
         // Only make a request if one is not already ongoing
-        if (drainRequested.compareAndSet(false, true)) {
-            resumeDrain?.resume(Unit)
+        synchronized(drainLock) {
+            if (!drainRequested) {
+                drainRequested = true
+                resumeDrain?.resume(Unit)
+            }
         }
     }
 
@@ -98,11 +106,13 @@ public class WireTraceSink(
                 pooledPacketArray.recycle()
             }
         }
-        drainRequested.set(false)
-        // Mark resumeDrain as consumed because the Coroutines Machinery might still consider
-        // the Continuation as resumed after drainQueue() completes. This was the Atomics
-        // drainRequested, and the Continuation resumeDrain are in sync.
-        resumeDrain = null
+        synchronized(drainLock) {
+            drainRequested = false
+            // Mark resumeDrain as consumed because the Coroutines Machinery might still consider
+            // the Continuation as resumed after drainQueue() completes. This was the Atomics
+            // drainRequested, and the Continuation resumeDrain are in sync.
+            resumeDrain = null
+        }
     }
 
     override fun close() {
