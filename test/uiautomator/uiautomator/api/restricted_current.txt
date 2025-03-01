@@ -263,6 +263,7 @@ package androidx.test.uiautomator {
     method public boolean waitForAppToBeVisible();
     method public boolean waitForAppToBeVisible(optional String appPackageName);
     method public boolean waitForAppToBeVisible(optional String appPackageName, optional long timeoutMs);
+    method public <T> androidx.test.uiautomator.watcher.WatcherRegistration watchFor(androidx.test.uiautomator.watcher.ScopedUiWatcher<T> watcher, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public java.util.List<android.view.accessibility.AccessibilityNodeInfo> windowRoots();
     method public java.util.List<android.view.accessibility.AccessibilityWindowInfo> windows();
     property public android.app.Instrumentation instrumentation;
@@ -634,6 +635,32 @@ package androidx.test.uiautomator {
   public final class ViewNotFoundException extends java.lang.Exception {
     ctor public ViewNotFoundException();
     ctor public ViewNotFoundException(optional String? msg);
+  }
+
+}
+
+package androidx.test.uiautomator.watcher {
+
+  public final class PermissionDialog implements androidx.test.uiautomator.watcher.ScopedUiWatcher<androidx.test.uiautomator.watcher.PermissionDialog.Scope> {
+    method public boolean isVisible();
+    method public androidx.test.uiautomator.watcher.PermissionDialog.Scope scope();
+    field public static final androidx.test.uiautomator.watcher.PermissionDialog INSTANCE;
+  }
+
+  public static final class PermissionDialog.Scope {
+    method public void clickAllow();
+    method public void clickDeny();
+    field public static final androidx.test.uiautomator.watcher.PermissionDialog.Scope INSTANCE;
+  }
+
+  public interface ScopedUiWatcher<T> {
+    method public boolean isVisible();
+    method public T scope();
+  }
+
+  public interface WatcherRegistration extends java.lang.AutoCloseable {
+    method public default void close();
+    method public void unregister();
   }
 
 }
