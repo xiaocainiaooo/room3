@@ -615,9 +615,9 @@ package androidx.work {
     method public final W build();
     method @RequiresApi(26) public final B keepResultsForAtLeast(java.time.Duration duration);
     method public final B keepResultsForAtLeast(long duration, java.util.concurrent.TimeUnit timeUnit);
-    method @SuppressCompatibility @androidx.work.ExperimentalWorkRequestBuilderApi public final B setBackOffForSystemInterruptions();
     method @RequiresApi(26) public final B setBackoffCriteria(androidx.work.BackoffPolicy backoffPolicy, java.time.Duration duration);
     method public final B setBackoffCriteria(androidx.work.BackoffPolicy backoffPolicy, long backoffDelay, java.util.concurrent.TimeUnit timeUnit);
+    method @SuppressCompatibility @androidx.work.ExperimentalWorkRequestBuilderApi public final B setBackoffForSystemInterruptions();
     method public final B setConstraints(androidx.work.Constraints constraints);
     method public B setExpedited(androidx.work.OutOfQuotaPolicy policy);
     method public final B setId(java.util.UUID id);

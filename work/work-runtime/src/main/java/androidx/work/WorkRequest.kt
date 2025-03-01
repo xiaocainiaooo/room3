@@ -204,7 +204,7 @@ internal constructor(
         @ExperimentalWorkRequestBuilderApi
         @Suppress("MissingGetterMatchingBuilder")
         @SuppressWarnings("SetterReturnsThis")
-        fun setBackOffForSystemInterruptions(): B {
+        fun setBackoffForSystemInterruptions(): B {
             workSpec.backOffOnSystemInterruptions = true
             return thisObject
         }
