@@ -286,14 +286,15 @@ private val AutofillDemos =
             ComposableDemo("New login") { BTFResetCredentialsDemo() },
             ComposableDemo("BasicTextField Autofill") { BasicTextFieldAutofill() },
             ComposableDemo("BasicSecureTextField Autofill") { BasicSecureTextFieldAutofillDemo() },
-            ComposableDemo("TextField Autofill") { LegacyTextFieldAutofillDemo() },
-            ComposableDemo("OutlinedTextField Autofill") { OutlinedTextFieldAutofillDemo() },
-            ComposableDemo("OutlinedTextField with Visual Transformation Autofill") {
+            ComposableDemo("Legacy TextField Autofill") { LegacyTextFieldAutofillDemo() },
+            ComposableDemo("Legacy OutlinedTextField Autofill") { OutlinedTextFieldAutofillDemo() },
+            ComposableDemo("Legacy OutlinedTextField with Visual Transformation Autofill") {
                 OutlinedTextFieldVisualTransformationAutofillDemo()
             },
             ComposableDemo("Navigation Sample") { AutofillNavigation() },
             ComposableDemo("Multipage Navigation Sample") { MultiPageLoginDemo() },
-            ComposableDemo("Old and New Autofill Mixed") { MixedOldNewAutofillDemo() }
+            ComposableDemo("Old and New Autofill Mixed") { MixedOldNewAutofillDemo() },
+            ComposableDemo("Old Autofill demo") { ExplicitAutofillTypesDemo() },
         )
     )
 
@@ -318,7 +319,6 @@ val CoreDemos =
         listOfNotNull(
             ModifierDemos,
             if (SDK_INT >= 26) AutofillDemos else null,
-            ComposableDemo("Explicit autofill types") { ExplicitAutofillTypesDemo() },
             FocusDemos,
             KeyInputDemos,
             ComposableDemo("TouchMode") { TouchModeDemo() },
