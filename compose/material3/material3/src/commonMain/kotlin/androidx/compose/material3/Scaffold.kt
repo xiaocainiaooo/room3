@@ -157,6 +157,12 @@ private fun ScaffoldLayout(
         }
     }
 
+    val topBarContent: @Composable () -> Unit = remember(topBar) { { Box { topBar() } } }
+    val snackbarContent: @Composable () -> Unit = remember(snackbar) { { Box { snackbar() } } }
+    val fabContent: @Composable () -> Unit = remember(fab) { { Box { fab() } } }
+    val bodyContent: @Composable () -> Unit =
+        remember(content, contentPadding) { { Box { content(contentPadding) } } }
+    val bottomBarContent: @Composable () -> Unit = remember(bottomBar) { { Box { bottomBar() } } }
     SubcomposeLayout { constraints ->
         val layoutWidth = constraints.maxWidth
         val layoutHeight = constraints.maxHeight
@@ -169,17 +175,17 @@ private fun ScaffoldLayout(
         val bottomInset = contentWindowInsets.getBottom(this@SubcomposeLayout)
 
         val topBarPlaceable =
-            subcompose(ScaffoldLayoutContent.TopBar) { Box { topBar() } }
+            subcompose(ScaffoldLayoutContent.TopBar, topBarContent)
                 .first()
                 .measure(looseConstraints)
 
         val snackbarPlaceable =
-            subcompose(ScaffoldLayoutContent.Snackbar) { Box { snackbar() } }
+            subcompose(ScaffoldLayoutContent.Snackbar, snackbarContent)
                 .first()
                 .measure(looseConstraints.offset(-leftInset - rightInset, -bottomInset))
 
         val fabPlaceable =
-            subcompose(ScaffoldLayoutContent.Fab) { Box { fab() } }
+            subcompose(ScaffoldLayoutContent.Fab, fabContent)
                 .first()
                 .measure(looseConstraints.offset(-leftInset - rightInset, -bottomInset))
 
@@ -215,7 +221,7 @@ private fun ScaffoldLayout(
             }
 
         val bottomBarPlaceable =
-            subcompose(ScaffoldLayoutContent.BottomBar) { Box { bottomBar() } }
+            subcompose(ScaffoldLayoutContent.BottomBar, bottomBarContent)
                 .first()
                 .measure(looseConstraints)
 
@@ -266,7 +272,7 @@ private fun ScaffoldLayout(
             )
 
         val bodyContentPlaceable =
-            subcompose(ScaffoldLayoutContent.MainContent) { Box { content(contentPadding) } }
+            subcompose(ScaffoldLayoutContent.MainContent, bodyContent)
                 .first()
                 .measure(looseConstraints)
 
