@@ -95,8 +95,8 @@ fun TimePickerDialog(
                 Row(modifier = Modifier.height(TimePickerActionsHeight).fillMaxWidth()) {
                     modeToggleButton?.invoke()
                     Spacer(modifier = Modifier.weight(1f))
-                    confirmButton()
                     dismissButton?.invoke()
+                    confirmButton()
                 }
             }
         }
