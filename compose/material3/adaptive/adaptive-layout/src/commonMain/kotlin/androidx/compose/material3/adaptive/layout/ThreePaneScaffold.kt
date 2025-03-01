@@ -42,7 +42,6 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.MultiContentMeasurePolicy
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -317,7 +316,7 @@ private class ThreePaneContentMeasurePolicy(
                             } else {
                                 outerBounds
                             }
-                        measureAndPlacePaneWithLocalBounds(bounds, visiblePanes[1], isLookingAhead)
+                        measureAndPlacePane(bounds, visiblePanes[1], isLookingAhead)
                     } else if (
                         paneExpansionState.currentDraggingOffset >=
                             outerBounds.width - halfSpacerSize
@@ -332,16 +331,16 @@ private class ThreePaneContentMeasurePolicy(
                             } else {
                                 outerBounds
                             }
-                        measureAndPlacePaneWithLocalBounds(bounds, visiblePanes[0], isLookingAhead)
+                        measureAndPlacePane(bounds, visiblePanes[0], isLookingAhead)
                     } else {
-                        measureAndPlacePaneWithLocalBounds(
+                        measureAndPlacePane(
                             outerBounds.copy(
                                 right = paneExpansionState.currentDraggingOffset - halfSpacerSize
                             ),
                             visiblePanes[0],
                             isLookingAhead
                         )
-                        measureAndPlacePaneWithLocalBounds(
+                        measureAndPlacePane(
                             outerBounds.copy(
                                 left = paneExpansionState.currentDraggingOffset + halfSpacerSize
                             ),
@@ -355,20 +354,12 @@ private class ThreePaneContentMeasurePolicy(
                         paneExpansionState.firstPaneWidth == 0 ||
                             paneExpansionState.firstPaneProportion == 0f
                     ) {
-                        measureAndPlacePaneWithLocalBounds(
-                            outerBounds,
-                            visiblePanes[1],
-                            isLookingAhead
-                        )
+                        measureAndPlacePane(outerBounds, visiblePanes[1], isLookingAhead)
                     } else if (
                         paneExpansionState.firstPaneWidth >= availableWidth - verticalSpacerSize ||
                             paneExpansionState.firstPaneProportion >= 1f
                     ) {
-                        measureAndPlacePaneWithLocalBounds(
-                            outerBounds,
-                            visiblePanes[0],
-                            isLookingAhead
-                        )
+                        measureAndPlacePane(outerBounds, visiblePanes[0], isLookingAhead)
                     } else {
                         val firstPaneWidth =
                             if (
@@ -381,12 +372,12 @@ private class ThreePaneContentMeasurePolicy(
                                     .toInt()
                             }
                         val firstPaneRight = outerBounds.left + firstPaneWidth
-                        measureAndPlacePaneWithLocalBounds(
+                        measureAndPlacePane(
                             outerBounds.copy(right = firstPaneRight),
                             visiblePanes[0],
                             isLookingAhead
                         )
-                        measureAndPlacePaneWithLocalBounds(
+                        measureAndPlacePane(
                             outerBounds.copy(left = firstPaneRight + verticalSpacerSize),
                             visiblePanes[1],
                             isLookingAhead
@@ -394,74 +385,65 @@ private class ThreePaneContentMeasurePolicy(
                     }
                 }
             } else if (scaffoldDirective.excludedBounds.isNotEmpty()) {
-                val layoutBounds = coordinates!!.boundsInWindow()
-                val layoutPhysicalPartitions = mutableListOf<Rect>()
-                var actualLeft = layoutBounds.left
-                var actualRight = layoutBounds.right
-                val actualTop = layoutBounds.top
-                val actualBottom = layoutBounds.bottom
+                val layoutPartitions = mutableListOf<IntRect>()
+                var actualLeft = outerBounds.left
+                var actualRight = outerBounds.right
+                val actualTop = outerBounds.top
+                val actualBottom = outerBounds.bottom
                 // Assume hinge bounds are sorted from left to right, non-overlapped.
                 @Suppress("ListIterator")
-                scaffoldDirective.excludedBounds.forEach { hingeBound ->
-                    if (hingeBound.left <= actualLeft) {
+                scaffoldDirective.excludedBounds.forEach { it ->
+                    val excludedBound = getLocalBounds(it)
+                    if (excludedBound.left <= actualLeft) {
                         // The hinge is at the left of the layout, adjust the left edge of
                         // the current partition to the actual displayable bounds.
-                        actualLeft = max(actualLeft, hingeBound.right)
-                    } else if (hingeBound.right >= actualRight) {
+                        actualLeft = max(actualLeft, excludedBound.right)
+                    } else if (excludedBound.right >= actualRight) {
                         // The hinge is right at the right of the layout and there's no more
                         // room for more partitions, adjust the right edge of the current
                         // partition to the actual displayable bounds.
-                        actualRight = min(hingeBound.left, actualRight)
+                        actualRight = min(excludedBound.left, actualRight)
                         return@forEach
                     } else {
                         // The hinge is inside the layout, add the current partition to the list
                         // and move the left edge of the next partition to the right of the
                         // hinge.
-                        layoutPhysicalPartitions.add(
-                            Rect(actualLeft, actualTop, hingeBound.left, actualBottom)
+                        layoutPartitions.add(
+                            IntRect(actualLeft, actualTop, excludedBound.left, actualBottom)
                         )
-                        actualLeft = max(hingeBound.right, hingeBound.left + verticalSpacerSize)
+                        actualLeft =
+                            max(excludedBound.right, excludedBound.left + verticalSpacerSize)
                     }
                 }
                 if (actualLeft < actualRight) {
                     // The last partition
-                    layoutPhysicalPartitions.add(
-                        Rect(actualLeft, actualTop, actualRight, actualBottom)
-                    )
+                    layoutPartitions.add(IntRect(actualLeft, actualTop, actualRight, actualBottom))
                 }
-                if (layoutPhysicalPartitions.size == 0) {
+                if (layoutPartitions.isEmpty()) {
                     // Display nothing
-                } else if (layoutPhysicalPartitions.size == 1) {
+                } else if (layoutPartitions.size == 1) {
                     measureAndPlacePanes(
-                        layoutPhysicalPartitions[0],
+                        layoutPartitions[0],
                         verticalSpacerSize,
                         visiblePanes,
                         isLookingAhead
                     )
-                } else if (layoutPhysicalPartitions.size < visiblePanes.size) {
+                } else if (layoutPartitions.size < visiblePanes.size) {
                     // Note that the only possible situation is we have only two physical partitions
                     // but three expanded panes to show. In this case fit two panes in the larger
                     // partition.
-                    if (layoutPhysicalPartitions[0].width > layoutPhysicalPartitions[1].width) {
+                    if (layoutPartitions[0].width > layoutPartitions[1].width) {
                         measureAndPlacePanes(
-                            layoutPhysicalPartitions[0],
+                            layoutPartitions[0],
                             verticalSpacerSize,
                             visiblePanes.subList(0, 2),
                             isLookingAhead
                         )
-                        measureAndPlacePane(
-                            layoutPhysicalPartitions[1],
-                            visiblePanes[2],
-                            isLookingAhead
-                        )
+                        measureAndPlacePane(layoutPartitions[1], visiblePanes[2], isLookingAhead)
                     } else {
-                        measureAndPlacePane(
-                            layoutPhysicalPartitions[0],
-                            visiblePanes[0],
-                            isLookingAhead
-                        )
+                        measureAndPlacePane(layoutPartitions[0], visiblePanes[0], isLookingAhead)
                         measureAndPlacePanes(
-                            layoutPhysicalPartitions[1],
+                            layoutPartitions[1],
                             verticalSpacerSize,
                             visiblePanes.subList(1, 3),
                             isLookingAhead
@@ -470,20 +452,11 @@ private class ThreePaneContentMeasurePolicy(
                 } else {
                     // Layout each visible pane in a physical partition
                     visiblePanes.fastForEachIndexed { index, paneMeasurable ->
-                        measureAndPlacePane(
-                            layoutPhysicalPartitions[index],
-                            paneMeasurable,
-                            isLookingAhead
-                        )
+                        measureAndPlacePane(layoutPartitions[index], paneMeasurable, isLookingAhead)
                     }
                 }
             } else {
-                measureAndPlacePanesWithLocalBounds(
-                    outerBounds,
-                    verticalSpacerSize,
-                    visiblePanes,
-                    isLookingAhead
-                )
+                measureAndPlacePanes(outerBounds, verticalSpacerSize, visiblePanes, isLookingAhead)
             }
 
             if (visiblePanes.size == 2 && dragHandleMeasurable != null) {
@@ -581,17 +554,6 @@ private class ThreePaneContentMeasurePolicy(
     }
 
     private fun Placeable.PlacementScope.measureAndPlacePane(
-        partitionBounds: Rect,
-        measurable: PaneMeasurable,
-        isLookingAhead: Boolean
-    ) =
-        measureAndPlacePaneWithLocalBounds(
-            getLocalBounds(partitionBounds),
-            measurable,
-            isLookingAhead
-        )
-
-    private fun Placeable.PlacementScope.measureAndPlacePaneWithLocalBounds(
         localBounds: IntRect,
         measurable: PaneMeasurable,
         isLookingAhead: Boolean
@@ -608,20 +570,6 @@ private class ThreePaneContentMeasurePolicy(
     }
 
     private fun Placeable.PlacementScope.measureAndPlacePanes(
-        partitionBounds: Rect,
-        spacerSize: Int,
-        measurables: List<PaneMeasurable>,
-        isLookingAhead: Boolean
-    ) {
-        measureAndPlacePanesWithLocalBounds(
-            getLocalBounds(partitionBounds),
-            spacerSize,
-            measurables,
-            isLookingAhead
-        )
-    }
-
-    private fun Placeable.PlacementScope.measureAndPlacePanesWithLocalBounds(
         partitionBounds: IntRect,
         spacerSize: Int,
         measurables: List<PaneMeasurable>,
