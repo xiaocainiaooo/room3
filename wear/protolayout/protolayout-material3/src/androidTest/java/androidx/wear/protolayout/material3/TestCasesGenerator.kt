@@ -482,9 +482,9 @@ object TestCasesGenerator {
                                             backgroundContent = { icon(ICON_ID) },
                                             modifier =
                                                 LayoutModifier.background(
-                                                    color = colorScheme.onSecondaryContainer,
-                                                    corner = shapes.extraLarge
-                                                ),
+                                                        colorScheme.onSecondaryContainer
+                                                    )
+                                                    .clip(shapes.extraLarge),
                                             width = expand(),
                                             height = expand()
                                         )

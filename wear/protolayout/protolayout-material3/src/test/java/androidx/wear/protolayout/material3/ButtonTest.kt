@@ -25,7 +25,7 @@ import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.material3.CompactButtonStyle.COMPACT_BUTTON_HEIGHT_DP
 import androidx.wear.protolayout.modifiers.LayoutModifier
-import androidx.wear.protolayout.modifiers.backgroundColor
+import androidx.wear.protolayout.modifiers.background
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
 import androidx.wear.protolayout.testing.hasClickable
@@ -259,7 +259,7 @@ class ButtonTest {
                     onClick = CLICKABLE,
                     modifier =
                         LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
-                            .backgroundColor(color.argb),
+                            .background(color.argb),
                     content = { text(TEXT.layoutString) }
                 )
             }
