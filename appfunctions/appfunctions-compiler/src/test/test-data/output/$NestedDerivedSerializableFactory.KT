@@ -29,22 +29,22 @@ public class `$NestedDerivedSerializableFactory` :
     return NestedDerivedSerializable(stringBaseName, nestedBase, longBaseValue, nestedDerived)
   }
 
-  override fun toAppFunctionData(nestedDerivedSerializable: NestedDerivedSerializable):
+  override fun toAppFunctionData(appFunctionSerializable: NestedDerivedSerializable):
       AppFunctionData {
     val nestedBaseSerializableFactory = `$NestedBaseSerializableFactory`()
     val nestedDerivedSerializableFactory = `$NestedDerivedSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.NestedDerivedSerializable")
-    builder.setString("stringBaseName", nestedDerivedSerializable.stringBaseName)
-    if (nestedDerivedSerializable.nestedBase != null) {
+    builder.setString("stringBaseName", appFunctionSerializable.stringBaseName)
+    if (appFunctionSerializable.nestedBase != null) {
       builder.setAppFunctionData("nestedBase",
-          nestedBaseSerializableFactory.toAppFunctionData(nestedDerivedSerializable.nestedBase as
+          nestedBaseSerializableFactory.toAppFunctionData(appFunctionSerializable.nestedBase as
           NestedBaseSerializable))
     }
-    builder.setLong("longBaseValue", nestedDerivedSerializable.longBaseValue)
-    if (nestedDerivedSerializable.nestedDerived != null) {
+    builder.setLong("longBaseValue", appFunctionSerializable.longBaseValue)
+    if (appFunctionSerializable.nestedDerived != null) {
       builder.setAppFunctionData("nestedDerived",
-          nestedDerivedSerializableFactory.toAppFunctionData(nestedDerivedSerializable.nestedDerived
+          nestedDerivedSerializableFactory.toAppFunctionData(appFunctionSerializable.nestedDerived
           as NestedDerivedSerializable))
     }
 

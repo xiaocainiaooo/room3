@@ -66,13 +66,13 @@ private fun AppFunctionDataTypeMetadata.unsafeBuildReturnValue(result: Any): App
             unsafeBuildSingleReturnValue(this.type, result)
         }
         is AppFunctionObjectTypeMetadata -> {
-            unsafeBuildSingleReturnValue(TYPE_OBJECT, result)
+            unsafeBuildSingleReturnValue(TYPE_OBJECT, result, this.qualifiedName)
         }
         is AppFunctionArrayTypeMetadata -> {
             this.unsafeBuildReturnValue(result)
         }
         is AppFunctionReferenceTypeMetadata -> {
-            TODO("Not implemented yet - require resolve API")
+            unsafeBuildSingleReturnValue(TYPE_OBJECT, result, this.referenceDataType)
         }
         else -> {
             throw IllegalStateException("Unknown DataTypeMetadata: ${this::class.java}")
@@ -87,10 +87,10 @@ private fun AppFunctionArrayTypeMetadata.unsafeBuildReturnValue(result: Any): Ap
             unsafeBuildCollectionReturnValue(castItemType.type, result)
         }
         is AppFunctionObjectTypeMetadata -> {
-            unsafeBuildCollectionReturnValue(TYPE_OBJECT, result)
+            unsafeBuildCollectionReturnValue(TYPE_OBJECT, result, castItemType.qualifiedName)
         }
         is AppFunctionReferenceTypeMetadata -> {
-            TODO("Not implemented yet - require resolve API")
+            unsafeBuildCollectionReturnValue(TYPE_OBJECT, result, castItemType.referenceDataType)
         }
         else -> {
             throw IllegalStateException(
@@ -101,7 +101,11 @@ private fun AppFunctionArrayTypeMetadata.unsafeBuildReturnValue(result: Any): Ap
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionData {
+private fun unsafeBuildSingleReturnValue(
+    type: Int,
+    result: Any,
+    objectQualifiedName: String? = null
+): AppFunctionData {
     val builder = AppFunctionData.Builder("")
     when (type) {
         TYPE_LONG -> {
@@ -138,7 +142,10 @@ private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionDat
             TODO("Not implemented yet - clarify AppFunctionData.Builder#setBytes API")
         }
         TYPE_OBJECT -> {
-            TODO("Not implemented yet - require AppFunctionSerializableFactory")
+            builder.setAppFunctionData(
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
+                AppFunctionData.serialize(result, checkNotNull(objectQualifiedName))
+            )
         }
         TYPE_UNIT -> {
             // no-op
@@ -151,7 +158,11 @@ private fun unsafeBuildSingleReturnValue(type: Int, result: Any): AppFunctionDat
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private fun unsafeBuildCollectionReturnValue(type: Int, result: Any): AppFunctionData {
+private fun unsafeBuildCollectionReturnValue(
+    type: Int,
+    result: Any,
+    objectQualifiedName: String? = null
+): AppFunctionData {
     val builder = AppFunctionData.Builder("")
     when (type) {
         TYPE_LONG -> {
@@ -189,7 +200,13 @@ private fun unsafeBuildCollectionReturnValue(type: Int, result: Any): AppFunctio
             TODO("Not implemented yet - clarify AppFunctionData.Builder#setBytesList API")
         }
         TYPE_OBJECT -> {
-            TODO("Not implemented yet - require AppFunctionSerializableFactory")
+            @Suppress("UNCHECKED_CAST")
+            builder.setAppFunctionDataList(
+                ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE,
+                (result as List<Any>).map {
+                    AppFunctionData.serialize(it, checkNotNull(objectQualifiedName))
+                }
+            )
         }
         else -> {
             throw IllegalStateException("Unknown data type $type")

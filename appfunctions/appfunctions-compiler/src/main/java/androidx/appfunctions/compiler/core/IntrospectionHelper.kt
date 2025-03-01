@@ -120,6 +120,7 @@ object IntrospectionHelper {
 
         object ToAppFunctionDataMethod {
             const val METHOD_NAME = "toAppFunctionData"
+            const val APP_FUNCTION_SERIALIZABLE_PARAM_NAME = "appFunctionSerializable"
         }
     }
 

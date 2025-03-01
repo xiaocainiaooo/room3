@@ -52,7 +52,11 @@ internal fun AppFunctionData.unsafeGetParameterValue(
                 unsafeGetSingleProperty(parameterMetadata.name, castDataType.type)
             }
             is AppFunctionObjectTypeMetadata -> {
-                unsafeGetSingleProperty(parameterMetadata.name, TYPE_OBJECT)
+                unsafeGetSingleProperty(
+                    parameterMetadata.name,
+                    TYPE_OBJECT,
+                    castDataType.qualifiedName
+                )
             }
             is AppFunctionArrayTypeMetadata -> {
                 getArrayTypeParameterValue(
@@ -62,7 +66,11 @@ internal fun AppFunctionData.unsafeGetParameterValue(
                 )
             }
             is AppFunctionReferenceTypeMetadata -> {
-                TODO("Not implement yet - requires reference resolving APIs")
+                unsafeGetSingleProperty(
+                    parameterMetadata.name,
+                    TYPE_OBJECT,
+                    castDataType.referenceDataType
+                )
             }
             else ->
                 throw IllegalStateException("Unknown DataTypeMetadata: ${castDataType::class.java}")
@@ -102,14 +110,19 @@ private fun AppFunctionData.getArrayTypeParameterValue(
             parameter
         }
         is AppFunctionObjectTypeMetadata -> {
-            val parameter = unsafeGetCollectionProperty(key, TYPE_OBJECT)
+            val parameter = unsafeGetCollectionProperty(key, TYPE_OBJECT, itemType.qualifiedName)
             if (parameter == null && isRequired) {
                 throw NoSuchElementException("Parameter $key is required")
             }
             parameter
         }
         is AppFunctionReferenceTypeMetadata -> {
-            TODO("Not implement yet - requires reference resolving APIs")
+            val parameter =
+                unsafeGetCollectionProperty(key, TYPE_OBJECT, itemType.referenceDataType)
+            if (parameter == null && isRequired) {
+                throw NoSuchElementException("Parameter $key is required")
+            }
+            parameter
         }
         else ->
             throw IllegalStateException("Unknown item DataTypeMetadata: ${itemType::class.java}")
@@ -120,6 +133,7 @@ private fun AppFunctionData.getArrayTypeParameterValue(
 private fun AppFunctionData.unsafeGetSingleProperty(
     key: String,
     type: Int,
+    objectQualifiedName: String? = null,
 ): Any? {
     return when (type) {
         TYPE_INT -> {
@@ -144,7 +158,7 @@ private fun AppFunctionData.unsafeGetSingleProperty(
             getString(key)
         }
         TYPE_OBJECT -> {
-            TODO("Not implement yet - require AppFunctionSerializableFactory")
+            getAppFunctionData(key).deserialize(checkNotNull(objectQualifiedName))
         }
         else -> throw IllegalStateException("Unknown data type $type")
     }
@@ -154,6 +168,7 @@ private fun AppFunctionData.unsafeGetSingleProperty(
 private fun AppFunctionData.unsafeGetCollectionProperty(
     key: String,
     type: Int,
+    objectQualifiedName: String? = null,
 ): Any? {
     return when (type) {
         TYPE_INT -> {
@@ -178,7 +193,9 @@ private fun AppFunctionData.unsafeGetCollectionProperty(
             getStringList(key)
         }
         TYPE_OBJECT -> {
-            TODO("Not implement yet - require AppFunctionSerializableFactory")
+            getAppFunctionDataList(key)?.map {
+                it.deserialize<Any>(checkNotNull(objectQualifiedName))
+            }
         }
         else -> throw IllegalStateException("Unknown data type $type")
     }
