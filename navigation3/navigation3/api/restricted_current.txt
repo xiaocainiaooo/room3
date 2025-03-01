@@ -32,17 +32,17 @@ package androidx.navigation3 {
     property public T key;
   }
 
-  @androidx.navigation3.EntryDsl public final class EntryProviderBuilder {
-    ctor public EntryProviderBuilder(kotlin.jvm.functions.Function1<java.lang.Object,? extends androidx.navigation3.NavEntry<? extends java.lang.Object?>> fallback);
+  @androidx.navigation3.EntryDsl public final class EntryProviderBuilder<T> {
+    ctor public EntryProviderBuilder(kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<T>> fallback);
     method public <T> void addEntryProvider(kotlin.reflect.KClass<T> clazz, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
     method public <T> void addEntryProvider(T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
-    method public kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.NavEntry<? extends java.lang.Object?>> build();
+    method public kotlin.jvm.functions.Function1<T,androidx.navigation3.NavEntry<T>> build();
   }
 
   public final class EntryProviderKt {
-    method public static inline <reified T> void entry(androidx.navigation3.EntryProviderBuilder, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
-    method public static <T> void entry(androidx.navigation3.EntryProviderBuilder, T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
-    method public static inline kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.NavEntry<? extends java.lang.Object?>> entryProvider(optional kotlin.jvm.functions.Function1<java.lang.Object,? extends androidx.navigation3.NavEntry<? extends java.lang.Object?>> fallback, kotlin.jvm.functions.Function1<? super androidx.navigation3.EntryProviderBuilder,kotlin.Unit> builder);
+    method public static inline <reified T> void entry(androidx.navigation3.EntryProviderBuilder<? extends java.lang.Object?>, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public static <T> void entry(androidx.navigation3.EntryProviderBuilder<T>, T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public static inline <T> kotlin.jvm.functions.Function1<T,androidx.navigation3.NavEntry<T>> entryProvider(optional kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<T>> fallback, kotlin.jvm.functions.Function1<? super androidx.navigation3.EntryProviderBuilder<T>,kotlin.Unit> builder);
   }
 
   public final class LocalNavAnimatedContentScope_androidKt {
@@ -95,7 +95,7 @@ package androidx.navigation3 {
   }
 
   public final class SinglePaneNavDisplay_androidKt {
-    method @androidx.compose.runtime.Composable public static <T> void SinglePaneNavDisplay(java.util.List<? extends T> backStack, optional androidx.compose.ui.Modifier modifier, optional java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional androidx.compose.animation.EnterTransition popEnterTransition, optional androidx.compose.animation.ExitTransition popExitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<? extends T>> entryProvider);
+    method @androidx.compose.runtime.Composable public static <T> void SinglePaneNavDisplay(java.util.List<? extends T> backStack, optional androidx.compose.ui.Modifier modifier, optional java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional androidx.compose.animation.EnterTransition popEnterTransition, optional androidx.compose.animation.ExitTransition popExitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<T>> entryProvider);
   }
 
 }
