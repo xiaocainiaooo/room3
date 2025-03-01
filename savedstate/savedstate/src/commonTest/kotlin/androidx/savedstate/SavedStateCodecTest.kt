@@ -19,7 +19,7 @@ package androidx.savedstate
 import androidx.kruth.assertThat
 import androidx.kruth.assertThrows
 import androidx.savedstate.SavedStateCodecTestUtils.encodeDecode
-import androidx.savedstate.serialization.SavedStateConfig
+import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
@@ -599,7 +599,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
 
     @Test
     fun canEncodeWithContextualSerialization() {
-        val config = SavedStateConfig {
+        val config = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 contextual(MyColor::class, MyColorIntArraySerializer)
             }
@@ -607,7 +607,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
 
         // Specifying `ContextualSerializer` explicitly.
         MyColor(1, 3, 5).encodeDecode(
-            config = config,
+            configuration = config,
             serializer = ContextualSerializer(MyColor::class)
         ) {
             assertThat(size()).isEqualTo(1)
@@ -617,14 +617,14 @@ internal class SavedStateCodecTest : RobolectricTest() {
 
     @Test
     fun canEncodeTopLevelObjectsWithImplicitContextualSerialization() {
-        val config = SavedStateConfig {
+        val config = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 contextual(MyColor::class, MyColorIntArraySerializer)
             }
         }
 
         // Fallback to contextual serializer as `MyColor` doesn't have an associated serializer.
-        MyColor(1, 3, 5).encodeDecode(config = config) {
+        MyColor(1, 3, 5).encodeDecode(configuration = config) {
             assertThat(size()).isEqualTo(1)
             assertThat(getIntArray("")).isEqualTo(intArrayOf(1, 3, 5))
         }
@@ -632,7 +632,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
 
     @Test
     fun canEncodeWithPolymorphicSerialization() {
-        val config = SavedStateConfig {
+        val config = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(Shape::class) {
                     subclass(Circle::class, Circle.serializer())
@@ -642,7 +642,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
         }
 
         Circle(3).encodeDecode<Shape>(
-            config = config,
+            configuration = config,
             // This is needed only in Kotlin/Native.
             serializer = PolymorphicSerializer(Shape::class)
         ) {
@@ -654,7 +654,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
             }
         }
         Rectangle(3, 5).encodeDecode<Shape>(
-            config = config,
+            configuration = config,
             // This is needed only in Kotlin/Native.
             serializer = PolymorphicSerializer(Shape::class)
         ) {
@@ -671,7 +671,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
     // Encode a `List<Any>` with `SerializersModule`.
     @Test
     fun canUseContextualSerializationWithPolymorphicSerialization() {
-        val config = SavedStateConfig {
+        val config = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 contextual(Any::class, PolymorphicSerializer(Any::class))
                 polymorphic(Any::class) {
@@ -680,7 +680,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
                 }
             }
         }
-        listOf("foo", 123).encodeDecode<List<Any>>(config = config) {
+        listOf("foo", 123).encodeDecode<List<Any>>(configuration = config) {
             assertThat(size()).isEqualTo(2)
             getSavedState("0").read {
                 assertThat(size()).isEqualTo(2)

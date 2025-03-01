@@ -23,7 +23,8 @@ import kotlin.test.Test
 
 internal class SavedStateCodecClassDiscriminatorAllObjectsTest :
     SavedStateSerializationBaseTest(
-        config = SavedStateConfig { classDiscriminatorMode = ClassDiscriminatorMode.ALL_OBJECTS }
+        configuration =
+            SavedStateConfiguration { classDiscriminatorMode = ClassDiscriminatorMode.ALL_OBJECTS }
     ) {
 
     @Test

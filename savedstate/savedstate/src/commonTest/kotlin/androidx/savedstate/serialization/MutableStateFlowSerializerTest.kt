@@ -97,8 +97,8 @@ internal class MutableStateFlowSerializerTest : RobolectricTest() {
         testEncodeDecode(
             mutableState = MutableStateFlow(USER_JOHN_DOE),
             serializer = MutableStateFlowSerializer(USER_SERIALIZER),
-            config =
-                SavedStateConfig {
+            configuration =
+                SavedStateConfiguration {
                     serializersModule = SerializersModule {
                         contextual(User::class, serializer<User>())
                     }
@@ -129,14 +129,18 @@ internal class MutableStateFlowSerializerTest : RobolectricTest() {
     private inline fun <reified T : Any> testEncodeDecode(
         mutableState: MutableStateFlow<T>,
         serializer: KSerializer<MutableStateFlow<T>> = MutableStateFlowSerializer<T>(),
-        config: SavedStateConfig = SavedStateConfig.DEFAULT
+        configuration: SavedStateConfiguration = SavedStateConfiguration.DEFAULT
     ) {
         val encoded =
-            encodeToSavedState(serializer = serializer, config = config, value = mutableState)
+            encodeToSavedState(
+                serializer = serializer,
+                configuration = configuration,
+                value = mutableState
+            )
         val decoded =
             decodeFromSavedState<MutableStateFlow<T>>(
                 deserializer = serializer,
-                config = config,
+                configuration = configuration,
                 savedState = encoded
             )
         assertThat(decoded.value).isEqualTo(mutableState.value)

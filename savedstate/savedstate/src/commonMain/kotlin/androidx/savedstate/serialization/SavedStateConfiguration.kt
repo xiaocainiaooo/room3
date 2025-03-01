@@ -16,7 +16,7 @@
 
 package androidx.savedstate.serialization
 
-import androidx.savedstate.serialization.SavedStateConfig.Builder
+import androidx.savedstate.serialization.SavedStateConfiguration.Builder
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmOverloads
@@ -28,18 +28,19 @@ import kotlinx.serialization.modules.overwriteWith
 import kotlinx.serialization.modules.plus
 
 /**
- * Configuration of the current [SavedStateConfig] configured with [SavedStateConfig.Builder].
+ * Configuration of the current [SavedStateConfiguration] configured with
+ * [SavedStateConfiguration.Builder].
  *
  * Can be used via [encodeToSavedState] and [decodeFromSavedState].
  *
  * Standalone configuration object cannot be used outside the encode and decode functions provided
  * by SavedState.
  *
- * Detailed description of each property is available in [SavedStateConfig.Builder] class.
+ * Detailed description of each property is available in [SavedStateConfiguration.Builder] class.
  *
- * @see SavedStateConfig.Builder
+ * @see SavedStateConfiguration.Builder
  */
-public class SavedStateConfig
+public class SavedStateConfiguration
 private constructor(
     public val serializersModule: SerializersModule = DEFAULT_SERIALIZERS_MODULE,
     @ClassDiscriminatorMode.Definition
@@ -48,15 +49,15 @@ private constructor(
     public val encodeDefaults: Boolean = false,
 ) {
     /**
-     * Builder of the [SavedStateConfig] instance provided by `SavedStateConfig { ... }` factory
-     * function.
+     * Builder of the [SavedStateConfiguration] instance provided by `SavedStateConfig { ... }`
+     * factory function.
      */
     @Suppress("MissingBuildMethod") // `build()` is internal, only used by the DSL.
-    public class Builder internal constructor(config: SavedStateConfig) {
+    public class Builder internal constructor(configuration: SavedStateConfiguration) {
 
         /**
          * Module with contextual and polymorphic serializers to be used in the resulting
-         * [SavedStateConfig] instance.
+         * [SavedStateConfiguration] instance.
          *
          * @see SerializersModule
          * @see Contextual
@@ -64,7 +65,7 @@ private constructor(
          */
         @get:Suppress("GetterOnBuilder") // KT-3110 (private get with public set).
         @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
-        public var serializersModule: SerializersModule = config.serializersModule
+        public var serializersModule: SerializersModule = configuration.serializersModule
 
         /**
          * Specifies whether default values of Kotlin properties should be encoded. `false` by
@@ -73,7 +74,7 @@ private constructor(
         @Suppress("GetterSetterNames") // More idiomatic, matches KTX Serialization naming.
         @get:Suppress("GetterOnBuilder") // KT-3110 (private get with public set).
         @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
-        public var encodeDefaults: Boolean = config.encodeDefaults
+        public var encodeDefaults: Boolean = configuration.encodeDefaults
 
         /**
          * Defines which classes and objects should have class discriminator added to the output.
@@ -84,10 +85,10 @@ private constructor(
         @get:Suppress("GetterOnBuilder") // KT-3110 (private get with public set).
         @set:Suppress("SetterReturnsThis") // DSL-like builder, no need to return this.
         @ClassDiscriminatorMode.Definition
-        public var classDiscriminatorMode: Int = config.classDiscriminatorMode
+        public var classDiscriminatorMode: Int = configuration.classDiscriminatorMode
 
-        internal fun build(): SavedStateConfig {
-            return SavedStateConfig(
+        internal fun build(): SavedStateConfiguration {
+            return SavedStateConfiguration(
                 serializersModule = DEFAULT_SERIALIZERS_MODULE.overwriteWith(serializersModule),
                 classDiscriminatorMode = classDiscriminatorMode,
                 encodeDefaults = encodeDefaults,
@@ -97,7 +98,7 @@ private constructor(
 
     public companion object {
         /**
-         * The default instance of [SavedStateConfig] with default configuration.
+         * The default instance of [SavedStateConfiguration] with default configuration.
          *
          * This configuration is used by [encodeToSavedState] and [decodeFromSavedState] unless an
          * alternative configuration is explicitly provided.
@@ -105,25 +106,25 @@ private constructor(
          * @see encodeToSavedState
          * @see decodeFromSavedState
          */
-        @JvmField public val DEFAULT: SavedStateConfig = SavedStateConfig()
+        @JvmField public val DEFAULT: SavedStateConfiguration = SavedStateConfiguration()
     }
 }
 
 /**
- * Creates an instance of [SavedStateConfig] configured from the optionally given [from] and
+ * Creates an instance of [SavedStateConfiguration] configured from the optionally given [from] and
  * adjusted with [builderAction].
  *
  * @sample androidx.savedstate.config
- * @param from An optional initial [SavedStateConfig] to start with. Defaults to
- *   [SavedStateConfig.DEFAULT].
+ * @param from An optional initial [SavedStateConfiguration] to start with. Defaults to
+ *   [SavedStateConfiguration.DEFAULT].
  * @param builderAction A lambda function to configure the [Builder] for additional customization.
- * @return A new [SavedStateConfig] instance configured based on the provided parameters.
+ * @return A new [SavedStateConfiguration] instance configured based on the provided parameters.
  */
 @JvmOverloads
-public fun SavedStateConfig(
-    from: SavedStateConfig = SavedStateConfig.DEFAULT,
+public fun SavedStateConfiguration(
+    from: SavedStateConfiguration = SavedStateConfiguration.DEFAULT,
     builderAction: Builder.() -> Unit,
-): SavedStateConfig {
+): SavedStateConfiguration {
     return Builder(from).apply(builderAction).build()
 }
 

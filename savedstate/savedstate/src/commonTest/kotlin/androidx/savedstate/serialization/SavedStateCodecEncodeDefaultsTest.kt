@@ -25,7 +25,7 @@ internal class SavedStateCodecEncodeDefaultsTest : SavedStateSerializationBaseTe
 
     @Test
     fun encodeDefaults_false() {
-        val config = SavedStateConfig { encodeDefaults = false }
+        val config = SavedStateConfiguration { encodeDefaults = false }
         doTest(Data(), config) {
             assertThat(original).isEqualTo(deserialized)
             assertThat(representation).isEqualTo(platformRepresentation)
@@ -35,7 +35,7 @@ internal class SavedStateCodecEncodeDefaultsTest : SavedStateSerializationBaseTe
 
     @Test
     fun encodeDefaults_true() {
-        val config = SavedStateConfig { encodeDefaults = true }
+        val config = SavedStateConfiguration { encodeDefaults = true }
         doTest(Data(), config) {
             assertThat(original).isEqualTo(deserialized)
             assertThat(representation).isEqualTo(platformRepresentation)

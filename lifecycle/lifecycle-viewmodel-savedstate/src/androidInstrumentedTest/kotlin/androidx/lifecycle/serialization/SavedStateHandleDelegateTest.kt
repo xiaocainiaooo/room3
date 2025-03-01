@@ -20,7 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.savedstate.serialization.SavedStateConfig
+import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -41,7 +41,7 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class SavedStateHandleDelegatesTest {
+class SavedStateHandleDelegateTest {
 
     @get:Rule val activityTestRuleScenario = ActivityScenarioRule(ComponentActivity::class.java)
 
@@ -117,21 +117,21 @@ class SavedStateHandleDelegatesTest {
             }
         }
 
-        val config = SavedStateConfig {
+        val config = SavedStateConfiguration {
             serializersModule = SerializersModule { contextual(User::class, UserSerializer()) }
         }
 
         val user = User("foo")
         activityTestRuleScenario.scenario.onActivity { activity ->
             val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
-            val value by viewModel.savedStateHandle.saved(config = config) { user }
+            val value by viewModel.savedStateHandle.saved(configuration = config) { user }
             assertThat(value).isEqualTo(user)
         }
         activityTestRuleScenario.scenario.recreate()
         activityTestRuleScenario.scenario.onActivity { activity ->
             val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
             val value: User by
-                viewModel.savedStateHandle.saved(config = config) {
+                viewModel.savedStateHandle.saved(configuration = config) {
                     error("Unexpected initializer call")
                 }
             assertThat(value).isEqualTo(user)

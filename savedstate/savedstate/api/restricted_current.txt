@@ -199,18 +199,18 @@ package androidx.savedstate.serialization {
     field public static final int POLYMORPHIC = 2; // 0x2
   }
 
-  public final class SavedStateConfig {
+  public final class SavedStateConfiguration {
     method public int getClassDiscriminatorMode();
     method public boolean getEncodeDefaults();
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
     property public int classDiscriminatorMode;
     property public boolean encodeDefaults;
     property public kotlinx.serialization.modules.SerializersModule serializersModule;
-    field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
-    field public static final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
+    field public static final androidx.savedstate.serialization.SavedStateConfiguration.Companion Companion;
+    field public static final androidx.savedstate.serialization.SavedStateConfiguration DEFAULT;
   }
 
-  public static final class SavedStateConfig.Builder {
+  public static final class SavedStateConfiguration.Builder {
     method public int getClassDiscriminatorMode();
     method public boolean getEncodeDefaults();
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
@@ -222,30 +222,30 @@ package androidx.savedstate.serialization {
     property public kotlinx.serialization.modules.SerializersModule serializersModule;
   }
 
-  public static final class SavedStateConfig.Companion {
-    property public androidx.savedstate.serialization.SavedStateConfig DEFAULT;
+  public static final class SavedStateConfiguration.Companion {
+    property public androidx.savedstate.serialization.SavedStateConfiguration DEFAULT;
   }
 
-  public final class SavedStateConfigKt {
-    method public static androidx.savedstate.serialization.SavedStateConfig SavedStateConfig(optional androidx.savedstate.serialization.SavedStateConfig from, kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfig.Builder,kotlin.Unit> builderAction);
-    method public static androidx.savedstate.serialization.SavedStateConfig SavedStateConfig(kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfig.Builder,kotlin.Unit> builderAction);
+  public final class SavedStateConfigurationKt {
+    method public static androidx.savedstate.serialization.SavedStateConfiguration SavedStateConfiguration(optional androidx.savedstate.serialization.SavedStateConfiguration from, kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfiguration.Builder,kotlin.Unit> builderAction);
+    method public static androidx.savedstate.serialization.SavedStateConfiguration SavedStateConfiguration(kotlin.jvm.functions.Function1<? super androidx.savedstate.serialization.SavedStateConfiguration.Builder,kotlin.Unit> builderAction);
   }
 
   public final class SavedStateDecoderKt {
-    method public static inline <reified T> T decodeFromSavedState(android.os.Bundle savedState, optional androidx.savedstate.serialization.SavedStateConfig config);
+    method public static inline <reified T> T decodeFromSavedState(android.os.Bundle savedState, optional androidx.savedstate.serialization.SavedStateConfiguration configuration);
     method public static <T> T decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<? extends T> deserializer, android.os.Bundle savedState);
-    method public static <T> T decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<? extends T> deserializer, android.os.Bundle savedState, androidx.savedstate.serialization.SavedStateConfig config);
+    method public static <T> T decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<? extends T> deserializer, android.os.Bundle savedState, optional androidx.savedstate.serialization.SavedStateConfiguration configuration);
   }
 
   public final class SavedStateEncoderKt {
     method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value);
-    method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value, androidx.savedstate.serialization.SavedStateConfig config);
-    method public static inline <reified T> android.os.Bundle encodeToSavedState(T value, optional androidx.savedstate.serialization.SavedStateConfig config);
+    method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value, optional androidx.savedstate.serialization.SavedStateConfiguration configuration);
+    method public static inline <reified T> android.os.Bundle encodeToSavedState(T value, optional androidx.savedstate.serialization.SavedStateConfiguration configuration);
   }
 
-  public final class SavedStateRegistryOwnerDelegatesKt {
-    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, optional String? key, optional androidx.savedstate.serialization.SavedStateConfig config, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlinx.serialization.KSerializer<T> serializer, optional String? key, optional androidx.savedstate.serialization.SavedStateConfig config, kotlin.jvm.functions.Function0<? extends T> init);
+  public final class SavedStateRegistryOwnerDelegateKt {
+    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, optional String? key, optional androidx.savedstate.serialization.SavedStateConfiguration configuration, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlinx.serialization.KSerializer<T> serializer, optional String? key, optional androidx.savedstate.serialization.SavedStateConfiguration configuration, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
 }
