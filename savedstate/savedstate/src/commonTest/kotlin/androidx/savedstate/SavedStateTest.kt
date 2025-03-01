@@ -336,11 +336,9 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getBoolean_whenSet_differentType_returnsDefault() {
+    fun getBoolean_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
-        val actual = underTest.read { getBoolean(KEY_1) }
-
-        assertThat(actual).isEqualTo(DEFAULT_BOOLEAN)
+        assertThrows<IllegalStateException> { underTest.read { getBoolean(KEY_1) } }
     }
 
     @Test
@@ -382,11 +380,9 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getChar_whenSet_differentType_returnsDefault() {
+    fun getChar_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MIN_VALUE) }
-        val actual = underTest.read { getChar(KEY_1) }
-
-        assertThat(actual).isEqualTo(DEFAULT_CHAR)
+        assertThrows<IllegalStateException> { underTest.read { getChar(KEY_1) } }
     }
 
     @Test
@@ -469,11 +465,9 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getDouble_whenSet_differentType_returnsDefault() {
+    fun getDouble_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
-        val actual = underTest.read { getDouble(KEY_1) }
-
-        assertThat(actual).isEqualTo(DEFAULT_DOUBLE)
+        assertThrows<IllegalStateException> { underTest.read { getDouble(KEY_1) } }
     }
 
     @Test
@@ -513,11 +507,9 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getFloat_whenSet_differentType_returnsDefault() {
+    fun getFloat_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
-        val actual = underTest.read { getFloat(KEY_1) }
-
-        assertThat(actual).isEqualTo(DEFAULT_FLOAT)
+        assertThrows<IllegalStateException> { underTest.read { getFloat(KEY_1) } }
     }
 
     @Test
@@ -557,11 +549,9 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getInt_whenSet_differentType_returnsDefault() {
+    fun getInt_whenSet_differentType_throws() {
         val underTest = savedState { putBoolean(KEY_1, false) }
-        val actual = underTest.read { getInt(KEY_1) }
-
-        assertThat(actual).isEqualTo(DEFAULT_INT)
+        assertThrows<IllegalStateException> { underTest.read { getInt(KEY_1) } }
     }
 
     @Test
@@ -603,9 +593,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getLong_whenSet_differentType_returnsDefault() {
         val underTest = savedState { putBoolean(KEY_1, false) }
-        val actual = underTest.read { getLong(KEY_1) }
-
-        assertThat(actual).isEqualTo(DEFAULT_LONG)
+        assertThrows<IllegalStateException> { underTest.read { getLong(KEY_1) } }
     }
 
     @Test

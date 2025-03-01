@@ -554,8 +554,13 @@ internal class SavedStateCodecTest : RobolectricTest() {
     // Users shouldn't do this. The test is just to document the behavior.
     @Test
     fun typeMismatchInDecodingWorks() {
-        assertThat(decodeFromSavedState<Int>(savedState { putBoolean("", true) }))
-            .isEqualTo(0) // This is the default value from `SavedStateReader.getInt(String)`.
+        assertThrows(IllegalStateException::class) {
+                decodeFromSavedState<Int>(savedState { putBoolean("", true) })
+            }
+            .hasMessageThat()
+            .contains(
+                "The saved state value associated with the key '' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
+            )
         assertThrows(IllegalStateException::class) {
                 decodeFromSavedState<String>(savedState { putBoolean("", true) })
             }
@@ -580,9 +585,13 @@ internal class SavedStateCodecTest : RobolectricTest() {
     fun illegalWrite() {
         val savedState = encodeToSavedState(3)
         savedState.write { putString("", "foo") }
-        // Got the default value of Int instead of 3 because the savedState got manipulated after
+        // Got exception instead of `3` because the savedState got manipulated after
         // encoding.
-        assertThat(decodeFromSavedState<Int>(savedState)).isEqualTo(0)
+        assertThrows<IllegalStateException> { decodeFromSavedState<Int>(savedState) }
+            .hasMessageThat()
+            .contains(
+                "The saved state value associated with the key '' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
+            )
     }
 
     @Test

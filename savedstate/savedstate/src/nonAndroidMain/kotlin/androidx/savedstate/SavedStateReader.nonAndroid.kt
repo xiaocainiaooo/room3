@@ -33,7 +33,7 @@ internal actual constructor(
 
     public actual inline fun getBoolean(key: String): Boolean {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Boolean ?: DEFAULT_BOOLEAN
+        return source.map[key] as? Boolean ?: valueNotFoundError(key)
     }
 
     public actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
@@ -43,7 +43,7 @@ internal actual constructor(
 
     public actual inline fun getChar(key: String): Char {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Char ?: DEFAULT_CHAR
+        return source.map[key] as? Char ?: valueNotFoundError(key)
     }
 
     public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
@@ -66,7 +66,7 @@ internal actual constructor(
 
     public actual inline fun getDouble(key: String): Double {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Double ?: DEFAULT_DOUBLE
+        return source.map[key] as? Double ?: valueNotFoundError(key)
     }
 
     public actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
@@ -76,7 +76,7 @@ internal actual constructor(
 
     public actual inline fun getFloat(key: String): Float {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Float ?: DEFAULT_FLOAT
+        return source.map[key] as? Float ?: valueNotFoundError(key)
     }
 
     public actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
@@ -86,7 +86,7 @@ internal actual constructor(
 
     public actual inline fun getInt(key: String): Int {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Int ?: DEFAULT_INT
+        return source.map[key] as? Int ?: valueNotFoundError(key)
     }
 
     public actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
@@ -96,7 +96,7 @@ internal actual constructor(
 
     public actual inline fun getLong(key: String): Long {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Long ?: DEFAULT_LONG
+        return source.map[key] as? Long ?: valueNotFoundError(key)
     }
 
     public actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {

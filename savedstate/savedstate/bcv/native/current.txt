@@ -196,19 +196,6 @@ final object androidx.savedstate.serialization/ClassDiscriminatorMode { // andro
         final fun <get-POLYMORPHIC>(): kotlin/Int // androidx.savedstate.serialization/ClassDiscriminatorMode.POLYMORPHIC.<get-POLYMORPHIC>|<get-POLYMORPHIC>(){}[0]
 }
 
-final const val androidx.savedstate/DEFAULT_BOOLEAN // androidx.savedstate/DEFAULT_BOOLEAN|{}DEFAULT_BOOLEAN[0]
-    final fun <get-DEFAULT_BOOLEAN>(): kotlin/Boolean // androidx.savedstate/DEFAULT_BOOLEAN.<get-DEFAULT_BOOLEAN>|<get-DEFAULT_BOOLEAN>(){}[0]
-final const val androidx.savedstate/DEFAULT_CHAR // androidx.savedstate/DEFAULT_CHAR|{}DEFAULT_CHAR[0]
-    final fun <get-DEFAULT_CHAR>(): kotlin/Char // androidx.savedstate/DEFAULT_CHAR.<get-DEFAULT_CHAR>|<get-DEFAULT_CHAR>(){}[0]
-final const val androidx.savedstate/DEFAULT_DOUBLE // androidx.savedstate/DEFAULT_DOUBLE|{}DEFAULT_DOUBLE[0]
-    final fun <get-DEFAULT_DOUBLE>(): kotlin/Double // androidx.savedstate/DEFAULT_DOUBLE.<get-DEFAULT_DOUBLE>|<get-DEFAULT_DOUBLE>(){}[0]
-final const val androidx.savedstate/DEFAULT_FLOAT // androidx.savedstate/DEFAULT_FLOAT|{}DEFAULT_FLOAT[0]
-    final fun <get-DEFAULT_FLOAT>(): kotlin/Float // androidx.savedstate/DEFAULT_FLOAT.<get-DEFAULT_FLOAT>|<get-DEFAULT_FLOAT>(){}[0]
-final const val androidx.savedstate/DEFAULT_INT // androidx.savedstate/DEFAULT_INT|{}DEFAULT_INT[0]
-    final fun <get-DEFAULT_INT>(): kotlin/Int // androidx.savedstate/DEFAULT_INT.<get-DEFAULT_INT>|<get-DEFAULT_INT>(){}[0]
-final const val androidx.savedstate/DEFAULT_LONG // androidx.savedstate/DEFAULT_LONG|{}DEFAULT_LONG[0]
-    final fun <get-DEFAULT_LONG>(): kotlin/Long // androidx.savedstate/DEFAULT_LONG.<get-DEFAULT_LONG>|<get-DEFAULT_LONG>(){}[0]
-
 final fun <#A: kotlin/Any> (androidx.savedstate/SavedStateRegistryOwner).androidx.savedstate.serialization/saved(kotlinx.serialization/KSerializer<#A>, kotlin/String? = ..., androidx.savedstate.serialization/SavedStateConfiguration = ..., kotlin/Function0<#A>): kotlin.properties/ReadWriteProperty<kotlin/Any?, #A> // androidx.savedstate.serialization/saved|saved@androidx.savedstate.SavedStateRegistryOwner(kotlinx.serialization.KSerializer<0:0>;kotlin.String?;androidx.savedstate.serialization.SavedStateConfiguration;kotlin.Function0<0:0>){0§<kotlin.Any>}[0]
 final fun <#A: kotlin/Any> androidx.savedstate.serialization/decodeFromSavedState(kotlinx.serialization/DeserializationStrategy<#A>, androidx.savedstate/SavedState, androidx.savedstate.serialization/SavedStateConfiguration = ...): #A // androidx.savedstate.serialization/decodeFromSavedState|decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<0:0>;androidx.savedstate.SavedState;androidx.savedstate.serialization.SavedStateConfiguration){0§<kotlin.Any>}[0]
 final fun <#A: kotlin/Any> androidx.savedstate.serialization/encodeToSavedState(kotlinx.serialization/SerializationStrategy<#A>, #A, androidx.savedstate.serialization/SavedStateConfiguration = ...): androidx.savedstate/SavedState // androidx.savedstate.serialization/encodeToSavedState|encodeToSavedState(kotlinx.serialization.SerializationStrategy<0:0>;0:0;androidx.savedstate.serialization.SavedStateConfiguration){0§<kotlin.Any>}[0]
