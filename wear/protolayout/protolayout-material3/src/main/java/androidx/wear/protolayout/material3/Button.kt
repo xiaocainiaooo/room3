@@ -105,7 +105,7 @@ public fun MaterialScope.iconButton(
 ): LayoutElement =
     buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.containerColor, corner = shape),
+        modifier = modifier.background(colors.containerColor).clip(shape),
         width = width,
         height = height,
         contentPadding = contentPadding,
@@ -172,7 +172,7 @@ public fun MaterialScope.textButton(
 ): LayoutElement =
     buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.containerColor, corner = shape),
+        modifier = modifier.background(colors.containerColor).clip(shape),
         width = width,
         height = height,
         contentPadding = contentPadding,
@@ -256,7 +256,7 @@ public fun MaterialScope.button(
 ): LayoutElement =
     buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.containerColor, corner = shape),
+        modifier = modifier.background(colors.containerColor).clip(shape),
         width = width,
         height = height,
         backgroundContent = backgroundContent,
@@ -369,7 +369,7 @@ public fun MaterialScope.avatarButton(
         }
     return buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.containerColor, corner = shape),
+        modifier = modifier.background(colors.containerColor).clip(shape),
         width = expand(),
         height = height,
         contentPadding = contentPadding,
@@ -526,7 +526,7 @@ public fun MaterialScope.compactButton(
             // The actual visible part of compact button
             componentContainer(
                 onClick = onClick,
-                modifier = modifier.background(color = colors.containerColor, corner = shape),
+                modifier = modifier.background(colors.containerColor).clip(shape),
                 width = width,
                 height = dp(COMPACT_BUTTON_HEIGHT_DP),
                 contentPadding = contentPadding,
