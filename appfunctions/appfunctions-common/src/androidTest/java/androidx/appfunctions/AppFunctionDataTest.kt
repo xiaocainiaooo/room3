@@ -446,6 +446,17 @@ class AppFunctionDataTest {
     }
 
     @Test
+    fun testSerialize_withQualifiedName() {
+        val note = Note(title = "Test Title", attachment = Attachment(uri = "Test Uri"))
+
+        val data = AppFunctionData.serialize(note, "androidx.appfunctions.Note")
+
+        Truth.assertThat(data.getString("title")).isEqualTo("Test Title")
+        Truth.assertThat(data.getAppFunctionData("attachment").getString("uri"))
+            .isEqualTo("Test Uri")
+    }
+
+    @Test
     fun testDeserialize() {
         val data =
             AppFunctionData.Builder("androidx.appfunctions.Note")
@@ -459,6 +470,25 @@ class AppFunctionDataTest {
                 .build()
 
         val note = data.deserialize(Note::class.java)
+
+        Truth.assertThat(note.title).isEqualTo("Test Title")
+        Truth.assertThat(note.attachment.uri).isEqualTo("Test Uri")
+    }
+
+    @Test
+    fun testDeserialize_withQualifiedName() {
+        val data =
+            AppFunctionData.Builder("androidx.appfunctions.Note")
+                .setString("title", "Test Title")
+                .setAppFunctionData(
+                    "attachment",
+                    AppFunctionData.Builder("androidx.appfunctions.Attachment")
+                        .setString("uri", "Test Uri")
+                        .build()
+                )
+                .build()
+
+        val note = data.deserialize<Note>("androidx.appfunctions.Note")
 
         Truth.assertThat(note.title).isEqualTo("Test Title")
         Truth.assertThat(note.attachment.uri).isEqualTo("Test Uri")

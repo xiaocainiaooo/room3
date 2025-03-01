@@ -375,6 +375,21 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
         }
     }
 
+    /**
+     * Deserializes the [AppFunctionData] to an [AppFunctionSerializable] instance identified by
+     * [qualifiedName].
+     *
+     * @param qualifiedName The qualifiedName of the AppFunctionSerializable class.
+     * @return The instance of the class identified by [qualifiedName].
+     * @throws IllegalArgumentException If unable to deserialize the [AppFunctionData] to an
+     *   instance of the class identified by [qualifiedName].
+     * @see [AppFunctionSerializable]
+     */
+    @RestrictTo(LIBRARY_GROUP)
+    public fun <T : Any> deserialize(qualifiedName: String): T {
+        return deserialize<T>(getSerializableClass(qualifiedName))
+    }
+
     private fun <T : Any> unsafeGetProperty(key: String, arrayClass: Class<T>): T? {
         return try {
             val value = genericDocument.getProperty(key)
@@ -483,6 +498,17 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
         private fun extrasKey(key: String, index: Int) = "property/$key[$index]"
 
         // TODO: Codegen the mapping table to prevent using reflection
+        private fun <T : Any> getSerializableClass(qualifiedName: String): Class<T> {
+            return try {
+                @Suppress("UNCHECKED_CAST")
+                Class.forName(qualifiedName) as Class<T>
+            } catch (e: Exception) {
+                Log.d(APP_FUNCTIONS_TAG, "Unable to find serializable class $qualifiedName", e)
+                throw IllegalArgumentException("Unable to find serializable class $qualifiedName")
+            }
+        }
+
+        // TODO: Codegen the mapping table to prevent using reflection
         private fun <T : Any> getSerializableFactory(
             serializableClass: Class<T>
         ): AppFunctionSerializableFactory<T> {
@@ -537,6 +563,21 @@ internal constructor(internal val genericDocument: GenericDocument, internal val
                     "Unable to serialize $serializableClass. Is the class annotated with @AppFunctionSerializable?"
                 )
             }
+        }
+
+        /**
+         * Serializes [serializable] to an [AppFunctionData].
+         *
+         * @param serializable The instance of [qualifiedName].
+         * @param qualifiedName The qualified name of the class [serializable].
+         * @return [AppFunctionData] with properties from [serializable].
+         * @throws IllegalArgumentException If unable to serialize [serializable] to an
+         *   [AppFunctionData].
+         * @see [AppFunctionSerializable]
+         */
+        @RestrictTo(LIBRARY_GROUP)
+        public fun <T : Any> serialize(serializable: T, qualifiedName: String): AppFunctionData {
+            return serialize(serializable, getSerializableClass<T>(qualifiedName))
         }
 
         /** Represents an empty [AppFunctionData]. */

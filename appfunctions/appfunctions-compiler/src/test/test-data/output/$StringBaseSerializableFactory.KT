@@ -14,10 +14,10 @@ public class `$StringBaseSerializableFactory` :
     return StringBaseSerializable(name)
   }
 
-  override fun toAppFunctionData(stringBaseSerializable: StringBaseSerializable): AppFunctionData {
+  override fun toAppFunctionData(appFunctionSerializable: StringBaseSerializable): AppFunctionData {
 
     val builder = AppFunctionData.Builder("com.testdata.StringBaseSerializable")
-    builder.setString("name", stringBaseSerializable.name)
+    builder.setString("name", appFunctionSerializable.name)
 
     return builder.build()
   }
