@@ -85,6 +85,7 @@ package androidx.tracing.driver {
 
   public abstract class TraceSink implements java.lang.AutoCloseable {
     ctor public TraceSink();
+    method public abstract void close();
     method public abstract void enqueue(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
     method public abstract void flush();
   }

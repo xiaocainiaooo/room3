@@ -16,7 +16,7 @@
 
 package androidx.tracing.driver
 
-/** Represents a track for a Thread like construct in Perfetto. */
+/** [Track] representing a `Thread` in the specified [ProcessTrack]. */
 public open class ThreadTrack(
     /** The thread id. */
     internal val id: Int,

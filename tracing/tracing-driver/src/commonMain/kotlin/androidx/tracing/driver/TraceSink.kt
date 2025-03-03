@@ -16,17 +16,42 @@
 
 package androidx.tracing.driver
 
-/** A sink that we can write [PooledTracePacketArray]s to. */
+/**
+ * Receives [PooledTracePacketArray]s from [Track]s and asynchronously serializes them to a file or
+ * buffer, depending on implementation.
+ *
+ * Note that while serialized trace events are typically written as [Perfetto TracePacket protos] so
+ * that they may be read by [ui.perfetto.dev](https://ui.perfetto.dev/) and queried with the
+ * corresponding `TraceProcessor` tools, the final serialization format is up to the TraceSink's
+ * implementation.
+ */
 public abstract class TraceSink : AutoCloseable {
+    /**
+     * Enqueue a [PooledTracePacketArray] to be written to the trace.
+     *
+     * This function may be called from any thread.
+     */
     public abstract fun enqueue(pooledPacketArray: PooledTracePacketArray)
 
+    /**
+     * Flush any enqueued trace events to the [TraceSink].
+     *
+     * This function may be called from any thread.
+     */
     public abstract fun flush()
+
+    /**
+     * Close the [TraceSink], completing any enqueued writes.
+     *
+     * This function may be called from any thread.
+     */
+    public abstract override fun close()
 }
 
-/** An empty trace sink that does nothing. */
+/** An empty trace sink that writes nowhere. */
 internal class EmptyTraceSink : TraceSink() {
     override fun enqueue(pooledPacketArray: PooledTracePacketArray) {
-        // Does nothing
+        pooledPacketArray.recycle()
     }
 
     override fun flush() {
