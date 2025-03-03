@@ -232,14 +232,20 @@ class PaneMotionData internal constructor() {
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@VisibleForTesting
 internal val PaneMotionData.targetLeft
     get() = targetPosition.x
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@VisibleForTesting
 internal val PaneMotionData.targetRight
     get() = targetPosition.x + targetSize.width
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+internal val PaneMotionData.targetTop
+    get() = targetPosition.y
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+internal val PaneMotionData.targetBottom
+    get() = targetPosition.y + targetSize.height
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @VisibleForTesting
