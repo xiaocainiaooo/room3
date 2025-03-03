@@ -19,37 +19,88 @@ package androidx.tracing.driver
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.withContext
 
-/** Entities that we can attach traces to to be visualized on the timeline with slices & flows. */
+/**
+ * Horizontal track of time in a trace which contains slice events (`beginSection` / `endSection`).
+ */
 public abstract class SliceTrack(
     /** The [TraceContext] instance. */
     context: TraceContext,
-    /** The uuid for the track descriptor. */
+    /**
+     * The uuid for the track descriptor.
+     *
+     * This ID must be unique within all [Track]s in a given trace produced by [TraceDriver] - it is
+     * used to connect recorded trace events to the containing track.
+     */
     uuid: Long
 ) : Track(context = context, uuid = uuid) {
-    public open fun beginSection(name: String, flowIds: List<Long>) {
-        if (context.isEnabled) {
-            emitTraceEvent { event -> event.setBeginSectionWithFlows(uuid, name, flowIds) }
-        }
-    }
 
+    /**
+     * Writes a trace message indicating that a given section of code has begun.
+     *
+     * Should be followed by a corresponding call to [endSection] on the same [SliceTrack]. If a
+     * corresponding [endSection] is missing, the section will be present in the trace, but
+     * non-terminating (generally shown as fading out to the left).
+     *
+     * @param name The name of the code section to appear in the trace.
+     */
     public open fun beginSection(name: String) {
         if (context.isEnabled) {
             emitTraceEvent { event -> event.setBeginSection(uuid, name) }
         }
     }
 
+    /**
+     * Writes a trace message indicating that a given section of code has begun.
+     *
+     * Should be followed by a corresponding call to [endSection] on the same [SliceTrack]. If a
+     * corresponding [endSection] is missing, the section will be present in the trace, but
+     * non-terminating (generally shown as fading out to the left).
+     *
+     * @param name The name of the code section to appear in the trace.
+     * @param flowIds A list of [Long]s which will connect this trace section to other sections in
+     *   the trace, potentially on different Tracks. The start and end of each trace `flow`
+     *   (connection) between trace sections must share an ID, so each `Long` must be unique to each
+     *   `flow` in the trace.
+     */
+    public open fun beginSection(name: String, flowIds: List<Long>) {
+        if (context.isEnabled) {
+            emitTraceEvent { event -> event.setBeginSectionWithFlows(uuid, name, flowIds) }
+        }
+    }
+
+    /**
+     * Writes a trace message indicating that a given section of code has ended.
+     *
+     * Must be preceded by a corresponding call to [beginSection] on the same [SliceTrack]. Any
+     * un-paired calls to [endSection] are ignored when the trace is displayed.
+     */
     public open fun endSection() {
         if (context.isEnabled) {
             emitTraceEvent { event -> event.setEndSection(uuid) }
         }
     }
 
+    /**
+     * Writes a zero duration section to the [SliceTrack].
+     *
+     * Similar to calling:
+     * ```
+     * beginSection(name)
+     * endSection()
+     * ```
+     *
+     * Except it is faster to write, and guaranteed zero duration.
+     */
     public open fun instant(name: String) {
         if (context.isEnabled) {
             emitTraceEvent { event -> event.setInstant(uuid, name) }
         }
     }
 
+    /**
+     * Traces the [block] as a named section of code in the trace - this is one of the primary entry
+     * points for tracing synchronous blocks of code.
+     */
     public inline fun <T> trace(name: String, crossinline block: () -> T): T {
         beginSection(name)
         try {

@@ -19,6 +19,7 @@ package androidx.tracing.driver.wire
 import androidx.annotation.GuardedBy
 import androidx.tracing.driver.PooledTracePacketArray
 import androidx.tracing.driver.Queue
+import androidx.tracing.driver.TraceEvent
 import androidx.tracing.driver.TraceSink
 import com.squareup.wire.ProtoWriter
 import kotlin.coroutines.Continuation
@@ -31,10 +32,38 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import okio.BufferedSink
 
-/** The trace sink that writes to a new file per trace session. */
+/**
+ * The trace sink that writes [BufferedSink], to a new file per trace session.
+ *
+ * This implementation converts [TraceEvent]s into binary protos using
+ * [the Wire library](https://square.github.io/wire/).
+ *
+ * The outputs created by `WireTraceSync` can be visualized with
+ * [ui.perfetto.dev](https://ui.perfetto.dev/), and queried by
+ * [TraceProcessor](https://developer.android.com/reference/androidx/benchmark/traceprocessor/TraceProcessor)
+ * from the `androidx.benchmark:benchmark-traceprocessor` library, the
+ * [C++](https://perfetto.dev/docs/analysis/trace-processor) tool it's built on, or the
+ * [Python](https://perfetto.dev/docs/analysis/trace-processor-python) wrapper.
+ *
+ * As binary protos embed strings as UTF-8, note that any strings serialized by WireTraceSink will
+ * be serialized as UTF-8.
+ *
+ * To create a WireTraceSink for a File, you can use `File("myFile").appendingSink().buffer()`.
+ */
 public class WireTraceSink(
+    /**
+     * ID which uniquely identifies the trace capture system, within which uuids are guaranteed to
+     * be unique.
+     *
+     * This is only relevant when merging traces across multiple sources (e.g. combining the trace
+     * output of this library with a trace captured on Android with Perfetto).
+     */
     sequenceId: Int,
+
+    /** Output [BufferedSink] the trace will be written to. */
     private val bufferedSink: BufferedSink,
+
+    /** Coroutine context to execute the serialization on. */
     private val coroutineContext: CoroutineContext = Dispatchers.IO
 ) : TraceSink() {
     private val wireTraceEventSerializer =

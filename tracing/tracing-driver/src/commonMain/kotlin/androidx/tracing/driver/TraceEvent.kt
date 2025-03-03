@@ -43,12 +43,17 @@ internal constructor(
     @field:Suppress("MutableBareField") // public / mutable to minimize overhead
     @JvmField
     public var type: Int,
+    /** Set to the value of the containing [Track]'s [Track.uuid]. */
     @field:Suppress("MutableBareField") // public / mutable to minimize overhead
     @JvmField
     public var trackUuid: Long,
+
+    /** Timestamp in nanoseconds of the trace event. */
     @field:Suppress("MutableBareField") // public / mutable to minimize overhead
     @JvmField
     public var timestamp: Long,
+
+    /** Name of the trace event - null if the event [type] is [TRACE_EVENT_TYPE_COUNTER]. */
     @field:Suppress("MutableBareField") // public / mutable to minimize overhead
     @JvmField
     public var name: String?,
@@ -56,8 +61,20 @@ internal constructor(
         "MutableBareField", // public / mutable to minimize overhead
         "AutoBoxing", // temporary
     )
+
+    /**
+     * Value of the trace event if the event [type] is [TRACE_EVENT_TYPE_COUNTER].
+     *
+     * Note that only one of [counterDoubleValue] and [counterLongValue] may be set.
+     */
     @JvmField
     public var counterDoubleValue: Double?,
+
+    /**
+     * Value of the trace event if the event [type] is [TRACE_EVENT_TYPE_COUNTER].
+     *
+     * Note that only one of [counterDoubleValue] and [counterLongValue] may be set.
+     */
     @field:Suppress(
         "MutableBareField", // public / mutable to minimize overhead
         "AutoBoxing", // temporary
@@ -65,10 +82,16 @@ internal constructor(
     @JvmField
     public var counterLongValue: Long?,
 
+    /** List of trace flows associated with this event. */
     // ideally this would be a array to avoid boxing, but proto libs consume longs anyway :|
     @field:Suppress("MutableBareField") // public / mutable to minimize overhead
     @JvmField
     public var flowIds: List<Long>,
+
+    /**
+     * If not null, this TraceEvent initializes a track, and the [TrackDescriptor] defines its
+     * properties.
+     */
     @field:Suppress("MutableBareField") // public / mutable to minimize overhead
     @JvmField
     public var trackDescriptor: TrackDescriptor?,

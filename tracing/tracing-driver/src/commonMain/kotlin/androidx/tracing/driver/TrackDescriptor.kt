@@ -22,15 +22,27 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACK_DESCRIPTOR_TYPE_THREAD: Int = 2
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val TRACK_DESCRIPTOR_TYPE_PROCESS: Int = 3
 
+/** Low level representation of a Track, written once to the Trace. */
 public class TrackDescriptor(
+    /** Display name of the Track in the trace. */
     public var name: String,
+    /**
+     * Unique ID of the Track - each corresponding [TraceEvent] in the trace will set
+     * [TraceEvent.trackUuid] to this value.
+     */
     public var uuid: Long,
+    /**
+     * If set, this Track will be nested inside of the parent track (for example, when a
+     * [ThreadTrack] is a child of a [ProcessTrack]).
+     */
     public var parentUuid: Long,
     /**
      * One of [TRACK_DESCRIPTOR_TYPE_THREAD], [TRACK_DESCRIPTOR_TYPE_COUNTER],
      * [TRACK_DESCRIPTOR_TYPE_PROCESS]
      */
     public var type: Int,
+    /** If type == [TRACK_DESCRIPTOR_TYPE_PROCESS], represents the PID of the process. */
     public var pid: Int,
+    /** If type == [TRACK_DESCRIPTOR_TYPE_THREAD], represents the TID of the thread. */
     public var tid: Int,
 )
