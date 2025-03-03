@@ -233,12 +233,11 @@ public object IBinderSerializer : KSerializer<IBinder> {
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
  *
- * @sample androidx.savedstate.charSequenceArraySerializer
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public object CharSequenceArraySerializer : KSerializer<Array<CharSequence>> {
+internal object CharSequenceArraySerializer : KSerializer<Array<CharSequence>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.Array<kotlin.CharSequence>")
 
@@ -265,12 +264,11 @@ public object CharSequenceArraySerializer : KSerializer<Array<CharSequence>> {
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
  *
- * @sample androidx.savedstate.parcelableArraySerializer
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public object ParcelableArraySerializer : KSerializer<Array<Parcelable>> {
+internal object ParcelableArraySerializer : KSerializer<Array<Parcelable>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.Array<android.os.Parcelable>")
 
@@ -297,12 +295,11 @@ public object ParcelableArraySerializer : KSerializer<Array<Parcelable>> {
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
  *
- * @sample androidx.savedstate.charSequenceListSerializer
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public object CharSequenceListSerializer : KSerializer<List<CharSequence>> {
+internal object CharSequenceListSerializer : KSerializer<List<CharSequence>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.collections.List<kotlin.CharSequence>")
 
@@ -328,12 +325,11 @@ public object CharSequenceListSerializer : KSerializer<List<CharSequence>> {
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
  *
- * @sample androidx.savedstate.parcelableListSerializer
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public object ParcelableListSerializer : KSerializer<List<Parcelable>> {
+internal object ParcelableListSerializer : KSerializer<List<Parcelable>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("kotlin.collections.List<android.os.Parcelable>")
 

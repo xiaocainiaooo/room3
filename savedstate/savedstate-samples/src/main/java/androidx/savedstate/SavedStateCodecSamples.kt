@@ -24,13 +24,9 @@ import androidx.annotation.Sampled
 import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
-import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
-import androidx.savedstate.serialization.serializers.CharSequenceListSerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
 import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
-import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
-import androidx.savedstate.serialization.serializers.ParcelableListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
@@ -207,42 +203,6 @@ fun iBinderSerializer() {
     @Serializable
     data class MyModel(
         @Serializable(with = IBinderSerializer::class) val binder: android.os.IBinder
-    )
-}
-
-@Sampled
-fun charSequenceArraySerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = CharSequenceArraySerializer::class)
-        val charSequenceArray: Array<CharSequence>
-    )
-}
-
-@Sampled
-fun parcelableArraySerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = ParcelableArraySerializer::class)
-        val parcelableArray: Array<android.os.Parcelable>
-    )
-}
-
-@Sampled
-fun charSequenceListSerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = CharSequenceListSerializer::class)
-        val charSequenceList: List<CharSequence>
-    )
-}
-
-@Sampled
-fun parcelableListSerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = ParcelableListSerializer::class)
-        val parcelableList: List<android.os.Parcelable>
     )
 }
 
