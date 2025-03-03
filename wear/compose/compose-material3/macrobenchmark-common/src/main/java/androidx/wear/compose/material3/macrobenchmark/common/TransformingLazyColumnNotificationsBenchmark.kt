@@ -19,61 +19,66 @@ package androidx.wear.compose.material3.macrobenchmark.common
 import android.os.SystemClock
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.lazy.scrollTransform
+import androidx.wear.compose.material3.TitleCard
+import androidx.wear.compose.material3.lazy.rememberResponsiveTransformationSpec
 
 val TransformingLazyColumnNotificationsBenchmark =
     object : MacrobenchmarkScreen {
         override val content: @Composable (BoxScope.() -> Unit)
             get() = {
                 val state = rememberTransformingLazyColumnState()
+                val transformationSpec = rememberResponsiveTransformationSpec()
                 AppScaffold {
-                    ScreenScaffold(
-                        state,
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
-                    ) { contentPadding ->
+                    ScreenScaffold(state) { contentPadding ->
                         TransformingLazyColumn(
+                            state = state,
                             contentPadding = contentPadding,
                             modifier =
-                                Modifier.padding(horizontal = 10.dp).semantics {
-                                    contentDescription = CONTENT_DESCRIPTION
-                                },
+                                Modifier.semantics { contentDescription = CONTENT_DESCRIPTION },
                         ) {
-                            item { ListHeader { Text("Notifications") } }
-                            items(5_000) { index ->
-                                val notification = notificationList[index % notificationList.size]
-                                Column(
+                            item {
+                                ListHeader(
+                                    transformation = SurfaceTransformation(transformationSpec),
                                     modifier =
-                                        Modifier.scrollTransform(
-                                                this@items,
-                                                backgroundColor = Color.DarkGray,
-                                                shape = RoundedCornerShape(20.dp)
-                                            )
-                                            .padding(10.dp)
+                                        Modifier.transformedHeight(
+                                            transformationSpec::getTransformedHeight
+                                        )
                                 ) {
-                                    Text(
-                                        notification.title,
-                                        fontWeight = FontWeight.Bold,
-                                        style = MaterialTheme.typography.labelLarge,
+                                    Text("Notifications")
+                                }
+                            }
+                            items(50_000) { index ->
+                                val notification = notificationList[index % notificationList.size]
+                                TransformExclusion {
+                                    TitleCard(
+                                        onClick = {},
+                                        title = {
+                                            Text(
+                                                notification.title,
+                                                fontWeight = FontWeight.Bold,
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        },
+                                        subtitle = { Text(notification.body) },
+                                        transformation = SurfaceTransformation(transformationSpec),
+                                        modifier =
+                                            Modifier.transformedHeight(
+                                                transformationSpec::getTransformedHeight
+                                            )
                                     )
-                                    Text(notification.body)
                                 }
                             }
                         }
@@ -84,12 +89,12 @@ val TransformingLazyColumnNotificationsBenchmark =
         override val exercise: MacrobenchmarkScope.() -> Unit
             get() = {
                 val swipeStartY = device.displayHeight * 9 / 10 // scroll up
-                val swipeEndY = device.displayHeight / 2
+                val swipeEndY = device.displayHeight / 10
                 val midX = device.displayWidth / 2
                 repeat(20) {
-                    device.swipe(midX, swipeStartY, midX, swipeEndY, 5)
+                    device.swipe(midX, swipeStartY, midX, swipeEndY, 2)
                     device.waitForIdle()
-                    SystemClock.sleep(500)
+                    SystemClock.sleep(30)
                 }
             }
     }
