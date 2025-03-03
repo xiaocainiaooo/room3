@@ -21,6 +21,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
+import androidx.benchmark.Arguments
 import androidx.benchmark.DeviceInfo.deviceSummaryString
 import androidx.benchmark.Shell
 import androidx.benchmark.inMemoryTrace
@@ -468,18 +469,22 @@ class PerfettoHelper(
             }
         }
 
-        fun cleanupPerfettoState() {
-            listOf("perfetto", "tracebox").forEach { processName ->
-                Shell.killProcessesAndWait(
-                    processName,
-                    waitPollPeriodMs = PERFETTO_KILL_WAIT_TIME_MS,
-                    waitPollMaxCount = PERFETTO_KILL_WAIT_CLEAN_COUNT,
-                    onFailure = { errorMessage ->
-                        // Failing to kill perfetto processes we don't own is non-fatal, as shell
-                        // may not have permission to kill them
-                        Log.d(LOG_TAG, errorMessage)
-                    }
-                )
+        fun cleanupPerfettoState(
+            killExistingPerfettoRecordings: Boolean = Arguments.killExistingPerfettoRecordings
+        ) {
+            if (killExistingPerfettoRecordings) {
+                listOf("perfetto", "tracebox").forEach { processName ->
+                    Shell.killProcessesAndWait(
+                        processName,
+                        waitPollPeriodMs = PERFETTO_KILL_WAIT_TIME_MS,
+                        waitPollMaxCount = PERFETTO_KILL_WAIT_CLEAN_COUNT,
+                        onFailure = { errorMessage ->
+                            // Failing to kill perfetto processes we don't own is non-fatal, as
+                            // shell may not have permission to kill them
+                            Log.d(LOG_TAG, errorMessage)
+                        }
+                    )
+                }
             }
 
             // Have seen cases where bundled Perfetto crashes, and leaves ftrace enabled,
