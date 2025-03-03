@@ -130,7 +130,8 @@ fun VerticalDragHandle(
  * Specifies the colors that will be used in a drag handle in different states.
  *
  * @param color the default color of the drag handle when it's not being pressed.
- * @param pressedColor the color of the drag handle when it's being pressed.
+ * @param pressedColor the color of the drag handle when it's being pressed but not dragged, by
+ *   default it will be the same as [draggedColor].
  * @param draggedColor the color of the drag handle when it's being dragged.
  */
 @Immutable
@@ -156,7 +157,8 @@ class DragHandleColors(val color: Color, val pressedColor: Color, val draggedCol
  * Specifies the shapes that will be used in a drag handle in different states.
  *
  * @param shape the default shape of the drag handle when it's not being pressed.
- * @param pressedShape the shape of the drag handle when it's being pressed.
+ * @param pressedShape the shape of the drag handle when it's being pressed but not dragged, by
+ *   default it will be the same as [draggedShape].
  * @param draggedShape the shape of the drag handle when it's being dragged.
  */
 @Immutable
@@ -182,7 +184,8 @@ class DragHandleShapes(val shape: Shape, val pressedShape: Shape, val draggedSha
  * Specifies the sizes that will be used in a drag handle in different states.
  *
  * @param size the default size of the drag handle when it's not being pressed.
- * @param pressedSize the size of the drag handle when it's being pressed.
+ * @param pressedSize the size of the drag handle when it's being pressed but not dragged, by
+ *   default it will be the same as [draggedSize].
  * @param draggedSize the size of the drag handle when it's being dragged.
  */
 @Immutable
@@ -219,7 +222,7 @@ object VerticalDragHandleDefaults {
      * @param color provides a different color to override the default color of the drag handle when
      *   it's not being pressed.
      * @param pressedColor provides a different color to override the color of the drag handle when
-     *   it's being pressed.
+     *   it's being pressed but not dragged.
      * @param draggedColor provides a different color to override the color of the drag handle when
      *   it's being dragged.
      */
@@ -250,7 +253,7 @@ object VerticalDragHandleDefaults {
      * @param shape provides a different shape to override the default shape of the drag handle when
      *   it's not being pressed.
      * @param pressedShape provides a different shape to override the shape of the drag handle when
-     *   it's being pressed.
+     *   it's being pressed but not dragged.
      * @param draggedShape provides a different shape to override the shape of the drag handle when
      *   it's being dragged.
      */
@@ -275,7 +278,7 @@ object VerticalDragHandleDefaults {
      * @param size provides a different size to override the default size of the drag handle when
      *   it's not being pressed.
      * @param pressedSize provides a different size to override the size of the drag handle when
-     *   it's being pressed.
+     *   it's being pressed but not dragged.
      * @param draggedSize provides a different size to override the size of the drag handle when
      *   it's being dragged.
      */
