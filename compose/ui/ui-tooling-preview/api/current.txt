@@ -36,6 +36,13 @@ package androidx.compose.ui.tooling.preview {
     property public static String PIXEL_7;
     property public static String PIXEL_7A;
     property public static String PIXEL_7_PRO;
+    property public static String PIXEL_8;
+    property public static String PIXEL_8A;
+    property public static String PIXEL_8_PRO;
+    property public static String PIXEL_9;
+    property public static String PIXEL_9_PRO;
+    property public static String PIXEL_9_PRO_FOLD;
+    property public static String PIXEL_9_PRO_XL;
     property public static String PIXEL_C;
     property public static String PIXEL_FOLD;
     property public static String PIXEL_TABLET;
@@ -78,6 +85,13 @@ package androidx.compose.ui.tooling.preview {
     field public static final String PIXEL_7 = "id:pixel_7";
     field public static final String PIXEL_7A = "id:pixel_7a";
     field public static final String PIXEL_7_PRO = "id:pixel_7_pro";
+    field public static final String PIXEL_8 = "id:pixel_8";
+    field public static final String PIXEL_8A = "id:pixel_8a";
+    field public static final String PIXEL_8_PRO = "id:pixel_8_pro";
+    field public static final String PIXEL_9 = "id:pixel_9";
+    field public static final String PIXEL_9_PRO = "id:pixel_9_pro";
+    field public static final String PIXEL_9_PRO_FOLD = "id:pixel_9_pro_fold";
+    field public static final String PIXEL_9_PRO_XL = "id:pixel_9_pro_xl";
     field public static final String PIXEL_C = "id:pixel_c";
     field public static final String PIXEL_FOLD = "id:pixel_fold";
     field public static final String PIXEL_TABLET = "id:pixel_tablet";
