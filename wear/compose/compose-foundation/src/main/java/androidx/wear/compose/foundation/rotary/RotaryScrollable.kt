@@ -422,7 +422,9 @@ internal class ScalingLazyColumnRotarySnapLayoutInfoProvider(
     override val averageItemSize: Float
         get() {
             val visibleItems = scrollableState.layoutInfo.visibleItemsInfo
-            return (visibleItems.fastSumBy { it.unadjustedSize } / visibleItems.size).toFloat()
+            return if (visibleItems.isNotEmpty()) {
+                (visibleItems.fastSumBy { it.unadjustedSize } / visibleItems.size).toFloat()
+            } else 0f
         }
 
     /** Current (centered) item index */
@@ -804,7 +806,8 @@ internal class RotarySnapHandler(
             snapTarget = layoutInfoProvider.currentItemIndex + moveForElements
         }
         snapTargetUpdated = true
-        snapTarget = snapTarget.coerceIn(0 until layoutInfoProvider.totalItemCount)
+        snapTarget =
+            snapTarget.coerceIn(0..(layoutInfoProvider.totalItemCount - 1).coerceAtLeast(0))
         debugLog { "Snap target updated to $snapTarget, moveForElements: $moveForElements" }
     }
 
