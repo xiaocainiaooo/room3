@@ -18,6 +18,7 @@ package androidx.health.connect.client.permission
 import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.BasalBodyTemperatureRecord
 import androidx.health.connect.client.records.BasalMetabolicRateRecord
@@ -191,12 +192,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_WRITE_MEDICAL_DATA = PERMISSION_PREFIX + "WRITE_MEDICAL_DATA"
 
         /**
@@ -204,12 +205,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_ALLERGIES_INTOLERANCES =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_ALLERGIES_INTOLERANCES"
 
@@ -218,12 +219,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_CONDITIONS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_CONDITIONS"
 
@@ -232,12 +233,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_LABORATORY_RESULTS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_LABORATORY_RESULTS"
 
@@ -246,12 +247,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_MEDICATIONS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_MEDICATIONS"
 
@@ -264,12 +265,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_PERSONAL_DETAILS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_PERSONAL_DETAILS"
 
@@ -281,12 +282,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_PRACTITIONER_DETAILS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_PRACTITIONER_DETAILS"
 
@@ -295,12 +296,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_PREGNANCY =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_PREGNANCY"
 
@@ -309,12 +310,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_PROCEDURES =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_PROCEDURES"
 
@@ -323,12 +324,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_SOCIAL_HISTORY =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_SOCIAL_HISTORY"
 
@@ -337,12 +338,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_VACCINES =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_VACCINES"
 
@@ -354,12 +355,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_VISITS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_VISITS"
 
@@ -368,12 +369,12 @@ public class HealthPermission internal constructor() {
          *
          * This feature is dependent on the version of HealthConnect installed on the device. To
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+         * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. If not available,
+         * this permission will not be granted if requested.
          *
          * @sample androidx.health.connect.client.samples.RequestMedicalPermissions
          */
-        // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @ExperimentalPersonalHealthRecordApi
         const val PERMISSION_READ_MEDICAL_DATA_VITAL_SIGNS =
             PERMISSION_PREFIX + "READ_MEDICAL_DATA_VITAL_SIGNS"
 
@@ -578,6 +579,7 @@ public class HealthPermission internal constructor() {
          *
          * @return A list of permissions as Strings
          */
+        @OptIn(ExperimentalPersonalHealthRecordApi::class)
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @JvmField
         public val ALL_PERSONAL_HEALTH_RECORD_PERMISSIONS: List<String> = buildList {

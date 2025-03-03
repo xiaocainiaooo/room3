@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.Sampled
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_HISTORY
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
@@ -104,6 +105,7 @@ suspend fun GetPermissions(permissionController: PermissionController) {
     }
 }
 
+@OptIn(ExperimentalPersonalHealthRecordApi::class)
 @Sampled
 fun RequestMedicalPermissions(features: HealthConnectFeatures, activity: ActivityResultCaller) {
     // The set of medical permissions to be requested (add additional read permissions as required)
