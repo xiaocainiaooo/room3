@@ -54,7 +54,7 @@ class QualityAddedEncoderProfilesProviderTest {
                 DEFAULT_DURATION,
                 DEFAULT_OUTPUT_FORMAT,
                 listOf(createFakeAudioProfileProxy()),
-                listOf(createFakeVideoProfileProxy(RESOLUTION_480P.width, RESOLUTION_480P.height)),
+                listOf(createFakeVideoProfileProxy(RESOLUTION_480P)),
             )
         val quirks = Quirks(listOf(FakeQuirk(mapOf(QUALITY_480P to encoderProfiles))))
         val cameraInfo = FakeCameraInfoInternal()
