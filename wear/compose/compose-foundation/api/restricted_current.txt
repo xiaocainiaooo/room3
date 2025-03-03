@@ -370,6 +370,7 @@ package androidx.wear.compose.foundation {
     method public float getOffset();
     method public androidx.wear.compose.foundation.SwipeToDismissValue getTargetValue();
     method public boolean isAnimationRunning();
+    method public float requireOffset();
     method public suspend Object? snapTo(androidx.wear.compose.foundation.SwipeToDismissValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public androidx.wear.compose.foundation.SwipeToDismissValue currentValue;
     property public boolean isAnimationRunning;
