@@ -148,7 +148,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
     private val visiblePages: Range<Int>
-        get() = pageLayoutManager?.visiblePages?.value ?: Range(0, 0)
+        get() = pageLayoutManager?.visiblePages?.value?.pages ?: Range(0, 0)
 
     private val fullyVisiblePages: Range<Int>
         get() = pageLayoutManager?.fullyVisiblePages?.value ?: Range(0, 0)
@@ -208,7 +208,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private var pageLayoutManager: PageLayoutManager? = null
     private var pageManager: PageManager? = null
-    private var visiblePagesCollector: Job? = null
     private var layoutInfoCollector: Job? = null
     private var pageSignalCollector: Job? = null
     private var selectionStateCollector: Job? = null
@@ -263,7 +262,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     GestureTracker.Gesture.DRAG,
                     GestureTracker.Gesture.DRAG_X,
                     GestureTracker.Gesture.DRAG_Y
-                ) || isFling || doubleTapAnimator?.isRunning == true
+                ) ||
+                    isFling ||
+                    doubleTapAnimator?.isRunning == true ||
+                    fastScrollGestureDetector?.trackingFastScrollGesture == true
             return !zoomIsChanging && !scrollIsChanging
         }
 
@@ -749,16 +751,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     launch {
                         manager.dimensions.collect { onPageDimensionsReceived(it.first, it.second) }
                     }
-                    launch { manager.visiblePages.collect { maybeUpdatePageVisibility() } }
-                }
-            // Don't let two copies of this run concurrently
-            val visiblePagesToJoin = visiblePagesCollector?.apply { cancel() }
-            visiblePagesCollector =
-                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    manager.visiblePages.collect {
-                        // Prevent 2 copies from running concurrently
-                        visiblePagesToJoin?.join()
-                        maybeUpdatePageVisibility()
+                    launch {
+                        manager.visiblePages.collect {
+                            // If layout is still in progress don't add / render new pages yet.
+                            // Wait until the layout has settled
+                            if (!it.layoutInProgress) maybeUpdatePageVisibility()
+                        }
                     }
                 }
         }
@@ -796,7 +794,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private fun stopCollectingData() {
         layoutInfoCollector?.cancel()
-        visiblePagesCollector?.cancel()
         pageSignalCollector?.cancel()
         selectionStateCollector?.cancel()
     }
@@ -977,6 +974,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val visiblePageAreas =
             pageLayoutManager?.getVisiblePageAreas(visiblePages, getVisibleAreaInContentCoords())
                 ?: return
+
         pageManager?.updatePageVisibilities(visiblePageAreas, zoom, positionIsStable)
     }
 

@@ -70,7 +70,7 @@ class PageLayoutManagerTest {
     @Test
     fun onViewportChanged() = runTest {
         // Start collecting from PaginationManager#visiblePages
-        val visiblePageValues = mutableListOf<Range<Int>>()
+        val visiblePageValues = mutableListOf<PagesInViewport>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             paginationManager.visiblePages.toList(visiblePageValues)
         }
@@ -86,17 +86,17 @@ class PageLayoutManagerTest {
         // We expect to collect 3 values: the default [0, 0] value and two updates based on two
         // viewport changes
         assertThat(visiblePageValues.size).isEqualTo(3)
-        assertThat(visiblePageValues[0]).isEqualTo(Range(0, 0))
+        assertThat(visiblePageValues[0]).isEqualTo(PagesInViewport(Range(0, 0)))
         // These assertions are deliberately coarse so as not to test the implementation details of
         // PaginationModel here
-        assertThat(visiblePageValues[1].upper).isGreaterThan(0)
-        assertThat(visiblePageValues[2].upper).isGreaterThan(visiblePageValues[1].upper)
+        assertThat(visiblePageValues[1].pages.upper).isGreaterThan(0)
+        assertThat(visiblePageValues[2].pages.upper).isGreaterThan(visiblePageValues[1].pages.upper)
     }
 
     @Test
     fun onViewportChanged_noChange() = runTest {
         // Start collecting from PaginationManager#visiblePages
-        val visiblePageValues = mutableListOf<Range<Int>>()
+        val visiblePageValues = mutableListOf<PagesInViewport>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             paginationManager.visiblePages.toList(visiblePageValues)
         }
@@ -112,16 +112,16 @@ class PageLayoutManagerTest {
         // We expect to collect 2 values: the default [0, 0] value and one update based on one
         // viewport change
         assertThat(visiblePageValues.size).isEqualTo(2)
-        assertThat(visiblePageValues[0]).isEqualTo(Range(0, 0))
+        assertThat(visiblePageValues[0]).isEqualTo(PagesInViewport(Range(0, 0)))
         // This assertion is deliberately coarse so as not to test the implementation details of
         // PaginationModel here
-        assertThat(visiblePageValues[1].upper).isGreaterThan(0)
+        assertThat(visiblePageValues[1].pages.upper).isGreaterThan(0)
     }
 
     @Test
     fun onViewportChanged_prefetchPages() = runTest {
         // Start collecting from PaginationManager#visiblePages
-        val visiblePageValues = mutableListOf<Range<Int>>()
+        val visiblePageValues = mutableListOf<PagesInViewport>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             paginationManager.visiblePages.toList(visiblePageValues)
         }

@@ -38,7 +38,9 @@ import androidx.pdf.service.connect.PdfServiceConnection
 import androidx.pdf.utils.toAndroidClass
 import androidx.pdf.utils.toContentClass
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
@@ -73,6 +75,9 @@ public class SandboxedPdfDocument(
     override val isLinearized: Boolean,
     override val formType: Int
 ) : PdfDocument {
+
+    /** The [CoroutineScope] we use to close [BitmapSource]s asynchronously */
+    private val closeScope = CoroutineScope(dispatcher + SupervisorJob())
 
     override suspend fun getPageInfo(pageNumber: Int): PdfDocument.PageInfo {
         return withDocument { document ->
@@ -191,7 +196,8 @@ public class SandboxedPdfDocument(
         @WorkerThread
         override fun close() {
             if (connection.isConnected) {
-                runBlocking { withDocument { it.releasePage(pageNumber) } }
+                // We can't block the main thread with this IPC
+                closeScope.launch { withDocument { it.releasePage(pageNumber) } }
             }
 
             // TODO(b/397324529): Enqueue releasePage requests and execute when connection is

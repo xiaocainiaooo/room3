@@ -147,8 +147,8 @@ class PaginationModelTest {
 
         // When the viewport is above the top of this model, we expect an empty range at the
         // beginning of this model
-        assertThat(visiblePages.upper).isEqualTo(0)
-        assertThat(visiblePages.lower).isEqualTo(0)
+        assertThat(visiblePages.pages.upper).isEqualTo(0)
+        assertThat(visiblePages.pages.lower).isEqualTo(0)
     }
 
     @Test
@@ -167,8 +167,8 @@ class PaginationModelTest {
 
         // When the viewport is below the end of this model, we expect an empty range at the last
         // known page
-        assertThat(visiblePages.upper).isEqualTo(2)
-        assertThat(visiblePages.lower).isEqualTo(2)
+        assertThat(visiblePages.pages.upper).isEqualTo(2)
+        assertThat(visiblePages.pages.lower).isEqualTo(2)
     }
 
     @Test
@@ -182,8 +182,8 @@ class PaginationModelTest {
         val visiblePages =
             paginationModel.getPagesInViewport(viewportTop = 0, viewportBottom = contentBottom + 10)
 
-        assertThat(visiblePages.upper).isEqualTo(2)
-        assertThat(visiblePages.lower).isEqualTo(0)
+        assertThat(visiblePages.pages.upper).isEqualTo(2)
+        assertThat(visiblePages.pages.lower).isEqualTo(0)
     }
 
     @Test
@@ -196,8 +196,8 @@ class PaginationModelTest {
         val visiblePages =
             paginationModel.getPagesInViewport(viewportTop = 235, viewportBottom = 335)
 
-        assertThat(visiblePages.upper).isEqualTo(1)
-        assertThat(visiblePages.lower).isEqualTo(1)
+        assertThat(visiblePages.pages.upper).isEqualTo(1)
+        assertThat(visiblePages.pages.lower).isEqualTo(1)
     }
 
     @Test
@@ -210,8 +210,8 @@ class PaginationModelTest {
         val visiblePages =
             paginationModel.getPagesInViewport(viewportTop = 235, viewportBottom = 455)
 
-        assertThat(visiblePages.upper).isEqualTo(2)
-        assertThat(visiblePages.lower).isEqualTo(1)
+        assertThat(visiblePages.pages.upper).isEqualTo(2)
+        assertThat(visiblePages.pages.lower).isEqualTo(1)
     }
 
     @Test
@@ -225,8 +225,8 @@ class PaginationModelTest {
         val visiblePages =
             paginationModel.getPagesInViewport(viewportTop = 210, viewportBottom = 840)
 
-        assertThat(visiblePages.upper).isEqualTo(3)
-        assertThat(visiblePages.lower).isEqualTo(1)
+        assertThat(visiblePages.pages.upper).isEqualTo(3)
+        assertThat(visiblePages.pages.lower).isEqualTo(1)
     }
 
     /**
