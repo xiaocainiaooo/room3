@@ -22,6 +22,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.AnyThread;
+import androidx.annotation.IntRange;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RequiresOptIn;
 import androidx.annotation.RestrictTo;
@@ -1420,6 +1422,49 @@ public class WebViewCompat {
             getProvider(webView).prerenderUrlAsync(url, cancellationSignal, callbackExecutor,
                     params,
                     callback);
+        } else {
+            throw WebViewFeatureInternal.getUnsupportedOperationException();
+        }
+    }
+
+    /**
+     * Denotes that the WebViewCompat#saveState API surface is experimental.
+     * <p>
+     * It may change without warning and should not be relied upon for non-experimental purposes.
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
+    @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
+    public @interface ExperimentalSaveState {
+    }
+
+    /**
+     * Saves the state of the provided WebView, such as for use with
+     * {@link android.app.Activity#onSaveInstanceState}. This is an extension of
+     * {@link WebView#saveState(Bundle)} and the returned state can be restored through
+     * {@link WebView#restoreState(Bundle)}.
+     *
+     * @param webView the {@link WebView} whose state is to be saved.
+     * @param outState the {@link Bundle} to store the state in.
+     * @param maxSizeBytes the maximum size (in bytes) that the returned state can be. If the
+     *                     WebView contains more state, history entries further back will not be
+     *                     saved.
+     * @param includeForwardState whether to include entries that can only be reached through going
+     *                            forward in history (such as through {@link WebView#goForward()}.
+     *                            Some apps don't give the user a way to go forward, so won't need
+     *                            to save the forward history.
+     */
+    @RequiresFeature(name = WebViewFeature.SAVE_STATE,
+            enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
+    @UiThread
+    @ExperimentalSaveState
+    public static void saveState(@NonNull WebView webView,
+            @NonNull Bundle outState,
+            @IntRange(from = 1) int maxSizeBytes,
+            boolean includeForwardState) {
+        ApiFeature.NoFramework feature = WebViewFeatureInternal.SAVE_STATE;
+        if (feature.isSupportedByWebView()) {
+            getProvider(webView).saveState(outState, maxSizeBytes, includeForwardState);
         } else {
             throw WebViewFeatureInternal.getUnsupportedOperationException();
         }

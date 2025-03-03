@@ -18,12 +18,14 @@ package androidx.webkit.internal;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.UiThread;
 import androidx.webkit.PrerenderException;
 import androidx.webkit.PrerenderOperationCallback;
 import androidx.webkit.Profile;
@@ -249,5 +251,16 @@ public class WebViewProviderAdapter {
                 paramsBoundaryInterface,
                 activationCallback,
                 errorCallback);
+    }
+
+    /**
+     * Adapter method for {@link WebViewCompat#saveState(WebView, Bundle, int, boolean)}.
+     */
+    @UiThread
+    public void saveState(
+            @NonNull Bundle outState,
+            int maxSizeBytes,
+            boolean includeForwardState) {
+        mImpl.saveState(outState, maxSizeBytes, includeForwardState);
     }
 }
