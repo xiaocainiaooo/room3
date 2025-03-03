@@ -2249,6 +2249,8 @@ final object androidx.compose.material3/ButtonDefaults { // androidx.compose.mat
         final fun <get-MinWidth>(): androidx.compose.ui.unit/Dp // androidx.compose.material3/ButtonDefaults.MinWidth.<get-MinWidth>|<get-MinWidth>(){}[0]
     final val SmallButtonContentPadding // androidx.compose.material3/ButtonDefaults.SmallButtonContentPadding|{}SmallButtonContentPadding[0]
         final fun <get-SmallButtonContentPadding>(): androidx.compose.foundation.layout/PaddingValues // androidx.compose.material3/ButtonDefaults.SmallButtonContentPadding.<get-SmallButtonContentPadding>|<get-SmallButtonContentPadding>(){}[0]
+    final val SmallContentPadding // androidx.compose.material3/ButtonDefaults.SmallContentPadding|{}SmallContentPadding[0]
+        final fun <get-SmallContentPadding>(): androidx.compose.foundation.layout/PaddingValues // androidx.compose.material3/ButtonDefaults.SmallContentPadding.<get-SmallContentPadding>|<get-SmallContentPadding>(){}[0]
     final val TextButtonContentPadding // androidx.compose.material3/ButtonDefaults.TextButtonContentPadding|{}TextButtonContentPadding[0]
         final fun <get-TextButtonContentPadding>(): androidx.compose.foundation.layout/PaddingValues // androidx.compose.material3/ButtonDefaults.TextButtonContentPadding.<get-TextButtonContentPadding>|<get-TextButtonContentPadding>(){}[0]
     final val TextButtonWithIconContentPadding // androidx.compose.material3/ButtonDefaults.TextButtonWithIconContentPadding|{}TextButtonWithIconContentPadding[0]
