@@ -27,12 +27,17 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 dependencies {
     api(libs.kotlinStdlib)
     // Public dependencies
     implementation("androidx.appsearch:appsearch:1.1.0-beta01")
+    // Manually specify the dependency on kotlinMetadataJvm due to missing prebuilt for appsearch
+    // compiler.
+    kapt(libs.kotlinMetadataJvm)
+    kapt("androidx.appsearch:appsearch-compiler:1.1.0-beta01")
 
     // Internal dependencies
     implementation("androidx.annotation:annotation:1.8.1")
@@ -49,6 +54,13 @@ dependencies {
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testRunner)
     androidTestCompileOnly(project(":appfunctions:appfunctions-stubs"))
+}
+
+// Restricts AppSearch generated code to library to avoid it surfacing in public API.
+kapt {
+    arguments {
+        arg("AppSearchCompiler.RestrictGeneratedCodeToLib", "true")
+    }
 }
 
 android {
