@@ -343,8 +343,7 @@ internal class LocalSdkProviderTest(
         @JvmStatic
         fun params(): List<Array<Any>> = buildList {
             ClientApiVersion.values().forEach { version ->
-                // FUTURE_VERSION tested separately
-                if (version != ClientApiVersion.FUTURE_VERSION) {
+                if (version.mustHaveTestSdk()) {
                     add(
                         arrayOf(
                             "v${version.apiLevel}",
@@ -373,6 +372,14 @@ internal class LocalSdkProviderTest(
                     ClientApiVersion.FUTURE_VERSION.apiLevel
                 )
             )
+        }
+
+        private fun ClientApiVersion.mustHaveTestSdk(): Boolean {
+            if (this == ClientApiVersion.FUTURE_VERSION) {
+                return false
+            }
+
+            return stable || apiLevel > ClientApiVersion.LATEST_STABLE_VERSION.apiLevel
         }
 
         private fun loadTestSdkFromAssets(
