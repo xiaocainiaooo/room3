@@ -9,7 +9,7 @@ public class `$StringBaseSerializableFactory` :
     AppFunctionSerializableFactory<StringBaseSerializable> {
   override fun fromAppFunctionData(appFunctionData: AppFunctionData): StringBaseSerializable {
 
-    val name = appFunctionData.getString("name")
+    val name = checkNotNull(appFunctionData.getString("name"))
 
     return StringBaseSerializable(name)
   }

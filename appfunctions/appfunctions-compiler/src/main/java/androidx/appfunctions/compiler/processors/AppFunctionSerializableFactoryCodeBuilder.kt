@@ -29,11 +29,13 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerial
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.ToAppFunctionDataMethod.APP_FUNCTION_SERIALIZABLE_PARAM_NAME
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
 import androidx.appfunctions.compiler.core.ignoreNullable
+import androidx.appfunctions.compiler.core.isOfType
 import androidx.appfunctions.compiler.core.toTypeName
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.buildCodeBlock
 
 /**
@@ -101,10 +103,17 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 "getter_name" to getAppFunctionDataGetterName(afType),
                 "default_value_postfix" to getGetterDefaultValuePostfix(afType)
             )
-        addNamed(
-            "val %param_name:L = %app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L\n",
-            formatStringMap
-        )
+        if (afType.isNullable) {
+            addNamed(
+                "val %param_name:L = %app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L\n",
+                formatStringMap
+            )
+        } else {
+            addNamed(
+                "val %param_name:L = checkNotNull(%app_function_data_param_name:L.%getter_name:L(\"%param_name:L\")%default_value_postfix:L)\n",
+                formatStringMap
+            )
+        }
         return this
     }
 
@@ -125,11 +134,11 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 "serializable_data_val_name" to "${paramName}Data"
             )
 
-        addNamed(
-            "val %serializable_data_val_name:L = %app_function_data_param_name:L.%getter_name:L(%param_name:S)\n",
-            formatStringMap
-        )
         if (afType.isNullable) {
+            addNamed(
+                "val %serializable_data_val_name:L = %app_function_data_param_name:L.%getter_name:L(%param_name:S)\n",
+                formatStringMap
+            )
             return addNamed("var %param_name:L: %param_type:T = null\n", formatStringMap)
                 .addNamed("if (%serializable_data_val_name:L != null) {\n", formatStringMap)
                 .indent()
@@ -140,6 +149,10 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 .unindent()
                 .addStatement("}")
         } else {
+            addNamed(
+                "val %serializable_data_val_name:L = checkNotNull(%app_function_data_param_name:L.%getter_name:L(%param_name:S))\n",
+                formatStringMap
+            )
             addNamed(
                 "val %param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L)\n",
                 formatStringMap
@@ -298,9 +311,15 @@ class AppFunctionSerializableFactoryCodeBuilder(
     private fun getAppFunctionDataGetterName(afType: AppFunctionTypeReference): String {
         val shortTypeName = afType.selfOrItemTypeReference.getTypeShortName()
         return when (afType.typeCategory) {
-            PRIMITIVE_SINGULAR -> "get$shortTypeName${if (afType.isNullable) "OrNull" else ""}"
+            PRIMITIVE_SINGULAR -> {
+                if (afType.selfTypeReference.isOfType(STRING)) {
+                    "getString"
+                } else {
+                    "get${shortTypeName}OrNull"
+                }
+            }
             PRIMITIVE_ARRAY -> "get$shortTypeName"
-            SERIALIZABLE_SINGULAR -> "getAppFunctionData${if (afType.isNullable) "OrNull" else ""}"
+            SERIALIZABLE_SINGULAR -> "getAppFunctionData"
             SERIALIZABLE_LIST -> "getAppFunctionDataList"
             PRIMITIVE_LIST -> "get${shortTypeName}List"
         }

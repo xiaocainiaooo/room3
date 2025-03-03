@@ -197,7 +197,7 @@ class IntegrationTest {
         assertThat(
                 successResponse.returnValue
                     .getAppFunctionData(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
-                    .deserialize(Note::class.java)
+                    ?.deserialize(Note::class.java)
             )
             .isEqualTo(expectedNote)
     }

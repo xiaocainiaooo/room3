@@ -13,7 +13,8 @@ public class `$EntityWithDiffPackageSerializablePropertyFactory` :
       EntityWithDiffPackageSerializableProperty {
     val diffPackageSerializableFactory = `$DiffPackageSerializableFactory`()
 
-    val inputSerializableData = appFunctionData.getAppFunctionData("inputSerializable")
+    val inputSerializableData =
+        checkNotNull(appFunctionData.getAppFunctionData("inputSerializable"))
     val inputSerializable =
         diffPackageSerializableFactory.fromAppFunctionData(inputSerializableData)
     val serializableListData = appFunctionData.getAppFunctionDataList("serializableList") ?:
