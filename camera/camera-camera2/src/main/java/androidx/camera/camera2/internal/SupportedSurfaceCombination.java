@@ -331,7 +331,9 @@ final class SupportedSurfaceCombination {
     }
 
     private int getMaxFrameRate(int imageFormat, @NonNull Size size, boolean isHighSpeedOn) {
-        return isHighSpeedOn ? mHighSpeedResolver.getMaxFrameRate(imageFormat, size)
+        Preconditions.checkState(!isHighSpeedOn
+                || imageFormat == ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE);
+        return isHighSpeedOn ? mHighSpeedResolver.getMaxFrameRate(size)
                 : getMaxFrameRate(mCharacteristics, imageFormat, size);
     }
 
@@ -570,12 +572,14 @@ final class SupportedSurfaceCombination {
             @NonNull List<AttachedSurfaceInfo> attachedSurfaces,
             @NonNull Map<UseCaseConfig<?>, List<Size>> newUseCaseConfigsSupportedSizeMap,
             boolean isPreviewStabilizationOn,
-            boolean hasVideoCapture,
-            @Nullable Range<Integer> targetHighSpeedFpsRange) {
+            boolean hasVideoCapture) {
         // Refresh Preview Size based on current display configurations.
         refreshPreviewSize();
 
-        boolean isHighSpeedOn = targetHighSpeedFpsRange != null;
+        Range<Integer> targetHighSpeedFpsRange = HighSpeedResolver.getTargetHighSpeedFrameRate(
+                attachedSurfaces, newUseCaseConfigsSupportedSizeMap.keySet());
+
+        boolean isHighSpeedOn = !targetHighSpeedFpsRange.equals(FRAME_RATE_RANGE_UNSPECIFIED);
         // Filter out unsupported sizes for high-speed at the beginning to ensure correct
         // resolution selection later. High-speed session requires all surface sizes to be the same.
         if (isHighSpeedOn) {
