@@ -19,14 +19,12 @@ package androidx.wear.compose.material3
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -75,7 +73,6 @@ public fun ListHeader(
         modifier =
             modifier
                 .defaultMinSize(minHeight = ListHeaderTokens.Height)
-                .height(IntrinsicSize.Min)
                 .wrapContentSize()
                 .surface(
                     transformation = transformation,
@@ -129,7 +126,6 @@ public fun ListSubHeader(
         modifier =
             modifier
                 .defaultMinSize(minHeight = ListSubHeaderTokens.Height)
-                .height(IntrinsicSize.Min)
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.CenterStart)
                 .surface(painter = ColorPainter(backgroundColor), transformation = transformation)
