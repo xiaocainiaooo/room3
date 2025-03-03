@@ -1,6 +1,17 @@
 // Signature format: 4.0
 package androidx.xr.compose.material3 {
 
+  public final class AppBarKt {
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.xr.compose.material3.HorizontalOrbiterProperties getDefaultSingleRowTopAppBarOrbiterProperties();
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.xr.compose.material3.HorizontalOrbiterProperties getDefaultTwoRowsTopAppBarOrbiterProperties();
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.xr.compose.material3.HorizontalOrbiterProperties> getLocalSingleRowTopAppBarOrbiterProperties();
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.xr.compose.material3.HorizontalOrbiterProperties> getLocalTwoRowsTopAppBarOrbiterProperties();
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.xr.compose.material3.HorizontalOrbiterProperties DefaultSingleRowTopAppBarOrbiterProperties;
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.xr.compose.material3.HorizontalOrbiterProperties DefaultTwoRowsTopAppBarOrbiterProperties;
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.xr.compose.material3.HorizontalOrbiterProperties> LocalSingleRowTopAppBarOrbiterProperties;
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.xr.compose.material3.HorizontalOrbiterProperties> LocalTwoRowsTopAppBarOrbiterProperties;
+  }
+
   public final class EnableXrComponentOverridesKt {
     method @SuppressCompatibility @androidx.compose.runtime.Composable @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public static void EnableXrComponentOverrides(optional androidx.xr.compose.material3.XrComponentOverrideEnabler overrideEnabler, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
@@ -70,11 +81,15 @@ package androidx.xr.compose.material3 {
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getNavigationBar();
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getNavigationRail();
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getNavigationSuiteScaffold();
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getSingleRowTopAppBar();
     method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getThreePaneScaffold();
+    method @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String getTwoRowsTopAppBar();
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String NavigationBar;
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String NavigationRail;
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String NavigationSuiteScaffold;
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String SingleRowTopAppBar;
     property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String ThreePaneScaffold;
+    property @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public String TwoRowsTopAppBar;
   }
 
   @SuppressCompatibility @androidx.xr.compose.material3.ExperimentalMaterial3XrApi public interface XrComponentOverrideEnabler {
