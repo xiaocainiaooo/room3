@@ -82,6 +82,8 @@ public fun Dialog(
     properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit,
 ) {
+    val key = remember { Any() }
+
     val showState by rememberUpdatedState(visible)
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
 
@@ -131,16 +133,18 @@ public fun Dialog(
     }
 
     if (LocalScaffoldState.current.appScaffoldPresent) {
-        LocalScaffoldState.current.fullScreenContent =
+        LocalScaffoldState.current.fullScreenContent.addOrUpdateFullScreen(key) {
             DialogContentWrapper(
-                shouldShow,
-                content,
-                swipeToDismissBoxState,
-                modifier,
-                transition,
-                onDismissRequest,
-                transitionState
-            )
+                    shouldShow,
+                    content,
+                    swipeToDismissBoxState,
+                    modifier,
+                    transition,
+                    onDismissRequest,
+                    transitionState
+                )
+                ?.invoke()
+        }
     } else {
         if (shouldShow) {
             Log.i(
@@ -186,7 +190,7 @@ public fun Dialog(
     DisposableEffect(Unit) {
         onDispose {
             scaffoldState.parentScale.floatValue = 1f
-            scaffoldState.fullScreenContent = null
+            scaffoldState.fullScreenContent.removeFullScreen(key)
         }
     }
 }

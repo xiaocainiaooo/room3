@@ -16,6 +16,7 @@
 
 package androidx.wear.compose.material3
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate
@@ -27,17 +28,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.fastForEach
 import androidx.wear.compose.foundation.ScrollInfoProvider
+import kotlin.collections.find
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -45,21 +45,51 @@ import kotlinx.coroutines.launch
 
 internal class ScaffoldState(
     internal val appScaffoldPresent: Boolean,
-    private val appTimeText: (@Composable (() -> Unit))? = null,
+    appTimeText: (@Composable (() -> Unit))? = null,
 ) {
-    var fullScreenContent by mutableStateOf<(@Composable () -> Unit)?>(null)
+    val fullScreenContent = FullScreenContent()
+    val screenContent = ScreenContent(appTimeText)
 
-    fun removeScreen(key: Any) {
-        screenContent.removeIf { it.key === key }
+    /**
+     * Represents the scale factor applied to the parent screen. This should be used when scaling is
+     * needed for transitions or other animations affecting the parent.
+     */
+    var parentScale = mutableFloatStateOf(1f)
+}
+
+/**
+ * Manages an ordered list of full-screen composable content items. Used for displaying the full
+ * screen content - such as various dialogs.
+ */
+internal class FullScreenContent() {
+
+    fun addOrUpdateFullScreen(key: Any, content: @Composable () -> Unit) {
+        contentItems.apply {
+            find { it.key === key }?.let { it.content = content }
+                ?: add(FullScreenContentItem(key, content))
+        }
     }
 
-    fun addScreen(
-        key: Any,
-        timeText: @Composable (() -> Unit)?,
-        scrollInfoProvider: ScrollInfoProvider? = null
-    ) {
-        screenContent.add(ScreenContent(key, scrollInfoProvider, timeText))
+    fun removeFullScreen(key: Any) {
+        contentItems.removeIf { it.key === key }
     }
+
+    @Composable fun OverlayContent() = contentItems.forEach { it.content() }
+
+    @VisibleForTesting internal val contentItems = mutableStateListOf<FullScreenContentItem>()
+
+    internal data class FullScreenContentItem(val key: Any, var content: @Composable () -> Unit)
+}
+
+/**
+ * Manages the content and state of a screen, including the visibility and behavior of a time text
+ * element and handling screen stages (New, Scrolling, Idle).
+ *
+ * This class is designed to be used internally within a screen management system. It allows adding
+ * and removing screen content, displaying a time text element, and managing the screen's stage
+ * based on scrolling activity.
+ */
+internal class ScreenContent(private val appTimeText: @Composable (() -> Unit)?) {
 
     val timeText: @Composable (() -> Unit)
         get() = {
@@ -74,11 +104,17 @@ internal class ScaffoldState(
             }
         }
 
-    /**
-     * Represents the scale factor applied to the parent screen. This should be used when scaling is
-     * needed for transitions or other animations affecting the parent.
-     */
-    var parentScale = mutableFloatStateOf(1f)
+    fun removeScreen(key: Any) {
+        contentItems.removeIf { it.key === key }
+    }
+
+    fun addScreen(
+        key: Any,
+        timeText: @Composable (() -> Unit)?,
+        scrollInfoProvider: ScrollInfoProvider? = null
+    ) {
+        contentItems.add(ScreenContent(key, scrollInfoProvider, timeText))
+    }
 
     internal val screenStage: MutableState<ScreenStage> = mutableStateOf(ScreenStage.New)
 
@@ -98,16 +134,10 @@ internal class ScaffoldState(
         }
     }
 
-    internal data class ScreenContent(
-        val key: Any,
-        val scrollInfoProvider: ScrollInfoProvider? = null,
-        val timeText: (@Composable () -> Unit)? = null,
-    )
-
     private fun currentContent(): Pair<ScreenContent?, @Composable (() -> Unit)> {
         var resultTimeText: @Composable (() -> Unit)? = null
         var resultContent: ScreenContent? = null
-        screenContent.fastForEach {
+        contentItems.fastForEach {
             if (it.timeText != null) {
                 resultTimeText = it.timeText
             }
@@ -118,7 +148,13 @@ internal class ScaffoldState(
         return resultContent to (resultTimeText ?: appTimeText ?: {})
     }
 
-    private val screenContent = mutableStateListOf<ScreenContent>()
+    private val contentItems = mutableStateListOf<ScreenContent>()
+
+    private data class ScreenContent(
+        val key: Any,
+        val scrollInfoProvider: ScrollInfoProvider? = null,
+        val timeText: (@Composable () -> Unit)? = null,
+    )
 }
 
 @Composable
