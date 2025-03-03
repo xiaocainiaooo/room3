@@ -1279,7 +1279,9 @@ public final class AppSearchImpl implements Closeable {
                  DigestInputStream digestInputStream =
                          new DigestInputStream(inputStream, MessageDigest.getInstance("SHA-256"))) {
                 byte[] buffer = new byte[8192];
-                while (digestInputStream.read(buffer) != -1) ;
+                while (digestInputStream.read(buffer) != -1) {
+                    // pass
+                }
                 digest = digestInputStream.getMessageDigest().digest();
             } catch (NoSuchAlgorithmException e) {
                 throw new AppSearchException(AppSearchResult.RESULT_INTERNAL_ERROR,

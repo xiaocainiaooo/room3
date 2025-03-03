@@ -194,9 +194,9 @@ public class FlagsTest {
     }
 
     @Test
-    public void testFlagValue_enableAppsearchManageBlobFiles() {
-        assertThat(Flags.FLAG_ENABLE_APPSEARCH_MANAGE_BLOB_FILES)
-                .isEqualTo("com.android.appsearch.flags.enable_appsearch_manage_blob_files");
+    public void testFlagValue_enableAppSearchManageBlobFiles() {
+        assertThat(Flags.FLAG_ENABLE_APP_SEARCH_MANAGE_BLOB_FILES)
+                .isEqualTo("com.android.appsearch.flags.enable_app_search_manage_blob_files");
     }
 
     @Test
