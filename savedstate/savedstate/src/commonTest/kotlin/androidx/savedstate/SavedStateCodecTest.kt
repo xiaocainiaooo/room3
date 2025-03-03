@@ -74,7 +74,6 @@ internal class SavedStateCodecTest : RobolectricTest() {
         }
         Long.MIN_VALUE.encodeDecode {
             assertThat(size()).isEqualTo(1)
-            assertThat(source)
             assertThat(getLong("")).isEqualTo(Long.MIN_VALUE)
         }
         Long.MAX_VALUE.encodeDecode {
@@ -525,17 +524,15 @@ internal class SavedStateCodecTest : RobolectricTest() {
             putString("s", "foo")
             putIntArray("a", intArrayOf(1, 3, 5))
         }
-        val restored =
-            decodeFromSavedState(
-                SavedStateSerializer,
-                encodeToSavedState(SavedStateSerializer, origin).read {
-                    assertThat(size()).isEqualTo(3)
-                    assertThat(getInt("i")).isEqualTo(1)
-                    assertThat(getString("s")).isEqualTo("foo")
-                    assertThat(getIntArray("a")).isEqualTo(intArrayOf(1, 3, 5))
-                    source
-                }
-            )
+        val encoded = encodeToSavedState(SavedStateSerializer, origin)
+        val restored = decodeFromSavedState(SavedStateSerializer, encoded)
+
+        encoded.read {
+            assertThat(size()).isEqualTo(3)
+            assertThat(getInt("i")).isEqualTo(1)
+            assertThat(getString("s")).isEqualTo("foo")
+            assertThat(getIntArray("a")).isEqualTo(intArrayOf(1, 3, 5))
+        }
         assertThat(restored.read { contentDeepEquals(origin) }).isTrue()
         assertThat(restored).isNotSameInstanceAs(origin)
     }

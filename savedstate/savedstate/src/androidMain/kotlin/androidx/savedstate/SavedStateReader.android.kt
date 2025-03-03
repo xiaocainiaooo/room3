@@ -36,7 +36,7 @@ import java.io.Serializable
 public actual value class SavedStateReader
 @PublishedApi
 internal actual constructor(
-    @PublishedApi internal actual val source: SavedState,
+    private actual val source: SavedState,
 ) {
 
     /**
@@ -47,7 +47,7 @@ internal actual constructor(
      * @throws IllegalArgumentException If the key is not found.
      * @throws IllegalArgumentException if associated value has wrong type.
      */
-    public inline fun getBinder(key: String): IBinder {
+    public fun getBinder(key: String): IBinder {
         return source.getBinder(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -56,7 +56,7 @@ internal actual constructor(
         return source.getBinder(key)
     }
 
-    public actual inline fun getBoolean(key: String): Boolean {
+    public actual fun getBoolean(key: String): Boolean {
         val result = source.getBoolean(key, false)
         if (result == false) {
             val reference = source.getBoolean(key, true)
@@ -79,7 +79,7 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getChar(key: String): Char {
+    public actual fun getChar(key: String): Char {
         val result = source.getChar(key, Char.MIN_VALUE)
         if (result == Char.MIN_VALUE) {
             val reference = source.getChar(key, Char.MAX_VALUE)
@@ -101,7 +101,7 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getCharSequence(key: String): CharSequence {
+    public actual fun getCharSequence(key: String): CharSequence {
         return source.getCharSequence(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -109,7 +109,7 @@ internal actual constructor(
         return source.getCharSequence(key)
     }
 
-    public actual inline fun getDouble(key: String): Double {
+    public actual fun getDouble(key: String): Double {
         val result = source.getDouble(key, Double.MIN_VALUE)
         if (result == Double.MIN_VALUE) {
             val reference = source.getDouble(key, Double.MAX_VALUE)
@@ -132,7 +132,7 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getFloat(key: String): Float {
+    public actual fun getFloat(key: String): Float {
         val result = source.getFloat(key, Float.MIN_VALUE)
         if (result == Float.MIN_VALUE) {
             val reference = source.getFloat(key, Float.MAX_VALUE)
@@ -155,7 +155,7 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getInt(key: String): Int {
+    public actual fun getInt(key: String): Int {
         val result = source.getInt(key, Int.MIN_VALUE)
         if (result == Int.MIN_VALUE) {
             val reference = source.getInt(key, Int.MAX_VALUE)
@@ -178,7 +178,7 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getLong(key: String): Long {
+    public actual fun getLong(key: String): Long {
         val result = source.getLong(key, Long.MIN_VALUE)
         if (result == Long.MIN_VALUE) {
             val reference = source.getLong(key, Long.MAX_VALUE)
@@ -243,7 +243,7 @@ internal actual constructor(
      * @throws IllegalArgumentException If the key is not found.
      * @throws IllegalArgumentException if associated value has wrong type.
      */
-    public inline fun getSize(key: String): Size {
+    public fun getSize(key: String): Size {
         return source.getSize(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -260,7 +260,7 @@ internal actual constructor(
      * @throws IllegalArgumentException If the key is not found.
      * @throws IllegalArgumentException if associated value has wrong type.
      */
-    public inline fun getSizeF(key: String): SizeF {
+    public fun getSizeF(key: String): SizeF {
         return source.getSizeF(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -270,7 +270,7 @@ internal actual constructor(
     }
 
     @Suppress("ArrayReturn")
-    public actual inline fun getSavedStateArray(key: String): Array<SavedState> {
+    public actual fun getSavedStateArray(key: String): Array<SavedState> {
         return getParcelableArray(key)
     }
 
@@ -279,7 +279,7 @@ internal actual constructor(
         return getParcelableArrayOrNull(key)
     }
 
-    public actual inline fun getString(key: String): String {
+    public actual fun getString(key: String): String {
         return source.getString(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -287,7 +287,7 @@ internal actual constructor(
         return source.getString(key)
     }
 
-    public actual inline fun getIntList(key: String): List<Int> {
+    public actual fun getIntList(key: String): List<Int> {
         return source.getIntegerArrayList(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -296,7 +296,7 @@ internal actual constructor(
         return source.getIntegerArrayList(key)
     }
 
-    public actual inline fun getCharSequenceList(key: String): List<CharSequence> {
+    public actual fun getCharSequenceList(key: String): List<CharSequence> {
         return source.getCharSequenceArrayList(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -305,7 +305,7 @@ internal actual constructor(
         return source.getCharSequenceArrayList(key)
     }
 
-    public actual inline fun getSavedStateList(key: String): List<SavedState> {
+    public actual fun getSavedStateList(key: String): List<SavedState> {
         return getParcelableList(key)
     }
 
@@ -314,7 +314,7 @@ internal actual constructor(
         return getParcelableListOrNull(key)
     }
 
-    public actual inline fun getStringList(key: String): List<String> {
+    public actual fun getStringList(key: String): List<String> {
         return source.getStringArrayList(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -341,7 +341,7 @@ internal actual constructor(
         return getParcelableArrayList(source, key, T::class.java)
     }
 
-    public actual inline fun getBooleanArray(key: String): BooleanArray {
+    public actual fun getBooleanArray(key: String): BooleanArray {
         return source.getBooleanArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -349,7 +349,7 @@ internal actual constructor(
         return source.getBooleanArray(key)
     }
 
-    public actual inline fun getCharArray(key: String): CharArray {
+    public actual fun getCharArray(key: String): CharArray {
         return source.getCharArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -358,16 +358,16 @@ internal actual constructor(
     }
 
     @Suppress("ArrayReturn")
-    public actual inline fun getCharSequenceArray(key: String): Array<CharSequence> {
+    public actual fun getCharSequenceArray(key: String): Array<CharSequence> {
         return source.getCharSequenceArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     @Suppress("ArrayReturn", "NullableCollection")
-    public actual inline fun getCharSequenceArrayOrNull(key: String): Array<CharSequence>? {
+    public actual fun getCharSequenceArrayOrNull(key: String): Array<CharSequence>? {
         return source.getCharSequenceArray(key)
     }
 
-    public actual inline fun getDoubleArray(key: String): DoubleArray {
+    public actual fun getDoubleArray(key: String): DoubleArray {
         return source.getDoubleArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -375,7 +375,7 @@ internal actual constructor(
         return source.getDoubleArray(key)
     }
 
-    public actual inline fun getFloatArray(key: String): FloatArray {
+    public actual fun getFloatArray(key: String): FloatArray {
         return source.getFloatArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -383,7 +383,7 @@ internal actual constructor(
         return source.getFloatArray(key)
     }
 
-    public actual inline fun getIntArray(key: String): IntArray {
+    public actual fun getIntArray(key: String): IntArray {
         return source.getIntArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -391,7 +391,7 @@ internal actual constructor(
         return source.getIntArray(key)
     }
 
-    public actual inline fun getLongArray(key: String): LongArray {
+    public actual fun getLongArray(key: String): LongArray {
         return source.getLongArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -399,7 +399,7 @@ internal actual constructor(
         return source.getLongArray(key)
     }
 
-    public actual inline fun getStringArray(key: String): Array<String> {
+    public actual fun getStringArray(key: String): Array<String> {
         return source.getStringArray(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -451,7 +451,7 @@ internal actual constructor(
         return getSparseParcelableArray(source, key, T::class.java)
     }
 
-    public actual inline fun getSavedState(key: String): SavedState {
+    public actual fun getSavedState(key: String): SavedState {
         return source.getBundle(key) ?: keyOrValueNotFoundError(key)
     }
 
@@ -460,18 +460,18 @@ internal actual constructor(
         return source.getBundle(key)
     }
 
-    public actual inline fun size(): Int = source.size()
+    public actual fun size(): Int = source.size()
 
-    public actual inline fun isEmpty(): Boolean = source.isEmpty
+    public actual fun isEmpty(): Boolean = source.isEmpty
 
-    public actual inline fun isNull(key: String): Boolean {
+    public actual fun isNull(key: String): Boolean {
         // Using `getString` to check for `null` is unreliable as it returns null for type
         // mismatches. To reliably determine if the value is actually `null`, we use the
         // deprecated `Bundle.get`.
         @Suppress("DEPRECATION") return contains(key) && source[key] == null
     }
 
-    public actual inline operator fun contains(key: String): Boolean = source.containsKey(key)
+    public actual operator fun contains(key: String): Boolean = source.containsKey(key)
 
     public actual fun contentDeepEquals(other: SavedState): Boolean =
         source.contentDeepEquals(other)
