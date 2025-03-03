@@ -194,12 +194,13 @@ internal constructor(
         }
 
         /**
-         * Specifies that we need to apply the standard backoff policy when work is interrupted by
-         * the system without the app requesting it. This might happen when the [ListenableWorker]
-         * runs longer than it should, or when constraints defined for a given [ListenableWorker]
-         * are unmet.
+         * Specifies that the backoff policy (as specified via [setBackoffCriteria]) will be applied
+         * when work is interrupted by the system without the app requesting it. This might happen
+         * when the [ListenableWorker] runs longer than it should, or when constraints defined for a
+         * given [ListenableWorker] are unmet.
          *
          * @return The current [Builder]
+         * @see setBackoffCriteria
          */
         @ExperimentalWorkRequestBuilderApi
         @Suppress("MissingGetterMatchingBuilder")
