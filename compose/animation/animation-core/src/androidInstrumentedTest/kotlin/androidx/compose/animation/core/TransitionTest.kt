@@ -833,4 +833,123 @@ class TransitionTest {
         rule.onNodeWithTag("animatedColor").assertTextEquals(Color.Red.toString())
         rule.onNodeWithTag("currentStateText").assertTextEquals("2")
     }
+
+    @Test
+    fun recreatedTransition_animatesAsExpected() {
+        val animDuration = 10 * 16 // have to assume frame time duration
+
+        // Generic number to change calculations between test cases
+        var baseValue = 0
+
+        var transitionState by mutableStateOf(MutableTransitionState(AnimStates.From))
+
+        fun recreateTransitionState(initialState: AnimStates) {
+            val state = MutableTransitionState(initialState)
+
+            if (baseValue == 0) {
+                transitionState = state
+            } else {
+                // Double check
+                assert(transitionState != state)
+                transitionState = state
+            }
+        }
+
+        /**
+         * Convenient method to generate distinct animation values from the Transition targetState
+         * and a `baseValue`
+         */
+        @Suppress("REDUNDANT_ELSE_IN_WHEN") // Easier to change when using 'else'
+        fun animationValueFor(animState: AnimStates): Float =
+            when (animState) {
+                AnimStates.From -> {
+                    // values: 0, 2
+                    baseValue * 2f
+                }
+                AnimStates.To -> {
+                    // values: 1, 3
+                    (baseValue * 2f) + 1f
+                }
+                else -> {
+                    throw Exception("Unexpected target value")
+                }
+            }
+
+        rule.setContent {
+            val transition = rememberTransition(transitionState)
+
+            val animatedFloat =
+                transition.animateFloat(
+                    transitionSpec = {
+                        when {
+                            AnimStates.From isTransitioningTo AnimStates.To -> {
+                                // If segment is updated properly across recomposition, this
+                                // AnimationSpec should be used
+                                tween(animDuration, easing = LinearEasing)
+                            }
+                            else -> {
+                                // If we end up using stale `segment` information it will be
+                                // evident since it'll use this animationSpec from the initial setup
+                                // meaning initial and target state will be the same value
+                                tween(animDuration * 2, easing = LinearEasing)
+                            }
+                        }
+                    }
+                ) { targetState ->
+                    // Here we'll generate distinct animation targets for each state and `baseValue`
+                    animationValueFor(targetState)
+                }
+            Text(text = animatedFloat.value.toString(), modifier = Modifier.testTag("text"))
+        }
+        rule.waitForIdle()
+        rule.onNodeWithTag("text").assertTextEquals("0.0")
+        assertEquals(AnimStates.From, transitionState.currentState)
+        assertEquals(AnimStates.From, transitionState.targetState)
+
+        // Here we effectively recreate the Transition with the same values, however if we don't
+        // invalidate `segment` properly, the rest of the animations will always calculate using
+        // AnimStates.From for current and target state
+        recreateTransitionState(AnimStates.From)
+
+        rule.mainClock.autoAdvance = false
+        transitionState.targetState = AnimStates.To
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+
+        // Test at half duration
+        rule.onNodeWithTag("text").assertTextEquals("0.0")
+        rule.mainClock.advanceTimeBy(animDuration / 2L)
+        rule.onNodeWithTag("text").assertTextEquals("0.5")
+
+        // Advance until animations are finished
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        assertFalse(transitionState.isRunning)
+        assertEquals(AnimStates.To, transitionState.targetState)
+        assertEquals(AnimStates.To, transitionState.currentState)
+
+        rule.mainClock.autoAdvance = false
+        // Update base value for calculations and force a recompostion by recreating the
+        // TransitionState
+        baseValue = 1
+        recreateTransitionState(AnimStates.From)
+
+        // Reset Transition, despite moving to AnimState.From, there should be no animation, visible
+        // on the target/current state and text with animated value
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        assertEquals(AnimStates.From, transitionState.targetState)
+        assertEquals(AnimStates.From, transitionState.currentState)
+        rule.onNodeWithTag("text").assertTextEquals("2.0")
+
+        // Trigger another animation, this time it should reflect with the new values from 2f to 3f
+        transitionState.targetState = AnimStates.To
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.mainClock.advanceTimeBy(animDuration / 2L)
+        assertEquals(AnimStates.To, transitionState.targetState)
+        assertEquals(AnimStates.From, transitionState.currentState)
+        rule.onNodeWithTag("text").assertTextEquals("2.5")
+    }
 }

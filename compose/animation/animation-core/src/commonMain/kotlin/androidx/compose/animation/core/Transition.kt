@@ -1854,8 +1854,8 @@ public inline fun <S, T, V : AnimationVector> Transition<S>.animateValue(
     // recomposition for both the first and second frame of the animation. As a temporary
     // workaround, `derivedStateOf` is added here to avoid recomposing when the state value is the
     // same.
-    val targetValue = targetValueByState(remember { derivedStateOf { targetState } }.value)
-    val animationSpec = transitionSpec(remember { derivedStateOf { segment } }.value)
+    val targetValue = targetValueByState(remember(this) { derivedStateOf { targetState } }.value)
+    val animationSpec = transitionSpec(remember(this) { derivedStateOf { segment } }.value)
 
     return createTransitionAnimation(initialValue, targetValue, animationSpec, typeConverter, label)
 }
