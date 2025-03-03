@@ -16,6 +16,7 @@
 
 package androidx.privacysandbox.ads.adservices.customaudience
 
+import android.adservices.common.AdServicesOutcomeReceiver
 import android.adservices.customaudience.CustomAudienceManager
 import android.content.Context
 import android.net.Uri
@@ -34,6 +35,7 @@ import androidx.testutils.assertThrows
 import com.android.dx.mockito.inline.extended.ExtendedMockito
 import com.android.dx.mockito.inline.extended.StaticMockitoSession
 import com.google.common.truth.Truth
+import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -51,7 +53,11 @@ import org.mockito.Mockito.`when`
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.quality.Strictness
 
-@OptIn(ExperimentalFeatures.Ext8OptIn::class, ExperimentalFeatures.Ext10OptIn::class)
+@OptIn(
+    ExperimentalFeatures.Ext8OptIn::class,
+    ExperimentalFeatures.Ext10OptIn::class,
+    ExperimentalFeatures.Ext14OptIn::class
+)
 @SmallTest
 @SuppressWarnings("NewApi")
 @RunWith(AndroidJUnit4::class)
@@ -134,6 +140,39 @@ class CustomAudienceManagerTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 34, minSdkVersion = 31)
+    fun testScheduleCustomAudienceUpdateOlderVersions() {
+        /* AdServices or ExtServices are present */
+        Assume.assumeTrue(
+            "minSdkVersion = API 33 ext 4 or API 31/32 ext 9",
+            mValidAdServicesSdkExtVersion || mValidAdExtServicesSdkExtVersion
+        )
+
+        /* API is not available */
+        Assume.assumeTrue(
+            "maxSdkVersion = API 31-34 ext 13",
+            AdServicesInfo.adServicesVersion() < 14 && AdServicesInfo.extServicesVersionS() < 14
+        )
+        mockCustomAudienceManager(mContext, mValidAdExtServicesSdkExtVersion)
+        val managerCompat = obtain(mContext)
+
+        // Verify that it throws an exception
+        assertThrows(UnsupportedOperationException::class.java) {
+                runBlocking {
+                    val request =
+                        ScheduleCustomAudienceUpdateRequest(
+                            uri,
+                            minDelayDuration,
+                            partialCustomAudienceList
+                        )
+                    managerCompat!!.scheduleCustomAudienceUpdate(request)
+                }
+            }
+            .hasMessageThat()
+            .contains("API is not available. Min version is API 31 ext 14")
+    }
+
+    @Test
     fun testJoinCustomAudience() {
         Assume.assumeTrue(
             "minSdkVersion = API 33 ext 4 or API 31/32 ext 9",
@@ -206,6 +245,40 @@ class CustomAudienceManagerTest {
     }
 
     @Test
+    fun testScheduleCustomAudienceUpdate() {
+        Assume.assumeTrue(
+            "minSdkVersion = API 31 ext 14",
+            AdServicesInfo.adServicesVersion() >= 14 || AdServicesInfo.extServicesVersionS() >= 14
+        )
+
+        val customAudienceManager =
+            mockCustomAudienceManager(mContext, mValidAdExtServicesSdkExtVersion)
+        setupScheduleCustomAudienceUpdateResponse(customAudienceManager)
+        val managerCompat = obtain(mContext)
+
+        // Actually invoke the compat code.
+        runBlocking {
+            val request =
+                ScheduleCustomAudienceUpdateRequest(
+                    uri,
+                    minDelayDuration,
+                    partialCustomAudienceList
+                )
+            managerCompat!!.scheduleCustomAudienceUpdate(request)
+        }
+
+        // Verify that the compat code was invoked correctly.
+        val captor =
+            ArgumentCaptor.forClass(
+                android.adservices.customaudience.ScheduleCustomAudienceUpdateRequest::class.java
+            )
+        verify(customAudienceManager).scheduleCustomAudienceUpdate(captor.capture(), any(), any())
+
+        // Verify that the request that the compat code makes to the platform is correct.
+        verifyScheduleCustomAudienceUpdateRequest(captor.value)
+    }
+
+    @Test
     fun testLeaveCustomAudience() {
         Assume.assumeTrue(
             "minSdkVersion = API 33 ext 4 or API 31/32 ext 9",
@@ -249,6 +322,8 @@ class CustomAudienceManagerTest {
         private val ads: List<AdData> = listOf(AdData(uri, metadata))
         private val activationTime: Instant = Instant.ofEpochSecond(5)
         private val expirationTime: Instant = Instant.ofEpochSecond(10)
+        private val minDelayDuration = Duration.ofMinutes(30)
+        private val partialCustomAudienceList = listOf(PartialCustomAudience("partialCa1"))
 
         private fun mockCustomAudienceManager(
             spyContext: Context,
@@ -283,6 +358,19 @@ class CustomAudienceManagerTest {
             doAnswer(answer)
                 .`when`(customAudienceManager)
                 .fetchAndJoinCustomAudience(any(), any(), any())
+        }
+
+        private fun setupScheduleCustomAudienceUpdateResponse(
+            customAudienceManager: CustomAudienceManager
+        ) {
+            val answer = { args: InvocationOnMock ->
+                val receiver = args.getArgument<AdServicesOutcomeReceiver<Any, Exception>>(2)
+                receiver.onResult(Object())
+                null
+            }
+            doAnswer(answer)
+                .`when`(customAudienceManager)
+                .scheduleCustomAudienceUpdate(any(), any(), any())
         }
 
         private fun verifyJoinCustomAudienceRequest(
@@ -392,6 +480,23 @@ class CustomAudienceManagerTest {
 
             // Verify that the actual request matches the expected one.
             Truth.assertThat(expectedRequest == fetchAndJoinCustomAudienceRequest).isTrue()
+        }
+
+        private fun verifyScheduleCustomAudienceUpdateRequest(
+            scheduleCustomAudienceUpdateRequest:
+                android.adservices.customaudience.ScheduleCustomAudienceUpdateRequest
+        ) {
+            // Set up the request that we expect the compat code to invoke.
+            val expectedRequest =
+                android.adservices.customaudience.ScheduleCustomAudienceUpdateRequest.Builder(
+                        uri,
+                        minDelayDuration,
+                        partialCustomAudienceList.map { it.convertToAdServices() }
+                    )
+                    .build()
+
+            // Verify that the actual request matches the expected one.
+            Truth.assertThat(expectedRequest == scheduleCustomAudienceUpdateRequest).isTrue()
         }
 
         private fun verifyLeaveCustomAudienceRequest(
