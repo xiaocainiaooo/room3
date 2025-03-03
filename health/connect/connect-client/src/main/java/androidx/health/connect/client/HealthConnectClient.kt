@@ -327,10 +327,10 @@ interface HealthConnectClient {
     /**
      * Inserts or updates a list of [MedicalResource]s using [UpsertMedicalResourceRequest]s.
      *
-     * From [UpsertMedicalResourceRequest.dataSourceId] and [UpsertMedicalResourceRequest.data] in
-     * each request, a unique [MedicalResourceId] will be constructed. If there is already a
-     * [MedicalResource] with that ID in Health Connect, then it will be updated, otherwise a new
-     * [MedicalResource] will be inserted and returned.
+     * In each request, from [UpsertMedicalResourceRequest.dataSourceId], fhir resource type and
+     * fhir resource ID extracted from [UpsertMedicalResourceRequest.data], a [MedicalResourceId]
+     * will be constructed. If there already exists a [MedicalResource] with that ID in Health
+     * Connect, then it will be updated, otherwise a new [MedicalResource] will be inserted.
      *
      * For each [UpsertMedicalResourceRequest], one [MedicalResource] will be returned, regardless
      * whether it's updated or inserted. The order of the [MedicalResource]s in the returned list

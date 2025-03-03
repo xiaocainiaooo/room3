@@ -31,10 +31,10 @@ import androidx.health.connect.client.records.toString
 /**
  * A request class for both inserting and updating [MedicalResource]s.
  *
- * From the provided data such as [dataSourceId] and [data], a unique [MedicalResourceId] will be
- * constructed. If the unique ID already exists in Health Connect, then its corresponding
- * [MedicalResource] will be updated, otherwise a new [MedicalResource] will be inserted and
- * returned.
+ * From [dataSourceId], fhir resource type and fhir resource ID extracted from [data], a
+ * [MedicalResourceId] will be constructed. If there already exists a [MedicalResource] with that
+ * [MedicalResourceId] in Health Connect, then that [MedicalResource] will be updated, otherwise a
+ * new [MedicalResource] will be inserted.
  *
  * The data representation follows the
  * [Fast Healthcare Interoperability Resources (FHIR)](https://hl7.org/fhir/) standard.
