@@ -52,6 +52,7 @@ import androidx.wear.compose.foundation.angularSize
 import androidx.wear.compose.foundation.angularSizeDp
 import androidx.wear.compose.foundation.background
 import androidx.wear.compose.foundation.basicCurvedText
+import androidx.wear.compose.foundation.clearAndSetSemantics
 import androidx.wear.compose.foundation.curvedBox
 import androidx.wear.compose.foundation.curvedColumn
 import androidx.wear.compose.foundation.curvedComposable
@@ -317,6 +318,27 @@ fun CurvedSemanticsSample() {
             Spacer(Modifier.size(10.dp))
             Text("Text 4", Modifier.semantics { traversalIndex = 4f })
         }
+    }
+}
+
+@Sampled
+@Composable
+fun CurvedClearSemanticsSample() {
+    val style =
+        CurvedTextStyle(
+            letterSpacing = 0.6.sp,
+            letterSpacingCounterClockwise = 1.4.sp,
+            color = Color.White
+        )
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CurvedLayout(modifier = Modifier.fillMaxSize()) {
+            basicCurvedText(
+                "This is not announced",
+                style,
+                CurvedModifier.clearAndSetSemantics {},
+            )
+        }
+        Row { Text("This is announced", Modifier.semantics { traversalIndex = -1f }) }
     }
 }
 
