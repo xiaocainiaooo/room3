@@ -95,7 +95,6 @@ class KspTypeNamesGoldenTest {
         assertKspSignaturesMatchKapt(
             kaptSignatures = kaptSignatures.associateBy { it.name },
             kspSignatures = ksp1Signatures.associateBy { it.name },
-            expectedFailingKeys = emptyList()
         )
     }
 
@@ -118,41 +117,20 @@ class KspTypeNamesGoldenTest {
         assertKspSignaturesMatchKapt(
             kaptSignatures = kaptSignatures.associateBy { it.name },
             kspSignatures = ksp2Signatures.associateBy { it.name },
-            // TODO(b/394692559): Fix these cases and remove this list of failing keys.
-            expectedFailingKeys =
-                listOf(
-                    "main.VarianceSubject.lambda2",
-                    "main.VarianceSubject.suspendLambda2",
-                )
         )
     }
 
     private fun assertKspSignaturesMatchKapt(
         kaptSignatures: Map<String, MethodSignature>,
         kspSignatures: Map<String, MethodSignature>,
-        expectedFailingKeys: List<String> = listOf()
     ) {
-        assertThat(kspSignatures.keys).containsExactlyElementsIn(kaptSignatures.keys)
-        assertWithMessage("Found signatures in 'expectedFailingKeys' that don't exist")
-            .that(kspSignatures.keys)
-            .containsAtLeastElementsIn(expectedFailingKeys)
-
-        val actualFailingKeys =
-            kspSignatures.keys.filter { name -> kspSignatures[name] != kaptSignatures[name] }
-        assertWithMessage("Found signatures in 'expectedFailingKeys' that aren't actually failing")
-            .that(actualFailingKeys)
-            .containsAtLeastElementsIn(expectedFailingKeys)
-
-        assertWithMessage(
-                "Found incorrect KSP signatures not listed in 'expectedFailingKeys': [\n\t${
-                (actualFailingKeys - expectedFailingKeys).joinToString("\n\t")
-            }\n]"
-            )
-            // We filter out the expected failing keys since we only want to report the unexpected.
-            .that(kspSignatures.values.filterNot { expectedFailingKeys.contains(it.name) })
-            .containsExactlyElementsIn(
-                kaptSignatures.values.filterNot { expectedFailingKeys.contains(it.name) }
-            )
+        val failingKeys =
+            kspSignatures.keys
+                .filter { name -> kspSignatures[name] != kaptSignatures[name] }
+                .joinToString(prefix = "[\n\t", separator = "\n\t", postfix = "\n]")
+        assertWithMessage("Found incorrect KSP signatures: $failingKeys")
+            .that(kspSignatures.values)
+            .containsExactlyElementsIn(kaptSignatures.values)
     }
 
     private data class MethodSignature(
@@ -676,6 +654,13 @@ class KspTypeNamesGoldenTest {
                     fun lambda5(param: MyLambdaAlias5): MyLambdaAlias5 = TODO()
                     fun lambda6(param: MyLambdaAlias6): MyLambdaAlias6 = TODO()
                     fun lambda7(param: MyLambdaAlias7): MyLambdaAlias7 = TODO()
+                    fun listOfLambda1(param: List<MyLambdaAlias1>): List<MyLambdaAlias1> = TODO()
+                    fun listOfLambda2(param: List<MyLambdaAlias2>): List<MyLambdaAlias2> = TODO()
+                    fun listOfLambda3(param: List<MyLambdaAlias3>): List<MyLambdaAlias3> = TODO()
+                    fun listOfLambda4(param: List<MyLambdaAlias4>): List<MyLambdaAlias4> = TODO()
+                    fun listOfLambda5(param: List<MyLambdaAlias5>): List<MyLambdaAlias5> = TODO()
+                    fun listOfLambda6(param: List<MyLambdaAlias6>): List<MyLambdaAlias6> = TODO()
+                    fun listOfLambda7(param: List<MyLambdaAlias7>): List<MyLambdaAlias7> = TODO()
                     @JSW fun lambda1WithJSW(param: MyLambdaAlias1): MyLambdaAlias1 = TODO()
                     @JSW fun lambda2WithJSW(param: MyLambdaAlias2): MyLambdaAlias2 = TODO()
                     @JSW fun lambda3WithJSW(param: MyLambdaAlias3): MyLambdaAlias3 = TODO()
