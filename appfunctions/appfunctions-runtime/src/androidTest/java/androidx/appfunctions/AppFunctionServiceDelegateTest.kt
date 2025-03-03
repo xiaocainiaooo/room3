@@ -24,12 +24,15 @@ import androidx.appfunctions.internal.AggregatedAppFunctionInventory
 import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.AppFunctionInventory
 import androidx.appfunctions.internal.AppFunctionInvoker
+import androidx.appfunctions.internal.Translator
+import androidx.appfunctions.internal.TranslatorSelector
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_UNIT
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
@@ -49,13 +52,10 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppFunctionServiceDelegateTest {
     private val testDispatcher = UnconfinedTestDispatcher()
-
     private lateinit var context: Context
-
     private lateinit var fakeAggregatedInvoker: FakeAggregatedInvoker
-
     private lateinit var fakeAggregatedInventory: FakeAggregatedInventory
-
+    private lateinit var fakeTranslatorSelector: FakeTranslatorSelector
     private lateinit var delegate: AppFunctionServiceDelegate
 
     @Before
@@ -63,6 +63,7 @@ class AppFunctionServiceDelegateTest {
         context = InstrumentationRegistry.getInstrumentation().context
         fakeAggregatedInvoker = FakeAggregatedInvoker()
         fakeAggregatedInventory = FakeAggregatedInventory()
+        fakeTranslatorSelector = FakeTranslatorSelector()
         delegate =
             AppFunctionServiceDelegate(
                 context,
@@ -70,6 +71,7 @@ class AppFunctionServiceDelegateTest {
                 testDispatcher,
                 fakeAggregatedInventory,
                 fakeAggregatedInvoker,
+                fakeTranslatorSelector
             )
     }
 
@@ -246,6 +248,52 @@ class AppFunctionServiceDelegateTest {
             .isEqualTo("TestString")
     }
 
+    @Test
+    fun testOnExecuteFunction_requestUsesOldFormatAndHasTranslator_translatorInvoked() {
+        fakeAggregatedInventory.setAppFunctionMetadata(SUCCESS_FUNCTION_METADATA)
+        val fakeTranslator = FakeTranslator()
+        fakeTranslatorSelector.setTranslator(fakeTranslator)
+        fakeAggregatedInvoker.setAppFunctionResult("succeedFunction") { "TestString" }
+        val request =
+            ExecuteAppFunctionRequest(
+                targetPackageName = context.packageName,
+                functionIdentifier = "succeedFunction",
+                functionParameters = AppFunctionData.EMPTY,
+                useJetpackSchema = false
+            )
+
+        val response = runBlocking { executeFunctionBlocking(request) }
+
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
+        assertThat(fakeTranslator.upgradeRequestCalled).isTrue()
+        assertThat(fakeTranslator.upgradeResponseCalled).isFalse()
+        assertThat(fakeTranslator.downgradeRequestCalled).isFalse()
+        assertThat(fakeTranslator.downgradeResponseCalled).isTrue()
+    }
+
+    @Test
+    fun testOnExecuteFunction_requestUsesJetpackFormatAndHasTranslator_translatorNotInvoked() {
+        fakeAggregatedInventory.setAppFunctionMetadata(SUCCESS_FUNCTION_METADATA)
+        val fakeTranslator = FakeTranslator()
+        fakeTranslatorSelector.setTranslator(fakeTranslator)
+        fakeAggregatedInvoker.setAppFunctionResult("succeedFunction") { "TestString" }
+        val request =
+            ExecuteAppFunctionRequest(
+                targetPackageName = context.packageName,
+                functionIdentifier = "succeedFunction",
+                functionParameters = AppFunctionData.EMPTY,
+                useJetpackSchema = true
+            )
+
+        val response = runBlocking { executeFunctionBlocking(request) }
+
+        assertThat(response).isInstanceOf(ExecuteAppFunctionResponse.Success::class.java)
+        assertThat(fakeTranslator.upgradeRequestCalled).isFalse()
+        assertThat(fakeTranslator.upgradeResponseCalled).isFalse()
+        assertThat(fakeTranslator.downgradeRequestCalled).isFalse()
+        assertThat(fakeTranslator.downgradeResponseCalled).isFalse()
+    }
+
     private suspend fun executeFunctionBlocking(
         request: ExecuteAppFunctionRequest,
     ): ExecuteAppFunctionResponse = suspendCancellableCoroutine { cont ->
@@ -262,6 +310,24 @@ class AppFunctionServiceDelegateTest {
                 }
             },
         )
+    }
+
+    private companion object {
+        val SUCCESS_FUNCTION_METADATA =
+            CompileTimeAppFunctionMetadata(
+                id = "succeedFunction",
+                isEnabledByDefault = true,
+                schema = AppFunctionSchemaMetadata("test", "succeedFunction", version = 1),
+                parameters = listOf(),
+                response =
+                    AppFunctionResponseMetadata(
+                        valueType =
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = TYPE_STRING,
+                                isNullable = false,
+                            )
+                    )
+            )
     }
 
     private class FakeAggregatedInvoker : AggregatedAppFunctionInvoker() {
@@ -315,6 +381,44 @@ class AppFunctionServiceDelegateTest {
 
         fun setAppFunctionMetadata(metadata: CompileTimeAppFunctionMetadata) {
             internalInventory.setAppFunctionMetadata(metadata)
+        }
+    }
+
+    private class FakeTranslatorSelector : TranslatorSelector {
+        private var translator: Translator? = null
+
+        override fun getTranslator(schemaMetadata: AppFunctionSchemaMetadata): Translator? =
+            translator
+
+        fun setTranslator(translator: Translator) {
+            this.translator = translator
+        }
+    }
+
+    private class FakeTranslator : Translator {
+        var upgradeRequestCalled = false
+        var upgradeResponseCalled = false
+        var downgradeRequestCalled = false
+        var downgradeResponseCalled = false
+
+        override fun upgradeRequest(request: AppFunctionData): AppFunctionData {
+            upgradeRequestCalled = true
+            return request
+        }
+
+        override fun upgradeResponse(response: AppFunctionData): AppFunctionData {
+            upgradeResponseCalled = true
+            return response
+        }
+
+        override fun downgradeRequest(request: AppFunctionData): AppFunctionData {
+            downgradeRequestCalled = true
+            return request
+        }
+
+        override fun downgradeResponse(response: AppFunctionData): AppFunctionData {
+            downgradeResponseCalled = true
+            return response
         }
     }
 }

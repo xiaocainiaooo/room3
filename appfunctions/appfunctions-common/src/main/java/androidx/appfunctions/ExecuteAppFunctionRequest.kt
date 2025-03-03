@@ -17,8 +17,10 @@
 package androidx.appfunctions
 
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
+import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
 
 /**
  * Represents a request to execute a specific app function.
@@ -30,13 +32,22 @@ import androidx.annotation.RestrictTo
  *   values are the values of those parameters. The data object may have missing parameters.
  *   Developers are advised to implement defensive handling measures.
  */
-public class ExecuteAppFunctionRequest(
+public class ExecuteAppFunctionRequest
+@RestrictTo(LIBRARY_GROUP)
+constructor(
     public val targetPackageName: String,
     public val functionIdentifier: String,
     public val functionParameters: AppFunctionData,
+    /** Whether the parameters in this request is encoded in the jetpack format or not. */
+    @get:RestrictTo(LIBRARY_GROUP) public val useJetpackSchema: Boolean
 ) {
+    public constructor(
+        targetPackageName: String,
+        functionIdentifier: String,
+        functionParameters: AppFunctionData
+    ) : this(targetPackageName, functionIdentifier, functionParameters, useJetpackSchema = true)
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @RestrictTo(LIBRARY_GROUP)
     public fun toPlatformExtensionClass():
         com.android.extensions.appfunctions.ExecuteAppFunctionRequest {
         return com.android.extensions.appfunctions.ExecuteAppFunctionRequest.Builder(
@@ -44,7 +55,12 @@ public class ExecuteAppFunctionRequest(
                 functionIdentifier,
             )
             .setParameters(functionParameters.genericDocument)
-            .setExtras(functionParameters.extras)
+            .setExtras(
+                Bundle().apply {
+                    putBundle(EXTRA_PARAMETERS, functionParameters.extras)
+                    putBoolean(EXTRA_USE_JETPACK_SCHEMA, useJetpackSchema)
+                }
+            )
             .build()
     }
 
@@ -54,8 +70,11 @@ public class ExecuteAppFunctionRequest(
     }
 
     public companion object {
+        internal const val EXTRA_PARAMETERS = "androidXAppfunctionsExtraParameters"
+        internal const val EXTRA_USE_JETPACK_SCHEMA = "androidXAppfunctionsExtraUseJetpackSchema"
+
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        @RestrictTo(LIBRARY_GROUP)
         public fun fromPlatformExtensionClass(
             request: com.android.extensions.appfunctions.ExecuteAppFunctionRequest
         ): ExecuteAppFunctionRequest {
@@ -65,8 +84,9 @@ public class ExecuteAppFunctionRequest(
                 functionParameters =
                     AppFunctionData(
                         request.parameters,
-                        request.extras,
+                        request.extras.getBundle(EXTRA_PARAMETERS) ?: Bundle.EMPTY
                     ),
+                useJetpackSchema = request.extras.getBoolean(EXTRA_USE_JETPACK_SCHEMA, false)
             )
         }
     }

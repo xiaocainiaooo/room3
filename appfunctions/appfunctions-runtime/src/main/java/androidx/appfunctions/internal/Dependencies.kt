@@ -21,7 +21,7 @@ import androidx.annotation.RequiresApi
 
 /** Provides manual dependency injection for AppFunction runtime infrastructure. */
 @RequiresApi(Build.VERSION_CODES.S)
-internal class Dependencies {
+internal object Dependencies {
 
     /** The instance of [AggregatedAppFunctionInventory]. */
     internal val aggregatedAppFunctionInventory: AggregatedAppFunctionInventory by lazy {
@@ -43,11 +43,5 @@ internal class Dependencies {
             )
     }
 
-    companion object {
-        @Volatile private var instance: Dependencies? = null
-
-        /** Gets the instance of [Dependencies]. */
-        internal fun getInstance() =
-            instance ?: synchronized(this) { instance ?: Dependencies().also { instance = it } }
-    }
+    internal val translatorSelector: TranslatorSelector = TranslatorSelectorImpl()
 }

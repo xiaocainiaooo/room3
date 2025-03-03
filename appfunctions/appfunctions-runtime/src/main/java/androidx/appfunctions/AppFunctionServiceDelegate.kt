@@ -25,8 +25,11 @@ import androidx.annotation.RequiresApi
 import androidx.appfunctions.internal.AggregatedAppFunctionInventory
 import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
+import androidx.appfunctions.internal.Translator
+import androidx.appfunctions.internal.TranslatorSelector
 import androidx.appfunctions.internal.unsafeBuildReturnValue
 import androidx.appfunctions.internal.unsafeGetParameterValue
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
@@ -42,6 +45,7 @@ internal class AppFunctionServiceDelegate(
     private val mainCoroutineContext: CoroutineContext,
     private val aggregatedInventory: AggregatedAppFunctionInventory,
     private val aggregatedInvoker: AggregatedAppFunctionInvoker,
+    private val translatorSelector: TranslatorSelector
 ) {
 
     private val job = Job()
@@ -70,14 +74,18 @@ internal class AppFunctionServiceDelegate(
                     )
                     return@launch
                 }
+                val translator =
+                    getTranslator(executeAppFunctionRequest, appFunctionMetadata.schema)
 
-                val parameters = extractParameters(executeAppFunctionRequest, appFunctionMetadata)
+                val parameters =
+                    extractParameters(executeAppFunctionRequest, appFunctionMetadata, translator)
                 callback.onResult(
                     unsafeInvokeFunction(
                         executeAppFunctionRequest,
                         callingPackageName,
                         appFunctionMetadata,
                         parameters,
+                        translator
                     )
                 )
             } catch (e: CancellationException) {
@@ -93,14 +101,29 @@ internal class AppFunctionServiceDelegate(
         job.cancel()
     }
 
+    private fun getTranslator(
+        request: ExecuteAppFunctionRequest,
+        schemaMetadata: AppFunctionSchemaMetadata?
+    ): Translator? {
+        if (request.useJetpackSchema) {
+            return null
+        }
+        return schemaMetadata?.let { translatorSelector.getTranslator(it) }
+    }
+
     private fun extractParameters(
         request: ExecuteAppFunctionRequest,
         appFunctionMetadata: CompileTimeAppFunctionMetadata,
+        translator: Translator?
     ): Map<String, Any?> {
+        // Upgrade the parameters from the agents, if they are using the old format.
+        val translatedParameters =
+            translator?.upgradeRequest(request.functionParameters) ?: request.functionParameters
+
         return buildMap {
             for (parameterMetadata in appFunctionMetadata.parameters) {
                 this[parameterMetadata.name] =
-                    request.functionParameters.unsafeGetParameterValue(parameterMetadata)
+                    translatedParameters.unsafeGetParameterValue(parameterMetadata)
             }
         }
     }
@@ -109,7 +132,8 @@ internal class AppFunctionServiceDelegate(
         request: ExecuteAppFunctionRequest,
         callingPackageName: String,
         appFunctionMetadata: CompileTimeAppFunctionMetadata,
-        parameters: Map<String, Any?>
+        parameters: Map<String, Any?>,
+        translator: Translator?
     ): ExecuteAppFunctionResponse {
         val result =
             withContext(mainCoroutineContext) {
@@ -120,7 +144,9 @@ internal class AppFunctionServiceDelegate(
                 )
             }
         val returnValue = appFunctionMetadata.response.unsafeBuildReturnValue(result)
-        return ExecuteAppFunctionResponse.Success(returnValue)
+        // Downgrade the return value from the agents, if they are using the old format.
+        val translatedReturnValue = translator?.downgradeResponse(returnValue) ?: returnValue
+        return ExecuteAppFunctionResponse.Success(translatedReturnValue)
     }
 
     private fun buildAppFunctionContext(callingPackageName: String): AppFunctionContext {

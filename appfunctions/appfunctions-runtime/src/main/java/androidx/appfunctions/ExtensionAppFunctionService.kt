@@ -41,8 +41,9 @@ public class ExtensionAppFunctionService : AppFunctionService() {
                 this@ExtensionAppFunctionService,
                 Dispatchers.Worker,
                 Dispatchers.Main,
-                Dependencies.getInstance().aggregatedAppFunctionInventory,
-                Dependencies.getInstance().aggregatedAppFunctionInvoker,
+                Dependencies.aggregatedAppFunctionInventory,
+                Dependencies.aggregatedAppFunctionInvoker,
+                Dependencies.translatorSelector,
             )
     }
 
