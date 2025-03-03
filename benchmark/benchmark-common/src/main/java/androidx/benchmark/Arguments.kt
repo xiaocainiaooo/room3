@@ -75,6 +75,7 @@ object Arguments {
     val dropShadersThrowOnFailure: Boolean
     val skipBenchmarksOnEmulator: Boolean
     val saveProfileWaitMillis: Long
+    val killExistingPerfettoRecordings: Boolean
 
     // internal properties are microbenchmark only
     internal val outputEnable: Boolean
@@ -340,6 +341,9 @@ object Arguments {
 
         throwOnMainThreadMeasureRepeated =
             arguments.getBenchmarkArgument("throwOnMainThreadMeasureRepeated")?.toBoolean() ?: false
+
+        killExistingPerfettoRecordings =
+            arguments.getString("killExistingPerfettoRecordings")?.toBoolean() ?: true
 
         if (arguments.getString("orchestratorService") != null) {
             InstrumentationResults.scheduleIdeWarningOnNextReport(
