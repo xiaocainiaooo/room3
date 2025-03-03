@@ -23,6 +23,7 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionS
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_SINGULAR
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.SUPPORTED_TYPES_STRING
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.isSupportedType
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.toAppFunctionDatatype
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
@@ -543,31 +544,6 @@ data class AnnotatedAppFunctions(
                     "Not a supported array type " +
                         selfTypeReference.ensureQualifiedTypeName().asString(),
                     selfTypeReference,
-                )
-        }
-    }
-
-    private fun KSTypeReference.toAppFunctionDatatype(): Int {
-        return when (this.toTypeName().ignoreNullable().toString()) {
-            String::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_STRING
-            Int::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_INT
-            Long::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_LONG
-            Float::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_FLOAT
-            Double::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_DOUBLE
-            Boolean::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_BOOLEAN
-            Unit::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_UNIT
-            Byte::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_BYTES
-            IntArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_INT
-            LongArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_LONG
-            FloatArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_FLOAT
-            DoubleArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_DOUBLE
-            BooleanArray::class.ensureQualifiedName() ->
-                AppFunctionPrimitiveTypeMetadata.TYPE_BOOLEAN
-            ByteArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_BYTES
-            else ->
-                throw ProcessingException(
-                    "Unsupported type reference " + this.ensureQualifiedTypeName().asString(),
-                    this,
                 )
         }
     }

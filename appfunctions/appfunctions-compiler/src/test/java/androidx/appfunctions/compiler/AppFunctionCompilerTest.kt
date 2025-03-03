@@ -108,6 +108,27 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testAllParcelablePrimitiveInputFunctions_genAppFunctionInventory_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("ParcelablePrimitiveFunctions.KT"),
+                processorOptions = mapOf("appfunctions:aggregateAppFunctions" to "true")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}ParcelablePrimitiveFunctions_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}ParcelablePrimitiveFunctions_AppFunctionInventory.KT",
+        )
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_v2.xml",
+            goldenFileName = "parcelablePrimitiveFunctions_app_function_dynamic_schema.xml",
+        )
+    }
+
+    @Test
     fun testSimpleFunction_genAppFunctionInvokerImpl_success() {
         val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
 

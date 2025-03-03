@@ -33,7 +33,8 @@ import androidx.appsearch.annotation.Document
     AppFunctionDataTypeMetadata.TYPE_STRING,
     AppFunctionDataTypeMetadata.TYPE_ARRAY,
     AppFunctionDataTypeMetadata.TYPE_REFERENCE,
-    AppFunctionDataTypeMetadata.TYPE_ALL_OF
+    AppFunctionDataTypeMetadata.TYPE_ALL_OF,
+    AppFunctionDataTypeMetadata.TYPE_PENDING_INTENT,
 )
 @Retention(AnnotationRetention.SOURCE)
 internal annotation class AppFunctionDataType
@@ -47,6 +48,7 @@ internal annotation class AppFunctionDataType
     AppFunctionDataTypeMetadata.TYPE_LONG,
     AppFunctionDataTypeMetadata.TYPE_INT,
     AppFunctionDataTypeMetadata.TYPE_STRING,
+    AppFunctionDataTypeMetadata.TYPE_PENDING_INTENT,
 )
 @Retention(AnnotationRetention.SOURCE)
 internal annotation class AppFunctionPrimitiveType
@@ -93,6 +95,8 @@ internal constructor(
          * All of type. The schema of the all of type is defined in a [AppFunctionAllOfTypeMetadata]
          */
         internal const val TYPE_ALL_OF: Int = 12
+        /** Pending Intent type. */
+        internal const val TYPE_PENDING_INTENT: Int = 13
 
         /** All primitive types used in [AppFunctionPrimitiveType] @IntDef annotation. */
         internal val PRIMITIVE_TYPES =
@@ -104,7 +108,8 @@ internal constructor(
                 TYPE_FLOAT,
                 TYPE_LONG,
                 TYPE_INT,
-                TYPE_STRING
+                TYPE_STRING,
+                TYPE_PENDING_INTENT
             )
     }
 
@@ -462,6 +467,8 @@ public class AppFunctionPrimitiveTypeMetadata(
         public const val TYPE_INT: Int = AppFunctionDataTypeMetadata.TYPE_INT
         /** String type. */
         public const val TYPE_STRING: Int = AppFunctionDataTypeMetadata.TYPE_STRING
+        /** Pending Intent type. */
+        public const val TYPE_PENDING_INTENT: Int = AppFunctionDataTypeMetadata.TYPE_PENDING_INTENT
     }
 }
 
