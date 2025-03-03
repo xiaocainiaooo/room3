@@ -107,9 +107,8 @@ class AppFunctionResponseMetadataReturnValueBuilderTest {
 
         val returnValue = responseMetadata.unsafeBuildReturnValue(result)
 
-        assertThrows(NoSuchElementException::class.java) {
-            returnValue.getString(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE)
-        }
+        assertThat(returnValue.getString(ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE))
+            .isNull()
     }
 
     @Test

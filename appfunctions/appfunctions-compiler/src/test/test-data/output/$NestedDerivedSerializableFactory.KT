@@ -11,15 +11,15 @@ public class `$NestedDerivedSerializableFactory` :
     val nestedBaseSerializableFactory = `$NestedBaseSerializableFactory`()
     val nestedDerivedSerializableFactory = `$NestedDerivedSerializableFactory`()
 
-    val stringBaseName = appFunctionData.getString("stringBaseName")
-    val nestedBaseData = appFunctionData.getAppFunctionDataOrNull("nestedBase")
+    val stringBaseName = checkNotNull(appFunctionData.getString("stringBaseName"))
+    val nestedBaseData = appFunctionData.getAppFunctionData("nestedBase")
     var nestedBase: NestedBaseSerializable? = null
     if (nestedBaseData != null) {
       nestedBase = nestedBaseSerializableFactory.fromAppFunctionData(nestedBaseData) as
           NestedBaseSerializable?
     }
-    val longBaseValue = appFunctionData.getLong("longBaseValue")
-    val nestedDerivedData = appFunctionData.getAppFunctionDataOrNull("nestedDerived")
+    val longBaseValue = checkNotNull(appFunctionData.getLongOrNull("longBaseValue"))
+    val nestedDerivedData = appFunctionData.getAppFunctionData("nestedDerived")
     var nestedDerived: NestedDerivedSerializable? = null
     if (nestedDerivedData != null) {
       nestedDerived = nestedDerivedSerializableFactory.fromAppFunctionData(nestedDerivedData) as

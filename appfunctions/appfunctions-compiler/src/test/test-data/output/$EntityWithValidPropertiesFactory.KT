@@ -10,15 +10,16 @@ public class `$EntityWithValidPropertiesFactory` :
   override fun fromAppFunctionData(appFunctionData: AppFunctionData): EntityWithValidProperties {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
-    val longParam = appFunctionData.getLong("longParam")
-    val doubleParam = appFunctionData.getDouble("doubleParam")
-    val boolParam = appFunctionData.getBoolean("boolParam")
-    val stringParam = appFunctionData.getString("stringParam")
-    val longArray = appFunctionData.getLongArray("longArray") ?: LongArray(0)
-    val doubleArray = appFunctionData.getDoubleArray("doubleArray") ?: DoubleArray(0)
-    val boolArray = appFunctionData.getBooleanArray("boolArray") ?: BooleanArray(0)
-    val stringList = appFunctionData.getStringList("stringList") ?: emptyList()
-    val inputSerializableData = appFunctionData.getAppFunctionData("inputSerializable")
+    val longParam = checkNotNull(appFunctionData.getLongOrNull("longParam"))
+    val doubleParam = checkNotNull(appFunctionData.getDoubleOrNull("doubleParam"))
+    val boolParam = checkNotNull(appFunctionData.getBooleanOrNull("boolParam"))
+    val stringParam = checkNotNull(appFunctionData.getString("stringParam"))
+    val longArray = checkNotNull(appFunctionData.getLongArray("longArray") ?: LongArray(0))
+    val doubleArray = checkNotNull(appFunctionData.getDoubleArray("doubleArray") ?: DoubleArray(0))
+    val boolArray = checkNotNull(appFunctionData.getBooleanArray("boolArray") ?: BooleanArray(0))
+    val stringList = checkNotNull(appFunctionData.getStringList("stringList") ?: emptyList())
+    val inputSerializableData =
+        checkNotNull(appFunctionData.getAppFunctionData("inputSerializable"))
     val inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData)
     val serializableListData = appFunctionData.getAppFunctionDataList("serializableList") ?:
         emptyList()

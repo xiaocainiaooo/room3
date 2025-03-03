@@ -8,8 +8,8 @@ import javax.`annotation`.processing.Generated
 public class `$LongBaseSerializableFactory` : AppFunctionSerializableFactory<LongBaseSerializable> {
   override fun fromAppFunctionData(appFunctionData: AppFunctionData): LongBaseSerializable {
 
-    val age = appFunctionData.getLong("age")
-    val name = appFunctionData.getString("name")
+    val age = checkNotNull(appFunctionData.getLongOrNull("age"))
+    val name = checkNotNull(appFunctionData.getString("name"))
 
     return LongBaseSerializable(age, name)
   }
