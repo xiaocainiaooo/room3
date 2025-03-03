@@ -45,6 +45,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -570,16 +571,21 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
             val value: Array<@Serializable(with = MyParcelableSerializer::class) MyParcelable>
         )
         val myParcelableArray = arrayOf(MyParcelable(3, "foo", 3.14), MyParcelable(4, "bar", 1.73))
-        // Even though `Bundle` does retain the actual `Parcelable` type there's no way for us to
-        // specify this `Parcelable` element type for the array, so the restored array is still of
-        // type `Array<Parcelable>` and the plugin-generated serializer will get
-        // `ClassCastException` when trying to cast it back to `Array<MyParcelable>`.
-        assertThrows(ClassCastException::class) {
-            ParcelableArrayContainer(myParcelableArray).encodeDecode {
-                assertThat(size()).isEqualTo(1)
-                assertThat(getParcelableArray<MyParcelable>("value")).isEqualTo(myParcelableArray)
-            }
+        myParcelableArray.encodeDecode(serializer = ArraySerializer(MyParcelableSerializer)) {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getParcelableArray<MyParcelable>("")).isEqualTo(myParcelableArray)
         }
+        ParcelableArrayContainer(myParcelableArray)
+            .encodeDecode(
+                checkDecoded = { decoded, original ->
+                    assertThat(decoded.value.contentEquals(original.value)).isTrue()
+                },
+                checkEncoded = {
+                    assertThat(
+                        getParcelableArray<MyParcelable>("value").contentEquals(myParcelableArray)
+                    )
+                }
+            )
 
         @Serializable
         data class CharSequenceListContainer(
