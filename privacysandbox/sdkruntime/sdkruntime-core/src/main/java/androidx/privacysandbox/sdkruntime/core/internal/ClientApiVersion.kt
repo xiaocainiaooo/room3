@@ -31,10 +31,16 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 enum class ClientApiVersion(
     val apiLevel: Int,
+    val stable: Boolean = false,
     private val newFeatures: Set<ClientFeature> = emptySet()
 ) {
     V5__1_0_ALPHA13(apiLevel = 5),
-    V6__1_0_ALPHA14(apiLevel = 6, newFeatures = setOf(ClientFeature.GET_CLIENT_PACKAGE_NAME)),
+    V6__1_0_ALPHA14(
+        apiLevel = 6,
+        /** Temporary mark as stable to run tests for V6 and V7 */
+        stable = true,
+        newFeatures = setOf(ClientFeature.GET_CLIENT_PACKAGE_NAME)
+    ),
     V7__1_0_ALPHA16(apiLevel = 7, newFeatures = setOf(ClientFeature.CLIENT_IMPORTANCE_LISTENER)),
 
     /**
@@ -57,6 +63,8 @@ enum class ClientApiVersion(
         val MIN_SUPPORTED_SDK_VERSION = values().minBy { v -> v.apiLevel }
 
         val CURRENT_VERSION = values().filter { v -> v != FUTURE_VERSION }.maxBy { v -> v.apiLevel }
+
+        val LATEST_STABLE_VERSION = values().filter { v -> v.stable }.maxBy { v -> v.apiLevel }
 
         private val FEATURE_TO_VERSION_MAP = buildFeatureMap()
 
