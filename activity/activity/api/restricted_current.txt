@@ -311,6 +311,7 @@ package androidx.activity.result {
     method public long getAccentColor();
     method public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab getDefaultTab();
     method public int getMaxItems();
+    method public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities? getMediaCapabilitiesForTranscoding();
     method public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType getMediaType();
     method public boolean isCustomAccentColorApplied();
     method public boolean isOrderedSelection();
@@ -319,6 +320,7 @@ package androidx.activity.result {
     property public boolean isCustomAccentColorApplied;
     property public boolean isOrderedSelection;
     property public int maxItems;
+    property public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities? mediaCapabilitiesForTranscoding;
     property public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType;
   }
 
@@ -328,11 +330,14 @@ package androidx.activity.result {
     method public androidx.activity.result.PickVisualMediaRequest.Builder setAccentColor(long accentColor);
     method public androidx.activity.result.PickVisualMediaRequest.Builder setDefaultTab(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab defaultTab);
     method public androidx.activity.result.PickVisualMediaRequest.Builder setMaxItems(@IntRange(from=2L) int maxItems);
+    method @RequiresApi(android.os.Build.VERSION_CODES.TIRAMISU) public androidx.activity.result.PickVisualMediaRequest.Builder setMediaCapabilitiesForTranscoding(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities? mediaCapabilities);
     method public androidx.activity.result.PickVisualMediaRequest.Builder setMediaType(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType);
     method public androidx.activity.result.PickVisualMediaRequest.Builder setOrderedSelection(boolean isOrderedSelection);
   }
 
   public final class PickVisualMediaRequestKt {
+    method @RequiresApi(android.os.Build.VERSION_CODES.TIRAMISU) public static androidx.activity.result.PickVisualMediaRequest PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities? mediaCapabilitiesForTranscoding, optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType, optional @IntRange(from=2L) int maxItems, optional boolean isOrderedSelection, optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab defaultTab);
+    method @RequiresApi(android.os.Build.VERSION_CODES.TIRAMISU) public static androidx.activity.result.PickVisualMediaRequest PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities? mediaCapabilitiesForTranscoding, long accentColor, optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType, optional @IntRange(from=2L) int maxItems, optional boolean isOrderedSelection, optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab defaultTab);
     method @Deprecated public static androidx.activity.result.PickVisualMediaRequest PickVisualMediaRequest(optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType);
     method @Deprecated public static androidx.activity.result.PickVisualMediaRequest PickVisualMediaRequest(optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType, optional @IntRange(from=2L) int maxItems);
     method public static androidx.activity.result.PickVisualMediaRequest PickVisualMediaRequest(optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType, optional @IntRange(from=2L) int maxItems, optional boolean isOrderedSelection, optional androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab defaultTab);
@@ -471,6 +476,29 @@ package androidx.activity.result.contract {
 
   public static final class ActivityResultContracts.PickVisualMedia.ImageOnly implements androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType {
     field public static final androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly INSTANCE;
+  }
+
+  public static final class ActivityResultContracts.PickVisualMedia.MediaCapabilities {
+    method public java.util.Set<java.lang.Integer> getSupportedHdrTypes();
+    property public java.util.Set<java.lang.Integer> supportedHdrTypes;
+    field public static final androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities.Companion Companion;
+    field public static final int TYPE_DOLBY_VISION = 3; // 0x3
+    field public static final int TYPE_HDR10 = 1; // 0x1
+    field public static final int TYPE_HDR10_PLUS = 2; // 0x2
+    field public static final int TYPE_HLG10 = 0; // 0x0
+  }
+
+  public static final class ActivityResultContracts.PickVisualMedia.MediaCapabilities.Builder {
+    ctor public ActivityResultContracts.PickVisualMedia.MediaCapabilities.Builder();
+    method public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities.Builder addSupportedHdrType(int hdrType);
+    method public androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.MediaCapabilities build();
+  }
+
+  public static final class ActivityResultContracts.PickVisualMedia.MediaCapabilities.Companion {
+    property public static int TYPE_DOLBY_VISION;
+    property public static int TYPE_HDR10;
+    property public static int TYPE_HDR10_PLUS;
+    property public static int TYPE_HLG10;
   }
 
   public static final class ActivityResultContracts.PickVisualMedia.SingleMimeType implements androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType {
