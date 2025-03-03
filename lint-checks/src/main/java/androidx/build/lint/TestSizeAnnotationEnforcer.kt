@@ -156,13 +156,14 @@ class TestSizeAnnotationEnforcer : Detector(), SourceCodeScanner {
 
         /**
          * Only AndroidJUnit4 enforces timeouts, so it should be used over JUnit4 / other such
-         * runners. Parameterized does not enforce timeouts, but there is no equivalent that does,
-         * so it is still fine to use.
+         * runners. Parameterized/TestParameterInjector do not enforce timeouts, but there is no
+         * equivalent that does, so they is still fine to use.
          */
         private val ALLOWED_TEST_RUNNERS =
             listOf(
                 "androidx.test.ext.junit.runners.AndroidJUnit4",
-                "org.junit.runners.Parameterized"
+                "org.junit.runners.Parameterized",
+                "com.google.testing.junit.testparameterinjector.TestParameterInjector",
             )
         private const val RUN_WITH = "org.junit.runner.RunWith"
         private const val RUN_WITH_VALUE = "value"
@@ -193,8 +194,8 @@ class TestSizeAnnotationEnforcer : Detector(), SourceCodeScanner {
                 "Unsupported test runner",
                 "Only AndroidJUnit4 supports setting a timeout for tests using the test size " +
                     "annotation, so this test runner should be used instead. There is no " +
-                    "equivalent parameterized runner that also sets timeouts, so Parameterized is " +
-                    "also allowed.",
+                    "equivalent parameterized runner that also sets timeouts, so parameterized " +
+                    "runners are also allowed.",
                 Category.CORRECTNESS,
                 5,
                 Severity.ERROR,
