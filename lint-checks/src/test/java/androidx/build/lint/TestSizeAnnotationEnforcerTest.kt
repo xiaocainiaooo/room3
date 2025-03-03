@@ -125,7 +125,7 @@ src/test/androidx/foo/Test.kt:8: Error: Unexpected test size annotation [Unexpec
             .run()
             .expect(
                 """
-src/androidTest/androidx/foo/Test.kt:7: Error: Unsupported test runner. Supported runners are: [androidx.test.ext.junit.runners.AndroidJUnit4, org.junit.runners.Parameterized] [UnsupportedTestRunner]
+src/androidTest/androidx/foo/Test.kt:7: Error: Unsupported test runner. Supported runners are: [androidx.test.ext.junit.runners.AndroidJUnit4, org.junit.runners.Parameterized, com.google.testing.junit.testparameterinjector.TestParameterInjector] [UnsupportedTestRunner]
                 @RunWith(JUnit4::class)
                          ~~~~~~~~~~~~~
 1 errors, 0 warnings
@@ -177,6 +177,32 @@ src/androidTest/androidx/foo/Test.kt:7: Error: Unsupported test runner. Supporte
                     fun test() {}
                 }
             """
+                    )
+                    .within("src/androidTest"),
+                *StubClasses
+            )
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun allowsTestParameterInjector() {
+        lint()
+            .files(
+                kotlin(
+                        """
+                        package androidx.foo
+
+                        import org.junit.Test
+                        import org.junit.runner.RunWith
+                        import com.google.testing.junit.testparameterinjector.TestParameterInjector
+
+                        @RunWith(TestParameterInjector::class)
+                        class Test {
+                            @Test
+                            fun test() {}
+                        }
+                        """
                     )
                     .within("src/androidTest"),
                 *StubClasses
@@ -361,6 +387,7 @@ src/androidTest/androidx/foo/Test.kt:14: Error: Missing test size annotation [Mi
             Stubs.ParameterizedRunner,
             Stubs.AndroidJUnit4Runner,
             Stubs.TestSizeAnnotations,
-            Stubs.TestAnnotation
+            Stubs.TestAnnotation,
+            Stubs.TestParameterInjector,
         )
 }
