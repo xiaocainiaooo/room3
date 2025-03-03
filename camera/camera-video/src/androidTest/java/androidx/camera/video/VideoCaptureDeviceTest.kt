@@ -19,7 +19,6 @@ package androidx.camera.video
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.os.Build
-import android.util.Size
 import android.view.Surface
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
@@ -221,7 +220,7 @@ class VideoCaptureDeviceTest(
             qualityList.forEach loop@{ quality ->
                 val profile =
                     videoCapabilities.getProfiles(quality, dynamicRange)!!.defaultVideoProfile
-                val targetResolution = Size(profile.width, profile.height)
+                val targetResolution = profile.resolution
                 val videoOutput =
                     createTestVideoOutput(
                         mediaSpec =

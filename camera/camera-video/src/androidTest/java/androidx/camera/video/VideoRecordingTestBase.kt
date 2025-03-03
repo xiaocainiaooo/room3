@@ -23,7 +23,6 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.util.Rational
-import android.util.Size
 import android.view.Surface
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
@@ -321,7 +320,7 @@ abstract class VideoRecordingTestBase(
         // Arbitrary cropping
         val profile =
             videoCapabilities.getProfiles(quality, defaultDynamicRange)!!.defaultVideoProfile
-        val targetResolution = Size(profile.width, profile.height)
+        val targetResolution = profile.resolution
         val cropRect = Rect(6, 6, targetResolution.width - 7, targetResolution.height - 7)
         videoCapture.setViewPortCropRect(cropRect)
 

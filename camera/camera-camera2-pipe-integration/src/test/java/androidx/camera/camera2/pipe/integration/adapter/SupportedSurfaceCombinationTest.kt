@@ -146,13 +146,10 @@ class SupportedSurfaceCombinationTest {
     private val recordSize = Size(3840, 2160)
     private val maximumSize = Size(4032, 3024)
     private val legacyVideoMaximumSize = Size(1920, 1080)
-    private val profileUhd =
-        EncoderProfilesUtil.createFakeEncoderProfilesProxy(recordSize.width, recordSize.height)
-    private val profileFhd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(1920, 1080)
-    private val profileHd =
-        EncoderProfilesUtil.createFakeEncoderProfilesProxy(previewSize.width, previewSize.height)
-    private val profileSd =
-        EncoderProfilesUtil.createFakeEncoderProfilesProxy(vgaSize.width, vgaSize.height)
+    private val profileUhd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(recordSize)
+    private val profileFhd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(Size(1920, 1080))
+    private val profileHd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(previewSize)
+    private val profileSd = EncoderProfilesUtil.createFakeEncoderProfilesProxy(vgaSize)
     private val supportedSizes =
         arrayOf(
             Size(4032, 3024), // 4:3
@@ -220,6 +217,7 @@ class SupportedSurfaceCombinationTest {
         whenever(mockEncoderProfilesAdapter.hasProfile(ArgumentMatchers.anyInt())).thenReturn(true)
         whenever(mockVideoProfileProxy.width).thenReturn(3840)
         whenever(mockVideoProfileProxy.height).thenReturn(2160)
+        whenever(mockVideoProfileProxy.resolution).thenReturn(Size(3840, 2160))
         whenever(mockEncoderProfilesProxy.videoProfiles).thenReturn(listOf(mockVideoProfileProxy))
         whenever(mockEncoderProfilesAdapter.getAll(ArgumentMatchers.anyInt()))
             .thenReturn(mockEncoderProfilesProxy)
