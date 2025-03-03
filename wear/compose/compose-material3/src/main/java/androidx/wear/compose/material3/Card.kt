@@ -24,7 +24,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -77,6 +76,11 @@ import androidx.wear.compose.materialcore.Text
  * Example of [Card] with onLongClick:
  *
  * @sample androidx.wear.compose.material3.samples.CardWithOnLongClickSample
+ *
+ * [Card] does not constrain the height of its contents by default. Where necessary to do that, use
+ * `Modifier.height(IntrinsicSize.Min)` as shown in this example:
+ *
+ * @sample androidx.wear.compose.material3.samples.CardFillContentSample
  *
  * For more information, see the
  * [Cards](https://developer.android.com/training/wearables/components/cards) Wear OS Material
@@ -769,8 +773,7 @@ public object CardDefaults {
 }
 
 @Composable
-private fun Modifier.cardSizeModifier(): Modifier =
-    defaultMinSize(minHeight = CardDefaults.Height).height(IntrinsicSize.Min)
+private fun Modifier.cardSizeModifier(): Modifier = defaultMinSize(minHeight = CardDefaults.Height)
 
 /**
  * Represents Colors used in [Card]. Unlike other Material 3 components, Cards do not change their
