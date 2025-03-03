@@ -24,7 +24,10 @@ import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_BOOLEAN
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_BYTES
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_DOUBLE
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_FLOAT
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_INT
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.test.filters.SdkSuppress
@@ -44,27 +47,41 @@ class AppFunctionDataTest {
                 AppFunctionComponentsMetadata(),
             )
 
+        builder.setInt("int", 234)
         builder.setLong("long", 123L)
+        builder.setFloat("float", 100.0f)
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
         builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
         val data = builder.build()
 
+        assertThat(data.getInt("int")).isEqualTo(234)
         assertThat(data.getLong("long")).isEqualTo(123L)
+        assertThat(data.getFloat("float")).isEqualTo(100.0f)
         assertThat(data.getDouble("double")).isEqualTo(50.0)
         assertThat(data.getBoolean("boolean")).isTrue()
         assertThat(data.getString("string")).isEqualTo("testString")
+        assertThat(data.getIntArray("intArray")).asList().containsExactly(4, 5, 6)
         assertThat(data.getLongArray("longArray")).asList().containsExactly(1L, 2L, 3L)
+        assertThat(data.getFloatArray("floatArray"))
+            .usingExactEquality()
+            .containsExactly(10.0f, 20.0f, 30.0f)
         assertThat(data.getDoubleArray("doubleArray"))
             .usingExactEquality()
             .containsExactly(4.0, 5.0, 6.0)
         assertThat(data.getBooleanArray("booleanArray"))
             .asList()
             .containsExactly(false, true, false)
+        assertThat(data.getByteArray("byteArray"))
+            .asList()
+            .containsExactly(10.toByte(), 20.toByte())
         assertThat(data.getStringList("stringList")).containsExactly("1", "2", "3")
     }
 
@@ -77,9 +94,19 @@ class AppFunctionDataTest {
             )
 
         assertThrows(IllegalArgumentException::class.java) {
+            builder.setIntArray("int", intArrayOf(100, 200))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setLong("int", 50) }
+
+        assertThrows(IllegalArgumentException::class.java) {
             builder.setLongArray("long", longArrayOf(100, 200))
         }
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("long", 50.0) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setFloatArray("float", floatArrayOf(50.0f, 100.0f))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("float", 20.0) }
 
         assertThrows(IllegalArgumentException::class.java) {
             builder.setDoubleArray("double", doubleArrayOf(50.0, 100.0))
@@ -96,9 +123,19 @@ class AppFunctionDataTest {
         }
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("string", 100.0) }
 
+        assertThrows(IllegalArgumentException::class.java) { builder.setInt("intArray", 100) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setLongArray("intArray", longArrayOf(2, 3))
+        }
+
         assertThrows(IllegalArgumentException::class.java) { builder.setLong("longArray", 100L) }
         assertThrows(IllegalArgumentException::class.java) {
             builder.setDoubleArray("longArray", doubleArrayOf(2.0))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("floatArray", 1.0) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setDoubleArray("floatArray", doubleArrayOf(1.0))
         }
 
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("doubleArray", 1.0) }
@@ -112,6 +149,11 @@ class AppFunctionDataTest {
         assertThrows(IllegalArgumentException::class.java) {
             builder.setStringList("booleanArray", listOf("test1"))
         }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setBooleanArray("byteArray", booleanArrayOf(false, true))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setInt("byteArray", 1) }
 
         assertThrows(IllegalArgumentException::class.java) {
             builder.setString("stringList", "test1")
@@ -128,18 +170,29 @@ class AppFunctionDataTest {
                 TEST_PARAMETER_METADATA,
                 AppFunctionComponentsMetadata(),
             )
+        builder.setInt("int", 234)
         builder.setLong("long", 123L)
+        builder.setFloat("float", 100.0f)
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
         builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
         val data = builder.build()
 
+        assertThrows(IllegalArgumentException::class.java) { data.getLong("int") }
+        assertThrows(IllegalArgumentException::class.java) { data.getIntArray("int") }
+
         assertThrows(IllegalArgumentException::class.java) { data.getDouble("long") }
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("long") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDouble("float") }
+        assertThrows(IllegalArgumentException::class.java) { data.getFloatArray("float") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getBoolean("double") }
         assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("double") }
@@ -150,14 +203,23 @@ class AppFunctionDataTest {
         assertThrows(IllegalArgumentException::class.java) { data.getLong("string") }
         assertThrows(IllegalArgumentException::class.java) { data.getStringList("string") }
 
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("intArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getInt("intArray") }
+
         assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("longArray") }
         assertThrows(IllegalArgumentException::class.java) { data.getLong("longArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("floatArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getFloat("floatArray") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getBooleanArray("doubleArray") }
         assertThrows(IllegalArgumentException::class.java) { data.getDouble("doubleArray") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getStringList("booleanArray") }
-        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("boolean Array") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("booleanArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("byteArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("byteArray") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("stringList") }
         assertThrows(IllegalArgumentException::class.java) { data.getString("stringList") }
@@ -167,27 +229,41 @@ class AppFunctionDataTest {
     fun testReadWrite_asObject_conformSpec() {
         val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
 
+        builder.setInt("int", 234)
         builder.setLong("long", 123L)
+        builder.setFloat("float", 100.0f)
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
         builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
         val data = builder.build()
 
+        assertThat(data.getInt("int")).isEqualTo(234)
         assertThat(data.getLong("long")).isEqualTo(123L)
+        assertThat(data.getFloat("float")).isEqualTo(100.0f)
         assertThat(data.getDouble("double")).isEqualTo(50.0)
         assertThat(data.getBoolean("boolean")).isTrue()
         assertThat(data.getString("string")).isEqualTo("testString")
+        assertThat(data.getIntArray("intArray")).asList().containsExactly(4, 5, 6)
         assertThat(data.getLongArray("longArray")).asList().containsExactly(1L, 2L, 3L)
+        assertThat(data.getFloatArray("floatArray"))
+            .usingExactEquality()
+            .containsExactly(10.0f, 20.0f, 30.0f)
         assertThat(data.getDoubleArray("doubleArray"))
             .usingExactEquality()
             .containsExactly(4.0, 5.0, 6.0)
         assertThat(data.getBooleanArray("booleanArray"))
             .asList()
             .containsExactly(false, true, false)
+        assertThat(data.getByteArray("byteArray"))
+            .asList()
+            .containsExactly(10.toByte(), 20.toByte())
         assertThat(data.getStringList("stringList")).containsExactly("1", "2", "3")
     }
 
@@ -196,9 +272,19 @@ class AppFunctionDataTest {
         val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
 
         assertThrows(IllegalArgumentException::class.java) {
+            builder.setIntArray("int", intArrayOf(100, 200))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setLong("int", 50) }
+
+        assertThrows(IllegalArgumentException::class.java) {
             builder.setLongArray("long", longArrayOf(100, 200))
         }
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("long", 50.0) }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setFloatArray("float", floatArrayOf(50.0f, 100.0f))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("float", 20.0) }
 
         assertThrows(IllegalArgumentException::class.java) {
             builder.setDoubleArray("double", doubleArrayOf(50.0, 100.0))
@@ -215,9 +301,19 @@ class AppFunctionDataTest {
         }
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("string", 100.0) }
 
+        assertThrows(IllegalArgumentException::class.java) { builder.setInt("intArray", 100) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setLongArray("intArray", longArrayOf(2, 3))
+        }
+
         assertThrows(IllegalArgumentException::class.java) { builder.setLong("longArray", 100L) }
         assertThrows(IllegalArgumentException::class.java) {
             builder.setDoubleArray("longArray", doubleArrayOf(2.0))
+        }
+
+        assertThrows(IllegalArgumentException::class.java) { builder.setDouble("floatArray", 1.0) }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setDoubleArray("floatArray", doubleArrayOf(1.0))
         }
 
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("doubleArray", 1.0) }
@@ -233,6 +329,11 @@ class AppFunctionDataTest {
         }
 
         assertThrows(IllegalArgumentException::class.java) {
+            builder.setBooleanArray("byteArray", booleanArrayOf(false, true))
+        }
+        assertThrows(IllegalArgumentException::class.java) { builder.setInt("byteArray", 1) }
+
+        assertThrows(IllegalArgumentException::class.java) {
             builder.setString("stringList", "test1")
         }
         assertThrows(IllegalArgumentException::class.java) {
@@ -243,18 +344,29 @@ class AppFunctionDataTest {
     @Test
     fun testRead_asObject_notConformSpec() {
         val builder = AppFunctionData.Builder(TEST_OBJECT_METADATA, AppFunctionComponentsMetadata())
+        builder.setInt("int", 234)
         builder.setLong("long", 123L)
+        builder.setFloat("float", 100.0f)
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
+        builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
         builder.setDoubleArray("doubleArray", doubleArrayOf(4.0, 5.0, 6.0))
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
+        builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
         val data = builder.build()
 
+        assertThrows(IllegalArgumentException::class.java) { data.getLong("int") }
+        assertThrows(IllegalArgumentException::class.java) { data.getIntArray("int") }
+
         assertThrows(IllegalArgumentException::class.java) { data.getDouble("long") }
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("long") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDouble("float") }
+        assertThrows(IllegalArgumentException::class.java) { data.getFloatArray("float") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getBoolean("double") }
         assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("double") }
@@ -265,14 +377,23 @@ class AppFunctionDataTest {
         assertThrows(IllegalArgumentException::class.java) { data.getLong("string") }
         assertThrows(IllegalArgumentException::class.java) { data.getStringList("string") }
 
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("intArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getInt("intArray") }
+
         assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("longArray") }
         assertThrows(IllegalArgumentException::class.java) { data.getLong("longArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getDoubleArray("floatArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getFloat("floatArray") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getBooleanArray("doubleArray") }
         assertThrows(IllegalArgumentException::class.java) { data.getDouble("doubleArray") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getStringList("booleanArray") }
-        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("boolean Array") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("booleanArray") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getLongArray("byteArray") }
+        assertThrows(IllegalArgumentException::class.java) { data.getBoolean("byteArray") }
 
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("stringList") }
         assertThrows(IllegalArgumentException::class.java) { data.getString("stringList") }
@@ -548,13 +669,25 @@ class AppFunctionDataTest {
             AppFunctionObjectTypeMetadata(
                 properties =
                     mapOf(
+                        "int" to AppFunctionPrimitiveTypeMetadata(TYPE_INT, false),
                         "long" to AppFunctionPrimitiveTypeMetadata(TYPE_LONG, false),
+                        "float" to AppFunctionPrimitiveTypeMetadata(TYPE_FLOAT, false),
                         "double" to AppFunctionPrimitiveTypeMetadata(TYPE_DOUBLE, false),
                         "boolean" to AppFunctionPrimitiveTypeMetadata(TYPE_BOOLEAN, false),
                         "string" to AppFunctionPrimitiveTypeMetadata(TYPE_STRING, false),
+                        "intArray" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false),
+                                isNullable = false,
+                            ),
                         "longArray" to
                             AppFunctionArrayTypeMetadata(
                                 itemType = AppFunctionPrimitiveTypeMetadata(TYPE_LONG, false),
+                                isNullable = false,
+                            ),
+                        "floatArray" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_FLOAT, false),
                                 isNullable = false,
                             ),
                         "doubleArray" to
@@ -565,6 +698,11 @@ class AppFunctionDataTest {
                         "booleanArray" to
                             AppFunctionArrayTypeMetadata(
                                 itemType = AppFunctionPrimitiveTypeMetadata(TYPE_BOOLEAN, false),
+                                isNullable = false,
+                            ),
+                        "byteArray" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType = AppFunctionPrimitiveTypeMetadata(TYPE_BYTES, false),
                                 isNullable = false,
                             ),
                         "stringList" to
@@ -581,11 +719,29 @@ class AppFunctionDataTest {
         val TEST_PARAMETER_METADATA =
             listOf(
                 AppFunctionParameterMetadata(
+                    name = "int",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_INT,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
                     name = "long",
                     isRequired = true,
                     dataType =
                         AppFunctionPrimitiveTypeMetadata(
                             type = TYPE_LONG,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "float",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_FLOAT,
                             isNullable = false,
                         ),
                 ),
@@ -617,6 +773,19 @@ class AppFunctionDataTest {
                         ),
                 ),
                 AppFunctionParameterMetadata(
+                    name = "intArray",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_INT,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
                     name = "longArray",
                     isRequired = true,
                     dataType =
@@ -624,6 +793,19 @@ class AppFunctionDataTest {
                             itemType =
                                 AppFunctionPrimitiveTypeMetadata(
                                     type = TYPE_LONG,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "floatArray",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_FLOAT,
                                     isNullable = false,
                                 ),
                             isNullable = false,
@@ -650,6 +832,19 @@ class AppFunctionDataTest {
                             itemType =
                                 AppFunctionPrimitiveTypeMetadata(
                                     type = TYPE_BOOLEAN,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "byteArray",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_BYTES,
                                     isNullable = false,
                                 ),
                             isNullable = false,
