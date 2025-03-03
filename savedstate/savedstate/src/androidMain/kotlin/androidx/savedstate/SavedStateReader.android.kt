@@ -16,7 +16,6 @@
 
 @file:JvmName("SavedStateReaderKt")
 @file:JvmMultifileClass
-@file:Suppress("NOTHING_TO_INLINE")
 
 package androidx.savedstate
 
@@ -57,20 +56,6 @@ internal actual constructor(
         return source.getBinder(key)
     }
 
-    /**
-     * Retrieves an [IBinder] value associated with the specified [key], or returns [defaultValue]
-     * if the [key] is not found or the associated value has the wrong type.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun getBinderOrElse(key: String, defaultValue: () -> IBinder): IBinder {
-        return source.getBinder(key) ?: defaultValue()
-    }
-
     public actual inline fun getBoolean(key: String): Boolean {
         val result = source.getBoolean(key, false)
         if (result == false) {
@@ -92,10 +77,6 @@ internal actual constructor(
             }
         }
         return result
-    }
-
-    public actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
-        return source.getBoolean(key, defaultValue())
     }
 
     public actual inline fun getChar(key: String): Char {
@@ -120,23 +101,12 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
-        return source.getChar(key, defaultValue())
-    }
-
     public actual inline fun getCharSequence(key: String): CharSequence {
         return source.getCharSequence(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getCharSequenceOrNull(key: String): CharSequence? {
         return source.getCharSequence(key)
-    }
-
-    public actual inline fun getCharSequenceOrElse(
-        key: String,
-        defaultValue: () -> CharSequence
-    ): CharSequence {
-        return source.getCharSequence(key) ?: defaultValue()
     }
 
     public actual inline fun getDouble(key: String): Double {
@@ -162,10 +132,6 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
-        return source.getDouble(key, defaultValue())
-    }
-
     public actual inline fun getFloat(key: String): Float {
         val result = source.getFloat(key, Float.MIN_VALUE)
         if (result == Float.MIN_VALUE) {
@@ -187,10 +153,6 @@ internal actual constructor(
             }
         }
         return result
-    }
-
-    public actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
-        return source.getFloat(key, defaultValue())
     }
 
     public actual inline fun getInt(key: String): Int {
@@ -216,10 +178,6 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
-        return source.getInt(key, defaultValue())
-    }
-
     public actual inline fun getLong(key: String): Long {
         val result = source.getLong(key, Long.MIN_VALUE)
         if (result == Long.MIN_VALUE) {
@@ -243,10 +201,6 @@ internal actual constructor(
         return result
     }
 
-    public actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
-        return source.getLong(key, defaultValue())
-    }
-
     /**
      * Retrieves a [Parcelable] object associated with the specified key.
      *
@@ -262,23 +216,6 @@ internal actual constructor(
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     public inline fun <reified T : Parcelable> getParcelableOrNull(key: String): T? {
         return getParcelable(source, key, T::class.java)
-    }
-
-    /**
-     * Retrieves a [Parcelable] value associated with the specified [key], or returns [defaultValue]
-     * if the [key] is not found or the associated value has the wrong type.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun <reified T : Parcelable> getParcelableOrElse(
-        key: String,
-        defaultValue: () -> T
-    ): T {
-        return getParcelable(source, key, T::class.java) ?: defaultValue()
     }
 
     /**
@@ -299,23 +236,6 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Serializable] value associated with the specified [key], or returns
-     * [defaultValue] if the [key] is not found or the associated value has the wrong type.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun <reified T : Serializable> getJavaSerializableOrElse(
-        key: String,
-        defaultValue: () -> T
-    ): T {
-        return getSerializable(source, key, T::class.java) ?: defaultValue()
-    }
-
-    /**
      * Retrieves a [Size] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
@@ -330,20 +250,6 @@ internal actual constructor(
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     public fun getSizeOrNull(key: String): Size? {
         return source.getSize(key)
-    }
-
-    /**
-     * Retrieves a [Size] value associated with the specified [key], or returns [defaultValue] if
-     * the [key] is not found or the associated value has the wrong type.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun getSizeOrElse(key: String, defaultValue: () -> Size): Size {
-        return source.getSize(key) ?: defaultValue()
     }
 
     /**
@@ -363,20 +269,6 @@ internal actual constructor(
         return source.getSizeF(key)
     }
 
-    /**
-     * Retrieves a [SizeF] value associated with the specified [key], or returns [defaultValue] if
-     * the [key] is not found or the associated value has the wrong type.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun getSizeFOrElse(key: String, defaultValue: () -> SizeF): SizeF {
-        return source.getSizeF(key) ?: defaultValue()
-    }
-
     @Suppress("ArrayReturn")
     public actual inline fun getSavedStateArray(key: String): Array<SavedState> {
         return getParcelableArray(key)
@@ -387,24 +279,12 @@ internal actual constructor(
         return getParcelableArrayOrNull(key)
     }
 
-    @Suppress("ArrayReturn")
-    public actual inline fun getSavedStateArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<SavedState>,
-    ): Array<SavedState> {
-        return getParcelableArrayOrElse(key, defaultValue)
-    }
-
     public actual inline fun getString(key: String): String {
         return source.getString(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getStringOrNull(key: String): String? {
         return source.getString(key)
-    }
-
-    public actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
-        return source.getString(key, defaultValue())
     }
 
     public actual inline fun getIntList(key: String): List<Int> {
@@ -416,13 +296,6 @@ internal actual constructor(
         return source.getIntegerArrayList(key)
     }
 
-    public actual inline fun getIntListOrElse(
-        key: String,
-        defaultValue: () -> List<Int>
-    ): List<Int> {
-        return source.getIntegerArrayList(key) ?: defaultValue()
-    }
-
     public actual inline fun getCharSequenceList(key: String): List<CharSequence> {
         return source.getCharSequenceArrayList(key) ?: keyOrValueNotFoundError(key)
     }
@@ -430,13 +303,6 @@ internal actual constructor(
     @Suppress("NullableCollection")
     public actual fun getCharSequenceListOrNull(key: String): List<CharSequence>? {
         return source.getCharSequenceArrayList(key)
-    }
-
-    public actual inline fun getCharSequenceListOrElse(
-        key: String,
-        defaultValue: () -> List<CharSequence>
-    ): List<CharSequence> {
-        return source.getCharSequenceArrayList(key) ?: defaultValue()
     }
 
     public actual inline fun getSavedStateList(key: String): List<SavedState> {
@@ -448,13 +314,6 @@ internal actual constructor(
         return getParcelableListOrNull(key)
     }
 
-    public actual inline fun getSavedStateListOrElse(
-        key: String,
-        defaultValue: () -> List<SavedState>
-    ): List<SavedState> {
-        return getParcelableListOrElse(key, defaultValue)
-    }
-
     public actual inline fun getStringList(key: String): List<String> {
         return source.getStringArrayList(key) ?: keyOrValueNotFoundError(key)
     }
@@ -462,13 +321,6 @@ internal actual constructor(
     @Suppress("NullableCollection")
     public actual fun getStringListOrNull(key: String): List<String>? {
         return source.getStringArrayList(key)
-    }
-
-    public actual inline fun getStringListOrElse(
-        key: String,
-        defaultValue: () -> List<String>
-    ): List<String> {
-        return source.getStringArrayList(key) ?: defaultValue()
     }
 
     /**
@@ -489,23 +341,6 @@ internal actual constructor(
         return getParcelableArrayList(source, key, T::class.java)
     }
 
-    /**
-     * Retrieves a [List] of elements of [Parcelable] associated with the specified [key], or a
-     * default value if the [key] doesn't exist.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun <reified T : Parcelable> getParcelableListOrElse(
-        key: String,
-        defaultValue: () -> List<T>
-    ): List<T> {
-        return getParcelableArrayList(source, key, T::class.java) ?: defaultValue()
-    }
-
     public actual inline fun getBooleanArray(key: String): BooleanArray {
         return source.getBooleanArray(key) ?: keyOrValueNotFoundError(key)
     }
@@ -514,26 +349,12 @@ internal actual constructor(
         return source.getBooleanArray(key)
     }
 
-    public actual inline fun getBooleanArrayOrElse(
-        key: String,
-        defaultValue: () -> BooleanArray
-    ): BooleanArray {
-        return source.getBooleanArray(key) ?: defaultValue()
-    }
-
     public actual inline fun getCharArray(key: String): CharArray {
         return source.getCharArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getCharArrayOrNull(key: String): CharArray? {
         return source.getCharArray(key)
-    }
-
-    public actual inline fun getCharArrayOrElse(
-        key: String,
-        defaultValue: () -> CharArray
-    ): CharArray {
-        return source.getCharArray(key) ?: defaultValue()
     }
 
     @Suppress("ArrayReturn")
@@ -546,27 +367,12 @@ internal actual constructor(
         return source.getCharSequenceArray(key)
     }
 
-    @Suppress("ArrayReturn")
-    public actual inline fun getCharSequenceArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<CharSequence>
-    ): Array<CharSequence> {
-        return source.getCharSequenceArray(key) ?: defaultValue()
-    }
-
     public actual inline fun getDoubleArray(key: String): DoubleArray {
         return source.getDoubleArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getDoubleArrayOrNull(key: String): DoubleArray? {
         return source.getDoubleArray(key)
-    }
-
-    public actual inline fun getDoubleArrayOrElse(
-        key: String,
-        defaultValue: () -> DoubleArray
-    ): DoubleArray {
-        return source.getDoubleArray(key) ?: defaultValue()
     }
 
     public actual inline fun getFloatArray(key: String): FloatArray {
@@ -577,26 +383,12 @@ internal actual constructor(
         return source.getFloatArray(key)
     }
 
-    public actual inline fun getFloatArrayOrElse(
-        key: String,
-        defaultValue: () -> FloatArray
-    ): FloatArray {
-        return source.getFloatArray(key) ?: defaultValue()
-    }
-
     public actual inline fun getIntArray(key: String): IntArray {
         return source.getIntArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getIntArrayOrNull(key: String): IntArray? {
         return source.getIntArray(key)
-    }
-
-    public actual inline fun getIntArrayOrElse(
-        key: String,
-        defaultValue: () -> IntArray
-    ): IntArray {
-        return source.getIntArray(key) ?: defaultValue()
     }
 
     public actual inline fun getLongArray(key: String): LongArray {
@@ -607,13 +399,6 @@ internal actual constructor(
         return source.getLongArray(key)
     }
 
-    public actual inline fun getLongArrayOrElse(
-        key: String,
-        defaultValue: () -> LongArray
-    ): LongArray {
-        return source.getLongArray(key) ?: defaultValue()
-    }
-
     public actual inline fun getStringArray(key: String): Array<String> {
         return source.getStringArray(key) ?: keyOrValueNotFoundError(key)
     }
@@ -621,13 +406,6 @@ internal actual constructor(
     @Suppress("NullableCollection")
     public actual fun getStringArrayOrNull(key: String): Array<String>? {
         return source.getStringArray(key)
-    }
-
-    public actual inline fun getStringArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<String>
-    ): Array<String> {
-        return source.getStringArray(key) ?: defaultValue()
     }
 
     /**
@@ -653,25 +431,6 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Array] of elements of [Parcelable] associated with the specified [key], or a
-     * default value if the [key] doesn't exist.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    @Suppress("ArrayReturn")
-    public inline fun <reified T : Parcelable> getParcelableArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<T>
-    ): Array<T> {
-        @Suppress("UNCHECKED_CAST")
-        return getParcelableArray(source, key, T::class.java) as? Array<T> ?: defaultValue()
-    }
-
-    /**
      * Retrieves a [SparseArray] of elements of [Parcelable] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
@@ -692,24 +451,6 @@ internal actual constructor(
         return getSparseParcelableArray(source, key, T::class.java)
     }
 
-    /**
-     * Retrieves a [SparseArray] of elements of [Parcelable] associated with the specified [key], or
-     * a default value if the [key] doesn't exist.
-     *
-     * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value to return if the key is not found
-     *   or the associated value has the wrong type.
-     * @return The value associated with the [key], or the result of [defaultValue] if the key is
-     *   not found or the associated value has the wrong type.
-     */
-    public inline fun <reified T : Parcelable> getSparseParcelableArrayOrElse(
-        key: String,
-        defaultValue: () -> SparseArray<T>
-    ): SparseArray<T> {
-        return getSparseParcelableArray(source, key, T::class.java) as? SparseArray<T>
-            ?: defaultValue()
-    }
-
     public actual inline fun getSavedState(key: String): SavedState {
         return source.getBundle(key) ?: keyOrValueNotFoundError(key)
     }
@@ -717,13 +458,6 @@ internal actual constructor(
     @Suppress("NullableCollection")
     public actual fun getSavedStateOrNull(key: String): SavedState? {
         return source.getBundle(key)
-    }
-
-    public actual inline fun getSavedStateOrElse(
-        key: String,
-        defaultValue: () -> SavedState
-    ): SavedState {
-        return source.getBundle(key) ?: defaultValue()
     }
 
     public actual inline fun size(): Int = source.size()

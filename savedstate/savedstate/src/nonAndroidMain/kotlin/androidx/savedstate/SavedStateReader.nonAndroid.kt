@@ -39,20 +39,12 @@ internal actual constructor(
         return source.map[key] as? Boolean
     }
 
-    public actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
-        return source.map[key] as? Boolean ?: defaultValue()
-    }
-
     public actual inline fun getChar(key: String): Char {
         return source.map[key] as? Char ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getCharOrNull(key: String): Char? {
         return source.map[key] as? Char
-    }
-
-    public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
-        return source.map[key] as? Char ?: defaultValue()
     }
 
     public actual inline fun getCharSequence(key: String): CharSequence {
@@ -63,23 +55,12 @@ internal actual constructor(
         return source.map[key] as? CharSequence
     }
 
-    public actual inline fun getCharSequenceOrElse(
-        key: String,
-        defaultValue: () -> CharSequence
-    ): CharSequence {
-        return source.map[key] as? CharSequence ?: defaultValue()
-    }
-
     public actual inline fun getDouble(key: String): Double {
         return source.map[key] as? Double ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getDoubleOrNull(key: String): Double? {
         return source.map[key] as? Double
-    }
-
-    public actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
-        return source.map[key] as? Double ?: defaultValue()
     }
 
     public actual inline fun getFloat(key: String): Float {
@@ -90,20 +71,12 @@ internal actual constructor(
         return source.map[key] as? Float
     }
 
-    public actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
-        return source.map[key] as? Float ?: defaultValue()
-    }
-
     public actual inline fun getInt(key: String): Int {
         return source.map[key] as? Int ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getIntOrNull(key: String): Int? {
         return source.map[key] as? Int
-    }
-
-    public actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
-        return source.map[key] as? Int ?: defaultValue()
     }
 
     public actual inline fun getLong(key: String): Long {
@@ -114,20 +87,12 @@ internal actual constructor(
         return source.map[key] as? Long
     }
 
-    public actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
-        return source.map[key] as? Long ?: defaultValue()
-    }
-
     public actual inline fun getString(key: String): String {
         return source.map[key] as? String ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getStringOrNull(key: String): String? {
         return source.map[key] as? String
-    }
-
-    public actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
-        return source.map[key] as? String ?: defaultValue()
     }
 
     public actual inline fun getCharSequenceList(key: String): List<CharSequence> {
@@ -139,13 +104,6 @@ internal actual constructor(
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<CharSequence>
     }
 
-    public actual inline fun getCharSequenceListOrElse(
-        key: String,
-        defaultValue: () -> List<CharSequence>
-    ): List<CharSequence> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<CharSequence> ?: defaultValue()
-    }
-
     public actual inline fun getIntList(key: String): List<Int> {
         @Suppress("UNCHECKED_CAST")
         return source.map[key] as? List<Int> ?: keyOrValueNotFoundError(key)
@@ -153,13 +111,6 @@ internal actual constructor(
 
     public actual fun getIntListOrNull(key: String): List<Int>? {
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int>
-    }
-
-    public actual inline fun getIntListOrElse(
-        key: String,
-        defaultValue: () -> List<Int>
-    ): List<Int> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int> ?: defaultValue()
     }
 
     public actual inline fun getSavedStateList(key: String): List<SavedState> {
@@ -171,13 +122,6 @@ internal actual constructor(
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<SavedState>
     }
 
-    public actual inline fun getSavedStateListOrElse(
-        key: String,
-        defaultValue: () -> List<SavedState>
-    ): List<SavedState> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<SavedState> ?: defaultValue()
-    }
-
     public actual inline fun getStringList(key: String): List<String> {
         @Suppress("UNCHECKED_CAST")
         return source.map[key] as? List<String> ?: keyOrValueNotFoundError(key)
@@ -187,26 +131,12 @@ internal actual constructor(
         @Suppress("UNCHECKED_CAST") return source.map[key] as? List<String>
     }
 
-    public actual inline fun getStringListOrElse(
-        key: String,
-        defaultValue: () -> List<String>
-    ): List<String> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<String> ?: defaultValue()
-    }
-
     public actual inline fun getCharArray(key: String): CharArray {
         return source.map[key] as? CharArray ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getCharArrayOrNull(key: String): CharArray? {
         return source.map[key] as? CharArray
-    }
-
-    public actual inline fun getCharArrayOrElse(
-        key: String,
-        defaultValue: () -> CharArray
-    ): CharArray {
-        return source.map[key] as? CharArray ?: defaultValue()
     }
 
     public actual inline fun getCharSequenceArray(key: String): Array<CharSequence> {
@@ -218,26 +148,12 @@ internal actual constructor(
         @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<CharSequence>
     }
 
-    public actual inline fun getCharSequenceArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<CharSequence>
-    ): Array<CharSequence> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<CharSequence> ?: defaultValue()
-    }
-
     public actual inline fun getBooleanArray(key: String): BooleanArray {
         return source.map[key] as? BooleanArray ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getBooleanArrayOrNull(key: String): BooleanArray? {
         return source.map[key] as? BooleanArray
-    }
-
-    public actual inline fun getBooleanArrayOrElse(
-        key: String,
-        defaultValue: () -> BooleanArray
-    ): BooleanArray {
-        return source.map[key] as? BooleanArray ?: defaultValue()
     }
 
     public actual inline fun getDoubleArray(key: String): DoubleArray {
@@ -248,26 +164,12 @@ internal actual constructor(
         return source.map[key] as? DoubleArray
     }
 
-    public actual inline fun getDoubleArrayOrElse(
-        key: String,
-        defaultValue: () -> DoubleArray,
-    ): DoubleArray {
-        return source.map[key] as? DoubleArray ?: defaultValue()
-    }
-
     public actual inline fun getFloatArray(key: String): FloatArray {
         return source.map[key] as? FloatArray ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getFloatArrayOrNull(key: String): FloatArray? {
         return source.map[key] as? FloatArray
-    }
-
-    public actual inline fun getFloatArrayOrElse(
-        key: String,
-        defaultValue: () -> FloatArray
-    ): FloatArray {
-        return source.map[key] as? FloatArray ?: defaultValue()
     }
 
     public actual inline fun getIntArray(key: String): IntArray {
@@ -278,26 +180,12 @@ internal actual constructor(
         return source.map[key] as? IntArray
     }
 
-    public actual inline fun getIntArrayOrElse(
-        key: String,
-        defaultValue: () -> IntArray
-    ): IntArray {
-        return source.map[key] as? IntArray ?: defaultValue()
-    }
-
     public actual inline fun getLongArray(key: String): LongArray {
         return source.map[key] as? LongArray ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getLongArrayOrNull(key: String): LongArray? {
         return source.map[key] as? LongArray
-    }
-
-    public actual inline fun getLongArrayOrElse(
-        key: String,
-        defaultValue: () -> LongArray
-    ): LongArray {
-        return source.map[key] as? LongArray ?: defaultValue()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -311,13 +199,6 @@ internal actual constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    public actual inline fun getSavedStateArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<SavedState>
-    ): Array<SavedState> { return source.map[key] as? Array<SavedState>?: defaultValue()
-    }
-
-    @Suppress("UNCHECKED_CAST")
     public actual inline fun getStringArray(key: String): Array<String> {
         return source.map[key] as? Array<String> ?: keyOrValueNotFoundError(key)
     }
@@ -326,27 +207,12 @@ internal actual constructor(
         @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<String>
     }
 
-    @Suppress("UNCHECKED_CAST")
-    public actual inline fun getStringArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<String>
-    ): Array<String> {
-        return source.map[key] as? Array<String> ?: defaultValue()
-    }
-
     public actual inline fun getSavedState(key: String): SavedState {
         return source.map[key] as? SavedState ?: keyOrValueNotFoundError(key)
     }
 
     public actual fun getSavedStateOrNull(key: String): SavedState? {
         return source.map[key] as? SavedState
-    }
-
-    public actual inline fun getSavedStateOrElse(
-        key: String,
-        defaultValue: () -> SavedState
-    ): SavedState {
-        return source.map[key] as? SavedState ?: defaultValue()
     }
 
     public actual inline fun size(): Int = source.map.size
