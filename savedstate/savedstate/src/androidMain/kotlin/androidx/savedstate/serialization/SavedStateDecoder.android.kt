@@ -24,6 +24,7 @@ import androidx.savedstate.serialization.serializers.DefaultParcelableSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableListSerializer
+import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
 import kotlinx.serialization.DeserializationStrategy
 
 @Suppress("UNCHECKED_CAST", "IMPLICIT_CAST_TO_ANY")
@@ -35,10 +36,18 @@ internal actual fun <T> SavedStateDecoder.decodeFormatSpecificTypesOnPlatform(
         polymorphicParcelableDescriptor -> DefaultParcelableSerializer.deserialize(this)
         polymorphicJavaSerializableDescriptor -> DefaultJavaSerializableSerializer.deserialize(this)
         polymorphicIBinderDescriptor -> IBinderSerializer.deserialize(this)
-        parcelableArrayDescriptor -> ParcelableArraySerializer.deserialize(this)
-        parcelableListDescriptor -> ParcelableListSerializer.deserialize(this)
-        charSequenceArrayDescriptor -> CharSequenceArraySerializer.deserialize(this)
-        charSequenceListDescriptor -> CharSequenceListSerializer.deserialize(this)
+        charSequenceArrayDescriptor,
+        polymorphicCharSequenceArrayDescriptor -> CharSequenceArraySerializer.deserialize(this)
+        charSequenceListDescriptor,
+        polymorphicCharSequenceListDescriptor -> CharSequenceListSerializer.deserialize(this)
+        parcelableArrayDescriptor,
+        polymorphicParcelableArrayDescriptor -> ParcelableArraySerializer.deserialize(this)
+        parcelableListDescriptor,
+        polymorphicParcelableListDescriptor -> ParcelableListSerializer.deserialize(this)
+        sparseParcelableArrayDescriptor,
+        polymorphicSparseParcelableArrayDescriptor,
+        nullablePolymorphicSparseParcelableArrayDescriptor ->
+            SparseParcelableArraySerializer.deserialize(this)
         else -> null
     }
         as T?

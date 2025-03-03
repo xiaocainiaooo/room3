@@ -18,6 +18,7 @@
 
 package androidx.savedstate.serialization.serializers
 
+import android.annotation.SuppressLint
 import android.os.IBinder
 import android.os.Parcelable
 import android.util.Size
@@ -31,6 +32,7 @@ import androidx.savedstate.write
 import java.io.Serializable as JavaSerializable
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -357,12 +359,11 @@ public object ParcelableListSerializer : KSerializer<List<Parcelable>> {
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
  *
- * @sample androidx.savedstate.sparseParcelableArraySerializer
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public object SparseParcelableArraySerializer : KSerializer<SparseArray<Parcelable>> {
+internal object SparseParcelableArraySerializer : KSerializer<SparseArray<Parcelable>> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("android.util.SparseArray<android.os.Parcelable>")
 
@@ -379,4 +380,47 @@ public object SparseParcelableArraySerializer : KSerializer<SparseArray<Parcelab
         }
         return decoder.run { savedState.read { getSparseParcelableArray(key) } }
     }
+}
+
+/**
+ * A serializer for [SparseArray].
+ *
+ * @sample androidx.savedstate.sparseArraySerializer
+ * @see androidx.savedstate.serialization.encodeToSavedState
+ * @see androidx.savedstate.serialization.decodeFromSavedState
+ */
+@OptIn(ExperimentalSerializationApi::class)
+public class SparseArraySerializer<T>(elementSerializer: KSerializer<T>) :
+    KSerializer<SparseArray<T>> {
+
+    private val surrogateSerializer = SparseArraySurrogate.serializer(elementSerializer)
+
+    // We can't use `SerialDescriptor("android.util.SparseArray", surrogateSerializer.descriptor)
+    // as the `WrappedSerialDescriptor` returned doesn't have a proper `equals()` to trigger our
+    // format-specific serialization:
+    // https://github.com/Kotlin/kotlinx.serialization/issues/2941
+    override val descriptor: SerialDescriptor = surrogateSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: SparseArray<T>) {
+        val surrogate =
+            SparseArraySurrogate(
+                keys = List(value.size()) { index -> value.keyAt(index) },
+                values = List(value.size()) { index -> value.valueAt(index) }
+            )
+        encoder.encodeSerializableValue(surrogateSerializer, surrogate)
+    }
+
+    override fun deserialize(decoder: Decoder): SparseArray<T> {
+        val surrogate = decoder.decodeSerializableValue(surrogateSerializer)
+        require(surrogate.keys.size == surrogate.values.size)
+        return SparseArray<T>(surrogate.keys.size).apply {
+            for (index in surrogate.keys.indices) {
+                append(surrogate.keys[index], surrogate.values[index])
+            }
+        }
+    }
+
+    @SuppressLint("UnsafeOptInUsageError") // The class is private.
+    @Serializable
+    private class SparseArraySurrogate<T>(val keys: List<Int>, val values: List<T>)
 }

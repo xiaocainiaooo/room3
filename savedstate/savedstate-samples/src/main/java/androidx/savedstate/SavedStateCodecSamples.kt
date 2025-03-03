@@ -35,7 +35,7 @@ import androidx.savedstate.serialization.serializers.ParcelableSerializer
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
 import androidx.savedstate.serialization.serializers.SizeSerializer
-import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
+import androidx.savedstate.serialization.serializers.SparseArraySerializer
 import java.util.UUID
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.PolymorphicSerializer
@@ -247,10 +247,10 @@ fun parcelableListSerializer() {
 }
 
 @Sampled
-fun sparseParcelableArraySerializer() {
+fun sparseArraySerializer() {
     @Serializable
     class MyModel(
-        @Serializable(with = SparseParcelableArraySerializer::class)
+        @Serializable(with = SparseArraySerializer::class)
         val sparseParcelableArray: android.util.SparseArray<android.os.Parcelable>
     )
 }

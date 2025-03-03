@@ -340,12 +340,12 @@ package androidx.savedstate.serialization.serializers {
     field public static final androidx.savedstate.serialization.serializers.SizeSerializer INSTANCE;
   }
 
-  public final class SparseParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.util.SparseArray<android.os.Parcelable>> {
-    method public android.util.SparseArray<android.os.Parcelable> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+  public final class SparseArraySerializer<T> implements kotlinx.serialization.KSerializer<android.util.SparseArray<T>> {
+    ctor public SparseArraySerializer(kotlinx.serialization.KSerializer<T> elementSerializer);
+    method public android.util.SparseArray<T> deserialize(kotlinx.serialization.encoding.Decoder decoder);
     method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
-    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.util.SparseArray<android.os.Parcelable> value);
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.util.SparseArray<T> value);
     property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
-    field public static final androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer INSTANCE;
   }
 
 }
