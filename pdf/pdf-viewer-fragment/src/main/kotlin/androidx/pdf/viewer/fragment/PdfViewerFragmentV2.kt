@@ -262,6 +262,18 @@ public open class PdfViewerFragmentV2 : Fragment() {
         toolboxView.setOnCurrentPageRequested { pdfView.visiblePages.getCenter() }
     }
 
+    override fun onResume() {
+        // This ensures that the focus request occurs before the view becomes visible,
+        // providing a smoother search animation without noticeable jerking.
+        if (
+            (documentViewModel.searchViewUiState.value !is SearchViewUiState.Closed) &&
+                !pdfSearchView.searchQueryBox.hasFocus()
+        )
+            pdfSearchView.searchQueryBox.requestFocus()
+
+        super.onResume()
+    }
+
     /**
      * Called from Fragment.onViewCreated(). This gives subclasses a chance to customize component.
      */
@@ -273,7 +285,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
             // Attach the callback to the decorView to reliably receive insets animation events,
             // such as those triggered by soft keyboard input.
             ViewCompat.setWindowInsetsAnimationCallback(
-                it.window.decorView,
+                pdfSearchView,
                 TranslateInsetsAnimationCallback(
                     view = pdfSearchView,
                     windowManager = windowManager,
