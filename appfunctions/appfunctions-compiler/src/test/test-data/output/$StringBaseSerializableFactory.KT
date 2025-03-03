@@ -5,8 +5,7 @@ import androidx.appfunctions.`internal`.AppFunctionSerializableFactory
 import javax.`annotation`.processing.Generated
 
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$StringBaseSerializableFactory` :
-    AppFunctionSerializableFactory<StringBaseSerializable> {
+public class `$StringBaseSerializableFactory` : AppFunctionSerializableFactory<StringBaseSerializable> {
   override fun fromAppFunctionData(appFunctionData: AppFunctionData): StringBaseSerializable {
 
     val name = checkNotNull(appFunctionData.getString("name"))

@@ -5,8 +5,7 @@ import androidx.appfunctions.`internal`.AppFunctionSerializableFactory
 import javax.`annotation`.processing.Generated
 
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$EntityWithValidPropertiesFactory` :
-    AppFunctionSerializableFactory<EntityWithValidProperties> {
+public class `$EntityWithValidPropertiesFactory` : AppFunctionSerializableFactory<EntityWithValidProperties> {
   override fun fromAppFunctionData(appFunctionData: AppFunctionData): EntityWithValidProperties {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
@@ -18,21 +17,17 @@ public class `$EntityWithValidPropertiesFactory` :
     val doubleArray = checkNotNull(appFunctionData.getDoubleArray("doubleArray") ?: DoubleArray(0))
     val boolArray = checkNotNull(appFunctionData.getBooleanArray("boolArray") ?: BooleanArray(0))
     val stringList = checkNotNull(appFunctionData.getStringList("stringList") ?: emptyList())
-    val inputSerializableData =
-        checkNotNull(appFunctionData.getAppFunctionData("inputSerializable"))
+    val inputSerializableData = checkNotNull(appFunctionData.getAppFunctionData("inputSerializable"))
     val inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData)
-    val serializableListData = appFunctionData.getAppFunctionDataList("serializableList") ?:
-        emptyList()
+    val serializableListData = appFunctionData.getAppFunctionDataList("serializableList") ?: emptyList()
     val serializableList = serializableListData.map { data ->
       inputSerializableFactory.fromAppFunctionData(data)
     }
 
-    return EntityWithValidProperties(longParam, doubleParam, boolParam, stringParam, longArray,
-        doubleArray, boolArray, stringList, inputSerializable, serializableList)
+    return EntityWithValidProperties(longParam, doubleParam, boolParam, stringParam, longArray, doubleArray, boolArray, stringList, inputSerializable, serializableList)
   }
 
-  override fun toAppFunctionData(appFunctionSerializable: EntityWithValidProperties):
-      AppFunctionData {
+  override fun toAppFunctionData(appFunctionSerializable: EntityWithValidProperties): AppFunctionData {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.EntityWithValidProperties")
@@ -44,11 +39,8 @@ public class `$EntityWithValidPropertiesFactory` :
     builder.setDoubleArray("doubleArray", appFunctionSerializable.doubleArray)
     builder.setBooleanArray("boolArray", appFunctionSerializable.boolArray)
     builder.setStringList("stringList", appFunctionSerializable.stringList)
-    builder.setAppFunctionData("inputSerializable",
-        inputSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as
-        InputSerializable))
-    builder.setAppFunctionDataList("serializableList", appFunctionSerializable.serializableList.map{
-        inputSerializable ->
+    builder.setAppFunctionData("inputSerializable", inputSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as InputSerializable))
+    builder.setAppFunctionDataList("serializableList", appFunctionSerializable.serializableList.map{ inputSerializable ->
       inputSerializableFactory.toAppFunctionData(inputSerializable)
     })
 

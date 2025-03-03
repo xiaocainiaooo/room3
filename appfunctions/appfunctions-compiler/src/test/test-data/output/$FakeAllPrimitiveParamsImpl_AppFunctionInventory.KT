@@ -22,15 +22,13 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
-    "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveParams" to
-        ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveParamsMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveArrayParams" to
-        ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveArrayParamsMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveParams" to ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveParamsMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveParamsImpl#allPrimitiveArrayParams" to ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveArrayParamsMetadataObject.APP_FUNCTION_METADATA,
   )
 
   private object ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveParamsMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveParams", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveParams", version=1)
 
     private val PARAMETER_METADATA_ARG1_PRIMITIVE_DATA_TYPE: AppFunctionPrimitiveTypeMetadata =
         AppFunctionPrimitiveTypeMetadata(
@@ -149,8 +147,8 @@ public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInv
   }
 
   private object ComTestdataFakeAllPrimitiveParamsImplAllPrimitiveArrayParamsMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveParams", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveParams", version=1)
 
     private val PARAMETER_METADATA_ARG1_ARRAY_DATA_TYPE_PRIMITIVE_ITEM_TYPE:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(

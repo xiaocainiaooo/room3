@@ -23,14 +23,10 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
-    "com.testdata.SerializableOutputFunctions#simpleFunction" to
-        ComTestdataSerializableOutputFunctionsSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList" to
-        ComTestdataSerializableOutputFunctionsSimpleFunctionSerializableListMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializableList" to
-        ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableListMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable" to
-        ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunction" to ComTestdataSerializableOutputFunctionsSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunctionSerializableList" to ComTestdataSerializableOutputFunctionsSimpleFunctionSerializableListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializableList" to ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableListMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SerializableOutputFunctions#simpleFunctionNullableSerializable" to ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableMetadataObject.APP_FUNCTION_METADATA,
   )
 
   private object ComTestdataSerializableOutputFunctionsSimpleFunctionMetadataObject {
@@ -55,8 +51,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
             isNullable = false
         )
 
-    private
-        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -64,8 +59,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
 
     private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
         AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-            itemType =
-            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            itemType = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
             isNullable = false
         )
 
@@ -109,8 +103,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
         )
   }
 
-  private object ComTestdataSerializableOutputFunctionsSimpleFunctionSerializableListMetadataObject
-      {
+  private object ComTestdataSerializableOutputFunctionsSimpleFunctionSerializableListMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
@@ -138,8 +131,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
             isNullable = false
         )
 
-    private
-        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -147,8 +139,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
 
     private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
         AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-            itemType =
-            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            itemType = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
             isNullable = false
         )
 
@@ -192,8 +183,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
         )
   }
 
-  private object
-      ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableListMetadataObject {
+  private object ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableListMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
@@ -221,8 +211,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
             isNullable = false
         )
 
-    private
-        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -230,8 +219,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
 
     private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
         AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-            itemType =
-            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            itemType = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
             isNullable = false
         )
 
@@ -275,8 +263,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
         )
   }
 
-  private object
-      ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableMetadataObject {
+  private object ComTestdataSerializableOutputFunctionsSimpleFunctionNullableSerializableMetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = null
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
@@ -298,8 +285,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
             isNullable = false
         )
 
-    private
-        val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
+    private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -307,8 +293,7 @@ public class `$SerializableOutputFunctions_AppFunctionInventory` : AppFunctionIn
 
     private val COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE:
         AppFunctionArrayTypeMetadata = AppFunctionArrayTypeMetadata(
-            itemType =
-            COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
+            itemType = COM_TESTDATA_SAMPLESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_LISTVALUE_PRIMITIVE_ITEM_TYPE,
             isNullable = false
         )
 

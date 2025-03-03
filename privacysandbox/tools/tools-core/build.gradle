@@ -86,5 +86,5 @@ androidx {
     type = SoftwareType.ANNOTATION_PROCESSOR_UTILS
     inceptionYear = "2022"
     description = "Core utilities for Privacy Sandbox Tools."
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }

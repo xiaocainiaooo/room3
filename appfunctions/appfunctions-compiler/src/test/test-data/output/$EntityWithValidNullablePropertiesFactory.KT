@@ -5,10 +5,8 @@ import androidx.appfunctions.`internal`.AppFunctionSerializableFactory
 import javax.`annotation`.processing.Generated
 
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$EntityWithValidNullablePropertiesFactory` :
-    AppFunctionSerializableFactory<EntityWithValidNullableProperties> {
-  override fun fromAppFunctionData(appFunctionData: AppFunctionData):
-      EntityWithValidNullableProperties {
+public class `$EntityWithValidNullablePropertiesFactory` : AppFunctionSerializableFactory<EntityWithValidNullableProperties> {
+  override fun fromAppFunctionData(appFunctionData: AppFunctionData): EntityWithValidNullableProperties {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
     val longParam = appFunctionData.getLongOrNull("longParam")
@@ -22,20 +20,17 @@ public class `$EntityWithValidNullablePropertiesFactory` :
     val inputSerializableData = appFunctionData.getAppFunctionData("inputSerializable")
     var inputSerializable: InputSerializable? = null
     if (inputSerializableData != null) {
-      inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData) as
-          InputSerializable?
+      inputSerializable = inputSerializableFactory.fromAppFunctionData(inputSerializableData) as InputSerializable?
     }
     val serializableListData = appFunctionData.getAppFunctionDataList("serializableList")
     val serializableList = serializableListData?.map { data ->
       inputSerializableFactory.fromAppFunctionData(data)
     }
 
-    return EntityWithValidNullableProperties(longParam, doubleParam, boolParam, stringParam,
-        longArray, doubleArray, boolArray, stringList, inputSerializable, serializableList)
+    return EntityWithValidNullableProperties(longParam, doubleParam, boolParam, stringParam, longArray, doubleArray, boolArray, stringList, inputSerializable, serializableList)
   }
 
-  override fun toAppFunctionData(appFunctionSerializable: EntityWithValidNullableProperties):
-      AppFunctionData {
+  override fun toAppFunctionData(appFunctionSerializable: EntityWithValidNullableProperties): AppFunctionData {
     val inputSerializableFactory = `$InputSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.EntityWithValidNullableProperties")
@@ -64,13 +59,10 @@ public class `$EntityWithValidNullablePropertiesFactory` :
       builder.setStringList("stringList", appFunctionSerializable.stringList)
     }
     if (appFunctionSerializable.inputSerializable != null) {
-      builder.setAppFunctionData("inputSerializable",
-          inputSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as
-          InputSerializable))
+      builder.setAppFunctionData("inputSerializable", inputSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as InputSerializable))
     }
     if (appFunctionSerializable.serializableList != null) {
-      builder.setAppFunctionDataList("serializableList",
-          appFunctionSerializable.serializableList.map{ inputSerializable ->
+      builder.setAppFunctionDataList("serializableList", appFunctionSerializable.serializableList.map{ inputSerializable ->
         inputSerializableFactory.toAppFunctionData(inputSerializable)
       })
     }

@@ -11,8 +11,7 @@ public interface MyInterface {
         sharedUiInterface: MySharedUiInterface,
     )
 
-    public fun doSomethingWithNullableInterface(maybeInterface: MySecondInterface?,
-            maybeSharedUiInterface: MySharedUiInterface?)
+    public fun doSomethingWithNullableInterface(maybeInterface: MySecondInterface?, maybeSharedUiInterface: MySharedUiInterface?)
 
     public fun doSomethingWithSdkActivityLauncher(launcher: SdkActivityLauncher)
 

@@ -22,67 +22,39 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
-    "com.testdata.FakeAllPrimitiveReturnsImpl#unitReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplUnitReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#byteArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplByteArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#intReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplIntReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#longReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplLongReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#floatReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplFloatReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#doubleReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplDoubleReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#stringReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplStringReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#booleanReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableIntReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableLongReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableFloatReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableStringReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#intArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#longArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#floatArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#doubleArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplDoubleArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#stringListReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplStringListReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#booleanArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringListReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableStringListReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatArrayReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
-    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringItemListReturn" to
-        ComTestdataFakeAllPrimitiveReturnsImplNullableStringItemListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#unitReturn" to ComTestdataFakeAllPrimitiveReturnsImplUnitReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#byteArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplByteArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#intReturn" to ComTestdataFakeAllPrimitiveReturnsImplIntReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#longReturn" to ComTestdataFakeAllPrimitiveReturnsImplLongReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#floatReturn" to ComTestdataFakeAllPrimitiveReturnsImplFloatReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#doubleReturn" to ComTestdataFakeAllPrimitiveReturnsImplDoubleReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#stringReturn" to ComTestdataFakeAllPrimitiveReturnsImplStringReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#booleanReturn" to ComTestdataFakeAllPrimitiveReturnsImplBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableByteArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableIntReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableLongReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableFloatReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableStringReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#intArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#longArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#floatArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#doubleArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplDoubleArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#stringListReturn" to ComTestdataFakeAllPrimitiveReturnsImplStringListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#booleanArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringListReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableStringListReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableIntArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableIntArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableLongArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableLongArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableDoubleArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableBooleanArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableFloatArrayReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableFloatArrayReturnMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.FakeAllPrimitiveReturnsImpl#nullableStringItemListReturn" to ComTestdataFakeAllPrimitiveReturnsImplNullableStringItemListReturnMetadataObject.APP_FUNCTION_METADATA,
   )
 
   private object ComTestdataFakeAllPrimitiveReturnsImplUnitReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -117,8 +89,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplByteArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -159,8 +131,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplIntReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -195,8 +167,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplLongReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -231,8 +203,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplFloatReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -267,8 +239,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplDoubleReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -303,8 +275,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplStringReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -339,8 +311,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplBooleanReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -375,8 +347,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableByteArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -417,8 +389,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableIntReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -453,8 +425,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableLongReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -489,8 +461,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableFloatReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -525,8 +497,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -561,8 +533,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableStringReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -597,8 +569,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -633,8 +605,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplIntArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -675,8 +647,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplLongArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -717,8 +689,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplFloatArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -759,8 +731,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplDoubleArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -801,8 +773,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplStringListReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -843,8 +815,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplBooleanArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -885,8 +857,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableStringListReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -927,8 +899,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableIntArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -969,8 +941,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableLongArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -1011,8 +983,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableDoubleArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -1053,8 +1025,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableBooleanArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -1095,8 +1067,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableFloatArrayReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )
@@ -1137,8 +1109,8 @@ public class `$FakeAllPrimitiveReturnsImpl_AppFunctionInventory` : AppFunctionIn
   }
 
   private object ComTestdataFakeAllPrimitiveReturnsImplNullableStringItemListReturnMetadataObject {
-    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category=
-        "fake_schema_category", name="allPrimitiveReturns", version=1)
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "fake_schema_category", name="allPrimitiveReturns", version=1)
 
     private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
     )

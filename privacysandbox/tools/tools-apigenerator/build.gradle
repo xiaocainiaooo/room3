@@ -126,5 +126,5 @@ androidx {
     type = SoftwareType.OTHER_CODE_PROCESSOR
     inceptionYear = "2022"
     description = "Generate sources for communication with SDKs in the Privacy Sandbox."
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }

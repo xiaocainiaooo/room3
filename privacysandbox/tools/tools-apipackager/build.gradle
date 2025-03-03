@@ -52,5 +52,5 @@ androidx {
     type = SoftwareType.OTHER_CODE_PROCESSOR
     inceptionYear = "2022"
     description = "Packages API descriptions from SDKs compiled with Privacy Sandbox annotations."
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }
