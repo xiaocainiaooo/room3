@@ -53,6 +53,11 @@ public class WireTraceSink(
 
     @GuardedBy("drainLock") private var drainRequested = false
 
+    // Once the sink is marked as closed. No more enqueue()'s are allowed. This way we can never
+    // race between a new drainRequest() after the last request for flush() happened. This
+    // is because we simply disallow adding more items to the underlying queue.
+    @Volatile private var closed = false
+
     @GuardedBy("drainLock") private var resumeDrain: Continuation<Unit>? = null
 
     init {
@@ -74,15 +79,15 @@ public class WireTraceSink(
     }
 
     override fun enqueue(pooledPacketArray: PooledTracePacketArray) {
-        queue.addLast(pooledPacketArray)
-        makeDrainRequest()
+        if (!closed) {
+            queue.addLast(pooledPacketArray)
+            makeDrainRequest()
+        }
     }
 
     override fun flush() {
         makeDrainRequest()
-        // The queue is the actual source of truth and a lot easier to reason about
-        // that drainRequested + the Coroutines machinery. Using this consistently instead.
-        while (queue.isNotEmpty()) {
+        while (queue.isNotEmpty() && synchronized(drainLock) { drainRequested }) {
             // Await completion of the drain.
         }
         bufferedSink.flush()
@@ -116,6 +121,11 @@ public class WireTraceSink(
     }
 
     override fun close() {
+        // Mark closed.
+        // We don't need a critical section here, given we have one final flush() that blocks
+        // until the queue is drained. So even if we are racing against additions to the queue,
+        // that should still be okay, because enqueue()'s will eventually start no-oping.
+        closed = true
         flush()
         bufferedSink.close()
     }
