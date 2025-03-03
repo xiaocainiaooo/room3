@@ -51,6 +51,32 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun getBinderOrNull_whenSet_returns() {
+        val underTest = savedState { putBinder(KEY_1, BINDER_VALUE_1) }
+        val actual = underTest.read { getBinderOrNull(KEY_1) }
+
+        assertThat(actual).isEqualTo(BINDER_VALUE_1)
+    }
+
+    @Test
+    fun getBinderOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getBinderOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getBinderOrNull_whenNotSet_returnsNull() {
+        assertThat(savedState().read { getBinderOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getBinderOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        assertThat(underTest.read { getBinderOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
     fun getBinderOrElse_whenSet_returns() {
         val underTest = savedState { putBinder(KEY_1, BINDER_VALUE_1) }
         val actual = underTest.read { getBinderOrElse(KEY_1) { BINDER_VALUE_2 } }
@@ -94,6 +120,32 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun getSizeOrNull_whenSet_returns() {
+        val underTest = savedState { putSize(KEY_1, SIZE_IN_PIXEL_VALUE_1) }
+        val actual = underTest.read { getSizeOrNull(KEY_1) }
+
+        assertThat(actual).isEqualTo(SIZE_IN_PIXEL_VALUE_1)
+    }
+
+    @Test
+    fun getSizeOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getSizeOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getSizeOrNull_whenNotSet_returnsNull() {
+        assertThat(savedState().read { getSizeOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getSizeOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        assertThat(underTest.read { getSizeOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
     fun getSizeOrElse_whenSet_returns() {
         val underTest = savedState { putSize(KEY_1, SIZE_IN_PIXEL_VALUE_1) }
         val actual = underTest.read { getSizeOrElse(KEY_1) { SIZE_IN_PIXEL_VALUE_2 } }
@@ -134,6 +186,32 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
         assertThrows<IllegalArgumentException> { underTest.read { getSizeF(KEY_1) } }
+    }
+
+    @Test
+    fun getSizeFOrNull_whenSet_returns() {
+        val underTest = savedState { putSizeF(KEY_1, SIZE_IN_FLOAT_VALUE_1) }
+        val actual = underTest.read { getSizeFOrNull(KEY_1) }
+
+        assertThat(actual).isEqualTo(SIZE_IN_FLOAT_VALUE_1)
+    }
+
+    @Test
+    fun getSizeFOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getSizeFOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getSizeFOrNull_whenNotSet_returnsNull() {
+        assertThat(savedState().read { getSizeFOrNull(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getSizeFOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        assertThat(underTest.read { getSizeFOrNull(KEY_1) }).isNull()
     }
 
     @Test
@@ -184,6 +262,34 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun getParcelableOrNull_whenSet_returns() {
+        val underTest = savedState { putParcelable(KEY_1, PARCELABLE_VALUE_1) }
+        val actual = underTest.read { getParcelableOrNull<TestParcelable>(KEY_1) }
+
+        assertThat(actual).isEqualTo(PARCELABLE_VALUE_1)
+    }
+
+    @Test
+    fun getParcelableOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getParcelableOrNull<TestParcelable>(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getParcelableOrNull_whenNotSet_returnsNull() {
+        val actual = savedState().read { getParcelableOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun getParcelableOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        val actual = underTest.read { getParcelableOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
     fun getParcelableOrElse_whenSet_returns() {
         val underTest = savedState { putParcelable(KEY_1, PARCELABLE_VALUE_1) }
         val actual = underTest.read { getParcelableOrElse(KEY_1) { PARCELABLE_VALUE_2 } }
@@ -230,6 +336,36 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
         assertThrows<IllegalArgumentException> {
             underTest.read { getParcelableList<TestParcelable>(KEY_1) }
         }
+    }
+
+    @Test
+    fun getParcelableListOrNull_whenSet_returns() {
+        val expected = List(size = 5) { idx -> TestParcelable(idx) }
+
+        val underTest = savedState { putParcelableList(KEY_1, expected) }
+        val actual = underTest.read { getParcelableListOrNull<TestParcelable>(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getParcelableListOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getParcelableListOrNull<TestParcelable>(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getParcelableListOrNull_whenNotSet_returnsNull() {
+        val actual = savedState().read { getParcelableListOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun getParcelableListOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        val actual = underTest.read { getParcelableListOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
     }
 
     @Test
@@ -286,6 +422,36 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun getParcelableArrayOrNull_whenSet_returns() {
+        val expected = Array(size = 5) { idx -> TestParcelable(idx) }
+
+        val underTest = savedState { putParcelableArray(KEY_1, expected) }
+        val actual = underTest.read { getParcelableArrayOrNull<TestParcelable>(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getParcelableArrayOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getParcelableArrayOrNull<TestParcelable>(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getParcelableArrayOrNull_whenNotSet_returnsNull() {
+        val actual = savedState().read { getParcelableArrayOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun getParcelableArrayOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        val actual = underTest.read { getParcelableArrayOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
     fun getParcelableArrayOrElse_whenSet_returns() {
         val expected = Array(size = 5) { idx -> TestParcelable(idx) }
 
@@ -336,6 +502,37 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
         assertThrows<IllegalArgumentException> {
             underTest.read { getSparseParcelableArray<TestParcelable>(KEY_1) }
         }
+    }
+
+    @Test
+    fun getSparseParcelableArrayOrNull_whenSet_returns() {
+        val expected = SPARSE_PARCELABLE_ARRAY
+
+        val underTest = savedState { putSparseParcelableArray(KEY_1, expected) }
+        val actual = underTest.read { getSparseParcelableArrayOrNull<TestParcelable>(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getSparseParcelableArrayOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getSparseParcelableArrayOrNull<TestParcelable>(KEY_1) })
+            .isNull()
+    }
+
+    @Test
+    fun getSparseParcelableArrayOrNull_whenNotSet_returnsNull() {
+        val actual = savedState().read { getSparseParcelableArrayOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun getSparseParcelableArrayOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        val actual = underTest.read { getSparseParcelableArrayOrNull<TestParcelable>(KEY_1) }
+        assertThat(actual).isNull()
     }
 
     @Test
@@ -393,6 +590,34 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
         assertThrows<IllegalArgumentException> {
             underTest.read { getJavaSerializable<TestSerializable>(KEY_1) }
         }
+    }
+
+    @Test
+    fun getJavaSerializableOrNull_whenSet_returns() {
+        val underTest = savedState { putJavaSerializable(KEY_1, SERIALIZABLE_VALUE_1) }
+        val actual = underTest.read { getJavaSerializableOrNull<TestSerializable>(KEY_1) }
+
+        assertThat(actual).isEqualTo(SERIALIZABLE_VALUE_1)
+    }
+
+    @Test
+    fun getJavaSerializableOrNull_whenSetNull_returns() {
+        val underTest = savedState { putNull(KEY_1) }
+        assertThat(underTest.read { getJavaSerializableOrNull<TestSerializable>(KEY_1) }).isNull()
+    }
+
+    @Test
+    fun getJavaSerializableOrNull_whenNotSet_returnsNull() {
+        val actual = savedState().read { getJavaSerializableOrNull<TestSerializable>(KEY_1) }
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun getJavaSerializableOrNull_whenSet_differentType_returnsNull() {
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+
+        val actual = underTest.read { getJavaSerializableOrNull<TestSerializable>(KEY_1) }
+        assertThat(actual).isNull()
     }
 
     @Test

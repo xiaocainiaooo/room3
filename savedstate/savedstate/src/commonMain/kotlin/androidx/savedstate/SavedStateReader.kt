@@ -47,6 +47,9 @@ internal constructor(
      */
     public inline fun getBoolean(key: String): Boolean
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getBooleanOrNull(key: String): Boolean?
+
     /**
      * Retrieves a [Boolean] value associated with the specified [key], or returns [defaultValue] if
      * the [key] is not found or the associated value has the wrong type.
@@ -69,6 +72,9 @@ internal constructor(
      */
     public inline fun getChar(key: String): Char
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getCharOrNull(key: String): Char?
+
     /**
      * Retrieves a [Char] value associated with the specified [key], or returns [defaultValue] if
      * the [key] is not found or the associated value has the wrong type.
@@ -90,6 +96,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharSequence(key: String): CharSequence
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getCharSequenceOrNull(key: String): CharSequence?
 
     /**
      * Retrieves a [CharSequence] value associated with the specified [key], or returns
@@ -116,6 +125,9 @@ internal constructor(
      */
     public inline fun getDouble(key: String): Double
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getDoubleOrNull(key: String): Double?
+
     /**
      * Retrieves a [Double] value associated with the specified [key], or returns [defaultValue] if
      * the [key] is not found or the associated value has the wrong type.
@@ -137,6 +149,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getFloat(key: String): Float
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getFloatOrNull(key: String): Float?
 
     /**
      * Retrieves a [Float] value associated with the specified [key], or returns [defaultValue] if
@@ -160,6 +175,9 @@ internal constructor(
      */
     public inline fun getInt(key: String): Int
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getIntOrNull(key: String): Int?
+
     /**
      * Retrieves a [Int] value associated with the specified [key], or returns [defaultValue] if the
      * [key] is not found or the associated value has the wrong type.
@@ -181,6 +199,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getLong(key: String): Long
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getLongOrNull(key: String): Long?
 
     /**
      * Retrieves a [Long] value associated with the specified [key], or returns [defaultValue] if
@@ -204,6 +225,9 @@ internal constructor(
      */
     public inline fun getString(key: String): String
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getStringOrNull(key: String): String?
+
     /**
      * Retrieves a [String] value associated with the specified [key], or returns [defaultValue] if
      * the [key] is not found or the associated value has the wrong type.
@@ -226,6 +250,9 @@ internal constructor(
      */
     public inline fun getIntList(key: String): List<Int>
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getIntListOrNull(key: String): List<Int>?
+
     /**
      * Retrieves a [List] of elements of [Int] associated with the specified [key], or a default
      * value if the [key] doesn't exist.
@@ -247,6 +274,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSavedStateList(key: String): List<SavedState>
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getSavedStateListOrNull(key: String): List<SavedState>?
 
     /**
      * Retrieves a [List] of elements of [SavedState] associated with the specified [key], or a
@@ -273,6 +303,9 @@ internal constructor(
      */
     public inline fun getStringList(key: String): List<String>
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getStringListOrNull(key: String): List<String>?
+
     /**
      * Retrieves a [List] of elements of [String] associated with the specified [key], or a default
      * value if the [key] doesn't exist.
@@ -297,6 +330,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharSequenceList(key: String): List<CharSequence>
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getCharSequenceListOrNull(key: String): List<CharSequence>?
 
     /**
      * Retrieves a [List] of elements of [CharSequence] associated with the specified [key], or a
@@ -323,6 +359,9 @@ internal constructor(
      */
     public inline fun getBooleanArray(key: String): BooleanArray
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getBooleanArrayOrNull(key: String): BooleanArray?
+
     /**
      * Retrieves a [BooleanArray] value associated with the specified [key], or a default value if
      * the [key] doesn't exist.
@@ -348,6 +387,9 @@ internal constructor(
      */
     public inline fun getCharArray(key: String): CharArray
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getCharArrayOrNull(key: String): CharArray?
+
     /**
      * Retrieves a [CharArray] value associated with the specified [key], or a default value if the
      * [key] doesn't exist.
@@ -369,6 +411,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharSequenceArray(key: String): Array<CharSequence>
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getCharSequenceArrayOrNull(key: String): Array<CharSequence>?
 
     /**
      * Retrieves a [CharArray] value associated with the specified [key], or a default value if the
@@ -395,6 +440,9 @@ internal constructor(
      */
     public inline fun getDoubleArray(key: String): DoubleArray
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getDoubleArrayOrNull(key: String): DoubleArray?
+
     /**
      * Retrieves a [DoubleArray] value associated with the specified [key], or a default value if
      * the [key] doesn't exist.
@@ -420,6 +468,9 @@ internal constructor(
      */
     public inline fun getFloatArray(key: String): FloatArray
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getFloatArrayOrNull(key: String): FloatArray?
+
     /**
      * Retrieves a [FloatArray] value associated with the specified [key], or a default value if the
      * [key] doesn't exist.
@@ -441,6 +492,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getIntArray(key: String): IntArray
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getIntArrayOrNull(key: String): IntArray?
 
     /**
      * Retrieves a [IntArray] value associated with the specified [key], or a default value if the
@@ -464,6 +518,9 @@ internal constructor(
      */
     public inline fun getLongArray(key: String): LongArray
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getLongArrayOrNull(key: String): LongArray?
+
     /**
      * Retrieves a [LongArray] value associated with the specified [key], or a default value if the
      * [key] doesn't exist.
@@ -485,6 +542,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSavedStateArray(key: String): Array<SavedState>
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getSavedStateArrayOrNull(key: String): Array<SavedState>?
 
     /**
      * Retrieves a [Array] of [SavedState] value associated with the specified [key], or a default
@@ -511,6 +571,9 @@ internal constructor(
      */
     public inline fun getStringArray(key: String): Array<String>
 
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getStringArrayOrNull(key: String): Array<String>?
+
     /**
      * Retrieves a [Array] of [String] value associated with the specified [key], or a default value
      * if the [key] doesn't exist.
@@ -535,6 +598,9 @@ internal constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSavedState(key: String): SavedState
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun getSavedStateOrNull(key: String): SavedState?
 
     /**
      * Retrieves a [SavedState] object associated with the specified [key], or a default value if
@@ -635,5 +701,12 @@ internal fun keyOrValueNotFoundError(key: String): Nothing {
         "No valid saved state was found for the key '$key'. It may be missing, null, or not of " +
             "the expected type. This can occur if the value was saved with a different type or " +
             "if the saved state was modified unexpectedly."
+    )
+}
+
+internal fun keyOrValueNotFoundError(key: String): Nothing {
+    throw IllegalArgumentException(
+        "No valid saved state was found for the key '$key'. It may be missing, null, or not of the expected type. " +
+            "This can occur if the value was saved with a different type or if the saved state was modified unexpectedly."
     )
 }
