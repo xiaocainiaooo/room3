@@ -27,7 +27,6 @@ public class MyUiInterfaceClientProxy(
         clientExecutor: Executor,
         client: SandboxedUiAdapter.SessionClient,
     ) {
-        sandboxedUiAdapter.openSession(context, sessionData, initialWidth, initialHeight,
-                isZOrderOnTop, clientExecutor, client)
+        sandboxedUiAdapter.openSession(context, sessionData, initialWidth, initialHeight, isZOrderOnTop, clientExecutor, client)
     }
 }

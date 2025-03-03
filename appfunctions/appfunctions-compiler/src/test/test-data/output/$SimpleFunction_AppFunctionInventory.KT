@@ -20,8 +20,7 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
-    "com.testdata.SimpleFunction#simpleFunction" to
-        ComTestdataSimpleFunctionSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
+    "com.testdata.SimpleFunction#simpleFunction" to ComTestdataSimpleFunctionSimpleFunctionMetadataObject.APP_FUNCTION_METADATA,
   )
 
   private object ComTestdataSimpleFunctionSimpleFunctionMetadataObject {

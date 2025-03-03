@@ -87,5 +87,5 @@ androidx {
     type = SoftwareType.GRADLE_PLUGIN
     inceptionYear = "2017"
     description = "Android Navigation TypeSafe Arguments Gradle Plugin"
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }

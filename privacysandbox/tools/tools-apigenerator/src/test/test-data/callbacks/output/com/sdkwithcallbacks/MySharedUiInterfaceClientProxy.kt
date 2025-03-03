@@ -16,8 +16,7 @@ public class MySharedUiInterfaceClientProxy(
         remote.doUiStuff()
     }
 
-    public override fun openSession(clientExecutor: Executor,
-            client: SharedUiAdapter.SessionClient) {
+    public override fun openSession(clientExecutor: Executor, client: SharedUiAdapter.SessionClient) {
         sharedUiAdapter.openSession(clientExecutor, client)
     }
 }

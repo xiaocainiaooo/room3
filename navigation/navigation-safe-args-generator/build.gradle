@@ -55,9 +55,7 @@ dependencies {
     testImplementation(libs.hamcrestCore)
     testImplementation(libs.junit)
     testImplementation(libs.truth)
-    testImplementation(project(":room:room-compiler-processing-testing"), {
-        exclude group: "androidx.room", module: "room-compiler-processing"
-    })
+    testImplementation(project(":room:room-compiler-processing-testing"))
     testImplementationAarAsJar(project(":navigation:navigation-common"))
     testImplementationAarAsJar(project(":lifecycle:lifecycle-viewmodel-savedstate"))
     testImplementation(tasks.named("strippedAndroidJar").map { it.outputs.files })
@@ -73,5 +71,5 @@ androidx {
     type = SoftwareType.OTHER_CODE_PROCESSOR
     inceptionYear = "2017"
     description = "Android Navigation TypeSafe Arguments Generator"
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
 }
