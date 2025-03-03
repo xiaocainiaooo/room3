@@ -431,7 +431,7 @@ public final class SchemaToPlatformConverter {
 
         @DoNotInline
         @SuppressLint("WrongConstant")
-        static android.app.appsearch.AppSearchSchema.EmbeddingPropertyConfig
+        static android.app.appsearch.AppSearchSchema.PropertyConfig
                 createPlatformEmbeddingPropertyConfig(
                 AppSearchSchema.@NonNull EmbeddingPropertyConfig jetpackEmbeddingProperty) {
             return new android.app.appsearch.AppSearchSchema.EmbeddingPropertyConfig.Builder(
