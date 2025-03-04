@@ -27,7 +27,7 @@ dependencies {
 
     implementation(project(":activity:activity-compose"))
     implementation(project(":activity:activity"))
-    implementation(project(":core:core-ktx"))
+    implementation("androidx.core:core-ktx:1.15.0")
     implementation(project(":compose:material:material"))
     implementation(project(":compose:material3:material3"))
     implementation(project(":compose:runtime:runtime"))
@@ -36,8 +36,8 @@ dependencies {
     implementation(project(":compose:ui:ui-tooling"))
 
 
-    androidTestImplementation(project(":core:core"))
-    androidTestImplementation(project(":core:core-ktx"))
+    androidTestImplementation("androidx.core:core:1.15.0")
+    androidTestImplementation("androidx.core:core-ktx:1.15.0")
     androidTestImplementation(project(":activity:activity-compose"))
     androidTestImplementation(project(":activity:activity-ktx"))
     androidTestImplementation(project(":compose:ui:ui-test"))
