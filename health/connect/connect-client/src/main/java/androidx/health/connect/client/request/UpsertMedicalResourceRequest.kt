@@ -17,7 +17,6 @@
 package androidx.health.connect.client.request
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
@@ -50,9 +49,7 @@ import androidx.health.connect.client.records.toString
  *   [MedicalDataSource.fhirVersion].
  * @property data The FHIR resource data in JSON representation.
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@OptIn(ExperimentalPersonalHealthRecordApi::class)
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class UpsertMedicalResourceRequest(
     val dataSourceId: String,
     val fhirVersion: FhirVersion,

@@ -351,7 +351,10 @@ interface HealthConnectClient {
      * [Fast Healthcare Interoperability Resources (FHIR)]("https://hl7.org/fhir/") standard. The
      * FHIR resource provided in [UpsertMedicalResourceRequest.data] is expected to be valid for the
      * specified [FHIR version][UpsertMedicalResourceRequest.fhirVersion] according to the
-     * [FHIR spec](https://hl7.org/fhir/resourcelist.html).
+     * [FHIR spec](https://hl7.org/fhir/resourcelist.html). Structural validation checks such as
+     * resource structure, field types and presence of required fields will be performed, however
+     * these checks may not cover all FHIR spec requirements and are dependant on the backing
+     * implementation of Health Connect.
      *
      * Data written to Health Connect should be for a single individual only. However, the API
      * allows for multiple Patient resources to be written to account for the possibility of
@@ -361,17 +364,14 @@ interface HealthConnectClient {
      * - [UpsertMedicalResourceRequest.data] must contain an "id" field and a "resourceType" field.
      *   The "resource type" must be one of the items in the accepted list of resource types in
      *   [FhirResource].
-     * - The FHIR resource does not contain any "contained" resources.
+     * - The FHIR resource does not have a "contained" field (holds
+     *   [contained resources](https://build.fhir.org/references.html#contained)).
      * - [FHIR version][UpsertMedicalResourceRequest.fhirVersion] of each request must match
      *   [MedicalDataSource.fhirVersion] of [UpsertMedicalResourceRequest.dataSourceId]'s
      *   corresponding [MedicalDataSource].
      *
-     * Structural validation checks such as resource structure, field types and presence of required
-     * fields will be performed, however these checks may not cover all FHIR spec requirements and
-     * may change in future versions.
-     *
      * If any request is failed to be processed for any reason, none of the requests will be
-     * inserted or updated.
+     * inserted or updated in one transaction.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
@@ -384,9 +384,8 @@ interface HealthConnectClient {
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
      * @sample androidx.health.connect.client.samples.UpsertMedicalResourcesSample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @ExperimentalPersonalHealthRecordApi
     suspend fun upsertMedicalResources(
         requests: List<UpsertMedicalResourceRequest>
     ): List<MedicalResource> =
@@ -433,8 +432,7 @@ interface HealthConnectClient {
      *
      * @sample androidx.health.connect.client.samples.ReadMedicalResourcesByRequestSample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @ExperimentalPersonalHealthRecordApi
     suspend fun readMedicalResources(
         request: ReadMedicalResourcesRequest
     ): ReadMedicalResourcesResponse =
@@ -478,8 +476,7 @@ interface HealthConnectClient {
      *   invalid.
      * @sample androidx.health.connect.client.samples.ReadMedicalResourcesByIdsSample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @ExperimentalPersonalHealthRecordApi
     suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
@@ -508,9 +505,8 @@ interface HealthConnectClient {
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
      * @sample androidx.health.connect.client.samples.DeleteMedicalResourcesSample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @ExperimentalPersonalHealthRecordApi
     suspend fun deleteMedicalResources(ids: List<MedicalResourceId>): Unit =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
@@ -535,9 +531,8 @@ interface HealthConnectClient {
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
      * @sample androidx.health.connect.client.samples.DeleteMedicalResourcesByRequestSample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
     @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @ExperimentalPersonalHealthRecordApi
     suspend fun deleteMedicalResources(request: DeleteMedicalResourcesRequest): Unit =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,

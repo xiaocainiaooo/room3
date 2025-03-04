@@ -21,6 +21,7 @@ package androidx.health.connect.client.impl.platform.records
 
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.records.BloodGlucoseRecord
 import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.BodyTemperatureMeasurementLocation
@@ -566,6 +567,7 @@ internal val SDK_TO_PLATFORM_RECORDING_METHOD: Map<Int, Int> =
         Metadata.RECORDING_METHOD_MANUAL_ENTRY to PlatformMetadata.RECORDING_METHOD_MANUAL_ENTRY
     )
 
+@OptIn(ExperimentalPersonalHealthRecordApi::class)
 internal val SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE: Map<Int, Int> =
     mapOf(
         FHIR_RESOURCE_TYPE_IMMUNIZATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_IMMUNIZATION,
@@ -591,6 +593,7 @@ internal val SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE: Map<Int, Int> =
 internal val PLATFORM_TO_SDK_FHIR_RESOURCE_TYPE: Map<Int, Int> =
     SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE.reversed()
 
+@OptIn(ExperimentalPersonalHealthRecordApi::class)
 internal val SDK_TO_PLATFORM_MEDICAL_RESOURCE_TYPE: Map<Int, Int> =
     mapOf(
         MEDICAL_RESOURCE_TYPE_ALLERGIES_INTOLERANCES to

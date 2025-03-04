@@ -17,10 +17,10 @@
 package androidx.health.connect.client.request
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesPageRequestBuilder
 import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesRequest
@@ -41,15 +41,14 @@ import androidx.health.connect.client.response.ReadMedicalResourcesResponse
  * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
  * thrown if the feature is not available.
  *
- * @param pageSize The maximum number of [MedicalResource]s to be read. Default value is
+ * @property pageSize The maximum number of [MedicalResource]s to be read. Default value is
  *   [DEFAULT_PAGE_SIZE]. An [IllegalArgumentException] might be thrown if [pageSize] is deemed as
  *   invalid, such as too large.
  * @property pageToken The token to read the next page, this should be obtained from
  *   [ReadMedicalResourcesResponse.nextPageToken].
  * @see [HealthConnectClient.readMedicalResources]
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class ReadMedicalResourcesPageRequest(val pageToken: String, pageSize: Int = DEFAULT_PAGE_SIZE) :
     ReadMedicalResourcesRequest(pageSize) {
 

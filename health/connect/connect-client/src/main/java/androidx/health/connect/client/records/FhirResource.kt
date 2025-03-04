@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.records.PlatformFhirResource
 import androidx.health.connect.client.impl.platform.records.PlatformFhirResourceBuilder
@@ -46,8 +47,7 @@ import androidx.health.connect.client.impl.platform.records.toPlatformFhirResour
  *   [https://www.hl7.org/fhir/resource.html#id](https://www.hl7.org/fhir/resource.html#id).
  * @property data The FHIR resource data in JSON representation.
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class FhirResource(@FhirResourceType val type: Int, val id: String, val data: String) {
     @SuppressLint("NewApi") // already checked with a feature availability check
     internal val platformFhirResource: PlatformFhirResource =
