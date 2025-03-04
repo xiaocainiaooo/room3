@@ -32,6 +32,9 @@ import static androidx.camera.video.internal.DebugUtils.readableUs;
 import static androidx.camera.video.internal.config.AudioConfigUtil.resolveAudioEncoderConfig;
 import static androidx.camera.video.internal.config.AudioConfigUtil.resolveAudioMimeInfo;
 import static androidx.camera.video.internal.config.AudioConfigUtil.resolveAudioSettings;
+import static androidx.camera.video.internal.config.VideoConfigUtil.resolveVideoEncoderConfig;
+import static androidx.camera.video.internal.config.VideoConfigUtil.resolveVideoMimeInfo;
+import static androidx.camera.video.internal.config.VideoConfigUtil.workaroundDataSpaceIfRequired;
 import static androidx.camera.video.internal.utils.StorageUtil.formatSize;
 import static androidx.camera.video.internal.utils.StorageUtil.isStorageFullException;
 import static androidx.core.util.Preconditions.checkArgument;
@@ -93,6 +96,7 @@ import androidx.camera.video.internal.compat.quirk.DeactivateEncoderSurfaceBefor
 import androidx.camera.video.internal.compat.quirk.DeviceQuirks;
 import androidx.camera.video.internal.compat.quirk.EncoderNotUsePersistentInputSurfaceQuirk;
 import androidx.camera.video.internal.config.AudioMimeInfo;
+import androidx.camera.video.internal.config.VideoMimeInfo;
 import androidx.camera.video.internal.encoder.AudioEncoderConfig;
 import androidx.camera.video.internal.encoder.BufferCopiedEncodedData;
 import androidx.camera.video.internal.encoder.EncodeException;
@@ -103,6 +107,7 @@ import androidx.camera.video.internal.encoder.EncoderFactory;
 import androidx.camera.video.internal.encoder.EncoderImpl;
 import androidx.camera.video.internal.encoder.InvalidConfigException;
 import androidx.camera.video.internal.encoder.OutputConfig;
+import androidx.camera.video.internal.encoder.VideoEncoderConfig;
 import androidx.camera.video.internal.encoder.VideoEncoderInfo;
 import androidx.camera.video.internal.encoder.VideoEncoderInfoImpl;
 import androidx.camera.video.internal.utils.OutputUtil;
@@ -1270,9 +1275,24 @@ public final class Recorder implements VideoOutput {
                         new VideoEncoderSession(mVideoEncoderFactory, mSequentialExecutor,
                                 mExecutor);
                 MediaSpec mediaSpec = getObservableData(mMediaSpec);
-                ListenableFuture<Encoder> configureFuture =
-                        videoEncoderSession.configure(request, timebase, mediaSpec,
-                                mHasGlProcessing, mResolvedEncoderProfiles);
+                DynamicRange dynamicRange = request.getDynamicRange();
+                VideoMimeInfo videoMimeInfo = resolveVideoMimeInfo(mediaSpec, dynamicRange,
+                        mResolvedEncoderProfiles);
+                // The VideoSpec from mediaSpec only contains settings requested by the recorder,
+                // but the actual settings may need to differ depending on the FPS chosen by the
+                // camera. The expected frame rate from the camera is passed on here from the
+                // SurfaceRequest.
+                VideoEncoderConfig config = resolveVideoEncoderConfig(
+                        videoMimeInfo,
+                        timebase,
+                        mediaSpec.getVideoSpec(),
+                        request.getResolution(),
+                        dynamicRange,
+                        request.getExpectedFrameRate());
+                config = workaroundDataSpaceIfRequired(config, mHasGlProcessing);
+
+                ListenableFuture<Encoder> configureFuture = videoEncoderSession.configure(request,
+                        config);
                 mVideoEncoderSession = videoEncoderSession;
                 Futures.addCallback(configureFuture, new FutureCallback<Encoder>() {
                     @Override
