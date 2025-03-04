@@ -51,6 +51,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewConfigurationCompat
 import androidx.test.core.app.ApplicationProvider
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assume
@@ -719,6 +721,34 @@ class RotaryScrollTest {
             assertThat(overscrollController.overscrollDeltaReceived)
                 .isEqualTo(Offset(0f, itemSizePx))
             assertThat(consumedNestedScroll).isEqualTo(itemSizePx)
+        }
+    }
+
+    @Test
+    fun snap_with_empty_SLC() {
+        rule.setContent {
+            state = rememberLazyListState()
+
+            MockRotaryResolution() {
+                val state = rememberScalingLazyListState()
+                ScalingLazyColumn(
+                    modifier =
+                        Modifier.size(200.dp)
+                            .testTag(TEST_TAG)
+                            .rotaryScrollable(
+                                RotaryScrollableDefaults.snapBehavior(state),
+                                focusRequester
+                            ),
+                    state = state
+                ) {}
+            }
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        rule.onNodeWithTag(TEST_TAG).performRotaryScrollInput {
+            rotateToScrollVertically(itemSizePx)
+            advanceEventTime(20)
+            rotateToScrollVertically(-itemSizePx)
         }
     }
 
