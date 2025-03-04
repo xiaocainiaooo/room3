@@ -111,7 +111,6 @@ dependencies {
     docs(project(":constraintlayout:constraintlayout"))
     kmpDocs(project(":constraintlayout:constraintlayout-compose"))
     docs(project(":constraintlayout:constraintlayout-core"))
-    docs(project(":contentpager:contentpager"))
     docs(project(":coordinatorlayout:coordinatorlayout"))
     docs(project(":core:core"))
     docs(project(":core:core-animation"))
