@@ -42,7 +42,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.autofill.ContentDataType
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusEventModifierNode
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequesterModifierNode
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.requestFocus
@@ -355,22 +354,8 @@ internal class TextFieldDecoratorModifierNode(
 
     private val keyboardActionScope =
         object : KeyboardActionScope {
-            private val focusManager: FocusManager
-                get() = currentValueOf(LocalFocusManager)
-
             override fun defaultKeyboardAction(imeAction: ImeAction) {
-                when (imeAction) {
-                    ImeAction.Next -> {
-                        focusManager.moveFocus(FocusDirection.Next)
-                    }
-                    ImeAction.Previous -> {
-                        focusManager.moveFocus(FocusDirection.Previous)
-                    }
-                    ImeAction.Done -> {
-                        requireKeyboardController().hide()
-                    }
-                    else -> Unit
-                }
+                defaultKeyboardActionWithResult(imeAction)
             }
         }
 
@@ -780,21 +765,38 @@ internal class TextFieldDecoratorModifierNode(
         }
     }
 
-    private fun onImeActionPerformed(imeAction: ImeAction) {
+    private fun onImeActionPerformed(imeAction: ImeAction): Boolean {
         if (
             imeAction == ImeAction.None ||
                 imeAction == ImeAction.Default ||
                 keyboardActionHandler == null
         ) {
             // this should never happen but better be safe
-            keyboardActionScope.defaultKeyboardAction(imeAction)
-            return
+            return defaultKeyboardActionWithResult(imeAction)
         }
 
         keyboardActionHandler?.onKeyboardAction(
             performDefaultAction = { keyboardActionScope.defaultKeyboardAction(imeAction) }
         )
+        return true
     }
+
+    private fun defaultKeyboardActionWithResult(imeAction: ImeAction): Boolean =
+        when (imeAction) {
+            ImeAction.Next -> {
+                currentValueOf(LocalFocusManager).moveFocus(FocusDirection.Next)
+                true
+            }
+            ImeAction.Previous -> {
+                currentValueOf(LocalFocusManager).moveFocus(FocusDirection.Previous)
+                true
+            }
+            ImeAction.Done -> {
+                requireKeyboardController().hide()
+                true
+            }
+            else -> false
+        }
 }
 
 /** Runs platform-specific text input logic. */

@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Rule
@@ -915,6 +916,40 @@ class TextFieldKeyEventTest {
 
         rule.onNodeWithTag(tag).performKeyInput { pressKey(Key.A) }
         rule.runOnIdle { assertThat(handled).isEqualTo(1) }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun singleLineTextField_enterIsNotConsumed_withDefaultKeyboardAction() {
+        var keyDownReceived = false
+        var keyUpReceived = false
+        rule.setContent {
+            val state = rememberTextFieldState()
+            Box(
+                Modifier.onKeyEvent {
+                    if (it.key == Key.Enter) {
+                        when (it.type) {
+                            KeyEventType.KeyDown -> keyDownReceived = true
+                            KeyEventType.KeyUp -> keyUpReceived = true
+                        }
+                    }
+                    false
+                }
+            ) {
+                BasicTextField(
+                    state = state,
+                    lineLimits = SingleLine,
+                    modifier = Modifier.testTag(tag),
+                )
+            }
+        }
+        rule.onNodeWithTag(tag).apply {
+            requestFocus()
+            performKeyInput { pressKey(Key.Enter) }
+        }
+
+        assertTrue(keyDownReceived)
+        assertTrue(keyUpReceived)
     }
 
     private inner class SequenceScope(

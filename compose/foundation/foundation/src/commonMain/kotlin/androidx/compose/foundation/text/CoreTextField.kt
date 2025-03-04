@@ -881,6 +881,9 @@ internal class LegacyTextFieldState(
     val onImeActionPerformed: (ImeAction) -> Unit = { imeAction ->
         keyboardActionRunner.runAction(imeAction)
     }
+    val onImeActionPerformedWithResult: (ImeAction) -> Boolean = { imeAction ->
+        keyboardActionRunner.runAction(imeAction)
+    }
 
     /** The paint used to draw highlight backgrounds. */
     val highlightPaint: Paint = Paint()
