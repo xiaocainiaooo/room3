@@ -177,7 +177,10 @@ public class BiometricPrompt {
     public static final int ERROR_IDENTITY_CHECK_NOT_ACTIVE = 20;
 
     /**
-     * Biometrics is not allowed to verify the user in apps.
+     * Biometrics is not allowed to verify the user in apps. It's for internal use only. This
+     * error code, introduced in API 35, was previously covered by ERROR_HW_UNAVAILABLE and
+     * doesn't need to be public. Therefore, for backward compatibility, this error will be
+     * converted to ERROR_HW_UNAVAILABLE.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public static final int ERROR_NOT_ENABLED_FOR_APPS = 21;
