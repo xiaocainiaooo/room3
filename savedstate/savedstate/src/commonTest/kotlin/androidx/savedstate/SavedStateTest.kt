@@ -338,7 +338,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getBoolean_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
-        assertThrows<IllegalStateException> { underTest.read { getBoolean(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getBoolean(KEY_1) } }
     }
 
     @Test
@@ -382,7 +382,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getChar_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MIN_VALUE) }
-        assertThrows<IllegalStateException> { underTest.read { getChar(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getChar(KEY_1) } }
     }
 
     @Test
@@ -425,7 +425,7 @@ internal class SavedStateTest : RobolectricTest() {
     fun getCharSequence_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getString(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getString(KEY_1) } }
     }
 
     @Test
@@ -467,7 +467,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getDouble_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
-        assertThrows<IllegalStateException> { underTest.read { getDouble(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getDouble(KEY_1) } }
     }
 
     @Test
@@ -509,7 +509,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getFloat_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
-        assertThrows<IllegalStateException> { underTest.read { getFloat(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getFloat(KEY_1) } }
     }
 
     @Test
@@ -551,7 +551,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getInt_whenSet_differentType_throws() {
         val underTest = savedState { putBoolean(KEY_1, false) }
-        assertThrows<IllegalStateException> { underTest.read { getInt(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getInt(KEY_1) } }
     }
 
     @Test
@@ -593,7 +593,7 @@ internal class SavedStateTest : RobolectricTest() {
     @Test
     fun getLong_whenSet_differentType_returnsDefault() {
         val underTest = savedState { putBoolean(KEY_1, false) }
-        assertThrows<IllegalStateException> { underTest.read { getLong(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getLong(KEY_1) } }
     }
 
     @Test
@@ -660,7 +660,7 @@ internal class SavedStateTest : RobolectricTest() {
     fun getString_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getString(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getString(KEY_1) } }
     }
 
     @Test
@@ -708,7 +708,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getIntList(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getIntList(KEY_1) } }
     }
 
     @Test
@@ -755,7 +755,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getCharSequenceList(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getCharSequenceList(KEY_1) } }
     }
 
     @Test
@@ -802,7 +802,7 @@ internal class SavedStateTest : RobolectricTest() {
     fun getSavedStateList_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getSavedStateList(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getSavedStateList(KEY_1) } }
     }
 
     @Test
@@ -849,7 +849,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getStringList(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getStringList(KEY_1) } }
     }
 
     @Test
@@ -898,7 +898,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getBooleanArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getBooleanArray(KEY_1) } }
     }
 
     @Test
@@ -951,7 +951,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getCharArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getCharArray(KEY_1) } }
     }
 
     @Test
@@ -1004,7 +1004,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getCharSequenceArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getCharSequenceArray(KEY_1) } }
     }
 
     @Test
@@ -1057,7 +1057,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getDoubleArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getDoubleArray(KEY_1) } }
     }
 
     @Test
@@ -1110,7 +1110,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getFloatArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getFloatArray(KEY_1) } }
     }
 
     @Test
@@ -1163,7 +1163,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getIntArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getIntArray(KEY_1) } }
     }
 
     @Test
@@ -1216,7 +1216,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getLongArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getLongArray(KEY_1) } }
     }
 
     @Test
@@ -1267,7 +1267,7 @@ internal class SavedStateTest : RobolectricTest() {
     fun getSavedStateArray_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getSavedStateArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getSavedStateArray(KEY_1) } }
     }
 
     @Test
@@ -1316,7 +1316,7 @@ internal class SavedStateTest : RobolectricTest() {
 
         val underTest = savedState { putInt(KEY_1, expected) }
 
-        assertThrows<IllegalStateException> { underTest.read { getStringArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getStringArray(KEY_1) } }
     }
 
     @Test
@@ -1365,7 +1365,7 @@ internal class SavedStateTest : RobolectricTest() {
     fun getSavedState_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getSavedState(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getSavedState(KEY_1) } }
     }
 
     @Test

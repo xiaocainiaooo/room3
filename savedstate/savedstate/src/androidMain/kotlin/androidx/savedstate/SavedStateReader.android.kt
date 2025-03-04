@@ -45,11 +45,11 @@ internal actual constructor(
      *
      * @param key The key to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalStateException If the key is not found.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getBinder(key: String): IBinder {
-        if (key !in this) keyNotFoundError(key)
-        return source.getBinder(key) ?: valueNotFoundError(key)
+        return source.getBinder(key) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -71,11 +71,7 @@ internal actual constructor(
         if (result == false) {
             val reference = source.getBoolean(key, true)
             if (reference == true) {
-                if (key in this) {
-                    valueNotFoundError(key)
-                } else {
-                    keyNotFoundError(key)
-                }
+                keyOrValueNotFoundError(key)
             }
         }
         return result
@@ -90,11 +86,7 @@ internal actual constructor(
         if (result == Char.MIN_VALUE) {
             val reference = source.getChar(key, Char.MAX_VALUE)
             if (reference == Char.MAX_VALUE) {
-                if (key in this) {
-                    valueNotFoundError(key)
-                } else {
-                    keyNotFoundError(key)
-                }
+                keyOrValueNotFoundError(key)
             }
         }
         return result
@@ -105,8 +97,7 @@ internal actual constructor(
     }
 
     public actual inline fun getCharSequence(key: String): CharSequence {
-        if (key !in this) keyNotFoundError(key)
-        return source.getCharSequence(key) ?: valueNotFoundError(key)
+        return source.getCharSequence(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getCharSequenceOrElse(
@@ -122,11 +113,7 @@ internal actual constructor(
         if (result == Double.MIN_VALUE) {
             val reference = source.getDouble(key, Double.MAX_VALUE)
             if (reference == Double.MAX_VALUE) {
-                if (key in this) {
-                    valueNotFoundError(key)
-                } else {
-                    keyNotFoundError(key)
-                }
+                keyOrValueNotFoundError(key)
             }
         }
         return result
@@ -142,11 +129,7 @@ internal actual constructor(
         if (result == Float.MIN_VALUE) {
             val reference = source.getFloat(key, Float.MAX_VALUE)
             if (reference == Float.MAX_VALUE) {
-                if (key in this) {
-                    valueNotFoundError(key)
-                } else {
-                    keyNotFoundError(key)
-                }
+                keyOrValueNotFoundError(key)
             }
         }
         return result
@@ -161,11 +144,7 @@ internal actual constructor(
         if (result == Int.MIN_VALUE) {
             val reference = source.getInt(key, Int.MAX_VALUE)
             if (reference == Int.MAX_VALUE) {
-                if (key in this) {
-                    valueNotFoundError(key)
-                } else {
-                    keyNotFoundError(key)
-                }
+                keyOrValueNotFoundError(key)
             }
         }
         return result
@@ -180,11 +159,7 @@ internal actual constructor(
         if (result == Long.MIN_VALUE) {
             val reference = source.getLong(key, Long.MAX_VALUE)
             if (reference == Long.MAX_VALUE) {
-                if (key in this) {
-                    valueNotFoundError(key)
-                } else {
-                    keyNotFoundError(key)
-                }
+                keyOrValueNotFoundError(key)
             }
         }
         return result
@@ -199,11 +174,11 @@ internal actual constructor(
      *
      * @param key The key to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalStateException If the key is not found.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Parcelable> getParcelable(key: String): T {
-        if (key !in this) keyNotFoundError(key)
-        return getParcelable(source, key, T::class.java) ?: valueNotFoundError(key)
+        return getParcelable(source, key, T::class.java) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -228,11 +203,11 @@ internal actual constructor(
      *
      * @param key The key to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalStateException If the key is not found.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Serializable> getJavaSerializable(key: String): T {
-        if (key !in this) keyNotFoundError(key)
-        return getSerializable(source, key, T::class.java) ?: valueNotFoundError(key)
+        return getSerializable(source, key, T::class.java) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -257,11 +232,11 @@ internal actual constructor(
      *
      * @param key The key to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalStateException If the key is not found.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSize(key: String): Size {
-        if (key !in this) keyNotFoundError(key)
-        return source.getSize(key) ?: valueNotFoundError(key)
+        return source.getSize(key) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -283,11 +258,11 @@ internal actual constructor(
      *
      * @param key The key to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalStateException If the key is not found.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSizeF(key: String): SizeF {
-        if (key !in this) keyNotFoundError(key)
-        return source.getSizeF(key) ?: valueNotFoundError(key)
+        return source.getSizeF(key) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -318,8 +293,7 @@ internal actual constructor(
     }
 
     public actual inline fun getString(key: String): String {
-        if (key !in this) keyNotFoundError(key)
-        return source.getString(key) ?: valueNotFoundError(key)
+        return source.getString(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
@@ -327,8 +301,7 @@ internal actual constructor(
     }
 
     public actual inline fun getIntList(key: String): List<Int> {
-        if (key !in this) keyNotFoundError(key)
-        return source.getIntegerArrayList(key) ?: valueNotFoundError(key)
+        return source.getIntegerArrayList(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getIntListOrElse(
@@ -339,8 +312,7 @@ internal actual constructor(
     }
 
     public actual inline fun getCharSequenceList(key: String): List<CharSequence> {
-        if (key !in this) keyNotFoundError(key)
-        return source.getCharSequenceArrayList(key) ?: valueNotFoundError(key)
+        return source.getCharSequenceArrayList(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getCharSequenceListOrElse(
@@ -362,8 +334,7 @@ internal actual constructor(
     }
 
     public actual inline fun getStringList(key: String): List<String> {
-        if (key !in this) keyNotFoundError(key)
-        return source.getStringArrayList(key) ?: valueNotFoundError(key)
+        return source.getStringArrayList(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getStringListOrElse(
@@ -378,12 +349,11 @@ internal actual constructor(
      *
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Parcelable> getParcelableList(key: String): List<T> {
-        if (key !in this) keyNotFoundError(key)
-        return getParcelableArrayList(source, key, T::class.java) ?: valueNotFoundError(key)
+        return getParcelableArrayList(source, key, T::class.java) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -404,8 +374,7 @@ internal actual constructor(
     }
 
     public actual inline fun getBooleanArray(key: String): BooleanArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.getBooleanArray(key) ?: valueNotFoundError(key)
+        return source.getBooleanArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getBooleanArrayOrElse(
@@ -416,8 +385,7 @@ internal actual constructor(
     }
 
     public actual inline fun getCharArray(key: String): CharArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.getCharArray(key) ?: valueNotFoundError(key)
+        return source.getCharArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getCharArrayOrElse(
@@ -429,8 +397,7 @@ internal actual constructor(
 
     @Suppress("ArrayReturn")
     public actual inline fun getCharSequenceArray(key: String): Array<CharSequence> {
-        if (key !in this) keyNotFoundError(key)
-        return source.getCharSequenceArray(key) ?: valueNotFoundError(key)
+        return source.getCharSequenceArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     @Suppress("ArrayReturn")
@@ -442,8 +409,7 @@ internal actual constructor(
     }
 
     public actual inline fun getDoubleArray(key: String): DoubleArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.getDoubleArray(key) ?: valueNotFoundError(key)
+        return source.getDoubleArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getDoubleArrayOrElse(
@@ -454,8 +420,7 @@ internal actual constructor(
     }
 
     public actual inline fun getFloatArray(key: String): FloatArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.getFloatArray(key) ?: valueNotFoundError(key)
+        return source.getFloatArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getFloatArrayOrElse(
@@ -466,8 +431,7 @@ internal actual constructor(
     }
 
     public actual inline fun getIntArray(key: String): IntArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.getIntArray(key) ?: valueNotFoundError(key)
+        return source.getIntArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getIntArrayOrElse(
@@ -478,8 +442,7 @@ internal actual constructor(
     }
 
     public actual inline fun getLongArray(key: String): LongArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.getLongArray(key) ?: valueNotFoundError(key)
+        return source.getLongArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getLongArrayOrElse(
@@ -490,8 +453,7 @@ internal actual constructor(
     }
 
     public actual inline fun getStringArray(key: String): Array<String> {
-        if (key !in this) keyNotFoundError(key)
-        return source.getStringArray(key) ?: valueNotFoundError(key)
+        return source.getStringArray(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getStringArrayOrElse(
@@ -506,15 +468,14 @@ internal actual constructor(
      *
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     @Suppress("ArrayReturn")
     public inline fun <reified T : Parcelable> getParcelableArray(key: String): Array<T> {
-        if (key !in this) keyNotFoundError(key)
         @Suppress("UNCHECKED_CAST")
         return getParcelableArray(source, key, T::class.java) as? Array<T>
-            ?: valueNotFoundError(key)
+            ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -541,16 +502,14 @@ internal actual constructor(
      *
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
-     * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Parcelable> getSparseParcelableArray(
         key: String
     ): SparseArray<T> {
-        if (key !in this) keyNotFoundError(key)
         return getSparseParcelableArray(source, key, T::class.java) as? SparseArray<T>
-            ?: valueNotFoundError(key)
-    }
+            ?: keyOrValueNotFoundError(key)    }
 
     /**
      * Retrieves a [SparseArray] of elements of [Parcelable] associated with the specified [key], or
@@ -571,8 +530,7 @@ internal actual constructor(
     }
 
     public actual inline fun getSavedState(key: String): SavedState {
-        if (key !in this) keyNotFoundError(key)
-        return source.getBundle(key) ?: valueNotFoundError(key)
+        return source.getBundle(key) ?: keyOrValueNotFoundError(key)
     }
 
     public actual inline fun getSavedStateOrElse(

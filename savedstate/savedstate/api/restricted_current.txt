@@ -82,8 +82,7 @@ package androidx.savedstate {
   }
 
   public final class SavedStateReaderKt {
-    method @kotlin.PublishedApi internal static inline Void keyNotFoundError(String key);
-    method @kotlin.PublishedApi internal static inline Void valueNotFoundError(String key);
+    method @kotlin.PublishedApi internal static Void keyOrValueNotFoundError(String key);
   }
 
   public final class SavedStateRegistry {

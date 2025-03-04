@@ -43,6 +43,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getBoolean(key: String): Boolean
 
@@ -64,6 +65,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getChar(key: String): Char
 
@@ -85,7 +87,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharSequence(key: String): CharSequence
 
@@ -110,6 +112,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getDouble(key: String): Double
 
@@ -131,6 +134,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getFloat(key: String): Float
 
@@ -152,6 +156,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getInt(key: String): Int
 
@@ -173,6 +178,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getLong(key: String): Long
 
@@ -194,7 +200,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getString(key: String): String
 
@@ -216,7 +222,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getIntList(key: String): List<Int>
 
@@ -238,7 +244,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSavedStateList(key: String): List<SavedState>
 
@@ -263,7 +269,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getStringList(key: String): List<String>
 
@@ -288,7 +294,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharSequenceList(key: String): List<CharSequence>
 
@@ -313,7 +319,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getBooleanArray(key: String): BooleanArray
 
@@ -338,7 +344,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharArray(key: String): CharArray
 
@@ -360,7 +366,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getCharSequenceArray(key: String): Array<CharSequence>
 
@@ -385,7 +391,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getDoubleArray(key: String): DoubleArray
 
@@ -410,7 +416,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getFloatArray(key: String): FloatArray
 
@@ -432,7 +438,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getIntArray(key: String): IntArray
 
@@ -454,7 +460,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getLongArray(key: String): LongArray
 
@@ -476,7 +482,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSavedStateArray(key: String): Array<SavedState>
 
@@ -501,7 +507,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getStringArray(key: String): Array<String>
 
@@ -526,7 +532,7 @@ internal constructor(
      * @param key The [key] to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the [key] is not found.
-     * @throws IllegalStateException if associated value has wrong type.
+     * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun getSavedState(key: String): SavedState
 
@@ -624,15 +630,10 @@ internal constructor(
 }
 
 @PublishedApi
-internal inline fun keyNotFoundError(key: String): Nothing {
-    throw IllegalArgumentException("No saved state was found associated with the key '$key'.")
-}
-
-@PublishedApi
-internal inline fun valueNotFoundError(key: String): Nothing {
-    throw IllegalStateException(
-        "The saved state value associated with the key '$key' is " +
-            "either null or not of the expected type. This might happen if the value was saved " +
-            "with a different type or if the saved state has been modified unexpectedly."
+internal fun keyOrValueNotFoundError(key: String): Nothing {
+    throw IllegalArgumentException(
+        "No valid saved state was found for the key '$key'. It may be missing, null, or not of " +
+            "the expected type. This can occur if the value was saved with a different type or " +
+            "if the saved state was modified unexpectedly."
     )
 }

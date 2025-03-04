@@ -47,7 +47,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getBinder_whenSet_differentType_returnsDefault() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getBinder(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getBinder(KEY_1) } }
     }
 
     @Test
@@ -90,7 +90,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getSize_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getSize(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getSize(KEY_1) } }
     }
 
     @Test
@@ -133,7 +133,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getSizeF_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> { underTest.read { getSizeF(KEY_1) } }
+        assertThrows<IllegalArgumentException> { underTest.read { getSizeF(KEY_1) } }
     }
 
     @Test
@@ -178,7 +178,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getParcelable_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             underTest.read { getParcelable<TestParcelable>(KEY_1) }
         }
     }
@@ -227,7 +227,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getParcelableList_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             underTest.read { getParcelableList<TestParcelable>(KEY_1) }
         }
     }
@@ -280,7 +280,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getParcelableArray_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             underTest.read { getParcelableArray<TestParcelable>(KEY_1) }
         }
     }
@@ -333,7 +333,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getSparseParcelableArray_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             underTest.read { getSparseParcelableArray<TestParcelable>(KEY_1) }
         }
     }
@@ -390,7 +390,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     fun getSerializable_whenSet_differentType_throws() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             underTest.read { getJavaSerializable<TestSerializable>(KEY_1) }
         }
     }

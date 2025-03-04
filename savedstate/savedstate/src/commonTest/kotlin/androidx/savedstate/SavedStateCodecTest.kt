@@ -267,11 +267,9 @@ internal class SavedStateCodecTest : RobolectricTest() {
             assertThat(size()).isEqualTo(3)
             assertThat(getString("0")).isEqualTo("a")
             assertThat(isNull("1")).isTrue()
-            assertThrows(IllegalStateException::class) { getString("1") }
+            assertThrows(IllegalArgumentException::class) { getString("1") }
                 .hasMessageThat()
-                .contains(
-                    "The saved state value associated with the key '1' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
-                )
+                .contains(keyOrValueNotFoundErrorMessage("1"))
             assertThat(getString("2")).isEqualTo("c")
         }
 
@@ -554,20 +552,16 @@ internal class SavedStateCodecTest : RobolectricTest() {
     // Users shouldn't do this. The test is just to document the behavior.
     @Test
     fun typeMismatchInDecodingWorks() {
-        assertThrows(IllegalStateException::class) {
+        assertThrows(IllegalArgumentException::class) {
                 decodeFromSavedState<Int>(savedState { putBoolean("", true) })
             }
             .hasMessageThat()
-            .contains(
-                "The saved state value associated with the key '' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
-            )
-        assertThrows(IllegalStateException::class) {
+            .contains(keyOrValueNotFoundErrorMessage(""))
+        assertThrows(IllegalArgumentException::class) {
                 decodeFromSavedState<String>(savedState { putBoolean("", true) })
             }
             .hasMessageThat()
-            .contains(
-                "The saved state value associated with the key '' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
-            )
+            .contains(keyOrValueNotFoundErrorMessage(""))
         @Serializable data class Foo(val i: Int)
         @Serializable data class Bar(val i: Int)
         assertEquals(Bar(3), decodeFromSavedState<Bar>(encodeToSavedState(Foo(3))))
@@ -577,7 +571,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
     fun decodeMissingKey() {
         assertThrows(IllegalArgumentException::class) { decodeFromSavedState<Int>(savedState()) }
             .hasMessageThat()
-            .contains("No saved state was found associated with the key ''")
+            .contains(keyOrValueNotFoundErrorMessage(""))
     }
 
     // This is not ideal. The test is just to document the behavior.
@@ -587,11 +581,9 @@ internal class SavedStateCodecTest : RobolectricTest() {
         savedState.write { putString("", "foo") }
         // Got exception instead of `3` because the savedState got manipulated after
         // encoding.
-        assertThrows<IllegalStateException> { decodeFromSavedState<Int>(savedState) }
+        assertThrows<IllegalArgumentException> { decodeFromSavedState<Int>(savedState) }
             .hasMessageThat()
-            .contains(
-                "The saved state value associated with the key '' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
-            )
+            .contains(keyOrValueNotFoundErrorMessage(""))
     }
 
     @Test
@@ -740,6 +732,12 @@ internal class SavedStateCodecTest : RobolectricTest() {
                 }
             )
     }
+}
+
+private fun keyOrValueNotFoundErrorMessage(key: String): String {
+    return "No valid saved state was found for the key '$key'. It may be missing, null, or not " +
+        "of the expected type. This can occur if the value was saved with a different type or if " +
+        "the saved state was modified unexpectedly."
 }
 
 @Serializable
