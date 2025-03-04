@@ -166,10 +166,12 @@ public data class AppFunctionMetadataDocument(
     @Document.BooleanProperty(name = "enabledByDefault") public val isEnabledByDefault: Boolean,
     /** The predefined schema of the AppFunction. */
     @Document.DocumentProperty public val schema: AppFunctionSchemaMetadataDocument?,
+    // Below properties are nullable as they won't be populated in the underlying GD created by
+    // legacy AppSearch indexer.
     /** The parameters of the AppFunction. */
-    @Document.DocumentProperty public val parameters: List<AppFunctionParameterMetadataDocument>,
+    @Document.DocumentProperty public val parameters: List<AppFunctionParameterMetadataDocument>?,
     /** The response of the AppFunction. */
-    @Document.DocumentProperty public val response: AppFunctionResponseMetadataDocument,
+    @Document.DocumentProperty public val response: AppFunctionResponseMetadataDocument?,
     /** The reusable components for the AppFunction. */
-    @Document.DocumentProperty public val components: AppFunctionComponentsMetadataDocument,
+    @Document.DocumentProperty public val components: AppFunctionComponentsMetadataDocument?,
 )

@@ -18,7 +18,10 @@ package androidx.appfunctions.core
 
 import android.content.Context
 import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.`annotation`.RequiresApi
+import androidx.appfunctions.`internal`.readAll
+import androidx.appfunctions.metadata.AppFunctionMetadataDocument
+import androidx.appsearch.app.Features
 import androidx.appsearch.app.GlobalSearchSession
 import androidx.appsearch.app.SearchSpec
 import androidx.appsearch.platformstorage.PlatformStorage
@@ -66,6 +69,43 @@ internal class AppFunctionMetadataTestHelper(private val context: Context) {
         }
         throw IllegalStateException("AppSearch indexer fail")
     }
+
+    /** Checks if the legacy AppFunction indexer is available on the device. */
+    suspend fun isLegacyAppFunctionIndexerAvailable(): Boolean {
+        return createSearchSession().use {
+            // AppFunctions indexer was shipped with Mobile applications indexer.
+            it.features.isFeatureSupported(Features.INDEXER_MOBILE_APPLICATIONS)
+        }
+    }
+
+    /**
+     * Checks if the dynamic indexer is available.
+     *
+     * Only works if the functions are already indexed. Use [awaitAppFunctionIndexed] for waiting.
+     */
+    suspend fun isDynamicIndexerAvailable(): Boolean =
+        // TODO - Check AppSearch version when new indexer is available in AppSearch.
+        createSearchSession().use { session ->
+            val metadataDocument =
+                session
+                    .search(
+                        "",
+                        SearchSpec.Builder()
+                            .addFilterNamespaces("app_functions")
+                            .addFilterDocumentClasses(AppFunctionMetadataDocument::class.java)
+                            .addFilterPackageNames("android")
+                            .setVerbatimSearchEnabled(true)
+                            .setNumericSearchEnabled(true)
+                            .build()
+                    )
+                    .readAll { it.genericDocument }
+                    .filterNotNull()
+                    .first()
+
+            // Check if one of the additional property i.e. response is available. Checking for
+            // response as all app functions will always have a response.
+            return metadataDocument.getPropertyDocument("response") != null
+        }
 
     private suspend fun createSearchSession(): GlobalSearchSession {
         return PlatformStorage.createGlobalSearchSessionAsync(
