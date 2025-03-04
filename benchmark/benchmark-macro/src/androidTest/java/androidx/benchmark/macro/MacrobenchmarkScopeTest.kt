@@ -98,8 +98,14 @@ class MacrobenchmarkScopeTest {
     @SdkSuppress(minSdkVersion = 24)
     @Test
     fun compile_speedProfile_withProfileFlushes() {
-        // Emulator api 30 does not have dex2oat (b/264938965)
-        assumeTrue(Build.VERSION.SDK_INT != Build.VERSION_CODES.R)
+        if (DeviceInfo.isEmulator) {
+            // Emulator API 30 does not have dex2oat (b/264938965)
+            assumeTrue(Build.VERSION.SDK_INT != 30)
+
+            // Emulator API 26 times out when compiling (b/393186249)
+            assumeTrue(Build.VERSION.SDK_INT != 26)
+        }
+
         val scope = MacrobenchmarkScope(Packages.TARGET, launchWithClearTask = true)
         val warmupIterations = 2
         var executions = 0
