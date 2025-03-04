@@ -266,7 +266,7 @@ internal class PrefetchMetrics {
             lastUsedAverage
         } else {
             averagesByContentType
-                .getOrPut(contentType) { overallAverage.copy() }
+                .getOrPut(contentType) { Averages() }
                 .also {
                     this.lastUsedContentType = contentType
                     this.lastUsedAverage = it
@@ -274,7 +274,6 @@ internal class PrefetchMetrics {
         }
     }
 
-    private val overallAverage = Averages()
     private val averagesByContentType = mutableScatterMapOf<Any?, Averages>()
 
     private var lastUsedContentType: Any? = null
@@ -285,12 +284,10 @@ internal class PrefetchMetrics {
     fun getMeasureTimeNanos(contentType: Any?) = getAverage(contentType).measureTimeNanos
 
     fun saveCompositionTime(contentType: Any?, timeNanos: Long) {
-        overallAverage.saveCompositionTimeNanos(timeNanos)
         getAverage(contentType).saveCompositionTimeNanos(timeNanos)
     }
 
     fun saveMeasureTime(contentType: Any?, timeNanos: Long) {
-        overallAverage.saveMeasureTimeNanos(timeNanos)
         getAverage(contentType).saveMeasureTimeNanos(timeNanos)
     }
 }
@@ -308,12 +305,6 @@ private class Averages {
     fun saveMeasureTimeNanos(timeNanos: Long) {
         measureTimeNanos = calculateAverageTime(timeNanos, measureTimeNanos)
     }
-
-    fun copy() =
-        Averages().also {
-            it.compositionTimeNanos = compositionTimeNanos
-            it.measureTimeNanos = measureTimeNanos
-        }
 
     private fun calculateAverageTime(new: Long, current: Long): Long {
         // Calculate a weighted moving average of time taken to compose an item. We use weighted
