@@ -135,6 +135,11 @@ public fun MaterialScope.iconButton(
  * recommended stadium shape occupying available space with [width] and [height] set to [expand] or
  * [weight], usually arranged with the [buttonGroup].
  *
+ * The button's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
+ *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
  * @param labelContent The text slot for content displayed in this button. It is recommended to use
@@ -196,6 +201,11 @@ public fun MaterialScope.textButton(
 /**
  * Opinionated ProtoLayout Material3 pill shape button that offers up to three slots to take content
  * representing vertically stacked label and secondary label, and an icon next to it.
+ *
+ * The button's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
@@ -316,6 +326,11 @@ public fun MaterialScope.button(
  *
  * Difference from the [button] is that this one takes an image instead of an icon and spaces the
  * content proportionally, so that edge of the button nicely hugs the avatar image.
+ *
+ * The button's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
@@ -471,6 +486,11 @@ public fun MaterialScope.imageButton(
 /**
  * Opinionated ProtoLayout Material3 compact button that offers up to two slots to take horizontally
  * stacked content representing an icon and text next to it.
+ *
+ * The button's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
