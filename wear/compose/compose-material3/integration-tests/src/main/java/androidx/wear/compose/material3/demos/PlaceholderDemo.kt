@@ -240,15 +240,7 @@ fun PlaceholderButtonList() {
             }
             item {
                 var label by remember { mutableStateOf("") }
-                ButtonWithOverlaidPlaceholder(
-                    label = label,
-                    icon = Icons.Filled.Home,
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            iconColor = Color.Magenta.copy(alpha = 0.5f),
-                        ),
-                )
+                ButtonWithOverlaidPlaceholder(label = label, icon = Icons.Filled.Home)
                 LaunchedEffect(resetCount) {
                     label = ""
                     delay(3000)
@@ -262,7 +254,12 @@ fun PlaceholderButtonList() {
                     label = label,
                     icon = Icons.Filled.Home,
                     secondaryLabel = secondaryLabel,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color.Magenta,
+                            contentColor = Color.Black,
+                            secondaryContentColor = Color.Black
+                        ),
                 )
                 LaunchedEffect(resetCount) {
                     label = ""
