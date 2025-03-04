@@ -71,7 +71,6 @@ import androidx.wear.compose.material3.ScrollIndicatorDefaults.maxSizeFraction
 import androidx.wear.compose.material3.ScrollIndicatorDefaults.minSizeFraction
 import androidx.wear.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.wear.compose.materialcore.isLargeScreen
-import androidx.wear.compose.materialcore.isRoundDevice
 import androidx.wear.compose.materialcore.toRadians
 import kotlin.math.asin
 import kotlin.math.cos
@@ -452,7 +451,6 @@ internal fun IndicatorImpl(
 ) {
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
 
-    val isScreenRound = isRoundDevice()
     val layoutDirection = LocalLayoutDirection.current
     val gapHeight = ScrollIndicatorDefaults.gapHeight
 
@@ -469,12 +467,12 @@ internal fun IndicatorImpl(
         // position indicator on (the center of the arc, which is indicatorWidth wide).
         val radius = screenWidthDp.value / 2 - paddingHorizontal.value - indicatorWidth.value / 2
         val width =
-            (if (isScreenRound) {
-                // The sqrt is the size of the projection on the x axis of line between center of
-                // the container and the point where we start the arc.
-                // The coerceAtLeast is needed while initializing since containerSize.width is 0
-                radius - sqrt((sqr(radius) - sqr(indicatorHeight.value / 2)).coerceAtLeast(0f))
-            } else 0f) + paddingHorizontal.value + indicatorWidth.value
+            // The sqrt is the size of the projection on the x axis of line between center of
+            // the container and the point where we start the arc.
+            // The coerceAtLeast is needed while initializing since containerSize.width is 0
+            radius - sqrt((sqr(radius) - sqr(indicatorHeight.value / 2)).coerceAtLeast(0f)) +
+                paddingHorizontal.value +
+                indicatorWidth.value
 
         val height = indicatorHeight.value + indicatorWidth.value
 
@@ -533,7 +531,7 @@ internal fun IndicatorImpl(
                 // We need to invert reverseDirection when the screen is round and we are on
                 // the left.
                 val actualReverseDirection =
-                    if (isScreenRound && !indicatorOnTheRight) {
+                    if (!indicatorOnTheRight) {
                         !reverseDirection
                     } else {
                         reverseDirection
@@ -554,31 +552,18 @@ internal fun IndicatorImpl(
 
                 val paddingHorizontalPx = paddingHorizontal.toPx()
                 onDrawWithContent {
-                    if (isScreenRound) {
-                        drawCurvedIndicator(
-                            screenWidthDp.toPx(),
-                            color,
-                            background,
-                            paddingHorizontalPx,
-                            indicatorOnTheRight,
-                            indicatorHeight,
-                            gapHeight,
-                            indicatorWidthPx,
-                            indicatorStart,
-                            sizeFractionAnimatable.value,
-                        )
-                    } else {
-                        drawStraightIndicator(
-                            color,
-                            background,
-                            paddingHorizontalPx,
-                            indicatorOnTheRight,
-                            indicatorWidthPx,
-                            indicatorHeight.toPx(),
-                            indicatorStart,
-                            sizeFractionAnimatable.value,
-                        )
-                    }
+                    drawCurvedIndicator(
+                        screenWidthDp.toPx(),
+                        color,
+                        background,
+                        paddingHorizontalPx,
+                        indicatorOnTheRight,
+                        indicatorHeight,
+                        gapHeight,
+                        indicatorWidthPx,
+                        indicatorStart,
+                        sizeFractionAnimatable.value,
+                    )
                 }
             }
     )
@@ -1104,40 +1089,6 @@ private fun ContentDrawScope.drawCurvedIndicator(
 
 private fun pixelsHeightToDegrees(heightInPixels: Float, radius: Float): Float =
     2 * asin(heightInPixels / 2 / radius).toDegrees()
-
-private fun ContentDrawScope.drawStraightIndicator(
-    color: Color,
-    background: Color,
-    paddingHorizontalPx: Float,
-    indicatorOnTheRight: Boolean,
-    indicatorWidthPx: Float,
-    indicatorHeightPx: Float,
-    indicatorStart: Float,
-    indicatorSize: Float,
-) {
-    val x =
-        if (indicatorOnTheRight) {
-            size.width - paddingHorizontalPx - indicatorWidthPx / 2
-        } else {
-            paddingHorizontalPx + indicatorWidthPx / 2
-        }
-    val lineTop = Offset(x, (size.height - indicatorHeightPx) / 2f)
-    val lineBottom = lineTop + Offset(0f, indicatorHeightPx)
-    drawLine(
-        color = background,
-        lineTop,
-        lineBottom,
-        strokeWidth = indicatorWidthPx,
-        cap = StrokeCap.Round
-    )
-    drawLine(
-        color,
-        lerp(lineTop, lineBottom, indicatorStart),
-        lerp(lineTop, lineBottom, indicatorStart + indicatorSize),
-        strokeWidth = indicatorWidthPx,
-        cap = StrokeCap.Round
-    )
-}
 
 private fun sqr(x: Float) = x * x
 

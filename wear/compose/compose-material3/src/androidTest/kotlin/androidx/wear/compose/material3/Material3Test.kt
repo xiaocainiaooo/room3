@@ -97,7 +97,6 @@ enum class ScreenSize(val size: Int) {
 
 enum class ScreenShape(val isRound: Boolean) {
     ROUND_DEVICE(true),
-    SQUARE_DEVICE(false)
 }
 
 /**
