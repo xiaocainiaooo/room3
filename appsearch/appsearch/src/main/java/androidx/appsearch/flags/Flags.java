@@ -197,8 +197,8 @@ public final class Flags {
             FLAG_PREFIX + "enable_delete_propagation_type";
 
     /** Enables AppSearch to manage blob files. */
-    public static final String FLAG_ENABLE_APPSEARCH_MANAGE_BLOB_FILES =
-            FLAG_PREFIX + "enable_appsearch_manage_blob_files";
+    public static final String FLAG_ENABLE_APP_SEARCH_MANAGE_BLOB_FILES =
+            FLAG_PREFIX + "enable_app_search_manage_blob_files";
 
     /**
      * Enables time since last optimize to be calculated by last attempted optimize run time instead
