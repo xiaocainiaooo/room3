@@ -237,7 +237,7 @@ public object ButtonDefaults {
      * common action on a screen.
      *
      * These colors are using [ColorScheme.primary] for background color and [ColorScheme.onPrimary]
-     * for content color.
+     * for content color from the given [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledButtonColors(): ButtonColors =
         ButtonColors(
@@ -251,7 +251,8 @@ public object ButtonDefaults {
      * [ButtonColors] for the medium-emphasis button.
      *
      * These colors are using [ColorScheme.surfaceContainer] for background color,
-     * [ColorScheme.onSurface] for content color and [ColorScheme.primary] for icon.
+     * [ColorScheme.onSurface] for content color and [ColorScheme.primary] for icon from the given
+     * [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledTonalButtonColors(): ButtonColors =
         ButtonColors(
@@ -265,7 +266,8 @@ public object ButtonDefaults {
      * Alternative [ButtonColors] for the high-emphasis button.
      *
      * These colors are using [ColorScheme.primaryContainer] for background color and
-     * [ColorScheme.onPrimaryContainer] for content color.
+     * [ColorScheme.onPrimaryContainer] for content color from the given [MaterialScope]'s
+     * [ColorScheme].
      */
     public fun MaterialScope.filledVariantButtonColors(): ButtonColors =
         ButtonColors(
