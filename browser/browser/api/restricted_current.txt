@@ -224,6 +224,7 @@ package androidx.browser.customtabs {
     method public static boolean isActivitySideSheetMaximizationEnabled(android.content.Intent);
     method public static boolean isBackgroundInteractionEnabled(android.content.Intent);
     method public static boolean isBookmarksButtonEnabled(android.content.Intent);
+    method public static boolean isCloseButtonEnabled(android.content.Intent);
     method public static boolean isDownloadButtonEnabled(android.content.Intent);
     method @SuppressCompatibility @androidx.browser.customtabs.ExperimentalEphemeralBrowsing public boolean isEphemeralBrowsingEnabled();
     method public static boolean isSendToExternalDefaultHandlerEnabled(android.content.Intent);
@@ -256,6 +257,7 @@ package androidx.browser.customtabs {
     field public static final String EXTRA_ACTIVITY_SIDE_SHEET_ENABLE_MAXIMIZATION = "androidx.browser.customtabs.extra.ACTIVITY_SIDE_SHEET_ENABLE_MAXIMIZATION";
     field public static final String EXTRA_ACTIVITY_SIDE_SHEET_POSITION = "androidx.browser.customtabs.extra.ACTIVITY_SIDE_SHEET_POSITION";
     field public static final String EXTRA_ACTIVITY_SIDE_SHEET_ROUNDED_CORNERS_POSITION = "androidx.browser.customtabs.extra.ACTIVITY_SIDE_SHEET_ROUNDED_CORNERS_POSITION";
+    field public static final String EXTRA_CLOSE_BUTTON_ENABLED = "androidx.browser.customtabs.extra.CLOSE_BUTTON_ENABLED";
     field public static final String EXTRA_CLOSE_BUTTON_ICON = "android.support.customtabs.extra.CLOSE_BUTTON_ICON";
     field public static final String EXTRA_CLOSE_BUTTON_POSITION = "androidx.browser.customtabs.extra.CLOSE_BUTTON_POSITION";
     field public static final String EXTRA_COLOR_SCHEME = "androidx.browser.customtabs.extra.COLOR_SCHEME";
@@ -321,6 +323,7 @@ package androidx.browser.customtabs {
     method public androidx.browser.customtabs.CustomTabsIntent.Builder setActivitySideSheetRoundedCornersPosition(int);
     method public androidx.browser.customtabs.CustomTabsIntent.Builder setBackgroundInteractionEnabled(boolean);
     method public androidx.browser.customtabs.CustomTabsIntent.Builder setBookmarksButtonEnabled(boolean);
+    method public androidx.browser.customtabs.CustomTabsIntent.Builder setCloseButtonEnabled(boolean);
     method public androidx.browser.customtabs.CustomTabsIntent.Builder setCloseButtonIcon(android.graphics.Bitmap);
     method public androidx.browser.customtabs.CustomTabsIntent.Builder setCloseButtonPosition(int);
     method public androidx.browser.customtabs.CustomTabsIntent.Builder setColorScheme(int);
