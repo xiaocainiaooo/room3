@@ -55,7 +55,7 @@ import androidx.wear.protolayout.types.dp
 import kotlin.math.min
 
 /**
- * Protolayout Material3 design circular progress indicator.
+ * ProtoLayout Material3 design circular progress indicator.
  *
  * Note that, the proper implementation of this component requires a ProtoLayout renderer with
  * version equal to or above 1.403. When the renderer is lower than 1.403, this component will
@@ -64,6 +64,11 @@ import kotlin.math.min
  *
  * This component consumes 3 animation quotas when [dynamicProgress] is specified with animation by
  * the caller. It is highly recommend to use the [recommendedAnimationSpec] to animate the progress.
+ *
+ * The progress indicator's [colors] default to using [ColorScheme] from the [MaterialScope] it's
+ * defined in, which defaults to [dynamicColorScheme], meaning that the colors follow system theme
+ * if available on device. If not, or switched off by user, uses fallback [ColorScheme] defined in
+ * its [MaterialScope].
  *
  * @param staticProgress The static progress of this progress indicator where 0 represent no
  *   progress and 1 represents completion. Progress above 1 is also allowed. If [dynamicProgress] is
@@ -154,7 +159,7 @@ public fun MaterialScope.circularProgressIndicator(
 }
 
 /**
- * Protolayout Material3 design segmented circular progress indicator.
+ * ProtoLayout Material3 design segmented circular progress indicator.
  *
  * A segmented variant of [circularProgressIndicator] that is divided into equally sized segments.
  *
@@ -165,6 +170,11 @@ public fun MaterialScope.circularProgressIndicator(
  *
  * This component consumes 2 animation quotas when [dynamicProgress] is specified with animation by
  * the caller. It is highly recommend to use the [recommendedAnimationSpec] to animate the progress.
+ *
+ * The progress indicator's [colors] default to using [ColorScheme] from the [MaterialScope] it's
+ * defined in, which defaults to [dynamicColorScheme], meaning that the colors follow system theme
+ * if available on device. If not, or switched off by user, uses fallback [ColorScheme] defined in
+ * its [MaterialScope].
  *
  * @param segmentCount Number of equal segments that the progress indicator should be divided into.
  *   Has to be a number greater than or equal to 1.

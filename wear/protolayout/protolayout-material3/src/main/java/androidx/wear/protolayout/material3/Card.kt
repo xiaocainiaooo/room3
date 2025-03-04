@@ -58,6 +58,11 @@ import androidx.wear.protolayout.modifiers.padding
  * It is highly recommended to set its height to fill the available space, with [expand] for optimal
  * experience across different screen sizes.
  *
+ * The card's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
+ *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param title A slot for displaying the title of the card, expected to be one or two lines of
@@ -180,6 +185,11 @@ public fun MaterialScope.titleCard(
  * The second row shows a title, this is expected to be a single row of start aligned [text].
  *
  * The rest of the [appCard] contains the content which should be [text].
+ *
+ * The card's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
  *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
@@ -319,6 +329,11 @@ public fun MaterialScope.appCard(
  *
  * This card works well in [buttonGroup] with cards [width] and [height] is set to [expand].
  *
+ * The card's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
+ *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
@@ -439,6 +454,11 @@ public fun MaterialScope.textDataCard(
  *
  * This card works well in [buttonGroup] with cards [width] and [height] set to [expand].
  *
+ * The card's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
+ *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
@@ -557,6 +577,11 @@ public fun MaterialScope.iconDataCard(
  *
  * It is highly recommended to set its height to fill the available space, with [expand] for optimal
  * experience across different screen sizes.
+ *
+ * The card's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
  *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.

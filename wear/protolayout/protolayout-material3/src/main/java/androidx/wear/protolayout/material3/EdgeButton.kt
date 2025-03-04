@@ -73,6 +73,11 @@ import androidx.wear.protolayout.types.dp
  *
  * This component is not intended to be used with an image background.
  *
+ * The button's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
+ *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
@@ -123,6 +128,11 @@ public fun MaterialScope.iconEdgeButton(
  * whole horizontal space in its position as well as being anchored to the screen bottom.
  *
  * This component is not intended to be used with an image background.
+ *
+ * The button's [colors] default to using [ColorScheme] from the [MaterialScope] it's defined in,
+ * which defaults to [dynamicColorScheme], meaning that the colors follow system theme if available
+ * on device. If not, or switched off by user, uses fallback [ColorScheme] defined in its
+ * [MaterialScope].
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
