@@ -2692,7 +2692,7 @@ package androidx.compose.material3 {
     method public float getScrollableTabRowMinTabWidth();
     method @androidx.compose.runtime.Composable public long getSecondaryContainerColor();
     method @androidx.compose.runtime.Composable public long getSecondaryContentColor();
-    method public androidx.compose.ui.Modifier tabIndicatorOffset(androidx.compose.ui.Modifier, androidx.compose.material3.TabPosition currentTabPosition);
+    method @Deprecated public androidx.compose.ui.Modifier tabIndicatorOffset(androidx.compose.ui.Modifier, androidx.compose.material3.TabPosition currentTabPosition);
     property public float ScrollableTabRowEdgeStartPadding;
     property public float ScrollableTabRowMinTabWidth;
     property @Deprecated @androidx.compose.runtime.Composable public long containerColor;

@@ -893,6 +893,7 @@ class TabTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun testInspectorValue() {
         val pos = TabPosition(10.0.dp, 200.0.dp, 0.dp)
         rule.setContent {
