@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.pdf.testapp.ui
+package androidx.pdf.testapp.ui.v2
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.core.os.OperationCanceledException
 import androidx.pdf.testapp.R
+import androidx.pdf.testapp.ui.OpCancellationHandler
 import androidx.pdf.viewer.fragment.PdfStylingOptions
 import androidx.pdf.viewer.fragment.PdfViewerFragment
 

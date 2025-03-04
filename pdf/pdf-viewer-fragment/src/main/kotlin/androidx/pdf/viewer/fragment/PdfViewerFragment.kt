@@ -18,6 +18,7 @@ package androidx.pdf.viewer.fragment
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -32,8 +33,9 @@ import android.widget.LinearLayout.GONE
 import android.widget.LinearLayout.VISIBLE
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.CallSuper
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
 import androidx.fragment.app.Fragment
@@ -63,8 +65,43 @@ import androidx.pdf.viewer.fragment.view.PdfViewManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public open class PdfViewerFragmentV2 : Fragment() {
+/**
+ * A Fragment that renders a PDF document.
+ *
+ * <p>A [PdfViewerFragment] that can display paginated PDFs. The viewer includes a FAB for
+ * annotation support and a search menu. Each page is rendered in its own View. Upon creation, this
+ * fragment displays a loading spinner.
+ *
+ * <p>Rendering is done in 2 passes:
+ * <ol>
+ * <li>Layout: Request the page data, get the dimensions and set them as measure for the image view.
+ * <li>Render: Create bitmap(s) at adequate dimensions and attach them to the page view.
+ * </ol>
+ *
+ * <p>The layout pass is progressive: starts with a few first pages of the document, then reach
+ * further as the user scrolls down (and ultimately spans the whole document). The rendering pass is
+ * tightly limited to the currently visible pages. Pages that are scrolled past (become not visible)
+ * have their bitmaps released to free up memory.
+ *
+ * <p>Note that every activity/fragment that uses this class has to be themed with Theme.AppCompat
+ * or a theme that extends that theme.
+ *
+ * @see documentUri
+ */
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+public open class PdfViewerFragment constructor() : Fragment() {
+
+    /**
+     * Protected constructor for instantiating a [PdfViewerFragment] with the specified styling
+     * options.
+     *
+     * @param pdfStylingOptions The styling options to be applied to the PDF viewer.
+     */
+    protected constructor(pdfStylingOptions: PdfStylingOptions) : this() {
+        val args =
+            Bundle().also { it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId) }
+        arguments = args
+    }
 
     /**
      * The URI of the PDF document to display defaulting to `null`.
@@ -123,7 +160,6 @@ public open class PdfViewerFragmentV2 : Fragment() {
      *
      * @param enterImmersive true to enter immersive mode, false to exit.
      */
-    @CallSuper
     public open fun onRequestImmersiveMode(enterImmersive: Boolean) {
         // Update toolbox visibility
         isToolboxVisible = !enterImmersive
@@ -157,13 +193,21 @@ public open class PdfViewerFragmentV2 : Fragment() {
         PdfDocumentViewModel.Factory
     }
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY) protected lateinit var pdfView: PdfView
+    @VisibleForTesting
+    protected val pdfView: PdfView
+        @RestrictTo(RestrictTo.Scope.LIBRARY) get() = _pdfView
+
+    @VisibleForTesting
+    protected val pdfSearchView: PdfSearchView
+        @RestrictTo(RestrictTo.Scope.LIBRARY) get() = _pdfSearchView
+
+    private lateinit var _pdfView: PdfView
+    private lateinit var _pdfSearchView: PdfSearchView
     private lateinit var toolboxView: ToolBoxView
     private lateinit var errorView: TextView
     private lateinit var loadingView: ProgressBar
     private lateinit var pdfViewManager: PdfViewManager
     private lateinit var pdfSearchViewManager: PdfSearchViewManager
-    protected lateinit var pdfSearchView: PdfSearchView
 
     private var searchStateCollector: Job? = null
     private var highlightStateCollector: Job? = null
@@ -182,7 +226,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 documentViewModel.searchDocument(
                     query = s.toString(),
-                    visiblePageRange = pdfView.visiblePages
+                    visiblePageRange = _pdfView.visiblePages
                 )
             }
 
@@ -197,7 +241,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
                 object : ToolboxGestureDelegate {
                     override fun onSingleTap() {
                         documentViewModel.updateToolboxState(isToolboxActive = !isToolboxVisible)
-                        pdfSearchView.clearFocus()
+                        _pdfSearchView.clearFocus()
                     }
 
                     override fun onScroll(position: Int) {
@@ -218,10 +262,10 @@ public open class PdfViewerFragmentV2 : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(view) {
-            pdfView = findViewById(R.id.pdfView)
+            _pdfView = findViewById(R.id.pdfView)
             errorView = findViewById(R.id.errorTextView)
             loadingView = findViewById(R.id.pdfLoadingProgressBar)
-            pdfSearchView = findViewById(R.id.pdfSearchView)
+            _pdfSearchView = findViewById(R.id.pdfSearchView)
             toolboxView = findViewById(R.id.toolBoxView)
         }
         val gestureDetector =
@@ -236,30 +280,30 @@ public open class PdfViewerFragmentV2 : Fragment() {
                 }
             )
 
-        pdfView.setOnTouchListener { _, event ->
+        _pdfView.setOnTouchListener { _, event ->
             // we should not consume this event as the events are required in PdfView
             gestureDetector.onTouchEvent(event)
         }
-        pdfView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+        _pdfView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
             toolboxGestureEventProcessor.processEvent(ScrollTo(scrollY))
         }
 
         pdfViewManager =
             PdfViewManager(
-                pdfView = pdfView,
+                pdfView = _pdfView,
                 selectedHighlightColor =
                     requireContext().getColor(R.color.selected_highlight_color),
                 highlightColor = requireContext().getColor(R.color.highlight_color)
             )
-        pdfSearchViewManager = PdfSearchViewManager(pdfSearchView)
+        pdfSearchViewManager = PdfSearchViewManager(_pdfSearchView)
 
         setupPdfViewListeners()
 
-        onPdfSearchViewCreated(pdfSearchView)
+        onPdfSearchViewCreated(_pdfSearchView)
 
         collectFlowOnLifecycleScope { collectFragmentUiScreenState() }
         toolboxView.hide()
-        toolboxView.setOnCurrentPageRequested { pdfView.visiblePages.getCenter() }
+        toolboxView.setOnCurrentPageRequested { _pdfView.visiblePages.getCenter() }
     }
 
     override fun onResume() {
@@ -267,9 +311,9 @@ public open class PdfViewerFragmentV2 : Fragment() {
         // providing a smoother search animation without noticeable jerking.
         if (
             (documentViewModel.searchViewUiState.value !is SearchViewUiState.Closed) &&
-                !pdfSearchView.searchQueryBox.hasFocus()
+                !_pdfSearchView.searchQueryBox.hasFocus()
         )
-            pdfSearchView.searchQueryBox.requestFocus()
+            _pdfSearchView.searchQueryBox.requestFocus()
 
         super.onResume()
     }
@@ -277,17 +321,17 @@ public open class PdfViewerFragmentV2 : Fragment() {
     /**
      * Called from Fragment.onViewCreated(). This gives subclasses a chance to customize component.
      */
-    protected fun onPdfSearchViewCreated(pdfSearchView: PdfSearchView) {
-        setupSearchViewListeners(pdfSearchView)
+    private fun onPdfSearchViewCreated(searchView: PdfSearchView) {
+        setupSearchViewListeners(searchView)
         val windowManager = activity?.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
         activity?.let {
             // Attach the callback to the decorView to reliably receive insets animation events,
             // such as those triggered by soft keyboard input.
             ViewCompat.setWindowInsetsAnimationCallback(
-                pdfSearchView,
+                searchView,
                 TranslateInsetsAnimationCallback(
-                    view = pdfSearchView,
+                    view = searchView,
                     windowManager = windowManager,
                     pdfContainer = view,
                     // As the decorView is a top-level view, insets must not be consumed here.
@@ -303,7 +347,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
          * Closes any active search session if the user selects anything in the PdfView. This
          * improves the user experience by allowing the focus to shift to the intended content.
          */
-        pdfView.addOnSelectionChangedListener(
+        _pdfView.addOnSelectionChangedListener(
             object : PdfView.OnSelectionChangedListener {
                 override fun onSelectionChanged(
                     previousSelection: Selection?,
@@ -315,8 +359,8 @@ public open class PdfViewerFragmentV2 : Fragment() {
         )
     }
 
-    private fun setupSearchViewListeners(pdfSearchView: PdfSearchView) {
-        with(pdfSearchView) {
+    private fun setupSearchViewListeners(searchView: PdfSearchView) {
+        with(searchView) {
             searchQueryBox.addTextChangedListener(searchQueryTextWatcher)
 
             searchQueryBox.setOnEditorActionListener { _, actionId, _ ->
@@ -344,7 +388,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     }
 
     private fun searchDocument(query: String) {
-        documentViewModel.searchDocument(query = query, visiblePageRange = pdfView.visiblePages)
+        documentViewModel.searchDocument(query = query, visiblePageRange = _pdfView.visiblePages)
     }
 
     private fun collectViewStates() {
@@ -353,12 +397,12 @@ public open class PdfViewerFragmentV2 : Fragment() {
                 pdfSearchViewManager.setState(uiState)
 
                 /** Clear selection when we start a search session. */
-                if (uiState !is SearchViewUiState.Closed) pdfView.clearSelection()
+                if (uiState !is SearchViewUiState.Closed) _pdfView.clearSelection()
 
                 /**
                  * Dynamically control the fast scroller visibility based on the search UI state.
                  */
-                pdfView.overrideFastScrollerVisibility(uiState is SearchViewUiState.Closed)
+                _pdfView.overrideFastScrollerVisibility(uiState is SearchViewUiState.Closed)
             }
         }
 
@@ -463,7 +507,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     private fun handleDocumentLoaded(uiState: DocumentLoaded) {
         dismissPasswordDialog()
         onLoadDocumentSuccess()
-        pdfView.pdfDocument = uiState.pdfDocument
+        _pdfView.pdfDocument = uiState.pdfDocument
         toolboxView.setPdfDocument(uiState.pdfDocument)
         setViewVisibility(
             pdfView = VISIBLE,
@@ -492,7 +536,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
         loadingView: Int,
         errorView: Int,
     ) {
-        this.pdfView.visibility = pdfView
+        this._pdfView.visibility = pdfView
         this.loadingView.visibility = loadingView
         this.errorView.visibility = errorView
     }
@@ -507,7 +551,26 @@ public open class PdfViewerFragmentV2 : Fragment() {
         }
     }
 
-    private companion object {
+    public companion object {
         private const val PASSWORD_DIALOG_TAG = "password-dialog"
+        private const val KEY_PDF_VIEW_STYLE = "keyPdfViewStyle"
+
+        /**
+         * Creates a new instance of [PdfViewerFragment] with the specified styling options.
+         *
+         * @param pdfStylingOptions The styling options to be applied.
+         * @return A new instance of [PdfViewerFragment] with the provided styling options.
+         */
+        @JvmStatic
+        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragment {
+            val fragment = PdfViewerFragment()
+            val args =
+                Bundle().also {
+                    it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId)
+                }
+
+            fragment.arguments = args
+            return fragment
+        }
     }
 }

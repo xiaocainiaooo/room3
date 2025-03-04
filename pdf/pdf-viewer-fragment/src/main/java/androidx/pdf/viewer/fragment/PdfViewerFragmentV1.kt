@@ -86,7 +86,7 @@ import kotlinx.coroutines.launch
 /**
  * A Fragment that renders a PDF document.
  *
- * <p>A [PdfViewerFragment] that can display paginated PDFs. The viewer includes a FAB for
+ * <p>A [PdfViewerFragmentV1] that can display paginated PDFs. The viewer includes a FAB for
  * annotation support and a search menu. Each page is rendered in its own View. Upon creation, this
  * fragment displays a loading spinner.
  *
@@ -106,11 +106,12 @@ import kotlinx.coroutines.launch
  *
  * @see documentUri
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-public open class PdfViewerFragment constructor() : Fragment() {
+public open class PdfViewerFragmentV1 constructor() : Fragment() {
 
     /**
-     * Protected constructor for instantiating a [PdfViewerFragment] with the specified styling
+     * Protected constructor for instantiating a [PdfViewerFragmentV1] with the specified styling
      * options.
      *
      * @param pdfStylingOptions The styling options to be applied to the PDF viewer.
@@ -329,7 +330,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
             if (pdfViewStyleFromAttrs != ID_NULL) {
                 /**
                  * [Fragment.onInflate] will only be called on fragment instantiation; therefore
-                 * save it in [androidx.pdf.viewer.fragment.PdfViewerFragment]'s arguments for
+                 * save it in [androidx.pdf.viewer.fragment.PdfViewerFragmentV1]'s arguments for
                  * fragment restoring scenarios.
                  */
                 arguments?.putInt(KEY_PDF_VIEW_STYLE, pdfViewStyleFromAttrs)
@@ -1068,7 +1069,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
     }
 
     /** Feed this Viewer with contents to be displayed. */
-    private fun feed(contents: DisplayData?): PdfViewerFragment {
+    private fun feed(contents: DisplayData?): PdfViewerFragmentV1 {
         if (contents != null) {
             postContentsAvailable(contents)
         }
@@ -1150,14 +1151,14 @@ public open class PdfViewerFragment constructor() : Fragment() {
         private const val NO_DEFAULT_ATTR = 0
 
         /**
-         * Creates a new instance of [PdfViewerFragment] with the specified styling options.
+         * Creates a new instance of [PdfViewerFragmentV1] with the specified styling options.
          *
          * @param pdfStylingOptions The styling options to be applied.
-         * @return A new instance of [PdfViewerFragment] with the provided styling options.
+         * @return A new instance of [PdfViewerFragmentV1] with the provided styling options.
          */
         @JvmStatic
-        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragment {
-            val fragment = PdfViewerFragment()
+        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragmentV1 {
+            val fragment = PdfViewerFragmentV1()
             val args =
                 Bundle().also {
                     it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId)
