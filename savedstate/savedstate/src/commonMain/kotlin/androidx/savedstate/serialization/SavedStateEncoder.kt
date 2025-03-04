@@ -219,12 +219,12 @@ internal class SavedStateEncoder(
         descriptor: SerialDescriptor,
         savedState: SavedState,
     ) {
-        if (savedState.read { contains(CLASS_DISCRIMINATOR_KEY) }) {
+        // POLYMORPHIC is handled by kotlinx.serialization.PolymorphicSerializer.
+        if (configuration.classDiscriminatorMode != ClassDiscriminatorMode.ALL_OBJECTS) {
             return
         }
 
-        // POLYMORPHIC is handled by kotlinx.serialization.PolymorphicSerializer.
-        if (configuration.classDiscriminatorMode != ClassDiscriminatorMode.ALL_OBJECTS) {
+        if (savedState.read { contains(CLASS_DISCRIMINATOR_KEY) }) {
             return
         }
 
