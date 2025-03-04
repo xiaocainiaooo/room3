@@ -126,6 +126,19 @@ public class SandboxedPdfDocument(
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+    override suspend fun getSelectAllSelectionBounds(pageNumber: Int): PageSelection? {
+        return withDocument { document ->
+            document
+                .selectPageText(
+                    pageNumber,
+                    android.graphics.pdf.models.selection.SelectionBoundary(0),
+                    android.graphics.pdf.models.selection.SelectionBoundary(Int.MAX_VALUE)
+                )
+                ?.toContentClass()
+        }
+    }
+
     override suspend fun getPageContent(pageNumber: Int): PdfPageContent {
         return withDocument { document ->
             val textContents =
