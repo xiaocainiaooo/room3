@@ -33,6 +33,9 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -213,7 +216,7 @@ object PaneMotionDefaults {
  */
 @ExperimentalMaterial3AdaptiveApi
 class PaneMotionData internal constructor() {
-    var motion: PaneMotion = PaneMotion.NoMotion
+    var motion: PaneMotion by mutableStateOf(PaneMotion.NoMotion)
         internal set
 
     var originSize: IntSize = IntSize.Zero
