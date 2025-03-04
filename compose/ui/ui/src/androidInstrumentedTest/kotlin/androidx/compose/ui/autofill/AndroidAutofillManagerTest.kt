@@ -45,12 +45,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.elementOf
 import androidx.compose.ui.node.requestAutofill
 import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -103,7 +106,10 @@ class AndroidAutofillManagerTest {
     private val height = 200.dp
     private val width = 200.dp
     private val am: PlatformAutofillManager = mock()
+
     private lateinit var view: View
+    private lateinit var focusManager: FocusManager
+    private lateinit var inputModeManager: InputModeManager
 
     @OptIn(ExperimentalComposeUiApi::class)
     private val previousFlagValue = ComposeUiFlags.isSemanticAutofillEnabled
@@ -716,9 +722,7 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewExited_previousFocusTrue() {
         // Arrange.
-        lateinit var focusManager: FocusManager
         rule.setTestContent {
-            focusManager = LocalFocusManager.current
             Box(
                 Modifier.semantics {
                         testTag = "username"
@@ -739,9 +743,10 @@ class AndroidAutofillManagerTest {
         rule.waitForIdle()
         verify(am).notifyViewExited(view = eq(view), semanticsId = eq(semanticsId))
 
-        // Before API 28, we reassigned initial focus after clear focus even in touch mode.
+        // Clearing focus in Keyboard mode reassigns initial focus.
+        // Before API 28, we reassigned initial focus even in touch mode.
         // https://developer.android.com/about/versions/pie/android-9.0-changes-28#focus
-        if (Build.VERSION.SDK_INT < 28) {
+        if (inputModeManager.inputMode == InputMode.Keyboard || Build.VERSION.SDK_INT < 28) {
             rule.waitForIdle()
             verify(am)
                 .notifyViewEntered(
@@ -760,9 +765,7 @@ class AndroidAutofillManagerTest {
     @Test
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewExited_previouslyFocusedItemNotAutofillable() {
-        lateinit var focusManager: FocusManager
         rule.setTestContent {
-            focusManager = LocalFocusManager.current
             Box(Modifier.semantics { testTag = "username" }.size(height, width).focusable())
         }
 
@@ -1063,6 +1066,8 @@ class AndroidAutofillManagerTest {
     private fun ComposeContentTestRule.setTestContent(composable: @Composable () -> Unit) {
         setContent {
             view = LocalView.current
+            focusManager = LocalFocusManager.current
+            inputModeManager = LocalInputModeManager.current
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             composable()
         }
