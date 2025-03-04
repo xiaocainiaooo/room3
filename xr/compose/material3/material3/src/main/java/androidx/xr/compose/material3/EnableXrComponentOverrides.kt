@@ -18,6 +18,7 @@ package androidx.xr.compose.material3
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
+import androidx.compose.material3.LocalBasicAlertDialogOverride
 import androidx.compose.material3.LocalNavigationBarOverride
 import androidx.compose.material3.LocalNavigationRailOverride
 import androidx.compose.material3.LocalSingleRowTopAppBarOverride
@@ -85,6 +86,10 @@ public fun EnableXrComponentOverrides(
                 }
                 if (context.shouldOverrideComponent(XrComponentOverride.TwoRowsTopAppBar)) {
                     add(LocalTwoRowsTopAppBarOverride provides XrTwoRowsTopAppBarOverride)
+                }
+
+                if (context.shouldOverrideComponent(XrComponentOverride.BasicAlertDialog)) {
+                    add(LocalBasicAlertDialogOverride provides XrBasicAlertDialogOverride)
                 }
             }
         }
@@ -156,6 +161,12 @@ public value class XrComponentOverride private constructor(private val name: Str
         @get:ExperimentalMaterial3XrApi
         @ExperimentalMaterial3XrApi
         public val TwoRowsTopAppBar: XrComponentOverride = XrComponentOverride("TwoRowsTopAppBar")
+
+        /** Material3 BasicAlertDialog. */
+        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+        @get:ExperimentalMaterial3XrApi
+        @ExperimentalMaterial3XrApi
+        public val BasicAlertDialog: XrComponentOverride = XrComponentOverride("BasicAlertDialog")
     }
 }
 
