@@ -41,7 +41,6 @@
     <issue id="BanThreadSleep" severity="fatal" />
     <issue id="NewApi" severity="fatal" />
     <issue id="WrongThread" severity="fatal" />
-    <issue id="MissingTestSizeAnnotation" severity="fatal" />
     <issue id="IgnoreClassLevelDetector" severity="fatal" />
     <issue id="WithPluginClasspathUsage" severity="fatal" />
     <issue id="AutoValueNullnessOverride" severity="fatal" />
