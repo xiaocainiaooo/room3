@@ -178,6 +178,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     public var selectionActionModeCallback: DefaultSelectionActionModeCallback =
         DefaultSelectionActionModeCallback(this)
 
+    /** Listener that notifies of scroll state changes */
+    public var scrollStateChangedListener: OnScrollStateChangedListener? = null
+
     /** The currently selected PDF content, as [Selection] */
     public val currentSelection: Selection?
         get() {
@@ -195,6 +198,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             previousSelection: Selection?,
             newSelection: Selection?,
         )
+    }
+
+    /** Listener interface to receive updates when the scroll state changes */
+    public interface OnScrollStateChangedListener {
+        /** Called when a scroll state changes */
+        public fun onScrollStateChanged(x: Int, y: Int, isStable: Boolean)
     }
 
     private var onSelectionChangedListeners = mutableListOf<OnSelectionChangedListener>()
@@ -293,6 +302,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val selectionRenderer = SelectionRenderer(context)
     private var selectionActionMode: ActionMode? = null
     private var gestureInProgress = false
+    private var isScrollReleased = false
 
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
@@ -595,6 +605,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         state.documentUri = pdfDocument?.uri
         state.paginationModel = pageLayoutManager?.paginationModel
         state.selectionModel = selectionStateManager?.selectionModel?.value
+        state.isScrollReleased = isScrollReleased
         return state
     }
 
@@ -622,6 +633,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             // Once the fling has ended, prompt the page manager to start fetching data for pages
             // that we don't fetch during a fling
             maybeUpdatePageVisibility()
+        }
+
+        if (isScrollReleased && scroller.isFinished) {
+            isScrollReleased = false
+            scrollStateChangedListener?.onScrollStateChanged(scrollX, scrollY, isStable = true)
         }
     }
 
@@ -710,6 +726,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
         val positionToRestore =
             PointF(localStateToRestore.contentCenterX, localStateToRestore.contentCenterY)
+
+        isScrollReleased = localStateToRestore.isScrollReleased
+
         if (awaitingFirstLayout) {
             scrollPositionToRestore = positionToRestore
             zoomToRestore = localStateToRestore.zoom
@@ -1406,6 +1425,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 if (handleExternalLinks(links, touchPoint.pagePoint)) return true
             }
             return super.onSingleTapConfirmed(e)
+        }
+
+        override fun onScrollTouchUp() {
+            isScrollReleased = true
         }
 
         private fun handleGotoLinks(

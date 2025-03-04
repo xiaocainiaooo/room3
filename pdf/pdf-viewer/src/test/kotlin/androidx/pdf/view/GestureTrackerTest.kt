@@ -154,6 +154,7 @@ class GestureTrackerTest {
         verify(gestureHandlerSpy, atLeastOnce()).onScroll(any(), any(), any(), any())
         verify(gestureHandlerSpy).onGestureEnd(eq(GestureTracker.Gesture.DRAG_X))
         assertThat(gestureTracker.matches(GestureTracker.Gesture.DRAG_X)).isTrue()
+        verify(gestureHandlerSpy, times(1)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
@@ -172,6 +173,7 @@ class GestureTrackerTest {
         verify(gestureHandlerSpy, atLeastOnce()).onScroll(any(), any(), any(), any())
         verify(gestureHandlerSpy).onGestureEnd(eq(GestureTracker.Gesture.DRAG_Y))
         assertThat(gestureTracker.matches(GestureTracker.Gesture.DRAG_Y)).isTrue()
+        verify(gestureHandlerSpy, times(1)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
@@ -191,6 +193,7 @@ class GestureTrackerTest {
         verify(gestureHandlerSpy, atLeastOnce()).onScroll(any(), any(), any(), any())
         verify(gestureHandlerSpy).onGestureEnd(eq(GestureTracker.Gesture.DRAG))
         assertThat(gestureTracker.matches(GestureTracker.Gesture.DRAG)).isTrue()
+        verify(gestureHandlerSpy, times(1)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
@@ -211,6 +214,7 @@ class GestureTrackerTest {
         verify(gestureHandlerSpy, atLeastOnce()).onScroll(any(), any(), any(), any())
         verify(gestureHandlerSpy).onGestureEnd(eq(GestureTracker.Gesture.FLING))
         assertThat(gestureTracker.matches(GestureTracker.Gesture.FLING)).isTrue()
+        verify(gestureHandlerSpy, times(1)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
@@ -327,6 +331,7 @@ class GestureTrackerTest {
         assertThat(gestureTracker.matches(GestureTracker.Gesture.DRAG_X)).isTrue()
         // And we should never have detected a double tap
         verify(gestureHandlerSpy, never()).onDoubleTap(any())
+        verify(gestureHandlerSpy, times(1)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
@@ -363,6 +368,7 @@ class GestureTrackerTest {
         assertThat(gestureTracker.matches(GestureTracker.Gesture.SINGLE_TAP)).isTrue()
         // And we should never have detected a double tap
         verify(gestureHandlerSpy, never()).onDoubleTap(any())
+        verify(gestureHandlerSpy, times(1)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
@@ -403,6 +409,7 @@ class GestureTrackerTest {
         assertThat(gestureTracker.matches(GestureTracker.Gesture.DRAG_X)).isTrue()
         // And that we never detected a zoom / quick scale
         verify(gestureHandlerSpy, never()).onScale(any())
+        verify(gestureHandlerSpy, times(2)).onScrollTouchUp()
 
         verifyNoMoreInteractions(gestureHandlerSpy)
     }

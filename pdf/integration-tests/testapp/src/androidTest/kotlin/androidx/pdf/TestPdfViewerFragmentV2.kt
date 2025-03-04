@@ -27,8 +27,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.pdf.idlingresource.PdfIdlingResource
 import androidx.pdf.testapp.R
 import androidx.pdf.view.PdfView
+import androidx.pdf.view.PdfView.OnScrollStateChangedListener
 import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.UUID
 
 /**
  * A subclass fragment from [PdfViewerFragmentV2] to include [androidx.test.espresso.IdlingResource]
@@ -39,6 +41,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
 
     val pdfLoadingIdlingResource = PdfIdlingResource(PDF_LOAD_RESOURCE_NAME)
+    val pdfScrollIdlingResource = PdfIdlingResource(PDF_SCROLL_RESOURCE_NAME)
+    val pdfSearchFocusIdlingResource = PdfIdlingResource(PDF_SEARCH_FOCUS_RESOURCE_NAME)
 
     private var hostView: FrameLayout? = null
     private var search: FloatingActionButton? = null
@@ -73,6 +77,23 @@ internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
 
         // Set up search button click listener
         search?.setOnClickListener { isTextSearchActive = true }
+
+        pdfView.scrollStateChangedListener =
+            object : OnScrollStateChangedListener {
+                override fun onScrollStateChanged(x: Int, y: Int, isStable: Boolean) {
+                    if (isStable) {
+                        pdfScrollIdlingResource.decrement()
+                    }
+                }
+            }
+        pdfSearchView.searchQueryBox.onFocusChangeListener =
+            object : View.OnFocusChangeListener {
+                override fun onFocusChange(v: View?, hasFocus: Boolean) {
+                    if (!hasFocus) {
+                        pdfSearchFocusIdlingResource.decrement()
+                    }
+                }
+            }
     }
 
     override fun onRequestImmersiveMode(enterImmersive: Boolean) {
@@ -91,7 +112,10 @@ internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
     }
 
     companion object {
-        private const val PDF_LOAD_RESOURCE_NAME = "PdfLoad"
+        // Resource name must be unique to avoid conflicts while running multiple test scenarios
+        private val PDF_LOAD_RESOURCE_NAME = "PdfLoad-${UUID.randomUUID()}"
+        private val PDF_SCROLL_RESOURCE_NAME = "PdfScroll-${UUID.randomUUID()}"
+        private val PDF_SEARCH_FOCUS_RESOURCE_NAME = "PdfSearchFocus-${UUID.randomUUID()}"
 
         fun handleInsets(hostView: View) {
             ViewCompat.setOnApplyWindowInsetsListener(hostView) { view, insets ->

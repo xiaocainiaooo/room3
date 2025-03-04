@@ -76,6 +76,8 @@ internal class SearchInteractionTest {
             // Register idling resource
             IdlingRegistry.getInstance()
                 .register(fragment.pdfLoadingIdlingResource.countingIdlingResource)
+            IdlingRegistry.getInstance()
+                .register(fragment.pdfSearchFocusIdlingResource.countingIdlingResource)
 
             scenarioLoadDocument(
                 scenario = scenario,
@@ -91,6 +93,8 @@ internal class SearchInteractionTest {
             // Un-register idling resource
             IdlingRegistry.getInstance()
                 .unregister(fragment.pdfLoadingIdlingResource.countingIdlingResource)
+            IdlingRegistry.getInstance()
+                .unregister(fragment.pdfSearchFocusIdlingResource.countingIdlingResource)
         }
         scenario.close()
     }
@@ -170,6 +174,11 @@ internal class SearchInteractionTest {
             // Single tap on PdfView(anywhere on the content)
             onView(isRoot()).perform(click())
 
+            scenario.onFragment { it.pdfSearchFocusIdlingResource.increment() }
+            // Espresso will wait on the idling resource on the next action performed hence adding a
+            // click which is essentially a no-op
+            onView(isRoot()).perform(click())
+
             // search focus on search is cleared
             assertFalse(it.hasFocus())
             // assert soft input mode is also hidden
@@ -195,6 +204,11 @@ internal class SearchInteractionTest {
             assertTrue(it.hasFocus())
 
             // Single tap on PdfView(anywhere on the content)
+            onView(isRoot()).perform(click())
+
+            scenario.onFragment { it.pdfSearchFocusIdlingResource.increment() }
+            // Espresso will wait on the idling resource on the next action performed hence adding a
+            // click which is essentially a no-op
             onView(isRoot()).perform(click())
 
             // search focus on search is cleared
