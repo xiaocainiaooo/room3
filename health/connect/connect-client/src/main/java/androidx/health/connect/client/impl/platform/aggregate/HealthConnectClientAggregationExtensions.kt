@@ -52,7 +52,8 @@ internal suspend fun HealthConnectClient.aggregateFallback(
     val aggregationResult =
         AGGREGATION_FALLBACK_RECORD_TYPES.associateWith { recordType ->
                 request.withFilteredMetrics {
-                    it.dataTypeName == RECORDS_CLASS_NAME_MAP[recordType]!!
+                    !it.isPlatformSupportedMetric() &&
+                        it.dataTypeName == RECORDS_CLASS_NAME_MAP[recordType]!!
                 }
             }
             .filterValues { it.metrics.isNotEmpty() }
@@ -78,7 +79,10 @@ internal suspend fun HealthConnectClient.aggregateFallback(
     request: AggregateGroupByPeriodRequest
 ): List<AggregationResultGroupedByPeriod> {
     return AGGREGATION_FALLBACK_RECORD_TYPES.associateWith { recordType ->
-            request.withFilteredMetrics { it.dataTypeName == RECORDS_CLASS_NAME_MAP[recordType]!! }
+            request.withFilteredMetrics {
+                !it.isPlatformSupportedMetric() &&
+                    it.dataTypeName == RECORDS_CLASS_NAME_MAP[recordType]!!
+            }
         }
         .filterValues { it.metrics.isNotEmpty() }
         .flatMap { (recordType, recordTypeRequest) ->
@@ -108,7 +112,10 @@ internal suspend fun HealthConnectClient.aggregateFallback(
     request: AggregateGroupByDurationRequest
 ): List<AggregationResultGroupedByDuration> {
     return AGGREGATION_FALLBACK_RECORD_TYPES.associateWith { recordType ->
-            request.withFilteredMetrics { it.dataTypeName == RECORDS_CLASS_NAME_MAP[recordType]!! }
+            request.withFilteredMetrics {
+                !it.isPlatformSupportedMetric() &&
+                    it.dataTypeName == RECORDS_CLASS_NAME_MAP[recordType]!!
+            }
         }
         .filterValues { it.metrics.isNotEmpty() }
         .flatMap { (recordType, recordTypeRequest) ->
