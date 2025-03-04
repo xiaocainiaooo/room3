@@ -19,11 +19,15 @@ package androidx.pdf.testapp
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
@@ -65,6 +69,12 @@ class MainActivityV2 : AppCompatActivity() {
         }
 
         searchButton.setOnClickListener { pdfViewerFragment?.isTextSearchActive = true }
+
+        handleWindowInsets()
+
+        // Ensure WindowInsetsCompat are passed to content views without being consumed by the decor
+        // view.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     private fun setPdfView() {
@@ -82,6 +92,25 @@ class MainActivityV2 : AppCompatActivity() {
         )
         transaction.commitAllowingStateLoss()
         fragmentManager.executePendingTransactions()
+    }
+
+    private fun handleWindowInsets() {
+        val pdfContainerView: View = findViewById(R.id.pdf_container_view)
+
+        ViewCompat.setOnApplyWindowInsetsListener(pdfContainerView) { view, insets ->
+            // Get the insets for the system bars (status bar, navigation bar)
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Adjust the padding of the container view to accommodate system windows
+            view.setPadding(
+                view.paddingLeft,
+                systemBarsInsets.top,
+                view.paddingRight,
+                systemBarsInsets.bottom
+            )
+
+            insets
+        }
     }
 
     companion object {
