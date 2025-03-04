@@ -30,6 +30,7 @@ import androidx.core.os.BundleCompat.getParcelableArrayList
 import androidx.core.os.BundleCompat.getSerializable
 import androidx.core.os.BundleCompat.getSparseParcelableArray
 import java.io.Serializable
+import kotlin.reflect.KClass
 
 @Suppress("ValueClassDefinition")
 @JvmInline
@@ -205,17 +206,51 @@ internal actual constructor(
      * Retrieves a [Parcelable] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
+     * @param parcelableClass The type of the object expected
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
+     */
+    public fun <T : Parcelable> getParcelable(key: String, parcelableClass: KClass<T>): T {
+        return getParcelable(source, key, parcelableClass.java) ?: keyOrValueNotFoundError(key)
+    }
+
+    /**
+     * Retrieves a [Parcelable] object associated with the specified key.
+     *
+     * @param key The key to retrieve the value for.
      * @return The value associated with the [key].
      * @throws IllegalArgumentException If the key is not found.
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Parcelable> getParcelable(key: String): T {
-        return getParcelable(source, key, T::class.java) ?: keyOrValueNotFoundError(key)
+        return getParcelable(key, T::class)
+    }
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun <T : Parcelable> getParcelableOrNull(key: String, parcelableClass: KClass<T>): T? {
+        return getParcelable(source, key, parcelableClass.java)
     }
 
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     public inline fun <reified T : Parcelable> getParcelableOrNull(key: String): T? {
-        return getParcelable(source, key, T::class.java)
+        return getParcelableOrNull(key, T::class)
+    }
+
+    /**
+     * Retrieves a [Serializable] object associated with the specified key.
+     *
+     * @param key The key to retrieve the value for.
+     * @param serializableClass The type of the object expected
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
+     */
+    public fun <T : Serializable> getJavaSerializable(
+        key: String,
+        serializableClass: KClass<T>
+    ): T {
+        return getSerializable(source, key, serializableClass.java) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -227,12 +262,20 @@ internal actual constructor(
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Serializable> getJavaSerializable(key: String): T {
-        return getSerializable(source, key, T::class.java) ?: keyOrValueNotFoundError(key)
+        return getJavaSerializable(key, T::class)
+    }
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun <T : Serializable> getJavaSerializableOrNull(
+        key: String,
+        serializableClass: KClass<T>
+    ): T? {
+        return getSerializable(source, key, serializableClass.java)
     }
 
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     public inline fun <reified T : Serializable> getJavaSerializableOrNull(key: String): T? {
-        return getSerializable(source, key, T::class.java)
+        return getJavaSerializableOrNull(key, T::class)
     }
 
     /**
@@ -327,18 +370,44 @@ internal actual constructor(
      * Retrieves a [List] of elements of [Parcelable] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
+     * @param parcelableClass The type of the object expected
      * @return The value associated with the [key].
-     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
+     */
+    public fun <T : Parcelable> getParcelableList(
+        key: String,
+        parcelableClass: KClass<T>
+    ): List<T> {
+        return getParcelableArrayList(source, key, parcelableClass.java)
+            ?: keyOrValueNotFoundError(key)
+    }
+
+    /**
+     * Retrieves a [List] of elements of [Parcelable] associated with the specified [key].
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     public inline fun <reified T : Parcelable> getParcelableList(key: String): List<T> {
-        return getParcelableArrayList(source, key, T::class.java) ?: keyOrValueNotFoundError(key)
+        return getParcelableList(key, T::class)
+    }
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    @Suppress("NullableCollection")
+    public fun <T : Parcelable> getParcelableListOrNull(
+        key: String,
+        parcelableClass: KClass<T>
+    ): List<T>? {
+        return getParcelableArrayList(source, key, parcelableClass.java)
     }
 
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     @Suppress("NullableCollection")
     public inline fun <reified T : Parcelable> getParcelableListOrNull(key: String): List<T>? {
-        return getParcelableArrayList(source, key, T::class.java)
+        return getParcelableListOrNull(key, T::class)
     }
 
     public actual fun getBooleanArray(key: String): BooleanArray {
@@ -412,22 +481,62 @@ internal actual constructor(
      * Retrieves an [Array] of elements of [Parcelable] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
+     * @param parcelableClass The type of the object expected
      * @return The value associated with the [key].
-     * @throws IllegalArgumentException If the key is not found.
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
+     */
+    @Suppress("ArrayReturn")
+    public fun <T : Parcelable> getParcelableArray(
+        key: String,
+        parcelableClass: KClass<T>
+    ): Array<T> {
+        return getParcelableArrayOrNull(key, parcelableClass) ?: keyOrValueNotFoundError(key)
+    }
+
+    /**
+     * Retrieves an [Array] of elements of [Parcelable] associated with the specified [key].
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      * @throws IllegalArgumentException if associated value has wrong type.
      */
     @Suppress("ArrayReturn")
     public inline fun <reified T : Parcelable> getParcelableArray(key: String): Array<T> {
+        return getParcelableArray(key, T::class)
+    }
+
+    /** Returns the value corresponding to the given [key], or throws [IllegalArgumentException]. */
+    @Suppress("ArrayReturn", "NullableCollection")
+    public fun <T : Parcelable> getParcelableArrayOrNull(
+        key: String,
+        parcelableClass: KClass<T>
+    ): Array<T>? {
         @Suppress("UNCHECKED_CAST")
-        return getParcelableArray(source, key, T::class.java) as? Array<T>
-            ?: keyOrValueNotFoundError(key)
+        return getParcelableArray(source, key, parcelableClass.java) as? Array<T>
     }
 
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     @Suppress("ArrayReturn", "NullableCollection")
     public inline fun <reified T : Parcelable> getParcelableArrayOrNull(key: String): Array<T>? {
-        @Suppress("UNCHECKED_CAST")
-        return getParcelableArray(source, key, T::class.java) as? Array<T>
+        return getParcelableArrayOrNull(key, T::class)
+    }
+
+    /**
+     * Retrieves a [SparseArray] of elements of [Parcelable] associated with the specified [key].
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param parcelableClass The type of the object expected
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalArgumentException if associated value has wrong type.
+     */
+    public fun <T : Parcelable> getSparseParcelableArray(
+        key: String,
+        parcelableClass: KClass<T>,
+    ): SparseArray<T> {
+        return getSparseParcelableArrayOrNull(key, parcelableClass) ?: keyOrValueNotFoundError(key)
     }
 
     /**
@@ -441,14 +550,22 @@ internal actual constructor(
     public inline fun <reified T : Parcelable> getSparseParcelableArray(
         key: String
     ): SparseArray<T> {
-        return getSparseParcelableArray(source, key, T::class.java) as? SparseArray<T>
-            ?: keyOrValueNotFoundError(key)    }
+        return getSparseParcelableArray(key, T::class)
+    }
+
+    /** Returns the value corresponding to the given [key], or null if such a key is not present. */
+    public fun <T : Parcelable> getSparseParcelableArrayOrNull(
+        key: String,
+        parcelableClass: KClass<T>,
+    ): SparseArray<T>? {
+        return getSparseParcelableArray(source, key, parcelableClass.java)
+    }
 
     /** Returns the value corresponding to the given [key], or null if such a key is not present. */
     public inline fun <reified T : Parcelable> getSparseParcelableArrayOrNull(
         key: String
     ): SparseArray<T>? {
-        return getSparseParcelableArray(source, key, T::class.java)
+        return getSparseParcelableArrayOrNull(key, T::class)
     }
 
     public actual fun getSavedState(key: String): SavedState {

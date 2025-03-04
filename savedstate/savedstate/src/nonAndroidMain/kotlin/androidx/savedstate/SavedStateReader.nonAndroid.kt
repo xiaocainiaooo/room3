@@ -193,8 +193,7 @@ internal actual constructor(
     }
 
     public actual fun getSavedStateArrayOrNull(key: String): Array<SavedState>? {
-        @Suppress("UNCHECKED_CAST")
-        return source.map[key] as? Array<SavedState>
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<SavedState>
     }
 
     @Suppress("UNCHECKED_CAST")

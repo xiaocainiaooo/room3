@@ -201,7 +201,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getParcelableOrNull_whenSetNull_returns() {
+    fun getParcelableOrNull_whenSetNull_returnsNull() {
         val underTest = savedState { putNull(KEY_1) }
         assertThat(underTest.read { getParcelableOrNull<TestParcelable>(KEY_1) }).isNull()
     }
@@ -257,7 +257,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getParcelableListOrNull_whenSetNull_returns() {
+    fun getParcelableListOrNull_whenSetNull_returnsNull() {
         val underTest = savedState { putNull(KEY_1) }
         assertThat(underTest.read { getParcelableListOrNull<TestParcelable>(KEY_1) }).isNull()
     }
@@ -313,7 +313,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getParcelableArrayOrNull_whenSetNull_returns() {
+    fun getParcelableArrayOrNull_whenSetNull_returnsNull() {
         val underTest = savedState { putNull(KEY_1) }
         assertThat(underTest.read { getParcelableArrayOrNull<TestParcelable>(KEY_1) }).isNull()
     }
@@ -369,7 +369,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getSparseParcelableArrayOrNull_whenSetNull_returns() {
+    fun getSparseParcelableArrayOrNull_whenSetNull_returnsNull() {
         val underTest = savedState { putNull(KEY_1) }
         assertThat(underTest.read { getSparseParcelableArrayOrNull<TestParcelable>(KEY_1) })
             .isNull()
@@ -422,7 +422,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
     }
 
     @Test
-    fun getJavaSerializableOrNull_whenSetNull_returns() {
+    fun getJavaSerializableOrNull_whenSetNull_returnsNull() {
         val underTest = savedState { putNull(KEY_1) }
         assertThat(underTest.read { getJavaSerializableOrNull<TestSerializable>(KEY_1) }).isNull()
     }
