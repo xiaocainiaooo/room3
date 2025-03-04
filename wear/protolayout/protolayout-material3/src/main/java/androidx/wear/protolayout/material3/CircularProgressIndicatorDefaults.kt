@@ -57,7 +57,8 @@ public class ProgressIndicatorColors(
 public object CircularProgressIndicatorDefaults {
     /**
      * Returns the recommended [ProgressIndicatorColors] object to be used when placing the progress
-     * indicator inside a graphic card with [CardDefaults.filledCardColors].
+     * indicator inside a graphic card with [CardDefaults.filledCardColors] from the given
+     * [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledProgressIndicatorColors(): ProgressIndicatorColors =
         ProgressIndicatorColors(
@@ -68,7 +69,8 @@ public object CircularProgressIndicatorDefaults {
 
     /**
      * Returns the recommended [ProgressIndicatorColors] object to be used when placing the progress
-     * indicator inside a graphic card with [CardDefaults.filledTonalCardColors].
+     * indicator inside a graphic card with [CardDefaults.filledTonalCardColors] from the given
+     * [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledTonalProgressIndicatorColors(): ProgressIndicatorColors =
         ProgressIndicatorColors(
@@ -79,7 +81,8 @@ public object CircularProgressIndicatorDefaults {
 
     /**
      * Returns the recommended [ProgressIndicatorColors] object to be used when placing the progress
-     * indicator inside a graphic card with [CardDefaults.filledVariantCardColors].
+     * indicator inside a graphic card with [CardDefaults.filledVariantCardColors] from the given
+     * [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledVariantProgressIndicatorColors(): ProgressIndicatorColors =
         ProgressIndicatorColors(

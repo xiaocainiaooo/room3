@@ -99,7 +99,7 @@ public object CardDefaults {
      * common action on a screen.
      *
      * These colors are using [ColorScheme.primary] for background color and [ColorScheme.onPrimary]
-     * for content colors.
+     * for content colors from the given [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledCardColors(): CardColors =
         CardColors(
@@ -114,7 +114,8 @@ public object CardDefaults {
      * [CardColors] for the medium-emphasis card.
      *
      * These colors are using [ColorScheme.surfaceContainer] for background color and
-     * [ColorScheme.onSurface] and [ColorScheme.onSurfaceVariant] for content colors.
+     * [ColorScheme.onSurface] and [ColorScheme.onSurfaceVariant] for content colors from the given
+     * [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.filledTonalCardColors(): CardColors =
         CardColors(
@@ -130,7 +131,8 @@ public object CardDefaults {
      * Alternative [CardColors] for the high-emphasis card.
      *
      * These colors are using [ColorScheme.primaryContainer] for background color and
-     * [ColorScheme.primaryContainer] for content colors.
+     * [ColorScheme.primaryContainer] for content colors from the given [MaterialScope]'s
+     * [ColorScheme].
      */
     public fun MaterialScope.filledVariantCardColors(): CardColors =
         CardColors(
@@ -144,7 +146,8 @@ public object CardDefaults {
     /**
      * Alternative [CardColors] for the card with [backgroundImage] as a background.
      *
-     * These colors are using [ColorScheme.onBackground] for content colors.
+     * These colors are using [ColorScheme.onBackground] for content colors from the given
+     * [MaterialScope]'s [ColorScheme].
      */
     public fun MaterialScope.imageBackgroundCardColors(): CardColors =
         CardColors(
