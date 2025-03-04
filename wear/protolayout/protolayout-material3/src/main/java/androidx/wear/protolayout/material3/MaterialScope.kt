@@ -105,7 +105,12 @@ internal constructor(
 
 /**
  * Creates a top-level receiver scope [MaterialScope] that calls the given [layout] to support for
- * opinionated defaults and building Material3 components and layout, with default dynamic theme.
+ * opinionated defaults and building Material3 components and layout, with default dynamic theme
+ * colors defined in [dynamicColorScheme].
+ *
+ * The colors of elements in this receiver scope will automatically follow colors from the system
+ * theme, including whenever user changes the theme. If dynamic color scheme is switched off by user
+ * or unavailable on device, defaults to static, default [ColorScheme].
  *
  * @param context The Android Context for the Tile service
  * @param deviceConfiguration The device parameters for where the components will be rendered
