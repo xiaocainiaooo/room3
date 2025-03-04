@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
@@ -29,7 +28,6 @@ import androidx.annotation.RestrictTo
 import androidx.core.content.ContextCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.R
-import androidx.pdf.view.PdfView
 import com.google.android.material.color.MaterialColors
 
 /**
@@ -110,28 +108,16 @@ public class FastScrollDrawer(
      * canvas.
      *
      * @param canvas The canvas on which to draw the scrubber.
-     * @param zoom The current zoom level.
-     * @param scrollY The vertical position of the scrubber in pixels.
-     * @param visibleAreaPx The rectangular area of the view that is currently visible.
+     * @param xOffset offset on x-axis in view coordinates.
+     * @param yOffset offset on y-axis in view coordinates.
      * @param visiblePages The range of pages that are currently visible.
      */
-    public fun draw(
-        canvas: Canvas,
-        zoom: Float,
-        scrollY: Int,
-        visibleAreaPx: Rect,
-        visiblePages: Range<Int>
-    ) {
+    public fun draw(canvas: Canvas, xOffset: Int, yOffset: Int, visiblePages: Range<Int>) {
         val thumbLeftPx =
-            (PdfView.toViewCoord(visibleAreaPx.right.toFloat(), zoom, scroll = 0) -
-                    thumbWidthDp.dpToPx(context))
-                .toInt() + scrubberEdgeOffsetDp.dpToPx(context)
-        val thumbTopPx =
-            (scrollY + PdfView.toViewCoord(visibleAreaPx.top.toFloat(), zoom, scroll = 0)).toInt()
+            (xOffset - thumbWidthDp.dpToPx(context) + scrubberEdgeOffsetDp.dpToPx(context)).toInt()
+        val thumbTopPx = yOffset
         val thumbBottomPx = thumbTopPx + thumbHeightDp.dpToPx(context)
-        val thumbRightPx =
-            PdfView.toViewCoord(visibleAreaPx.right.toFloat(), zoom, scroll = 0).toInt() +
-                scrubberEdgeOffsetDp.dpToPx(context)
+        val thumbRightPx = (xOffset + scrubberEdgeOffsetDp.dpToPx(context)).toInt()
 
         thumbShadowDrawable?.setBounds(
             thumbLeftPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
@@ -145,26 +131,23 @@ public class FastScrollDrawer(
         thumbDrawable.draw(canvas)
 
         drawDragHandle(canvas, thumbRightPx, thumbTopPx)
-        drawPageIndicator(canvas, zoom, thumbTopPx, visiblePages, visibleAreaPx)
+        drawPageIndicator(canvas, xOffset, thumbTopPx, visiblePages)
     }
 
     private fun drawPageIndicator(
         canvas: Canvas,
-        zoom: Float,
+        xOffset: Int,
         thumbTopPx: Int,
-        visiblePages: Range<Int>,
-        visibleAreaPx: Rect,
+        visiblePages: Range<Int>
     ) {
         currentPageIndicatorLabel = generateLabel(visiblePages)
         val labelWidth = textPaint.measureText(currentPageIndicatorLabel)
         val pageIndicatorWidthPx =
             (labelWidth + (2 * pageIndicatorTextOffsetDp.dpToPx(context))).toInt()
 
-        val viewRightPx =
-            (PdfView.toViewCoord(visibleAreaPx.right.toFloat(), zoom, scroll = 0)).toInt()
         val pageIndicatorHeightPx = pageIndicatorHeightDp.dpToPx(context)
 
-        val indicatorRightPx = viewRightPx - pageIndicatorRightMarginDp.dpToPx(context)
+        val indicatorRightPx = xOffset - pageIndicatorRightMarginDp.dpToPx(context)
         val indicatorLeftPx = indicatorRightPx - pageIndicatorWidthPx
         val indicatorTopPx =
             thumbTopPx + ((thumbHeightDp.dpToPx(context) - pageIndicatorHeightPx) / 2)

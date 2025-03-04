@@ -18,7 +18,6 @@ package androidx.pdf.view.fastscroll
 
 import android.animation.ValueAnimator
 import android.graphics.Canvas
-import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
@@ -42,7 +41,9 @@ public class FastScroller(
     public val fastScrollDrawer: FastScrollDrawer,
     private val scrollCalculator: FastScrollCalculator
 ) {
-    internal var fastScrollY: Int = 0
+    // Init position for fastScrollY with the top margin of the scroller.
+    internal var fastScrollY: Int =
+        scrollCalculator.scrollerTopMarginDp.dpToPx(fastScrollDrawer.context)
 
     // This is used to optimize performance. If the scroll position has already been updated
     // by another method the calculation is skipped.
@@ -59,34 +60,39 @@ public class FastScroller(
      * `renderer`.
      *
      * @param canvas The canvas on which to draw the scroller.
+     * @param scrollX The raw horizontal scroll position in pixels.
      * @param scrollY The raw vertical scroll position in pixels.
-     * @param zoom The current zoom level.
+     * @param viewWidth The width of the view in pixels.
      * @param viewHeight The height of the view in pixels.
-     * @param visibleArea The rectangular area of the view that is currently visible.
      * @param visiblePages The range of pages that are currently visible.
+     * @param estimatedFullHeight The estimated full height of the pdf document in pixels.
      */
     public fun drawScroller(
         canvas: Canvas,
+        scrollX: Int,
         scrollY: Int,
-        zoom: Float,
+        viewWidth: Int,
         viewHeight: Int,
-        visibleArea: Rect,
         visiblePages: Range<Int>,
-        estimatedFullHeight: Int
+        estimatedFullHeight: Float
     ) {
         if (scrollY != lastScrollY) {
             fastScrollY =
                 scrollCalculator.computeThumbPosition(
-                    scrollY,
-                    zoom,
-                    viewHeight,
-                    fastScrollDrawer.thumbHeightPx,
-                    estimatedFullHeight
+                    scrollY = scrollY,
+                    viewHeight = viewHeight,
+                    thumbHeightPx = fastScrollDrawer.thumbHeightPx,
+                    estimatedFullHeight = estimatedFullHeight
                 )
             lastScrollY = scrollY
         }
 
-        fastScrollDrawer.draw(canvas, zoom, fastScrollY, visibleArea, visiblePages)
+        fastScrollDrawer.draw(
+            canvas,
+            xOffset = scrollX + viewWidth,
+            yOffset = scrollY + fastScrollY,
+            visiblePages
+        )
     }
 
     /**
@@ -98,15 +104,13 @@ public class FastScroller(
      * into account the zoom level.
      *
      * @param scrollY The raw vertical scroll position of the fast scroller in pixels.
-     * @param zoom The current zoom level.
      * @param viewHeight The height of the view in pixels.
      * @return The calculated content scroll position in pixels.
      */
     public fun viewScrollPositionFromFastScroller(
         scrollY: Float,
-        zoom: Float,
         viewHeight: Int,
-        estimatedFullHeight: Int
+        estimatedFullHeight: Float
     ): Int {
         fastScrollY =
             scrollCalculator.constrainScrollPosition(
@@ -116,10 +120,10 @@ public class FastScroller(
             )
 
         return scrollCalculator.computeViewScroll(
-            fastScrollY,
-            viewHeight,
-            zoom,
-            estimatedFullHeight
+            fastScrollY = fastScrollY,
+            viewHeight = viewHeight,
+            thumbHeightPx = fastScrollDrawer.thumbHeightPx,
+            estimatedFullHeight = estimatedFullHeight
         )
     }
 

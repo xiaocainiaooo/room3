@@ -283,10 +283,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private val fastScrollGestureHandler =
         object : FastScrollGestureDetector.FastScrollGestureHandler {
-            override fun onFastScrollDetected(scrollY: Float) {
+            override fun onFastScrollDetected(eventY: Float) {
                 fastScroller?.let {
                     val updatedY =
-                        it.viewScrollPositionFromFastScroller(scrollY, zoom, height, contentHeight)
+                        it.viewScrollPositionFromFastScroller(
+                            scrollY = eventY,
+                            viewHeight = height,
+                            estimatedFullHeight =
+                                toViewCoord(contentHeight.toFloat(), zoom, scroll = 0)
+                        )
                     scrollTo(scrollX, updatedY)
                     invalidate()
                 }
@@ -494,13 +499,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val documentPageCount = pdfDocument?.pageCount ?: 0
         if (documentPageCount > 1 && !shouldOverrideFastScrollVisibility) {
             fastScroller?.drawScroller(
-                canvas,
-                scrollY,
-                zoom,
-                height,
-                /* visibleArea= */ getVisibleAreaInContentCoords(),
-                fullyVisiblePages,
-                contentHeight
+                canvas = canvas,
+                scrollX = scrollX,
+                scrollY = scrollY,
+                viewWidth = width,
+                viewHeight = height,
+                visiblePages = fullyVisiblePages,
+                estimatedFullHeight =
+                    toViewCoord(contentCoord = contentHeight.toFloat(), zoom = zoom, scroll = 0)
             )
         }
     }
