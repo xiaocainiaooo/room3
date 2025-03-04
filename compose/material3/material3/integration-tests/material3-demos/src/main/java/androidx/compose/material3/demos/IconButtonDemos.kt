@@ -540,7 +540,6 @@ fun IconButtonAndToggleButtonsDemo() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             var checked by remember { mutableStateOf(false) }
-
             Text(
                 text =
                     if (!checked) {
@@ -556,7 +555,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Outlined.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
 
             FilledTonalIconToggleButton(
@@ -564,7 +563,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Outlined.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
 
             OutlinedIconToggleButton(
@@ -572,7 +571,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Outlined.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
 
             IconToggleButton(
@@ -580,7 +579,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Outlined.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
         }
 
@@ -610,7 +609,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Filled.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
 
             FilledTonalIconToggleButton(
@@ -618,7 +617,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Filled.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
 
             OutlinedIconToggleButton(
@@ -626,7 +625,7 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Filled.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
 
             IconToggleButton(
@@ -634,8 +633,17 @@ fun IconButtonAndToggleButtonsDemo() {
                 onCheckedChange = { checked = it },
                 shapes = IconButtonDefaults.toggleableShapes()
             ) {
-                Icon(Icons.Filled.Edit, contentDescription = "Localized description")
+                IconFor(checked)
             }
         }
+    }
+}
+
+@Composable
+private fun IconFor(checked: Boolean) {
+    if (checked) {
+        Icon(Icons.Filled.Edit, contentDescription = "Localized description")
+    } else {
+        Icon(Icons.Outlined.Edit, contentDescription = "Localized description")
     }
 }
