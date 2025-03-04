@@ -314,9 +314,9 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
 
         val lintXmlPath =
             if (extension.type == SoftwareType.SAMPLES) {
-                "buildSrc/lint_samples.xml"
+                "buildSrc/lint/lint_samples.xml"
             } else {
-                "buildSrc/lint.xml"
+                "buildSrc/lint/lint.xml"
             }
 
         // Prevent libraries from fully overriding the config from buildSrc. Projects can create a
