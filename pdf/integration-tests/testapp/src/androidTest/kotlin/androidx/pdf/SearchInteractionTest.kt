@@ -177,6 +177,40 @@ internal class SearchInteractionTest {
         }
     }
 
+    @Test
+    fun test_pdfViewerFragment_searchFocused_onResume() {
+        onView(withId(androidx.pdf.viewer.fragment.R.id.pdfView)).check(matches(isDisplayed()))
+        var pdfSearchView: PdfSearchView? = null
+
+        scenario.onFragment { fragment ->
+            pdfSearchView =
+                fragment.view?.findViewById<PdfSearchView>(
+                    androidx.pdf.viewer.fragment.R.id.pdfSearchView
+                )
+            fragment.isTextSearchActive = true
+        }
+
+        pdfSearchView?.let {
+            // Assert that the search view is focused when the user initiates a search.
+            assertTrue(it.hasFocus())
+
+            // Single tap on PdfView(anywhere on the content)
+            onView(isRoot()).perform(click())
+
+            // search focus on search is cleared
+            assertFalse(it.hasFocus())
+            // assert soft input mode is also hidden
+            assertFalse(it.rootWindowInsets.isVisible(WindowInsets.Type.ime()))
+
+            // Simulate the user switching away and then returning back.
+            scenario.moveToState(Lifecycle.State.STARTED)
+            scenario.moveToState(Lifecycle.State.RESUMED)
+
+            // Assert that the search view gains focus when the user returns to the PDF view.
+            assertTrue(it.hasFocus())
+        }
+    }
+
     private fun longClickAtCenter() {
         onView(isRoot())
             .perform(
