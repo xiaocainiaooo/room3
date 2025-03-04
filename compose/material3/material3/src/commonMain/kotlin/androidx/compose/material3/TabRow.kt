@@ -1142,6 +1142,13 @@ object TabRowDefaults {
      * @param currentTabPosition [TabPosition] of the currently selected tab. This is used to
      *   calculate the offset of the indicator this modifier is applied to, as well as its width.
      */
+    @Deprecated(
+        level = DeprecationLevel.WARNING,
+        message =
+            "Solely for use alongside deprecated TabRowDefaults.Indicator method. For " +
+                "recommended PrimaryIndicator and SecondaryIndicator methods, please use " +
+                "TabIndicatorScope.tabIndicatorOffset method."
+    )
     fun Modifier.tabIndicatorOffset(currentTabPosition: TabPosition): Modifier =
         composed(
             inspectorInfo =
@@ -1376,6 +1383,7 @@ fun SecondaryScrollableTabRow(
             "SecondaryTabRow(selectedTabIndex, modifier, containerColor, contentColor, indicator, divider, tabs)"
         )
 )
+@Suppress("DEPRECATION")
 fun TabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
@@ -1442,6 +1450,7 @@ fun TabRow(
             "SecondaryScrollableTabRow(selectedTabIndex, modifier, containerColor, contentColor, edgePadding, indicator, divider, tabs)"
         )
 )
+@Suppress("DEPRECATION")
 fun ScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
