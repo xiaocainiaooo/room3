@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,23 @@
 package androidx.datastore.core
 
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 
-/** Public factory for creating DataStore instances. */
-public expect object DataStoreFactory {
-
-    public fun <T> create(
-        storage: Storage<T>,
-        corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
-        migrations: List<DataMigration<T>> = listOf(),
-        scope: CoroutineScope = CoroutineScope(ioDispatcher() + SupervisorJob()),
-    ): DataStore<T>
+class DataStoreFactoryTest() : BaseDataStoreFactoryTest() {
+    override fun <T> createDataStore(
+        serializer: Serializer<T>,
+        corruptionHandler: ReplaceFileCorruptionHandler<T>?,
+        migrations: List<DataMigration<T>>,
+        scope: CoroutineScope,
+        produceFile: () -> File
+    ): DataStore<T> {
+        return DataStoreFactory.create(
+            serializer,
+            corruptionHandler,
+            migrations,
+            scope,
+            produceFile
+        )
+    }
 }

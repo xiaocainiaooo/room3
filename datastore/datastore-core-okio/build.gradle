@@ -55,10 +55,7 @@ androidXMultiplatform {
             }
         }
         jvmMain {
-            dependencies {
-                api(libs.kotlinStdlib)
-                api(libs.kotlinCoroutinesCore)
-            }
+            dependsOn(commonMain)
         }
         commonTest {
             dependencies {
