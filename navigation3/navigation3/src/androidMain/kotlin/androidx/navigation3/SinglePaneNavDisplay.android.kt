@@ -248,7 +248,7 @@ public fun <T : Any> SinglePaneNavDisplay(
         ) { innerStack ->
             // popped entries will be remembered and retrieved so it can animate out properly
             val currEntry =
-                remember((innerStack.last())) {
+                remember(innerStack) {
                     entries.findLast { entry -> entry.key == innerStack.last() }
                 }
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this) {
