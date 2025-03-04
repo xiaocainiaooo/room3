@@ -19,6 +19,8 @@ package androidx.camera.camera2.internal;
 import static android.content.pm.PackageManager.FEATURE_CAMERA_CONCURRENT;
 import static android.hardware.camera2.CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES;
 
+import static androidx.camera.core.impl.SessionConfig.SESSION_TYPE_HIGH_SPEED;
+import static androidx.camera.core.impl.SessionConfig.SESSION_TYPE_REGULAR;
 import static androidx.camera.core.impl.StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED;
 import static androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_1080P;
 import static androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_480P;
@@ -796,6 +798,8 @@ final class SupportedSurfaceCombination {
                 Size resolutionForUseCase = savedSizes.get(
                         useCasesPriorityOrder.indexOf(newUseCaseConfigs.indexOf(useCaseConfig)));
                 StreamSpec.Builder streamSpecBuilder = StreamSpec.builder(resolutionForUseCase)
+                        .setSessionType(
+                                isHighSpeedOn ? SESSION_TYPE_HIGH_SPEED : SESSION_TYPE_REGULAR)
                         .setDynamicRange(Preconditions.checkNotNull(
                                 resolvedDynamicRanges.get(useCaseConfig)))
                         .setImplementationOptions(

@@ -69,6 +69,8 @@ import androidx.camera.core.impl.CameraMode
 import androidx.camera.core.impl.CameraMode.ULTRA_HIGH_RESOLUTION_CAMERA
 import androidx.camera.core.impl.ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE
 import androidx.camera.core.impl.ImageInputConfig
+import androidx.camera.core.impl.SessionConfig.SESSION_TYPE_HIGH_SPEED
+import androidx.camera.core.impl.SessionConfig.SESSION_TYPE_REGULAR
 import androidx.camera.core.impl.StreamSpec
 import androidx.camera.core.impl.StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
 import androidx.camera.core.impl.SurfaceCombination
@@ -1729,7 +1731,8 @@ class SupportedSurfaceCombinationTest {
             capabilities = intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
             useCasesOutputSizesMap = useCasesOutputSizesMap,
             supportedHighSpeedSizeAndFpsMap = supportedHighSpeedSizeAndFpsMap,
-            compareExpectedFps = compareExpectedFps
+            compareExpectedFps = compareExpectedFps,
+            expectedSessionType = SESSION_TYPE_HIGH_SPEED
         )
     }
 
@@ -1748,7 +1751,8 @@ class SupportedSurfaceCombinationTest {
         supportedOutputFormats: IntArray? = null,
         supportedHighSpeedSizeAndFpsMap: Map<Size, List<Range<Int>>>? = null,
         isPreviewStabilizationOn: Boolean = false,
-        hasVideoCapture: Boolean = false
+        hasVideoCapture: Boolean = false,
+        expectedSessionType: Int = SESSION_TYPE_REGULAR
     ): Pair<Map<UseCaseConfig<*>, StreamSpec>, Map<AttachedSurfaceInfo, StreamSpec>> {
         setupCameraAndInitCameraX(
             hardwareLevel = hardwareLevel,
@@ -1800,6 +1804,9 @@ class SupportedSurfaceCombinationTest {
             }
             val zslDisabled = suggestedStreamSpecsForNewUseCases[useCaseConfigMap[it]]!!.zslDisabled
             assertThat(zslDisabled).isEqualTo(hasVideoCapture)
+
+            val sessionType = suggestedStreamSpecsForNewUseCases[useCaseConfigMap[it]]!!.sessionType
+            assertThat(sessionType).isEqualTo(expectedSessionType)
         }
 
         useCasesExpectedDynamicRangeMap.keys.forEach {
