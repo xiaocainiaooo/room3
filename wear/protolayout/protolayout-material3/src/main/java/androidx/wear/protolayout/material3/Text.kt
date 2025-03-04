@@ -40,7 +40,9 @@ import androidx.wear.protolayout.types.LayoutString
  * @param modifiers Modifiers to set to this element.
  * @param typography The typography from [Typography] to be applied to this text. This will have
  *   predefined default value specified by each components that uses this text, to achieve the
- *   recommended look.
+ *   recommended look. If using some of `Typography.NUMERAL_` styles and the provided text is
+ *   animating, the [settings] should include [FontSetting.tabularNum] font feature setting for the
+ *   best results and to avoid text changing its width based on the number present.
  * @param color The color to be applied to this text. It is recommended to use predefined default
  *   styles created by each component or `getColorProp(token)`.
  * @param italic Whether text should be displayed as italic.
