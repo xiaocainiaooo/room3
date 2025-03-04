@@ -50,8 +50,9 @@ public fun <T : Any> NavBackStackProvider(
             val entry = entryProvider.invoke(it)
             localProviders.distinct().foldRight(entry) { provider: NavLocalProvider, wrappedEntry ->
                 object : NavEntryWrapper<T>(wrappedEntry) {
-                    override val content: @Composable ((T) -> Unit)
-                        get() = { provider.ProvideToEntry(wrappedEntry) }
+                    override val content: @Composable ((T) -> Unit) = {
+                        provider.ProvideToEntry(wrappedEntry)
+                    }
                 }
             }
         }
