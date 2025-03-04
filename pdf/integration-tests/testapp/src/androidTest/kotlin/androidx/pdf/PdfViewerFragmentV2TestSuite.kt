@@ -70,12 +70,12 @@ import org.junit.runner.RunWith
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 class PdfViewerFragmentV2TestSuite {
 
-    private lateinit var scenario: FragmentScenario<TestPdfViewerFragmentV2>
+    private lateinit var scenario: FragmentScenario<TestPdfViewerFragment>
 
     @Before
     fun setup() {
         scenario =
-            launchFragmentInContainer<TestPdfViewerFragmentV2>(
+            launchFragmentInContainer<TestPdfViewerFragment>(
                 themeResId =
                     com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar,
                 initialState = Lifecycle.State.INITIALIZED
@@ -296,10 +296,14 @@ class PdfViewerFragmentV2TestSuite {
     // TODO(b/392638037): Add immersive mode integration test
 
     private fun withPdfView(
-        scenario: FragmentScenario<TestPdfViewerFragmentV2>,
-        callback: (TestPdfViewerFragmentV2, PdfView, Drawable) -> Unit
+        scenario: FragmentScenario<TestPdfViewerFragment>,
+        callback: (TestPdfViewerFragment, PdfView, Drawable) -> Unit
     ) {
         scenario.onFragment { fragment ->
+            assertNotNull(
+                "Fast scroll thumb cannot be null",
+                fragment.getPdfViewInstance().fastScrollVerticalThumbDrawable
+            )
             val fastScrollThumb = fragment.getPdfViewInstance().fastScrollVerticalThumbDrawable!!
             assertNotNull("Fast scroll thumbnail cannot be null", fastScrollThumb)
             callback(fragment, fragment.getPdfViewInstance(), fastScrollThumb)

@@ -57,14 +57,14 @@ import org.junit.runner.RunWith
 class StylingOptionsTests {
 
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private lateinit var scenario: FragmentScenario<TestPdfViewerFragment>
+    private lateinit var scenario: FragmentScenario<TestPdfViewerFragmentV1>
     private val themeResId =
         com.google.android.material.R.style.Theme_Material3_DayNight_NoActionBar
 
     @Before
     fun setup() {
         val pdfStylingOptions = PdfStylingOptions(R.style.PdfViewCustomization)
-        val styledFragment = TestPdfViewerFragment(pdfStylingOptions)
+        val styledFragment = TestPdfViewerFragmentV1(pdfStylingOptions)
 
         scenario =
             launchFragmentInContainer(

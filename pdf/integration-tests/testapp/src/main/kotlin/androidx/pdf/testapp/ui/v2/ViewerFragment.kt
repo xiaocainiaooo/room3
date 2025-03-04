@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.pdf.testapp.ui
+package androidx.pdf.testapp.ui.v2
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -26,7 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
@@ -35,29 +35,22 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.pdf.testapp.R
 import androidx.pdf.testapp.databinding.BasicPdfFragmentBinding
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV1
+import androidx.pdf.testapp.ui.OpCancellationHandler
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.button.MaterialButton
 
 @SuppressLint("RestrictedApiAndroidX")
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class BasicPdfFragment : Fragment(), OpCancellationHandler {
+class ViewerFragment : Fragment(), OpCancellationHandler {
 
-    private var pdfViewerFragment: PdfViewerFragmentV1? = null
+    private var pdfViewerFragment: PdfViewerFragment? = null
     private var isPdfViewInitialized = false
 
     @VisibleForTesting
     var filePicker: ActivityResultLauncher<String> =
-        registerForActivityResult(GetContent()) { uri: Uri? -> uri?.let { setDocumentUri(uri) } }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (pdfViewerFragment == null) {
-            pdfViewerFragment =
-                childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG)
-                    as PdfViewerFragmentV1?
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { setDocumentUri(uri) }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,16 +96,16 @@ class BasicPdfFragment : Fragment(), OpCancellationHandler {
 
         pdfViewerFragment =
             when (fragmentType) {
-                FragmentType.BASIC_FRAGMENT -> HostFragment()
-                FragmentType.STYLED_FRAGMENT -> StyledPdfViewerFragmentV1.newInstance()
-                else -> HostFragment()
+                FragmentType.BASIC_FRAGMENT -> PdfViewerFragmentExtended()
+                FragmentType.STYLED_FRAGMENT -> StyledPdfViewerFragment.newInstance()
+                else -> PdfViewerFragmentExtended()
             }
 
         // Replace an existing fragment in a container with an instance of a new fragment
         fragmentManager
             .beginTransaction()
             .replace(R.id.pdf_fragment_container_view, pdfViewerFragment!!, PDF_VIEWER_FRAGMENT_TAG)
-            .commit()
+            .commitNow()
 
         fragmentManager.executePendingTransactions()
     }
@@ -160,10 +153,8 @@ class BasicPdfFragment : Fragment(), OpCancellationHandler {
             STYLED_FRAGMENT
         }
 
-        fun newInstance(
-            fragmentType: FragmentType = FragmentType.BASIC_FRAGMENT
-        ): BasicPdfFragment {
-            val fragment = BasicPdfFragment()
+        fun newInstance(fragmentType: FragmentType = FragmentType.BASIC_FRAGMENT): ViewerFragment {
+            val fragment = ViewerFragment()
             val args = Bundle().also { it.putSerializable(FRAGMENT_TYPE_KEY, fragmentType) }
             fragment.arguments = args
 

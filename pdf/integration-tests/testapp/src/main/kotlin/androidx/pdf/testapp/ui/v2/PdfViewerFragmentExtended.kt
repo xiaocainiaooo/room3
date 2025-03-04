@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.pdf.testapp.ui
+package androidx.pdf.testapp.ui.v2
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,9 +23,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.RequiresExtension
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.OperationCanceledException
 import androidx.pdf.testapp.R
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV1
+import androidx.pdf.testapp.ui.OpCancellationHandler
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
@@ -34,9 +35,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  * adds a FloatingActionButton for search functionality and manages its visibility based on the
  * immersive mode state.
  */
-@SuppressLint("RestrictedApiAndroidX")
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-class HostFragment : PdfViewerFragmentV1() {
+class PdfViewerFragmentExtended : PdfViewerFragment() {
     private var hostView: FrameLayout? = null
     private var search: FloatingActionButton? = null
 
@@ -45,14 +45,15 @@ class HostFragment : PdfViewerFragmentV1() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState) as FrameLayout
+        val pdfContainer =
+            super.onCreateView(inflater, container, savedInstanceState) as ConstraintLayout
 
         // Inflate the custom layout for this fragment.
         hostView = inflater.inflate(R.layout.fragment_host, container, false) as FrameLayout
         search = hostView?.findViewById(R.id.host_Search)
 
         // Add the default PDF viewer to the custom layout
-        hostView?.addView(view)
+        hostView?.addView(pdfContainer)
 
         // Show/hide the search button based on initial toolbox visibility
         if (isToolboxVisible) search?.show() else search?.hide()

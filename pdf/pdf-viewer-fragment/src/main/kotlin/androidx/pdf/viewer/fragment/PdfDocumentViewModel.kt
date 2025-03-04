@@ -74,7 +74,7 @@ internal class PdfDocumentViewModel(
 
     /**
      * Parent [Job] for search query and result collectors. All children jobs will be cancelled upon
-     * disabling [PdfViewerFragmentV2.isTextSearchActive].
+     * disabling [PdfViewerFragment.isTextSearchActive].
      */
     private val searchCollector = SupervisorJob(viewModelScope.coroutineContext[Job])
 
@@ -220,7 +220,7 @@ internal class PdfDocumentViewModel(
 
     /**
      * Called when the user toggles the search view's active state
-     * [PdfViewerFragmentV2.isTextSearchActive].
+     * [PdfViewerFragment.isTextSearchActive].
      *
      * This function updates the search state in the [SavedStateHandle] and performs actions related
      * to enabling/disabling the search view.

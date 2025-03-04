@@ -38,6 +38,19 @@
         app:layout_constraintTop_toBottomOf="@+id/tab_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tab_view_v2"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tab_view_v2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tab_view_string_v2"
+        app:strokeWidth="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/pdfFragmentV2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/styledPdfFragment"/>
 
     <com.google.android.material.button.MaterialButton
@@ -48,7 +61,7 @@
         app:strokeWidth="1dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/pdfFragmentV2"
+        app:layout_constraintTop_toBottomOf="@+id/tab_view_v2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/xmlStyledPdfFragment"/>

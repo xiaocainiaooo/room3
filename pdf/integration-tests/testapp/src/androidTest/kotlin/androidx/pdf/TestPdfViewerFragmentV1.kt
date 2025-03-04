@@ -16,84 +16,76 @@
 
 package androidx.pdf
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.annotation.RequiresExtension
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.pdf.idlingresource.PdfIdlingResource
+import androidx.pdf.metrics.EventCallback
 import androidx.pdf.testapp.R
-import androidx.pdf.view.PdfView
-import androidx.pdf.view.PdfView.OnScrollStateChangedListener
-import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import androidx.pdf.viewer.fragment.PdfStylingOptions
+import androidx.pdf.viewer.fragment.PdfViewerFragmentV1
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.UUID
 
 /**
- * A subclass fragment from [PdfViewerFragmentV2] to include [androidx.test.espresso.IdlingResource]
+ * A subclass fragment from [PdfViewerFragmentV1] to include [androidx.test.espresso.IdlingResource]
  * while loading pdf document.
  *
  * TODO(b/386721657) Remove this when PdfViewerFragment is replaced with PdfViewerFragmentV2.
  */
-internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+internal class TestPdfViewerFragmentV1 : PdfViewerFragmentV1 {
 
-    val pdfLoadingIdlingResource = PdfIdlingResource(PDF_LOAD_RESOURCE_NAME)
-    val pdfScrollIdlingResource = PdfIdlingResource(PDF_SCROLL_RESOURCE_NAME)
-    val pdfSearchFocusIdlingResource = PdfIdlingResource(PDF_SEARCH_FOCUS_RESOURCE_NAME)
+    constructor() : super()
+
+    constructor(pdfStylingOptions: PdfStylingOptions) : super(pdfStylingOptions)
 
     private var hostView: FrameLayout? = null
     private var search: FloatingActionButton? = null
+    val pdfLoadingIdlingResource = PdfIdlingResource(PDF_LOAD_RESOURCE_NAME)
 
     var documentLoaded = false
     var documentError: Throwable? = null
 
-    fun getPdfViewInstance(): PdfView = pdfView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        super.setEventCallback(
+            object : EventCallback {
+                override fun onPasswordRequested() {
+                    pdfLoadingIdlingResource.decrement()
+                }
+            }
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState) as ConstraintLayout
+        val view = super.onCreateView(inflater, container, savedInstanceState) as FrameLayout
 
         // Inflate the custom layout for this fragment
         hostView = inflater.inflate(R.layout.fragment_host, container, false) as FrameLayout
+        search = hostView?.findViewById(R.id.host_Search)
+
         hostView?.let { hostView -> handleInsets(hostView) }
 
         // Add the default PDF viewer to the custom layout
         hostView?.addView(view)
-        return hostView
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        search = hostView?.findViewById(R.id.host_Search)
 
         // Show/hide the search button based on initial toolbox visibility
         if (isToolboxVisible) search?.show() else search?.hide()
 
         // Set up search button click listener
         search?.setOnClickListener { isTextSearchActive = true }
-
-        pdfView.scrollStateChangedListener =
-            object : OnScrollStateChangedListener {
-                override fun onScrollStateChanged(x: Int, y: Int, isStable: Boolean) {
-                    if (isStable) {
-                        pdfScrollIdlingResource.decrement()
-                    }
-                }
-            }
-        pdfSearchView.searchQueryBox.onFocusChangeListener =
-            object : View.OnFocusChangeListener {
-                override fun onFocusChange(v: View?, hasFocus: Boolean) {
-                    if (!hasFocus) {
-                        pdfSearchFocusIdlingResource.decrement()
-                    }
-                }
-            }
+        return hostView
     }
 
     override fun onRequestImmersiveMode(enterImmersive: Boolean) {
@@ -112,10 +104,9 @@ internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
     }
 
     companion object {
-        // Resource name must be unique to avoid conflicts while running multiple test scenarios
-        private val PDF_LOAD_RESOURCE_NAME = "PdfLoad-${UUID.randomUUID()}"
-        private val PDF_SCROLL_RESOURCE_NAME = "PdfScroll-${UUID.randomUUID()}"
-        private val PDF_SEARCH_FOCUS_RESOURCE_NAME = "PdfSearchFocus-${UUID.randomUUID()}"
+        // It is vital to keep the resource name unique for each test scenario as it conflicts in
+        // parallel runs during increment and decrement making tests flaky.
+        private val PDF_LOAD_RESOURCE_NAME = UUID.randomUUID().toString()
 
         fun handleInsets(hostView: View) {
             ViewCompat.setOnApplyWindowInsetsListener(hostView) { view, insets ->
