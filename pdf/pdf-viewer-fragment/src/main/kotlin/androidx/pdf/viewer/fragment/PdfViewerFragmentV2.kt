@@ -63,7 +63,7 @@ import androidx.pdf.viewer.fragment.view.PdfViewManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public open class PdfViewerFragmentV2 : Fragment() {
 
     /**
@@ -161,9 +161,9 @@ public open class PdfViewerFragmentV2 : Fragment() {
     private lateinit var toolboxView: ToolBoxView
     private lateinit var errorView: TextView
     private lateinit var loadingView: ProgressBar
-    private lateinit var pdfSearchView: PdfSearchView
     private lateinit var pdfViewManager: PdfViewManager
     private lateinit var pdfSearchViewManager: PdfSearchViewManager
+    protected lateinit var pdfSearchView: PdfSearchView
 
     private var searchStateCollector: Job? = null
     private var highlightStateCollector: Job? = null
