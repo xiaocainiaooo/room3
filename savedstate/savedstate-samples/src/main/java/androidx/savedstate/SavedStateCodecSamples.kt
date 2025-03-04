@@ -24,18 +24,14 @@ import androidx.annotation.Sampled
 import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
-import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
-import androidx.savedstate.serialization.serializers.CharSequenceListSerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
 import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
-import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
-import androidx.savedstate.serialization.serializers.ParcelableListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
 import androidx.savedstate.serialization.serializers.SizeSerializer
-import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
+import androidx.savedstate.serialization.serializers.SparseArraySerializer
 import java.util.UUID
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.PolymorphicSerializer
@@ -211,46 +207,10 @@ fun iBinderSerializer() {
 }
 
 @Sampled
-fun charSequenceArraySerializer() {
+fun sparseArraySerializer() {
     @Serializable
     class MyModel(
-        @Serializable(with = CharSequenceArraySerializer::class)
-        val charSequenceArray: Array<CharSequence>
-    )
-}
-
-@Sampled
-fun parcelableArraySerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = ParcelableArraySerializer::class)
-        val parcelableArray: Array<android.os.Parcelable>
-    )
-}
-
-@Sampled
-fun charSequenceListSerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = CharSequenceListSerializer::class)
-        val charSequenceList: List<CharSequence>
-    )
-}
-
-@Sampled
-fun parcelableListSerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = ParcelableListSerializer::class)
-        val parcelableList: List<android.os.Parcelable>
-    )
-}
-
-@Sampled
-fun sparseParcelableArraySerializer() {
-    @Serializable
-    class MyModel(
-        @Serializable(with = SparseParcelableArraySerializer::class)
+        @Serializable(with = SparseArraySerializer::class)
         val sparseParcelableArray: android.util.SparseArray<android.os.Parcelable>
     )
 }
