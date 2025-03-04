@@ -16,9 +16,11 @@
 
 package androidx.datastore.core
 
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.kruth.assertThat
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -28,6 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
@@ -44,11 +47,16 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.junit.rules.Timeout
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
-@RunWith(JUnit4::class)
-class SingleProcessDataStoreStressTest {
+abstract class BaseSingleProcessDataStoreStressTest {
+    abstract fun <T> createDataStore(
+        serializer: Serializer<T>,
+        corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
+        migrations: List<DataMigration<T>> = listOf(),
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        produceFile: () -> File
+    ): DataStore<T>
+
     @get:Rule val tempFolder = TemporaryFolder()
 
     @get:Rule val timeout = Timeout(4, TimeUnit.MINUTES)
@@ -69,7 +77,7 @@ class SingleProcessDataStoreStressTest {
             file.delete()
 
             val dataStore =
-                DataStoreFactory.create(
+                createDataStore(
                     serializer = LongSerializer(failWrites = false, failReads = false),
                     scope = testScope
                 ) {
@@ -105,8 +113,7 @@ class SingleProcessDataStoreStressTest {
 
             val serializer = LongSerializer(failWrites = false, failReads = false)
 
-            val dataStore =
-                DataStoreFactory.create(serializer = serializer, scope = testScope) { file }
+            val dataStore = createDataStore(serializer = serializer, scope = testScope) { file }
 
             val readers =
                 (0 until READER_COUNT).map {
@@ -167,8 +174,7 @@ class SingleProcessDataStoreStressTest {
 
             val serializer = LongSerializer(failWrites = false, failReads = true)
 
-            val dataStore =
-                DataStoreFactory.create(serializer = serializer, scope = testScope) { file }
+            val dataStore = createDataStore(serializer = serializer, scope = testScope) { file }
 
             val readers =
                 (0 until READER_COUNT).map {

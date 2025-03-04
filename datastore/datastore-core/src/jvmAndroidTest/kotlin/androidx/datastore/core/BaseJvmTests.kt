@@ -18,12 +18,17 @@ package androidx.datastore.core
 
 import androidx.datastore.FileTestIO
 import androidx.datastore.JavaIOFile
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.kruth.assertThat
 import androidx.kruth.assertThrows
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -35,12 +40,20 @@ class DataMigrationInitializerTestFileTest :
 class CloseDownstreamOnCloseJavaTest : CloseDownstreamOnCloseTest<JavaIOFile>(FileTestIO())
 
 @InternalCoroutinesApi
-class SingleProcessDataStoreJavaTest : SingleProcessDataStoreTest<JavaIOFile>(FileTestIO()) {
+abstract class SingleProcessDataStoreJavaTest :
+    SingleProcessDataStoreTest<JavaIOFile>(FileTestIO()) {
+    abstract fun <T> createDataStore(
+        serializer: Serializer<T>,
+        corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
+        migrations: List<DataMigration<T>> = listOf(),
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        produceFile: () -> File
+    ): DataStore<T>
 
     @Test
     fun testMutatingDataStoreFails() = runTest {
         val dataStore =
-            DataStoreFactory.create(serializer = ByteWrapperSerializer(), scope = dataStoreScope) {
+            createDataStore(serializer = ByteWrapperSerializer(), scope = dataStoreScope) {
                 testFile.file
             }
 
