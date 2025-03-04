@@ -28,7 +28,8 @@ import androidx.health.connect.client.records.MedicalResource
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+ * thrown if the feature is not available.
  *
  * @property pageSize The maximum number of [MedicalResource]s to be read.
  * @see [HealthConnectClient.readMedicalResources]

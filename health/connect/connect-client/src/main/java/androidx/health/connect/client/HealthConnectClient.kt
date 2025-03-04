@@ -23,6 +23,7 @@ import android.os.Build
 import android.os.UserManager
 import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.annotation.RestrictTo
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_AVAILABLE
@@ -35,6 +36,7 @@ import androidx.health.connect.client.aggregate.AggregateMetric
 import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByPeriod
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.FEATURE_CONSTANT_NAME_PHR
 import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableImpl
 import androidx.health.connect.client.feature.createExceptionDueToFeatureUnavailable
@@ -373,16 +375,18 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param requests List of upsert requests.
      * @throws IllegalArgumentException if any request is failed to be processed for any reason such
      *   as invalid [UpsertMedicalResourceRequest.dataSourceId]
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
-     * @sample //TODO: b/394856391 - add sample
      */
+    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     suspend fun upsertMedicalResources(
         requests: List<UpsertMedicalResourceRequest>
     ): List<MedicalResource> =
@@ -424,10 +428,10 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
-     *
-     * @sample // TODO: b/394856391 - add sample
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      */
+    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     suspend fun readMedicalResources(
@@ -466,12 +470,13 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @throws IllegalArgumentException if the size of [ids] is too large or any ID is deemed as
      *   invalid.
-     * @sample // TODO: b/394856391 - add sample
      */
+    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
@@ -495,14 +500,16 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param ids The ids to delete.
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
-     * @sample // TODO: b/394856391 - add sample
      */
+    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     suspend fun deleteMedicalResources(ids: List<MedicalResourceId>): Unit =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
@@ -520,14 +527,16 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param request The request that contains the filters to delete.
      * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
-     * @sample // TODO: b/394856391 - add sample
      */
+    // TODO: b/394856391 - add sample to kdoc
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     suspend fun deleteMedicalResources(request: DeleteMedicalResourcesRequest): Unit =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
@@ -553,19 +562,22 @@ interface HealthConnectClient {
      * resource id.
      *
      * The [CreateMedicalDataSourceRequest.displayName] must be unique across all medical data
-     * sources created by an app. See [CreateMedicalDataSourceRequest.fhirBaseUri] for more details
-     * on the FHIR base URI. The data source can not be updated after creation.
+     * sources created by an app, otherwise an [IllegalArgumentException] will be thrown. See
+     * [CreateMedicalDataSourceRequest.fhirBaseUri] for more details on the FHIR base URI. The data
+     * source can not be updated after creation.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param request request containing details of the [MedicalDataSource] to be created
      * @return the created [MedicalDataSource]
+     * @throws [SecurityException] if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
      * @sample androidx.health.connect.client.samples.CreateMedicalDataSourceSample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @ExperimentalPersonalHealthRecordApi
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     suspend fun createMedicalDataSource(
         request: CreateMedicalDataSourceRequest
     ): MedicalDataSource {
@@ -583,20 +595,22 @@ interface HealthConnectClient {
      *   [SecurityException] will be thrown.
      * - With [PERMISSION_WRITE_MEDICAL_DATA] granted, caller is permitted to call this API in
      *   either foreground or background.
-     * - Caller may only delete data sources it has created.
+     * - Caller may only delete data sources it created.
      *
      * Medical data is represented using the
      * [Fast Healthcare Interoperability Resources (FHIR)](https://hl7.org/fhir/) standard.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param id The id of the data source to delete.
-     * @sample // TODO: b/394856391 - add sample
+     * @throws IllegalArgumentException if [id] is invalid, does not exist, or owned by another app.
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    // TODO: b/394856391 - add sample to kdoc
+    @ExperimentalPersonalHealthRecordApi
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
     suspend fun deleteMedicalDataSourceWithData(id: String) {
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
@@ -628,23 +642,25 @@ interface HealthConnectClient {
      *   [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it can also read other apps'
      *   [MedicalDataSource]s as long as each of those [MedicalDataSource] contains at least one
      *   [MedicalResource] with the corresponding type.
-     *     - For example, if a caller `A` created a [MedicalDataSource] `DS1`, then used `DS1` to
+     *     - For example, a client `A` created a [MedicalDataSource] `DS1`, then used `DS1` to
      *       insert a [MedicalResource] `MR1` with type
-     *       [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES], and another caller `B` created `DS2`.
-     *       If `A` holds [PERMISSION_READ_MEDICAL_DATA_VACCINES], it can only read `DS1` in
-     *       background. However, if it is in foreground or holds
+     *       [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES]. Similarly another client `B` created
+     *       `DS2`, then used `DS2` to insert another [MedicalResource] `MR2` with the same
+     *       [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES]. If `A` holds
+     *       [PERMISSION_READ_MEDICAL_DATA_VACCINES] and it is in background, it can only read
+     *       `DS1`. However, if `A` is in foreground or holds
      *       [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it can read both `DS1` and `DS2`.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param request containing details of the [MedicalDataSource]s to retrieve
      * @return [MedicalDataSource]s matching the provided request
-     * @sample // TODO: b/394856391 - add sample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    // TODO: b/394856391 - add sample to kdoc
+    @ExperimentalPersonalHealthRecordApi
     suspend fun getMedicalDataSources(
         request: GetMedicalDataSourcesRequest
     ): List<MedicalDataSource> {
@@ -661,7 +677,8 @@ interface HealthConnectClient {
      *
      * Number of data sources returned by this API will depend based on below factors:
      * - If an empty list of [ids] is provided, no data sources will be returned.
-     * - If an id is invalid or non-existent, no data source will be returned for that id.
+     * - If an id is invalid or non-existent, no data source will be returned for that id, this
+     *   means the returned list might have fewer elements than [ids].
      * - Callers will only get data sources they are permitted to get. See below.
      *
      * There is no specific read permission for getting data sources. Instead, permission to read
@@ -689,14 +706,14 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+     * thrown if the feature is not available.
      *
      * @param ids ids of the [MedicalDataSource]s to retrieve
      * @return [MedicalDataSource]s matching the provided [ids]
-     * @sample // TODO: b/394856391 - add sample
      */
-    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    // TODO: b/394856391 - add sample to kdoc
+    @ExperimentalPersonalHealthRecordApi
     suspend fun getMedicalDataSources(ids: List<String>): List<MedicalDataSource> {
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,

@@ -38,7 +38,8 @@ import androidx.health.connect.client.response.ReadMedicalResourcesResponse
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+ * thrown if the feature is not available.
  *
  * @param pageSize The maximum number of [MedicalResource]s to be read. Default value is
  *   [DEFAULT_PAGE_SIZE]. An [IllegalArgumentException] might be thrown if [pageSize] is deemed as

@@ -24,6 +24,7 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.COMPLETE
 import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.INCOMPLETE
@@ -80,6 +81,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalPersonalHealthRecordApi::class)
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, codeName = "UpsideDownCake")

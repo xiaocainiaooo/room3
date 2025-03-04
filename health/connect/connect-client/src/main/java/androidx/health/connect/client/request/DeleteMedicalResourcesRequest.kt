@@ -36,7 +36,8 @@ import androidx.health.connect.client.records.toString
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+ * thrown if the feature is not available.
  *
  * @property dataSourceIds IDs of [MedicalDataSource]s to delete [MedicalResource]s from. This being
  *   empty is equivalent as if all [MedicalDataSource]s are set.

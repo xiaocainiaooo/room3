@@ -16,8 +16,8 @@
 package androidx.health.connect.client.records
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.records.PlatformFhirVersion
 
@@ -32,10 +32,10 @@ import androidx.health.connect.client.impl.platform.records.PlatformFhirVersion
  *
  * This feature is dependent on the version of HealthConnect installed on the device. To check if
  * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
- * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+ * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An
+ * [UnsupportedOperationException] would be thrown if the feature is not available.
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<FhirVersion> {
     @SuppressLint("NewApi") // already checked with a feature availability check
     internal val platformFhirVersion: PlatformFhirVersion =
@@ -102,6 +102,7 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<F
          * [the official FHIR versions](https://build.fhir.org/versions.html#versions). Note that
          * the "label" is not supported for now, which represents a 'working' version.
          */
+        @JvmStatic
         fun parseFhirVersion(fhirVersionString: String): FhirVersion {
             val result = VERSION_REGEX.find(fhirVersionString)
             require(result != null) { "Invalid FHIR version string: $fhirVersionString" }

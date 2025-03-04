@@ -18,6 +18,7 @@ package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.records.FhirVersion
 import androidx.health.connect.client.records.MedicalDataSource
@@ -31,6 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalPersonalHealthRecordApi
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class MedicalDataSourceTest {

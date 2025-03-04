@@ -16,6 +16,7 @@
 
 package androidx.health.connect.client.impl.platform.phr
 
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.impl.platform.phr.PhrConstants.FHIR_VERSION_4_0_1
 import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.COMPLETE
 import androidx.health.connect.client.request.UpsertMedicalResourceRequest
@@ -103,6 +104,7 @@ internal object VaccinesMedicalResourceFactory {
                 .trimIndent()
         )
 
+    @OptIn(ExperimentalPersonalHealthRecordApi::class)
     fun createVaccinesUpsertMedicalResourceRequest(
         dataSourceId: String,
         fhirResourceId: String? = null,

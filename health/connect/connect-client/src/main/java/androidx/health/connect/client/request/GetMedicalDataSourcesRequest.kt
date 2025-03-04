@@ -17,7 +17,10 @@
 package androidx.health.connect.client.request
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.request.PlatformGetMedicalDataSourcesRequest
 import androidx.health.connect.client.impl.platform.request.PlatformGetMedicalDataSourcesRequestBuilder
@@ -28,14 +31,18 @@ import androidx.health.connect.client.records.toString
  * Request to read medical data sources using [HealthConnectManager#getMedicalDataSources]
  *
  * If no package names are set in a request, all data sources from all packages will be returned.
- * Otherwise the response is limited to the requested package names.
+ * Otherwise the response is limited to the requested package names per permission enforced in
+ * [HealthConnectClient.getMedicalDataSources]
+ *
+ * This feature is dependent on the version of HealthConnect installed on the device. To check if
+ * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+ * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
+ * thrown if the feature is not available.
  *
  * @property packageNames Only [MedicalDataSource]s created by the apps with these package names
  *   will be returned.
  */
-
-// TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class GetMedicalDataSourcesRequest(val packageNames: List<String>) {
 
     @SuppressLint("NewApi") // already checked with a feature availability check
