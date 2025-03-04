@@ -108,7 +108,8 @@ public class VideoEncoderConfigVideoProfileResolver implements Supplier<VideoEnc
                 .setInputTimebase(mInputTimebase)
                 .setResolution(mSurfaceSize)
                 .setBitrate(resolvedBitrate)
-                .setFrameRate(resolvedFrameRate)
+                .setCaptureFrameRate(resolvedFrameRate)
+                .setEncodeFrameRate(resolvedFrameRate)
                 .setProfile(resolvedProfile)
                 .setDataSpace(dataSpace)
                 .build();

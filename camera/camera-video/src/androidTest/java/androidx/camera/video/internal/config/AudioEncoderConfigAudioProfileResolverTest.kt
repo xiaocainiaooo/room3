@@ -140,7 +140,8 @@ class AudioEncoderConfigAudioProfileResolverTest(
 
             assertThat(config.mimeType).isEqualTo(audioProfile.mediaType)
             assertThat(config.bitrate).isEqualTo(audioProfile.bitrate)
-            assertThat(config.sampleRate).isEqualTo(audioProfile.sampleRate)
+            assertThat(config.captureSampleRate).isEqualTo(audioProfile.sampleRate)
+            assertThat(config.encodeSampleRate).isEqualTo(audioProfile.sampleRate)
             assertThat(config.channelCount).isEqualTo(audioProfile.channels)
         }
     }
@@ -202,7 +203,7 @@ class AudioEncoderConfigAudioProfileResolverTest(
                     profile
                 )
                 .get()
-        val defaultSampleRate = defaultConfig.sampleRate
+        val defaultSampleRate = defaultConfig.captureSampleRate
 
         val higherSampleRateAudioSettings =
             defaultAudioSettings.toBuilder().setChannelCount(defaultSampleRate * 2).build()

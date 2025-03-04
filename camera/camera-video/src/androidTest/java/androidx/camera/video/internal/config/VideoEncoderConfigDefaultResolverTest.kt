@@ -95,19 +95,22 @@ class VideoEncoderConfigDefaultResolverTest {
         assertThat(configCif.mimeType).isEqualTo(DEFAULT_MIME_TYPE)
         assertThat(configCif.bitrate).isGreaterThan(0)
         assertThat(configCif.resolution).isEqualTo(surfaceSizeCif)
-        assertThat(configCif.frameRate).isEqualTo(FRAME_RATE_30)
+        assertThat(configCif.captureFrameRate).isEqualTo(FRAME_RATE_30)
+        assertThat(configCif.encodeFrameRate).isEqualTo(FRAME_RATE_30)
 
         val config720p = configSupplier720p.get()
         assertThat(config720p.mimeType).isEqualTo(DEFAULT_MIME_TYPE)
         assertThat(config720p.bitrate).isGreaterThan(0)
         assertThat(config720p.resolution).isEqualTo(surfaceSize720p)
-        assertThat(config720p.frameRate).isEqualTo(FRAME_RATE_30)
+        assertThat(config720p.captureFrameRate).isEqualTo(FRAME_RATE_30)
+        assertThat(config720p.encodeFrameRate).isEqualTo(FRAME_RATE_30)
 
         val config1080p = configSupplier1080p.get()
         assertThat(config1080p.mimeType).isEqualTo(DEFAULT_MIME_TYPE)
         assertThat(config1080p.bitrate).isGreaterThan(0)
         assertThat(config1080p.resolution).isEqualTo(surfaceSize1080p)
-        assertThat(config1080p.frameRate).isEqualTo(FRAME_RATE_30)
+        assertThat(config1080p.captureFrameRate).isEqualTo(FRAME_RATE_30)
+        assertThat(config1080p.encodeFrameRate).isEqualTo(FRAME_RATE_30)
     }
 
     @Test
@@ -189,7 +192,7 @@ class VideoEncoderConfigDefaultResolverTest {
                         SurfaceRequest.FRAME_RATE_RANGE_UNSPECIFIED
                     )
                     .get()
-                    .frameRate
+                    .encodeFrameRate
             )
             .isEqualTo(VideoEncoderConfigDefaultResolver.VIDEO_FRAME_RATE_FIXED_DEFAULT)
     }
@@ -216,7 +219,7 @@ class VideoEncoderConfigDefaultResolverTest {
                         expectedFrameRateRange
                     )
                     .get()
-                    .frameRate
+                    .encodeFrameRate
             )
             .isEqualTo(FRAME_RATE_45)
     }

@@ -87,7 +87,8 @@ public final class AudioSettingsAudioProfileResolver implements Supplier<AudioSe
                 .setAudioSource(resolvedAudioSource)
                 .setAudioFormat(resolvedSourceFormat)
                 .setChannelCount(resolvedChannelCount)
-                .setSampleRate(resolvedSampleRate)
+                .setCaptureSampleRate(resolvedSampleRate)
+                .setEncodeSampleRate(resolvedSampleRate)
                 .build();
     }
 }

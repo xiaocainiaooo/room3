@@ -83,7 +83,8 @@ public final class AudioSettingsDefaultResolver implements Supplier<AudioSetting
                 .setAudioSource(resolvedAudioSource)
                 .setAudioFormat(resolvedSourceFormat)
                 .setChannelCount(resolvedChannelCount)
-                .setSampleRate(resolvedSampleRate)
+                .setCaptureSampleRate(resolvedSampleRate)
+                .setEncodeSampleRate(resolvedSampleRate)
                 .build();
     }
 

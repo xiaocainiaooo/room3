@@ -55,7 +55,7 @@ class AudioSettingsDefaultResolverTest {
             val audioSettings = AudioSettingsDefaultResolver(it).get()
             assertThat(
                 AudioSource.isSettingsSupported(
-                    audioSettings.sampleRate,
+                    audioSettings.captureSampleRate,
                     audioSettings.channelCount,
                     audioSettings.audioFormat
                 )

@@ -114,7 +114,8 @@ public class VideoEncoderConfigDefaultResolver implements Supplier<VideoEncoderC
                 .setInputTimebase(mInputTimebase)
                 .setResolution(mSurfaceSize)
                 .setBitrate(resolvedBitrate)
-                .setFrameRate(resolvedFrameRate)
+                .setCaptureFrameRate(resolvedFrameRate)
+                .setEncodeFrameRate(resolvedFrameRate)
                 .setProfile(resolvedProfile)
                 .setDataSpace(dataSpace)
                 .build();

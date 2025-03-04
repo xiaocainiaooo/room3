@@ -141,7 +141,8 @@ class VideoEncoderConfigVideoProfileResolverTest(
                 assertThat(config.mimeType).isEqualTo(videoProfile.mediaType)
                 assertThat(config.bitrate).isEqualTo(videoProfile.bitrate)
                 assertThat(config.resolution).isEqualTo(videoProfile.resolution)
-                assertThat(config.frameRate).isEqualTo(videoProfile.frameRate)
+                assertThat(config.captureFrameRate).isEqualTo(videoProfile.frameRate)
+                assertThat(config.encodeFrameRate).isEqualTo(videoProfile.frameRate)
             }
         }
     }
@@ -284,7 +285,7 @@ class VideoEncoderConfigVideoProfileResolverTest(
                         lowerOperatingRange
                     )
                     .get()
-                    .frameRate
+                    .encodeFrameRate
 
             val clampedUpFrameRate =
                 VideoEncoderConfigVideoProfileResolver(
@@ -297,7 +298,7 @@ class VideoEncoderConfigVideoProfileResolverTest(
                         higherOperatingRange
                     )
                     .get()
-                    .frameRate
+                    .encodeFrameRate
 
             assertThat(clampedDownFrameRate).isEqualTo(lowerOperatingRange.upper)
             assertThat(clampedUpFrameRate).isEqualTo(higherOperatingRange.lower)
@@ -325,7 +326,7 @@ class VideoEncoderConfigVideoProfileResolverTest(
                         operatingRange
                     )
                     .get()
-                    .frameRate
+                    .encodeFrameRate
 
             assertThat(resolvedFrameRate).isEqualTo(profile.frameRate)
         }

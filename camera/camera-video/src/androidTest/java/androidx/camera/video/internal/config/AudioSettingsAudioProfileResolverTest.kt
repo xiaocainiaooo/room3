@@ -150,7 +150,11 @@ class AudioSettingsAudioProfileResolverTest(
 
         resolvedSettings.forEach {
             assertThat(
-                AudioSource.isSettingsSupported(it.sampleRate, it.channelCount, it.audioFormat)
+                AudioSource.isSettingsSupported(
+                    it.captureSampleRate,
+                    it.channelCount,
+                    it.audioFormat
+                )
             )
         }
     }
@@ -177,7 +181,11 @@ class AudioSettingsAudioProfileResolverTest(
 
         resolvedSettings.forEach {
             assertThat(
-                AudioSource.isSettingsSupported(it.sampleRate, it.channelCount, it.audioFormat)
+                AudioSource.isSettingsSupported(
+                    it.captureSampleRate,
+                    it.channelCount,
+                    it.audioFormat
+                )
             )
         }
     }
@@ -215,11 +223,10 @@ class AudioSettingsAudioProfileResolverTest(
             AudioSpec.builder()
                 .setSampleRate(Range(nonReportedSampleRate!!, nonReportedSampleRate))
                 .build()
-        val resolvedSampleRate =
-            AudioSettingsAudioProfileResolver(audioSpec, audioProfile).get().sampleRate
+        val resolvedAudioSettings = AudioSettingsAudioProfileResolver(audioSpec, audioProfile).get()
 
-        assertThat(resolvedSampleRate).isNotEqualTo(audioProfile.sampleRate)
-        assertThat(resolvedSampleRate).isEqualTo(nonReportedSampleRate)
+        assertThat(resolvedAudioSettings.encodeSampleRate).isNotEqualTo(audioProfile.sampleRate)
+        assertThat(resolvedAudioSettings.encodeSampleRate).isEqualTo(nonReportedSampleRate)
     }
 
     @Test
