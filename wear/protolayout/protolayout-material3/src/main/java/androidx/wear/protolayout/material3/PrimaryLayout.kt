@@ -28,7 +28,6 @@ import androidx.wear.protolayout.DimensionBuilders.wrap
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
-import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
@@ -63,8 +62,11 @@ import androidx.wear.protolayout.material3.PrimaryLayoutMarginsImpl.Companion.MA
 import androidx.wear.protolayout.material3.PrimaryLayoutMarginsImpl.Companion.MID
 import androidx.wear.protolayout.material3.PrimaryLayoutMarginsImpl.Companion.MIN
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.background
+import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
+import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.dp
 
 /**
@@ -157,6 +159,7 @@ public fun MaterialScope.primaryLayout(
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public fun MaterialScope.primaryLayoutWithOverrideIcon(
     overrideIcon: Boolean,
+    overrideIconColor: LayoutColor? = null,
     titleSlot: (MaterialScope.() -> LayoutElement)? = null,
     mainSlot: (MaterialScope.() -> LayoutElement)? = null,
     bottomSlot: (MaterialScope.() -> LayoutElement)? = null,
@@ -202,7 +205,8 @@ public fun MaterialScope.primaryLayoutWithOverrideIcon(
                             )
                             .titleSlot()
                     },
-                    overrideIcon
+                    overrideIcon,
+                    overrideIconColor,
                 )
             )
 
@@ -268,18 +272,16 @@ public fun MaterialScope.primaryLayoutWithOverrideIcon(
     return mainLayout.build()
 }
 
-private fun MaterialScope.getIconPlaceholder(overrideIcon: Boolean): LayoutElement {
+private fun MaterialScope.getIconPlaceholder(
+    overrideIcon: Boolean,
+    overrideIconColor: LayoutColor? = null,
+): LayoutElement {
     val iconSlot = Box.Builder().setWidth(HEADER_ICON_SIZE_DP.dp).setHeight(HEADER_ICON_SIZE_DP.dp)
     if (overrideIcon) {
         iconSlot.setModifiers(
-            Modifiers.Builder()
-                .setBackground(
-                    ModifiersBuilders.Background.Builder()
-                        .setCorner(shapes.full)
-                        .setColor(theme.colorScheme.onBackground.prop)
-                        .build()
-                )
-                .build()
+            LayoutModifier.background(overrideIconColor ?: theme.colorScheme.onBackground)
+                .clip(shapes.full)
+                .toProtoLayoutModifiers()
         )
     }
     return iconSlot.build()
@@ -288,14 +290,15 @@ private fun MaterialScope.getIconPlaceholder(overrideIcon: Boolean): LayoutEleme
 /** Returns header content with the mandatory icon and optional title. */
 private fun MaterialScope.getHeaderContent(
     titleSlot: LayoutElement?,
-    overrideIcon: Boolean
+    overrideIcon: Boolean,
+    overrideIconColor: LayoutColor? = null,
 ): Column {
     val headerBuilder =
         Column.Builder()
             .setWidth(wrap())
             .setHeight(wrap())
             .setModifiers(Modifiers.Builder().setPadding(getMarginForHeader()).build())
-            .addContent(getIconPlaceholder(overrideIcon))
+            .addContent(getIconPlaceholder(overrideIcon, overrideIconColor))
 
     titleSlot?.apply {
         headerBuilder

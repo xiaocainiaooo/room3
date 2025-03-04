@@ -17,11 +17,14 @@
 package androidx.wear.protolayout.material3
 
 import android.content.Context
+import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.ImageDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.ContentScaleMode
+import androidx.wear.protolayout.LayoutElementBuilders.Layout
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.TEXT_OVERFLOW_ELLIPSIZE
@@ -153,6 +156,40 @@ public fun materialScope(
             defaultAvatarImageStyle = AvatarImageStyle(),
             layoutSlotsPresence = LayoutSlotsPresence(),
             defaultProgressIndicatorStyle = ProgressIndicatorStyle()
+        )
+        .layout()
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@VisibleForTesting
+public fun materialScopeFromLayout(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    allowDynamicTheme: Boolean = true,
+    defaultColorScheme: ColorScheme = ColorScheme(),
+    layout: MaterialScope.() -> Layout,
+): Layout =
+    MaterialScope(
+            context = context,
+            deviceConfiguration = deviceConfiguration,
+            allowDynamicTheme = allowDynamicTheme,
+            theme =
+                MaterialTheme(
+                    colorScheme =
+                        if (allowDynamicTheme) {
+                            dynamicColorScheme(
+                                context = context,
+                                defaultColorScheme = defaultColorScheme
+                            )
+                        } else {
+                            defaultColorScheme
+                        }
+                ),
+            defaultTextElementStyle = TextElementStyle(),
+            defaultIconStyle = IconStyle(),
+            defaultBackgroundImageStyle = BackgroundImageStyle(),
+            defaultAvatarImageStyle = AvatarImageStyle(),
+            layoutSlotsPresence = LayoutSlotsPresence(),
+            defaultProgressIndicatorStyle = ProgressIndicatorStyle(),
         )
         .layout()
 

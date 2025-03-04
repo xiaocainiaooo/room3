@@ -104,35 +104,30 @@ public final class VariableFontSettingsTokens {
 
     public static final List<FontSetting> NUMERAL_EXTRA_LARGE_VARIATION_SETTINGS =
             List.of(
-                    FontSetting.tabularNum(),
                     TypeScaleTokens.NUMERAL_EXTRA_LARGE_WEIGHT,
                     TypeScaleTokens.NUMERAL_EXTRA_LARGE_WIDTH,
                     TypeScaleTokens.DEFAULT_ROUNDNESS);
 
     public static final List<FontSetting> NUMERAL_EXTRA_SMALL_VARIATION_SETTINGS =
             List.of(
-                    FontSetting.tabularNum(),
                     TypeScaleTokens.NUMERAL_EXTRA_SMALL_WEIGHT,
                     TypeScaleTokens.NUMERAL_EXTRA_SMALL_WIDTH,
                     TypeScaleTokens.DEFAULT_ROUNDNESS);
 
     public static final List<FontSetting> NUMERAL_LARGE_VARIATION_SETTINGS =
             List.of(
-                    FontSetting.tabularNum(),
                     TypeScaleTokens.NUMERAL_LARGE_WEIGHT,
                     TypeScaleTokens.NUMERAL_LARGE_WIDTH,
                     TypeScaleTokens.DEFAULT_ROUNDNESS);
 
     public static final List<FontSetting> NUMERAL_MEDIUM_VARIATION_SETTINGS =
             List.of(
-                    FontSetting.tabularNum(),
                     TypeScaleTokens.NUMERAL_MEDIUM_WEIGHT,
                     TypeScaleTokens.NUMERAL_MEDIUM_WIDTH,
                     TypeScaleTokens.DEFAULT_ROUNDNESS);
 
     public static final List<FontSetting> NUMERAL_SMALL_VARIATION_SETTINGS =
             List.of(
-                    FontSetting.tabularNum(),
                     TypeScaleTokens.NUMERAL_SMALL_WEIGHT,
                     TypeScaleTokens.NUMERAL_SMALL_WIDTH,
                     TypeScaleTokens.DEFAULT_ROUNDNESS);
