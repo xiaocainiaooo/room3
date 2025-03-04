@@ -20,8 +20,11 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appfunctions.AppFunctionSearchSpec
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadataDocument
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appsearch.app.GlobalSearchSession
 import androidx.appsearch.app.SearchResult
 import androidx.appsearch.app.SearchSpec
@@ -101,14 +104,22 @@ internal class AppFunctionReader(private val context: Context) {
                     staticMetadataDocument.parameters?.map { it.toAppFunctionParameterMetadata() }
                         ?: emptyList()
                 } else {
-                    TODO("Populate for legacy indexer")
+                    // TODO - Populate for legacy indexer
+                    emptyList()
                 },
             response =
                 staticMetadataDocument.response?.toAppFunctionResponseMetadata()
-                    ?: TODO("Populate for legacy indexer"),
+                    ?: // TODO - Populate for legacy indexer. Currently using a dummy value.
+                    AppFunctionResponseMetadata(
+                        valueType =
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                isNullable = false
+                            )
+                    ),
             components =
                 staticMetadataDocument.components?.toAppFunctionComponentsMetadata()
-                    ?: TODO("Populate for legacy indexer"),
+                    ?: AppFunctionComponentsMetadata(),
         )
     }
 
