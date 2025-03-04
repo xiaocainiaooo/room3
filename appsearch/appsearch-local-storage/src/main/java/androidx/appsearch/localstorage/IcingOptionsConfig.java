@@ -283,10 +283,18 @@ public interface IcingOptionsConfig {
                 .setEnableEmbeddingQuantization(
                         Flags.enableSchemaEmbeddingQuantization())
                 .setEnableScorableProperties(Flags.enableScorableProperty())
-                .setEnableQualifiedIdJoinIndexV3AndDeletePropagateFrom(
-                        Flags.enableDeletePropagationType())
                 .setIcuDataFileAbsolutePath(getIcuDataFileAbsolutePath())
                 .setManageBlobFiles(!Flags.enableAppSearchManageBlobFiles())
+                // Join index v3 is a prerequisite for delete propagation.
+                .setEnableDeletePropagationFrom(
+                        Flags.enableDeletePropagationType() && Flags.enableQualifiedIdJoinIndexV3())
+                .setCalculateTimeSinceLastAttemptedOptimize(
+                        Flags.enableCalculateTimeSinceLastAttemptedOptimize())
+                .setEnableQualifiedIdJoinIndexV3(Flags.enableQualifiedIdJoinIndexV3())
+                .setEnableSoftIndexRestoration(Flags.enableSoftIndexRestoration())
+                .setEnableMarkerFileForOptimize(Flags.enableMarkerFileForOptimize())
+                .setReleaseBackupSchemaFileIfOverlayPresent(
+                        Flags.enableReleaseBackupSchemaFileIfOverlayPresent())
                 .build();
     }
 }
