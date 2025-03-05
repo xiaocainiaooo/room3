@@ -159,6 +159,7 @@ public fun materialScope(
         )
         .layout()
 
+/** See [materialScope]. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @VisibleForTesting
 public fun materialScopeFromLayout(
