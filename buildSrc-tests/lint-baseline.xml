@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.9.0-beta01" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.0-beta01)" variant="all" version="8.9.0-beta01">
+<issues format="6" by="lint 8.10.0-alpha07" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.0-alpha07)" variant="all" version="8.10.0-alpha07">
 
     <issue
         id="EagerGradleConfiguration"
@@ -8,15 +8,6 @@
         errorLine2="                      ~~~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/docs/AndroidXDocsImplPlugin.kt"/>
-    </issue>
-
-    <issue
-        id="EagerGradleConfiguration"
-        message="Avoid using method get"
-        errorLine1="        val jvmJarTask = jvmJarTaskProvider.get()"
-        errorLine2="                                            ~~~">
-        <location
-            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/ErrorProneConfiguration.kt"/>
     </issue>
 
     <issue
@@ -174,20 +165,20 @@
 
     <issue
         id="GradleProjectIsolation"
+        message="Use isolated.rootProject instead of getRootProject"
+        errorLine1="            playgroundProjectOrArtifact(project.rootProject, name)"
+        errorLine2="                                                ~~~~~~~~~~~">
+        <location
+            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*3}/androidx/build/AndroidXExtension.kt"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
         message="Use providers.gradleProperty instead of getProperties"
         errorLine1="    for (propertyName in project.properties.keys) {"
         errorLine2="                                 ~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXGradleProperties.kt"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Use isolated.rootProject instead of getRootProject"
-        errorLine1="                        AndroidXPlaygroundRootImplPlugin.projectOrArtifact(rootProject, this)"
-        errorLine2="                                                                           ~~~~~~~~~~~">
-        <location
-            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXImplPlugin.kt"/>
     </issue>
 
     <issue
@@ -215,15 +206,6 @@
         errorLine2="    ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXMultiplatformExtension.kt"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method findProject"
-        errorLine1="            val requested = rootProject.findProject(path)"
-        errorLine2="                                        ~~~~~~~~~~~">
-        <location
-            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXPlaygroundRootImplPlugin.kt"/>
     </issue>
 
     <issue
@@ -413,6 +395,15 @@
         errorLine2="        ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/testConfiguration/OwnersService.kt"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method findProject"
+        errorLine1="    val requested = rootProject.findProject(path)"
+        errorLine2="                                ~~~~~~~~~~~">
+        <location
+            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*3}/androidx/build/ProjectOrArtifact.kt"/>
     </issue>
 
     <issue

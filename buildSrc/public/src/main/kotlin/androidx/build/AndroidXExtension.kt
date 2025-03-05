@@ -433,6 +433,21 @@ abstract class AndroidXExtension(
     // `androidx` block tries retrieves that project object and calls to look for :foo property
     // on it, then checking all the parents for it.
     fun project(name: String): Project = project.project(name)
+
+    /**
+     * Declare an optional project dependency on a project or its latest snapshot artifact. In AOSP
+     * builds this is a no-op and always returns a project reference
+     */
+    fun projectOrArtifact(name: String): Any {
+        return if (!ProjectLayoutType.isPlayground(project)) {
+            // In AndroidX build, this is always enforced to the project
+            project.project(name)
+        } else {
+            // In Playground builds, they are converted to the latest SNAPSHOT artifact if the
+            // project is not included in that playground.
+            playgroundProjectOrArtifact(project.rootProject, name)
+        }
+    }
 }
 
 class License {
