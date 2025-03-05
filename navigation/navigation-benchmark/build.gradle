@@ -31,8 +31,8 @@ plugins {
 }
 
 dependencies {
-    androidTestImplementation(projectOrArtifact(":benchmark:benchmark-common"))
-    androidTestImplementation(projectOrArtifact(":benchmark:benchmark-junit4"))
+    androidTestImplementation(androidx.projectOrArtifact(":benchmark:benchmark-common"))
+    androidTestImplementation(androidx.projectOrArtifact(":benchmark:benchmark-junit4"))
     androidTestImplementation(project(":internal-testutils-navigation"))
     androidTestImplementation(project(":navigation:navigation-common"))
     androidTestImplementation(project(":navigation:navigation-runtime"))

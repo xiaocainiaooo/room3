@@ -70,7 +70,7 @@ androidXMultiplatform {
         androidInstrumentedTest {
             dependsOn(commonTest)
             dependencies {
-                implementation(projectOrArtifact(":benchmark:benchmark-junit4"))
+                implementation(androidx.projectOrArtifact(":benchmark:benchmark-junit4"))
                 implementation(libs.junit)
                 implementation(libs.testExtJunit)
                 implementation(libs.testCore)
