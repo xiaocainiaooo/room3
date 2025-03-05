@@ -69,6 +69,7 @@ public class VisibilityStoreMigrationHelperFromV0Test {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // AppSearchImpl.putDocument
     public void testVisibilityMigration_from0() throws Exception {
         // Values for a "foo" client
         String packageNameFoo = "packageFoo";

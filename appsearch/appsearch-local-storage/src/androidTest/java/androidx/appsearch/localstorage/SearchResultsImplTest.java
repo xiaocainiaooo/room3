@@ -69,6 +69,7 @@ public class SearchResultsImplTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // AppSearchImpl.putDocument
     public void testGetEmptyNextPage() throws Exception {
         // Insert package1 schema
         List<AppSearchSchema> schema1 =
@@ -118,6 +119,7 @@ public class SearchResultsImplTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // AppSearchImpl.putDocument
     public void testGetEmptyNextPage_multiPages() throws Exception {
         // Insert package1 schema
         List<AppSearchSchema> schema1 =
