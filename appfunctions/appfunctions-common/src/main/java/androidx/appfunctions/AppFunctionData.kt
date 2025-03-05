@@ -301,7 +301,7 @@ internal constructor(
                 null
             } else {
                 AppFunctionData(
-                    spec?.getChildSpec(key),
+                    spec?.getPropertyObjectSpec(key),
                     array[0],
                     extras.getBundle(extrasKey(key)) ?: Bundle.EMPTY
                 )
@@ -404,12 +404,12 @@ internal constructor(
     public fun getAppFunctionDataList(
         key: String,
     ): List<AppFunctionData>? {
-        val internalSpec = spec?.getChildSpec(key)
+        val propertySpec = spec?.getPropertyObjectSpec(key)
         val dataArrayValue =
             unsafeGetProperty(key, Array<GenericDocument>::class.java)?.mapIndexed { index, element
                 ->
                 AppFunctionData(
-                    internalSpec,
+                    propertySpec,
                     element,
                     extras.getBundle(extrasKey(key, index)) ?: Bundle.EMPTY
                 )
@@ -632,8 +632,9 @@ internal constructor(
          *   incorrect according to the metadata specification.
          */
         public fun setAppFunctionData(key: String, value: AppFunctionData): Builder {
-            // TODO(b/399823985): Validate value conforms the metadata as well
             spec?.validateWriteRequest(key, AppFunctionData::class.java, isCollection = false)
+            spec?.getPropertyObjectSpec(key)?.validateDataSpecMatches(value)
+
             genericDocumentBuilder.setPropertyDocument(key, value.genericDocument)
             if (!value.extras.isEmpty()) {
                 extrasBuilder.putBundle(extrasKey(key), value.extras)
@@ -706,13 +707,13 @@ internal constructor(
          *   incorrect according to the metadata specification.
          */
         public fun setAppFunctionDataList(key: String, value: List<AppFunctionData>): Builder {
-            // TODO(b/399823985): Validate value conforms the metadata as well
             spec?.validateWriteRequest(key, AppFunctionData::class.java, isCollection = true)
             genericDocumentBuilder.setPropertyDocument(
                 key,
                 *value.map { it.genericDocument }.toTypedArray(),
             )
             value.forEachIndexed { index, element ->
+                spec?.getPropertyObjectSpec(key)?.validateDataSpecMatches(element)
                 if (!element.extras.isEmpty()) {
                     extrasBuilder.putBundle(extrasKey(key, index), element.extras)
                 }

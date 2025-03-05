@@ -34,9 +34,7 @@ import androidx.appfunctions.metadata.AppFunctionReferenceTypeMetadata
 /** Specification class defining the properties metadata for [AppFunctionData]. */
 internal abstract class AppFunctionDataSpec {
     abstract val objectQualifiedName: String
-
-    /** Gets the child [AppFunctionDataSpec] under [key]. */
-    abstract fun getChildSpec(key: String): AppFunctionDataSpec?
+    abstract val componentMetadata: AppFunctionComponentsMetadata
 
     internal abstract fun getDataType(key: String): AppFunctionDataTypeMetadata?
 
@@ -45,6 +43,55 @@ internal abstract class AppFunctionDataSpec {
     /** Checks if there is a metadata for [key]. */
     fun containsMetadata(key: String): Boolean {
         return getDataType(key) != null
+    }
+
+    /**
+     * Gets the property object spec associated with [key].
+     *
+     * If the property associated with [key] is an Array, it would return the item object's
+     * specification.
+     *
+     * @throws IllegalArgumentException If this is no child specification associated with [key].
+     */
+    fun getPropertyObjectSpec(key: String): AppFunctionDataSpec {
+        val childDataType =
+            getDataType(key)
+                ?: throw IllegalArgumentException("Value associated with $key is not an object")
+        return when (childDataType) {
+            is AppFunctionArrayTypeMetadata -> {
+                val itemObjectType =
+                    childDataType.itemType as? AppFunctionObjectTypeMetadata
+                        ?: throw IllegalArgumentException(
+                            "Value associated with $key is not an object array"
+                        )
+                ObjectSpec(itemObjectType, componentMetadata)
+            }
+            is AppFunctionObjectTypeMetadata -> {
+                ObjectSpec(childDataType, componentMetadata)
+            }
+            is AppFunctionReferenceTypeMetadata -> {
+                val resolvedDataType = componentMetadata.dataTypes[childDataType.referenceDataType]
+                if (
+                    resolvedDataType == null || resolvedDataType !is AppFunctionObjectTypeMetadata
+                ) {
+                    throw IllegalArgumentException("Value associated with $key is not an object")
+                }
+                ObjectSpec(resolvedDataType, componentMetadata)
+            }
+            else -> {
+                throw IllegalStateException("Unexpected data type $childDataType")
+            }
+        }
+    }
+
+    /**
+     * Validates if [data] matches the current [AppFunctionDataSpec].
+     *
+     * @throws IllegalArgumentException If the [data] does not match the specification.
+     */
+    fun validateDataSpecMatches(data: AppFunctionData) {
+        val otherSpec = data.spec ?: return
+        require(this == otherSpec) { "$data does not match the metadata specification of $this" }
     }
 
     /**
@@ -99,9 +146,9 @@ internal abstract class AppFunctionDataSpec {
         }
     }
 
-    private class ObjectSpec(
+    private data class ObjectSpec(
         private val objectTypeMetadata: AppFunctionObjectTypeMetadata,
-        private val componentMetadata: AppFunctionComponentsMetadata
+        override val componentMetadata: AppFunctionComponentsMetadata
     ) : AppFunctionDataSpec() {
         override val objectQualifiedName: String
             get() = objectTypeMetadata.qualifiedName ?: ""
@@ -113,19 +160,11 @@ internal abstract class AppFunctionDataSpec {
         override fun isRequired(key: String): Boolean {
             return objectTypeMetadata.required.contains(key)
         }
-
-        override fun getChildSpec(key: String): AppFunctionDataSpec? {
-            val childDataType = objectTypeMetadata.properties[key]
-            if (childDataType == null || childDataType !is AppFunctionObjectTypeMetadata) {
-                return null
-            }
-            return ObjectSpec(childDataType, componentMetadata)
-        }
     }
 
-    private class ParametersSpec(
+    private data class ParametersSpec(
         private val parameterMetadataList: List<AppFunctionParameterMetadata>,
-        private val componentMetadata: AppFunctionComponentsMetadata
+        override val componentMetadata: AppFunctionComponentsMetadata
     ) : AppFunctionDataSpec() {
         override val objectQualifiedName: String
             get() = ""
@@ -136,14 +175,6 @@ internal abstract class AppFunctionDataSpec {
 
         override fun isRequired(key: String): Boolean {
             return parameterMetadataList.firstOrNull { it.name == key }?.isRequired ?: false
-        }
-
-        override fun getChildSpec(key: String): AppFunctionDataSpec? {
-            val childDataType = parameterMetadataList.firstOrNull { it.name == key }?.dataType
-            if (childDataType == null || childDataType !is AppFunctionObjectTypeMetadata) {
-                return null
-            }
-            return ObjectSpec(childDataType, componentMetadata)
         }
     }
 
