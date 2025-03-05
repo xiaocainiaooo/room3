@@ -61,8 +61,8 @@ import androidx.wear.compose.foundation.RevealDirection.Companion.RightToLeft
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
 import androidx.wear.compose.foundation.SwipeToReveal
-import androidx.wear.compose.foundation.SwipeToRevealDefaults.allowAllGestures
-import androidx.wear.compose.foundation.SwipeToRevealDefaults.ignoreLeftEdge
+import androidx.wear.compose.foundation.SwipeToRevealDefaults.bidirectionalGestureInclusion
+import androidx.wear.compose.foundation.SwipeToRevealDefaults.gestureInclusion
 import androidx.wear.compose.foundation.createRevealAnchors
 import androidx.wear.compose.foundation.rememberRevealState
 import androidx.wear.compose.material3.ButtonDefaults.buttonColors
@@ -114,11 +114,11 @@ import kotlinx.coroutines.launch
  *   for a Card composable, it's suggested to use [SwipeToRevealDefaults.LargeActionButtonHeight].
  * @param gestureInclusion Provides fine-grained control so that touch gestures can be excluded when
  *   they start in a certain region. An instance of [GestureInclusion] can be passed in here which
- *   will determine via [GestureInclusion.allowGesture] whether the gesture should proceed or not.
- *   By default, [gestureInclusion] allows gestures everywhere for when [revealState] contains
- *   anchors for both directions (see [allowAllGestures]). If it doesn't, then it allows gestures
- *   everywhere, except a zone on the left edge, which is used for swipe-to-dismiss (see
- *   [ignoreLeftEdge]).
+ *   will determine via [GestureInclusion.ignoreGestureStart] whether the gesture should proceed or
+ *   not. By default, [gestureInclusion] allows gestures everywhere for when [revealState] contains
+ *   anchors for both directions (see [bidirectionalGestureInclusion]). If it doesn't, then it
+ *   allows gestures everywhere, except a zone on the left edge, which is used for swipe-to-dismiss
+ *   (see [gestureInclusion]).
  * @param content The content that will be initially displayed over the other actions provided.
  * @see [androidx.wear.compose.foundation.SwipeToReveal]
  */
@@ -130,9 +130,9 @@ public fun SwipeToReveal(
     actionButtonHeight: Dp = SwipeToRevealDefaults.SmallActionButtonHeight,
     gestureInclusion: GestureInclusion =
         if (revealState.hasBidirectionalAnchors()) {
-            allowAllGestures()
+            bidirectionalGestureInclusion()
         } else {
-            ignoreLeftEdge()
+            gestureInclusion()
         },
     content: @Composable () -> Unit,
 ) {

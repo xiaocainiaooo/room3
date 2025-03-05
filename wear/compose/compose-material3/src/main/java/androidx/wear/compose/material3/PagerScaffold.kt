@@ -243,7 +243,7 @@ private fun PagerScaffoldImpl(
  * @param gestureInclusion When userScrollEnabled=true, this function provides more fine-grained
  *   control so that touch gestures can be excluded when they start in a certain region. An instance
  *   of [GestureInclusion] can be passed in here which will determine via
- *   [GestureInclusion.allowGesture] whether the gesture should proceed or not. By default,
+ *   [GestureInclusion.ignoreGestureStart] whether the gesture should proceed or not. By default,
  *   [gestureInclusion] allows gestures everywhere except a zone on the left edge of the first page,
  *   which is used for swipe-to-dismiss (see [PagerDefaults.gestureInclusion]).
  * @param reverseLayout reverse the direction of scrolling and layout.
@@ -282,14 +282,14 @@ internal fun AnimatedHorizontalPager(
         userScrollEnabled = userScrollEnabled,
         gestureInclusion =
             object : GestureInclusion {
-                override fun allowGesture(
+                override fun ignoreGestureStart(
                     offset: Offset,
                     layoutCoordinates: LayoutCoordinates
                 ): Boolean {
                     return if (touchExplorationServicesEnabled) {
-                        true
+                        false
                     } else {
-                        gestureInclusion.allowGesture(offset, layoutCoordinates)
+                        gestureInclusion.ignoreGestureStart(offset, layoutCoordinates)
                     }
                 }
             },

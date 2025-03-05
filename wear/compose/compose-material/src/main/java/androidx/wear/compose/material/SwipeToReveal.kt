@@ -52,7 +52,7 @@ import androidx.compose.ui.util.lerp
 import androidx.wear.compose.foundation.RevealActionType
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.SwipeToReveal
-import androidx.wear.compose.foundation.SwipeToRevealDefaults.allowAllGestures
+import androidx.wear.compose.foundation.SwipeToRevealDefaults.bidirectionalGestureInclusion
 import kotlin.math.abs
 
 /**
@@ -440,7 +440,7 @@ private fun SwipeToRevealComponent(
                     }
                 else -> null
             },
-        gestureInclusion = allowAllGestures(),
+        gestureInclusion = bidirectionalGestureInclusion(),
         content = content
     )
 }
