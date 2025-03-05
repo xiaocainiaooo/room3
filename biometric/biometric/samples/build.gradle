@@ -27,7 +27,10 @@ plugins {
     id("kotlin-android")
 }
 dependencies {
+    api 'androidx.fragment:fragment:1.2.5'
+
     compileOnly(project(":annotation:annotation-sampled"))
+
     implementation(project(":biometric:biometric"))
 }
 androidx {
