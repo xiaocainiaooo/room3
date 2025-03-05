@@ -58,8 +58,9 @@ class DarwinBenchmarkPlugin : Plugin<Project> {
         // You can override the xcodeGenDownloadUri by specifying something like:
         // androidx.benchmark.darwin.xcodeGenDownloadUri=https://github.com/yonaskolb/XcodeGen/releases/download/2.32.0/xcodegen.zip
         val xcodeGenUri =
-            when (val uri = project.findProperty(XCODEGEN_DOWNLOAD_URI)) {
-                null ->
+            project.providers
+                .gradleProperty(XCODEGEN_DOWNLOAD_URI)
+                .orElse(
                     File(
                             project.rootProject.projectDir, // frameworks/support
                             "../../prebuilts/androidx/external/xcodegen"
@@ -67,8 +68,7 @@ class DarwinBenchmarkPlugin : Plugin<Project> {
                         .absoluteFile
                         .toURI()
                         .toString()
-                else -> uri.toString()
-            }
+                )
 
         val xcodeProjectPath =
             extension.xcodeProjectName.flatMap { name ->

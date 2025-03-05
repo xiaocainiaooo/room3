@@ -118,9 +118,8 @@ androidx {
 }
 
 darwinBenchmark {
-    xcodeGenConfigFile = project.rootProject.file(
-            "benchmark/benchmark-darwin-xcode/projects/collection-benchmark-ios.yml"
-    )
+    xcodeGenConfigFile = new File(rootDir,
+            "benchmark/benchmark-darwin-xcode/projects/collection-benchmark-ios.yml")
     xcodeProjectName = "collection-benchmark-ios"
     scheme = "testapp-ios"
     // To run locally switch to iOS 17.0 simulators
