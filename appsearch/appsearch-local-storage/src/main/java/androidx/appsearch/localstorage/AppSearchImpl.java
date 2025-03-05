@@ -2629,35 +2629,33 @@ public final class AppSearchImpl implements Closeable {
         }
     }
 
-    /** Estimates the storage usage info for a specific package. */
+    /** Estimates the total storage usage info data size for a specific set of packages. */
     @ExperimentalAppSearchApi
-    public @NonNull StorageInfo getStorageInfoForPackage(@NonNull String packageName)
+    public @NonNull StorageInfo getStorageInfoForPackages(@NonNull Set<String> packageNames)
             throws AppSearchException {
         mReadWriteLock.readLock().lock();
         try {
             throwIfClosedLocked();
 
             StorageInfo.Builder storageInfoBuilder = new StorageInfo.Builder();
-            if (Flags.enableBlobStore()) {
-                StorageInfoProto storageInfoProto = getRawStorageInfoProto();
-                // read blob storage info and set to storageInfoBuilder
-                getBlobStorageInfoForPrefix(storageInfoProto, packageName, storageInfoBuilder);
-                // read document storage info and set to storageInfoBuilder
-                Set<String> wantedPrefixedDocumentNamespaces = mNamespaceCacheLocked
-                        .getAllPrefixedDocumentNamespaceForPackage(packageName);
-                if (!wantedPrefixedDocumentNamespaces.isEmpty()) {
-                    getDocumentStorageInfoForNamespaces(storageInfoProto,
-                            wantedPrefixedDocumentNamespaces, storageInfoBuilder);
-                }
-            } else {
-                // blob flag off, only read document storage info and set to storageInfoBuilder if
-                // the database exists.
-                Set<String> wantedPrefixedDocumentNamespaces = mNamespaceCacheLocked
-                        .getAllPrefixedDocumentNamespaceForPackage(packageName);
-                if (!wantedPrefixedDocumentNamespaces.isEmpty()) {
-                    getDocumentStorageInfoForNamespaces(getRawStorageInfoProto(),
-                            wantedPrefixedDocumentNamespaces, storageInfoBuilder);
-                }
+            // read document storage info and set to storageInfoBuilder
+            Set<String> wantedPrefixedDocumentNamespaces =
+                    mNamespaceCacheLocked.getAllPrefixedDocumentNamespaceForPackages(packageNames);
+            Set<String> wantedPrefixedBlobNamespaces =
+                    mNamespaceCacheLocked.getAllPrefixedBlobNamespaceForPackages(packageNames);
+            if (wantedPrefixedDocumentNamespaces.isEmpty()
+                    && wantedPrefixedBlobNamespaces.isEmpty()) {
+                return storageInfoBuilder.build();
+            }
+            StorageInfoProto storageInfoProto = getRawStorageInfoProto();
+
+            if (Flags.enableBlobStore() && !wantedPrefixedBlobNamespaces.isEmpty()) {
+                getBlobStorageInfoForNamespaces(
+                        storageInfoProto, wantedPrefixedBlobNamespaces, storageInfoBuilder);
+            }
+            if (!wantedPrefixedDocumentNamespaces.isEmpty()) {
+                getDocumentStorageInfoForNamespaces(
+                        storageInfoProto, wantedPrefixedDocumentNamespaces, storageInfoBuilder);
             }
             return storageInfoBuilder.build();
         } finally {
@@ -2815,6 +2813,36 @@ public final class AppSearchImpl implements Closeable {
             @NonNull StorageInfoProto storageInfoProto,
             @NonNull String prefix,
             StorageInfo.@NonNull Builder storageInfoBuilder) {
+        Set<String> prefixedNamespaces = new ArraySet<>();
+        List<NamespaceBlobStorageInfoProto> blobStorageInfoProtos =
+                storageInfoProto.getNamespaceBlobStorageInfoList();
+        for (int i = 0; i < blobStorageInfoProtos.size(); i++) {
+            String prefixedNamespace = blobStorageInfoProtos.get(i).getNamespace();
+            if (prefixedNamespace.startsWith(prefix)) {
+                prefixedNamespaces.add(prefixedNamespace);
+            }
+        }
+        getBlobStorageInfoForNamespaces(storageInfoProto, prefixedNamespaces, storageInfoBuilder);
+    }
+
+    /**
+     * Extracts and returns blob storage information from {@link StorageInfoProto} based on prefixed
+     * namespaces.
+     *
+     * @param storageInfoProto   The source {@link StorageInfoProto} containing blob storage
+     *                           information to be analyzed.
+     * @param prefixedNamespaces A set of prefixed namespaces that the blob storage information will
+     *                           be filtered against. Only namespaces in this set will be
+     *                           included in the analysis.
+     * @param storageInfoBuilder The {@link StorageInfo.Builder} used to and build the resulting
+     *                           {@link StorageInfo}. This builder will be modified with
+     *                           calculated values.
+     */
+    @ExperimentalAppSearchApi
+    private void getBlobStorageInfoForNamespaces(
+            @NonNull StorageInfoProto storageInfoProto,
+            @NonNull Set<String> prefixedNamespaces,
+            StorageInfo.@NonNull Builder storageInfoBuilder) {
         if (storageInfoProto.getNamespaceBlobStorageInfoCount() == 0) {
             return;
         }
@@ -2824,7 +2852,7 @@ public final class AppSearchImpl implements Closeable {
         int blobCount = 0;
         for (int i = 0; i < blobStorageInfoProtos.size(); i++) {
             NamespaceBlobStorageInfoProto blobStorageInfoProto = blobStorageInfoProtos.get(i);
-            if (blobStorageInfoProto.getNamespace().startsWith(prefix)) {
+            if (prefixedNamespaces.contains(blobStorageInfoProto.getNamespace())) {
                 if (Flags.enableAppSearchManageBlobFiles()) {
                     List<String> blobFileNames = blobStorageInfoProto.getBlobFileNamesList();
                     for (int j = 0; j < blobFileNames.size(); j++) {
@@ -2838,8 +2866,7 @@ public final class AppSearchImpl implements Closeable {
                 }
             }
         }
-        storageInfoBuilder.setBlobsCount(blobCount)
-                .setBlobsSizeBytes(blobSizeBytes);
+        storageInfoBuilder.setBlobsCount(blobCount).setBlobsSizeBytes(blobSizeBytes);
     }
 
     /**
