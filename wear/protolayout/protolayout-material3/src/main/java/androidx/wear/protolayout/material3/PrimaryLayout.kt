@@ -68,6 +68,7 @@ import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.dp
+import kotlin.math.ceil
 
 /**
  * ProtoLayout Material3 full screen layout that represents a suggested Material3 layout style that
@@ -439,11 +440,11 @@ private fun MaterialScope.getMarginForHeader() =
 internal object PrimaryLayoutDefaults {
     internal fun MaterialScope.percentageWidthToDp(
         @FloatRange(from = 0.0, to = 1.0) percentage: Float
-    ): Float = percentage * deviceConfiguration.screenWidthDp
+    ): Float = ceil(percentage * deviceConfiguration.screenWidthDp)
 
     internal fun MaterialScope.percentageHeightToDp(
         @FloatRange(from = 0.0, to = 1.0) percentage: Float
-    ): Float = percentage * deviceConfiguration.screenHeightDp
+    ): Float = ceil(percentage * deviceConfiguration.screenHeightDp)
 
     /** Tool tag for Metadata in Modifiers, so we know that Row is actually a PrimaryLayout. */
     @VisibleForTesting internal const val METADATA_TAG: String = "M3_PL"
