@@ -18,6 +18,7 @@ package androidx.navigation3
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
@@ -643,6 +644,62 @@ class SinglePaneNavDisplayTest {
         }
 
         assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 0").isDisplayed()).isTrue()
+    }
+
+    @Test
+    fun testDuplicateKeyStateNestedStateIsCorrect() {
+        lateinit var numberOnScreen1: MutableState<Int>
+        lateinit var nestedNumberOnScreen1: MutableState<Int>
+        lateinit var backStack: MutableList<Any>
+        lateinit var nestedBackStack: MutableList<Any>
+        composeTestRule.setContent {
+            backStack = remember { mutableStateListOf(first) }
+            nestedBackStack = remember { mutableStateListOf(first) }
+            SinglePaneNavDisplay(backStack = backStack) {
+                when (it) {
+                    first ->
+                        NavEntry(first) {
+                            numberOnScreen1 = rememberSaveable { mutableStateOf(0) }
+                            Column {
+                                Text("numberOnScreen1: ${numberOnScreen1.value}")
+                                SinglePaneNavDisplay(backStack = nestedBackStack) {
+                                    when (it) {
+                                        first ->
+                                            NavEntry(first) {
+                                                nestedNumberOnScreen1 = rememberSaveable {
+                                                    mutableStateOf(0)
+                                                }
+                                                Text(
+                                                    "nestedNumberOnScreen1: ${nestedNumberOnScreen1.value}"
+                                                )
+                                            }
+                                        else -> error("Invalid key passed")
+                                    }
+                                }
+                            }
+                        }
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0")
+                .that(nestedNumberOnScreen1.value)
+                .isEqualTo(0)
+            nestedNumberOnScreen1.value++
+        }
+
+        assertThat(composeTestRule.onNodeWithText("nestedNumberOnScreen1: 1").isDisplayed())
+            .isTrue()
     }
 }
 

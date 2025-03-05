@@ -37,7 +37,7 @@ import kotlin.collections.plus
 public fun <T : Any> NavBackStackProvider(
     backStack: List<T>,
     entryProvider: (key: T) -> NavEntry<out T>,
-    localProviders: List<NavLocalProvider> = listOf(SaveableStateNavLocalProvider()),
+    localProviders: List<NavLocalProvider> = listOf(SaveableStateNavLocalProvider),
     content: @Composable (List<NavEntry<T>>) -> Unit
 ) {
     // Kotlin does not know these things are compatible so we need this explicit cast

@@ -61,13 +61,6 @@ final class <#A: kotlin/Any> androidx.navigation3/EntryProviderBuilder { // andr
     final fun build(): kotlin/Function1<#A, androidx.navigation3/NavEntry<#A>> // androidx.navigation3/EntryProviderBuilder.build|build(){}[0]
 }
 
-final class androidx.navigation3/SaveableStateNavLocalProvider : androidx.navigation3/NavLocalProvider { // androidx.navigation3/SaveableStateNavLocalProvider|null[0]
-    constructor <init>() // androidx.navigation3/SaveableStateNavLocalProvider.<init>|<init>(){}[0]
-
-    final fun <#A1: kotlin/Any> ProvideToEntry(androidx.navigation3/NavEntry<#A1>) // androidx.navigation3/SaveableStateNavLocalProvider.ProvideToEntry|ProvideToEntry(androidx.navigation3.NavEntry<0:0>){0§<kotlin.Any>}[0]
-    final fun ProvideToBackStack(kotlin.collections/List<kotlin/Any>, kotlin/Function0<kotlin/Unit>) // androidx.navigation3/SaveableStateNavLocalProvider.ProvideToBackStack|ProvideToBackStack(kotlin.collections.List<kotlin.Any>;kotlin.Function0<kotlin.Unit>){}[0]
-}
-
 open class <#A: kotlin/Any> androidx.navigation3/NavEntry { // androidx.navigation3/NavEntry|null[0]
     constructor <init>(#A, kotlin.collections/Map<kotlin/String, kotlin/Any> = ..., kotlin/Function1<#A, kotlin/Unit>) // androidx.navigation3/NavEntry.<init>|<init>(1:0;kotlin.collections.Map<kotlin.String,kotlin.Any>;kotlin.Function1<1:0,kotlin.Unit>){}[0]
 
@@ -90,6 +83,11 @@ open class <#A: kotlin/Any> androidx.navigation3/NavEntryWrapper : androidx.navi
         open fun <get-featureMap>(): kotlin.collections/Map<kotlin/String, kotlin/Any> // androidx.navigation3/NavEntryWrapper.featureMap.<get-featureMap>|<get-featureMap>(){}[0]
     open val key // androidx.navigation3/NavEntryWrapper.key|{}key[0]
         open fun <get-key>(): #A // androidx.navigation3/NavEntryWrapper.key.<get-key>|<get-key>(){}[0]
+}
+
+final object androidx.navigation3/SaveableStateNavLocalProvider : androidx.navigation3/NavLocalProvider { // androidx.navigation3/SaveableStateNavLocalProvider|null[0]
+    final fun <#A1: kotlin/Any> ProvideToEntry(androidx.navigation3/NavEntry<#A1>) // androidx.navigation3/SaveableStateNavLocalProvider.ProvideToEntry|ProvideToEntry(androidx.navigation3.NavEntry<0:0>){0§<kotlin.Any>}[0]
+    final fun ProvideToBackStack(kotlin.collections/List<kotlin/Any>, kotlin/Function0<kotlin/Unit>) // androidx.navigation3/SaveableStateNavLocalProvider.ProvideToBackStack|ProvideToBackStack(kotlin.collections.List<kotlin.Any>;kotlin.Function0<kotlin.Unit>){}[0]
 }
 
 final object androidx.navigation3/SavedStateNavLocalProvider : androidx.navigation3/NavLocalProvider { // androidx.navigation3/SavedStateNavLocalProvider|null[0]

@@ -79,8 +79,8 @@ package androidx.navigation3 {
   }
 
   public final class SaveableStateNavLocalProvider implements androidx.navigation3.NavLocalProvider {
-    ctor public SaveableStateNavLocalProvider();
     method @androidx.compose.runtime.Composable public <T> void ProvideToEntry(androidx.navigation3.NavEntry<T> entry);
+    field public static final androidx.navigation3.SaveableStateNavLocalProvider INSTANCE;
   }
 
   public final class SavedStateNavLocalProvider implements androidx.navigation3.NavLocalProvider {
