@@ -123,6 +123,9 @@ internal class AppFunctionMetadataTestHelper(private val context: Context) {
         const val NO_SCHEMA_EXECUTION_SUCCEED =
             "androidx.appfunctions.test#noSchema_executionSucceed"
         const val NO_SCHEMA_EXECUTION_FAIL = "androidx.appfunctions.test#noSchema_executionFail"
+        const val NOTES_SCHEMA_PRINT = "androidx.appfunctions.test#notesSchema_print"
+        const val MEDIA_SCHEMA_PRINT = "androidx.appfunctions.test#mediaSchema_print"
+        const val MEDIA_SCHEMA2_PRINT = "androidx.appfunctions.test#mediaSchema2_print"
     }
 
     companion object {

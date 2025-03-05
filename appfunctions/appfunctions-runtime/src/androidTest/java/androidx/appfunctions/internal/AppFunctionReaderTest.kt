@@ -24,11 +24,11 @@ import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -50,11 +50,11 @@ class AppFunctionReaderTest {
         }
 
     @Test
-    fun searchAppFunctions_emptyPackagesListInSearchSpec_emptyFlow() =
+    fun searchAppFunctions_emptyPackagesListInSearchSpec_noResults() =
         runBlocking<Unit> {
             val searchFunctionSpec = AppFunctionSearchSpec(packageNames = emptySet())
 
-            assertThat(appFunctionReader.searchAppFunctions(searchFunctionSpec).toList()).isEmpty()
+            assertThat(appFunctionReader.searchAppFunctions(searchFunctionSpec).first()).isEmpty()
         }
 
     @Test
@@ -65,17 +65,14 @@ class AppFunctionReaderTest {
             val appFunctions = appFunctionReader.searchAppFunctions(searchFunctionSpec).first()
 
             // TODO: Populate other fields for legacy indexer.
-            assertThat(appFunctions.map { it.id })
-                .containsExactly(
-                    FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED,
-                    FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT,
-                    FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT,
-                    FunctionIds.NO_SCHEMA_EXECUTION_FAIL
-                )
+            val expectedMetadata = getTestFunctionIdToMetadataMap(context.packageName)
+            assertThat(appFunctions.map { it.id }).containsExactlyElementsIn(expectedMetadata.keys)
             // Only check for all fields when dynamic indexer is enabled.
             assumeTrue(appFunctionMetadataTestHelper.isDynamicIndexerAvailable())
             assertThat(appFunctions)
-                .containsExactlyElementsIn(getTestAppFunctionMetadataList(context.packageName))
+                .containsExactlyElementsIn(
+                    getTestFunctionIdToMetadataMap(context.packageName).values
+                )
         }
 
     @Test
@@ -87,86 +84,222 @@ class AppFunctionReaderTest {
             val appFunctions = appFunctionReader.searchAppFunctions(searchFunctionSpec).first()
 
             // TODO: Populate other fields for legacy indexer.
-            assertThat(appFunctions.map { it.id })
-                .containsExactly(
-                    FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED,
-                    FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT,
-                    FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT,
-                    FunctionIds.NO_SCHEMA_EXECUTION_FAIL
-                )
+            val expectedMetadata = getTestFunctionIdToMetadataMap(context.packageName)
+            assertThat(appFunctions.map { it.id }).containsExactlyElementsIn(expectedMetadata.keys)
             // Only check for all fields when dynamic indexer is enabled.
             assumeTrue(appFunctionMetadataTestHelper.isDynamicIndexerAvailable())
             assertThat(appFunctions)
-                .containsExactlyElementsIn(getTestAppFunctionMetadataList(context.packageName))
+                .containsExactlyElementsIn(
+                    getTestFunctionIdToMetadataMap(context.packageName).values
+                )
+        }
+
+    @Test
+    fun searchAppFunctions_schemaNameInSpec_returnsMatchingAppFunctions() =
+        runBlocking<Unit> {
+            val searchFunctionSpec = AppFunctionSearchSpec(schemaName = "print")
+
+            val appFunctions = appFunctionReader.searchAppFunctions(searchFunctionSpec).first()
+
+            val expectedFunctionIds =
+                setOf(
+                    FunctionIds.MEDIA_SCHEMA_PRINT,
+                    FunctionIds.NOTES_SCHEMA_PRINT,
+                    FunctionIds.MEDIA_SCHEMA2_PRINT
+                )
+            val expectedMetadata =
+                getTestFunctionIdToMetadataMap(context.packageName)
+                    .filterKeys { it in expectedFunctionIds }
+                    .values
+            // TODO: Populate other fields for legacy indexer.
+            assertThat(appFunctions.map { it.id }).containsExactlyElementsIn(expectedFunctionIds)
+            assertThat(appFunctions.map { it.schema })
+                .containsExactlyElementsIn(expectedMetadata.map { it.schema })
+            // Only check for all fields when dynamic indexer is enabled.
+            assumeTrue(appFunctionMetadataTestHelper.isDynamicIndexerAvailable())
+            assertThat(appFunctions).containsExactlyElementsIn(expectedMetadata)
+        }
+
+    @Test
+    fun searchAppFunctions_schemaCategoryInSpec_returnsMatchingAppFunctions() =
+        runBlocking<Unit> {
+            val searchFunctionSpec = AppFunctionSearchSpec(schemaCategory = "media")
+
+            val appFunctions = appFunctionReader.searchAppFunctions(searchFunctionSpec).first()
+
+            val expectedFunctionIds =
+                setOf(FunctionIds.MEDIA_SCHEMA_PRINT, FunctionIds.MEDIA_SCHEMA2_PRINT)
+            val expectedMetadata =
+                getTestFunctionIdToMetadataMap(context.packageName)
+                    .filterKeys { it in expectedFunctionIds }
+                    .values
+            // TODO: Populate other fields for legacy indexer.
+            assertThat(appFunctions.map { it.id }).containsExactlyElementsIn(expectedFunctionIds)
+            assertThat(appFunctions.map { it.schema })
+                .containsExactlyElementsIn(expectedMetadata.map { it.schema })
+            // Only check for all fields when dynamic indexer is enabled.
+            assumeTrue(appFunctionMetadataTestHelper.isDynamicIndexerAvailable())
+            assertThat(appFunctions).containsExactlyElementsIn(expectedMetadata)
+        }
+
+    @Test
+    fun searchAppFunctions_minSchemaVersionInSpec_returnsAppFunctionsWithSchemaVersionGreaterThanMin() =
+        runBlocking<Unit> {
+            val searchFunctionSpec = AppFunctionSearchSpec(minSchemaVersion = 2)
+
+            val appFunctions = appFunctionReader.searchAppFunctions(searchFunctionSpec).first()
+
+            val expectedFunctionIds = setOf(FunctionIds.MEDIA_SCHEMA2_PRINT)
+            val expectedMetadata =
+                getTestFunctionIdToMetadataMap(context.packageName)
+                    .filterKeys { it in expectedFunctionIds }
+                    .values
+            // TODO: Populate other fields for legacy indexer.
+            assertThat(appFunctions.map { it.id }).containsExactlyElementsIn(expectedFunctionIds)
+            assertThat(appFunctions.map { it.schema })
+                .containsExactlyElementsIn(expectedMetadata.map { it.schema })
+            // Only check for all fields when dynamic indexer is enabled.
+            assumeTrue(appFunctionMetadataTestHelper.isDynamicIndexerAvailable())
+            assertThat(appFunctions).containsExactlyElementsIn(expectedMetadata)
         }
 
     private companion object {
-        fun getTestAppFunctionMetadataList(packageName: String) =
-            listOf(
-                AppFunctionMetadata(
-                    id = FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED,
-                    packageName = packageName,
-                    isEnabled = true,
-                    schema = null,
-                    parameters = emptyList(),
-                    response =
-                        AppFunctionResponseMetadata(
-                            valueType =
-                                AppFunctionPrimitiveTypeMetadata(
-                                    type = 8, // TYPE_STRING
-                                    isNullable = false
-                                )
-                        ),
-                    components = AppFunctionComponentsMetadata()
-                ),
-                AppFunctionMetadata(
-                    id = FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT,
-                    packageName = packageName,
-                    isEnabled = true,
-                    schema = null,
-                    parameters = emptyList(),
-                    response =
-                        AppFunctionResponseMetadata(
-                            valueType =
-                                AppFunctionPrimitiveTypeMetadata(
-                                    type = 0, // TYPE_UNIT
-                                    isNullable = false
-                                )
-                        ),
-                    components = AppFunctionComponentsMetadata()
-                ),
-                AppFunctionMetadata(
-                    id = FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT,
-                    packageName = packageName,
-                    isEnabled = false,
-                    schema = null,
-                    parameters = emptyList(),
-                    response =
-                        AppFunctionResponseMetadata(
-                            valueType =
-                                AppFunctionPrimitiveTypeMetadata(
-                                    type = 0, // TYPE_UNIT
-                                    isNullable = false
-                                )
-                        ),
-                    components = AppFunctionComponentsMetadata()
-                ),
-                AppFunctionMetadata(
-                    id = FunctionIds.NO_SCHEMA_EXECUTION_FAIL,
-                    packageName = packageName,
-                    isEnabled = true,
-                    schema = null,
-                    parameters = emptyList(),
-                    response =
-                        AppFunctionResponseMetadata(
-                            valueType =
-                                AppFunctionPrimitiveTypeMetadata(
-                                    type = 0, // TYPE_UNIT
-                                    isNullable = false
-                                )
-                        ),
-                    components = AppFunctionComponentsMetadata()
-                )
+        fun getTestFunctionIdToMetadataMap(packageName: String) =
+            mapOf(
+                FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED to
+                    AppFunctionMetadata(
+                        id = FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED,
+                        packageName = packageName,
+                        isEnabled = true,
+                        schema = null,
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_STRING,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
+                FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT to
+                    AppFunctionMetadata(
+                        id = FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT,
+                        packageName = packageName,
+                        isEnabled = true,
+                        schema = null,
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
+                FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT to
+                    AppFunctionMetadata(
+                        id = FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT,
+                        packageName = packageName,
+                        isEnabled = false,
+                        schema = null,
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
+                FunctionIds.NO_SCHEMA_EXECUTION_FAIL to
+                    AppFunctionMetadata(
+                        id = FunctionIds.NO_SCHEMA_EXECUTION_FAIL,
+                        packageName = packageName,
+                        isEnabled = true,
+                        schema = null,
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
+                FunctionIds.NOTES_SCHEMA_PRINT to
+                    AppFunctionMetadata(
+                        id = FunctionIds.NOTES_SCHEMA_PRINT,
+                        packageName = packageName,
+                        isEnabled = true,
+                        schema =
+                            AppFunctionSchemaMetadata(
+                                category = "notes",
+                                name = "print",
+                                version = 1
+                            ),
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
+                FunctionIds.MEDIA_SCHEMA_PRINT to
+                    AppFunctionMetadata(
+                        id = FunctionIds.MEDIA_SCHEMA_PRINT,
+                        packageName = packageName,
+                        isEnabled = true,
+                        schema =
+                            AppFunctionSchemaMetadata(
+                                category = "media",
+                                name = "print",
+                                version = 1
+                            ),
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
+                FunctionIds.MEDIA_SCHEMA2_PRINT to
+                    AppFunctionMetadata(
+                        id = FunctionIds.MEDIA_SCHEMA2_PRINT,
+                        packageName = packageName,
+                        isEnabled = true,
+                        schema =
+                            AppFunctionSchemaMetadata(
+                                category = "media",
+                                name = "print",
+                                version = 2
+                            ),
+                        parameters = emptyList(),
+                        response =
+                            AppFunctionResponseMetadata(
+                                valueType =
+                                    AppFunctionPrimitiveTypeMetadata(
+                                        type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
+                                        isNullable = false
+                                    )
+                            ),
+                        components = AppFunctionComponentsMetadata()
+                    ),
             )
     }
 }
