@@ -18,6 +18,7 @@ package androidx.appfunctions.internal
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appfunctions.AppFunctionSearchSpec
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
@@ -25,11 +26,12 @@ import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadataDocument
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appsearch.app.GenericDocument
 import androidx.appsearch.app.GlobalSearchSession
 import androidx.appsearch.app.SearchResult
 import androidx.appsearch.app.SearchSpec
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 
 /**
@@ -55,10 +57,12 @@ internal class AppFunctionReader(private val context: Context) {
         searchFunctionSpec: AppFunctionSearchSpec
     ): Flow<List<AppFunctionMetadata>> {
         // TODO: Use observer API to emit new values when underlying documents are changed.
-        if (searchFunctionSpec.packageNames?.isEmpty() == true) {
-            return emptyFlow()
-        }
         return flow {
+            if (searchFunctionSpec.packageNames?.isEmpty() == true) {
+                emit(emptyList())
+                return@flow
+            }
+
             createSearchSession(context = context).use { session ->
                 emit(performSearch(session, searchFunctionSpec))
             }
@@ -95,8 +99,12 @@ internal class AppFunctionReader(private val context: Context) {
             packageName = packageName,
             // TODO: Compute effectively enabled.
             isEnabled = staticMetadataDocument.isEnabledByDefault,
+            schema =
+                staticMetadataDocument.schema?.toAppFunctionSchemaMetadata()
+                    ?:
+                    // In legacy indexer, schema properties are specified at top level.
+                    buildSchemaMetadataFromGdForLegacyIndexer(searchResult.genericDocument),
             // TODO: Populate them separately for legacy indexer.
-            schema = staticMetadataDocument.schema?.toAppFunctionSchemaMetadata(),
             parameters =
                 // Since this is a list type it can be null for cases where an app function has no
                 // parameters.
@@ -109,8 +117,7 @@ internal class AppFunctionReader(private val context: Context) {
                 },
             response =
                 staticMetadataDocument.response?.toAppFunctionResponseMetadata()
-                    ?: // TODO - Populate for legacy indexer. Currently using a dummy value.
-                    AppFunctionResponseMetadata(
+                    ?: AppFunctionResponseMetadata(
                         valueType =
                             AppFunctionPrimitiveTypeMetadata(
                                 type = AppFunctionPrimitiveTypeMetadata.TYPE_UNIT,
@@ -120,6 +127,30 @@ internal class AppFunctionReader(private val context: Context) {
             components =
                 staticMetadataDocument.components?.toAppFunctionComponentsMetadata()
                     ?: AppFunctionComponentsMetadata(),
+        )
+    }
+
+    private fun buildSchemaMetadataFromGdForLegacyIndexer(
+        document: GenericDocument
+    ): AppFunctionSchemaMetadata? {
+        val schemaName = document.getPropertyString("schemaName")
+        val schemaCategory = document.getPropertyString("schemaCategory")
+        val schemaVersion = document.getPropertyLong("schemaVersion")
+
+        if (schemaName == null || schemaCategory == null || schemaVersion == 0L) {
+            if (schemaName != null || schemaCategory != null || schemaVersion != 0L) {
+                Log.e(
+                    AppFunctionReader::class.simpleName,
+                    "Unexpected state: schemaName=$schemaName, schemaCategory=$schemaCategory, schemaVersion=$schemaVersion"
+                )
+            }
+            return null
+        }
+
+        return AppFunctionSchemaMetadata(
+            name = schemaName,
+            category = schemaCategory,
+            version = schemaVersion
         )
     }
 
@@ -135,6 +166,8 @@ internal class AppFunctionReader(private val context: Context) {
                 .addFilterPackageNames(SYSTEM_PACKAGE_NAME)
                 .setVerbatimSearchEnabled(true)
                 .setNumericSearchEnabled(true)
+                .setListFilterQueryLanguageEnabled(true)
+                .setListFilterHasPropertyFunctionEnabled(true)
                 .build()
     }
 }

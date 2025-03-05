@@ -54,14 +54,34 @@ constructor(
 
     /** Creates a search query for searching [AppFunctionMetadataDocument] from App Search. */
     internal fun toStaticMetadataAppSearchQuery(): String =
-        // TODO: Add search for schema fields.
-        if (packageNames != null) {
-            check(packageNames.isNotEmpty()) { "Package names cannot be empty at this stage." }
-            "packageName:(${getOrQueryExpression(packageNames)
-            })"
-        } else {
-            ""
-        }
+        buildList<String> {
+                if (packageNames != null) {
+                    check(packageNames.isNotEmpty()) {
+                        "Cannot filter by empty set of package names."
+                    }
+                    add("packageName:(${getOrQueryExpression(packageNames)})")
+                }
+
+                // TODO - Decide what to do with empty strings.
+                // Schema fields need to be searched against top level fields as well for legacy
+                // indexer.
+                if (!schemaName.isNullOrEmpty()) {
+                    add("(schema.schemaName:\"${schemaName}\" OR schemaName:\"${schemaName}\")")
+                }
+
+                if (!schemaCategory.isNullOrEmpty()) {
+                    add(
+                        "(schema.schemaCategory:\"${schemaCategory}\" OR schemaCategory:\"${schemaCategory}\")"
+                    )
+                }
+
+                if (minSchemaVersion > 0) {
+                    add(
+                        "(schema.schemaVersion>=${minSchemaVersion} OR schemaVersion>=${minSchemaVersion})"
+                    )
+                }
+            }
+            .joinToString(" ")
 
     private fun getOrQueryExpression(elements: Set<String>) =
         elements.joinToString(" OR ") { "\"$it\"" }

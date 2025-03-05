@@ -103,7 +103,7 @@
             type="xs:string" />
         <!-- End of legacy properties.-->
 
-        <xs:element name="schemaMetadata" cardinality="2"
+        <xs:element name="schema" cardinality="2"
             shouldIndexNestedProperties="true" type="appfn:AppFunctionSchemaMetadataDocument" />
         <xs:element name="description" cardinality="2" type="xs:string" />
         <xs:element name="parameters" cardinality="1"
