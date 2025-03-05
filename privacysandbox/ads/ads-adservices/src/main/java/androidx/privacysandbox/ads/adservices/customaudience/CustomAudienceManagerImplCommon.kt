@@ -107,9 +107,15 @@ open class CustomAudienceManagerImplCommon(
             .build()
     }
 
+    @SuppressLint("WrongConstant")
     private fun convertCustomAudience(
         request: CustomAudience
     ): android.adservices.customaudience.CustomAudience {
+        if (
+            AdServicesInfo.adServicesVersion() >= 14 || AdServicesInfo.extServicesVersionS() >= 14
+        ) {
+            return Ext14Impl.convertCustomAudience(request)
+        }
         return android.adservices.customaudience.CustomAudience.Builder()
             .setActivationTime(request.activationTime)
             .setAds(convertAds(request.ads))
@@ -170,6 +176,42 @@ open class CustomAudienceManagerImplCommon(
                         }
                     )
                 }
+            }
+
+            fun convertCustomAudience(
+                request: CustomAudience
+            ): android.adservices.customaudience.CustomAudience {
+                return android.adservices.customaudience.CustomAudience.Builder()
+                    .setActivationTime(request.activationTime)
+                    .setAds(convertAds(request.ads))
+                    .setBiddingLogicUri(request.biddingLogicUri)
+                    .setBuyer(request.buyer.convertToAdServices())
+                    .setDailyUpdateUri(request.dailyUpdateUri)
+                    .setExpirationTime(request.expirationTime)
+                    .setName(request.name)
+                    .setTrustedBiddingData(convertTrustedSignals(request.trustedBiddingSignals))
+                    .setUserBiddingSignals(request.userBiddingSignals?.convertToAdServices())
+                    .setAuctionServerRequestFlags(request.auctionServerRequestFlags)
+                    .setPriority(request.priority)
+                    .build()
+            }
+
+            private fun convertAds(input: List<AdData>): List<android.adservices.common.AdData> {
+                val result = mutableListOf<android.adservices.common.AdData>()
+                for (ad in input) {
+                    result.add(ad.convertToAdServices())
+                }
+                return result
+            }
+
+            private fun convertTrustedSignals(
+                input: TrustedBiddingData?
+            ): android.adservices.customaudience.TrustedBiddingData? {
+                if (input == null) return null
+                return android.adservices.customaudience.TrustedBiddingData.Builder()
+                    .setTrustedBiddingKeys(input.trustedBiddingKeys)
+                    .setTrustedBiddingUri(input.trustedBiddingUri)
+                    .build()
             }
         }
     }
