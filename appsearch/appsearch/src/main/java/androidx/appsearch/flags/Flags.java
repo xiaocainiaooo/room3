@@ -226,6 +226,10 @@ public final class Flags {
     public static final String FLAG_ENABLE_RELEASE_BACKUP_SCHEMA_FILE_IF_OVERLAY_PRESENT =
             FLAG_PREFIX + "enable_release_backup_schema_file_if_overlay_present";
 
+    /** Enables retrieving embedding match snippet information. This affects  */
+    public static final String FLAG_ENABLE_EMBEDDING_MATCH_INFO =
+            FLAG_PREFIX + "enable_embedding_match_info";
+
     // Whether the features should be enabled.
     //
     // In Jetpack, those should always return true.
@@ -457,6 +461,13 @@ public final class Flags {
      * instance exists.
      */
     public static boolean enableReleaseBackupSchemaFileIfOverlayPresent() {
+        return true;
+    }
+
+    /**
+     * Whether to enable retrieving embedding match info during snippetting.
+     */
+    public static boolean enableEmbeddingMatchInfo() {
         return true;
     }
 }
