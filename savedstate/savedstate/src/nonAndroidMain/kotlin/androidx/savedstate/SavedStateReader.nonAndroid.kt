@@ -16,7 +16,6 @@
 
 @file:JvmName("SavedStateReaderKt")
 @file:JvmMultifileClass
-@file:Suppress("NOTHING_TO_INLINE")
 
 package androidx.savedstate
 
@@ -28,267 +27,199 @@ import kotlin.jvm.JvmName
 public actual value class SavedStateReader
 @PublishedApi
 internal actual constructor(
-    @PublishedApi internal actual val source: SavedState,
+    private actual val source: SavedState,
 ) {
 
-    public actual inline fun getBoolean(key: String): Boolean {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Boolean ?: valueNotFoundError(key)
+    public actual fun getBoolean(key: String): Boolean {
+        return source.map[key] as? Boolean ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
-        return source.map[key] as? Boolean ?: defaultValue()
+    public actual fun getBooleanOrNull(key: String): Boolean? {
+        return source.map[key] as? Boolean
     }
 
-    public actual inline fun getChar(key: String): Char {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Char ?: valueNotFoundError(key)
+    public actual fun getChar(key: String): Char {
+        return source.map[key] as? Char ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
-        return source.map[key] as? Char ?: defaultValue()
+    public actual fun getCharOrNull(key: String): Char? {
+        return source.map[key] as? Char
     }
 
-    public actual inline fun getCharSequence(key: String): CharSequence {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? CharSequence ?: valueNotFoundError(key)
+    public actual fun getCharSequence(key: String): CharSequence {
+        return source.map[key] as? CharSequence ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getCharSequenceOrElse(
-        key: String,
-        defaultValue: () -> CharSequence
-    ): CharSequence {
-        return source.map[key] as? CharSequence ?: defaultValue()
+    public actual fun getCharSequenceOrNull(key: String): CharSequence? {
+        return source.map[key] as? CharSequence
     }
 
-    public actual inline fun getDouble(key: String): Double {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Double ?: valueNotFoundError(key)
+    public actual fun getDouble(key: String): Double {
+        return source.map[key] as? Double ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
-        return source.map[key] as? Double ?: defaultValue()
+    public actual fun getDoubleOrNull(key: String): Double? {
+        return source.map[key] as? Double
     }
 
-    public actual inline fun getFloat(key: String): Float {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Float ?: valueNotFoundError(key)
+    public actual fun getFloat(key: String): Float {
+        return source.map[key] as? Float ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
-        return source.map[key] as? Float ?: defaultValue()
+    public actual fun getFloatOrNull(key: String): Float? {
+        return source.map[key] as? Float
     }
 
-    public actual inline fun getInt(key: String): Int {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Int ?: valueNotFoundError(key)
+    public actual fun getInt(key: String): Int {
+        return source.map[key] as? Int ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
-        return source.map[key] as? Int ?: defaultValue()
+    public actual fun getIntOrNull(key: String): Int? {
+        return source.map[key] as? Int
     }
 
-    public actual inline fun getLong(key: String): Long {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Long ?: valueNotFoundError(key)
+    public actual fun getLong(key: String): Long {
+        return source.map[key] as? Long ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
-        return source.map[key] as? Long ?: defaultValue()
+    public actual fun getLongOrNull(key: String): Long? {
+        return source.map[key] as? Long
     }
 
-    public actual inline fun getString(key: String): String {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? String ?: valueNotFoundError(key)
+    public actual fun getString(key: String): String {
+        return source.map[key] as? String ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
-        return source.map[key] as? String ?: defaultValue()
+    public actual fun getStringOrNull(key: String): String? {
+        return source.map[key] as? String
     }
 
-    public actual inline fun getCharSequenceList(key: String): List<CharSequence> {
-        if (key !in this) keyNotFoundError(key)
+    public actual fun getCharSequenceList(key: String): List<CharSequence> {
         @Suppress("UNCHECKED_CAST")
-        return source.map[key] as? List<CharSequence> ?: valueNotFoundError(key)
+        return source.map[key] as? List<CharSequence> ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getCharSequenceListOrElse(
-        key: String,
-        defaultValue: () -> List<CharSequence>
-    ): List<CharSequence> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<CharSequence> ?: defaultValue()
+    public actual fun getCharSequenceListOrNull(key: String): List<CharSequence>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<CharSequence>
     }
 
-    public actual inline fun getIntList(key: String): List<Int> {
-        if (key !in this) keyNotFoundError(key)
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int> ?: valueNotFoundError(key)
-    }
-
-    public actual inline fun getIntListOrElse(
-        key: String,
-        defaultValue: () -> List<Int>
-    ): List<Int> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int> ?: defaultValue()
-    }
-
-    public actual inline fun getSavedStateList(key: String): List<SavedState> {
-        if (key !in this) keyNotFoundError(key)
+    public actual fun getIntList(key: String): List<Int> {
         @Suppress("UNCHECKED_CAST")
-        return source.map[key] as? List<SavedState> ?: valueNotFoundError(key)
+        return source.map[key] as? List<Int> ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getSavedStateListOrElse(
-        key: String,
-        defaultValue: () -> List<SavedState>
-    ): List<SavedState> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<SavedState> ?: defaultValue()
+    public actual fun getIntListOrNull(key: String): List<Int>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int>
     }
 
-    public actual inline fun getStringList(key: String): List<String> {
-        if (key !in this) keyNotFoundError(key)
+    public actual fun getSavedStateList(key: String): List<SavedState> {
         @Suppress("UNCHECKED_CAST")
-        return source.map[key] as? List<String> ?: valueNotFoundError(key)
+        return source.map[key] as? List<SavedState> ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getStringListOrElse(
-        key: String,
-        defaultValue: () -> List<String>
-    ): List<String> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<String> ?: defaultValue()
+    public actual fun getSavedStateListOrNull(key: String): List<SavedState>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<SavedState>
     }
 
-    public actual inline fun getCharArray(key: String): CharArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? CharArray ?: valueNotFoundError(key)
-    }
-
-    public actual inline fun getCharArrayOrElse(
-        key: String,
-        defaultValue: () -> CharArray
-    ): CharArray {
-        return source.map[key] as? CharArray ?: defaultValue()
-    }
-
-    public actual inline fun getCharSequenceArray(key: String): Array<CharSequence> {
-        if (key !in this) keyNotFoundError(key)
+    public actual fun getStringList(key: String): List<String> {
         @Suppress("UNCHECKED_CAST")
-        return source.map[key] as? Array<CharSequence> ?: valueNotFoundError(key)
+        return source.map[key] as? List<String> ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getCharSequenceArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<CharSequence>
-    ): Array<CharSequence> {
-        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<CharSequence> ?: defaultValue()
+    public actual fun getStringListOrNull(key: String): List<String>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<String>
     }
 
-    public actual inline fun getBooleanArray(key: String): BooleanArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? BooleanArray ?: valueNotFoundError(key)
+    public actual fun getCharArray(key: String): CharArray {
+        return source.map[key] as? CharArray ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getBooleanArrayOrElse(
-        key: String,
-        defaultValue: () -> BooleanArray
-    ): BooleanArray {
-        return source.map[key] as? BooleanArray ?: defaultValue()
+    public actual fun getCharArrayOrNull(key: String): CharArray? {
+        return source.map[key] as? CharArray
     }
 
-    public actual inline fun getDoubleArray(key: String): DoubleArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? DoubleArray ?: valueNotFoundError(key)
+    public actual fun getCharSequenceArray(key: String): Array<CharSequence> {
+        @Suppress("UNCHECKED_CAST")
+        return source.map[key] as? Array<CharSequence> ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getDoubleArrayOrElse(
-        key: String,
-        defaultValue: () -> DoubleArray,
-    ): DoubleArray {
-        return source.map[key] as? DoubleArray ?: defaultValue()
+    public actual fun getCharSequenceArrayOrNull(key: String): Array<CharSequence>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<CharSequence>
     }
 
-    public actual inline fun getFloatArray(key: String): FloatArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? FloatArray ?: valueNotFoundError(key)
+    public actual fun getBooleanArray(key: String): BooleanArray {
+        return source.map[key] as? BooleanArray ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getFloatArrayOrElse(
-        key: String,
-        defaultValue: () -> FloatArray
-    ): FloatArray {
-        return source.map[key] as? FloatArray ?: defaultValue()
+    public actual fun getBooleanArrayOrNull(key: String): BooleanArray? {
+        return source.map[key] as? BooleanArray
     }
 
-    public actual inline fun getIntArray(key: String): IntArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? IntArray ?: valueNotFoundError(key)
+    public actual fun getDoubleArray(key: String): DoubleArray {
+        return source.map[key] as? DoubleArray ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getIntArrayOrElse(
-        key: String,
-        defaultValue: () -> IntArray
-    ): IntArray {
-        return source.map[key] as? IntArray ?: defaultValue()
+    public actual fun getDoubleArrayOrNull(key: String): DoubleArray? {
+        return source.map[key] as? DoubleArray
     }
 
-    public actual inline fun getLongArray(key: String): LongArray {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? LongArray ?: valueNotFoundError(key)
+    public actual fun getFloatArray(key: String): FloatArray {
+        return source.map[key] as? FloatArray ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getLongArrayOrElse(
-        key: String,
-        defaultValue: () -> LongArray
-    ): LongArray {
-        return source.map[key] as? LongArray ?: defaultValue()
+    public actual fun getFloatArrayOrNull(key: String): FloatArray? {
+        return source.map[key] as? FloatArray
+    }
+
+    public actual fun getIntArray(key: String): IntArray {
+        return source.map[key] as? IntArray ?: keyOrValueNotFoundError(key)
+    }
+
+    public actual fun getIntArrayOrNull(key: String): IntArray? {
+        return source.map[key] as? IntArray
+    }
+
+    public actual fun getLongArray(key: String): LongArray {
+        return source.map[key] as? LongArray ?: keyOrValueNotFoundError(key)
+    }
+
+    public actual fun getLongArrayOrNull(key: String): LongArray? {
+        return source.map[key] as? LongArray
     }
 
     @Suppress("UNCHECKED_CAST")
-    public actual inline fun getSavedStateArray(key: String): Array<SavedState> {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Array<SavedState> ?: valueNotFoundError(key)
+    public actual fun getSavedStateArray(key: String): Array<SavedState> {
+        return source.map[key] as? Array<SavedState> ?: keyOrValueNotFoundError(key)
+    }
+
+    public actual fun getSavedStateArrayOrNull(key: String): Array<SavedState>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<SavedState>
     }
 
     @Suppress("UNCHECKED_CAST")
-    public actual inline fun getSavedStateArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<SavedState>
-    ): Array<SavedState> {
-        return source.map[key] as? Array<SavedState> ?: defaultValue()
+    public actual fun getStringArray(key: String): Array<String> {
+        return source.map[key] as? Array<String> ?: keyOrValueNotFoundError(key)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    public actual inline fun getStringArray(key: String): Array<String> {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? Array<String> ?: valueNotFoundError(key)
+    public actual fun getStringArrayOrNull(key: String): Array<String>? {
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<String>
     }
 
-    @Suppress("UNCHECKED_CAST")
-    public actual inline fun getStringArrayOrElse(
-        key: String,
-        defaultValue: () -> Array<String>
-    ): Array<String> {
-        return source.map[key] as? Array<String> ?: defaultValue()
+    public actual fun getSavedState(key: String): SavedState {
+        return source.map[key] as? SavedState ?: keyOrValueNotFoundError(key)
     }
 
-    public actual inline fun getSavedState(key: String): SavedState {
-        if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? SavedState ?: valueNotFoundError(key)
+    public actual fun getSavedStateOrNull(key: String): SavedState? {
+        return source.map[key] as? SavedState
     }
 
-    public actual inline fun getSavedStateOrElse(
-        key: String,
-        defaultValue: () -> SavedState
-    ): SavedState {
-        return source.map[key] as? SavedState ?: defaultValue()
-    }
+    public actual fun size(): Int = source.map.size
 
-    public actual inline fun size(): Int = source.map.size
+    public actual fun isEmpty(): Boolean = source.map.isEmpty()
 
-    public actual inline fun isEmpty(): Boolean = source.map.isEmpty()
+    public actual fun isNull(key: String): Boolean = contains(key) && source.map[key] == null
 
-    public actual inline fun isNull(key: String): Boolean = contains(key) && source.map[key] == null
-
-    public actual inline operator fun contains(key: String): Boolean = source.map.containsKey(key)
+    public actual operator fun contains(key: String): Boolean = source.map.containsKey(key)
 
     public actual fun contentDeepEquals(other: SavedState): Boolean =
         source.contentDeepEquals(other)
