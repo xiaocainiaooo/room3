@@ -108,19 +108,30 @@ public class BiometricManager {
     public static final int BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE = 20;
 
     /**
+     * Biometrics is not allowed to verify the user in apps. It's for internal use only. This
+     * error code, introduced in API 35, was previously covered by ERROR_HW_UNAVAILABLE and
+     * doesn't need to be public. Therefore, for backward compatibility, this error will be
+     * converted to BIOMETRIC_ERROR_HW_UNAVAILABLE.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int BIOMETRIC_ERROR_NOT_ENABLED_FOR_APPS = 21;
+
+    /**
      * A status code that may be returned when checking for biometric authentication.
      */
     @IntDef({
-        BIOMETRIC_SUCCESS,
-        BIOMETRIC_STATUS_UNKNOWN,
-        BIOMETRIC_ERROR_UNSUPPORTED,
-        BIOMETRIC_ERROR_HW_UNAVAILABLE,
-        BIOMETRIC_ERROR_NONE_ENROLLED,
-        BIOMETRIC_ERROR_NO_HARDWARE,
-        BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED
+            BIOMETRIC_SUCCESS,
+            BIOMETRIC_STATUS_UNKNOWN,
+            BIOMETRIC_ERROR_UNSUPPORTED,
+            BIOMETRIC_ERROR_HW_UNAVAILABLE,
+            BIOMETRIC_ERROR_NONE_ENROLLED,
+            BIOMETRIC_ERROR_NO_HARDWARE,
+            BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED,
+            BIOMETRIC_ERROR_NOT_ENABLED_FOR_APPS
     })
     @Retention(RetentionPolicy.SOURCE)
-    @interface AuthenticationStatus {}
+    @interface AuthenticationStatus {
+    }
 
     /**
      * Types of authenticators, defined at a level of granularity supported by
@@ -753,7 +764,11 @@ public class BiometricManager {
                 Log.e(TAG, "Failure in canAuthenticate(). BiometricManager was null.");
                 return BIOMETRIC_ERROR_HW_UNAVAILABLE;
             }
-            return Api30Impl.canAuthenticate(mBiometricManager, authenticators);
+            final int canAuthenticate = Api30Impl.canAuthenticate(mBiometricManager,
+                    authenticators);
+            // Convert BIOMETRIC_ERROR_NOT_ENABLED_FOR_APPS to BIOMETRIC_ERROR_HW_UNAVAILABLE
+            return (canAuthenticate == BIOMETRIC_ERROR_NOT_ENABLED_FOR_APPS)
+                    ? BIOMETRIC_ERROR_HW_UNAVAILABLE : canAuthenticate;
         }
         return canAuthenticateCompat(authenticators);
     }
