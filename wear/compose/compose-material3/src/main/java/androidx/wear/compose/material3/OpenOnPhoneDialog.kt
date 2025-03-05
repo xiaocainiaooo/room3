@@ -51,9 +51,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.wear.compose.foundation.CurvedDirection
 import androidx.wear.compose.foundation.CurvedLayout
@@ -284,7 +287,13 @@ public object OpenOnPhoneDialogDefaults {
 
     /** The default style for curved text content. */
     public val curvedTextStyle: CurvedTextStyle
-        @Composable get() = CurvedTextStyle(MaterialTheme.typography.titleLarge)
+        @Composable
+        get() =
+            MaterialTheme.typography.arcLarge.copy(
+                fontSize = CurvedTextFontSize,
+                letterSpacing = CurvedTextLetterSpacing,
+                fontWeight = FontWeight.Medium,
+            )
 
     /** The default message for an [OpenOnPhoneDialog]. */
     public val text: String
@@ -498,3 +507,6 @@ private const val HeightPaddingFraction = 0.157f
 private const val SizeFraction = 1 - WidthPaddingFraction * 2
 private val progressIndicatorStrokeWidth = 5.dp
 private val progressIndicatorPadding = 5.dp
+
+private val CurvedTextFontSize: TextUnit = 18.sp
+private val CurvedTextLetterSpacing: TextUnit = 1.8f.sp
