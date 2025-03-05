@@ -90,11 +90,11 @@ class PagerTest {
                 modifier = Modifier.testTag(pagerTestTag),
                 gestureInclusion =
                     object : GestureInclusion {
-                        override fun allowGesture(
+                        override fun ignoreGestureStart(
                             offset: Offset,
                             layoutCoordinates: LayoutCoordinates
                         ): Boolean {
-                            return true
+                            return false
                         }
                     },
                 // disable swipe to dismiss as it conflicts with swipeRight()
@@ -138,13 +138,14 @@ class PagerTest {
                 modifier = Modifier.testTag(pagerTestTag),
                 gestureInclusion =
                     object : GestureInclusion {
-                        override fun allowGesture(
+                        override fun ignoreGestureStart(
                             offset: Offset,
                             layoutCoordinates: LayoutCoordinates
                         ): Boolean {
                             val screenOffset = layoutCoordinates.localToScreen(offset)
                             val screenWidth = layoutCoordinates.findRootCoordinates().size.width
-                            return screenOffset.x > screenWidth * PagerDefaults.LeftEdgeZoneFraction
+                            return screenOffset.x <=
+                                screenWidth * PagerDefaults.LeftEdgeZoneFraction
                         }
                     },
                 // enable swipe to dismiss on each page
@@ -323,10 +324,10 @@ class PagerTest {
             lowRes = false,
             userScrollEnabled = true,
             rotaryScrollableBehavior = { RotaryScrollableDefaults.snapBehavior(it) },
-            rotaryScrollInput = { pagerState ->
+            rotaryScrollInput = { state ->
                 for (i in 0..1) {
                     rotateToScrollVertically(
-                        pagerState.layoutInfo.pageSize.toFloat() /
+                        state.pagerState.layoutInfo.pageSize.toFloat() /
                             RotarySnapSensitivity.HIGH.minThresholdDivider + 1
                     )
                     advanceEventTime(100)
@@ -360,9 +361,9 @@ class PagerTest {
             lowRes = false,
             userScrollEnabled = false,
             rotaryScrollableBehavior = { RotaryScrollableDefaults.snapBehavior(it) },
-            rotaryScrollInput = { pagerState ->
+            rotaryScrollInput = { state ->
                 rotateToScrollVertically(
-                    pagerState.layoutInfo.pageSize.toFloat() /
+                    state.pagerState.layoutInfo.pageSize.toFloat() /
                         RotarySnapSensitivity.HIGH.minThresholdDivider + 1
                 )
             },
@@ -377,9 +378,9 @@ class PagerTest {
             lowRes = false,
             userScrollEnabled = true,
             rotaryScrollableBehavior = { null },
-            rotaryScrollInput = { pagerState ->
+            rotaryScrollInput = { state ->
                 rotateToScrollVertically(
-                    pagerState.layoutInfo.pageSize.toFloat() /
+                    state.pagerState.layoutInfo.pageSize.toFloat() /
                         RotarySnapSensitivity.HIGH.minThresholdDivider + 1
                 )
             },
@@ -394,10 +395,10 @@ class PagerTest {
             lowRes = false,
             userScrollEnabled = true,
             rotaryScrollableBehavior = { RotaryScrollableDefaults.snapBehavior(it) },
-            rotaryScrollInput = { pagerState ->
+            rotaryScrollInput = { state ->
                 for (i in 0..1) {
                     rotateToScrollVertically(
-                        pagerState.layoutInfo.pageSize.toFloat() /
+                        state.pagerState.layoutInfo.pageSize.toFloat() /
                             RotarySnapSensitivity.HIGH.minThresholdDivider + 1
                     )
                     advanceEventTime(100)
@@ -431,9 +432,9 @@ class PagerTest {
             lowRes = false,
             userScrollEnabled = false,
             rotaryScrollableBehavior = { RotaryScrollableDefaults.snapBehavior(it) },
-            rotaryScrollInput = { pagerState ->
+            rotaryScrollInput = { state ->
                 rotateToScrollVertically(
-                    pagerState.layoutInfo.pageSize.toFloat() /
+                    state.pagerState.layoutInfo.pageSize.toFloat() /
                         RotarySnapSensitivity.HIGH.minThresholdDivider + 1
                 )
             },
@@ -448,9 +449,9 @@ class PagerTest {
             lowRes = false,
             userScrollEnabled = true,
             rotaryScrollableBehavior = { null },
-            rotaryScrollInput = { pagerState ->
+            rotaryScrollInput = { state ->
                 rotateToScrollVertically(
-                    pagerState.layoutInfo.pageSize.toFloat() /
+                    state.pagerState.layoutInfo.pageSize.toFloat() /
                         RotarySnapSensitivity.HIGH.minThresholdDivider + 1
                 )
             },
@@ -491,18 +492,18 @@ class PagerTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun content_in_horizontalPager_not_rotary_scrolled_with_rotaryScrollableBehavior() {
-        lateinit var pagerState: PagerState
+        lateinit var state: PagerState
         val pageCount = 5
         lateinit var lcStates: MutableList<LazyListState>
 
         rule.setContent {
-            pagerState = rememberPagerState { pageCount }
+            state = rememberPagerState { pageCount }
             lcStates = MutableList(pageCount) { rememberLazyListState() }
             MockRotaryResolution(lowRes = false) {
                 HorizontalPager(
                     modifier = Modifier.testTag(pagerTestTag).size(100.dp),
-                    state = pagerState,
-                    rotaryScrollableBehavior = RotaryScrollableDefaults.snapBehavior(pagerState)
+                    state = state,
+                    rotaryScrollableBehavior = RotaryScrollableDefaults.snapBehavior(state)
                 ) { page ->
                     DefaultLazyColumn(lcStates[page])
                 }
@@ -511,13 +512,13 @@ class PagerTest {
 
         rule.onNodeWithTag(pagerTestTag).performRotaryScrollInput {
             rotateToScrollVertically(
-                pagerState.layoutInfo.pageSize.toFloat() /
+                state.pagerState.layoutInfo.pageSize.toFloat() /
                     RotarySnapSensitivity.HIGH.minThresholdDivider + 1
             )
         }
 
         // We expect HorizontalPager to be scrolled by 1 page.
-        rule.runOnIdle { Assert.assertEquals(1, pagerState.currentPage) }
+        rule.runOnIdle { Assert.assertEquals(1, state.currentPage) }
         // At the same time LazyColumns shouldn't be scrolled.
         for (lcState in lcStates) {
             rule.runOnIdle { Assert.assertEquals(0, lcState.firstVisibleItemIndex) }
@@ -558,18 +559,18 @@ class PagerTest {
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun content_in_verticalPager_not_rotary_scrolled_with_rotaryScrollableBehavior() {
-        lateinit var pagerState: PagerState
+        lateinit var state: PagerState
         val pageCount = 5
         lateinit var lcStates: MutableList<LazyListState>
 
         rule.setContent {
-            pagerState = rememberPagerState { pageCount }
+            state = rememberPagerState { pageCount }
             lcStates = MutableList(pageCount) { rememberLazyListState() }
             MockRotaryResolution(lowRes = false) {
                 HorizontalPager(
                     modifier = Modifier.testTag(pagerTestTag).size(100.dp),
-                    state = pagerState,
-                    rotaryScrollableBehavior = RotaryScrollableDefaults.snapBehavior(pagerState)
+                    state = state,
+                    rotaryScrollableBehavior = RotaryScrollableDefaults.snapBehavior(state)
                 ) { page ->
                     DefaultLazyColumn(lcStates[page])
                 }
@@ -578,13 +579,13 @@ class PagerTest {
 
         rule.onNodeWithTag(pagerTestTag).performRotaryScrollInput {
             rotateToScrollVertically(
-                pagerState.layoutInfo.pageSize.toFloat() /
+                state.pagerState.layoutInfo.pageSize.toFloat() /
                     RotarySnapSensitivity.HIGH.minThresholdDivider + 1
             )
         }
 
         // We expect VerticalPager to be scrolled by 1 page.
-        rule.runOnIdle { Assert.assertEquals(1, pagerState.currentPage) }
+        rule.runOnIdle { Assert.assertEquals(1, state.currentPage) }
         // At the same time LazyColumns shouldn't be scrolled.
         for (lcState in lcStates) {
             rule.runOnIdle { Assert.assertEquals(0, lcState.firstVisibleItemIndex) }

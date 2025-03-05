@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.HierarchicalFocusCoordinator
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
-import androidx.wear.compose.foundation.pager.rememberPagerState
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
@@ -50,7 +49,7 @@ import androidx.wear.compose.material.Text
 @Composable
 public fun NestedScrollPagerDemo() {
     // Creates a 3-pager vertical pager with nested scroll
-    val state = rememberPagerState(initialPage = 1) { 3 }
+    val state = androidx.compose.foundation.pager.rememberPagerState(initialPage = 1) { 3 }
     androidx.compose.foundation.pager.VerticalPager(
         state = state,
         modifier = Modifier.fillMaxSize(),

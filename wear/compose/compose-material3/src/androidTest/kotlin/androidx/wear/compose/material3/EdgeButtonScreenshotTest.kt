@@ -86,11 +86,11 @@ class EdgeButtonScreenshotTest {
                 modifier = Modifier.testTag("Pager"),
                 gestureInclusion =
                     object : GestureInclusion {
-                        override fun allowGesture(
+                        override fun ignoreGestureStart(
                             offset: Offset,
                             layoutCoordinates: LayoutCoordinates
                         ): Boolean {
-                            return true
+                            return false
                         }
                     },
                 // disable swipe to dismiss

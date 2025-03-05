@@ -86,7 +86,7 @@ import kotlinx.coroutines.coroutineScope
  * @param gestureInclusion When userScrollEnabled=true, this function provides more fine-grained
  *   control so that touch gestures can be excluded when they start in a certain region. An instance
  *   of [GestureInclusion] can be passed in here which will determine via
- *   [GestureInclusion.allowGesture] whether the gesture should proceed or not. By default,
+ *   [GestureInclusion.ignoreGestureStart] whether the gesture should proceed or not. By default,
  *   [gestureInclusion] allows gestures everywhere except a zone on the left edge of the first page,
  *   which is used for swipe-to-dismiss (see [PagerDefaults.gestureInclusion]).
  * @param reverseLayout reverse the direction of scrolling and layout.
@@ -129,7 +129,7 @@ public fun HorizontalPager(
             else Modifier
 
         HorizontalPager(
-            state = state,
+            state = state.pagerState,
             modifier =
                 modifier
                     .onPlaced { layoutCoordinates -> pagerCoordinates = layoutCoordinates }
@@ -145,7 +145,7 @@ public fun HorizontalPager(
                                 val firstDown = awaitFirstDown(false, PointerEventPass.Initial)
 
                                 allowPaging =
-                                    gestureInclusion.allowGesture(
+                                    !gestureInclusion.ignoreGestureStart(
                                         firstDown.position,
                                         pagerCoordinates!!
                                     )
@@ -250,7 +250,7 @@ public fun VerticalPager(
         else Modifier
 
     VerticalPager(
-        state = state,
+        state = state.pagerState,
         modifier = modifier.then(rotaryModifier),
         contentPadding = contentPadding,
         pageSize = PageSize.Fill,
@@ -273,42 +273,41 @@ public fun VerticalPager(
 /** Contains the default values used by [Pager]. These are optimised for Wear. */
 public object PagerDefaults {
     /**
-     * The default behaviour for when [HorizontalPager] should consume gestures. In this
+     * The default behaviour for when [HorizontalPager] should handle gestures. In this
      * implementation of [gestureInclusion], scroll events that originate in the left edge of the
      * first page of the Pager (as determined by [LeftEdgeZoneFraction]) will be ignored. This
      * allows swipe-to-dismiss handlers (if present) to handle the gesture in this region. However
-     * if talkback is enabled then the Pager will always consume gestures, never allowing swipe to
+     * if talkback is enabled then the Pager will always handle gestures, never allowing swipe to
      * dismiss handlers to take over.
      *
-     * @param pagerState The state of the [HorizontalPager]. Used to determine the current page.
+     * @param state The state of the [HorizontalPager]. Used to determine the current page.
      * @param edgeZoneFraction The fraction of the screen width from the left edge where gestures
      *   should be ignored on the first page. Defaults to [LeftEdgeZoneFraction].
      */
     @Composable
     public fun gestureInclusion(
-        pagerState: PagerState,
+        state: PagerState,
         edgeZoneFraction: Float = LeftEdgeZoneFraction
     ): GestureInclusion {
         val touchExplorationStateProvider = remember { DefaultTouchExplorationStateProvider() }
         val touchExplorationServicesEnabled by touchExplorationStateProvider.touchExplorationState()
 
-        return remember(pagerState, touchExplorationServicesEnabled, edgeZoneFraction) {
+        return remember(state, touchExplorationServicesEnabled, edgeZoneFraction) {
             object : GestureInclusion {
-                override fun allowGesture(
+                override fun ignoreGestureStart(
                     offset: Offset,
                     layoutCoordinates: LayoutCoordinates
                 ): Boolean {
-                    if (touchExplorationServicesEnabled || pagerState.currentPage != 0) {
-                        return true
+                    if (touchExplorationServicesEnabled || state.currentPage != 0) {
+                        return false
                     }
 
                     // On Page 0 - only allow gestures to be consumed by Pager if they are on the
-                    // right
-                    // of edgeZoneFraction, gestures to the left of this can be consumed by swipe to
-                    // dismiss handlers
+                    // right of edgeZoneFraction, gestures to the left of this can be ignored and
+                    // handled by swipe to dismiss handlers
                     val screenOffset = layoutCoordinates.localToScreen(offset)
                     val screenWidth = layoutCoordinates.findRootCoordinates().size.width
-                    return screenOffset.x > screenWidth * edgeZoneFraction
+                    return screenOffset.x <= screenWidth * edgeZoneFraction
                 }
             }
         }
@@ -349,7 +348,7 @@ public object PagerDefaults {
         @FloatRange(from = 0.0, to = 1.0) snapPositionalThreshold: Float = 0.5f
     ): TargetedFlingBehavior {
         return ComposePagerDefaults.flingBehavior(
-            state = state,
+            state = state.pagerState,
             pagerSnapDistance = ComposePagerSnapDistance.atMost(maxFlingPages),
             decayAnimationSpec = decayAnimationSpec,
             snapAnimationSpec = snapAnimationSpec,

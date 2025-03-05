@@ -38,8 +38,6 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.SwipeToRevealDefaults.allowAllGestures
-import androidx.wear.compose.foundation.SwipeToRevealDefaults.ignoreLeftEdge
 import junit.framework.TestCase.assertEquals
 import kotlin.test.assertFalse
 import kotlinx.coroutines.launch
@@ -543,9 +541,9 @@ class SwipeToRevealTest {
             onFullSwipe = onFullSwipe,
             gestureInclusion =
                 if (edgeSwipeEnabled) {
-                    allowAllGestures()
+                    SwipeToRevealDefaults.bidirectionalGestureInclusion()
                 } else {
-                    ignoreLeftEdge()
+                    SwipeToRevealDefaults.gestureInclusion()
                 },
             content = content
         )
