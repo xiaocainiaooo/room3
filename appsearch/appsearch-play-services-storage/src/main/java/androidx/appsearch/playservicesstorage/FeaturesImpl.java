@@ -105,6 +105,10 @@ final class FeaturesImpl implements Features {
             case Features.INDEXER_MOBILE_APPLICATIONS:
                 // TODO(b/275592563) : Update once this features is supported.
                 // fall through
+            case Features.SEARCH_EMBEDDING_MATCH_INFO:
+                // TODO(b/395128139) : Update once this features is supported.
+                // fall through
+
             default:
                 return false; // AppSearch features absent in GMSCore AppSearch.
         }
