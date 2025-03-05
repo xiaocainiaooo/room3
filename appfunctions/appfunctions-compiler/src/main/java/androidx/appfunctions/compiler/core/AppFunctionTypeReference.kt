@@ -21,6 +21,7 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionS
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.PRIMITIVE_SINGULAR
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_LIST
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_SINGULAR
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.TypeName
@@ -120,6 +121,42 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
                 isAppFunctionSerializableListType(typeReferenceArgument)
         }
 
+        /**
+         * Converts a type reference to an AppFunction data type.
+         *
+         * @return The AppFunction data type.
+         * @throws ProcessingException If the type reference is not a supported type.
+         */
+        fun KSTypeReference.toAppFunctionDatatype(): Int {
+            return when (this.toTypeName().ignoreNullable().toString()) {
+                String::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_STRING
+                Int::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_INT
+                Long::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_LONG
+                Float::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_FLOAT
+                Double::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_DOUBLE
+                Boolean::class.ensureQualifiedName() ->
+                    AppFunctionPrimitiveTypeMetadata.TYPE_BOOLEAN
+                Unit::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_UNIT
+                Byte::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_BYTES
+                IntArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_INT
+                LongArray::class.ensureQualifiedName() -> AppFunctionPrimitiveTypeMetadata.TYPE_LONG
+                FloatArray::class.ensureQualifiedName() ->
+                    AppFunctionPrimitiveTypeMetadata.TYPE_FLOAT
+                DoubleArray::class.ensureQualifiedName() ->
+                    AppFunctionPrimitiveTypeMetadata.TYPE_DOUBLE
+                BooleanArray::class.ensureQualifiedName() ->
+                    AppFunctionPrimitiveTypeMetadata.TYPE_BOOLEAN
+                ByteArray::class.ensureQualifiedName() ->
+                    AppFunctionPrimitiveTypeMetadata.TYPE_BYTES
+                ANDROID_PENDING_INTENT -> AppFunctionPrimitiveTypeMetadata.TYPE_PENDING_INTENT
+                else ->
+                    throw ProcessingException(
+                        "Unsupported type reference " + this.ensureQualifiedTypeName().asString(),
+                        this,
+                    )
+            }
+        }
+
         private fun isSupportedPrimitiveListType(typeReferenceArgument: KSTypeReference) =
             typeReferenceArgument.isOfType(LIST) &&
                 typeReferenceArgument
@@ -149,6 +186,9 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
         private fun KSTypeReference.asStringWithoutNullQualifier(): String =
             toTypeName().ignoreNullable().toString()
 
+        // Android Only primitives
+        private const val ANDROID_PENDING_INTENT = "android.app.PendingIntent"
+
         private val SUPPORTED_ARRAY_PRIMITIVE_TYPES =
             setOf(
                 IntArray::class.ensureQualifiedName(),
@@ -168,6 +208,7 @@ class AppFunctionTypeReference(val selfTypeReference: KSTypeReference) {
                 Boolean::class.ensureQualifiedName(),
                 String::class.ensureQualifiedName(),
                 Unit::class.ensureQualifiedName(),
+                ANDROID_PENDING_INTENT
             )
 
         private val SUPPORTED_PRIMITIVE_TYPES_IN_LIST = setOf(String::class.ensureQualifiedName())
