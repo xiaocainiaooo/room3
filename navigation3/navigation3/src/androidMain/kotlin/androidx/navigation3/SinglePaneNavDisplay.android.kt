@@ -101,7 +101,7 @@ public object SinglePaneNavDisplay {
 public fun <T : Any> SinglePaneNavDisplay(
     backStack: List<T>,
     modifier: Modifier = Modifier,
-    localProviders: List<NavLocalProvider> = listOf(SaveableStateNavLocalProvider()),
+    localProviders: List<NavLocalProvider> = listOf(SaveableStateNavLocalProvider),
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
     enterTransition: EnterTransition =

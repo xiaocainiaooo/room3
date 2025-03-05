@@ -33,7 +33,7 @@ import kotlin.collections.LinkedHashSet
  * This [NavLocalProvider] is the only one that is **required** as saving state is considered a
  * non-optional feature.
  */
-public class SaveableStateNavLocalProvider : NavLocalProvider {
+public object SaveableStateNavLocalProvider : NavLocalProvider {
 
     @Composable
     override fun ProvideToBackStack(backStack: List<Any>, content: @Composable () -> Unit) {
