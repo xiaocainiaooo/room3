@@ -16,8 +16,10 @@
 
 package androidx.biometric;
 
+import static androidx.biometric.BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE;
 import static androidx.biometric.BiometricManager.BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE;
 import static androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED;
+import static androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NOT_ENABLED_FOR_APPS;
 import static androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
 import static androidx.biometric.BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED;
 import static androidx.biometric.BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
@@ -649,6 +651,31 @@ public class BiometricManagerTest {
 
         assertThat(biometricManager.canAuthenticate(authenticators)).isEqualTo(BIOMETRIC_SUCCESS);
     }
+
+    @Test
+    @Config(minSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    public void testCanAuthenticate_ReturnsHardwareError_ForNotEnabledForApps_OnApi35AndAbove() {
+        final android.hardware.biometrics.BiometricManager frameworkBiometricManager =
+                mock(android.hardware.biometrics.BiometricManager.class);
+        when(frameworkBiometricManager.canAuthenticate()).thenReturn(
+                BIOMETRIC_ERROR_NOT_ENABLED_FOR_APPS);
+        when(mFingerprintManager.isHardwareDetected()).thenReturn(true);
+        when(mFingerprintManager.hasEnrolledFingerprints()).thenReturn(true);
+
+        final BiometricManager biometricManager = new BiometricManager(
+                new TestInjector.Builder(mContext)
+                        .setFingerprintManager(mFingerprintManager)
+                        .setDeviceSecurable(true)
+                        .setDeviceSecuredWithCredential(true)
+                        .setFingerprintHardwarePresent(true)
+                        .build());
+
+        final int authenticators = Authenticators.BIOMETRIC_WEAK;
+        assertThat(biometricManager.canAuthenticate(authenticators)).isEqualTo(
+                BIOMETRIC_ERROR_HW_UNAVAILABLE);
+    }
+
 
     @Test
     @Config(minSdk = Build.VERSION_CODES.S)
