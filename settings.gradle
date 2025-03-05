@@ -1272,21 +1272,6 @@ includeProject(":kruth:kruth", [BuildType.MAIN, BuildType.INFRAROGUE, BuildType.
 
 /////////////////////////////
 //
-// Applications and libraries for tests
-//
-/////////////////////////////
-includeProject(":media:version-compat-tests:client",
-        "media/version-compat-tests/current/client", [BuildType.MAIN, BuildType.MEDIA])
-includeProject(":media:version-compat-tests:client-previous",
-        "media/version-compat-tests/previous/client", [BuildType.MAIN, BuildType.MEDIA])
-includeProject(":media:version-compat-tests:service",
-        "media/version-compat-tests/current/service", [BuildType.MAIN, BuildType.MEDIA])
-includeProject(":media:version-compat-tests:service-previous",
-        "media/version-compat-tests/previous/service", [BuildType.MAIN, BuildType.MEDIA])
-includeProject(":media:version-compat-tests:lib", [BuildType.MAIN, BuildType.MEDIA])
-
-/////////////////////////////
-//
 // External
 //
 /////////////////////////////
