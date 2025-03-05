@@ -26,6 +26,7 @@ import androidx.privacysandbox.ads.adservices.common.AdSelectionSignals
 import androidx.privacysandbox.ads.adservices.common.AdTechIdentifier
 import androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures
 import androidx.privacysandbox.ads.adservices.customaudience.CustomAudience
+import androidx.privacysandbox.ads.adservices.customaudience.CustomAudience.Companion.FLAG_AUCTION_SERVER_REQUEST_OMIT_ADS
 import androidx.privacysandbox.ads.adservices.customaudience.FetchAndJoinCustomAudienceRequest
 import androidx.privacysandbox.ads.adservices.customaudience.JoinCustomAudienceRequest
 import androidx.privacysandbox.ads.adservices.customaudience.LeaveCustomAudienceRequest
@@ -227,6 +228,87 @@ class CustomAudienceManagerFuturesTest {
     }
 
     @Test
+    fun testJoinCustomAudienceWithPriorityAndAuctionServerRequestFlag() {
+        Assume.assumeTrue(
+            "minSdkVersion = API 33 ext 14 or API 31/32 ext 14",
+            VersionCompatUtil.isTestableVersion(
+                /* minAdServicesVersion= */ 14,
+                /* minExtServicesVersion=*/ 14
+            )
+        )
+
+        val customAudienceManager =
+            mockCustomAudienceManager(mContext, mValidAdExtServicesSdkExtVersion)
+        setupResponse(customAudienceManager)
+        val managerCompat = from(mContext)
+
+        // Actually invoke the compat code.
+        val customAudience =
+            CustomAudience.Builder(buyer, name, uri, uri, ads)
+                .setActivationTime(Instant.now())
+                .setExpirationTime(Instant.now())
+                .setUserBiddingSignals(userBiddingSignals)
+                .setTrustedBiddingData(trustedBiddingSignals)
+                .setPriority(priority)
+                .setAuctionServerRequestFlags(FLAG_AUCTION_SERVER_REQUEST_OMIT_ADS)
+                .build()
+        val request = JoinCustomAudienceRequest(customAudience)
+        managerCompat!!.joinCustomAudienceAsync(request).get()
+
+        // Verify that the compat code was invoked correctly.
+        val captor =
+            ArgumentCaptor.forClass(
+                android.adservices.customaudience.JoinCustomAudienceRequest::class.java
+            )
+        verify(customAudienceManager).joinCustomAudience(captor.capture(), any(), any())
+
+        // Verify that the request that the compat code makes to the platform is correct.
+        verifyJoinCustomAudienceRequestWithPriorityAndAuctionServerFlag(captor.value)
+    }
+
+    @Test
+    fun testJoinCAWithPriorityAndAuctionServerFlagDoesNotThrowExceptionForOlderVersion() {
+        /* Make sure JoinCustomAudience API is available. */
+        Assume.assumeTrue(
+            "minSdkVersion = API 33 ext 4 or API 31/32 ext 9",
+            VersionCompatUtil.isTestableVersion(
+                /* minAdServicesVersion= */ 4,
+                /* minExtServicesVersion=*/ 9
+            )
+        )
+
+        /* Make sure priority and auction server flag field is not available. */
+        Assume.assumeFalse(
+            "maxSdkVersion = API 31-34 ext 13",
+            VersionCompatUtil.isTestableVersion(
+                /* minAdServicesVersion=*/ 14,
+                /* minExtServicesVersion=*/ 14
+            )
+        )
+
+        val customAudienceManager =
+            mockCustomAudienceManager(mContext, mValidAdExtServicesSdkExtVersion)
+        setupResponse(customAudienceManager)
+        val managerCompat = from(mContext)
+
+        // Actually invoke the compat code.
+        val customAudience =
+            CustomAudience.Builder(buyer, name, uri, uri, ads)
+                .setActivationTime(Instant.now())
+                .setExpirationTime(Instant.now())
+                .setUserBiddingSignals(userBiddingSignals)
+                .setTrustedBiddingData(trustedBiddingSignals)
+                .setPriority(priority)
+                .setAuctionServerRequestFlags(FLAG_AUCTION_SERVER_REQUEST_OMIT_ADS)
+                .build()
+        val request = JoinCustomAudienceRequest(customAudience)
+
+        // If this does not throw an exception, it means that priority and auction field were
+        // handled properly and setters were not invoked.
+        managerCompat!!.joinCustomAudienceAsync(request).get()
+    }
+
+    @Test
     fun testFetchAndJoinCustomAudience() {
         Assume.assumeTrue(
             "minSdkVersion = API 31 ext 10",
@@ -341,6 +423,7 @@ class CustomAudienceManagerFuturesTest {
         private val expirationTime: Instant = Instant.ofEpochSecond(10)
         private val minDelayDuration = Duration.ofMinutes(30)
         private const val PARTIAL_CA_1 = "partialCa1"
+        private val priority: Double = 2.0
 
         private val partialCustomAudienceList = listOf(PartialCustomAudience(PARTIAL_CA_1))
 
@@ -391,6 +474,18 @@ class CustomAudienceManagerFuturesTest {
             doAnswer(answer)
                 .`when`(customAudienceManager)
                 .scheduleCustomAudienceUpdate(any(), any(), any())
+        }
+
+        private fun verifyJoinCustomAudienceRequestWithPriorityAndAuctionServerFlag(
+            joinCustomAudienceRequest: android.adservices.customaudience.JoinCustomAudienceRequest
+        ) {
+            verifyJoinCustomAudienceRequest(joinCustomAudienceRequest)
+            Truth.assertWithMessage("Priority")
+                .that(joinCustomAudienceRequest.customAudience.priority)
+                .isEqualTo(priority)
+            Truth.assertWithMessage("Auction server request flag")
+                .that(joinCustomAudienceRequest.customAudience.auctionServerRequestFlags)
+                .isEqualTo(FLAG_AUCTION_SERVER_REQUEST_OMIT_ADS)
         }
 
         private fun verifyJoinCustomAudienceRequest(
