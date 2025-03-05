@@ -19,6 +19,7 @@ package androidx.health.connect.client.impl.platform.aggregate
 import android.annotation.TargetApi
 import android.content.Context
 import android.os.Build
+import android.os.ext.SdkExtensions
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
@@ -48,6 +49,8 @@ import java.time.Period
 import java.time.ZoneOffset
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assume
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,6 +76,13 @@ class NutritionAggregationExtensionsTest {
             HealthPermission.getWritePermission(NutritionRecord::class),
             HealthPermission.getReadPermission(NutritionRecord::class)
         )
+
+    @Before
+    fun setUp() {
+        Assume.assumeTrue(
+            SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) < 10
+        )
+    }
 
     @After
     fun tearDown() = runTest {
