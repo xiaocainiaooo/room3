@@ -207,7 +207,12 @@ internal fun MaterialScope.componentContainer(
                                     null
                                 },
                             shape = protoLayoutModifiers.background?.corner ?: shapes.large,
-                            contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS,
+                            contentScaleMode =
+                                if (useOverlayOnBackground) {
+                                    LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
+                                } else {
+                                    LayoutElementBuilders.CONTENT_SCALE_MODE_CROP
+                                },
                         )
                 )
                 .backgroundContent()
