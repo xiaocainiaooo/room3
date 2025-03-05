@@ -378,143 +378,6 @@ private fun Project.addAppApksToPrivacySandboxTestConfigsGeneration(
     }
 }
 
-private fun getOrCreateMediaTestConfigTask(
-    project: Project
-): TaskProvider<GenerateMediaTestConfigurationTask> {
-    val parentProject = project.parent!!
-    if (
-        !parentProject.tasks
-            .withType(GenerateMediaTestConfigurationTask::class.java)
-            .names
-            .contains("support-media-test${GENERATE_TEST_CONFIGURATION_TASK}")
-    ) {
-        val task =
-            parentProject.tasks.register(
-                "support-media-test${GENERATE_TEST_CONFIGURATION_TASK}",
-                GenerateMediaTestConfigurationTask::class.java
-            ) { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
-            }
-        project.rootProject.tasks.findByName(FINALIZE_TEST_CONFIGS_WITH_APKS_TASK)!!.dependsOn(task)
-        return task
-    } else {
-        return parentProject.tasks
-            .withType(GenerateMediaTestConfigurationTask::class.java)
-            .named("support-media-test${GENERATE_TEST_CONFIGURATION_TASK}")
-    }
-}
-
-private fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
-    variantName: String,
-    artifacts: Artifacts,
-    minSdk: Int,
-    testRunner: Provider<String>,
-    projectIsolationEnabled: Boolean,
-) {
-    val mediaTask = getOrCreateMediaTestConfigTask(this)
-
-    fun getJsonName(clientToT: Boolean, serviceToT: Boolean, clientTests: Boolean): String {
-        return "_mediaClient${
-            if (clientToT) "ToT" else "Previous"
-        }Service${
-            if (serviceToT) "ToT" else "Previous"
-        }${
-            if (clientTests) "Client" else "Service"
-        }Tests$variantName.json"
-    }
-
-    fun Project.addTestModule(
-        clientToT: Boolean,
-        serviceToT: Boolean,
-        projectIsolationEnabled: Boolean
-    ) {
-        // We don't test the combination of previous versions of service and client as that is not
-        // useful data. We always want at least one tip of tree project.
-        if (!clientToT && !serviceToT) return
-
-        var testName =
-            getJsonName(clientToT = clientToT, serviceToT = serviceToT, clientTests = true)
-        addToModuleInfo(testName, projectIsolationEnabled)
-        extensions.getByType<AndroidXExtension>().testModuleNames.add(testName)
-
-        testName = getJsonName(clientToT = clientToT, serviceToT = serviceToT, clientTests = false)
-        addToModuleInfo(testName, projectIsolationEnabled)
-        extensions.getByType<AndroidXExtension>().testModuleNames.add(testName)
-    }
-    val isClient = this.name.contains("client")
-    val isPrevious = this.name.contains("previous")
-
-    if (isClient) {
-        addTestModule(clientToT = !isPrevious, serviceToT = false, projectIsolationEnabled)
-        addTestModule(clientToT = !isPrevious, serviceToT = true, projectIsolationEnabled)
-    } else {
-        addTestModule(clientToT = true, serviceToT = !isPrevious, projectIsolationEnabled)
-        addTestModule(clientToT = false, serviceToT = !isPrevious, projectIsolationEnabled)
-    }
-
-    mediaTask.configure {
-        if (isClient) {
-            if (isPrevious) {
-                it.clientPreviousFolder.set(artifacts.get(SingleArtifact.APK))
-                it.clientPreviousLoader.set(artifacts.getBuiltArtifactsLoader())
-            } else {
-                it.clientToTFolder.set(artifacts.get(SingleArtifact.APK))
-                it.clientToTLoader.set(artifacts.getBuiltArtifactsLoader())
-            }
-        } else {
-            if (isPrevious) {
-                it.servicePreviousFolder.set(artifacts.get(SingleArtifact.APK))
-                it.servicePreviousLoader.set(artifacts.getBuiltArtifactsLoader())
-            } else {
-                it.serviceToTFolder.set(artifacts.get(SingleArtifact.APK))
-                it.serviceToTLoader.set(artifacts.getBuiltArtifactsLoader())
-            }
-        }
-        it.jsonClientPreviousServiceToTClientTests.set(
-            getFileInTestConfigDirectory(
-                getJsonName(clientToT = false, serviceToT = true, clientTests = true)
-            )
-        )
-        it.jsonClientPreviousServiceToTServiceTests.set(
-            getFileInTestConfigDirectory(
-                getJsonName(clientToT = false, serviceToT = true, clientTests = false)
-            )
-        )
-        it.jsonClientToTServicePreviousClientTests.set(
-            getFileInTestConfigDirectory(
-                getJsonName(clientToT = true, serviceToT = false, clientTests = true)
-            )
-        )
-        it.jsonClientToTServicePreviousServiceTests.set(
-            getFileInTestConfigDirectory(
-                getJsonName(clientToT = true, serviceToT = false, clientTests = false)
-            )
-        )
-        it.jsonClientToTServiceToTClientTests.set(
-            getFileInTestConfigDirectory(
-                getJsonName(clientToT = true, serviceToT = true, clientTests = true)
-            )
-        )
-        it.jsonClientToTServiceToTServiceTests.set(
-            getFileInTestConfigDirectory(
-                getJsonName(clientToT = true, serviceToT = true, clientTests = false)
-            )
-        )
-        it.totClientApk.set(getFileInTestConfigDirectory("mediaClientToT$variantName.apk"))
-        it.previousClientApk.set(
-            getFileInTestConfigDirectory("mediaClientPrevious$variantName.apk")
-        )
-        it.totServiceApk.set(getFileInTestConfigDirectory("mediaServiceToT$variantName.apk"))
-        it.previousServiceApk.set(
-            getFileInTestConfigDirectory("mediaServicePrevious$variantName.apk")
-        )
-        it.minSdk.set(minSdk)
-        it.testRunner.set(testRunner)
-        it.presubmit.set(isPresubmitBuild())
-        AffectedModuleDetector.configureTaskGuard(it)
-    }
-}
-
 fun Project.configureTestConfigGeneration(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
     projectIsolationEnabled: Boolean,
@@ -524,30 +387,16 @@ fun Project.configureTestConfigGeneration(
             when {
                 variant is HasDeviceTests -> {
                     variant.deviceTests.forEach { (_, deviceTest) ->
-                        when {
-                            path.contains("media:version-compat-tests:") -> {
-                                createOrUpdateMediaTestConfigurationGenerationTask(
-                                    deviceTest.name,
-                                    deviceTest.artifacts,
-                                    // replace minSdk after b/328495232 is fixed
-                                    commonExtension.defaultConfig.minSdk!!,
-                                    deviceTest.instrumentationRunner,
-                                    projectIsolationEnabled,
-                                )
-                            }
-                            else -> {
-                                createTestConfigurationGenerationTask(
-                                    deviceTest.name,
-                                    deviceTest.artifacts,
-                                    // replace minSdk after b/328495232 is fixed
-                                    commonExtension.defaultConfig.minSdk!!,
-                                    deviceTest.instrumentationRunner,
-                                    deviceTest.instrumentationRunnerArguments,
-                                    variant,
-                                    projectIsolationEnabled,
-                                )
-                            }
-                        }
+                        createTestConfigurationGenerationTask(
+                            deviceTest.name,
+                            deviceTest.artifacts,
+                            // replace minSdk after b/328495232 is fixed
+                            commonExtension.defaultConfig.minSdk!!,
+                            deviceTest.instrumentationRunner,
+                            deviceTest.instrumentationRunnerArguments,
+                            variant,
+                            projectIsolationEnabled,
+                        )
                     }
                 }
                 project.plugins.hasPlugin("com.android.test") -> {
