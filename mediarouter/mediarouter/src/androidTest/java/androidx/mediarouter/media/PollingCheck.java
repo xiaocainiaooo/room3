@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.support.mediacompat.testlib.util;
+package androidx.mediarouter.media;
 
 import static org.junit.Assert.fail;
 
