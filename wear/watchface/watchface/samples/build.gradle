@@ -39,6 +39,14 @@ dependencies {
     api(libs.kotlinStdlib)
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.suppressWarnings = true
+}
+
+tasks.withType(JavaCompile){
+    options.compilerArgs <<"-Xlint:-deprecation"
+}
+
 androidx {
     name = "Wear Watchface Samples"
     type = SoftwareType.SAMPLES
