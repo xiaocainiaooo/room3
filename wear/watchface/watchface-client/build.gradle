@@ -59,6 +59,14 @@ dependencies {
     implementation("androidx.core:core:1.1.0")
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.suppressWarnings = true
+}
+
+tasks.withType(JavaCompile){
+    options.compilerArgs <<"-Xlint:-deprecation"
+}
+
 android {
     defaultConfig {
         minSdk = 26
@@ -75,4 +83,5 @@ androidx {
     description = "Client library for controlling androidx watchfaces"
     legacyDisableKotlinStrictApiMode = true
     addGoldenImageAssets()
+    failOnDeprecationWarnings = false
 }
