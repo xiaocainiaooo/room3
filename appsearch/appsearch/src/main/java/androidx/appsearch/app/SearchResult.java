@@ -212,12 +212,19 @@ public final class SearchResult extends AbstractSafeParcelable {
      * {@link SearchSpec.Builder#setSnippetCountPerProperty}, for all results after that
      * value, this method returns an empty list.
      */
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public @NonNull List<MatchInfo> getMatchInfos() {
         if (mMatchInfosCached == null) {
             mMatchInfosCached = new ArrayList<>(mMatchInfos.size());
             for (int i = 0; i < mMatchInfos.size(); i++) {
                 MatchInfo matchInfo = mMatchInfos.get(i);
                 matchInfo.setDocument(getGenericDocument());
+                if (matchInfo.getTextMatch() != null) {
+                    // This is necessary in order to use the TextMatchInfo after IPC, since
+                    // TextMatch.mPropertyPath is private and is not retained by SafeParcelable
+                    // across IPC.
+                    matchInfo.mTextMatch.setPropertyPath(matchInfo.getPropertyPath());
+                }
                 if (mMatchInfosCached != null) {
                     // This additional check is added for NullnessChecker.
                     mMatchInfosCached.add(matchInfo);
@@ -1239,7 +1246,7 @@ public final class SearchResult extends AbstractSafeParcelable {
         @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
         @Override
         public void writeToParcel(@NonNull Parcel dest, int flags) {
-            MatchInfoCreator.writeToParcel(this, dest, flags);
+            TextMatchInfoCreator.writeToParcel(this, dest, flags);
         }
     }
 
@@ -1263,11 +1270,14 @@ public final class SearchResult extends AbstractSafeParcelable {
         @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
         public static final @NonNull Parcelable.Creator<EmbeddingMatchInfo> CREATOR =
                 new EmbeddingMatchInfoCreator();
-        @Field(id = 1)
+
+        @Field(id = 1, getter = "getSemanticScore")
         private final double mSemanticScore;
-        @Field(id = 2)
+
+        @Field(id = 2, getter = "getQueryEmbeddingVectorIndex")
         private final int mQueryEmbeddingVectorIndex;
-        @Field(id = 3)
+
+        @Field(id = 3, getter = "getEmbeddingSearchMetricType")
         private final int mEmbeddingSearchMetricType;
 
         /**
