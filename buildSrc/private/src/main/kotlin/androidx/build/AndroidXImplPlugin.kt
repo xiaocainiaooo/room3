@@ -109,10 +109,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
@@ -220,7 +218,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         project.publishInspectionArtifacts()
         project.configureProjectStructureValidation(androidXExtension)
         project.configureProjectVersionValidation(androidXExtension)
-        project.registerProjectOrArtifact()
         project.validateMultiplatformPluginHasNotBeenApplied()
 
         project.tasks.register("printCoordinates", PrintProjectCoordinatesTask::class.java) {
@@ -275,34 +272,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                     else KotlinTarget.DEFAULT
                 )
             }
-    }
-
-    private fun Project.registerProjectOrArtifact() {
-        // Add a method for each sub project where they can declare an optional
-        // dependency on a project or its latest snapshot artifact.
-        if (!ProjectLayoutType.isPlayground(this)) {
-            // In AndroidX build, this is always enforced to the project
-            extra.set(
-                PROJECT_OR_ARTIFACT_EXT_NAME,
-                KotlinClosure1<String, Project>(
-                    function = {
-                        // this refers to the first parameter of the closure.
-                        project.resolveProject(this)
-                    }
-                )
-            )
-        } else {
-            // In Playground builds, they are converted to the latest SNAPSHOT artifact if the
-            // project is not included in that playground.
-            extra.set(
-                PROJECT_OR_ARTIFACT_EXT_NAME,
-                KotlinClosure1<String, Any>(
-                    function = {
-                        AndroidXPlaygroundRootImplPlugin.projectOrArtifact(rootProject, this)
-                    }
-                )
-            )
-        }
     }
 
     /**
@@ -1778,5 +1747,3 @@ internal fun KotlinMultiplatformExtension.hasJvmTarget(): Boolean =
 internal fun String.camelCase() = replaceFirstChar {
     if (it.isLowerCase()) it.titlecase() else it.toString()
 }
-
-const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
