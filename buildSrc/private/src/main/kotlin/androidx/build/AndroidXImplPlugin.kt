@@ -886,6 +886,16 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         experimentalProperties.put(ASB_SIGNING_CONFIG_PROPERTY_NAME, keyStore.absolutePath)
     }
 
+    // Taken from
+    // https://developer.android.com/build/releases/gradle-plugin#api-level-support
+    private fun mapToMinAgpVersion(compileSdk: Int): String {
+        return when (compileSdk) {
+            34 -> "8.1.1"
+            35 -> "8.6.0"
+            else -> throw Exception("Unknown compileSdk to minAgpVersion mapping")
+        }
+    }
+
     private fun configureWithLibraryPlugin(project: Project, androidXExtension: AndroidXExtension) {
         val buildTypeForTests = "release"
         project.extensions.getByType<LibraryExtension>().apply {
@@ -919,7 +929,10 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 // resulting AAR metadata won't have a minCompileSdk --
                 // this is okay because AGP automatically embeds forceCompileSdkPreview in the AAR
                 // metadata and uses it instead of minCompileSdk.
-                it.defaultConfig.aarMetadata.minCompileSdk = it.compileSdk
+                it.compileSdk?.apply {
+                    it.defaultConfig.aarMetadata.minCompileSdk = this
+                    it.defaultConfig.aarMetadata.minAgpVersion = mapToMinAgpVersion(this)
+                }
                 it.lint.targetSdk = project.defaultAndroidConfig.targetSdk
                 it.testOptions.targetSdk = project.defaultAndroidConfig.targetSdk
                 // Replace with a public API once available, see b/360392255
