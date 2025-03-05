@@ -355,6 +355,116 @@ class AppFunctionDataTest {
     }
 
     @Test
+    fun testWrite_nestedAppFunctionData_notConformSpec() {
+        val innerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf(
+                        "innerDouble" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = TYPE_DOUBLE,
+                                isNullable = false,
+                            )
+                    ),
+                required = emptyList(),
+                qualifiedName = "innerData",
+                isNullable = false,
+            )
+        val incorrectInnerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf(
+                        "innerDouble" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = TYPE_LONG,
+                                isNullable = false,
+                            )
+                    ),
+                required = emptyList(),
+                qualifiedName = "innerData",
+                isNullable = false,
+            )
+        val outerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties = mapOf("nestedData" to innerObjectType),
+                required = emptyList(),
+                qualifiedName = "outerData",
+                isNullable = false,
+            )
+        val incorrectInnerDataBuilder =
+            AppFunctionData.Builder(incorrectInnerObjectType, AppFunctionComponentsMetadata())
+        val outerDataBuilder =
+            AppFunctionData.Builder(
+                outerObjectType,
+                AppFunctionComponentsMetadata(),
+            )
+
+        incorrectInnerDataBuilder.setLong("innerDouble", 500)
+        assertThrows(IllegalArgumentException::class.java) {
+            outerDataBuilder.setAppFunctionData("nestedData", incorrectInnerDataBuilder.build())
+        }
+    }
+
+    @Test
+    fun testWrite_nestedListAppFunctionData_notConformSpec() {
+        val innerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf(
+                        "innerDouble" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = TYPE_DOUBLE,
+                                isNullable = false,
+                            )
+                    ),
+                required = emptyList(),
+                qualifiedName = "innerData",
+                isNullable = false,
+            )
+        val incorrectInnerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf(
+                        "innerDouble" to
+                            AppFunctionPrimitiveTypeMetadata(
+                                type = TYPE_LONG,
+                                isNullable = false,
+                            )
+                    ),
+                required = emptyList(),
+                qualifiedName = "innerData",
+                isNullable = false,
+            )
+        val outerObjectType =
+            AppFunctionObjectTypeMetadata(
+                properties =
+                    mapOf("nestedDataList" to AppFunctionArrayTypeMetadata(innerObjectType, false)),
+                required = emptyList(),
+                qualifiedName = "outerData",
+                isNullable = false,
+            )
+        val correctInnerDataBuilder =
+            AppFunctionData.Builder(innerObjectType, AppFunctionComponentsMetadata())
+        val incorrectInnerDataBuilder =
+            AppFunctionData.Builder(incorrectInnerObjectType, AppFunctionComponentsMetadata())
+        val outerDataBuilder =
+            AppFunctionData.Builder(
+                outerObjectType,
+                AppFunctionComponentsMetadata(),
+            )
+
+        correctInnerDataBuilder.setDouble("innerDouble", 500.0)
+        incorrectInnerDataBuilder.setLong("innerDouble", 500)
+
+        assertThrows(IllegalArgumentException::class.java) {
+            outerDataBuilder.setAppFunctionDataList(
+                "nestedDataList",
+                listOf(correctInnerDataBuilder.build(), incorrectInnerDataBuilder.build())
+            )
+        }
+    }
+
+    @Test
     fun testSerialize() {
         val note = Note(title = "Test Title", attachment = Attachment(uri = "Test Uri"))
 
