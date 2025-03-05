@@ -63,11 +63,18 @@ object HorizontalPagerBenchmark : MacrobenchmarkScreen {
     override val exercise: MacrobenchmarkScope.() -> Unit
         get() = {
             val horizontalPager = device.findObject(By.desc(CONTENT_DESCRIPTION))
-            horizontalPager.setGestureMargin(device.displayWidth / 5)
-            repeat(9) {
-                horizontalPager.swipe(Direction.LEFT, 1f, 500)
-                device.waitForIdle()
-                SystemClock.sleep(500)
+            if (horizontalPager != null) {
+                horizontalPager.setGestureMargin(device.displayWidth / 5)
+                repeat(2) {
+                    horizontalPager.swipe(Direction.LEFT, 1f, 1000)
+                    device.waitForIdle()
+                    SystemClock.sleep(500)
+                }
+                repeat(2) {
+                    horizontalPager.swipe(Direction.RIGHT, 1f, 1000)
+                    device.waitForIdle()
+                    SystemClock.sleep(500)
+                }
             }
         }
 }
