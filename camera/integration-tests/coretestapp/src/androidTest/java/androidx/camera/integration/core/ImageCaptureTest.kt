@@ -74,6 +74,7 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.integration.core.util.CameraInfoUtil
 import androidx.camera.integration.core.util.CameraPipeUtil
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.testing.impl.CameraAvailabilityUtil.assumeDeviceHasFrontCamera
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.CoreAppTestUtil
@@ -313,6 +314,8 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
 
     @Test
     fun canCaptureImageWithFlashModeOn_frontCamera() {
+        assumeDeviceHasFrontCamera()
+
         // This test also wants to ensure that the image can be captured without the flash unit.
         // Front camera usually doesn't have a flash unit.
         canTakeImages(
@@ -332,6 +335,8 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
 
     @Test
     fun canCaptureImageWithFlashModeOnAndUseTorch_frontCamera() {
+        assumeDeviceHasFrontCamera()
+
         // This test also wants to ensure that the image can be captured without the flash unit.
         // Front camera usually doesn't have a flash unit.
         canTakeImages(
@@ -344,6 +349,8 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
 
     @Test
     fun canCaptureImageWithFlashModeScreen_frontCamera() {
+        assumeDeviceHasFrontCamera()
+
         // Front camera usually doesn't have a flash unit. Screen flash will be used in such case.
         // Otherwise, physical flash will be used. But capture should be successful either way.
         canTakeImages(
@@ -357,6 +364,8 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
 
     @Test
     fun canCaptureImageWithFlashModeScreenAndUseTorch_frontCamera() {
+        assumeDeviceHasFrontCamera()
+
         // Front camera usually doesn't have a flash unit. Screen flash will be used in such case.
         // Otherwise, physical flash will be used as torch. Either way, capture should be successful
         canTakeImages(
