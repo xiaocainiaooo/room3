@@ -321,6 +321,12 @@ internal class PdfDocumentViewModel(
     }
 
     private suspend fun openDocument(uri: Uri, password: String? = null) {
+        /**
+         * PdfDocument, if ever created, will be stored in DocumentLoaded state. This state could be
+         * transitioned to other only if a new uri is submitted.
+         */
+        releaseDocument()
+
         /** Move to [PdfFragmentUiState.Loading] state before we begin load operation. */
         _fragmentUiScreenState.update { PdfFragmentUiState.Loading }
 
@@ -399,6 +405,19 @@ internal class PdfDocumentViewModel(
                 OperationCanceledException("Password cancelled. Cannot open PDF.")
             )
         }
+    }
+
+    /**
+     * Closes the currently loaded PDF document, if one exists. This is important to release
+     * resources and prevent leaks.
+     */
+    private fun releaseDocument() {
+        (_fragmentUiScreenState.value as? PdfFragmentUiState.DocumentLoaded)?.pdfDocument?.close()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        releaseDocument()
     }
 
     @Suppress("UNCHECKED_CAST")

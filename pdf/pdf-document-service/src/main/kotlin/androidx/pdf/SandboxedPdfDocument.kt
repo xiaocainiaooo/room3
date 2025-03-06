@@ -149,7 +149,8 @@ public class SandboxedPdfDocument(
 
     @WorkerThread
     override fun close() {
-        connection.disconnect()
+        // TODO(b/380191925): Remove this when service is closed from SandboxedPdfLoader
+        //        connection.disconnect()
 
         // TODO(b/377920470): Remove this when PdfRenderer closes the file descriptor
         fileDescriptor.close()
