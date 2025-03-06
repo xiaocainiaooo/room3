@@ -230,6 +230,10 @@ package androidx.compose.ui.autofill {
     method public abstract void commit();
   }
 
+  public final class AutofillModifierKt {
+    method public static androidx.compose.ui.Modifier autofillContentType(androidx.compose.ui.Modifier, androidx.compose.ui.autofill.ContentType contentType);
+  }
+
   @Deprecated public final class AutofillNode {
     ctor @Deprecated public AutofillNode(optional java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, optional androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
     method @Deprecated public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
