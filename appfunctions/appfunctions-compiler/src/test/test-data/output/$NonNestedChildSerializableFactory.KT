@@ -13,7 +13,7 @@ public class `$NonNestedChildSerializableFactory` : AppFunctionSerializableFacto
     val nestedBaseData = appFunctionData.getAppFunctionData("nestedBase")
     var nestedBase: NestedBaseSerializable? = null
     if (nestedBaseData != null) {
-      nestedBase = nestedBaseSerializableFactory.fromAppFunctionData(nestedBaseData) as NestedBaseSerializable?
+      nestedBase = nestedBaseSerializableFactory.fromAppFunctionData(nestedBaseData)
     }
     val longBaseValue = checkNotNull(appFunctionData.getLongOrNull("longBaseValue"))
 
@@ -24,11 +24,14 @@ public class `$NonNestedChildSerializableFactory` : AppFunctionSerializableFacto
     val nestedBaseSerializableFactory = `$NestedBaseSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.NonNestedChildSerializable")
-    builder.setString("stringBaseName", appFunctionSerializable.stringBaseName)
-    if (appFunctionSerializable.nestedBase != null) {
-      builder.setAppFunctionData("nestedBase", nestedBaseSerializableFactory.toAppFunctionData(appFunctionSerializable.nestedBase as NestedBaseSerializable))
+    val stringBaseName = appFunctionSerializable.stringBaseName
+    builder.setString("stringBaseName", stringBaseName)
+    val nestedBase = appFunctionSerializable.nestedBase
+    if (nestedBase != null) {
+      builder.setAppFunctionData("nestedBase", nestedBaseSerializableFactory.toAppFunctionData(nestedBase))
     }
-    builder.setLong("longBaseValue", appFunctionSerializable.longBaseValue)
+    val longBaseValue = appFunctionSerializable.longBaseValue
+    builder.setLong("longBaseValue", longBaseValue)
 
     return builder.build()
   }
