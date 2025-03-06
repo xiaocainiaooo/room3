@@ -17,8 +17,10 @@ public class `$DerivedSerializableFactory` : AppFunctionSerializableFactory<Deri
   override fun toAppFunctionData(appFunctionSerializable: DerivedSerializable): AppFunctionData {
 
     val builder = AppFunctionData.Builder("com.testdata.DerivedSerializable")
-    builder.setString("name", appFunctionSerializable.name)
-    builder.setLong("age", appFunctionSerializable.age)
+    val name = appFunctionSerializable.name
+    builder.setString("name", name)
+    val age = appFunctionSerializable.age
+    builder.setLong("age", age)
 
     return builder.build()
   }

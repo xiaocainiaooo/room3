@@ -2,7 +2,6 @@ package com.testdata
 
 import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.`internal`.AppFunctionSerializableFactory
-import com.testdata.differentPackage.DiffPackageSerializable
 import com.testdata.differentPackage.`$DiffPackageSerializableFactory`
 import javax.`annotation`.processing.Generated
 
@@ -25,8 +24,10 @@ public class `$EntityWithDiffPackageSerializablePropertyFactory` : AppFunctionSe
     val diffPackageSerializableFactory = `$DiffPackageSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.EntityWithDiffPackageSerializableProperty")
-    builder.setAppFunctionData("inputSerializable", diffPackageSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as DiffPackageSerializable))
-    builder.setAppFunctionDataList("serializableList", appFunctionSerializable.serializableList.map{ diffPackageSerializable ->
+    val inputSerializable = appFunctionSerializable.inputSerializable
+    builder.setAppFunctionData("inputSerializable", diffPackageSerializableFactory.toAppFunctionData(inputSerializable))
+    val serializableList = appFunctionSerializable.serializableList
+    builder.setAppFunctionDataList("serializableList", serializableList.map{ diffPackageSerializable ->
       diffPackageSerializableFactory.toAppFunctionData(diffPackageSerializable)
     })
 

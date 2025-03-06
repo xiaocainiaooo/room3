@@ -31,16 +31,26 @@ public class `$EntityWithValidPropertiesFactory` : AppFunctionSerializableFactor
     val inputSerializableFactory = `$InputSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.EntityWithValidProperties")
-    builder.setLong("longParam", appFunctionSerializable.longParam)
-    builder.setDouble("doubleParam", appFunctionSerializable.doubleParam)
-    builder.setBoolean("boolParam", appFunctionSerializable.boolParam)
-    builder.setString("stringParam", appFunctionSerializable.stringParam)
-    builder.setLongArray("longArray", appFunctionSerializable.longArray)
-    builder.setDoubleArray("doubleArray", appFunctionSerializable.doubleArray)
-    builder.setBooleanArray("boolArray", appFunctionSerializable.boolArray)
-    builder.setStringList("stringList", appFunctionSerializable.stringList)
-    builder.setAppFunctionData("inputSerializable", inputSerializableFactory.toAppFunctionData(appFunctionSerializable.inputSerializable as InputSerializable))
-    builder.setAppFunctionDataList("serializableList", appFunctionSerializable.serializableList.map{ inputSerializable ->
+    val longParam = appFunctionSerializable.longParam
+    builder.setLong("longParam", longParam)
+    val doubleParam = appFunctionSerializable.doubleParam
+    builder.setDouble("doubleParam", doubleParam)
+    val boolParam = appFunctionSerializable.boolParam
+    builder.setBoolean("boolParam", boolParam)
+    val stringParam = appFunctionSerializable.stringParam
+    builder.setString("stringParam", stringParam)
+    val longArray = appFunctionSerializable.longArray
+    builder.setLongArray("longArray", longArray)
+    val doubleArray = appFunctionSerializable.doubleArray
+    builder.setDoubleArray("doubleArray", doubleArray)
+    val boolArray = appFunctionSerializable.boolArray
+    builder.setBooleanArray("boolArray", boolArray)
+    val stringList = appFunctionSerializable.stringList
+    builder.setStringList("stringList", stringList)
+    val inputSerializable = appFunctionSerializable.inputSerializable
+    builder.setAppFunctionData("inputSerializable", inputSerializableFactory.toAppFunctionData(inputSerializable))
+    val serializableList = appFunctionSerializable.serializableList
+    builder.setAppFunctionDataList("serializableList", serializableList.map{ inputSerializable ->
       inputSerializableFactory.toAppFunctionData(inputSerializable)
     })
 
