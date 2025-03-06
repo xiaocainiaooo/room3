@@ -26,11 +26,14 @@ import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadataDocument
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
+import androidx.appfunctions.metadata.AppFunctionRuntimeMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.appsearch.app.GenericDocument
 import androidx.appsearch.app.GlobalSearchSession
+import androidx.appsearch.app.JoinSpec
 import androidx.appsearch.app.SearchResult
 import androidx.appsearch.app.SearchSpec
+import com.android.extensions.appfunctions.AppFunctionManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -73,9 +76,22 @@ internal class AppFunctionReader(private val context: Context) {
         session: GlobalSearchSession,
         searchFunctionSpec: AppFunctionSearchSpec,
     ): List<AppFunctionMetadata> {
-        // TODO: Join with Runtime Spec.
+        val joinSpec =
+            JoinSpec.Builder(AppFunctionRuntimeMetadata.STATIC_METADATA_JOIN_PROPERTY)
+                .setNestedSearch("", RUNTIME_SEARCH_SPEC)
+                .build()
+
+        val staticSearchSpec =
+            SearchSpec.Builder()
+                .addFilterNamespaces(APP_FUNCTIONS_NAMESPACE)
+                .addFilterDocumentClasses(AppFunctionMetadataDocument::class.java)
+                .addFilterPackageNames(SYSTEM_PACKAGE_NAME)
+                .setJoinSpec(joinSpec)
+                .setVerbatimSearchEnabled(true)
+                .setNumericSearchEnabled(true)
+                .build()
         return session
-            .search(searchFunctionSpec.toStaticMetadataAppSearchQuery(), STATIC_SEARCH_SPEC)
+            .search(searchFunctionSpec.toStaticMetadataAppSearchQuery(), staticSearchSpec)
             .readAll(::convertSearchResultToAppFunctionMetadata)
             .filterNotNull()
     }
@@ -93,12 +109,16 @@ internal class AppFunctionReader(private val context: Context) {
         // TODO: Handle failures and log instead of throwing.
         val staticMetadataDocument =
             searchResult.genericDocument.toDocumentClass(AppFunctionMetadataDocument::class.java)
+        val runtimeMetadataDocument =
+            searchResult.joinedResults
+                .single()
+                .genericDocument
+                .toDocumentClass(AppFunctionRuntimeMetadata::class.java)
 
         return AppFunctionMetadata(
             id = functionId,
             packageName = packageName,
-            // TODO: Compute effectively enabled.
-            isEnabled = staticMetadataDocument.isEnabledByDefault,
+            isEnabled = computeEffectivelyEnabled(staticMetadataDocument, runtimeMetadataDocument),
             schema =
                 staticMetadataDocument.schema?.toAppFunctionSchemaMetadata()
                     ?:
@@ -130,6 +150,20 @@ internal class AppFunctionReader(private val context: Context) {
         )
     }
 
+    private fun computeEffectivelyEnabled(
+        staticMetadata: AppFunctionMetadataDocument,
+        runtimeMetadata: AppFunctionRuntimeMetadata,
+    ): Boolean =
+        when (runtimeMetadata.enabled.toInt()) {
+            AppFunctionManager.APP_FUNCTION_STATE_ENABLED -> true
+            AppFunctionManager.APP_FUNCTION_STATE_DISABLED -> false
+            AppFunctionManager.APP_FUNCTION_STATE_DEFAULT -> staticMetadata.isEnabledByDefault
+            else ->
+                throw IllegalStateException(
+                    "Unknown AppFunction state: ${runtimeMetadata.enabled}."
+                )
+        }
+
     private fun buildSchemaMetadataFromGdForLegacyIndexer(
         document: GenericDocument
     ): AppFunctionSchemaMetadata? {
@@ -159,15 +193,12 @@ internal class AppFunctionReader(private val context: Context) {
         const val APP_FUNCTIONS_NAMESPACE = "app_functions"
         const val APP_FUNCTIONS_RUNTIME_NAMESPACE = "app_functions_runtime"
 
-        val STATIC_SEARCH_SPEC =
+        val RUNTIME_SEARCH_SPEC =
             SearchSpec.Builder()
-                .addFilterNamespaces(APP_FUNCTIONS_NAMESPACE)
-                .addFilterDocumentClasses(AppFunctionMetadataDocument::class.java)
+                .addFilterNamespaces(APP_FUNCTIONS_RUNTIME_NAMESPACE)
+                .addFilterDocumentClasses(AppFunctionRuntimeMetadata::class.java)
                 .addFilterPackageNames(SYSTEM_PACKAGE_NAME)
                 .setVerbatimSearchEnabled(true)
-                .setNumericSearchEnabled(true)
-                .setListFilterQueryLanguageEnabled(true)
-                .setListFilterHasPropertyFunctionEnabled(true)
                 .build()
     }
 }
