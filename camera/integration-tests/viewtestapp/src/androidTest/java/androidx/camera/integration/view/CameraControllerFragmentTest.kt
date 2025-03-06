@@ -38,6 +38,7 @@ import androidx.camera.integration.view.util.takePictureOnDisk
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.testing.impl.AndroidUtil.isEmulator
 import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSupportedByEmulator
+import androidx.camera.testing.impl.CameraAvailabilityUtil.assumeDeviceHasFrontCamera
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.CoreAppTestUtil
@@ -424,12 +425,16 @@ class CameraControllerFragmentTest(
 
     @Test
     fun cameraToggled_previewIsStreaming() {
+        assumeDeviceHasFrontCamera()
+
         onView(withId(R.id.camera_toggle)).perform(click())
         fragment.assertPreviewIsStreaming()
     }
 
     @Test
     fun cameraToggled_canTakePicture() {
+        assumeDeviceHasFrontCamera()
+
         onView(withId(R.id.camera_toggle)).perform(click())
         fragment.assertPreviewIsStreaming()
         fragment.assertCanTakePicture()
@@ -469,6 +474,8 @@ class CameraControllerFragmentTest(
 
     @Test
     fun cameraToggled_canRecordVideo() {
+        assumeDeviceHasFrontCamera()
+
         skipVideoRecordingTestIfNotSupportedByEmulator()
         skipTestWithSurfaceProcessingOnCuttlefishApi30()
 
