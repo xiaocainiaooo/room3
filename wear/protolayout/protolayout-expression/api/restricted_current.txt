@@ -481,6 +481,7 @@ package androidx.wear.protolayout.expression {
     method public int compareTo(androidx.wear.protolayout.expression.VersionBuilders.VersionInfo);
     method public int getMajor();
     method public int getMinor();
+    field @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static final androidx.wear.protolayout.expression.VersionBuilders.VersionInfo CURRENT;
   }
 
   public static final class VersionBuilders.VersionInfo.Builder {
