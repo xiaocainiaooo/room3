@@ -187,14 +187,17 @@ internal fun TextContextMenuBuilderScope.textItem(
     )
 }
 
-internal suspend fun TextFieldSelectionState.getContextMenuItemsAvailability() =
-    MenuItemsAvailability(
+internal suspend fun TextFieldSelectionState.getContextMenuItemsAvailability():
+    MenuItemsAvailability {
+    updateClipboardEntry()
+    return MenuItemsAvailability(
         canCopy = canCopy(),
         canPaste = canPaste(),
         canCut = canCut(),
         canSelectAll = canSelectAll(),
         canAutofill = canAutofill()
     )
+}
 
 internal suspend fun TextFieldSelectionManager.getContextMenuItemsAvailability():
     MenuItemsAvailability {
