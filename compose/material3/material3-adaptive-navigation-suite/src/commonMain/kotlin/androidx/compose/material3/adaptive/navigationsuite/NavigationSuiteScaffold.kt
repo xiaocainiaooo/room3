@@ -87,6 +87,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
@@ -159,13 +160,93 @@ fun rememberNavigationSuiteScaffoldState(
  * The navigation component can be animated to be hidden or shown via a
  * [NavigationSuiteScaffoldState].
  *
- * Example default usage:
+ * The scaffold also supports an optional primary action composable, such as a floating action
+ * button, which will be displayed according to the current [NavigationSuiteType].
+ *
+ * A simple usage example looks like this:
  *
  * @sample androidx.compose.material3.adaptive.navigationsuite.samples.NavigationSuiteScaffoldSample
  *
- * Example custom configuration usage:
+ * An usage with custom layout choices looks like this:
  *
  * @sample androidx.compose.material3.adaptive.navigationsuite.samples.NavigationSuiteScaffoldCustomConfigSample
+ * @param navigationItems the navigation items to be displayed, typically [NavigationSuiteItem]s
+ * @param modifier the [Modifier] to be applied to the navigation suite scaffold
+ * @param navigationSuiteType the current [NavigationSuiteType]. Defaults to
+ *   [NavigationSuiteScaffoldDefaults.navigationSuiteType]
+ * @param navigationSuiteColors [NavigationSuiteColors] that will be used to determine the container
+ *   (background) color of the navigation component and the preferred color for content inside the
+ *   navigation component
+ * @param containerColor the color used for the background of the navigation suite scaffold,
+ *   including the passed [content] composable. Use [Color.Transparent] to have no color
+ * @param contentColor the preferred color to be used for typography and iconography within the
+ *   passed in [content] lambda inside the navigation suite scaffold.
+ * @param state the [NavigationSuiteScaffoldState] of this navigation suite scaffold
+ * @param navigationItemVerticalArrangement the vertical arrangement of the items inside vertical
+ *   navigation components (such as the types [NavigationSuiteType.WideNavigationRailCollapsed] and
+ *   [NavigationSuiteType.WideNavigationRailExpanded]). It's recommended to use [Arrangement.Top],
+ *   [Arrangement.Center], or [Arrangement.Bottom]. Defaults to [Arrangement.Top]
+ * @param primaryActionContent The optional primary action content of the navigation suite scaffold,
+ *   if any. Typically a [androidx.compose.material3.FloatingActionButton]. It'll be displayed
+ *   inside vertical navigation components as part of their header , and above horizontal navigation
+ *   components.
+ * @param primaryActionContentHorizontalAlignment The horizontal alignment of the primary action
+ *   content, if present, when it's displayed along with a horizontal navigation component.
+ * @param content the content of your screen
+ */
+@Composable
+fun NavigationSuiteScaffold(
+    navigationItems: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationSuiteType: NavigationSuiteType =
+        NavigationSuiteScaffoldDefaults.navigationSuiteType(WindowAdaptiveInfoDefault),
+    navigationSuiteColors: NavigationSuiteColors = NavigationSuiteDefaults.colors(),
+    containerColor: Color = NavigationSuiteScaffoldDefaults.containerColor,
+    contentColor: Color = NavigationSuiteScaffoldDefaults.contentColor,
+    state: NavigationSuiteScaffoldState = rememberNavigationSuiteScaffoldState(),
+    navigationItemVerticalArrangement: Arrangement.Vertical =
+        NavigationSuiteDefaults.verticalArrangement,
+    primaryActionContent: @Composable (() -> Unit) = {},
+    primaryActionContentHorizontalAlignment: Alignment.Horizontal =
+        NavigationSuiteScaffoldDefaults.primaryActionContentAlignment,
+    content: @Composable () -> Unit,
+) {
+    Surface(modifier = modifier, color = containerColor, contentColor = contentColor) {
+        NavigationSuiteScaffoldLayout(
+            navigationSuite = {
+                NavigationSuite(
+                    navigationSuiteType = navigationSuiteType,
+                    colors = navigationSuiteColors,
+                    primaryActionContent = primaryActionContent,
+                    verticalArrangement = navigationItemVerticalArrangement,
+                    content = navigationItems
+                )
+            },
+            navigationSuiteType = navigationSuiteType,
+            state = state,
+            primaryActionContent = primaryActionContent,
+            primaryActionContentHorizontalAlignment = primaryActionContentHorizontalAlignment,
+            content = {
+                Box(
+                    Modifier.navigationSuiteScaffoldConsumeWindowInsets(navigationSuiteType, state)
+                ) {
+                    content()
+                }
+            }
+        )
+    }
+}
+
+/**
+ * The Navigation Suite Scaffold wraps the provided content and places the adequate provided
+ * navigation component on the screen according to the current [NavigationSuiteType].
+ *
+ * Note: It is recommended to use the [NavigationSuiteScaffold] function with the navigationItems
+ * param that accepts [NavigationSuiteItem]s instead of this one.
+ *
+ * The navigation component can be animated to be hidden or shown via a
+ * [NavigationSuiteScaffoldState].
+ *
  * @param navigationSuiteItems the navigation items to be displayed
  * @param modifier the [Modifier] to be applied to the navigation suite scaffold
  * @param layoutType the current [NavigationSuiteType]. Defaults to
@@ -265,13 +346,6 @@ object DefaultNavigationSuiteScaffoldOverride : NavigationSuiteScaffoldOverride 
  * The Navigation Suite Scaffold wraps the provided content and places the adequate provided
  * navigation component on the screen according to the current [NavigationSuiteType].
  *
- * Example default usage:
- *
- * @sample androidx.compose.material3.adaptive.navigationsuite.samples.NavigationSuiteScaffoldSample
- *
- * Example custom configuration usage:
- *
- * @sample androidx.compose.material3.adaptive.navigationsuite.samples.NavigationSuiteScaffoldCustomConfigSample
  * @param navigationSuiteItems the navigation items to be displayed
  * @param modifier the [Modifier] to be applied to the navigation suite scaffold
  * @param layoutType the current [NavigationSuiteType]. Defaults to
@@ -313,25 +387,34 @@ fun NavigationSuiteScaffold(
 
 /**
  * Layout for a [NavigationSuiteScaffold]'s content. This function wraps the [content] and places
- * the [navigationSuite] component according to the given [layoutType].
+ * the [navigationSuite], and the [primaryActionContent], if any, according to the current
+ * [NavigationSuiteType].
  *
  * The usage of this function is recommended when you need some customization that is not viable via
- * the use of [NavigationSuiteScaffold]. Example usage:
+ * the use of [NavigationSuiteScaffold]. An usage example of using a custom modal wide rail can be
+ * found at androidx.compose.material3.demos.NavigationSuiteScaffoldCustomConfigDemo.
  *
- * @sample androidx.compose.material3.adaptive.navigationsuite.samples.NavigationSuiteScaffoldCustomNavigationRail
  * @param navigationSuite the navigation component to be displayed, typically [NavigationSuite]
- * @param layoutType the current [NavigationSuiteType]. Defaults to
- *   [NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo]
+ * @param navigationSuiteType the current [NavigationSuiteType]. Usually
+ *   [NavigationSuiteScaffoldDefaults.navigationSuiteType]
  * @param state the [NavigationSuiteScaffoldState] of this navigation suite scaffold layout
+ * @param primaryActionContent The optional primary action content of the navigation suite scaffold,
+ *   if any. Typically a [androidx.compose.material3.FloatingActionButton]. It'll be displayed
+ *   inside vertical navigation components as part of their header, and above horizontal navigation
+ *   components.
+ * @param primaryActionContentHorizontalAlignment The horizontal alignment of the primary action
+ *   content, if present, when it's displayed along with a horizontal navigation component.
  * @param content the content of your screen
  */
 @Composable
 fun NavigationSuiteScaffoldLayout(
     navigationSuite: @Composable () -> Unit,
-    layoutType: NavigationSuiteType =
-        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(WindowAdaptiveInfoDefault),
+    navigationSuiteType: NavigationSuiteType,
     state: NavigationSuiteScaffoldState = rememberNavigationSuiteScaffoldState(),
-    content: @Composable () -> Unit = {}
+    primaryActionContent: @Composable (() -> Unit) = {},
+    primaryActionContentHorizontalAlignment: Alignment.Horizontal =
+        NavigationSuiteScaffoldDefaults.primaryActionContentAlignment,
+    content: @Composable () -> Unit
 ) {
     val animationProgress by
         animateFloatAsState(
@@ -343,6 +426,7 @@ fun NavigationSuiteScaffoldLayout(
         // Wrap the navigation suite and content composables each in a Box to not propagate the
         // parent's (Surface) min constraints to its children (see b/312664933).
         Box(Modifier.layoutId(NavigationSuiteLayoutIdTag)) { navigationSuite() }
+        Box(Modifier.layoutId(PrimaryActionContentLayoutIdTag)) { primaryActionContent() }
         Box(Modifier.layoutId(ContentLayoutIdTag)) { content() }
     }) { measurables, constraints ->
         val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
@@ -351,10 +435,14 @@ fun NavigationSuiteScaffoldLayout(
             measurables
                 .fastFirst { it.layoutId == NavigationSuiteLayoutIdTag }
                 .measure(looseConstraints)
-        val isNavigationBar = layoutType == NavigationSuiteType.NavigationBar
+        val primaryActionContentPlaceable =
+            measurables
+                .fastFirst { it.layoutId == PrimaryActionContentLayoutIdTag }
+                .measure(looseConstraints)
+        val isNavigationBar = navigationSuiteType.isNavigationBar
         val layoutHeight = constraints.maxHeight
         val layoutWidth = constraints.maxWidth
-        // Find the content composable through it's layoutId tag
+        // Find the content composable through it's layoutId tag.
         val contentPlaceable =
             measurables
                 .fastFirst { it.layoutId == ContentLayoutIdTag }
@@ -389,6 +477,26 @@ fun NavigationSuiteScaffoldLayout(
                     0,
                     layoutHeight - (navigationPlaceable.height * animationProgress).toInt()
                 )
+                // Place the primary action content above the navigation component.
+                val positionX =
+                    if (primaryActionContentHorizontalAlignment == Alignment.Start) {
+                        PrimaryActionContentPadding.roundToPx()
+                    } else if (
+                        primaryActionContentHorizontalAlignment == Alignment.CenterHorizontally
+                    ) {
+                        (layoutWidth - primaryActionContentPlaceable.width) / 2
+                    } else {
+                        layoutWidth -
+                            primaryActionContentPlaceable.width -
+                            PrimaryActionContentPadding.roundToPx()
+                    }
+                primaryActionContentPlaceable.placeRelative(
+                    positionX,
+                    layoutHeight -
+                        primaryActionContentPlaceable.height -
+                        PrimaryActionContentPadding.roundToPx() -
+                        (navigationPlaceable.height * animationProgress).toInt()
+                )
             } else {
                 // Place the navigation component at the start of the screen.
                 navigationPlaceable.placeRelative(
@@ -409,10 +517,41 @@ fun NavigationSuiteScaffoldLayout(
  * Layout for a [NavigationSuiteScaffold]'s content. This function wraps the [content] and places
  * the [navigationSuite] component according to the given [layoutType].
  *
+ * Note: It is recommended to use the [NavigationSuiteScaffoldLayout] function with the
+ * navigationSuiteType param instead of this one.
+ *
+ * The usage of this function is recommended when you need some customization that is not viable via
+ * the use of [NavigationSuiteScaffold].
+ *
+ * @param navigationSuite the navigation component to be displayed, typically [NavigationSuite]
+ * @param layoutType the current [NavigationSuiteType]. Defaults to
+ *   [NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo]
+ * @param state the [NavigationSuiteScaffoldState] of this navigation suite scaffold layout
+ * @param content the content of your screen
+ */
+@Composable
+fun NavigationSuiteScaffoldLayout(
+    navigationSuite: @Composable () -> Unit,
+    layoutType: NavigationSuiteType =
+        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(WindowAdaptiveInfoDefault),
+    state: NavigationSuiteScaffoldState = rememberNavigationSuiteScaffoldState(),
+    content: @Composable () -> Unit = {}
+) {
+    NavigationSuiteScaffoldLayout(
+        navigationSuite = navigationSuite,
+        navigationSuiteType = layoutType,
+        state = state,
+        content = content
+    )
+}
+
+/**
+ * Layout for a [NavigationSuiteScaffold]'s content. This function wraps the [content] and places
+ * the [navigationSuite] component according to the given [layoutType].
+ *
  * The usage of this function is recommended when you need some customization that is not viable via
  * the use of [NavigationSuiteScaffold]. Example usage:
  *
- * @sample androidx.compose.material3.adaptive.navigationsuite.samples.NavigationSuiteScaffoldCustomNavigationRail
  * @param navigationSuite the navigation component to be displayed, typically [NavigationSuite]
  * @param layoutType the current [NavigationSuiteType]. Defaults to
  *   [NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo]
@@ -431,8 +570,8 @@ fun NavigationSuiteScaffoldLayout(
 ) =
     NavigationSuiteScaffoldLayout(
         navigationSuite = navigationSuite,
+        navigationSuiteType = layoutType,
         state = rememberNavigationSuiteScaffoldState(),
-        layoutType = layoutType,
         content = content
     )
 
@@ -452,16 +591,21 @@ fun NavigationSuiteScaffoldLayout(
  * @param verticalArrangement the vertical arrangement of the items inside vertical navigation
  *   components, such as the wide navigation rail. It's recommended to use [Arrangement.Top],
  *   [Arrangement.Center], or [Arrangement.Bottom].
+ * @param primaryActionContent The optional primary action content of the navigation suite scaffold,
+ *   if any. Typically a [androidx.compose.material3.FloatingActionButton]. It'll be displayed
+ *   inside vertical navigation components as their header, and above horizontal navigation
+ *   components.
  * @param content the content inside the current navigation component, typically
  *   [NavigationSuiteItem]s
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NavigationSuite(
     navigationSuiteType: NavigationSuiteType,
     modifier: Modifier = Modifier,
     colors: NavigationSuiteColors = NavigationSuiteDefaults.colors(),
     verticalArrangement: Arrangement.Vertical = NavigationSuiteDefaults.verticalArrangement,
+    primaryActionContent: @Composable (() -> Unit) = {},
     content: @Composable () -> Unit
 ) {
     val movableContent = remember(content) { movableContentOf(content) }
@@ -485,6 +629,7 @@ fun NavigationSuite(
         NavigationSuiteType.WideNavigationRailCollapsed -> {
             WideNavigationRail(
                 modifier = modifier,
+                header = primaryActionContent,
                 arrangement = verticalArrangement,
                 colors = colors.wideNavigationRailColors,
                 content = movableContent
@@ -493,6 +638,7 @@ fun NavigationSuite(
         NavigationSuiteType.WideNavigationRailExpanded -> {
             WideNavigationRail(
                 modifier = modifier,
+                header = primaryActionContent,
                 state =
                     rememberWideNavigationRailState(
                         initialValue = WideNavigationRailValue.Expanded
@@ -520,6 +666,7 @@ fun NavigationSuite(
         NavigationSuiteType.NavigationRail -> {
             NavigationRail(
                 modifier = modifier,
+                header = { primaryActionContent() },
                 containerColor = colors.navigationRailContainerColor,
                 contentColor = colors.navigationRailContentColor
             ) {
@@ -543,6 +690,7 @@ fun NavigationSuite(
                 drawerContainerColor = colors.navigationDrawerContainerColor,
                 drawerContentColor = colors.navigationDrawerContentColor
             ) {
+                primaryActionContent()
                 if (
                     verticalArrangement == Arrangement.Center ||
                         verticalArrangement == Arrangement.Bottom
@@ -1101,6 +1249,9 @@ object NavigationSuiteScaffoldDefaults {
     /** Default content color for a navigation suite scaffold. */
     val contentColor: Color
         @Composable get() = MaterialTheme.colorScheme.onBackground
+
+    /** Default primary action content alignment for a navigation suite scaffold. */
+    val primaryActionContentAlignment = Alignment.End
 }
 
 /** Contains the default values used by the [NavigationSuite]. */
@@ -1350,6 +1501,34 @@ internal class NavigationSuiteScaffoldStateImpl(var initialValue: NavigationSuit
     }
 }
 
+@Composable
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private fun Modifier.navigationSuiteScaffoldConsumeWindowInsets(
+    navigationSuiteType: NavigationSuiteType,
+    state: NavigationSuiteScaffoldState
+): Modifier =
+    consumeWindowInsets(
+        if (state.currentValue == NavigationSuiteScaffoldValue.Hidden && !state.isAnimating) {
+            NoWindowInsets
+        } else {
+            when (navigationSuiteType) {
+                NavigationSuiteType.ShortNavigationBarCompact,
+                NavigationSuiteType.ShortNavigationBarMedium ->
+                    ShortNavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
+                NavigationSuiteType.WideNavigationRailCollapsed,
+                NavigationSuiteType.WideNavigationRailExpanded, ->
+                    WideNavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
+                NavigationSuiteType.NavigationBar ->
+                    NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
+                NavigationSuiteType.NavigationRail ->
+                    NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
+                NavigationSuiteType.NavigationDrawer ->
+                    DrawerDefaults.windowInsets.only(WindowInsetsSides.Start)
+                else -> NoWindowInsets
+            }
+        }
+    )
+
 private val NavigationSuiteType.isNavigationBar
     get() =
         this == NavigationSuiteType.ShortNavigationBarCompact ||
@@ -1433,9 +1612,11 @@ private fun NavigationItemIcon(
 private const val SpringDefaultSpatialDamping = 0.9f
 private const val SpringDefaultSpatialStiffness = 700.0f
 private const val NavigationSuiteLayoutIdTag = "navigationSuite"
+private const val PrimaryActionContentLayoutIdTag = "primaryActionContent"
 private const val ContentLayoutIdTag = "content"
 
 private val TallNavigationBarHeight = 80.dp
+private val PrimaryActionContentPadding = 16.dp
 private val NoWindowInsets = WindowInsets(0, 0, 0, 0)
 private val AnimationSpec: SpringSpec<Float> =
     spring(dampingRatio = SpringDefaultSpatialDamping, stiffness = SpringDefaultSpatialStiffness)
