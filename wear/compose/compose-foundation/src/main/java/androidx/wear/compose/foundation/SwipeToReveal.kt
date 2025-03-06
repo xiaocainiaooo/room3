@@ -759,7 +759,7 @@ public object SwipeToRevealDefaults {
         tween(durationMillis = RAPID_ANIMATION, easing = FastOutSlowInEasing)
 
     /** Default padding space between action slots. */
-    internal val Padding = 2.dp
+    internal val Padding = 4.dp
 
     /**
      * Default ratio of the content displayed when in [RevealValue.RightRevealing] state, i.e. all
