@@ -49,6 +49,17 @@ import java.util.Set;
  * {@link #deInitSession()} is called.
  */
 public interface SessionProcessor {
+    /**
+     * The session processor is used for CameraX extension modes that will directly access the
+     * vendor library implementation.
+     */
+    int TYPE_VENDOR_LIBRARY = 0;
+
+    /**
+     * The session processor is used for Camera2 extension modes that should create the capture
+     * session via Camera2 Extensions API.
+     */
+    int TYPE_CAMERA2_EXTENSION = 1;
 
     /**
      * Initializes the session and returns a transformed {@link SessionConfig} which should be
@@ -191,7 +202,6 @@ public interface SessionProcessor {
         return null;
     }
 
-
     /**
      * Returns the dynamically calculated capture latency pair in milliseconds.
      *
@@ -213,6 +223,22 @@ public interface SessionProcessor {
      */
     default @Nullable Pair<Long, Long> getRealtimeCaptureLatency() {
         return null;
+    }
+
+    /**
+     * Returns the implementation type info composited by the extension impl type and the
+     * extension mode.
+     *
+     * <p>The first value of the returned {@link Pair} can be {@link #TYPE_VENDOR_LIBRARY} or
+     * {@link #TYPE_CAMERA2_EXTENSION} that can let the caller know how to use the
+     * SessionProcessor to create the capture session. The second value is the mode under the impl
+     * type.
+     *
+     * @return a {@link Pair} composited by the extension impl type and the extension mode.
+     */
+    @NonNull
+    default Pair<Integer, Integer> getImplementationType() {
+        return Pair.create(TYPE_VENDOR_LIBRARY, 0 /* ExtensionMode.None */);
     }
 
     /**
