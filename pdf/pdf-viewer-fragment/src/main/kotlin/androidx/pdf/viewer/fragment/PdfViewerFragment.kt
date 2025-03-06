@@ -36,6 +36,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
+import androidx.core.os.OperationCanceledException
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
 import androidx.fragment.app.Fragment
@@ -520,10 +521,18 @@ public open class PdfViewerFragment constructor() : Fragment() {
 
     private fun handleDocumentError(uiState: DocumentError) {
         dismissPasswordDialog()
-        val errorMessage =
-            context?.resources?.getString(androidx.pdf.R.string.pdf_error)
-                ?: uiState.exception.message
-        onLoadDocumentError(RuntimeException(errorMessage, uiState.exception))
+        if (uiState.exception is OperationCanceledException) {
+            onLoadDocumentError(uiState.exception)
+        } else {
+            onLoadDocumentError(
+                RuntimeException(
+                    context?.resources?.getString(androidx.pdf.R.string.pdf_error)
+                        ?: uiState.exception.message,
+                    uiState.exception
+                )
+            )
+        }
+
         setViewVisibility(
             pdfView = GONE,
             loadingView = GONE,
