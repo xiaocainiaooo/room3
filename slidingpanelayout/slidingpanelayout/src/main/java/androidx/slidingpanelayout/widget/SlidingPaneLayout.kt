@@ -75,7 +75,6 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
@@ -2324,6 +2323,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         contentDescription: String? = null,
         contentChangeType: Int = AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
     ) {
+        // Early return if accessibility is not enabled.
+        if (!accessibilityManager.isEnabled && !isAccessibilityEnabledForTesting) {
+            return
+        }
         parent?.requestSendAccessibilityEvent(
             this,
             @Suppress("DEPRECATION")
