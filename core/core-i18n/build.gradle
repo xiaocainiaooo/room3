@@ -39,7 +39,7 @@ dependencies {
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.testRunner)
-    androidTestImplementation(project(":core:core"))
+    androidTestImplementation("androidx.core:core:1.15.0")
 }
 
 androidx {
