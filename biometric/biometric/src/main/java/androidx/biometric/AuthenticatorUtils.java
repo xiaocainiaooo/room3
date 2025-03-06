@@ -206,4 +206,17 @@ class AuthenticatorUtils {
     static boolean isWeakBiometricAllowed(@BiometricManager.AuthenticatorTypes int authenticators) {
         return (authenticators & Authenticators.BIOMETRIC_WEAK) == Authenticators.BIOMETRIC_WEAK;
     }
+
+    /**
+     * Checks if a <strong>Class 3</strong> (formerly <strong>Strong</strong>) biometric is included
+     * in the given set of allowed authenticator types.
+     *
+     * @param authenticators A bit field representing a set of allowed authenticator types.
+     * @return Whether {@link Authenticators#BIOMETRIC_STRONG} is an allowed authenticator type.
+     */
+    static boolean isStrongBiometricAllowed(
+            @BiometricManager.AuthenticatorTypes int authenticators) {
+        return (authenticators & Authenticators.BIOMETRIC_STRONG)
+                == Authenticators.BIOMETRIC_STRONG;
+    }
 }
