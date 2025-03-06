@@ -44,6 +44,7 @@ package androidx.compose.material3.adaptive.navigationsuite {
     method public String calculateFromAdaptiveInfo(androidx.compose.material3.adaptive.WindowAdaptiveInfo adaptiveInfo);
     method @androidx.compose.runtime.Composable public long getContainerColor();
     method @androidx.compose.runtime.Composable public long getContentColor();
+    method public String navigationSuiteType(androidx.compose.material3.adaptive.WindowAdaptiveInfo adaptiveInfo);
     property @androidx.compose.runtime.Composable public long containerColor;
     property @androidx.compose.runtime.Composable public long contentColor;
     field public static final androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults INSTANCE;
@@ -83,7 +84,7 @@ package androidx.compose.material3.adaptive.navigationsuite {
     property public androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldState state;
   }
 
-  public interface NavigationSuiteScaffoldState {
+  @androidx.compose.runtime.Stable public interface NavigationSuiteScaffoldState {
     method public androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldValue getCurrentValue();
     method public androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldValue getTargetValue();
     method public suspend Object? hide(kotlin.coroutines.Continuation<? super kotlin.Unit>);
@@ -114,10 +115,18 @@ package androidx.compose.material3.adaptive.navigationsuite {
     method public String getNavigationDrawer();
     method public String getNavigationRail();
     method public String getNone();
+    method public String getShortNavigationBarCompact();
+    method public String getShortNavigationBarMedium();
+    method public String getWideNavigationRailCollapsed();
+    method public String getWideNavigationRailExpanded();
     property public String NavigationBar;
     property public String NavigationDrawer;
     property public String NavigationRail;
     property public String None;
+    property public String ShortNavigationBarCompact;
+    property public String ShortNavigationBarMedium;
+    property public String WideNavigationRailCollapsed;
+    property public String WideNavigationRailExpanded;
   }
 
 }

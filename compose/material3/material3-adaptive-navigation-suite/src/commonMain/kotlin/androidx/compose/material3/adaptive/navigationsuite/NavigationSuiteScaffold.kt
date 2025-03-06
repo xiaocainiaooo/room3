@@ -49,14 +49,18 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemColors
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRail
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveComponentOverrideApi
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
@@ -90,6 +94,7 @@ enum class NavigationSuiteScaffoldValue {
  *
  * @see rememberNavigationSuiteScaffoldState to construct the default implementation.
  */
+@Stable
 interface NavigationSuiteScaffoldState {
     /** Whether the state is currently animating. */
     val isAnimating: Boolean
@@ -575,10 +580,49 @@ value class NavigationSuiteType private constructor(private val description: Str
 
     companion object {
         /**
+         * A navigation suite type that instructs the [NavigationSuite] to expect a
+         * [ShortNavigationBar] with vertical [ShortNavigationBarItem]s that will be displayed at
+         * the bottom of the screen.
+         *
+         * @see [ShortNavigationBar]
+         */
+        val ShortNavigationBarCompact =
+            NavigationSuiteType(description = "ShortNavigationBarCompact")
+
+        /**
+         * A navigation suite type that instructs the [NavigationSuite] to expect a
+         * [ShortNavigationBar] with horizontal [ShortNavigationBarItem]s that will be displayed at
+         * the bottom of the screen.
+         *
+         * @see [ShortNavigationBar]
+         */
+        val ShortNavigationBarMedium = NavigationSuiteType(description = "ShortNavigationBarMedium")
+
+        /**
+         * A navigation suite type that instructs the [NavigationSuite] to expect a collapsed
+         * [WideNavigationRail] that will be displayed at the start of the screen.
+         *
+         * @see [WideNavigationRail]
+         */
+        val WideNavigationRailCollapsed =
+            NavigationSuiteType(description = "WideNavigationRailCollapsed")
+
+        /**
+         * A navigation suite type that instructs the [NavigationSuite] to expect an expanded
+         * [WideNavigationRail] that will be displayed at the start of the screen.
+         *
+         * @see [WideNavigationRail]
+         */
+        val WideNavigationRailExpanded =
+            NavigationSuiteType(description = "WideNavigationRailExpanded")
+
+        /**
          * A navigation suite type that instructs the [NavigationSuite] to expect a [NavigationBar]
          * that will be displayed at the bottom of the screen.
          *
-         * @see NavigationBar
+         * Note: It's recommended to use [ShortNavigationBarCompact] instead of this layout type.
+         *
+         * @see [NavigationBar]
          */
         val NavigationBar = NavigationSuiteType(description = "NavigationBar")
 
@@ -586,7 +630,9 @@ value class NavigationSuiteType private constructor(private val description: Str
          * A navigation suite type that instructs the [NavigationSuite] to expect a [NavigationRail]
          * that will be displayed at the start of the screen.
          *
-         * @see NavigationRail
+         * Note: It's recommended to use [WideNavigationRailCollapsed] instead of this layout type.
+         *
+         * @see [NavigationRail]
          */
         val NavigationRail = NavigationSuiteType(description = "NavigationRail")
 
@@ -594,13 +640,18 @@ value class NavigationSuiteType private constructor(private val description: Str
          * A navigation suite type that instructs the [NavigationSuite] to expect a
          * [PermanentDrawerSheet] that will be displayed at the start of the screen.
          *
-         * @see PermanentDrawerSheet
+         * Note: It's recommended to use [WideNavigationRailExpanded] instead of this layout type.
+         *
+         * @see [PermanentDrawerSheet]
          */
         val NavigationDrawer = NavigationSuiteType(description = "NavigationDrawer")
 
         /**
          * A navigation suite type that instructs the [NavigationSuite] to not display any
          * navigation components on the screen.
+         *
+         * Note: It's recommended to use [NavigationSuiteScaffoldState] instead of this layout type
+         * and set the visibility of the navigation component to hidden.
          */
         val None = NavigationSuiteType(description = "None")
     }
@@ -609,11 +660,41 @@ value class NavigationSuiteType private constructor(private val description: Str
 /** Contains the default values used by the [NavigationSuiteScaffold]. */
 object NavigationSuiteScaffoldDefaults {
     /**
-     * Returns the expected [NavigationSuiteType] according to the provided [WindowAdaptiveInfo].
-     * Usually used with the [NavigationSuiteScaffold] and related APIs.
+     * Returns the recommended [NavigationSuiteType] according to the provided [WindowAdaptiveInfo],
+     * following the Material specifications. Usually used with the [NavigationSuiteScaffold] and
+     * related APIs.
      *
      * @param adaptiveInfo the provided [WindowAdaptiveInfo]
      * @see NavigationSuiteScaffold
+     */
+    @Suppress("DEPRECATION") // WindowWidthSizeClass deprecated
+    fun navigationSuiteType(adaptiveInfo: WindowAdaptiveInfo): NavigationSuiteType {
+        return with(adaptiveInfo) {
+            if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT) {
+                NavigationSuiteType.ShortNavigationBarCompact
+            } else if (
+                windowPosture.isTabletop ||
+                    windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT &&
+                        (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.MEDIUM ||
+                            windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED)
+            ) {
+                NavigationSuiteType.ShortNavigationBarMedium
+            } else {
+                NavigationSuiteType.WideNavigationRailCollapsed
+            }
+        }
+    }
+
+    /**
+     * Returns the standard [NavigationSuiteType] according to the provided [WindowAdaptiveInfo].
+     * Usually used with the [NavigationSuiteScaffold] and related APIs.
+     *
+     * Note: It's recommended to use [navigationSuiteType] instead of this function, as that one
+     * offers extended and preferred types.
+     *
+     * @param adaptiveInfo the provided [WindowAdaptiveInfo]
+     * @see NavigationSuiteScaffold
+     * @see navigationSuiteType
      */
     @Suppress("DEPRECATION") // WindowWidthSizeClass deprecated
     fun calculateFromAdaptiveInfo(adaptiveInfo: WindowAdaptiveInfo): NavigationSuiteType {
