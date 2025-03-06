@@ -18,7 +18,6 @@ package androidx.pdf.view.fastscroll
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.Range
 import androidx.core.content.ContextCompat
@@ -73,12 +72,11 @@ class FastScrollDrawerTest {
 
     @Test
     fun draw_withinVisibleArea_verifyDrawOnCanvas() {
-        val zoom = 1.5f
-        val scrollY = 100
-        val visibleAreaPx = Rect(0, 0, 500, 800)
+        val xOffset = 500
+        val yOffset = 100
         val visiblePages = Range(1, 5)
 
-        fastScrollDrawer.draw(spyCanvas, zoom, scrollY, visibleAreaPx, visiblePages)
+        fastScrollDrawer.draw(spyCanvas, xOffset, yOffset, visiblePages)
 
         val leftCaptor = ArgumentCaptor.forClass(Int::class.java)
         val topCaptor = ArgumentCaptor.forClass(Int::class.java)
@@ -93,9 +91,9 @@ class FastScrollDrawerTest {
             )
         verify(thumbDrawable).draw(spyCanvas)
 
-        val expectedLeftRange = Range(600, 700)
-        val expectedTopRange = Range(100, 200)
-        val expectedRightRange = Range(700, 800)
+        val expectedLeftRange = Range(350, 450)
+        val expectedTopRange = Range(0, 100)
+        val expectedRightRange = Range(450, 550)
         val expectedBottomRange = Range(100, 300)
         assertTrue(expectedLeftRange.contains(leftCaptor.value))
         assertTrue(expectedTopRange.contains(topCaptor.value))

@@ -89,13 +89,42 @@ class FastScrollCalculatorTest {
         val fastScrollY =
             calculator.computeThumbPosition(
                 scrollY = 100,
-                zoom = 1f,
                 viewHeight = 500,
                 thumbHeightPx = 50,
-                estimatedFullHeight = 1000
+                estimatedFullHeight = 1000F
             )
 
-        val expectedScrollValue = 100
-        assertEquals(expectedScrollValue, fastScrollY)
+        // scrollbarLength = viewHeight - thumbHeight = 450
+        // scrollPercent = scrollY / scrollableHeight = 100 / 500 = 0.2
+        // fastScrollY = scrollPercent * scrollbarLength = 0.2 * 450 = 90
+        val expectedFastScrollY = 90
+        assertEquals(expectedFastScrollY, fastScrollY)
+    }
+
+    @Test
+    fun test_computeViewScroll() = runTest {
+        val mockContext = mock<Context>()
+        val mockResources = mock<Resources>()
+
+        val displayMetrics = DisplayMetrics()
+        displayMetrics.density = 2f
+        whenever(mockContext.resources).thenReturn(mockResources)
+        whenever(mockResources.displayMetrics).thenReturn(displayMetrics)
+
+        val calculator = FastScrollCalculator(mockContext)
+
+        val fastScrollY =
+            calculator.computeViewScroll(
+                fastScrollY = 90,
+                viewHeight = 500,
+                thumbHeightPx = 50,
+                estimatedFullHeight = 1000F
+            )
+
+        // scrollbarLength = viewHeight - thumbHeight = 450
+        // scrollPercent = fastScrollY / scrollbarLength = 90 / 450 = 0.2
+        // viewScroll = scrollPercent * scrollableHeight = 0.2 * 500 = 100
+        val expectedViewScroll = 100
+        assertEquals(expectedViewScroll, fastScrollY)
     }
 }

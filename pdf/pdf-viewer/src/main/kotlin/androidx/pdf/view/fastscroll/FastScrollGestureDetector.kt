@@ -88,9 +88,9 @@ internal class FastScrollGestureDetector(
         /**
          * Called when a fast scroll gesture is detected.
          *
-         * @param scrollY The vertical scroll position in pixels indicated by the fast scroll
+         * @param eventY The vertical scroll position in pixels indicated by the fast scroll
          *   gesture.
          */
-        fun onFastScrollDetected(scrollY: Float)
+        fun onFastScrollDetected(eventY: Float)
     }
 }
