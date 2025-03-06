@@ -113,8 +113,8 @@ class FastScrollGestureDetectorTest {
     open class FakeFastScrollGestureHandler : FastScrollGestureDetector.FastScrollGestureHandler {
         var lastScrollY: Float = 0f
 
-        override fun onFastScrollDetected(scrollY: Float) {
-            lastScrollY = scrollY
+        override fun onFastScrollDetected(eventY: Float) {
+            lastScrollY = eventY
         }
     }
 }
