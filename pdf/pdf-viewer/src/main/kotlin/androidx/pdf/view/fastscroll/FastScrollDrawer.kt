@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.Range
@@ -52,20 +51,16 @@ public class FastScrollDrawer(
     private val pageIndicatorBackground: Drawable,
 ) {
 
-    private val thumbWidthDp = context.getDimensions(R.dimen.default_thumb_width).toInt()
-    private val thumbHeightDp = context.getDimensions(R.dimen.default_thumb_height).toInt()
-    private val trackWidthDp = context.getDimensions(R.dimen.default_track_width).toInt()
-    private val trackHeightDp = context.getDimensions(R.dimen.default_track_height).toInt()
-    private val scrubberEdgeOffsetDp = context.getDimensions(R.dimen.scrubber_edge_offset).toInt()
-    private val pageIndicatorHeightDp = context.getDimensions(R.dimen.page_indicator_height).toInt()
-    private val pageIndicatorRightMarginDp =
+    internal val thumbWidthPx = context.getDimensions(R.dimen.default_thumb_width).toInt()
+    internal val thumbHeightPx = context.getDimensions(R.dimen.default_thumb_height).toInt()
+    private val trackWidthPx = context.getDimensions(R.dimen.default_track_width).toInt()
+    private val trackHeightPx = context.getDimensions(R.dimen.default_track_height).toInt()
+    private val scrubberEdgeOffsetPx = context.getDimensions(R.dimen.scrubber_edge_offset).toInt()
+    private val pageIndicatorHeightPx = context.getDimensions(R.dimen.page_indicator_height).toInt()
+    private val pageIndicatorRightMarginPx =
         context.getDimensions(R.dimen.page_indicator_right_margin).toInt()
-    private val pageIndicatorTextOffsetDp =
+    private val pageIndicatorTextOffsetPx =
         context.getDimensions(R.dimen.page_indicator_text_offset).toInt()
-    private val pageIndicatorTextXOffsetDp =
-        context.getDimensions(R.dimen.page_indicator_text_offset_x).toInt()
-    private val pageIndicatorTextYOffsetDp =
-        context.getDimensions(R.dimen.page_indicator_text_offset_y).toInt()
     private val pageIndicatorTextSize = context.getDimensions(R.dimen.page_indicator_text_size)
 
     private val textPaint: TextPaint =
@@ -76,17 +71,13 @@ public class FastScrollDrawer(
                     com.google.android.material.R.attr.colorOnSurface,
                     Color.BLACK
                 )
-            textSize = pageIndicatorTextSize.dpToPx(context)
+            textSize = pageIndicatorTextSize
             textAlign = Paint.Align.CENTER
             isAntiAlias = true
-            typeface = Typeface.DEFAULT_BOLD
         }
 
     private val thumbShadowDrawable: Drawable? =
         ContextCompat.getDrawable(context, R.drawable.drag_indicator_shadow)
-
-    internal val thumbWidthPx = thumbWidthDp.dpToPx(context)
-    internal val thumbHeightPx = thumbHeightDp.dpToPx(context)
 
     public var alpha: Int = GONE_ALPHA // Initially fast scroller should be hidden
         set(value) {
@@ -113,11 +104,10 @@ public class FastScrollDrawer(
      * @param visiblePages The range of pages that are currently visible.
      */
     public fun draw(canvas: Canvas, xOffset: Int, yOffset: Int, visiblePages: Range<Int>) {
-        val thumbLeftPx =
-            (xOffset - thumbWidthDp.dpToPx(context) + scrubberEdgeOffsetDp.dpToPx(context)).toInt()
+        val thumbLeftPx = (xOffset - (thumbWidthPx - scrubberEdgeOffsetPx)).toInt()
         val thumbTopPx = yOffset
-        val thumbBottomPx = thumbTopPx + thumbHeightDp.dpToPx(context)
-        val thumbRightPx = (xOffset + scrubberEdgeOffsetDp.dpToPx(context)).toInt()
+        val thumbBottomPx = thumbTopPx + thumbHeightPx
+        val thumbRightPx = (xOffset + scrubberEdgeOffsetPx).toInt()
 
         thumbShadowDrawable?.setBounds(
             thumbLeftPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
@@ -126,7 +116,6 @@ public class FastScrollDrawer(
             thumbBottomPx + SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context)
         )
         thumbShadowDrawable?.draw(canvas)
-
         thumbDrawable.setBounds(thumbLeftPx, thumbTopPx, thumbRightPx, thumbBottomPx)
         thumbDrawable.draw(canvas)
 
@@ -142,15 +131,12 @@ public class FastScrollDrawer(
     ) {
         currentPageIndicatorLabel = generateLabel(visiblePages)
         val labelWidth = textPaint.measureText(currentPageIndicatorLabel)
-        val pageIndicatorWidthPx =
-            (labelWidth + (2 * pageIndicatorTextOffsetDp.dpToPx(context))).toInt()
+        val pageIndicatorWidthPx = (labelWidth + (2 * pageIndicatorTextOffsetPx)).toInt()
+        val pageIndicatorHeightPx = pageIndicatorHeightPx
 
-        val pageIndicatorHeightPx = pageIndicatorHeightDp.dpToPx(context)
-
-        val indicatorRightPx = xOffset - pageIndicatorRightMarginDp.dpToPx(context)
+        val indicatorRightPx = xOffset - pageIndicatorRightMarginPx
         val indicatorLeftPx = indicatorRightPx - pageIndicatorWidthPx
-        val indicatorTopPx =
-            thumbTopPx + ((thumbHeightDp.dpToPx(context) - pageIndicatorHeightPx) / 2)
+        val indicatorTopPx = thumbTopPx + ((thumbHeightPx - pageIndicatorHeightPx) / 2)
         val indicatorBottomPx = indicatorTopPx + pageIndicatorHeightPx
 
         pageIndicatorBackground.setBounds(
@@ -169,18 +155,18 @@ public class FastScrollDrawer(
     }
 
     private fun drawDragHandle(canvas: Canvas, thumbRight: Int, thumbTop: Int) {
-        val thumbCenterX = thumbRight - thumbWidthDp.dpToPx(context) / 2
-        val thumbCenterY = thumbTop + thumbHeightDp.dpToPx(context) / 2
+        val thumbCenterX = thumbRight - thumbWidthPx / 2
+        val thumbCenterY = thumbTop + thumbHeightPx / 2
 
         // Calculate the top-left corner of the track to center it
-        val trackLeft = thumbCenterX - trackWidthDp.dpToPx(context) / 2
-        val trackTop = thumbCenterY - trackHeightDp.dpToPx(context) / 2
+        val trackLeft = thumbCenterX - trackWidthPx / 2
+        val trackTop = thumbCenterY - trackHeightPx / 2
 
         trackDrawable.setBounds(
             trackLeft,
             trackTop,
-            trackLeft + trackWidthDp.dpToPx(context),
-            trackTop + trackHeightDp.dpToPx(context)
+            trackLeft + trackWidthPx,
+            trackTop + trackHeightPx
         )
         trackDrawable.draw(canvas)
     }

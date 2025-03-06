@@ -42,8 +42,7 @@ public class FastScroller(
     private val scrollCalculator: FastScrollCalculator
 ) {
     // Init position for fastScrollY with the top margin of the scroller.
-    internal var fastScrollY: Int =
-        scrollCalculator.scrollerTopMarginDp.dpToPx(fastScrollDrawer.context)
+    internal var fastScrollY: Int = scrollCalculator.scrollerTopMarginPx
 
     // This is used to optimize performance. If the scroll position has already been updated
     // by another method the calculation is skipped.

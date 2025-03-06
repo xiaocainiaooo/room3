@@ -34,9 +34,9 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class FastScrollCalculatorTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private var scrollerTopMarginDp: Int =
+    private var scrollerTopMarginPx: Int =
         context.getDimensions(R.dimen.scroller_top_margin).toInt()
-    private var scrollerBottomMarginDp: Int =
+    private var scrollerBottomMarginPx: Int =
         context.getDimensions(R.dimen.scroller_bottom_margin).toInt()
 
     @Test
@@ -57,7 +57,7 @@ class FastScrollCalculatorTest {
         val constrainedPosition =
             calculator.constrainScrollPosition(scrollY = -50f, viewHeight = 500, thumbHeightPx = 50)
 
-        val expectedValue = scrollerTopMarginDp.dpToPx(context)
+        val expectedValue = scrollerTopMarginPx
         assertEquals(expectedValue, constrainedPosition)
     }
 
@@ -70,7 +70,7 @@ class FastScrollCalculatorTest {
         val constrainedPosition =
             calculator.constrainScrollPosition(scrollY = 600f, viewHeight, thumbHeightPx)
 
-        val expectedValue = viewHeight - (scrollerBottomMarginDp.dpToPx(context) + thumbHeightPx)
+        val expectedValue = viewHeight - (scrollerBottomMarginPx + thumbHeightPx)
         assertEquals(expectedValue, constrainedPosition)
     }
 
