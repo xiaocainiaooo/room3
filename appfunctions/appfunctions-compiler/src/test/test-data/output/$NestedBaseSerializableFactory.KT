@@ -13,7 +13,7 @@ public class `$NestedBaseSerializableFactory` : AppFunctionSerializableFactory<N
     val nestedBaseData = appFunctionData.getAppFunctionData("nestedBase")
     var nestedBase: NestedBaseSerializable? = null
     if (nestedBaseData != null) {
-      nestedBase = nestedBaseSerializableFactory.fromAppFunctionData(nestedBaseData) as NestedBaseSerializable?
+      nestedBase = nestedBaseSerializableFactory.fromAppFunctionData(nestedBaseData)
     }
 
     return NestedBaseSerializable(stringBaseName, nestedBase)
@@ -23,9 +23,11 @@ public class `$NestedBaseSerializableFactory` : AppFunctionSerializableFactory<N
     val nestedBaseSerializableFactory = `$NestedBaseSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.NestedBaseSerializable")
-    builder.setString("stringBaseName", appFunctionSerializable.stringBaseName)
-    if (appFunctionSerializable.nestedBase != null) {
-      builder.setAppFunctionData("nestedBase", nestedBaseSerializableFactory.toAppFunctionData(appFunctionSerializable.nestedBase as NestedBaseSerializable))
+    val stringBaseName = appFunctionSerializable.stringBaseName
+    builder.setString("stringBaseName", stringBaseName)
+    val nestedBase = appFunctionSerializable.nestedBase
+    if (nestedBase != null) {
+      builder.setAppFunctionData("nestedBase", nestedBaseSerializableFactory.toAppFunctionData(nestedBase))
     }
 
     return builder.build()

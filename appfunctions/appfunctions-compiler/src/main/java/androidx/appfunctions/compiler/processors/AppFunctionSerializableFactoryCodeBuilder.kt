@@ -28,7 +28,6 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerial
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod.APP_FUNCTION_DATA_PARAM_NAME
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.ToAppFunctionDataMethod.APP_FUNCTION_SERIALIZABLE_PARAM_NAME
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
-import androidx.appfunctions.compiler.core.ignoreNullable
 import androidx.appfunctions.compiler.core.isOfType
 import androidx.appfunctions.compiler.core.toTypeName
 import com.google.devtools.ksp.symbol.KSTypeReference
@@ -69,6 +68,15 @@ class AppFunctionSerializableFactoryCodeBuilder(
             addStatement("val builder = %T(%S)", AppFunctionData.Builder::class, qualifiedClassName)
             for (property in annotatedClass.getProperties()) {
                 val afType = AppFunctionTypeReference(property.type)
+                val formatStringMap =
+                    mapOf<String, Any>(
+                        "param_name" to checkNotNull(property.name).asString(),
+                        "annotated_class_instance" to APP_FUNCTION_SERIALIZABLE_PARAM_NAME
+                    )
+                addNamed(
+                    "val %param_name:L = %annotated_class_instance:L.%param_name:L\n",
+                    formatStringMap
+                )
                 if (afType.isNullable) {
                     appendNullableSetterStatement(property, afType)
                 } else {
@@ -143,7 +151,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 .addNamed("if (%serializable_data_val_name:L != null) {\n", formatStringMap)
                 .indent()
                 .addNamed(
-                    "%param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L) as %param_type:T\n",
+                    "%param_name:L = %factory_name:L.%from_app_function_data_method_name:L(%serializable_data_val_name:L)\n",
                     formatStringMap
                 )
                 .unindent()
@@ -216,13 +224,9 @@ class AppFunctionSerializableFactoryCodeBuilder(
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to checkNotNull(param.name).asString(),
-                "annotated_class_instance" to APP_FUNCTION_SERIALIZABLE_PARAM_NAME
             )
 
-        return addNamed(
-                "if (%annotated_class_instance:L.%param_name:L != null) {\n",
-                formatStringMap
-            )
+        return addNamed("if (%param_name:L != null) {\n", formatStringMap)
             .indent()
             .appendSetterStatement(param, type)
             .unindent()
@@ -250,12 +254,8 @@ class AppFunctionSerializableFactoryCodeBuilder(
             mapOf<String, Any>(
                 "param_name" to checkNotNull(param.name).asString(),
                 "setter_name" to getAppFunctionDataSetterName(afType),
-                "annotated_class_instance" to APP_FUNCTION_SERIALIZABLE_PARAM_NAME,
             )
-        addNamed(
-            "builder.%setter_name:L(\"%param_name:L\", %annotated_class_instance:L.%param_name:L)\n",
-            formatStringMap
-        )
+        addNamed("builder.%setter_name:L(\"%param_name:L\", %param_name:L)\n", formatStringMap)
         return this
     }
 
@@ -267,14 +267,12 @@ class AppFunctionSerializableFactoryCodeBuilder(
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to checkNotNull(param.name).asString(),
-                "param_type" to param.type.toTypeName().ignoreNullable(),
                 "factory_name" to "${typeName}Factory".lowerFirstChar(),
                 "setter_name" to getAppFunctionDataSetterName(afType),
-                "annotated_class_instance" to APP_FUNCTION_SERIALIZABLE_PARAM_NAME,
             )
 
         addNamed(
-            "builder.%setter_name:L(\"%param_name:L\", %factory_name:L.toAppFunctionData(%annotated_class_instance:L.%param_name:L as %param_type:T))\n",
+            "builder.%setter_name:L(\"%param_name:L\", %factory_name:L.toAppFunctionData(%param_name:L))\n",
             formatStringMap
         )
         return this
@@ -291,13 +289,12 @@ class AppFunctionSerializableFactoryCodeBuilder(
                 "param_name" to checkNotNull(param.name).asString(),
                 "factory_name" to "${parametrizedTypeName}Factory".lowerFirstChar(),
                 "setter_name" to getAppFunctionDataSetterName(afType),
-                "annotated_class_instance" to APP_FUNCTION_SERIALIZABLE_PARAM_NAME,
                 "lambda_param_name" to parametrizedTypeName.lowerFirstChar()
             )
 
         addNamed(
                 "builder.%setter_name:L(\"%param_name:L\", " +
-                    "%annotated_class_instance:L.%param_name:L" +
+                    "%param_name:L" +
                     ".map{ %lambda_param_name:L ->\n",
                 formatStringMap
             )

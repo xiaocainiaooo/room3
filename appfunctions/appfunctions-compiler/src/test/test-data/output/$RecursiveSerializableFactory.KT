@@ -12,7 +12,7 @@ public class `$RecursiveSerializableFactory` : AppFunctionSerializableFactory<Re
     val nestedData = appFunctionData.getAppFunctionData("nested")
     var nested: RecursiveSerializable? = null
     if (nestedData != null) {
-      nested = recursiveSerializableFactory.fromAppFunctionData(nestedData) as RecursiveSerializable?
+      nested = recursiveSerializableFactory.fromAppFunctionData(nestedData)
     }
 
     return RecursiveSerializable(nested)
@@ -22,8 +22,9 @@ public class `$RecursiveSerializableFactory` : AppFunctionSerializableFactory<Re
     val recursiveSerializableFactory = `$RecursiveSerializableFactory`()
 
     val builder = AppFunctionData.Builder("com.testdata.RecursiveSerializable")
-    if (appFunctionSerializable.nested != null) {
-      builder.setAppFunctionData("nested", recursiveSerializableFactory.toAppFunctionData(appFunctionSerializable.nested as RecursiveSerializable))
+    val nested = appFunctionSerializable.nested
+    if (nested != null) {
+      builder.setAppFunctionData("nested", recursiveSerializableFactory.toAppFunctionData(nested))
     }
 
     return builder.build()
