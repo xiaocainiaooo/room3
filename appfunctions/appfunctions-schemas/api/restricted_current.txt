@@ -1,1 +1,10 @@
 // Signature format: 4.0
+package androidx.appfunctions {
+
+  public interface AppFunctionOpenable {
+    method public android.app.PendingIntent getIntentToOpen();
+    property public abstract android.app.PendingIntent intentToOpen;
+  }
+
+}
+
