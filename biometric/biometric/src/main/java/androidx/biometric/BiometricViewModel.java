@@ -492,7 +492,7 @@ public class BiometricViewModel extends ViewModel {
         // Use a fake crypto object to force Strong biometric auth prior to Android 11 (API 30).
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-                && getAllowedAuthenticators() == BiometricManager.Authenticators.BIOMETRIC_STRONG
+                && AuthenticatorUtils.isStrongBiometricAllowed(getAllowedAuthenticators())
                 && cryptoObject == null) {
             mCryptoObject = CryptoObjectUtils.createFakeCryptoObject();
         }
