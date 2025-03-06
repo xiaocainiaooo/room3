@@ -9,9 +9,9 @@ public class `$LongBaseSerializableFactory` : AppFunctionSerializableFactory<Lon
   override fun fromAppFunctionData(appFunctionData: AppFunctionData): LongBaseSerializable {
 
     val age = checkNotNull(appFunctionData.getLongOrNull("age"))
-    val name = checkNotNull(appFunctionData.getString("name"))
+    val stringToOpen = checkNotNull(appFunctionData.getString("stringToOpen"))
 
-    return LongBaseSerializable(age, name)
+    return LongBaseSerializable(age, stringToOpen)
   }
 
   override fun toAppFunctionData(appFunctionSerializable: LongBaseSerializable): AppFunctionData {
@@ -19,8 +19,8 @@ public class `$LongBaseSerializableFactory` : AppFunctionSerializableFactory<Lon
     val builder = AppFunctionData.Builder("com.testdata.LongBaseSerializable")
     val age = appFunctionSerializable.age
     builder.setLong("age", age)
-    val name = appFunctionSerializable.name
-    builder.setString("name", name)
+    val stringToOpen = appFunctionSerializable.stringToOpen
+    builder.setString("stringToOpen", stringToOpen)
 
     return builder.build()
   }

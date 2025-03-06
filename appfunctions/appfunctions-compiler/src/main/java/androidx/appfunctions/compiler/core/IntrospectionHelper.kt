@@ -43,6 +43,10 @@ object IntrospectionHelper {
         val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionSerializable")
     }
 
+    object AppFunctionSchemaCapability {
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionSchemaCapability")
+    }
+
     object AppFunctionComponentRegistryAnnotation {
         val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionComponentRegistry")
         const val PROPERTY_COMPONENT_CATEGORY = "componentCategory"
