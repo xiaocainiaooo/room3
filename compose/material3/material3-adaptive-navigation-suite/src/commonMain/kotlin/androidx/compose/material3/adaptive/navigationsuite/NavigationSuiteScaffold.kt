@@ -25,13 +25,18 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DrawerDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +48,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemColors
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.NavigationItemColors
+import androidx.compose.material3.NavigationItemIconPosition
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailDefaults
 import androidx.compose.material3.NavigationRailItem
@@ -50,14 +57,22 @@ import androidx.compose.material3.NavigationRailItemColors
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarDefaults
 import androidx.compose.material3.ShortNavigationBarItem
+import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.WideNavigationRail
+import androidx.compose.material3.WideNavigationRailColors
+import androidx.compose.material3.WideNavigationRailDefaults
+import androidx.compose.material3.WideNavigationRailItem
+import androidx.compose.material3.WideNavigationRailItemDefaults
+import androidx.compose.material3.WideNavigationRailValue
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveComponentOverrideApi
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
@@ -67,6 +82,7 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
@@ -75,6 +91,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirst
 import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -423,6 +440,131 @@ fun NavigationSuiteScaffoldLayout(
  * The default Material navigation component according to the current [NavigationSuiteType] to be
  * used with the [NavigationSuiteScaffold].
  *
+ * For specifics about each navigation component, see [ShortNavigationBar], [WideNavigationRail],
+ * [NavigationRail], and [PermanentDrawerSheet].
+ *
+ * @param navigationSuiteType the [NavigationSuiteType] of the associated [NavigationSuiteScaffold].
+ *   Usually [NavigationSuiteScaffoldDefaults.navigationSuiteType]
+ * @param modifier the [Modifier] to be applied to the navigation component
+ * @param colors [NavigationSuiteColors] that will be used to determine the container (background)
+ *   color of the navigation component and the preferred color for content inside the navigation
+ *   component
+ * @param verticalArrangement the vertical arrangement of the items inside vertical navigation
+ *   components, such as the wide navigation rail. It's recommended to use [Arrangement.Top],
+ *   [Arrangement.Center], or [Arrangement.Bottom].
+ * @param content the content inside the current navigation component, typically
+ *   [NavigationSuiteItem]s
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun NavigationSuite(
+    navigationSuiteType: NavigationSuiteType,
+    modifier: Modifier = Modifier,
+    colors: NavigationSuiteColors = NavigationSuiteDefaults.colors(),
+    verticalArrangement: Arrangement.Vertical = NavigationSuiteDefaults.verticalArrangement,
+    content: @Composable () -> Unit
+) {
+    val movableContent = remember(content) { movableContentOf(content) }
+    when (navigationSuiteType) {
+        NavigationSuiteType.ShortNavigationBarCompact -> {
+            ShortNavigationBar(
+                modifier = modifier,
+                containerColor = colors.shortNavigationBarContainerColor,
+                contentColor = colors.shortNavigationBarContentColor,
+                content = movableContent
+            )
+        }
+        NavigationSuiteType.ShortNavigationBarMedium -> {
+            ShortNavigationBar(
+                modifier = modifier,
+                containerColor = colors.shortNavigationBarContainerColor,
+                contentColor = colors.shortNavigationBarContentColor,
+                content = movableContent
+            )
+        }
+        NavigationSuiteType.WideNavigationRailCollapsed -> {
+            WideNavigationRail(
+                modifier = modifier,
+                arrangement = verticalArrangement,
+                colors = colors.wideNavigationRailColors,
+                content = movableContent
+            )
+        }
+        NavigationSuiteType.WideNavigationRailExpanded -> {
+            WideNavigationRail(
+                modifier = modifier,
+                state =
+                    rememberWideNavigationRailState(
+                        initialValue = WideNavigationRailValue.Expanded
+                    ),
+                arrangement = verticalArrangement,
+                colors = colors.wideNavigationRailColors,
+                content = movableContent
+            )
+        }
+        // Note: This function does not support providing a NavigationBar for the
+        // NavigationSuiteType.NavigationBar type instead provides a ShortNavigationBar with a
+        // taller height so that it is visually the same.
+        // It's advised to to use NavigationSuiteType.ShortNavigationBarVerticalItems instead.
+        NavigationSuiteType.NavigationBar -> {
+            ShortNavigationBar(
+                modifier = modifier.heightIn(min = TallNavigationBarHeight),
+                containerColor = colors.navigationBarContainerColor,
+                contentColor = colors.navigationBarContentColor
+            ) {
+                movableContent()
+            }
+        }
+        // It's advised to to use NavigationSuiteType.WideNavigationRail instead of
+        // NavigationSuiteType.NavigationRail.
+        NavigationSuiteType.NavigationRail -> {
+            NavigationRail(
+                modifier = modifier,
+                containerColor = colors.navigationRailContainerColor,
+                contentColor = colors.navigationRailContentColor
+            ) {
+                if (
+                    verticalArrangement == Arrangement.Center ||
+                        verticalArrangement == Arrangement.Bottom
+                ) {
+                    Spacer(Modifier.weight(1f))
+                }
+                movableContent()
+                if (verticalArrangement == Arrangement.Center) {
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+        // It's advised to to use NavigationSuiteType.WideNavigationRail instead of
+        // NavigationSuiteType.NavigationDrawer.
+        NavigationSuiteType.NavigationDrawer -> {
+            PermanentDrawerSheet(
+                modifier = modifier,
+                drawerContainerColor = colors.navigationDrawerContainerColor,
+                drawerContentColor = colors.navigationDrawerContentColor
+            ) {
+                if (
+                    verticalArrangement == Arrangement.Center ||
+                        verticalArrangement == Arrangement.Bottom
+                ) {
+                    Spacer(Modifier.weight(1f))
+                }
+                movableContent()
+                if (verticalArrangement == Arrangement.Center) {
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * The default Material navigation component according to the current [NavigationSuiteType] to be
+ * used with the [NavigationSuiteScaffold].
+ *
+ * Note: It is recommended to use the [NavigationSuite] function with the navigationSuiteType param
+ * and that accepts [NavigationSuiteItem]s instead of this one.
+ *
  * For specifics about each navigation component, see [NavigationBar], [NavigationRail], and
  * [PermanentDrawerSheet].
  *
@@ -435,6 +577,7 @@ fun NavigationSuiteScaffoldLayout(
  * @param content the content inside the current navigation component, typically
  *   [NavigationSuiteScope.item]s
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NavigationSuite(
     modifier: Modifier = Modifier,
@@ -519,6 +662,242 @@ fun NavigationSuite(
         }
         NavigationSuiteType.None -> {
             /* Do nothing. */
+        }
+        else -> {
+            NavigationSuite(
+                navigationSuiteType = layoutType,
+                modifier = modifier,
+                colors = colors,
+            ) {
+                scope.itemList.forEach {
+                    NavigationSuiteItem(
+                        isNavigationSuite = true,
+                        navigationSuiteType = layoutType,
+                        modifier = it.modifier,
+                        selected = it.selected,
+                        onClick = it.onClick,
+                        icon = it.icon,
+                        badge = it.badge,
+                        enabled = it.enabled,
+                        label = it.label,
+                        navigationSuiteItemColors =
+                            it.colors ?: NavigationSuiteDefaults.itemColors(),
+                        navigationItemColors = null,
+                        interactionSource = it.interactionSource
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * The default Material navigation item component according to the current [NavigationSuiteType] to
+ * be used with the [NavigationSuite] that accepts this function.
+ *
+ * For specifics about each navigation component, see [ShortNavigationBarItem],
+ * [WideNavigationRailItem], [NavigationRailItem], and [NavigationDrawerItem].
+ *
+ * @param selected whether this item is selected
+ * @param onClick called when this item is clicked
+ * @param icon icon for this item, typically an [Icon]
+ * @param label the text label for this item
+ * @param modifier the [Modifier] to be applied to this item
+ * @param navigationSuiteType the current [NavigationSuiteType] of the associated [NavigationSuite].
+ *   Defaults to [NavigationSuiteScaffoldDefaults.navigationSuiteType]
+ * @param enabled controls the enabled state of this item. When `false`, this component will not
+ *   respond to user input, and it will appear visually disabled and disabled to accessibility
+ *   services. Note: as of now, for [NavigationDrawerItem], this is always `true`.
+ * @param badge optional badge to show on this item
+ * @param colors [NavigationItemColors] that will be used to resolve the colors used for this item
+ *   in different states. If null, a default Material colors for each specific item will be used.
+ * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
+ *   emitting [Interaction]s for this item. You can use this to change the item's appearance or
+ *   preview the item in different states. Note that if `null` is provided, interactions will still
+ *   happen internally.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun NavigationSuiteItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+    label: @Composable (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    navigationSuiteType: NavigationSuiteType =
+        NavigationSuiteScaffoldDefaults.navigationSuiteType(WindowAdaptiveInfoDefault),
+    enabled: Boolean = true,
+    badge: @Composable (() -> Unit)? = null,
+    colors: NavigationItemColors? = null,
+    interactionSource: MutableInteractionSource? = null,
+) {
+    NavigationSuiteItem(
+        isNavigationSuite = false,
+        navigationSuiteType = navigationSuiteType,
+        selected = selected,
+        onClick = onClick,
+        icon = icon,
+        label = label,
+        modifier = modifier,
+        enabled = enabled,
+        badge = badge,
+        navigationItemColors = colors,
+        navigationSuiteItemColors = null,
+        interactionSource = interactionSource,
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun NavigationSuiteItem(
+    isNavigationSuite: Boolean,
+    navigationSuiteType: NavigationSuiteType,
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+    label: @Composable (() -> Unit)?,
+    modifier: Modifier,
+    enabled: Boolean,
+    badge: @Composable (() -> Unit)?,
+    navigationItemColors: NavigationItemColors?,
+    navigationSuiteItemColors: NavigationSuiteItemColors?,
+    interactionSource: MutableInteractionSource?
+) {
+    when (navigationSuiteType) {
+        NavigationSuiteType.ShortNavigationBarCompact,
+        NavigationSuiteType.ShortNavigationBarMedium -> {
+            val iconPosition =
+                if (navigationSuiteType == NavigationSuiteType.ShortNavigationBarCompact) {
+                    NavigationItemIconPosition.Top
+                } else {
+                    NavigationItemIconPosition.Start
+                }
+            ShortNavigationBarItem(
+                selected = selected,
+                onClick = onClick,
+                icon = { NavigationItemIcon(icon = icon, badge = badge) },
+                label = label,
+                modifier = modifier,
+                enabled = enabled,
+                iconPosition = iconPosition,
+                colors = navigationItemColors ?: ShortNavigationBarItemDefaults.colors(),
+                interactionSource = interactionSource
+            )
+        }
+        NavigationSuiteType.WideNavigationRailCollapsed,
+        NavigationSuiteType.WideNavigationRailExpanded -> {
+            WideNavigationRailItem(
+                railExpanded =
+                    navigationSuiteType == NavigationSuiteType.WideNavigationRailExpanded,
+                selected = selected,
+                onClick = onClick,
+                icon = { NavigationItemIcon(icon = icon, badge = badge) },
+                label = label,
+                modifier = modifier,
+                enabled = enabled,
+                colors = navigationItemColors ?: WideNavigationRailItemDefaults.colors(),
+                interactionSource = interactionSource
+            )
+        }
+        // Note: This function does not support providing a NavigationBarItem for the
+        // NavigationSuiteType.NavigationBar type due to the NavigationBarItem being limited to
+        // RowScope. Instead we provide ShortNavigationBarItem with a top padding so that it is
+        // visually the same.
+        // It's advised to to use NavigationSuiteType.ShortNavigationBarVerticalItems instead.
+        NavigationSuiteType.NavigationBar -> {
+            val defaultColors =
+                navigationSuiteItemColors?.navigationBarItemColors
+                    ?: NavigationBarItemDefaults.colors()
+            val actualColors =
+                if ((!isNavigationSuite && navigationItemColors == null) || isNavigationSuite) {
+                    ShortNavigationBarItemDefaults.colors(
+                        selectedIconColor = defaultColors.selectedIconColor,
+                        selectedTextColor = defaultColors.selectedTextColor,
+                        selectedIndicatorColor = defaultColors.selectedIndicatorColor,
+                        unselectedIconColor = defaultColors.unselectedIconColor,
+                        unselectedTextColor = defaultColors.unselectedTextColor,
+                        disabledIconColor = defaultColors.disabledIconColor,
+                        disabledTextColor = defaultColors.disabledTextColor,
+                    )
+                } else {
+                    navigationItemColors!!
+                }
+
+            ShortNavigationBarItem(
+                selected = selected,
+                onClick = onClick,
+                icon = { NavigationItemIcon(icon = icon, badge = badge) },
+                label = label,
+                modifier = modifier.padding(top = 8.dp),
+                enabled = enabled,
+                colors = actualColors,
+                interactionSource = interactionSource
+            )
+        }
+        // It's advised to to use NavigationSuiteType.WideNavigationRail instead of
+        // NavigationSuiteType.NavigationRail.
+        NavigationSuiteType.NavigationRail -> {
+            val actualColors =
+                if (isNavigationSuite) {
+                    navigationSuiteItemColors?.navigationRailItemColors
+                        ?: NavigationRailItemDefaults.colors()
+                } else {
+                    if (navigationItemColors != null) {
+                        NavigationRailItemDefaults.colors(
+                            selectedIconColor = navigationItemColors.selectedIconColor,
+                            selectedTextColor = navigationItemColors.selectedTextColor,
+                            indicatorColor = navigationItemColors.selectedIndicatorColor,
+                            unselectedIconColor = navigationItemColors.unselectedIconColor,
+                            unselectedTextColor = navigationItemColors.unselectedTextColor,
+                            disabledIconColor = navigationItemColors.disabledIconColor,
+                            disabledTextColor = navigationItemColors.disabledTextColor,
+                        )
+                    } else {
+                        NavigationSuiteDefaults.itemColors().navigationRailItemColors
+                    }
+                }
+            NavigationRailItem(
+                selected = selected,
+                onClick = onClick,
+                icon = { NavigationItemIcon(icon = icon, badge = badge) },
+                label = label,
+                modifier = modifier,
+                enabled = enabled,
+                colors = actualColors,
+                interactionSource = interactionSource
+            )
+        }
+        // It's advised to to use NavigationSuiteType.WideNavigationRail instead of
+        // NavigationSuiteType.NavigationDrawer.
+        NavigationSuiteType.NavigationDrawer -> {
+            val actualColors =
+                if (isNavigationSuite) {
+                    navigationSuiteItemColors?.navigationDrawerItemColors
+                        ?: NavigationDrawerItemDefaults.colors()
+                } else {
+                    if (navigationItemColors != null) {
+                        NavigationDrawerItemDefaults.colors(
+                            selectedIconColor = navigationItemColors.selectedIconColor,
+                            selectedTextColor = navigationItemColors.selectedTextColor,
+                            unselectedIconColor = navigationItemColors.unselectedIconColor,
+                            unselectedTextColor = navigationItemColors.unselectedTextColor,
+                            selectedContainerColor = navigationItemColors.selectedIndicatorColor
+                        )
+                    } else {
+                        NavigationSuiteDefaults.itemColors().navigationDrawerItemColors
+                    }
+                }
+
+            NavigationDrawerItem(
+                modifier = modifier,
+                selected = selected,
+                onClick = onClick,
+                icon = icon,
+                badge = badge,
+                label = { label?.invoke() ?: Text("") },
+                colors = actualColors,
+                interactionSource = interactionSource
+            )
         }
     }
 }
@@ -726,6 +1105,55 @@ object NavigationSuiteScaffoldDefaults {
 
 /** Contains the default values used by the [NavigationSuite]. */
 object NavigationSuiteDefaults {
+    /** Default items vertical arrangement for a navigation suite. */
+    val verticalArrangement = Arrangement.Top
+
+    /**
+     * Creates a [NavigationSuiteColors] with the provided colors for the container color, according
+     * to the Material specification.
+     *
+     * Use [Color.Transparent] for the navigation*ContainerColor to have no color. The
+     * navigation*ContentColor will default to either the matching content color for
+     * navigation*ContainerColor, or to the current [LocalContentColor] if navigation*ContainerColor
+     * is not a color from the theme.
+     *
+     * @param shortNavigationBarContainerColor the container color for the [ShortNavigationBar]
+     * @param shortNavigationBarContentColor the content color for the [ShortNavigationBar]
+     * @param wideNavigationRailColors the [WideNavigationRailColors] for the [WideNavigationRail]
+     * @param navigationBarContainerColor the default container color for the [NavigationBar]
+     * @param navigationBarContentColor the default content color for the [NavigationBar]
+     * @param navigationRailContainerColor the default container color for the [NavigationRail]
+     * @param navigationRailContentColor the default content color for the [NavigationRail]
+     * @param navigationDrawerContainerColor the default container color for the
+     *   [PermanentDrawerSheet]
+     * @param navigationDrawerContentColor the default content color for the [PermanentDrawerSheet]
+     */
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Composable
+    fun colors(
+        shortNavigationBarContentColor: Color = ShortNavigationBarDefaults.contentColor,
+        shortNavigationBarContainerColor: Color = ShortNavigationBarDefaults.containerColor,
+        wideNavigationRailColors: WideNavigationRailColors = WideNavigationRailDefaults.colors(),
+        navigationBarContainerColor: Color = NavigationBarDefaults.containerColor,
+        navigationBarContentColor: Color = contentColorFor(navigationBarContainerColor),
+        navigationRailContainerColor: Color = NavigationRailDefaults.ContainerColor,
+        navigationRailContentColor: Color = contentColorFor(navigationRailContainerColor),
+        navigationDrawerContainerColor: Color =
+            @Suppress("DEPRECATION") DrawerDefaults.containerColor,
+        navigationDrawerContentColor: Color = contentColorFor(navigationDrawerContainerColor),
+    ): NavigationSuiteColors =
+        NavigationSuiteColors(
+            navigationDrawerContentColor = navigationDrawerContentColor,
+            shortNavigationBarContentColor = shortNavigationBarContentColor,
+            shortNavigationBarContainerColor = shortNavigationBarContainerColor,
+            wideNavigationRailColors = wideNavigationRailColors,
+            navigationBarContainerColor = navigationBarContainerColor,
+            navigationBarContentColor = navigationBarContentColor,
+            navigationRailContainerColor = navigationRailContainerColor,
+            navigationRailContentColor = navigationRailContentColor,
+            navigationDrawerContainerColor = navigationDrawerContainerColor
+        )
+
     /**
      * Creates a [NavigationSuiteColors] with the provided colors for the container color, according
      * to the Material specification.
@@ -743,6 +1171,13 @@ object NavigationSuiteDefaults {
      *   [PermanentDrawerSheet]
      * @param navigationDrawerContentColor the default content color for the [PermanentDrawerSheet]
      */
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Deprecated(
+        message =
+            "Deprecated in favor of colors with shortNavigationBar*Color and " +
+                "wideNavigationRailColors parameters",
+        level = DeprecationLevel.HIDDEN
+    )
     @Composable
     fun colors(
         navigationBarContainerColor: Color = NavigationBarDefaults.containerColor,
@@ -754,6 +1189,9 @@ object NavigationSuiteDefaults {
         navigationDrawerContentColor: Color = contentColorFor(navigationDrawerContainerColor),
     ): NavigationSuiteColors =
         NavigationSuiteColors(
+            shortNavigationBarContainerColor = ShortNavigationBarDefaults.containerColor,
+            shortNavigationBarContentColor = ShortNavigationBarDefaults.contentColor,
+            wideNavigationRailColors = WideNavigationRailDefaults.colors(),
             navigationBarContainerColor = navigationBarContainerColor,
             navigationBarContentColor = navigationBarContentColor,
             navigationRailContainerColor = navigationRailContainerColor,
@@ -796,6 +1234,12 @@ object NavigationSuiteDefaults {
  * For specifics about each navigation component colors see [NavigationBarDefaults],
  * [NavigationRailDefaults], and [DrawerDefaults].
  *
+ * @param shortNavigationBarContainerColor the container color for the [ShortNavigationBar] of the
+ *   [NavigationSuite]
+ * @param shortNavigationBarContentColor the content color for the [ShortNavigationBar] of the
+ *   [NavigationSuite]
+ * @param wideNavigationRailColors the [WideNavigationRailColors] for the [WideNavigationRail] of
+ *   the [NavigationSuite]
  * @param navigationBarContainerColor the container color for the [NavigationBar] of the
  *   [NavigationSuite]
  * @param navigationBarContentColor the content color for the [NavigationBar] of the
@@ -811,6 +1255,9 @@ object NavigationSuiteDefaults {
  */
 class NavigationSuiteColors
 internal constructor(
+    val shortNavigationBarContainerColor: Color,
+    val shortNavigationBarContentColor: Color,
+    val wideNavigationRailColors: WideNavigationRailColors,
     val navigationBarContainerColor: Color,
     val navigationBarContentColor: Color,
     val navigationRailContainerColor: Color,
@@ -903,6 +1350,12 @@ internal class NavigationSuiteScaffoldStateImpl(var initialValue: NavigationSuit
     }
 }
 
+private val NavigationSuiteType.isNavigationBar
+    get() =
+        this == NavigationSuiteType.ShortNavigationBarCompact ||
+            this == NavigationSuiteType.ShortNavigationBarMedium ||
+            this == NavigationSuiteType.NavigationBar
+
 private interface NavigationSuiteItemProvider {
     val itemsCount: Int
     val itemList: MutableVector<NavigationSuiteItem>
@@ -982,6 +1435,7 @@ private const val SpringDefaultSpatialStiffness = 700.0f
 private const val NavigationSuiteLayoutIdTag = "navigationSuite"
 private const val ContentLayoutIdTag = "content"
 
+private val TallNavigationBarHeight = 80.dp
 private val NoWindowInsets = WindowInsets(0, 0, 0, 0)
 private val AnimationSpec: SpringSpec<Float> =
     spring(dampingRatio = SpringDefaultSpatialDamping, stiffness = SpringDefaultSpatialStiffness)
