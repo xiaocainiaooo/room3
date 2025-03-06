@@ -20,6 +20,7 @@ import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionS
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_SINGULAR
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.SUPPORTED_TYPES_STRING
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.Companion.isSupportedType
+import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
@@ -57,23 +58,46 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                     ) != null
                 }
                 .toSet()
+        val superTypesWithCapabilityAnnotation =
+            appFunctionSerializableClass.superTypes
+                .map { it.resolve().declaration as KSClassDeclaration }
+                .filter {
+                    it.annotations.findAnnotation(
+                        IntrospectionHelper.AppFunctionSchemaCapability.CLASS_NAME
+                    ) != null
+                }
+                .toSet()
         val parametersToValidate =
             validatedPrimaryConstructor.parameters
                 .associateBy { checkNotNull(it.name).toString() }
                 .toMutableMap()
 
-        validateParameters(parametersToValidate, superTypesWithSerializableAnnotation)
+        validateParameters(
+            parametersToValidate,
+            superTypesWithSerializableAnnotation,
+            superTypesWithCapabilityAnnotation
+        )
 
         return this
     }
 
     private fun validateParameters(
         parametersToValidate: MutableMap<String, KSValueParameter>,
-        superTypesWithSerializableAnnotation: Set<KSClassDeclaration>
+        superTypesWithSerializableAnnotation: Set<KSClassDeclaration>,
+        superTypesWithCapabilityAnnotation: Set<KSClassDeclaration>,
     ) {
-        for (serializableSuperType in superTypesWithSerializableAnnotation) {
-            val superTypePrimaryConstructor =
-                serializableSuperType.validateSerializablePrimaryConstructor()
+        for (superType in superTypesWithSerializableAnnotation) {
+            if (
+                superType.annotations.findAnnotation(
+                    IntrospectionHelper.AppFunctionSerializableAnnotation.CLASS_NAME
+                ) == null
+            ) {
+                throw ProcessingException(
+                    "Expected supertype with @AppFunctionSerializable annotation.",
+                    superType
+                )
+            }
+            val superTypePrimaryConstructor = superType.validateSerializablePrimaryConstructor()
 
             for (superTypeParameter in superTypePrimaryConstructor.parameters) {
                 // Parameter has now been visited
@@ -81,9 +105,37 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                     parametersToValidate.remove(superTypeParameter.name.toString())
                 if (parameterInSuperType == null) {
                     throw ProcessingException(
-                        "App parameters in @AppFunctionSerializable " +
+                        "All parameters in @AppFunctionSerializable " +
                             "supertypes must be present in subtype",
                         superTypeParameter
+                    )
+                }
+                validateSerializableParameter(parameterInSuperType)
+            }
+        }
+
+        for (superType in superTypesWithCapabilityAnnotation) {
+            if (
+                superType.annotations.findAnnotation(
+                    IntrospectionHelper.AppFunctionSchemaCapability.CLASS_NAME
+                ) == null
+            ) {
+                throw ProcessingException(
+                    "Expected supertype with @AppFunctionSchemaCapability annotation.",
+                    superType
+                )
+            }
+            val capabilityProperties = superType.getDeclaredProperties()
+
+            for (superTypeProperty in capabilityProperties) {
+                // Parameter has now been visited
+                val parameterInSuperType =
+                    parametersToValidate.remove(superTypeProperty.simpleName.toString())
+                if (parameterInSuperType == null) {
+                    throw ProcessingException(
+                        "All Properties in @AppFunctionSchemaCapability " +
+                            "supertypes must be present in subtype",
+                        superTypeProperty
                     )
                 }
                 validateSerializableParameter(parameterInSuperType)
