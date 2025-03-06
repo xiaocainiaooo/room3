@@ -17,6 +17,7 @@
 package androidx.appfunctions.internal
 
 import android.os.Build
+import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.AppFunctionSearchSpec
 import androidx.appfunctions.core.AppFunctionMetadataTestHelper
 import androidx.appfunctions.core.AppFunctionMetadataTestHelper.FunctionIds
@@ -28,17 +29,22 @@ import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RunWith(TestParameterInjector::class)
 class AppFunctionReaderTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val appFunctionReader = AppFunctionReader(context)
     private val appFunctionMetadataTestHelper = AppFunctionMetadataTestHelper(context)
+    private val appFunctionManagerCompat = AppFunctionManagerCompat(context)
 
     @Before
     fun setup() =
@@ -47,6 +53,14 @@ class AppFunctionReaderTest {
             appFunctionMetadataTestHelper.awaitAppFunctionIndexed(
                 setOf(FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED)
             )
+
+            // Reset enabled state for all test ids
+            for (functionIds in getTestFunctionIdToMetadataMap(context.packageName).keys) {
+                appFunctionManagerCompat.setAppFunctionEnabled(
+                    functionIds,
+                    AppFunctionManagerCompat.APP_FUNCTION_STATE_DEFAULT
+                )
+            }
         }
 
     @Test
@@ -177,6 +191,64 @@ class AppFunctionReaderTest {
             // Only check for all fields when dynamic indexer is enabled.
             assumeTrue(appFunctionMetadataTestHelper.isDynamicIndexerAvailable())
             assertThat(appFunctions).containsExactlyElementsIn(expectedMetadata)
+        }
+
+    @Test
+    fun searchAppFunctions_isDisabledInRuntime_returnsIsEnabledFalse() =
+        runBlocking<Unit> {
+            val functionIdToTest = FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT
+            val searchFunctionSpec = AppFunctionSearchSpec()
+            appFunctionManagerCompat.setAppFunctionEnabled(
+                functionIdToTest,
+                AppFunctionManagerCompat.APP_FUNCTION_STATE_DISABLED
+            )
+
+            val appFunctionMetadata =
+                appFunctionReader.searchAppFunctions(searchFunctionSpec).first().single {
+                    it.id == functionIdToTest
+                }
+
+            assertThat(appFunctionMetadata.isEnabled).isFalse()
+        }
+
+    @Test
+    fun searchAppFunctions_isEnabledInRuntime_returnsIsEnabledTrue() =
+        runBlocking<Unit> {
+            val functionIdToTest = FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT
+            val searchFunctionSpec = AppFunctionSearchSpec()
+            appFunctionManagerCompat.setAppFunctionEnabled(
+                functionIdToTest,
+                AppFunctionManagerCompat.APP_FUNCTION_STATE_ENABLED
+            )
+
+            val appFunctionMetadata =
+                appFunctionReader.searchAppFunctions(searchFunctionSpec).first().single {
+                    it.id == functionIdToTest
+                }
+
+            assertThat(appFunctionMetadata.isEnabled).isTrue()
+        }
+
+    @Test
+    fun searchAppFunctions_isEnabledSetByDefault_returnsIsEnabledDefaultValue(
+        @TestParameter(
+            FunctionIds.NO_SCHEMA_DISABLED_BY_DEFAULT,
+            FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT
+        )
+        functionIdToTest: String
+    ) =
+        runBlocking<Unit> {
+            val searchFunctionSpec = AppFunctionSearchSpec()
+
+            val appFunctionMetadata =
+                appFunctionReader.searchAppFunctions(searchFunctionSpec).first().single {
+                    it.id == functionIdToTest
+                }
+
+            val expectedMetadataWithIsEnabledDefault =
+                getTestFunctionIdToMetadataMap(context.packageName).getValue(functionIdToTest)
+            assertThat(appFunctionMetadata.isEnabled)
+                .isEqualTo(expectedMetadataWithIsEnabledDefault.isEnabled)
         }
 
     private companion object {
