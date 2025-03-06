@@ -113,7 +113,7 @@ class AppFunctionSerializableProcessorTest {
     }
 
     @Test
-    fun testProcessor_badlyInheritedProperties_success() {
+    fun testProcessor_badlyInheritedSerializableProperties_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("SubClassRenamedPropertySerializable.KT")
@@ -121,7 +121,20 @@ class AppFunctionSerializableProcessorTest {
 
         compilationTestHelper.assertErrorWithMessage(
             report,
-            "App parameters in @AppFunctionSerializable supertypes must be present in subtype"
+            "All parameters in @AppFunctionSerializable supertypes must be present in subtype"
+        )
+    }
+
+    @Test
+    fun testProcessor_badlyInheritedCapabilityProperties_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("SubClassRenamedCapabilityProperty.KT")
+            )
+
+        compilationTestHelper.assertErrorWithMessage(
+            report,
+            "All Properties in @AppFunctionSchemaCapability supertypes must be present in subtype"
         )
     }
 

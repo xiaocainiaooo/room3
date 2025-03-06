@@ -14,9 +14,9 @@
                             <type>8</type>
                         </dataTypeMetadata>
                         <id>unused</id>
-                        <name>name</name>
+                        <name>stringToOpen</name>
                     </properties>
-                    <required>name</required>
+                    <required>stringToOpen</required>
                     <type>3</type>
                 </dataTypeMetadata>
                 <id>unused</id>
@@ -114,9 +114,9 @@
                             <type>8</type>
                         </dataTypeMetadata>
                         <id>unused</id>
-                        <name>name</name>
+                        <name>stringToOpen</name>
                     </properties>
-                    <required>name</required>
+                    <required>stringToOpen</required>
                     <type>3</type>
                 </dataTypeMetadata>
                 <id>unused</id>
@@ -209,9 +209,9 @@
                             <type>8</type>
                         </dataTypeMetadata>
                         <id>unused</id>
-                        <name>name</name>
+                        <name>stringToOpen</name>
                     </properties>
-                    <required>name</required>
+                    <required>stringToOpen</required>
                     <type>3</type>
                 </dataTypeMetadata>
                 <id>unused</id>
@@ -309,9 +309,9 @@
                             <type>8</type>
                         </dataTypeMetadata>
                         <id>unused</id>
-                        <name>name</name>
+                        <name>stringToOpen</name>
                     </properties>
-                    <required>name</required>
+                    <required>stringToOpen</required>
                     <type>3</type>
                 </dataTypeMetadata>
                 <id>unused</id>
@@ -409,9 +409,9 @@
                             <type>8</type>
                         </dataTypeMetadata>
                         <id>unused</id>
-                        <name>name</name>
+                        <name>stringToOpen</name>
                     </properties>
-                    <required>name</required>
+                    <required>stringToOpen</required>
                     <type>3</type>
                 </dataTypeMetadata>
                 <id>unused</id>
@@ -504,9 +504,9 @@
                             <type>8</type>
                         </dataTypeMetadata>
                         <id>unused</id>
-                        <name>name</name>
+                        <name>stringToOpen</name>
                     </properties>
-                    <required>name</required>
+                    <required>stringToOpen</required>
                     <type>3</type>
                 </dataTypeMetadata>
                 <id>unused</id>

@@ -47,7 +47,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = REFERENCE_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -55,12 +55,12 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "name" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
-      "name",
+      "stringToOpen",
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
@@ -176,7 +176,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = ARRAY_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -184,12 +184,12 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "name" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
-      "name",
+      "stringToOpen",
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
@@ -305,7 +305,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = ARRAY_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -313,12 +313,12 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "name" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
-      "name",
+      "stringToOpen",
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
@@ -428,7 +428,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = REFERENCE_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
@@ -436,12 +436,12 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "name" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_NAME,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
-      "name",
+      "stringToOpen",
     )
 
     private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
