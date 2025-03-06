@@ -58,6 +58,22 @@ class AppFunctionReaderTest {
         }
 
     @Test
+    fun searchAppFunctions_emptySchemaNameInSearchSpec_noResults() =
+        runBlocking<Unit> {
+            val searchFunctionSpec = AppFunctionSearchSpec(schemaName = "")
+
+            assertThat(appFunctionReader.searchAppFunctions(searchFunctionSpec).first()).isEmpty()
+        }
+
+    @Test
+    fun searchAppFunctions_emptySchemaCategoryInSearchSpec_noResults() =
+        runBlocking<Unit> {
+            val searchFunctionSpec = AppFunctionSearchSpec(schemaCategory = "")
+
+            assertThat(appFunctionReader.searchAppFunctions(searchFunctionSpec).first()).isEmpty()
+        }
+
+    @Test
     fun searchAppFunctions_packageListNotSetInSpec_returnsAllAppFunctions() =
         runBlocking<Unit> {
             val searchFunctionSpec = AppFunctionSearchSpec()
