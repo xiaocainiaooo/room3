@@ -35,10 +35,20 @@ import androidx.appsearch.app.GlobalSearchSession
 import androidx.appsearch.app.JoinSpec
 import androidx.appsearch.app.SearchResult
 import androidx.appsearch.app.SearchSpec
+import androidx.appsearch.observer.DocumentChangeInfo
+import androidx.appsearch.observer.ObserverCallback
+import androidx.appsearch.observer.ObserverSpec
+import androidx.appsearch.observer.SchemaChangeInfo
 import com.android.extensions.appfunctions.AppFunctionManager
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.guava.await
+import kotlinx.coroutines.launch
 
 /**
  * A class responsible for reading and searching for app functions based on a search specification.
@@ -53,18 +63,71 @@ internal class AppSearchAppFunctionReader(private val context: Context) : AppFun
     override fun searchAppFunctions(
         searchFunctionSpec: AppFunctionSearchSpec
     ): Flow<List<AppFunctionMetadata>> {
-        // TODO: Use observer API to emit new values when underlying documents are changed.
-        return flow {
-            if (searchFunctionSpec.packageNames?.isEmpty() == true) {
-                emit(emptyList())
-                return@flow
+        if (searchFunctionSpec.packageNames?.isEmpty() == true) {
+            return flow { emit(emptyList()) }
+        }
+
+        return callbackFlow {
+            val session = createSearchSession(context)
+
+            // Perform initial search immediately
+            send(performSearch(session, searchFunctionSpec))
+
+            val appSearchObserver = AppSearchChangeObserver()
+            // Register the observer callback
+            session.registerObserverCallback(
+                SYSTEM_PACKAGE_NAME,
+                buildObserverSpec(searchFunctionSpec.packageNames ?: emptySet()),
+                Dispatchers.Worker.asExecutor(),
+                appSearchObserver
+            )
+
+            // Coroutine to react to updates from the observer
+            val observerJob = launch {
+                // TODO: Optimize with debounce
+                appSearchObserver.observe().collect {
+                    // TODO(b/403264749): Check if we can skip the running a full search again by
+                    // caching the results.
+                    send(performSearch(session, searchFunctionSpec))
+                }
             }
 
-            createSearchSession(context = context).use { session ->
-                emit(performSearch(session, searchFunctionSpec))
+            // Clean up when collection stops
+            awaitClose {
+                observerJob.cancel()
+                appSearchObserver.close()
+                session.unregisterObserverCallback(SYSTEM_PACKAGE_NAME, appSearchObserver)
+                session.close()
             }
         }
     }
+
+    private class AppSearchChangeObserver : ObserverCallback {
+        val updateChannel = Channel<Unit>(Channel.RENDEZVOUS)
+
+        override fun onSchemaChanged(changeInfo: SchemaChangeInfo) {
+            updateChannel.trySend(Unit)
+        }
+
+        override fun onDocumentChanged(changeInfo: DocumentChangeInfo) {
+            updateChannel.trySend(Unit)
+        }
+
+        fun observe(): Flow<Unit> = updateChannel.receiveAsFlow()
+
+        fun close() {
+            updateChannel.close()
+        }
+    }
+
+    private fun buildObserverSpec(packageNames: Set<String>) =
+        ObserverSpec.Builder()
+            .addFilterSchemas(
+                packageNames.flatMap {
+                    listOf("AppFunctionStaticMetadata-$it", "AppFunctionRuntimeMetadata-$it")
+                }
+            )
+            .build()
 
     private suspend fun performSearch(
         session: GlobalSearchSession,
