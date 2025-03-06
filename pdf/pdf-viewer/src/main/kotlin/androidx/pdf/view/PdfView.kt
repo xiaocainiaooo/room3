@@ -1174,8 +1174,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 // We can't select all if we don't know what page the selection is on, or if
                 // we don't know the size of that page
                 val page = pdfView.currentSelection?.bounds?.first()?.pageNum ?: return false
-                val pageSize = pdfView.pageLayoutManager?.getPageSize(page) ?: return false
-                pdfView.selectionStateManager?.selectAllTextOnPageAsync(page, pageSize)
+                pdfView.selectionStateManager?.selectAllTextOnPageAsync(page)
                 return true
             } else if (item.itemId == R.id.action_copy) {
                 // We can't copy the current selection if no text is selected
