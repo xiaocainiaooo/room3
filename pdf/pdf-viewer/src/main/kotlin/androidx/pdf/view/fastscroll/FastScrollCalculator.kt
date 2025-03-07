@@ -26,8 +26,8 @@ import kotlin.math.roundToInt
 public class FastScrollCalculator(
     private val context: Context,
 ) {
-    internal val scrollerTopMarginDp = context.getDimensions(R.dimen.scroller_top_margin).toInt()
-    internal val scrollerBottomMarginDp =
+    internal val scrollerTopMarginPx = context.getDimensions(R.dimen.scroller_top_margin).toInt()
+    internal val scrollerBottomMarginPx =
         context.getDimensions(R.dimen.scroller_bottom_margin).toInt()
 
     /**
@@ -42,10 +42,7 @@ public class FastScrollCalculator(
     public fun constrainScrollPosition(scrollY: Float, viewHeight: Int, thumbHeightPx: Int): Int {
         return scrollY
             .roundToInt()
-            .coerceIn(
-                scrollerTopMarginDp.dpToPx(context),
-                viewHeight - (scrollerBottomMarginDp.dpToPx(context) + thumbHeightPx)
-            )
+            .coerceIn(scrollerTopMarginPx, viewHeight - (scrollerBottomMarginPx + thumbHeightPx))
     }
 
     /**
@@ -77,7 +74,7 @@ public class FastScrollCalculator(
 
         // Offset the scrollbar position by the top margin.
         // This ensures the scrollbar starts at the margin when the content is at the top.
-        deltaY += scrollerTopMarginDp.dpToPx(context)
+        deltaY += scrollerTopMarginPx
 
         return constrainScrollPosition(deltaY, viewHeight, thumbHeightPx)
     }
@@ -106,10 +103,7 @@ public class FastScrollCalculator(
 
         // Calculate the offset of the fast scroll position from the top margin.
         val scrollYOffset =
-            (fastScrollY.toFloat() - scrollerTopMarginDp.dpToPx(context)).coerceIn(
-                0F,
-                scrollbarLength.toFloat()
-            )
+            (fastScrollY.toFloat() - scrollerTopMarginPx).coerceIn(0F, scrollbarLength.toFloat())
 
         val scrollFraction = scrollYOffset / scrollbarLength
         val scrollableHeight = estimatedFullHeight - viewHeight
@@ -128,8 +122,5 @@ public class FastScrollCalculator(
      * @return The length of the fast scroll track in pixels.
      */
     private fun getScrollbarLength(viewHeight: Int, thumbHeightPx: Int): Int =
-        viewHeight -
-            (scrollerTopMarginDp.dpToPx(context) +
-                scrollerBottomMarginDp.dpToPx(context) +
-                thumbHeightPx)
+        viewHeight - (scrollerTopMarginPx + scrollerBottomMarginPx + thumbHeightPx)
 }
