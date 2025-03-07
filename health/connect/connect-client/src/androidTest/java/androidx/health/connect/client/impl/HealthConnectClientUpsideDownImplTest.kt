@@ -21,6 +21,8 @@ import android.os.Build
 import android.os.ext.SdkExtensions
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.aggregate.AggregationResult
+import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
 import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECORD_CLASS
@@ -450,6 +452,12 @@ class HealthConnectClientUpsideDownImplTest {
 
     @Test
     fun aggregateGroupByDuration() = runTest {
+        // Data origins are not supported for duration buckets pre sdkExt 10. See b/284163741
+        val dataOrigins =
+            if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) < 10)
+                emptySet()
+            else setOf(DataOrigin(context.packageName))
+
         healthConnectClient.insertRecords(
             listOf(
                 NutritionRecord(
@@ -482,18 +490,38 @@ class HealthConnectClientUpsideDownImplTest {
         val aggregateResponse =
             healthConnectClient.aggregateGroupByDuration(
                 AggregateGroupByDurationRequest(
-                    setOf(NutritionRecord.ENERGY_TOTAL),
+                    setOf(HeartRateRecord.BPM_AVG, NutritionRecord.ENERGY_TOTAL),
                     TimeRangeFilter.between(START_TIME, START_TIME + 1.minutes),
                     Duration.ofSeconds(30),
                     setOf()
                 )
             )
 
-        with(aggregateResponse) {
-            assertThat(this).hasSize(2)
-            assertThat(this[0].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(300.kilocalories)
-            assertThat(this[1].result[NutritionRecord.ENERGY_TOTAL]).isEqualTo(500.kilocalories)
-        }
+        assertThat(aggregateResponse)
+            .containsExactly(
+                AggregationResultGroupedByDuration(
+                    result =
+                        AggregationResult(
+                            longValues = emptyMap(),
+                            doubleValues = mapOf(NutritionRecord.ENERGY_TOTAL.metricKey to 300.0),
+                            dataOrigins = dataOrigins
+                        ),
+                    startTime = START_TIME,
+                    endTime = START_TIME + 30.seconds,
+                    zoneOffset = ZoneOffset.UTC
+                ),
+                AggregationResultGroupedByDuration(
+                    result =
+                        AggregationResult(
+                            longValues = emptyMap(),
+                            doubleValues = mapOf(NutritionRecord.ENERGY_TOTAL.metricKey to 500.0),
+                            dataOrigins = dataOrigins
+                        ),
+                    startTime = START_TIME + 30.seconds,
+                    endTime = START_TIME + 1.minutes,
+                    zoneOffset = ZoneOffset.UTC
+                )
+            )
     }
 
     @Test
