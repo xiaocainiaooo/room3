@@ -259,7 +259,7 @@ class SlidingPaneLayoutA11yTest {
             }
 
         val provider = spl.accessibilityDelegate.getAccessibilityNodeProvider(spl)!!
-
+        spl.isAccessibilityEnabledForTesting = true
         // Request Accessibility focus for divider
         provider.performAction(
             DIVIDER_VIRTUAL_VIEW_ID,
@@ -290,7 +290,7 @@ class SlidingPaneLayoutA11yTest {
 
         // Gut check, make sure OnClickListener is not triggered during initialization.
         assertThat(clicked).isFalse()
-
+        spl.isAccessibilityEnabledForTesting = true
         val provider = spl.accessibilityDelegate.getAccessibilityNodeProvider(spl)!!
 
         provider.performAction(
