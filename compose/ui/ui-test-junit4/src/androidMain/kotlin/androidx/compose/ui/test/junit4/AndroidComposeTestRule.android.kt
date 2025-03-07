@@ -298,12 +298,6 @@ private constructor(
                         base.evaluate()
                     } catch (t: Throwable) {
                         blockException = t
-                    } finally {
-                        // Remove all compose content in a controlled environment. Content may or
-                        // may not dispose cleanly. The Activity teardown is going to dispose all
-                        // of the compositions anyway, so we need to preemptively try now where we
-                        // can catch any exceptions.
-                        runOnUiThread { environment.tryDiscardAllCompositions() }
                     }
 
                     // Throw the aggregate exception. May be from the test body or from the cleanup.
