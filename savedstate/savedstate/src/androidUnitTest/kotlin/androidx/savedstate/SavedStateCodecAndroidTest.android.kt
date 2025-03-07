@@ -183,7 +183,7 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             @Serializable data class IBinderContainer(val value: IBinder)
             val binder = Binder("foo")
-            IBinderContainer(binder).encodeDecode {
+            IBinderContainer(binder).encodeDecode(doMarshalling = false) {
                 assertThat(size()).isEqualTo(1)
                 assertThat(getBinder("value")).isEqualTo(binder)
             }
@@ -218,7 +218,7 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             @Serializable data class IBinderContainer(val value: IBinder)
             val binder = Binder("foo")
-            IBinderContainer(binder).encodeDecode {
+            IBinderContainer(binder).encodeDecode(doMarshalling = false) {
                 assertThat(size()).isEqualTo(1)
                 assertThat(getBinder("value")).isEqualTo(binder)
             }
