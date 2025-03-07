@@ -509,6 +509,15 @@ constructor(
         if (!isLookingAhead && hasLookaheadOccurred) {
             // If there was already a lookahead pass, record this result as approach result
             approachLayoutInfo = result
+            Snapshot.withoutReadObservation {
+                if (
+                    _lazyLayoutScrollDeltaBetweenPasses.isActive &&
+                        result.firstVisibleItem?.index == scrollPosition.index &&
+                        result.firstVisibleItemScrollOffset == scrollPosition.scrollOffset
+                ) {
+                    _lazyLayoutScrollDeltaBetweenPasses.stop()
+                }
+            }
         } else {
             if (isLookingAhead) {
                 hasLookaheadOccurred = true
