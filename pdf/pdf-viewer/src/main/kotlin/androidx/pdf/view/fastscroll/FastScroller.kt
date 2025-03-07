@@ -133,10 +133,9 @@ public class FastScroller(
         animate(onAnimationUpdate)
     }
 
-    public fun hide(onAnimationUpdate: () -> Unit) {
+    public fun hide() {
         hideValueAnimator?.cancel()
         fastScrollDrawer.alpha = FastScrollDrawer.GONE_ALPHA
-        animate(onAnimationUpdate)
     }
 
     private fun animate(onAnimationUpdate: () -> Unit) {

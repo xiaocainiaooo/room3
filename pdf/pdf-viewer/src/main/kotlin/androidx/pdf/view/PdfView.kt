@@ -232,14 +232,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     @VisibleForTesting internal var isInitialZoomDone: Boolean = false
 
     /**
-     * Flag to indicate if we need to override fast scroll visibility. This is true when the search
-     * is visible
+     * Indicates whether the fast scroller's visibility is managed externally.
+     *
+     * If `true`, the [androidx.pdf.view.PdfView] will not automatically change the visibility of
+     * the fast scroller in response to actions like scrolling or zooming.
+     *
+     * This allows an external source to manage the visibility.
      */
-    private var shouldOverrideFastScrollVisibility: Boolean = false
-
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public var isFastScrollerVisible: Boolean = false
-        private set
+    public var forcedFastScrollVisibility: Boolean? = null
+        set(value) {
+            field = value
+            if (value == true) fastScroller?.show { postInvalidate() }
+            else if (value == false) fastScroller?.hide()
+        }
 
     /**
      * The width of the PdfView before the last layout change (e.g., before rotation). Used to
@@ -247,7 +253,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      */
     private var oldWidth: Int? = width
 
-    private var fastScroller: FastScroller? = null
+    @VisibleForTesting
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public var fastScroller: FastScroller? = null
     private var fastScrollGestureDetector: FastScrollGestureDetector? = null
 
     private val gestureHandler = ZoomScrollGestureHandler()
@@ -359,16 +367,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             localPageLayoutManager.increaseReach(position.pageNum)
             deferredScrollPosition = position
             deferredScrollPage = null
-        }
-    }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun overrideFastScrollerVisibility(isVisible: Boolean) {
-        shouldOverrideFastScrollVisibility = !isVisible
-        if (isVisible) {
-            maybeShowFastScroller()
-        } else {
-            maybeHideFastScroller()
         }
     }
 
@@ -497,7 +495,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         canvas.restore()
 
         val documentPageCount = pdfDocument?.pageCount ?: 0
-        if (documentPageCount > 1 && !shouldOverrideFastScrollVisibility) {
+        if (documentPageCount > 1) {
             fastScroller?.drawScroller(
                 canvas = canvas,
                 scrollX = scrollX,
@@ -541,15 +539,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     private fun maybeShowFastScroller() {
-        if (!shouldOverrideFastScrollVisibility) {
-            isFastScrollerVisible = true
-            fastScroller?.show { postInvalidate() }
-        }
+        if (forcedFastScrollVisibility != null) return // Forced visibility takes precedence
+
+        fastScroller?.show { postInvalidate() }
     }
 
     private fun maybeHideFastScroller() {
-        isFastScrollerVisible = false
-        fastScroller?.hide { postInvalidate() }
+        if (forcedFastScrollVisibility != null) return // Forced visibility takes precedence
+
+        fastScroller?.hide()
     }
 
     private fun maybeDragSelectionHandle(event: MotionEvent?): Boolean {
@@ -910,7 +908,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             fastScroller = localFastScroller
             fastScrollGestureDetector =
                 FastScrollGestureDetector(localFastScroller, fastScrollGestureHandler)
-            maybeShowFastScroller()
+            // set initial visibility of fast scroller
+            maybeHideFastScroller()
         }
 
         // We'll either create our layout and selection managers from restored state, or
