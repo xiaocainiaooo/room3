@@ -23,26 +23,13 @@ import androidx.appfunctions.AppFunctionSerializable
 
 @AppFunctionSerializable
 data class CreateNoteParams(
-    val title: String,
-    val content: List<String>,
-    val owner: Owner,
-    val attachments: List<Attachment>,
+    val title: String? = null,
 )
 
 @AppFunctionSerializable
 data class Note(
     val title: String,
-    val content: List<String>,
-    val owner: Owner,
-    val attachments: List<Attachment>,
 )
-
-@AppFunctionSerializable
-data class Owner(
-    val name: String,
-)
-
-@AppFunctionSerializable data class Attachment(val uriPath: String, val nested: Attachment? = null)
 
 @Suppress("UNUSED_PARAMETER")
 class TestFunctions {
@@ -62,10 +49,7 @@ class TestFunctions {
         createNoteParams: CreateNoteParams
     ): Note {
         return Note(
-            title = createNoteParams.title,
-            content = createNoteParams.content,
-            owner = createNoteParams.owner,
-            attachments = createNoteParams.attachments,
+            title = createNoteParams.title ?: "DEFAULT TITLE",
         )
     }
 }
