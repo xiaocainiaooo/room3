@@ -1528,7 +1528,7 @@ public final class AppSearchImpl implements Closeable {
             File blobFile = new File(mBlobFilesDir, blobProto.getFileName());
             return ParcelFileDescriptor.open(blobFile, mode);
         } else {
-            return ParcelFileDescriptor.fromFd(blobProto.getFileDescriptor());
+            return ParcelFileDescriptor.adoptFd(blobProto.getFileDescriptor());
         }
     }
 
