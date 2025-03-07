@@ -229,7 +229,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var awaitingFirstLayout: Boolean = true
     private var scrollPositionToRestore: PointF? = null
     private var zoomToRestore: Float? = null
-    @VisibleForTesting internal var isInitialZoomDone: Boolean = false
 
     /**
      * Indicates whether the fast scroller's visibility is managed externally.
@@ -583,16 +582,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        if (changed) {
-            val localScrollPositionToRestore = scrollPositionToRestore
-            if (awaitingFirstLayout && localScrollPositionToRestore != null) {
-                var newZoom = (zoomToRestore ?: zoom)
-                newZoom = MathUtils.clamp(newZoom, minZoom, maxZoom)
-                this.zoom = newZoom
-                scrollToRestoredPosition(localScrollPositionToRestore, zoom)
+        if (changed || awaitingFirstLayout) {
+            val positionToRestore = scrollPositionToRestore
+            if (positionToRestore != null) {
+                var resolvedZoom =
+                    if (zoomToRestore != null && zoomToRestore != DEFAULT_INIT_ZOOM) zoomToRestore!!
+                    else zoom
+                resolvedZoom = resolvedZoom * (width.toFloat() / (oldWidth ?: contentWidth))
+                val clampedZoom = MathUtils.clamp(resolvedZoom, minZoom, maxZoom)
+                this.zoom = clampedZoom
+                scrollToRestoredPosition(positionToRestore, clampedZoom)
+                scrollPositionToRestore = null
+                zoomToRestore = DEFAULT_INIT_ZOOM
             }
+            awaitingFirstLayout = false
         }
-        awaitingFirstLayout = false
+
+        if (changed) {
+            oldWidth = width
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -625,7 +633,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val superState = super.onSaveInstanceState()
         val state = PdfViewSavedState(superState)
         state.zoom = zoom
-        state.isInitialZoomDone = isInitialZoomDone
         state.viewWidth = width
         state.contentCenterX = toContentX(viewportWidth.toFloat() / 2f)
         state.contentCenterY = toContentY(viewportHeight.toFloat() / 2f)
@@ -764,7 +771,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             scrollPositionToRestore = positionToRestore
             zoomToRestore = localStateToRestore.zoom
             oldWidth = localStateToRestore.viewWidth
-            isInitialZoomDone = localStateToRestore.isInitialZoomDone
         } else {
             scrollToRestoredPosition(positionToRestore, localStateToRestore.zoom)
         }
@@ -1016,7 +1022,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         zoom = DEFAULT_INIT_ZOOM
         pageManager = null
         pageLayoutManager = null
-        isInitialZoomDone = false
         backgroundScope.coroutineContext.cancelChildren()
         stopCollectingData()
     }
@@ -1046,9 +1051,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // centering if it's needed. It doesn't override any restored state because we're scrolling
         // to the current scroll position.
         if (pageNum == 0) {
-            if (!isInitialZoomDone) {
+            // Only set default zoom if zoom is still the initial value
+            if (zoom == DEFAULT_INIT_ZOOM) {
                 this.zoom = getDefaultZoom()
-                isInitialZoomDone = true
             }
             scrollTo(scrollX, scrollY)
         }
