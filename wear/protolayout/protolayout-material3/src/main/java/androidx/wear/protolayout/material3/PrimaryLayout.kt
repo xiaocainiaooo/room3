@@ -43,7 +43,6 @@ import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.BOTTOM_SLOT_OTH
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.BOTTOM_SLOT_OTHER_MARGIN_SIDE_PERCENTAGE
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.BOTTOM_SLOT_OTHER_MARGIN_TOP_DP
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.FOOTER_LABEL_SLOT_MARGIN_SIDE_PERCENTAGE
-import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.FOOTER_LABEL_TO_BOTTOM_SLOT_SPACER_HEIGHT_DP
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.HEADER_ICON_SIZE_DP
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.HEADER_ICON_TITLE_SPACER_HEIGHT_LARGE_DP
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.HEADER_ICON_TITLE_SPACER_HEIGHT_SMALL_DP
@@ -381,15 +380,13 @@ private fun MaterialScope.getFooterContent(
         )
 
         labelSlot?.apply {
-            otherBottomSlot
-                .addContent(
-                    generateLabelContent(
-                        (FOOTER_LABEL_SLOT_MARGIN_SIDE_PERCENTAGE *
-                                deviceConfiguration.screenWidthDp)
-                            .dp
-                    )
+            otherBottomSlot.addContent(
+                generateLabelContent(
+                    (FOOTER_LABEL_SLOT_MARGIN_SIDE_PERCENTAGE * deviceConfiguration.screenWidthDp)
+                        .dp
                 )
-                .addContent(horizontalSpacer(FOOTER_LABEL_TO_BOTTOM_SLOT_SPACER_HEIGHT_DP))
+            )
+            // vertical spacing between the label slot and bottom slot is zero
         }
 
         footer.addContent(
@@ -467,8 +464,6 @@ internal object PrimaryLayoutDefaults {
     internal const val BOTTOM_SLOT_OTHER_MARGIN_BOTTOM_PERCENTAGE = 5.2f
 
     internal const val BOTTOM_SLOT_OTHER_MARGIN_SIDE_PERCENTAGE = 26f / 100
-
-    @Dimension(DP) internal const val FOOTER_LABEL_TO_BOTTOM_SLOT_SPACER_HEIGHT_DP = 2
 
     internal const val FOOTER_LABEL_SLOT_MARGIN_SIDE_PERCENTAGE = 16.64f / 100
 }
