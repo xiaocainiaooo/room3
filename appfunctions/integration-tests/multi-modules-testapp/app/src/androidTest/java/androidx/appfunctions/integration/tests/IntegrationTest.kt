@@ -22,10 +22,8 @@ import androidx.appfunctions.AppFunctionInvalidArgumentException
 import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.ExecuteAppFunctionRequest
 import androidx.appfunctions.ExecuteAppFunctionResponse
-import androidx.appfunctions.integration.testapp.Attachment
 import androidx.appfunctions.integration.testapp.CreateNoteParams
 import androidx.appfunctions.integration.testapp.Note
-import androidx.appfunctions.integration.testapp.Owner
 import androidx.appfunctions.integration.tests.AppSearchMetadataHelper
 import androidx.appfunctions.integration.tests.TestUtil.doBlocking
 import androidx.appfunctions.integration.tests.TestUtil.retryAssert
@@ -44,14 +42,6 @@ class IntegrationTest {
 
     @Before
     fun setup() = doBlocking {
-        InstrumentationRegistry.getInstrumentation().uiAutomation.apply {
-            adoptShellPermissionIdentity()
-            executeShellCommand(
-                "device_config put appsearch max_allowed_app_function_doc_size_in_bytes $TEST_APP_FUNCTION_DOC_SIZE_LIMIT"
-            )
-            dropShellPermissionIdentity()
-        }
-
         assumeTrue(appFunctionManager.isSupported())
 
         awaitAppFunctionsIndexed(FUNCTION_IDS)
@@ -191,10 +181,6 @@ class IntegrationTest {
                                 AppFunctionData.serialize(
                                     CreateNoteParams(
                                         title = "Test Title",
-                                        content = listOf("1", "2"),
-                                        owner = Owner("Test Owner"),
-                                        attachments =
-                                            listOf(Attachment("path1", Attachment("nested")))
                                     ),
                                     CreateNoteParams::class.java
                                 )
@@ -207,9 +193,6 @@ class IntegrationTest {
         val expectedNote =
             Note(
                 title = "Test Title",
-                content = listOf("1", "2"),
-                owner = Owner("Test Owner"),
-                attachments = listOf(Attachment("path1", Attachment("nested")))
             )
         assertThat(
                 successResponse.returnValue
@@ -227,8 +210,6 @@ class IntegrationTest {
     }
 
     private companion object {
-        const val TEST_APP_FUNCTION_DOC_SIZE_LIMIT = 512 * 1024 // 512kb
-
         // AppFunctions that are defined in the top-level module.
         const val APP_FUNCTION_ID = "androidx.appfunctions.integration.testapp.TestFunctions#add"
         const val DO_THROW_FUNCTION_ID =
