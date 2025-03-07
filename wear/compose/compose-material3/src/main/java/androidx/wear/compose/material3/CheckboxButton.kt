@@ -293,7 +293,7 @@ public fun SplitCheckboxButton(
                     this.shape = shape
 
                     val transformation = transformation ?: return@graphicsLayer
-                    with(transformation) { applyTransformation() }
+                    with(transformation) { applyContainerTransformation() }
                 }
     ) {
         Row(
