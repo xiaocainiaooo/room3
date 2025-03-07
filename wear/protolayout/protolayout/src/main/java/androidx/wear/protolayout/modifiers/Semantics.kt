@@ -23,6 +23,7 @@ import androidx.wear.protolayout.ModifiersBuilders.SemanticsRole
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.expression.RequiresSchemaVersion
+import androidx.wear.protolayout.modifiers.ClearSemanticElement.Companion.CLEAR_SEMANTIC_ELEMENT
 import java.util.Objects
 
 /**
@@ -53,13 +54,16 @@ fun LayoutModifier.contentDescription(
 fun LayoutModifier.semanticsRole(@SemanticsRole semanticsRole: Int): LayoutModifier =
     this then BaseSemanticElement(semanticsRole = semanticsRole)
 
+/** Clears the semantic from the modifier. */
+fun LayoutModifier.clearSemantics(): LayoutModifier = this then CLEAR_SEMANTIC_ELEMENT
+
 internal class BaseSemanticElement(
     val contentDescription: StringProp? = null,
     @SemanticsRole val semanticsRole: Int = SEMANTICS_ROLE_NONE
-) : LayoutModifier.Element {
+) : BaseProtoLayoutModifiersElement<Semantics.Builder> {
     @SuppressLint("ProtoLayoutMinSchema")
-    fun mergeTo(initial: Semantics.Builder?): Semantics.Builder =
-        (initial ?: Semantics.Builder()).apply {
+    override fun mergeTo(initialBuilder: Semantics.Builder?): Semantics.Builder =
+        (initialBuilder ?: Semantics.Builder()).apply {
             contentDescription?.let { setContentDescription(it) }
             if (semanticsRole != SEMANTICS_ROLE_NONE) {
                 setRole(semanticsRole)
@@ -75,4 +79,13 @@ internal class BaseSemanticElement(
 
     override fun toString(): String =
         "BaseSemanticElement[contentDescription=$contentDescription, semanticRole=$semanticsRole"
+}
+
+internal class ClearSemanticElement() : BaseProtoLayoutModifiersElement<Semantics.Builder> {
+    @SuppressLint("ProtoLayoutMinSchema")
+    override fun mergeTo(initialBuilder: Semantics.Builder?): Semantics.Builder? = null
+
+    companion object {
+        val CLEAR_SEMANTIC_ELEMENT = ClearSemanticElement()
+    }
 }
