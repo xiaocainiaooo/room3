@@ -2148,23 +2148,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
             node.contentDescription = getDividerContentDescription()
 
-            if (!dividerAtLeftEdge) {
-                node.addAction(AccessibilityActionCompat.ACTION_SCROLL_LEFT)
-                if (isLayoutRtl) {
-                    node.addAction(AccessibilityActionCompat.ACTION_SCROLL_FORWARD)
-                } else {
-                    // In LTR layout, scroll backward goes to left
-                    node.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
+            if (dividerHasA11yFocus) {
+                if (!dividerAtLeftEdge) {
+                    node.addAction(AccessibilityActionCompat.ACTION_SCROLL_LEFT)
+                    if (isLayoutRtl) {
+                        node.addAction(AccessibilityActionCompat.ACTION_SCROLL_FORWARD)
+                    } else {
+                        // In LTR layout, scroll backward goes to left
+                        node.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
+                    }
                 }
-            }
 
-            if (!dividerAtRightEdge) {
-                node.addAction(AccessibilityActionCompat.ACTION_SCROLL_RIGHT)
-                if (isLayoutRtl) {
-                    node.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
-                } else {
-                    // In LTR layout, scroll forward goes to right
-                    node.addAction(AccessibilityActionCompat.ACTION_SCROLL_FORWARD)
+                if (!dividerAtRightEdge) {
+                    node.addAction(AccessibilityActionCompat.ACTION_SCROLL_RIGHT)
+                    if (isLayoutRtl) {
+                        node.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
+                    } else {
+                        // In LTR layout, scroll forward goes to right
+                        node.addAction(AccessibilityActionCompat.ACTION_SCROLL_FORWARD)
+                    }
                 }
             }
 
