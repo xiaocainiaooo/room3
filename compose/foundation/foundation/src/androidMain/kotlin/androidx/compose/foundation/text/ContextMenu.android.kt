@@ -22,7 +22,6 @@ import androidx.compose.foundation.R
 import androidx.compose.foundation.contextmenu.ContextMenuScope
 import androidx.compose.foundation.contextmenu.ContextMenuState
 import androidx.compose.foundation.contextmenu.close
-import androidx.compose.foundation.internal.hasText
 import androidx.compose.foundation.text.contextmenu.builder.TextContextMenuBuilderScope
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuKeys
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuSession
@@ -37,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 
@@ -201,15 +199,13 @@ internal suspend fun TextFieldSelectionState.getContextMenuItemsAvailability():
 
 internal suspend fun TextFieldSelectionManager.getContextMenuItemsAvailability():
     MenuItemsAvailability {
-    val isPassword = visualTransformation is PasswordVisualTransformation
-    val hasSelection = !value.selection.collapsed
-
+    updateClipboardEntry()
     return MenuItemsAvailability(
-        canCopy = hasSelection && !isPassword,
-        canPaste = editable && clipboard?.getClipEntry()?.hasText() == true,
-        canCut = hasSelection && editable && !isPassword,
-        canSelectAll = value.selection.length != value.text.length,
-        canAutofill = editable && value.selection.collapsed
+        canCopy = canCopy(),
+        canPaste = canPaste(),
+        canCut = canCut(),
+        canSelectAll = canSelectAll(),
+        canAutofill = canAutofill()
     )
 }
 
