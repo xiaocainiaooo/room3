@@ -397,13 +397,16 @@ public open class PdfViewerFragment constructor() : Fragment() {
             documentViewModel.searchViewUiState.collect { uiState ->
                 pdfSearchViewManager.setState(uiState)
 
-                /** Clear selection when we start a search session. */
-                if (uiState !is SearchViewUiState.Closed) _pdfView.clearSelection()
-
-                /**
-                 * Dynamically control the fast scroller visibility based on the search UI state.
-                 */
-                _pdfView.overrideFastScrollerVisibility(uiState is SearchViewUiState.Closed)
+                /** Clear selection when we start a search session. Also hide the fast scroller. */
+                if (uiState !is SearchViewUiState.Closed) {
+                    _pdfView.apply {
+                        clearSelection()
+                        forcedFastScrollVisibility = false
+                    }
+                } else {
+                    // Let PdfView internally control fast scroller visibility.
+                    _pdfView.forcedFastScrollVisibility = null
+                }
             }
         }
 

@@ -88,7 +88,7 @@ public class FastScrollDrawer(
     internal val thumbWidthPx = thumbWidthDp.dpToPx(context)
     internal val thumbHeightPx = thumbHeightDp.dpToPx(context)
 
-    internal var alpha: Int = VISIBLE_ALPHA
+    public var alpha: Int = GONE_ALPHA // Initially fast scroller should be hidden
         set(value) {
             thumbDrawable.alpha = value
             trackDrawable.alpha = value

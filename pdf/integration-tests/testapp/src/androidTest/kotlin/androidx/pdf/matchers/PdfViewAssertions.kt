@@ -19,14 +19,14 @@ package androidx.pdf.matchers
 import androidx.pdf.view.PdfView
 import androidx.test.espresso.ViewAssertion
 
-class PdfViewAssertions {
+internal object PdfViewAssertions {
 
     fun isFastScrollerHidden(): ViewAssertion {
         return ViewAssertion { view, noViewFoundException ->
             if (view !is PdfView) {
                 throw noViewFoundException
             }
-            if (view.isFastScrollerVisible) {
+            if (view.fastScroller?.fastScrollDrawer?.alpha != 0) {
                 throw AssertionError("FastScroller should be hidden")
             }
         }
@@ -37,7 +37,7 @@ class PdfViewAssertions {
             if (view !is PdfView) {
                 throw noViewFoundException
             }
-            if (!view.isFastScrollerVisible) {
+            if ((view.fastScroller?.fastScrollDrawer?.alpha ?: 0) > 0) {
                 throw AssertionError("FastScroller should be shown")
             }
         }

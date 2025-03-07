@@ -27,6 +27,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.pdf.FragmentUtils.scenarioLoadDocument
 import androidx.pdf.TestUtils.waitFor
+import androidx.pdf.matchers.PdfViewAssertions.isFastScrollerHidden
 import androidx.pdf.matchers.SearchViewAssertions
 import androidx.pdf.util.Preconditions
 import androidx.pdf.view.PdfView
@@ -121,6 +122,8 @@ class PdfViewerFragmentV2TestSuite {
                 "Unable to load document due to ${it.documentError?.message}"
             )
         }
+        // Ensure the fast scroller is hidden when document is loaded initially
+        onView(withId(PdfR.id.pdfView)).check(isFastScrollerHidden())
 
         // Swipe actions
         onView(withId(PdfR.id.pdfView)).perform(swipeUp())
