@@ -24,28 +24,23 @@
     <issue id="LintBaseline" severity="ignore">
         <ignore regexp=".* filtered out because .* listed in the baseline file.*"/>
     </issue>
-    <!-- Disable all lint checks on tests by default. -->
-    <issue id="all">
+    <!-- Enable certain lint checks on tests which don't run on test scope by default. -->
+    <issue id="NewApi" severity="fatal" tests="true" />
+    <issue id="WrongThread" severity="fatal" tests="true" />
+    <!-- TODO(b/399428893): enable SdkSuppress check when it doesn't have false positives. -->
+    <issue id="UseSdkSuppress" severity="ignore" />
+    <!--
+      NewApi and ObsoleteSdkInt are implemented with the same detector. NewApi is enabled for tests
+      above, so ObsoleteSdkInt implicitly also is because the detector is running on tests. Set the
+      issue to ignore test paths since it isn't needed for tests.
+      -->
+    <issue id="ObsoleteSdkInt">
         <ignore path="**/src/test/**" />
         <ignore path="**/src/androidTest/**" />
         <!-- Required for Kotlin multi-platform tests. -->
         <ignore path="**/src/androidInstrumentedTest/**" />
         <ignore path="**/src/androidUnitTest/**" />
-        <ignore path="**/src/jvmTest/**" />
-        <ignore path="**/src/commonTest/**" />
-        <ignore path="**/src/nonEmulatorJvmTest/**" />
-        <!-- Required for AppSearch icing tests. -->
-        <ignore path="**/java/tests/**" />
     </issue>
-    <!-- Re-enable high-priority checks for tests (and everything else). -->
-    <issue id="BanThreadSleep" severity="fatal" />
-    <issue id="NewApi" severity="fatal" />
-    <issue id="WrongThread" severity="fatal" />
-    <issue id="IgnoreClassLevelDetector" severity="fatal" />
-    <issue id="WithPluginClasspathUsage" severity="fatal" />
-    <issue id="AutoValueNullnessOverride" severity="fatal" />
-    <issue id="UnexpectedTestSizeAnnotation" severity="fatal" />
-    <issue id="LintImplTrimIndent" severity="fatal" />
     <!-- Disable all lint checks on transformed classes by default. b/283812176 -->
     <issue id="all">
         <ignore path="**/.transforms/**" />
