@@ -16,21 +16,22 @@
 
 package androidx.appfunctions.internal
 
-import androidx.annotation.RestrictTo
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.appfunctions.AppFunctionData
 
 /** Translates the request and response between formats. */
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-public interface Translator {
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+internal interface Translator {
     /** Upgrades the request from old format to the jetpack format. */
-    public fun upgradeRequest(request: AppFunctionData): AppFunctionData
+    fun upgradeRequest(request: AppFunctionData): AppFunctionData
 
     /** Upgrades the response from the jetpack format to the old format. */
-    public fun upgradeResponse(response: AppFunctionData): AppFunctionData
+    fun upgradeResponse(response: AppFunctionData): AppFunctionData
 
     /** Downgrades the request from the jetpack format to the old format. */
-    public fun downgradeRequest(request: AppFunctionData): AppFunctionData
+    fun downgradeRequest(request: AppFunctionData): AppFunctionData
 
     /** Downgrades the response from old format to the jetpack format. */
-    public fun downgradeResponse(response: AppFunctionData): AppFunctionData
+    fun downgradeResponse(response: AppFunctionData): AppFunctionData
 }

@@ -48,12 +48,7 @@ dependencies {
     // Test dependencies
     testImplementation(libs.junit)
     testImplementation(libs.truth)
-    testImplementation(libs.kotlinCoroutinesTest)
-    testImplementation(libs.testRunner)
-    testImplementation(project(":appfunctions:appfunctions-stubs"))
-    testImplementation(libs.mockitoCore)
-    testImplementation(libs.testCore)
-    testImplementation(libs.robolectric)
+    testImplementation(libs.mockitoCore4)
 
     androidTestCompileOnly(project(":appfunctions:appfunctions-stubs"))
     androidTestImplementation("androidx.appsearch:appsearch:1.1.0-beta01")
