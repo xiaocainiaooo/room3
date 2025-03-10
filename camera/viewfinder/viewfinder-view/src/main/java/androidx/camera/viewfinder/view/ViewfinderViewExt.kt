@@ -22,10 +22,10 @@ import androidx.camera.viewfinder.core.ViewfinderSurfaceSession
 import androidx.concurrent.futures.await
 
 /**
- * Provides a suspending function of [CameraViewfinder.requestSurfaceSessionAsync] to request a
+ * Provides a suspending function of [ViewfinderView.requestSurfaceSessionAsync] to request a
  * [ViewfinderSurfaceSession] by sending a [ViewfinderSurfaceRequest].
  */
-suspend fun CameraViewfinder.requestSurfaceSession(
+suspend fun ViewfinderView.requestSurfaceSession(
     viewfinderSurfaceRequest: ViewfinderSurfaceRequest,
     transformationInfo: TransformationInfo = TransformationInfo()
 ): ViewfinderSurfaceSession =

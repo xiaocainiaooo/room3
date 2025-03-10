@@ -63,7 +63,7 @@ abstract class ViewfinderImplementation {
 
     /**
      * Invoked when the viewfinder needs to be adjusted, either because the layout bounds of the
-     * viewfinder's container {@link CameraViewfinder} have changed, or the
+     * viewfinder's container {@link ViewfinderView} have changed, or the
      * {@link androidx.camera.viewfinder.core.ScaleType} has changed.
      * <p>
      * Corrects and adjusts the viewfinder using the latest

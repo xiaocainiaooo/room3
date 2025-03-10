@@ -19,9 +19,8 @@ package androidx.camera.viewfinder.view.internal.quirk;
 /**
  * Defines an inconsistency, a limitation, or any behavior that deviates from the standard behavior.
  *
- * <p> This class is used to define both device specific and camera specific quirks. Device
- * specific quirks depend on device related information, such as the device's brand, model and OS
- * level. Whereas camera related quirks depend on the camera id and/or camera characteristics.
+ * <p> This class is used to define both device specific quirks. Device specific quirks depend on
+ * device related information, such as the device's brand, model and OS level.
  *
  * @see Quirks
  */

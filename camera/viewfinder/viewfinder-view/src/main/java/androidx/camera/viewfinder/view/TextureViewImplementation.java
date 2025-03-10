@@ -39,7 +39,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * The {@link TextureView} implementation for {@link CameraViewfinder}
+ * The {@link TextureView} implementation for {@link ViewfinderView}
  */
 final class TextureViewImplementation extends ViewfinderImplementation {
 

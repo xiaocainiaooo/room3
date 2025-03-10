@@ -42,7 +42,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * The SurfaceView implementation for {@link CameraViewfinder}.
+ * The SurfaceView implementation for {@link ViewfinderView}.
  */
 final class SurfaceViewImplementation extends ViewfinderImplementation {
 
@@ -224,12 +224,9 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
                     Bitmap.Config.ARGB_8888);
             int copyRes = PixelCopyCompat.requestSync(surface, bitmap, SCREENSHOT_TIMEOUT_MILLIS);
             if (copyRes == PixelCopy.SUCCESS) {
-                Logger.d(TAG,
-                        "CameraViewfinder.SurfaceViewImplementation.getBitmap() succeeded");
+                Logger.d(TAG, "SurfaceViewImplementation.getBitmap() succeeded");
             } else {
-                Logger.e(TAG,
-                        "CameraViewfinder.SurfaceViewImplementation.getBitmap() failed with "
-                                + "error " + copyRes);
+                Logger.e(TAG, "SurfaceViewImplementation.getBitmap() failed with error " + copyRes);
             }
             return bitmap;
         } finally {

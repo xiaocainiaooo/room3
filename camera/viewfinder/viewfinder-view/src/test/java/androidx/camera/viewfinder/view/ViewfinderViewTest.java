@@ -16,7 +16,7 @@
 
 package androidx.camera.viewfinder.view;
 
-import static androidx.camera.viewfinder.view.CameraViewfinder.shouldUseTextureView;
+import static androidx.camera.viewfinder.view.ViewfinderView.shouldUseTextureView;
 import static androidx.camera.viewfinder.core.ImplementationMode.EMBEDDED;
 import static androidx.camera.viewfinder.core.ImplementationMode.EXTERNAL;
 
@@ -38,7 +38,7 @@ import org.robolectric.annotation.internal.DoNotInstrument;
 @RunWith(RobolectricTestRunner.class)
 @DoNotInstrument
 @Config(minSdk = Build.VERSION_CODES.LOLLIPOP)
-public class CameraViewfinderTest {
+public class ViewfinderViewTest {
 
     @After
     public void tearDown() {

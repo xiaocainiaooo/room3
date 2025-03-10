@@ -43,7 +43,7 @@ import org.junit.runners.Parameterized
 @LargeTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = 21)
-class CameraViewfinderTest(private val implementationMode: ImplementationMode) {
+class ViewfinderViewTest(private val implementationMode: ImplementationMode) {
 
     companion object {
         @JvmStatic

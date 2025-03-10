@@ -41,9 +41,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Handles {@link CameraViewfinder} transformation.
+ * Handles {@link ViewfinderView} transformation.
  *
- * <p> This class transforms the camera output and display it in a {@link CameraViewfinder}.
+ * <p> This class transforms the source surface and displays it in a {@link ViewfinderView}.
  * The goal is to transform it in a way so that the entire area of
  * {@link TransformationInfo}'s crop rect is 1) visible to end users, and 2)
  * displayed as large as possible.
@@ -120,7 +120,7 @@ final class ViewfinderTransformation {
     }
 
     /**
-     * Calculates the transformation and applies it to the inner view of {@link CameraViewfinder}.
+     * Calculates the transformation and applies it to the inner view of {@link ViewfinderView}.
      *
      * <p> The inner view could be {@link SurfaceView} or a {@link TextureView}.
      * {@link TextureView} needs a preliminary correction since it doesn't handle the
@@ -171,7 +171,7 @@ final class ViewfinderTransformation {
     }
 
     /**
-     * Creates a transformed screenshot of {@link CameraViewfinder}.
+     * Creates a transformed screenshot of {@link ViewfinderView}.
      *
      * <p> Creates the transformed {@link Bitmap} by applying the same transformation applied to
      * the inner view. T

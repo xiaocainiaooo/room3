@@ -42,7 +42,7 @@ import org.junit.runners.Parameterized
 @SdkSuppress(minSdkVersion = 33) // Required for screenshot tests
 @LargeTest
 @RunWith(Parameterized::class)
-class CameraViewfinderBitmapTest(
+class ViewfinderViewBitmapTest(
     private val implementationMode: ImplementationMode,
     private val scaleType: ScaleType
 ) {

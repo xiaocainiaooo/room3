@@ -63,15 +63,15 @@ import java.util.Objects;
 import java.util.concurrent.CancellationException;
 
 /**
- * Base viewfinder widget that can display the camera feed for Camera2.
+ * Viewfinder widget that displays a {@link Surface} from a source such as a Camera2 camera feed.
  *
  * <p> It internally uses either a {@link TextureView} or {@link SurfaceView} to display the
- * camera feed, and applies required transformations on them to correctly display the viewfinder,
- * this involves correcting their aspect ratio, scale and rotation.
+ * {@link Surface}, and applies required transformations on them to correctly display the
+ * viewfinder. This involves correcting their aspect ratio, scale, rotation, and mirroring.
  */
-public final class CameraViewfinder extends FrameLayout {
+public final class ViewfinderView extends FrameLayout {
 
-    private static final String TAG = "CameraViewFinder";
+    private static final String TAG = "ViewfinderView";
 
     @ColorRes private static final int DEFAULT_BACKGROUND_COLOR = android.R.color.black;
     private static final ImplementationMode DEFAULT_IMPL_MODE = ImplementationMode.EXTERNAL;
@@ -114,24 +114,24 @@ public final class CameraViewfinder extends FrameLayout {
             };
 
     @UiThread
-    public CameraViewfinder(@NonNull Context context) {
+    public ViewfinderView(@NonNull Context context) {
         this(context, null);
     }
 
     @UiThread
-    public CameraViewfinder(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public ViewfinderView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
     @UiThread
-    public CameraViewfinder(@NonNull Context context,
+    public ViewfinderView(@NonNull Context context,
             @Nullable AttributeSet attrs,
             int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
     @UiThread
-    public CameraViewfinder(@NonNull Context context,
+    public ViewfinderView(@NonNull Context context,
             @Nullable AttributeSet attrs,
             int defStyleAttr,
             int defStyleRes) {
@@ -168,19 +168,19 @@ public final class CameraViewfinder extends FrameLayout {
      * Returns the {@link ImplementationMode}.
      *
      * <p> For each {@link ViewfinderSurfaceRequest} sent to
-     * {@link CameraViewfinder}, the
+     * {@link ViewfinderView}, the
      * {@link ImplementationMode} set in the
      * {@link ViewfinderSurfaceRequest} will be used first.
      * If it's not set, the {@code app:implementationMode} in the layout xml will be used. If
      * it's not set in the layout xml, the default value
      * {@link ImplementationMode#EXTERNAL}
      * will be used. Each {@link ViewfinderSurfaceRequest} sent
-     * to {@link CameraViewfinder} can override the
+     * to {@link ViewfinderView} can override the
      * {@link ImplementationMode} once it has set the
      * {@link ImplementationMode}.
      *
      * @return The {@link ImplementationMode} for
-     * {@link CameraViewfinder}.
+     * {@link ViewfinderView}.
      */
     @UiThread
     public @NonNull ImplementationMode getSurfaceImplementationMode() {
@@ -196,9 +196,9 @@ public final class CameraViewfinder extends FrameLayout {
      *
      * <p> The default value is {@link ScaleType#FILL_CENTER}.
      *
-     * <p> This method should be called after {@link CameraViewfinder} is inflated and can be
+     * <p> This method should be called after {@link ViewfinderView} is inflated and can be
      * called before or after
-     * {@link CameraViewfinder#requestSurfaceSessionAsync(ViewfinderSurfaceRequest, TransformationInfo)}.
+     * {@link ViewfinderView#requestSurfaceSessionAsync(ViewfinderSurfaceRequest, TransformationInfo)}.
      * The {@link ScaleType} to set will be effective immediately after the method is called.
      *
      * @param scaleType The {@link ScaleType} to apply to the viewfinder.
@@ -238,7 +238,7 @@ public final class CameraViewfinder extends FrameLayout {
      * ViewfinderSurfaceRequest request = new ViewfinderSurfaceRequest(width, height);
      *
      * ListenableFuture<ViewfinderSurfaceSession> sessionFuture =
-     *     mCameraViewFinder.requestSurfaceSessionAsync(request);
+     *     mViewfinder.requestSurfaceSessionAsync(request);
      *
      * Futures.addCallback(sessionFuture, new FutureCallback<ViewfinderSurfaceSession>() {
      *     {@literal @}Override
@@ -313,9 +313,9 @@ public final class CameraViewfinder extends FrameLayout {
         ViewfinderImplementation viewfinderImplementation =
                 shouldUseTextureView(mCurrentImplementationMode)
                         ? new TextureViewImplementation(
-                        CameraViewfinder.this, mViewfinderTransformation)
+                        ViewfinderView.this, mViewfinderTransformation)
                         : new SurfaceViewImplementation(
-                                CameraViewfinder.this, mViewfinderTransformation);
+                                ViewfinderView.this, mViewfinderTransformation);
 
         if (mImplementation != null && mImplementation != viewfinderImplementation) {
             mImplementation.onImplementationReplaced();
@@ -388,7 +388,7 @@ public final class CameraViewfinder extends FrameLayout {
 
     /**
      * Returns a {@link Bitmap} representation of the content displayed on the
-     * {@link CameraViewfinder}, or {@code null} if the camera viewfinder hasn't started yet.
+     * {@link ViewfinderView}, or {@code null} if the viewfinder hasn't started yet.
      * <p>
      * The returned {@link Bitmap} uses the {@link Bitmap.Config#ARGB_8888} pixel format and its
      * dimensions are the same as this view's.
@@ -399,8 +399,7 @@ public final class CameraViewfinder extends FrameLayout {
      * If an error occurs during the copy, an empty {@link Bitmap} will be returned.
      *
      * @return A {@link Bitmap.Config#ARGB_8888} {@link Bitmap} representing the content
-     * displayed on the {@link CameraViewfinder}, or null if the camera viewfinder hasn't started
-     * yet.
+     * displayed on the {@link ViewfinderView}, or null if the viewfinder hasn't started yet.
      */
     @UiThread
     public @Nullable Bitmap getBitmap() {

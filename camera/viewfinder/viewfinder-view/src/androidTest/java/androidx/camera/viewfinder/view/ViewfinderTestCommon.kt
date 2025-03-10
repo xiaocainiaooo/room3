@@ -48,13 +48,13 @@ inline fun runViewfinderTest(
         ActivityScenario.launch(FakeActivity::class.java).use { scenario ->
             var viewfinderTestScope: ViewfinderTestScope? = null
             scenario.onActivity { activity ->
-                val cameraViewfinder = CameraViewfinder(activity)
+                val viewfinderView = ViewfinderView(activity)
                 if (viewfinderInitiallyAttached) {
-                    activity.setContentView(cameraViewfinder)
+                    activity.setContentView(viewfinderView)
                 }
                 viewfinderTestScope =
                     ViewfinderTestScope(
-                        viewfinder = cameraViewfinder,
+                        viewfinder = viewfinderView,
                         activityScenario = scenario,
                         coroutineContext = coroutineContext,
                         viewfinderInitiallyAttached
@@ -69,7 +69,7 @@ inline fun runViewfinderTest(
 }
 
 data class ViewfinderTestScope(
-    val viewfinder: CameraViewfinder,
+    val viewfinder: ViewfinderView,
     private val activityScenario: ActivityScenario<FakeActivity>,
     override val coroutineContext: CoroutineContext,
     private var attached: Boolean = false
