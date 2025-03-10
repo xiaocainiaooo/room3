@@ -1,5 +1,5 @@
 // Signature format: 4.0
-package androidx.camera.viewfinder {
+package androidx.camera.viewfinder.view {
 
   public final class CameraViewfinder extends android.widget.FrameLayout {
     ctor @UiThread public CameraViewfinder(android.content.Context);
@@ -17,7 +17,7 @@ package androidx.camera.viewfinder {
   }
 
   public final class CameraViewfinderExtKt {
-    method public static suspend Object? requestSurfaceSession(androidx.camera.viewfinder.CameraViewfinder, androidx.camera.viewfinder.core.ViewfinderSurfaceRequest viewfinderSurfaceRequest, optional androidx.camera.viewfinder.core.TransformationInfo transformationInfo, kotlin.coroutines.Continuation<? super androidx.camera.viewfinder.core.ViewfinderSurfaceSession>);
+    method public static suspend Object? requestSurfaceSession(androidx.camera.viewfinder.view.CameraViewfinder, androidx.camera.viewfinder.core.ViewfinderSurfaceRequest viewfinderSurfaceRequest, optional androidx.camera.viewfinder.core.TransformationInfo transformationInfo, kotlin.coroutines.Continuation<? super androidx.camera.viewfinder.core.ViewfinderSurfaceSession>);
   }
 
 }

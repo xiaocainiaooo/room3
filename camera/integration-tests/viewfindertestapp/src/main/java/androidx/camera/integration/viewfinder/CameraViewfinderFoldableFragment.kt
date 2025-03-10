@@ -54,12 +54,12 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.camera.viewfinder.CameraViewfinder
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.ScaleType
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.camera.viewfinder.core.camera2.Camera2TransformationInfo
-import androidx.camera.viewfinder.requestSurfaceSession
+import androidx.camera.viewfinder.view.CameraViewfinder
+import androidx.camera.viewfinder.view.requestSurfaceSession
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
