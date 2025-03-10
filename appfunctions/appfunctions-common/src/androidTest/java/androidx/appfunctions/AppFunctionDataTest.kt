@@ -16,6 +16,9 @@
 
 package androidx.appfunctions
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
@@ -29,15 +32,25 @@ import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_FLOAT
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_INT
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_PENDING_INTENT
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_STRING
 import androidx.test.filters.SdkSuppress
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertThrows
+import org.junit.Before
 import org.junit.Test
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 class AppFunctionDataTest {
+
+    private lateinit var context: Context
+
+    @Before
+    fun setup() {
+        context = InstrumentationRegistry.getInstrumentation().targetContext
+    }
 
     @Test
     fun testReadWrite_asParameters_conformSpec() {
@@ -53,6 +66,10 @@ class AppFunctionDataTest {
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setPendingIntent(
+            "pendingIntent",
+            PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+        )
         builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
         builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
@@ -60,6 +77,13 @@ class AppFunctionDataTest {
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
         builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
+        builder.setPendingIntentList(
+            "pendingIntentList",
+            listOf(
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+                PendingIntent.getService(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+            )
+        )
         val data = builder.build()
 
         assertThat(data.getInt("int")).isEqualTo(234)
@@ -68,6 +92,10 @@ class AppFunctionDataTest {
         assertThat(data.getDouble("double")).isEqualTo(50.0)
         assertThat(data.getBoolean("boolean")).isTrue()
         assertThat(data.getString("string")).isEqualTo("testString")
+        assertThat(data.getPendingIntent("pendingIntent"))
+            .isEqualTo(
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+            )
         assertThat(data.getIntArray("intArray")).asList().containsExactly(4, 5, 6)
         assertThat(data.getLongArray("longArray")).asList().containsExactly(1L, 2L, 3L)
         assertThat(data.getFloatArray("floatArray"))
@@ -83,6 +111,11 @@ class AppFunctionDataTest {
             .asList()
             .containsExactly(10.toByte(), 20.toByte())
         assertThat(data.getStringList("stringList")).containsExactly("1", "2", "3")
+        assertThat(data.getPendingIntentList("pendingIntentList"))
+            .containsExactly(
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+                PendingIntent.getService(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+            )
     }
 
     @Test
@@ -123,6 +156,18 @@ class AppFunctionDataTest {
         }
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("string", 100.0) }
 
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setPendingIntentList(
+                "pendingIntent",
+                listOf(
+                    PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+                )
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setString("pendingIntent", "test")
+        }
+
         assertThrows(IllegalArgumentException::class.java) { builder.setInt("intArray", 100) }
         assertThrows(IllegalArgumentException::class.java) {
             builder.setLongArray("intArray", longArrayOf(2, 3))
@@ -161,6 +206,16 @@ class AppFunctionDataTest {
         assertThrows(IllegalArgumentException::class.java) {
             builder.setLongArray("stringList", longArrayOf(1))
         }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setPendingIntent(
+                "pendingIntentList",
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setStringList("pendingIntentList", listOf("string"))
+        }
     }
 
     @Test
@@ -176,6 +231,10 @@ class AppFunctionDataTest {
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setPendingIntent(
+            "pendingIntent",
+            PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+        )
         builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
         builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
@@ -183,6 +242,10 @@ class AppFunctionDataTest {
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
         builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
+        builder.setPendingIntentList(
+            "pendingIntentList",
+            listOf(PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE))
+        )
         val data = builder.build()
 
         assertThrows(IllegalArgumentException::class.java) { data.getLong("int") }
@@ -202,6 +265,11 @@ class AppFunctionDataTest {
 
         assertThrows(IllegalArgumentException::class.java) { data.getLong("string") }
         assertThrows(IllegalArgumentException::class.java) { data.getStringList("string") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getString("pendingIntent") }
+        assertThrows(IllegalArgumentException::class.java) {
+            data.getPendingIntentList("pendingIntent")
+        }
 
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("intArray") }
         assertThrows(IllegalArgumentException::class.java) { data.getInt("intArray") }
@@ -223,6 +291,13 @@ class AppFunctionDataTest {
 
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("stringList") }
         assertThrows(IllegalArgumentException::class.java) { data.getString("stringList") }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            data.getStringList("pendingIntentList")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            data.getPendingIntent("pendingIntentList")
+        }
     }
 
     @Test
@@ -235,6 +310,10 @@ class AppFunctionDataTest {
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setPendingIntent(
+            "pendingIntent",
+            PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+        )
         builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
         builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
@@ -242,6 +321,13 @@ class AppFunctionDataTest {
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
         builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
+        builder.setPendingIntentList(
+            "pendingIntentList",
+            listOf(
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+                PendingIntent.getService(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+            )
+        )
         val data = builder.build()
 
         assertThat(data.getInt("int")).isEqualTo(234)
@@ -250,6 +336,10 @@ class AppFunctionDataTest {
         assertThat(data.getDouble("double")).isEqualTo(50.0)
         assertThat(data.getBoolean("boolean")).isTrue()
         assertThat(data.getString("string")).isEqualTo("testString")
+        assertThat(data.getPendingIntent("pendingIntent"))
+            .isEqualTo(
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+            )
         assertThat(data.getIntArray("intArray")).asList().containsExactly(4, 5, 6)
         assertThat(data.getLongArray("longArray")).asList().containsExactly(1L, 2L, 3L)
         assertThat(data.getFloatArray("floatArray"))
@@ -265,6 +355,11 @@ class AppFunctionDataTest {
             .asList()
             .containsExactly(10.toByte(), 20.toByte())
         assertThat(data.getStringList("stringList")).containsExactly("1", "2", "3")
+        assertThat(data.getPendingIntentList("pendingIntentList"))
+            .containsExactly(
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+                PendingIntent.getService(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE),
+            )
     }
 
     @Test
@@ -301,6 +396,18 @@ class AppFunctionDataTest {
         }
         assertThrows(IllegalArgumentException::class.java) { builder.setDouble("string", 100.0) }
 
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setPendingIntentList(
+                "pendingIntent",
+                listOf(
+                    PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+                )
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setString("pendingIntent", "test")
+        }
+
         assertThrows(IllegalArgumentException::class.java) { builder.setInt("intArray", 100) }
         assertThrows(IllegalArgumentException::class.java) {
             builder.setLongArray("intArray", longArrayOf(2, 3))
@@ -339,6 +446,16 @@ class AppFunctionDataTest {
         assertThrows(IllegalArgumentException::class.java) {
             builder.setLongArray("stringList", longArrayOf(1))
         }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setPendingIntent(
+                "pendingIntentList",
+                PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+            )
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            builder.setStringList("pendingIntentList", listOf("string"))
+        }
     }
 
     @Test
@@ -350,6 +467,10 @@ class AppFunctionDataTest {
         builder.setDouble("double", 50.0)
         builder.setBoolean("boolean", true)
         builder.setString("string", "testString")
+        builder.setPendingIntent(
+            "pendingIntent",
+            PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+        )
         builder.setIntArray("intArray", intArrayOf(4, 5, 6))
         builder.setLongArray("longArray", longArrayOf(1L, 2L, 3L))
         builder.setFloatArray("floatArray", floatArrayOf(10.0f, 20.0f, 30.0f))
@@ -357,6 +478,10 @@ class AppFunctionDataTest {
         builder.setBooleanArray("booleanArray", booleanArrayOf(false, true, false))
         builder.setByteArray("byteArray", byteArrayOf(10.toByte(), 20.toByte()))
         builder.setStringList("stringList", listOf("1", "2", "3"))
+        builder.setPendingIntentList(
+            "pendingIntentList",
+            listOf(PendingIntent.getActivity(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE))
+        )
         val data = builder.build()
 
         assertThrows(IllegalArgumentException::class.java) { data.getLong("int") }
@@ -376,6 +501,11 @@ class AppFunctionDataTest {
 
         assertThrows(IllegalArgumentException::class.java) { data.getLong("string") }
         assertThrows(IllegalArgumentException::class.java) { data.getStringList("string") }
+
+        assertThrows(IllegalArgumentException::class.java) { data.getString("pendingIntent") }
+        assertThrows(IllegalArgumentException::class.java) {
+            data.getPendingIntentList("pendingIntent")
+        }
 
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("intArray") }
         assertThrows(IllegalArgumentException::class.java) { data.getInt("intArray") }
@@ -397,6 +527,13 @@ class AppFunctionDataTest {
 
         assertThrows(IllegalArgumentException::class.java) { data.getLongArray("stringList") }
         assertThrows(IllegalArgumentException::class.java) { data.getString("stringList") }
+
+        assertThrows(IllegalArgumentException::class.java) {
+            data.getStringList("pendingIntentList")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            data.getPendingIntent("pendingIntentList")
+        }
     }
 
     @Test
@@ -675,6 +812,8 @@ class AppFunctionDataTest {
                         "double" to AppFunctionPrimitiveTypeMetadata(TYPE_DOUBLE, false),
                         "boolean" to AppFunctionPrimitiveTypeMetadata(TYPE_BOOLEAN, false),
                         "string" to AppFunctionPrimitiveTypeMetadata(TYPE_STRING, false),
+                        "pendingIntent" to
+                            AppFunctionPrimitiveTypeMetadata(TYPE_PENDING_INTENT, false),
                         "intArray" to
                             AppFunctionArrayTypeMetadata(
                                 itemType = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false),
@@ -710,6 +849,12 @@ class AppFunctionDataTest {
                                 itemType = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, false),
                                 isNullable = false,
                             ),
+                        "pendingIntentList" to
+                            AppFunctionArrayTypeMetadata(
+                                itemType =
+                                    AppFunctionPrimitiveTypeMetadata(TYPE_PENDING_INTENT, false),
+                                isNullable = false,
+                            )
                     ),
                 required = emptyList(),
                 qualifiedName = "test",
@@ -769,6 +914,15 @@ class AppFunctionDataTest {
                     dataType =
                         AppFunctionPrimitiveTypeMetadata(
                             type = TYPE_STRING,
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "pendingIntent",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionPrimitiveTypeMetadata(
+                            type = TYPE_PENDING_INTENT,
                             isNullable = false,
                         ),
                 ),
@@ -858,6 +1012,19 @@ class AppFunctionDataTest {
                             itemType =
                                 AppFunctionPrimitiveTypeMetadata(
                                     type = TYPE_STRING,
+                                    isNullable = false,
+                                ),
+                            isNullable = false,
+                        ),
+                ),
+                AppFunctionParameterMetadata(
+                    name = "pendingIntentList",
+                    isRequired = true,
+                    dataType =
+                        AppFunctionArrayTypeMetadata(
+                            itemType =
+                                AppFunctionPrimitiveTypeMetadata(
+                                    type = TYPE_PENDING_INTENT,
                                     isNullable = false,
                                 ),
                             isNullable = false,
