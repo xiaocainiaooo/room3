@@ -71,6 +71,8 @@ import com.android.build.gradle.api.KotlinMultiplatformAndroidPlugin
 import com.android.build.gradle.api.PrivacySandboxSdkPlugin
 import com.android.build.gradle.tasks.factory.AndroidUnitTest
 import com.android.utils.appendCapitalized
+import com.google.devtools.ksp.gradle.KspExtension
+import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import com.google.protobuf.gradle.ProtobufExtension
 import com.google.protobuf.gradle.ProtobufPlugin
 import java.io.File
@@ -166,6 +168,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 is LibraryPlugin -> configureWithLibraryPlugin(project, androidXExtension)
                 is AppPlugin -> configureWithAppPlugin(project, androidXExtension)
                 is TestPlugin -> configureWithTestPlugin(project, androidXExtension)
+                is KspGradleSubplugin -> configureWithKspPlugin(project, androidXExtension)
                 is KotlinMultiplatformAndroidPlugin ->
                     configureWithKotlinMultiplatformAndroidPlugin(
                         project,
@@ -658,6 +661,13 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         }
         project.configureJavaCompilationWarnings(androidXExtension)
     }
+
+    private fun configureWithKspPlugin(project: Project, androidXExtension: AndroidXExtension) =
+        project.extensions.getByType<KspExtension>().apply {
+            useKsp2.set(
+                androidXExtension.kotlinTarget.map { it.apiVersion == KotlinVersion.KOTLIN_2_0 }
+            )
+        }
 
     private fun configureWithKotlinMultiplatformAndroidPlugin(
         project: Project,
