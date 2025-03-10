@@ -77,6 +77,10 @@ import kotlinx.coroutines.coroutineScope
  *   coordinates such as touch coordinates to surface space coordinates. When the Viewfinder is
  *   displaying content from the camera, this transformer can be used to translate touch events into
  *   camera sensor coordinates for focus and metering actions.
+ * @param alignment Optional alignment parameter used to place the [Surface] in the given bounds of
+ *   the [Viewfinder]. Defaults to [Alignment.Center].
+ * @param contentScale Optional scale parameter used to determine the aspect ratio scaling to be
+ *   used to fit the [Surface] in the bounds of the [Viewfinder]. Defaults to [ContentScale.Crop].
  * @param onInit Lambda invoked on first composition and any time a new [surfaceRequest] is
  *   provided. This lambda can be used to declare a [ViewfinderInitScope.onSurfaceSession] callback
  *   that will be called each time a new [Surface] is provided by the viewfinder.
@@ -89,6 +93,8 @@ fun Viewfinder(
     modifier: Modifier = Modifier,
     transformationInfo: TransformationInfo = DEFAULT,
     coordinateTransformer: MutableCoordinateTransformer? = null,
+    alignment: Alignment = Alignment.Center,
+    contentScale: ContentScale = ContentScale.Crop,
     onInit: ViewfinderInitScope.() -> Unit
 ) {
     Box(modifier = modifier.clipToBounds().fillMaxSize()) {
@@ -100,8 +106,8 @@ fun Viewfinder(
                 implementationMode =
                     surfaceRequest.implementationMode ?: ImplementationMode.EXTERNAL,
                 coordinateTransformer = coordinateTransformer,
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop
+                alignment = alignment,
+                contentScale = contentScale
             ) {
                 val viewfinderInitScope =
                     ViewfinderInitScopeImpl(viewfinderSurfaceRequest = surfaceRequest)
