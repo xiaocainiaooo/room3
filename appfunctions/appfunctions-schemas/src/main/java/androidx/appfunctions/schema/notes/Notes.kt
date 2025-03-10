@@ -19,10 +19,11 @@ package androidx.appfunctions.schema.notes
 import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
 import androidx.appfunctions.AppFunctionContext
+import androidx.appfunctions.AppFunctionOpenable
 import androidx.appfunctions.AppFunctionSchemaDefinition
 import androidx.appfunctions.schema.types.AppFunctionUri
 
-// TODO(b/401517540): Add remaining APIs: UpdateNote, ShowNote, GetNote, folder APIs
+// TODO(b/401517540): Add remaining APIs: UpdateNote, GetNote, folder APIs
 /**
  * The category name of Notes related app functions.
  *
@@ -179,6 +180,48 @@ public interface DeleteNotesAppFunction<
         /** A list of successfully deleted note IDs. */
         public val noteIds: List<String>
     }
+
+    public companion object {
+        /** Current schema version. */
+        @RestrictTo(LIBRARY_GROUP) internal const val SCHEMA_VERSION: Int = 2
+    }
+}
+
+/**
+ * Shows the note with the given parameters.
+ *
+ * @param Parameters The parameters of the note to show.
+ * @param Response The response including the [AppFunctionOpenable] to show the note.
+ */
+@AppFunctionSchemaDefinition(
+    name = "showNote",
+    version = ShowNoteAppFunction.SCHEMA_VERSION,
+    category = APP_FUNCTION_SCHEMA_CATEGORY_NOTES
+)
+public interface ShowNoteAppFunction<
+    Parameters : ShowNoteAppFunction.Parameters,
+    Response : ShowNoteAppFunction.Response
+> {
+    /**
+     * Shows the note with the given parameters.
+     *
+     * @param appFunctionContext The AppFunction execution context.
+     * @param showNoteParams The params of the note to show.
+     * @return The response including the intent to show the note.
+     */
+    public suspend fun showNote(
+        appFunctionContext: AppFunctionContext,
+        showNoteParams: Parameters
+    ): Response
+
+    /** The parameters for [showNote]. */
+    public interface Parameters {
+        /** The [AppFunctionNote.id] of the note to show. */
+        public val noteId: String
+    }
+
+    /** The [AppFunctionOpenable] response for [showNote]. */
+    public interface Response : AppFunctionOpenable
 
     public companion object {
         /** Current schema version. */

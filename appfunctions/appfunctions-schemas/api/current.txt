@@ -162,6 +162,22 @@ package androidx.appfunctions.schema.notes {
     field public static final String APP_FUNCTION_SCHEMA_CATEGORY_NOTES = "notes";
   }
 
+  public interface ShowNoteAppFunction<Parameters extends androidx.appfunctions.schema.notes.ShowNoteAppFunction.Parameters, Response extends androidx.appfunctions.schema.notes.ShowNoteAppFunction.Response> {
+    method public suspend Object? showNote(androidx.appfunctions.AppFunctionContext appFunctionContext, Parameters showNoteParams, kotlin.coroutines.Continuation<? super Response>);
+    field public static final androidx.appfunctions.schema.notes.ShowNoteAppFunction.Companion Companion;
+  }
+
+  public static final class ShowNoteAppFunction.Companion {
+  }
+
+  public static interface ShowNoteAppFunction.Parameters {
+    method public String getNoteId();
+    property public abstract String noteId;
+  }
+
+  public static interface ShowNoteAppFunction.Response extends androidx.appfunctions.AppFunctionOpenable {
+  }
+
 }
 
 package androidx.appfunctions.schema.types {
