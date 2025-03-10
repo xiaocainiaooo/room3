@@ -184,7 +184,8 @@ public class BiometricManager {
     @IntDef(flag = true, value = {
         Authenticators.BIOMETRIC_STRONG,
         Authenticators.BIOMETRIC_WEAK,
-        Authenticators.DEVICE_CREDENTIAL
+        Authenticators.DEVICE_CREDENTIAL,
+        Authenticators.IDENTITY_CHECK
     })
     @Retention(RetentionPolicy.SOURCE)
     @interface AuthenticatorTypes {}
@@ -1011,6 +1012,8 @@ public class BiometricManager {
          * @return An instance of {@link android.hardware.biometrics.BiometricManager.Strings}.
          */
         @RequiresPermission(Manifest.permission.USE_BIOMETRIC)
+        // This is expected because AndroidX and framework annotation are not identical
+        @SuppressWarnings("WrongConstant")
         static android.hardware.biometrics.BiometricManager.@NonNull Strings getStrings(
                 android.hardware.biometrics.@NonNull BiometricManager biometricManager,
                 @AuthenticatorTypes int authenticators) {
@@ -1083,6 +1086,8 @@ public class BiometricManager {
          * {@link android.hardware.biometrics.BiometricManager#canAuthenticate(int)}.
          */
         @AuthenticationStatus
+        // This is expected because AndroidX and framework annotation are not identical
+        @SuppressWarnings("WrongConstant")
         static int canAuthenticate(
                 android.hardware.biometrics.@NonNull BiometricManager biometricManager,
                 @AuthenticatorTypes int authenticators) {
@@ -1120,6 +1125,8 @@ public class BiometricManager {
          * {@link android.hardware.biometrics.BiometricManager#canAuthenticate()}.
          */
         @AuthenticationStatus
+        // This is expected because AndroidX and framework annotation are not identical
+        @SuppressWarnings("WrongConstant")
         static int canAuthenticate(
                 android.hardware.biometrics.@NonNull BiometricManager biometricManager) {
             return biometricManager.canAuthenticate();
