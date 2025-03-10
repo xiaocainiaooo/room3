@@ -46,14 +46,13 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.impl.utils.TransformUtils.rotateSize
 import androidx.camera.core.impl.utils.executor.CameraXExecutors
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSupportedByEmulator
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
+import androidx.camera.testing.impl.IgnoreVideoRecordingProblematicDeviceRule
 import androidx.camera.testing.impl.StreamSharingForceEnabledEffect
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
-import androidx.camera.testing.impl.testrule.PreTestRule
 import androidx.camera.video.internal.compat.quirk.DeviceQuirks
 import androidx.camera.video.internal.compat.quirk.SizeCannotEncodeVideoQuirk
 import androidx.core.util.Consumer
@@ -102,7 +101,7 @@ class SupportedQualitiesVerificationTest(
     // Chain rule to not run WakelockEmptyActivityRule when the test is ignored.
     @get:Rule
     val skipAndWakelockRule: TestRule =
-        RuleChain.outerRule(PreTestRule { skipVideoRecordingTestIfNotSupportedByEmulator() })
+        RuleChain.outerRule(IgnoreVideoRecordingProblematicDeviceRule())
             .around(WakelockEmptyActivityRule())
 
     companion object {
