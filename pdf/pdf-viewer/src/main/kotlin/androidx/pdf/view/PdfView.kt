@@ -252,9 +252,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      */
     private var oldWidth: Int? = width
 
-    @VisibleForTesting
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public var fastScroller: FastScroller? = null
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public var fastScroller: FastScroller? = null
     private var fastScrollGestureDetector: FastScrollGestureDetector? = null
 
     private val gestureHandler = ZoomScrollGestureHandler()
@@ -265,12 +263,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var isFling = false
 
     private var doubleTapAnimator: ValueAnimator? = null
+    internal var lastFastScrollerVisibility: Boolean = false
 
     /**
      * Returns true if neither zoom nor scroll are actively changing. Does not account for
      * externally-driven changes in position (e.g. a animating scrollY or zoom)
      */
-    private val positionIsStable: Boolean
+    internal val positionIsStable: Boolean
         get() {
             val zoomIsChanging = gestureTracker.matches(GestureTracker.Gesture.ZOOM)
             val scrollIsChanging =
@@ -906,6 +905,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
             val localFastScroller = FastScroller(fastScrollDrawer, fastScrollCalculator)
             fastScroller = localFastScroller
+            /* Invalidate the virtual views within the accessibility hierarchy when the fast scroller auto-hides. */
+            fastScroller?.visibilityChangeListener = { isVisible ->
+                if (lastFastScrollerVisibility != isVisible) {
+                    lastFastScrollerVisibility = isVisible
+                    if (!isVisible) {
+                        accessibilityPageHelper?.invalidateRoot()
+                    }
+                }
+            }
             fastScrollGestureDetector =
                 FastScrollGestureDetector(localFastScroller, fastScrollGestureHandler)
             // set initial visibility of fast scroller

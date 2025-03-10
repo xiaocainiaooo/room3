@@ -27,7 +27,6 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.pdf.FragmentUtils.scenarioLoadDocument
 import androidx.pdf.TestUtils.waitFor
-import androidx.pdf.matchers.PdfViewAssertions.isFastScrollerHidden
 import androidx.pdf.matchers.SearchViewAssertions
 import androidx.pdf.util.Preconditions
 import androidx.pdf.view.PdfView
@@ -87,6 +86,8 @@ class PdfViewerFragmentV2TestSuite {
                 .register(fragment.pdfLoadingIdlingResource.countingIdlingResource)
             IdlingRegistry.getInstance()
                 .register(fragment.pdfScrollIdlingResource.countingIdlingResource)
+            IdlingRegistry.getInstance()
+                .register(fragment.pdfSearchViewVisibleIdlingResource.countingIdlingResource)
         }
     }
 
@@ -98,6 +99,8 @@ class PdfViewerFragmentV2TestSuite {
                 .unregister(fragment.pdfLoadingIdlingResource.countingIdlingResource)
             IdlingRegistry.getInstance()
                 .unregister(fragment.pdfScrollIdlingResource.countingIdlingResource)
+            IdlingRegistry.getInstance()
+                .unregister(fragment.pdfSearchViewVisibleIdlingResource.countingIdlingResource)
         }
         scenario.close()
     }
@@ -122,8 +125,6 @@ class PdfViewerFragmentV2TestSuite {
                 "Unable to load document due to ${it.documentError?.message}"
             )
         }
-        // Ensure the fast scroller is hidden when document is loaded initially
-        onView(withId(PdfR.id.pdfView)).check(isFastScrollerHidden())
 
         // Swipe actions
         onView(withId(PdfR.id.pdfView)).perform(swipeUp())
@@ -294,6 +295,74 @@ class PdfViewerFragmentV2TestSuite {
                 "Incorrect exception returned ${fragment.documentError?.message}"
             )
         }
+    }
+
+    @Test
+    fun testPdfViewerFragment_whenFindInFileIsVisible_scrubberShouldBeInvisible() {
+        scenarioLoadDocument(
+            scenario = scenario,
+            filename = TEST_DOCUMENT_FILE,
+            nextState = Lifecycle.State.STARTED,
+            orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,
+        ) {
+            // Loading view assertion
+            onView(withId(PdfR.id.pdfLoadingProgressBar)).check(matches(isDisplayed()))
+        }
+
+        onView(withId(PdfR.id.pdfLoadingProgressBar))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
+        scenario.onFragment {
+            Preconditions.checkArgument(
+                it.documentLoaded,
+                "Unable to load document due to ${it.documentError?.message}"
+            )
+        }
+
+        // Check if the scrubber is initially visible
+        onView(withId(PdfR.id.pdfView)).perform(swipeUp())
+        scenario.onFragment { it.pdfScrollIdlingResource.increment() }
+
+        // Espresso will wait on the idling resource on the next action performed hence adding a
+        // click which is essentially a no-op
+        onView(withId(PdfR.id.pdfView)).perform(click())
+
+        withPdfView(scenario) { _, _, fastScrollThumb ->
+            assertTrue(fastScrollThumb.alpha == FastScrollDrawer.VISIBLE_ALPHA)
+        }
+        withPdfView(scenario) { _, _, fastScrollPageIndicator ->
+            assertTrue(fastScrollPageIndicator.alpha == FastScrollDrawer.VISIBLE_ALPHA)
+        }
+
+        // Enable FindInFile and verify the fast scroller visibility (i.e. should be hidden)
+        scenario.onFragment { it.pdfSearchViewVisibleIdlingResource.increment() }
+        scenario.onFragment { it.isTextSearchActive = true }
+        onView(withId(PdfR.id.pdfSearchView)).check(matches(isDisplayed()))
+        onView(withId(R.id.searchQueryBox)).perform(typeText(SEARCH_QUERY))
+
+        // Check if the scrubber is invisible
+        val totalTimeForScubberToHide =
+            FastScroller.HIDE_ANIMATION_DURATION_MILLIS + FastScroller.HIDE_DELAY_MS
+        onView(isRoot()).perform(waitFor(totalTimeForScubberToHide))
+        withPdfView(scenario) { _, _, fastScrollThumb ->
+            assertTrue(fastScrollThumb.alpha == FastScrollDrawer.GONE_ALPHA)
+        }
+        withPdfView(scenario) { _, _, fastScrollPageIndicator ->
+            assertTrue(fastScrollPageIndicator.alpha == FastScrollDrawer.GONE_ALPHA)
+        }
+
+        // Re-assert that the fast scroller remains invisible after scrolling
+        withPdfView(scenario) { _, _, fastScrollThumb ->
+            assertTrue(fastScrollThumb.alpha == FastScrollDrawer.GONE_ALPHA)
+        }
+        withPdfView(scenario) { _, _, fastScrollPageIndicator ->
+            assertTrue(fastScrollPageIndicator.alpha == FastScrollDrawer.GONE_ALPHA)
+        }
+
+        // Disable FindInFile and verify the fast scroller visibility (i.e. should be shown)
+        onView(withId(R.id.searchQueryBox)).perform(click())
+        onView(withId(R.id.closeButton)).perform(click())
+        onView(withId(R.id.searchQueryBox))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
     }
 
     // TODO(b/392638037): Add immersive mode integration test

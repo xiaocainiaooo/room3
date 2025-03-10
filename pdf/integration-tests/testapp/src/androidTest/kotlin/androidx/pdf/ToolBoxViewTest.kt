@@ -24,16 +24,12 @@ import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.pdf.TestUtils.waitFor
-import androidx.pdf.matchers.PdfViewAssertions.isFastScrollerHidden
-import androidx.pdf.matchers.PdfViewAssertions.isFastScrollerShown
 import androidx.pdf.util.AnnotationUtils
 import androidx.pdf.view.ToolBoxView
 import androidx.pdf.view.ToolBoxView.Companion.EXTRA_STARTING_PAGE
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.swipeUp
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -169,32 +165,6 @@ class ToolBoxViewTest {
                 hasExtra(EXTRA_STARTING_PAGE, pageNum)
             )
         intended(expectedIntent)
-    }
-
-    @Test
-    fun testFastScrollerVisibility_withFindInFile() {
-        scenarioLoadDocument(
-            TEST_DOCUMENT_FILE,
-            Lifecycle.State.STARTED,
-            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        )
-
-        // Espresso will wait on the idling resource on the next action performed hence adding a
-        // click which is essentially a no-op
-        onView(isRoot()).perform(click())
-
-        // Enable FindInFile and verify the fast scroller visibility (i.e. should be hidden)
-        scenario.onFragment { it.isTextSearchActive = true }
-        onView(withId(androidx.pdf.viewer.fragment.R.id.pdfSearchView))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.searchQueryBox)).perform(typeText(SEARCH_QUERY))
-        onView(withId(androidx.pdf.viewer.fragment.R.id.pdfView)).check(isFastScrollerHidden())
-
-        // Disable FindInFile and verify the fast scroller visibility (i.e. should be shown)
-        onView(withId(R.id.closeButton)).perform(click())
-        // Swipe to make fast scroller visible
-        onView(withId(androidx.pdf.viewer.fragment.R.id.pdfView)).perform(swipeUp())
-        onView(withId(androidx.pdf.viewer.fragment.R.id.pdfView)).check(isFastScrollerShown())
     }
 
     companion object {
