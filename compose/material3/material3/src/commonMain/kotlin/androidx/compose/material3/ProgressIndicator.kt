@@ -897,6 +897,7 @@ object ProgressIndicatorDefaults {
             val adjustedStopSize =
                 min(stopSize.toPx(), size.height) // Stop can't be bigger than track
             // The limit to prevent excessive padding when dealing with large progress height.
+            // TODO b/401511176 - Consider adding a new token.
             val maxStopOffset = StopIndicatorTrailingSpace.toPx()
             // Offset from end.
             val stopOffset = ((size.height - adjustedStopSize) / 2).fastCoerceAtMost(maxStopOffset)
