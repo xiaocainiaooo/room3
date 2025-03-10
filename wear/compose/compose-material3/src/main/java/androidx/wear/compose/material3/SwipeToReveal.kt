@@ -130,7 +130,7 @@ public fun SwipeToReveal(
     actionButtonHeight: Dp = SwipeToRevealDefaults.SmallActionButtonHeight,
     gestureInclusion: GestureInclusion =
         if (revealState.hasBidirectionalAnchors()) {
-            bidirectionalGestureInclusion()
+            bidirectionalGestureInclusion
         } else {
             gestureInclusion()
         },
