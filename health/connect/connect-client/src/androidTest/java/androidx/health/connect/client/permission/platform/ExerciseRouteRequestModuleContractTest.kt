@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.health.connect.client.impl
+package androidx.health.connect.client.permission.platform
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -24,7 +24,6 @@ import android.os.Build
 import androidx.health.connect.client.impl.platform.records.PlatformExerciseRoute
 import androidx.health.connect.client.impl.platform.records.PlatformExerciseRouteLocationBuilder
 import androidx.health.connect.client.impl.platform.records.PlatformLength
-import androidx.health.connect.client.permission.platform.ExerciseRouteRequestModuleContract
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.units.Length
 import androidx.test.core.app.ApplicationProvider
