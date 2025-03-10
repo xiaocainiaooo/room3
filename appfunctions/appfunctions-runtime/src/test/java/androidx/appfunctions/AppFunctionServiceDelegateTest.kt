@@ -17,15 +17,11 @@
 package androidx.appfunctions
 
 import android.content.Context
-import android.os.Build
 import android.os.OutcomeReceiver
-import androidx.annotation.RequiresApi
 import androidx.appfunctions.internal.AggregatedAppFunctionInventory
 import androidx.appfunctions.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.internal.AppFunctionInventory
 import androidx.appfunctions.internal.AppFunctionInvoker
-import androidx.appfunctions.internal.Translator
-import androidx.appfunctions.internal.TranslatorSelector
 import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion.TYPE_LONG
@@ -34,8 +30,9 @@ import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
-import androidx.test.filters.SdkSuppress
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.appfunctions.testing.FakeTranslator
+import androidx.appfunctions.testing.FakeTranslatorSelector
+import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -46,10 +43,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(minSdk = 33)
 class AppFunctionServiceDelegateTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var context: Context
@@ -60,7 +60,7 @@ class AppFunctionServiceDelegateTest {
 
     @Before
     fun setup() {
-        context = InstrumentationRegistry.getInstrumentation().context
+        context = ApplicationProvider.getApplicationContext()
         fakeAggregatedInvoker = FakeAggregatedInvoker()
         fakeAggregatedInventory = FakeAggregatedInventory()
         fakeTranslatorSelector = FakeTranslatorSelector()
@@ -381,44 +381,6 @@ class AppFunctionServiceDelegateTest {
 
         fun setAppFunctionMetadata(metadata: CompileTimeAppFunctionMetadata) {
             internalInventory.setAppFunctionMetadata(metadata)
-        }
-    }
-
-    private class FakeTranslatorSelector : TranslatorSelector {
-        private var translator: Translator? = null
-
-        override fun getTranslator(schemaMetadata: AppFunctionSchemaMetadata): Translator? =
-            translator
-
-        fun setTranslator(translator: Translator) {
-            this.translator = translator
-        }
-    }
-
-    private class FakeTranslator : Translator {
-        var upgradeRequestCalled = false
-        var upgradeResponseCalled = false
-        var downgradeRequestCalled = false
-        var downgradeResponseCalled = false
-
-        override fun upgradeRequest(request: AppFunctionData): AppFunctionData {
-            upgradeRequestCalled = true
-            return request
-        }
-
-        override fun upgradeResponse(response: AppFunctionData): AppFunctionData {
-            upgradeResponseCalled = true
-            return response
-        }
-
-        override fun downgradeRequest(request: AppFunctionData): AppFunctionData {
-            downgradeRequestCalled = true
-            return request
-        }
-
-        override fun downgradeResponse(response: AppFunctionData): AppFunctionData {
-            downgradeResponseCalled = true
-            return response
         }
     }
 }
