@@ -47,10 +47,13 @@ import androidx.webkit.WebViewClientCompat
 import java.util.concurrent.Executor
 
 class TestAdapters(private val sdkContext: Context) {
-    inner class TestBannerAd(private val text: String, private val withSlowDraw: Boolean) :
-        BannerAd() {
+    inner class TestBannerAd(
+        private val text: String,
+        private val withSlowDraw: Boolean,
+        private val automatedTestCallbackProxy: IAutomatedTestCallbackProxy? = null
+    ) : BannerAd() {
         override fun buildAdView(sessionContext: Context, width: Int, height: Int): View? {
-            return TestView(sessionContext, withSlowDraw, text)
+            return TestView(sessionContext, withSlowDraw, text, automatedTestCallbackProxy)
         }
     }
 
@@ -187,7 +190,8 @@ class TestAdapters(private val sdkContext: Context) {
     private inner class TestView(
         context: Context,
         private val withSlowDraw: Boolean,
-        private val text: String
+        private val text: String,
+        private val automatedTestCallbackProxy: IAutomatedTestCallbackProxy? = null
     ) : View(context) {
 
         init {
@@ -202,6 +206,7 @@ class TestAdapters(private val sdkContext: Context) {
 
         private val viewColor = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
         private val paint = Paint()
+        private var isFirstLayout = true
 
         @SuppressLint("BanThreadSleep")
         override fun onDraw(canvas: Canvas) {
@@ -214,6 +219,15 @@ class TestAdapters(private val sdkContext: Context) {
             paint.textSize = 50F
             canvas.drawColor(viewColor)
             canvas.drawText(text, 75F, 75F, paint)
+        }
+
+        override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+            super.onLayout(changed, left, top, right, bottom)
+            if (isFirstLayout) {
+                isFirstLayout = false
+            } else {
+                automatedTestCallbackProxy?.onResizeOccurred(right - left, bottom - top)
+            }
         }
     }
 
