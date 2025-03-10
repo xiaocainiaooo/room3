@@ -47,26 +47,63 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = REFERENCE_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
       "stringToOpen",
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
-        = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
-            required = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.AppFunctionOpenable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "age" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "age",
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.StringBaseSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
+        List<AppFunctionDataTypeMetadata> = listOf(
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
+        AppFunctionAllOfTypeMetadata(
+            matchAll = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST,
             qualifiedName = "com.testdata.StringBaseSerializable",
             isNullable = true
         )
@@ -77,34 +114,9 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             isNullable = true
         )
 
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
-        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-            type = 6,
-            isNullable = false
-        )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
-        Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "age" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
-        List<String> = listOf(
-      "age",
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
-        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
-            required = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
-            qualifiedName = "com.testdata.LongBaseSerializable",
-            isNullable = true
-        )
-
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
         List<AppFunctionDataTypeMetadata> = listOf(
       COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
-      COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
     )
 
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
@@ -134,7 +146,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
         mapOf(
-      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE,
+      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.LongBaseSerializable" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.DerivedSerializable" to COM_TESTDATA_DERIVEDSERIALIZABLE_ALL_OF_DATA_TYPE,
       )
@@ -176,26 +188,63 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = ARRAY_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
       "stringToOpen",
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
-        = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
-            required = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.AppFunctionOpenable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "age" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "age",
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.StringBaseSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
+        List<AppFunctionDataTypeMetadata> = listOf(
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
+        AppFunctionAllOfTypeMetadata(
+            matchAll = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST,
             qualifiedName = "com.testdata.StringBaseSerializable",
             isNullable = true
         )
@@ -206,34 +255,9 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             isNullable = true
         )
 
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
-        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-            type = 6,
-            isNullable = false
-        )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
-        Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "age" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
-        List<String> = listOf(
-      "age",
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
-        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
-            required = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
-            qualifiedName = "com.testdata.LongBaseSerializable",
-            isNullable = true
-        )
-
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
         List<AppFunctionDataTypeMetadata> = listOf(
       COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
-      COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
     )
 
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
@@ -263,7 +287,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
         mapOf(
-      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE,
+      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.LongBaseSerializable" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.DerivedSerializable" to COM_TESTDATA_DERIVEDSERIALIZABLE_ALL_OF_DATA_TYPE,
       )
@@ -305,26 +329,63 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = ARRAY_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
       "stringToOpen",
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
-        = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
-            required = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.AppFunctionOpenable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "age" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "age",
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.StringBaseSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
+        List<AppFunctionDataTypeMetadata> = listOf(
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
+        AppFunctionAllOfTypeMetadata(
+            matchAll = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST,
             qualifiedName = "com.testdata.StringBaseSerializable",
             isNullable = true
         )
@@ -335,34 +396,9 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             isNullable = true
         )
 
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
-        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-            type = 6,
-            isNullable = false
-        )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
-        Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "age" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
-        List<String> = listOf(
-      "age",
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
-        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
-            required = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
-            qualifiedName = "com.testdata.LongBaseSerializable",
-            isNullable = true
-        )
-
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
         List<AppFunctionDataTypeMetadata> = listOf(
       COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
-      COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
     )
 
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
@@ -392,7 +428,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
         mapOf(
-      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE,
+      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.LongBaseSerializable" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.DerivedSerializable" to COM_TESTDATA_DERIVEDSERIALIZABLE_ALL_OF_DATA_TYPE,
       )
@@ -428,26 +464,63 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             valueType = REFERENCE_RESPONSE_VALUE_TYPE
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
             isNullable = false
         )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP_STRINGTOOPEN,
+      "stringToOpen" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_STRINGTOOPEN,
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST:
         List<String> = listOf(
       "stringToOpen",
     )
 
-    private val COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata
-        = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_PROPERTIES_MAP,
-            required = COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.AppFunctionOpenable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 6,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "age" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "age",
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
+            required = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.StringBaseSerializable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
+        List<AppFunctionDataTypeMetadata> = listOf(
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
+      COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
+    )
+
+    private val COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
+        AppFunctionAllOfTypeMetadata(
+            matchAll = COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST,
             qualifiedName = "com.testdata.StringBaseSerializable",
             isNullable = true
         )
@@ -458,34 +531,9 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
             isNullable = true
         )
 
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE:
-        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
-            type = 6,
-            isNullable = false
-        )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP:
-        Map<String, AppFunctionDataTypeMetadata> = mapOf(
-      "age" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP_AGE,
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST:
-        List<String> = listOf(
-      "age",
-    )
-
-    private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1:
-        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
-            properties = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_PROPERTIES_MAP,
-            required = COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1_REQUIRED_PROPERTIES_LIST,
-            qualifiedName = "com.testdata.LongBaseSerializable",
-            isNullable = true
-        )
-
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
         List<AppFunctionDataTypeMetadata> = listOf(
       COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
-      COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_1,
     )
 
     private val COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE: AppFunctionAllOfTypeMetadata =
@@ -515,7 +563,7 @@ public class `$DerivedSerializableOutputFunctions_AppFunctionInventory` : AppFun
 
     private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
         mapOf(
-      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_OBJECT_DATA_TYPE,
+      "com.testdata.StringBaseSerializable" to COM_TESTDATA_STRINGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.LongBaseSerializable" to COM_TESTDATA_LONGBASESERIALIZABLE_ALL_OF_DATA_TYPE,
       "com.testdata.DerivedSerializable" to COM_TESTDATA_DERIVEDSERIALIZABLE_ALL_OF_DATA_TYPE,
       )
