@@ -47,12 +47,111 @@
     </issue>
 
     <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="internal fun ReverseMeasureLayout(modifier: Modifier, vararg contents: @Composable () -> Unit) ="
+        errorLine2="                                                             ~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/node/NodeUtils.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="        detachedFromParentLookaheadPlacmeentItemContent: @Composable () -> Unit"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/layout/SubcomposeLayoutTest.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="private fun Wrapper(body: @Composable () -> Unit) {"
+        errorLine2="                    ~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/platform/WrapperTest.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterPosition"
+        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
+        errorLine1="    content: @Composable @UiComposable () -> Unit,"
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/modifier/CompositionLocalMapInjectionTest.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="    private fun createUi() {"
+        errorLine2="                ~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/node/TraversableModifierNodeTest.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions with a return type should start with a lowercase letter"
+        errorLine1="    private fun VectorMirror(size: Int): VectorPainter {"
+        errorLine2="                ~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"/>
+    </issue>
+
+    <issue
+        id="CompositionLocalNaming"
+        message="CompositionLocal properties should be prefixed with `Local`"
+        errorLine1="        private val staticLocalInt = staticCompositionLocalOf { 0 }"
+        errorLine2="                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/node/CompositionLocalConsumerModifierNodeTest.kt"/>
+    </issue>
+
+    <issue
+        id="CompositionLocalNaming"
+        message="CompositionLocal properties should be prefixed with `Local`"
+        errorLine1="val SomeLocal = compositionLocalOf&lt;Int> { error(&quot;unprovided value&quot;) }"
+        errorLine2="    ~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/modifier/CompositionLocalMapInjectionTest.kt"/>
+    </issue>
+
+    <issue
         id="ConfigurationScreenWidthHeight"
         message="Using Configuration.screenHeightDp instead of LocalWindowInfo.current.containerSize"
         errorLine1="                                        (LocalConfiguration.current.screenHeightDp * 0.7f).dp"
         errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/viewinterop/ReentrantRecompose.kt"/>
+    </issue>
+
+    <issue
+        id="CoroutineCreationDuringComposition"
+        message="Calls to launch should happen inside a LaunchedEffect and not composition"
+        errorLine1="            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {"
+        errorLine2="                                     ~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/AndroidComposeViewAccessibilityDelegateCompatTest.kt"/>
+    </issue>
+
+    <issue
+        id="CoroutineCreationDuringComposition"
+        message="Calls to launch should happen inside a LaunchedEffect and not composition"
+        errorLine1="            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {"
+        errorLine2="                                     ~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/AndroidComposeViewAccessibilityDelegateCompatTest.kt"/>
+    </issue>
+
+    <issue
+        id="CoroutineCreationDuringComposition"
+        message="Calls to launch should happen inside a LaunchedEffect and not composition"
+        errorLine1="            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {"
+        errorLine2="                                     ~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/AndroidComposeViewAccessibilityDelegateCompatTest.kt"/>
     </issue>
 
     <issue
@@ -431,6 +530,24 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/contentcapture/AndroidContentCaptureManager.android.kt"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateValueProperty"
+        message="Reading `value` will cause an autoboxing operation. Use `intValue` to avoid unnecessary allocations."
+        errorLine1="            state.value"
+        errorLine2="                  ~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateValueProperty"
+        message="Assigning `value` will cause an autoboxing operation. Use `intValue` to avoid unnecessary allocations."
+        errorLine1="        state.value = 1"
+        errorLine2="              ~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"/>
     </issue>
 
     <issue

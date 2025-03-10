@@ -312,6 +312,9 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
 
         disable.add("RequiresWindowSdk") // temporarily disable this check due to downstream diff
 
+        // Report errors for incompatible custom lint jars
+        fatal.add("ObsoleteLintCustomCheck")
+
         val lintXmlPath =
             if (extension.type == SoftwareType.SAMPLES) {
                 "buildSrc/lint/lint_samples.xml"
