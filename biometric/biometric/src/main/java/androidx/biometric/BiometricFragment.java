@@ -1211,6 +1211,8 @@ public class BiometricFragment extends Fragment {
          * @param allowedAuthenticators A bit field representing allowed authenticator types.
          */
         @DoNotInline
+        // This is expected because AndroidX and framework annotation are not identical
+        @SuppressWarnings("WrongConstant")
         static void setAllowedAuthenticators(
                 android.hardware.biometrics.BiometricPrompt.@NonNull Builder builder,
                 @BiometricManager.AuthenticatorTypes int allowedAuthenticators) {
