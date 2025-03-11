@@ -119,11 +119,7 @@ internal class AppFunctionReader(private val context: Context) {
             id = functionId,
             packageName = packageName,
             isEnabled = computeEffectivelyEnabled(staticMetadataDocument, runtimeMetadataDocument),
-            schema =
-                staticMetadataDocument.schema?.toAppFunctionSchemaMetadata()
-                    ?:
-                    // In legacy indexer, schema properties are specified at top level.
-                    buildSchemaMetadataFromGdForLegacyIndexer(searchResult.genericDocument),
+            schema = buildSchemaMetadataFromGdForLegacyIndexer(searchResult.genericDocument),
             // TODO: Populate them separately for legacy indexer.
             parameters =
                 // Since this is a list type it can be null for cases where an app function has no
