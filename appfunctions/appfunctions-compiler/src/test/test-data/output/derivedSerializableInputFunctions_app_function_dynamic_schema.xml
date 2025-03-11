@@ -23,7 +23,7 @@
                     <allOf>
                         <id>unused</id>
                         <isNullable>true</isNullable>
-                        <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
+                        <objectQualifiedName>com.testdata.LongBaseSerializable</objectQualifiedName>
                         <properties>
                             <dataTypeMetadata>
                                 <id>unused</id>
@@ -35,22 +35,6 @@
                         </properties>
                         <required>age</required>
                         <type>3</type>
-                    </allOf>
-                    <id>unused</id>
-                    <isNullable>true</isNullable>
-                    <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
-                    <type>12</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>com.testdata.StringBaseSerializable</name>
-            </dataTypes>
-            <dataTypes>
-                <dataTypeMetadata>
-                    <allOf>
-                        <dataTypeReference>com.testdata.StringBaseSerializable</dataTypeReference>
-                        <id>unused</id>
-                        <isNullable>true</isNullable>
-                        <type>11</type>
                     </allOf>
                     <id>unused</id>
                     <isNullable>true</isNullable>
@@ -129,7 +113,7 @@
                     <allOf>
                         <id>unused</id>
                         <isNullable>true</isNullable>
-                        <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
+                        <objectQualifiedName>com.testdata.LongBaseSerializable</objectQualifiedName>
                         <properties>
                             <dataTypeMetadata>
                                 <id>unused</id>
@@ -141,22 +125,6 @@
                         </properties>
                         <required>age</required>
                         <type>3</type>
-                    </allOf>
-                    <id>unused</id>
-                    <isNullable>true</isNullable>
-                    <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
-                    <type>12</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>com.testdata.StringBaseSerializable</name>
-            </dataTypes>
-            <dataTypes>
-                <dataTypeMetadata>
-                    <allOf>
-                        <dataTypeReference>com.testdata.StringBaseSerializable</dataTypeReference>
-                        <id>unused</id>
-                        <isNullable>true</isNullable>
-                        <type>11</type>
                     </allOf>
                     <id>unused</id>
                     <isNullable>true</isNullable>
@@ -230,7 +198,7 @@
                     <allOf>
                         <id>unused</id>
                         <isNullable>true</isNullable>
-                        <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
+                        <objectQualifiedName>com.testdata.LongBaseSerializable</objectQualifiedName>
                         <properties>
                             <dataTypeMetadata>
                                 <id>unused</id>
@@ -242,22 +210,6 @@
                         </properties>
                         <required>age</required>
                         <type>3</type>
-                    </allOf>
-                    <id>unused</id>
-                    <isNullable>true</isNullable>
-                    <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
-                    <type>12</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>com.testdata.StringBaseSerializable</name>
-            </dataTypes>
-            <dataTypes>
-                <dataTypeMetadata>
-                    <allOf>
-                        <dataTypeReference>com.testdata.StringBaseSerializable</dataTypeReference>
-                        <id>unused</id>
-                        <isNullable>true</isNullable>
-                        <type>11</type>
                     </allOf>
                     <id>unused</id>
                     <isNullable>true</isNullable>
@@ -336,7 +288,7 @@
                     <allOf>
                         <id>unused</id>
                         <isNullable>true</isNullable>
-                        <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
+                        <objectQualifiedName>com.testdata.LongBaseSerializable</objectQualifiedName>
                         <properties>
                             <dataTypeMetadata>
                                 <id>unused</id>
@@ -348,22 +300,6 @@
                         </properties>
                         <required>age</required>
                         <type>3</type>
-                    </allOf>
-                    <id>unused</id>
-                    <isNullable>true</isNullable>
-                    <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
-                    <type>12</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>com.testdata.StringBaseSerializable</name>
-            </dataTypes>
-            <dataTypes>
-                <dataTypeMetadata>
-                    <allOf>
-                        <dataTypeReference>com.testdata.StringBaseSerializable</dataTypeReference>
-                        <id>unused</id>
-                        <isNullable>true</isNullable>
-                        <type>11</type>
                     </allOf>
                     <id>unused</id>
                     <isNullable>true</isNullable>
@@ -442,7 +378,7 @@
                     <allOf>
                         <id>unused</id>
                         <isNullable>true</isNullable>
-                        <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
+                        <objectQualifiedName>com.testdata.LongBaseSerializable</objectQualifiedName>
                         <properties>
                             <dataTypeMetadata>
                                 <id>unused</id>
@@ -454,22 +390,6 @@
                         </properties>
                         <required>age</required>
                         <type>3</type>
-                    </allOf>
-                    <id>unused</id>
-                    <isNullable>true</isNullable>
-                    <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
-                    <type>12</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>com.testdata.StringBaseSerializable</name>
-            </dataTypes>
-            <dataTypes>
-                <dataTypeMetadata>
-                    <allOf>
-                        <dataTypeReference>com.testdata.StringBaseSerializable</dataTypeReference>
-                        <id>unused</id>
-                        <isNullable>true</isNullable>
-                        <type>11</type>
                     </allOf>
                     <id>unused</id>
                     <isNullable>true</isNullable>
@@ -543,7 +463,7 @@
                     <allOf>
                         <id>unused</id>
                         <isNullable>true</isNullable>
-                        <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
+                        <objectQualifiedName>com.testdata.LongBaseSerializable</objectQualifiedName>
                         <properties>
                             <dataTypeMetadata>
                                 <id>unused</id>
@@ -555,22 +475,6 @@
                         </properties>
                         <required>age</required>
                         <type>3</type>
-                    </allOf>
-                    <id>unused</id>
-                    <isNullable>true</isNullable>
-                    <objectQualifiedName>com.testdata.StringBaseSerializable</objectQualifiedName>
-                    <type>12</type>
-                </dataTypeMetadata>
-                <id>unused</id>
-                <name>com.testdata.StringBaseSerializable</name>
-            </dataTypes>
-            <dataTypes>
-                <dataTypeMetadata>
-                    <allOf>
-                        <dataTypeReference>com.testdata.StringBaseSerializable</dataTypeReference>
-                        <id>unused</id>
-                        <isNullable>true</isNullable>
-                        <type>11</type>
                     </allOf>
                     <id>unused</id>
                     <isNullable>true</isNullable>
