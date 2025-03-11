@@ -83,5 +83,10 @@ public final class AndroidUtil {
                 "Emulator API 30 crashes running this test.",
                 Build.VERSION.SDK_INT == 30 && isEmulator()
         );
+        // Skip test for b/399669628, b/401097968
+        assumeFalse(
+                "Emulator API 26 MediaCodec doesn't send encoded data.",
+                Build.VERSION.SDK_INT == 26 && isEmulator()
+        );
     }
 }
