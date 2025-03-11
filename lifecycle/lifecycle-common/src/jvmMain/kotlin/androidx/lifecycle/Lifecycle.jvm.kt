@@ -21,19 +21,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-/**
- * TODO(b/320544977): Switch back to typealias when RestrictTo supports it. For now, we use an
- *   actual class implementation that delegates to the Java class, ensuring that the signatures of
- *   the members match the ones expected by the expect declaration
- */
+// TODO(b/320544977): Switch back to typealias when RestrictTo supports it. For now, we use an
+//  actual class implementation that delegates to the Java class, ensuring that the signatures of
+//  the members match the ones expected by the expect declaration
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public actual class AtomicReference<V> actual constructor(value: V) {
-    private val delegate = AtomicReference<V>(value)
+public actual class AtomicReference<V> actual constructor(initialValue: V) {
 
-    public actual fun get(): V = delegate.get()
+    private val base = AtomicReference<V>(initialValue)
 
-    public actual fun compareAndSet(expect: V, newValue: V): Boolean =
-        delegate.compareAndSet(expect, newValue)
+    public actual fun get(): V = base.get()
+
+    public actual fun compareAndSet(expectedValue: V, newValue: V): Boolean =
+        base.compareAndSet(expectedValue, newValue)
 }
 
 /**
