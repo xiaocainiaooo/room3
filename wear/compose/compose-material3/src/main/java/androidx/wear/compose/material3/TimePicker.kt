@@ -591,7 +591,7 @@ private fun getTimePickerStyles(
                 TimePickerTokens.ContentTypography
             }
             .value
-            .copy(textAlign = TextAlign.Center)
+            .copy(textAlign = TextAlign.Center, fontFeatureSettings = "tnum")
 
     val optionHeight =
         if (isLargeScreen || timePickerType == TimePickerType.HoursMinutes24H) {
