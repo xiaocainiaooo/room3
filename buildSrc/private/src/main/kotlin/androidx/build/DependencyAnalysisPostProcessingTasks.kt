@@ -113,6 +113,14 @@ abstract class ReportDependencyAnalysisAdviceTask : AbstractPostProcessingTask()
         val advice = StringBuilder()
 
         missingDependencyAdvice.forEach {
+            // Don't fail CI if test source set has misconfigured dependencies
+            if (it.fromConfiguration?.contains("test", ignoreCase = true) == true) {
+                return@forEach
+            }
+            if (it.toConfiguration?.contains("test", ignoreCase = true) == true) {
+                return@forEach
+            }
+
             val isCompileOnly =
                 it.toConfiguration?.endsWith("compileOnly", ignoreCase = true) == true
             val isTransitiveDependencyAdvice =
@@ -205,7 +213,12 @@ internal fun Project.configureDependencyAnalysisPlugin() {
         extensions.getByType(com.autonomousapps.DependencyAnalysisSubExtension::class.java)
     dependencyAnalysisSubExtension.registerPostProcessingTask(reportDependencyAnalysisAdviceTask)
     dependencyAnalysisSubExtension.registerPostProcessingTask(updateDependencyAnalysisBaselineTask)
+
+    // Ignore advice for runTimeOnly, compileOnly or incorrect dependency configs
+    // since it affects downstream consumers
     dependencyAnalysisSubExtension.issues { it.onIncorrectConfiguration { it.severity("ignore") } }
+    dependencyAnalysisSubExtension.issues { it.onRuntimeOnly { it.severity("ignore") } }
+    dependencyAnalysisSubExtension.issues { it.onCompileOnly { it.severity("ignore") } }
 }
 
 /**
