@@ -309,7 +309,7 @@ public fun SplitRadioButton(
                     this.shape = shape
                     clip = true
                     val transformation = transformation ?: return@graphicsLayer
-                    with(transformation) { applyTransformation() }
+                    with(transformation) { applyContainerTransformation() }
                 }
     ) {
         Row(
