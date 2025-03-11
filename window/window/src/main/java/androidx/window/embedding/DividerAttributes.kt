@@ -353,9 +353,15 @@ private constructor(
     companion object {
         /**
          * A special value to indicate that the system will choose a default value based on the
-         * display size and form factor.
+         * display size and form factor. Some devices may choose 0 as the default width, while the
+         * same app may be shown with a wider divider on other devices that have a different default
+         * value. If an app prefers to show a divider of a fixed width on all device, it should set
+         * the fixed width in [FixedDividerAttributes.Builder.setWidthDp] or
+         * [DraggableDividerAttributes.Builder.setWidthDp].
          *
          * @see DividerAttributes.widthDp
+         * @see FixedDividerAttributes.Builder.setWidthDp
+         * @see DraggableDividerAttributes.Builder.setWidthDp
          */
         const val WIDTH_SYSTEM_DEFAULT: Int = -1
 
