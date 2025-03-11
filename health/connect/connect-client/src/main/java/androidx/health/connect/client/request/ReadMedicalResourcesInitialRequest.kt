@@ -17,10 +17,10 @@
 package androidx.health.connect.client.request
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.records.toPlatformMedicalResourceType
 import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesInitialRequestBuilder
@@ -40,7 +40,7 @@ import androidx.health.connect.client.request.ReadMedicalResourcesRequest.Compan
  * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument. An [UnsupportedOperationException] would be
  * thrown if the feature is not available.
  *
- * @param pageSize The maximum number of [MedicalResource]s to be read. Default value is
+ * @property pageSize The maximum number of [MedicalResource]s to be read. Default value is
  *   [DEFAULT_PAGE_SIZE]. An [IllegalArgumentException] might be thrown if [pageSize] is deemed as
  *   invalid, such as too large.
  * @property medicalResourceType Only [MedicalResource]s with this [MedicalResourceType] will be
@@ -52,8 +52,7 @@ import androidx.health.connect.client.request.ReadMedicalResourcesRequest.Compan
  *   [IllegalArgumentException] might be thrown if any ID is deemed as invalid.
  * @see [HealthConnectClient.readMedicalResources]
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class ReadMedicalResourcesInitialRequest(
     @MedicalResourceType val medicalResourceType: Int,
     val medicalDataSourceIds: Set<String>,

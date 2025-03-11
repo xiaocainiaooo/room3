@@ -16,10 +16,10 @@
 
 package androidx.health.connect.client.request
 
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.impl.platform.request.PlatformReadMedicalResourcesRequest
 import androidx.health.connect.client.records.MedicalResource
 
@@ -34,8 +34,7 @@ import androidx.health.connect.client.records.MedicalResource
  * @property pageSize The maximum number of [MedicalResource]s to be read.
  * @see [HealthConnectClient.readMedicalResources]
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 abstract class ReadMedicalResourcesRequest internal constructor(val pageSize: Int) {
     internal abstract val platformReadMedicalResourcesRequest: PlatformReadMedicalResourcesRequest
 

@@ -16,10 +16,10 @@
 
 package androidx.health.connect.client.response
 
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.toString
 import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
@@ -39,8 +39,7 @@ import androidx.health.connect.client.request.ReadMedicalResourcesPageRequest
  *   this response.
  * @see [HealthConnectClient.readMedicalResources]
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class ReadMedicalResourcesResponse(
     val medicalResources: List<MedicalResource>,
     val nextPageToken: String?,

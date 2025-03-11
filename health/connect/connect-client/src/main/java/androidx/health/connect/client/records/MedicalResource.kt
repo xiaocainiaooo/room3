@@ -56,11 +56,8 @@ import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_
  * @property fhirVersion The FHIR version of [fhirResource].
  * @property fhirResource The [FhirResource] that this `MedicalResource` represents.
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-@OptIn(ExperimentalPersonalHealthRecordApi::class)
-class MedicalResource
-constructor(
+@ExperimentalPersonalHealthRecordApi
+class MedicalResource(
     @MedicalResourceType val type: Int,
     val id: MedicalResourceId,
     val dataSourceId: String,

@@ -17,10 +17,10 @@
 package androidx.health.connect.client.request
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.request.PlatformDeleteMedicalResourcesRequest
 import androidx.health.connect.client.impl.platform.request.PlatformDeleteMedicalResourcesRequestBuilder
@@ -46,8 +46,7 @@ import androidx.health.connect.client.records.toString
  * @throws IllegalArgumentException if both of [dataSourceIds] and [medicalResourceTypes] are empty.
  * @see [HealthConnectClient.deleteMedicalResources]
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class DeleteMedicalResourcesRequest(
     val dataSourceIds: Set<String> = emptySet<String>(),
     val medicalResourceTypes: Set<Int> = emptySet<Int>()

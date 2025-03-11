@@ -16,8 +16,8 @@
 package androidx.health.connect.client.records
 
 import android.annotation.SuppressLint
-import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectFeatures
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.withPhrFeatureCheck
 import androidx.health.connect.client.impl.platform.records.PlatformMedicalResourceId
 import androidx.health.connect.client.impl.platform.records.toPlatformFhirResourceType
@@ -44,8 +44,7 @@ import androidx.health.connect.client.records.FhirResource.Companion.FhirResourc
  * @property fhirResourceId The ID of the FHIR resource. This must be unique per
  *   [MedicalDataSource].
  */
-// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@ExperimentalPersonalHealthRecordApi
 class MedicalResourceId(
     val dataSourceId: String,
     @FhirResourceType val fhirResourceType: Int,
@@ -97,7 +96,7 @@ class MedicalResourceId(
          * check if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
          * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
          *
-         * @param dataSourceId Represents ID of a medical data source where the data comes from.
+         * @param dataSourceId Represents ID of a [MedicalDataSource] where the data comes from.
          * @param fhirReference The FHIR reference string typically extracted from the "reference"
          *   field in one FHIR resource (source), pointing to another FHIR resource (target) within
          *   the same data source, for example "Patient/034AB16".
@@ -111,6 +110,7 @@ class MedicalResourceId(
          *   [the official FHIR datatypes](https://build.fhir.org/datatypes.html#id).
          */
         @SuppressLint("NewApi") // checked with feature availability
+        @JvmStatic
         fun fromFhirReference(dataSourceId: String, fhirReference: String): MedicalResourceId =
             withPhrFeatureCheck(this::class, "fromFhirReference") {
                 PlatformMedicalResourceId.fromFhirReference(dataSourceId, fhirReference)
