@@ -130,7 +130,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         set(value) {
             checkMainThread()
             field = value
-            onViewportChanged()
+            onZoomChanged()
         }
 
     /**
@@ -148,10 +148,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
     private val visiblePages: Range<Int>
-        get() = pageLayoutManager?.visiblePages ?: Range(0, 0)
+        get() = pageLayoutManager?.visiblePages?.value?.pages ?: Range(0, 0)
 
     private val fullyVisiblePages: Range<Int>
-        get() = pageLayoutManager?.fullyVisiblePages ?: Range(0, 0)
+        get() = pageLayoutManager?.fullyVisiblePages?.value ?: Range(0, 0)
 
     /** The first page in the viewport, including partially-visible pages. 0-indexed. */
     public val firstVisiblePage: Int
@@ -160,19 +160,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** The number of pages visible in the viewport, including partially visible pages */
     public val visiblePagesCount: Int
         get() = if (pdfDocument != null) visiblePages.upper - visiblePages.lower + 1 else 0
-
-    /**
-     * Listener interface to receive changes to the viewport, i.e. the window of visible PDF content
-     */
-    public interface OnViewportChangedListener {
-        public fun onViewportChanged(
-            firstVisiblePage: Int,
-            firstPageLocation: Rect,
-            zoomLevel: Float
-        )
-    }
-
-    private val onViewportChangedListeners = mutableListOf<OnViewportChangedListener>()
 
     /** Listener interface for handling clicks on links in a PDF document. */
     public interface LinkClickListener {
@@ -409,52 +396,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
-    /**
-     * Adds the specified listener to the list of listeners that will be notified of viewport change
-     * events.
-     *
-     * @param listener listener to add
-     */
-    public fun addOnViewportChangedListener(listener: OnViewportChangedListener) {
-        onViewportChangedListeners.add(listener)
-    }
-
-    /**
-     * Removes the specified listener from the list of listeners that will be notified of viewport
-     * change events.
-     *
-     * @param listener listener to remove
-     */
-    public fun removeOnViewportChangedListener(listener: OnViewportChangedListener) {
-        onViewportChangedListeners.remove(listener)
-    }
-
-    /**
-     * Returns the [PdfPoint] corresponding to [viewPoint] in View coordinates, or null if no PDF
-     * content has been laid out at [viewPoint]
-     */
-    public fun viewToPdfPoint(viewPoint: PointF): PdfPoint? {
-        return pageLayoutManager?.getPdfPointAt(
-            PointF(toContentX(viewPoint.x), toContentY(viewPoint.y)),
-            getVisibleAreaInContentCoords(),
-            scanAllPages = true,
-        )
-    }
-
-    /**
-     * Returns the View coordinate location of [pdfPoint], or null if that PDF content has not been
-     * laid out yet.
-     */
-    public fun pdfToViewPoint(pdfPoint: PdfPoint): PointF? {
-        val pageLocation =
-            pageLayoutManager?.getPageLocation(pdfPoint.pageNum, getVisibleAreaInContentCoords())
-                ?: return null
-        return PointF(
-            toViewCoord(pageLocation.left + pdfPoint.pagePoint.x, zoom, scroll = scrollX),
-            toViewCoord(pageLocation.top + pdfPoint.pagePoint.y, zoom, scroll = scrollY)
-        )
-    }
-
     private fun gotoPage(pageNum: Int) {
         checkMainThread()
         val localPageLayoutManager =
@@ -535,12 +476,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         super.onDraw(canvas)
         val localPaginationManager = pageLayoutManager ?: return
         canvas.save()
-        // View itself translates the Canvas by scroll position, so we don't have to
         canvas.scale(zoom, zoom)
         val selectionModel = selectionStateManager?.selectionModel
         for (i in visiblePages.lower..visiblePages.upper) {
-            // Scroll and zoom are applied to the Canvas, so we draw to the Canvas using content
-            // coordinates
             val pageLoc = localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
             pageManager?.drawPage(i, canvas, pageLoc)
             selectionModel?.value?.let {
@@ -555,8 +493,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
         canvas.restore()
 
-        // Fast scroller is non-content and shouldn't be affected by zoom. It's drawn after
-        // restoring the Canvas to its unscaled state
         val documentPageCount = pdfDocument?.pageCount ?: 0
         if (documentPageCount > 1) {
             fastScroller?.drawScroller(
@@ -817,7 +753,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     DEFAULT_PAGE_PREFETCH_RADIUS,
                     paginationModel = requireNotNull(localStateToRestore.paginationModel)
                 )
-                .apply { onViewportChanged() }
+                .apply { onViewportChanged(scrollY, height, zoom) }
         selectionStateManager =
             SelectionStateManager(
                 localPdfDocument,
@@ -870,6 +806,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     layoutInfoToJoin?.join()
                     launch {
                         manager.dimensions.collect { onPageDimensionsReceived(it.first, it.second) }
+                    }
+                    launch {
+                        manager.visiblePages.collect {
+                            // If layout is still in progress don't add / render new pages yet.
+                            // Wait until the layout has settled
+                            if (!it.layoutInProgress) maybeUpdatePageVisibility()
+                        }
                     }
                 }
         }
@@ -980,7 +923,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         if (!maybeRestoreState()) {
             pageLayoutManager =
                 PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
-                    .apply { onViewportChanged() }
+                    .apply { onViewportChanged(scrollY, height, zoom) }
             selectionStateManager =
                 SelectionStateManager(
                     localPdfDocument,
@@ -999,30 +942,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val View.isAttachedToVisibleWindow
         get() = isAttachedToWindow && windowVisibility == VISIBLE
 
-    private fun onViewportChanged() {
-        val prevVisiblePages = visiblePages
-        // If the viewport didn't actually change, short-circuit all of the downstream work
-        if (pageLayoutManager?.onViewportChanged(getVisibleAreaInContentCoords()) != true) return
-        dispatchViewportChanged()
-        // Avoid fetching Bitmaps during active gestures like zoom and scroll, except to render
-        // net new pages
-        if (positionIsStable || visiblePages != prevVisiblePages) {
-            maybeUpdatePageVisibility()
-        }
-        accessibilityPageHelper?.invalidateRoot()
-        updateSelectionActionModeVisibility()
+    /**
+     * Compute what content is visible from the current position of this View. Generally invoked on
+     * position or size changes.
+     */
+    private fun onZoomChanged() {
+        onViewportChanged()
+        // Don't fetch new Bitmaps while the user is actively zooming, to avoid jank and rendering
+        // churn
+        if (positionIsStable) maybeUpdatePageVisibility()
     }
 
-    private fun dispatchViewportChanged() {
-        // If we don't have a page layout manager, we have no viewport to report
-        val localPageLayoutManager = pageLayoutManager ?: return
-        val firstPage = localPageLayoutManager.visiblePages.lower
-        val viewport = getVisibleAreaInContentCoords()
-        val firstPageLocation =
-            toViewRect(localPageLayoutManager.getPageLocation(firstPage, viewport))
-        for (listener in onViewportChangedListeners) {
-            listener.onViewportChanged(firstPage, firstPageLocation, zoom)
-        }
+    private fun onViewportChanged() {
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
+        if (positionIsStable) maybeUpdatePageVisibility()
+        accessibilityPageHelper?.invalidateRoot()
+        updateSelectionActionModeVisibility()
     }
 
     /**
@@ -1092,36 +1027,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     private fun maybeUpdatePageVisibility() {
-        val localPageLayoutManager = pageLayoutManager ?: return
-        val visiblePageAreas = localPageLayoutManager.visiblePageAreas
-        pageManager?.updatePageVisibilities(
-            visiblePageAreas,
-            zoom,
-            positionIsStable,
-            localPageLayoutManager.layingOutPages
-        )
+        val visiblePageAreas =
+            pageLayoutManager?.getVisiblePageAreas(visiblePages, getVisibleAreaInContentCoords())
+                ?: return
+
+        pageManager?.updatePageVisibilities(visiblePageAreas, zoom, positionIsStable)
     }
 
     /** React to a page's dimensions being made available */
     private fun onPageDimensionsReceived(pageNum: Int, size: Point) {
-        val localPageLayoutManager = pageLayoutManager ?: return
         val pageLocation =
             if (visiblePages.contains(pageNum)) {
-                localPageLayoutManager.getPageLocation(pageNum, getVisibleAreaInContentCoords())
+                pageLayoutManager?.getPageLocation(pageNum, getVisibleAreaInContentCoords())
             } else {
                 null
             }
-        pageManager?.addPage(
-            pageNum,
-            size,
-            zoom,
-            isFling,
-            pageLocation,
-            localPageLayoutManager.layingOutPages
-        )
+        pageManager?.addPage(pageNum, size, zoom, isFling, pageLocation)
         // Learning the dimensions of a page can change our understanding of the content that's in
         // the viewport
-        onViewportChanged()
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
 
         // We use scrollY to center content smaller than the viewport. This triggers the initial
         // centering if it's needed. It doesn't override any restored state because we're scrolling
@@ -1207,19 +1131,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val viewportWidth: Int
         get() = right - left - paddingRight - paddingLeft
 
-    /**
-     * Converts an X coordinate in View space (scaled) to an X coordinate in content space
-     * (unscaled)
-     */
+    /** Converts an X coordinate in View space to an X coordinate in content space */
     internal fun toContentX(viewX: Float): Float {
         return toContentCoord(viewX, zoom, scrollX)
     }
 
-    /**
-     * Converts a Y coordinate in View space (scaled) to a Y coordinate in content space (unscaled)
-     */
+    /** Converts a Y coordinate in View space to a Y coordinate in content space */
     internal fun toContentY(viewY: Float): Float {
         return toContentCoord(viewY, zoom, scrollY)
+    }
+
+    /**
+     * Converts a one-dimensional coordinate in View space to a one-dimensional coordinate in
+     * content space
+     */
+    private fun toContentCoord(viewCoord: Float, zoom: Float, scroll: Int): Float {
+        return (viewCoord + scroll) / zoom
     }
 
     private val contentWidth: Int
@@ -1318,18 +1245,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
-    private fun toViewRect(contentRect: RectF): Rect =
-        toViewRect(contentRect.left, contentRect.top, contentRect.right, contentRect.bottom)
-
-    private fun toViewRect(contentRect: Rect): Rect =
-        toViewRect(contentRect.left, contentRect.top, contentRect.right, contentRect.bottom)
-
-    private fun toViewRect(left: Number, top: Number, right: Number, bottom: Number): Rect {
+    private fun toViewRect(contentRect: RectF): Rect {
         return Rect(
-            toViewCoord(left.toFloat(), zoom, scrollX).roundToInt(),
-            toViewCoord(top.toFloat(), zoom, scrollY).roundToInt(),
-            toViewCoord(right.toFloat(), zoom, scrollX).roundToInt(),
-            toViewCoord(bottom.toFloat(), zoom, scrollY).roundToInt(),
+            toViewCoord(contentRect.left, zoom, scrollX).roundToInt(),
+            toViewCoord(contentRect.top, zoom, scrollY).roundToInt(),
+            toViewCoord(contentRect.right, zoom, scrollX).roundToInt(),
+            toViewCoord(contentRect.bottom, zoom, scrollY).roundToInt(),
         )
     }
 
@@ -1401,8 +1322,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             distanceX: Float,
             distanceY: Float,
         ): Boolean {
-            var dx = distanceX.roundToInt()
-            val dy = distanceY.roundToInt()
+            var dx = Math.round(distanceX)
+            val dy = Math.round(distanceY)
 
             if (straightenCurrentVerticalScroll) {
                 // Remember a window of recent scroll events.
@@ -1621,24 +1542,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             }
         }
 
-        /**
-         * Converts a one-dimensional coordinate in View space (scaled, offset by scroll position)
-         * to a one-dimensional coordinate in content space (unscaled).
-         *
-         * In both coordinate spaces the origin is at the top left corner of the page with the
-         * positive X direction being left and the positive Y direction being down.
-         */
-        internal fun toContentCoord(viewCoord: Float, zoom: Float, scroll: Int): Float {
-            return (viewCoord + scroll) / zoom
-        }
-
-        /**
-         * Converts a one-dimensional coordinate in content space (unscaled) to a View coordinate
-         * (scaled, offset by scroll position)
-         *
-         * In both coordinate spaces the origin is at the top left corner of the page with the
-         * positive X direction being left and the positive Y direction being down.
-         */
         internal fun toViewCoord(contentCoord: Float, zoom: Float, scroll: Int): Float {
             return (contentCoord * zoom) - scroll
         }
