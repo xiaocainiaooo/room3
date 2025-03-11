@@ -25,6 +25,7 @@ import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ClassName
@@ -58,15 +59,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                     ) != null
                 }
                 .toSet()
-        val superTypesWithCapabilityAnnotation =
-            appFunctionSerializableClass.superTypes
-                .map { it.resolve().declaration as KSClassDeclaration }
-                .filter {
-                    it.annotations.findAnnotation(
-                        IntrospectionHelper.AppFunctionSchemaCapability.CLASS_NAME
-                    ) != null
-                }
-                .toSet()
+        val superTypesWithCapabilityAnnotation = findSuperTypesWithCapabilityAnnotation()
         val parametersToValidate =
             validatedPrimaryConstructor.parameters
                 .associateBy { checkNotNull(it.name).toString() }
@@ -79,6 +72,65 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
         )
 
         return this
+    }
+
+    /**
+     * Finds all super types of an [appFunctionSerializableClass] that are annotated with the
+     * [androidx.appfunctions.AppFunctionSchemaCapability] annotation.
+     *
+     * For example, consider the following classes:
+     * ```
+     * @AppFunctionSchemaCapability
+     * public interface AppFunctionOpenable {
+     *     public val intentToOpen: PendingIntent
+     * }
+     *
+     * public interface OpenableResponse : AppFunctionOpenable {
+     *     override val intentToOpen: PendingIntent
+     * }
+     *
+     * @AppFunctionSerializable
+     * class MySerializableClass(
+     *   override val intentToOpen: PendingIntent
+     * ) : OpenableResponse
+     * ```
+     *
+     * This method will return the [KSClassDeclaration] of `AppFunctionOpenable` since it is a super
+     * type of `MySerializableClass` and is annotated with the
+     * [androidx.appfunctions.AppFunctionSchemaCapability] annotation.
+     *
+     * @param appFunctionSerializableClass the [KSClassDeclaration] of the
+     *   [appFunctionSerializableClass] being processed.
+     * @return a set of [KSClassDeclaration] for all super types of the
+     *   [appFunctionSerializableClass] that are annotated with
+     *   [androidx.appfunctions.AppFunctionSchemaCapability].
+     */
+    fun findSuperTypesWithCapabilityAnnotation(): Set<KSClassDeclaration> {
+        return buildSet {
+            val unvisitedSuperTypes: MutableList<KSTypeReference> =
+                appFunctionSerializableClass.superTypes.toMutableList()
+
+            while (!unvisitedSuperTypes.isEmpty()) {
+                val superTypeClassDeclaration =
+                    unvisitedSuperTypes.removeLast().resolve().declaration as KSClassDeclaration
+                if (
+                    superTypeClassDeclaration.annotations.findAnnotation(
+                        IntrospectionHelper.AppFunctionSchemaCapability.CLASS_NAME
+                    ) != null
+                ) {
+                    add(superTypeClassDeclaration)
+                }
+                if (
+                    superTypeClassDeclaration.annotations.findAnnotation(
+                        IntrospectionHelper.AppFunctionSerializableAnnotation.CLASS_NAME
+                    ) == null
+                ) {
+                    // Only consider non serializable super types since serializable super types
+                    // are already handled separately
+                    unvisitedSuperTypes.addAll(superTypeClassDeclaration.superTypes)
+                }
+            }
+        }
     }
 
     private fun validateParameters(
