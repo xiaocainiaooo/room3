@@ -38,6 +38,24 @@
     </issue>
 
     <issue
+        id="CoroutineCreationDuringComposition"
+        message="Calls to launch should happen inside a LaunchedEffect and not composition"
+        errorLine1="            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {"
+        errorLine2="                                     ~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/SelectionContainerTest.kt"/>
+    </issue>
+
+    <issue
+        id="CoroutineCreationDuringComposition"
+        message="Calls to launch should happen inside a LaunchedEffect and not composition"
+        errorLine1="            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {"
+        errorLine2="                                     ~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/SelectionContainerTest.kt"/>
+    </issue>
+
+    <issue
         id="InvalidLanguageTagDelimiter"
         message="A hyphen (-), not an underscore (_) delimiter should be used in a language tag"
         errorLine1="                    TransformedText(text.toUpperCase(LocaleList(&quot;en_US&quot;)), OffsetMapping.Identity)"
@@ -200,6 +218,60 @@
     </issue>
 
     <issue
+        id="UnrememberedMutableState"
+        message="Creating a state object during composition without using `remember`"
+        errorLine1="        texts = derivedStateOf {"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/gestures/MultiTextSelectionGesturesBidiTest.kt"/>
+    </issue>
+
+    <issue
+        id="UnrememberedMutableState"
+        message="Creating a state object during composition without using `remember`"
+        errorLine1="        textContentIndices = derivedStateOf { texts.value.textContentIndices() }"
+        errorLine2="                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/gestures/MultiTextSelectionGesturesBidiTest.kt"/>
+    </issue>
+
+    <issue
+        id="UnrememberedMutableState"
+        message="Creating a state object during composition without using `remember`"
+        errorLine1="        texts = derivedStateOf {"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/gestures/MultiTextSelectionGesturesRtlTest.kt"/>
+    </issue>
+
+    <issue
+        id="UnrememberedMutableState"
+        message="Creating a state object during composition without using `remember`"
+        errorLine1="        textContentIndices = derivedStateOf { texts.value.textContentIndices() }"
+        errorLine2="                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/gestures/MultiTextSelectionGesturesRtlTest.kt"/>
+    </issue>
+
+    <issue
+        id="UnrememberedMutableState"
+        message="Creating a state object during composition without using `remember`"
+        errorLine1="        texts = derivedStateOf {"
+        errorLine2="                ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/gestures/MultiTextSelectionGesturesTest.kt"/>
+    </issue>
+
+    <issue
+        id="UnrememberedMutableState"
+        message="Creating a state object during composition without using `remember`"
+        errorLine1="        textContentIndices = derivedStateOf { texts.value.textContentIndices() }"
+        errorLine2="                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/selection/gestures/MultiTextSelectionGesturesTest.kt"/>
+    </issue>
+
+    <issue
         id="UnusedBoxWithConstraintsScope"
         message="BoxWithConstraints scope is not used"
         errorLine1="                    BoxWithConstraints {"
@@ -233,6 +305,24 @@
         errorLine2="                                       ^">
         <location
             file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/modifiers/TextStringSimpleNodeTest.kt"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateValueProperty"
+        message="Reading `value` will cause an autoboxing operation. Use `intValue` to avoid unnecessary allocations."
+        errorLine1="            val stateValue = state.value"
+        errorLine2="                                   ~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/input/TextFieldKeyEventTest.kt"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateValueProperty"
+        message="Assigning `value` will cause an autoboxing operation. Use `intValue` to avoid unnecessary allocations."
+        errorLine1="            state.value += 1"
+        errorLine2="                  ~~~~~">
+        <location
+            file="src/androidInstrumentedTest/kotlin/androidx/compose/foundation/text/input/TextFieldKeyEventTest.kt"/>
     </issue>
 
     <issue
