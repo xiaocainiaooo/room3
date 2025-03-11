@@ -92,14 +92,8 @@ internal class Page(
      * @param zoom the current scale
      * @param viewArea the portion of the page that's visible, in content coordinates
      * @param stablePosition true if position is not actively changing, e.g. during a fling
-     * @param pauseBitmapFetch true if we should wait to fetch Bitmaps
      */
-    fun setVisible(
-        zoom: Float,
-        viewArea: Rect,
-        stablePosition: Boolean = true,
-        pauseBitmapFetch: Boolean = false
-    ) {
+    fun setVisible(zoom: Float, viewArea: Rect, stablePosition: Boolean = true) {
         if (bitmapFetcher == null) {
             bitmapFetcher =
                 BitmapFetcher(
@@ -111,9 +105,7 @@ internal class Page(
                     onPageUpdate
                 )
         }
-        if (!pauseBitmapFetch) {
-            bitmapFetcher?.maybeFetchNewBitmaps(zoom, viewArea)
-        }
+        bitmapFetcher?.maybeFetchNewBitmaps(zoom, viewArea)
         if (stablePosition) {
             maybeFetchLinks()
             if (isTouchExplorationEnabled) {
