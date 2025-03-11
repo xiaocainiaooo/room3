@@ -590,25 +590,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             pendingZoomRecalculation = false
         }
 
-        if (changed || awaitingFirstLayout) {
-            val positionToRestore = scrollPositionToRestore
-            if (positionToRestore != null) {
-                var resolvedZoom =
-                    if (zoomToRestore != null && zoomToRestore != DEFAULT_INIT_ZOOM) zoomToRestore!!
-                    else zoom
-                resolvedZoom = resolvedZoom * (width.toFloat() / (oldWidth ?: contentWidth))
-                val clampedZoom = MathUtils.clamp(resolvedZoom, minZoom, maxZoom)
-                this.zoom = clampedZoom
-                scrollToRestoredPosition(positionToRestore, clampedZoom)
-                scrollPositionToRestore = null
-                zoomToRestore = DEFAULT_INIT_ZOOM
-            }
-            awaitingFirstLayout = false
+        val positionToRestore = scrollPositionToRestore
+        if (changed && awaitingFirstLayout && positionToRestore != null) {
+            var resolvedZoom =
+                if (zoomToRestore != null && zoomToRestore != DEFAULT_INIT_ZOOM) zoomToRestore!!
+                else zoom
+            resolvedZoom = resolvedZoom * (width.toFloat() / (oldWidth ?: contentWidth))
+            val clampedZoom = MathUtils.clamp(resolvedZoom, minZoom, maxZoom)
+            this.zoom = clampedZoom
+            scrollToRestoredPosition(positionToRestore, clampedZoom)
+            scrollPositionToRestore = null
+            zoomToRestore = DEFAULT_INIT_ZOOM
         }
 
-        if (changed) {
-            oldWidth = width
-        }
+        awaitingFirstLayout = false
     }
 
     override fun onAttachedToWindow() {
