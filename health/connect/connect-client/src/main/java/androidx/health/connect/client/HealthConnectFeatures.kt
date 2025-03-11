@@ -18,6 +18,7 @@ package androidx.health.connect.client
 
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
+import androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi
 import androidx.health.connect.client.feature.HealthConnectPlatformVersion
 import androidx.health.connect.client.feature.HealthConnectVersionInfo
 
@@ -50,10 +51,10 @@ interface HealthConnectFeatures {
         /** Feature constant for mindfulness session. */
         @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_MINDFULNESS_SESSION = 5
 
-        /** Feature constant for Personal Health Records (PHR) APIs. */
-        // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
-        @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_PERSONAL_HEALTH_RECORD = 100
+        /** Feature constant for Personal Health Records APIs. */
+        @ExperimentalPersonalHealthRecordApi const val FEATURE_PERSONAL_HEALTH_RECORD = 6
 
+        @OptIn(ExperimentalPersonalHealthRecordApi::class)
         @Retention(AnnotationRetention.SOURCE)
         @IntDef(
             value =
@@ -92,6 +93,7 @@ interface HealthConnectFeatures {
         private val SDK_EXT_16_PLATFORM_VERSION: HealthConnectPlatformVersion =
             HealthConnectPlatformVersion(buildVersionCode = 36)
 
+        @OptIn(ExperimentalPersonalHealthRecordApi::class)
         internal val FEATURE_TO_VERSION_INFO_MAP: Map<Int, HealthConnectVersionInfo> =
             mapOf(
                 FEATURE_READ_HEALTH_DATA_IN_BACKGROUND to
