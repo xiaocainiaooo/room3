@@ -16,6 +16,7 @@
 
 package androidx.appfunctions
 
+import android.app.PendingIntent
 import android.app.appsearch.GenericDocument
 import android.os.Build
 import android.os.Bundle
@@ -427,6 +428,19 @@ internal constructor(
     }
 
     /**
+     * Retrieves a [PendingIntent] value associated with the specified [key].
+     *
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key], or null if the associated value is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
+     */
+    public fun getPendingIntent(key: String): PendingIntent? {
+        spec?.validateReadRequest(key, PendingIntent::class.java, isCollection = false)
+        return extras.getParcelable(key, PendingIntent::class.java)
+    }
+
+    /**
      * Retrieves a [BooleanArray] value associated with the specified [key].
      *
      * @param key The key to retrieve the value for.
@@ -607,6 +621,20 @@ internal constructor(
             isCollection = true,
         )
         return dataArrayValue
+    }
+
+    /**
+     * Retrieves a [List] of [PendingIntent] value associated with the specified [key].
+     *
+     * @param key The key to retrieve the value for.
+     * @return The value associated with the [key]. Or null if the associated value is not found.
+     * @throws IllegalArgumentException if the [key] is not allowed or the value type is incorrect
+     *   according to the metadata specification.
+     */
+    @Suppress("NullableCollection")
+    public fun getPendingIntentList(key: String): List<PendingIntent>? {
+        spec?.validateReadRequest(key, PendingIntent::class.java, isCollection = true)
+        return extras.getParcelableArrayList(key, PendingIntent::class.java)
     }
 
     override fun toString(): String {
@@ -874,6 +902,20 @@ internal constructor(
         }
 
         /**
+         * Sets a [PendingIntent] value for the given [key].
+         *
+         * @param key The key to set the [AppFunctionData] value for.
+         * @param value The [AppFunctionData] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the [value] does not
+         *   match the metadata specification associated with the [key].
+         */
+        public fun setPendingIntent(key: String, value: PendingIntent): Builder {
+            spec?.validateWriteRequest(key, PendingIntent::class.java, isCollection = false)
+            extrasBuilder.putParcelable(key, value)
+            return this
+        }
+
+        /**
          * Sets a [BooleanArray] value for the given [key].
          *
          * @param key The key to set the [BooleanArray] value for.
@@ -997,6 +1039,20 @@ internal constructor(
                     extrasBuilder.putBundle(extrasKey(key, index), element.extras)
                 }
             }
+            return this
+        }
+
+        /**
+         * Sets a [List] of [PendingIntent] value for the given [key].
+         *
+         * @param key The key to set the [List] of [AppFunctionData] value for.
+         * @param value The [List] of [AppFunctionData] value to set.
+         * @throws IllegalArgumentException if the [key] is not allowed or the [value] does not
+         *   match the metadata specification associated with the [key].
+         */
+        public fun setPendingIntentList(key: String, value: List<PendingIntent>): Builder {
+            spec?.validateWriteRequest(key, PendingIntent::class.java, isCollection = true)
+            extrasBuilder.putParcelableArrayList(key, ArrayList<PendingIntent>(value))
             return this
         }
 
