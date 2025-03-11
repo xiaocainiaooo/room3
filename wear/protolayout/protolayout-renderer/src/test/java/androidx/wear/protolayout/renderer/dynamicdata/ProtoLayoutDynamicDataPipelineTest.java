@@ -139,8 +139,7 @@ public class ProtoLayoutDynamicDataPipelineTest {
     @Test
     public void buildPipeline_dynamicBoolVisibilityStatus_assignsValues() {
         List<Boolean> results = new ArrayList<>();
-        DynamicBool dynamicBool =
-                PlatformEventSources.isLayoutVisible().toDynamicBoolProto();
+        DynamicBool dynamicBool = PlatformEventSources.isLayoutVisible().toDynamicBoolProto();
 
         ProtoLayoutDynamicDataPipeline pipeline =
                 initPipeline(results, results, true, dynamicBool, 0);
@@ -165,8 +164,7 @@ public class ProtoLayoutDynamicDataPipelineTest {
     @Test
     public void buildPipeline_dynamicBoolVisibilityStatus_updatesDisabled_notSendingValues() {
         List<Boolean> results = new ArrayList<>();
-        DynamicBool dynamicBool =
-                PlatformEventSources.isLayoutVisible().toDynamicBoolProto();
+        DynamicBool dynamicBool = PlatformEventSources.isLayoutVisible().toDynamicBoolProto();
 
         ProtoLayoutDynamicDataPipeline pipeline =
                 initPipeline(results, results, true, dynamicBool, 0);
