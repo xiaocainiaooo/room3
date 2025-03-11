@@ -501,7 +501,7 @@ public fun SwipeToReveal(
     state: RevealState = rememberRevealState(),
     secondaryAction: (@Composable () -> Unit)? = null,
     undoAction: (@Composable () -> Unit)? = null,
-    gestureInclusion: GestureInclusion = SwipeToRevealDefaults.gestureInclusion(),
+    gestureInclusion: GestureInclusion = SwipeToRevealDefaults.gestureInclusion(state = state),
     content: @Composable () -> Unit
 ) {
     // A no-op NestedScrollConnection which does not consume scroll/fling events
@@ -792,15 +792,18 @@ public object SwipeToRevealDefaults {
     /**
      * The default behaviour for when [SwipeToReveal] should handle gestures. In this implementation
      * of [GestureInclusion], swipe events that originate in the left edge of the screen (as
-     * determined by [LeftEdgeZoneFraction]) will be ignored. This allows swipe-to-dismiss handlers
-     * (if present) to handle the gesture in this region.
+     * determined by [LeftEdgeZoneFraction]) will be ignored, if the [RevealState] is
+     * [RevealValue.Covered]. This allows swipe-to-dismiss handlers (if present) to handle the
+     * gesture in this region.
      *
+     * @param state [RevealState] of the [SwipeToReveal].
      * @param edgeZoneFraction The fraction of the screen width from the left edge where gestures
      *   should be ignored. Defaults to [LeftEdgeZoneFraction].
      */
     public fun gestureInclusion(
+        state: RevealState,
         @FloatRange(from = 0.0, to = 1.0) edgeZoneFraction: Float = LeftEdgeZoneFraction
-    ): GestureInclusion = DefaultGestureInclusion(edgeZoneFraction)
+    ): GestureInclusion = DefaultGestureInclusion(state, edgeZoneFraction)
 
     /**
      * A behaviour for [SwipeToReveal] to handle all gestures, intended for rare cases where
@@ -811,11 +814,15 @@ public object SwipeToRevealDefaults {
 }
 
 @Stable
-private class DefaultGestureInclusion(private val edgeZoneFraction: Float) : GestureInclusion {
+private class DefaultGestureInclusion(
+    private val revealState: RevealState,
+    private val edgeZoneFraction: Float
+) : GestureInclusion {
     override fun ignoreGestureStart(offset: Offset, layoutCoordinates: LayoutCoordinates): Boolean {
         val screenOffset = layoutCoordinates.localToScreen(offset)
         val screenWidth = layoutCoordinates.findRootCoordinates().size.width
-        return screenOffset.x <= screenWidth * edgeZoneFraction
+        return revealState.currentValue == RevealValue.Covered &&
+            screenOffset.x <= screenWidth * edgeZoneFraction
     }
 
     override fun equals(other: Any?): Boolean {
@@ -824,11 +831,16 @@ private class DefaultGestureInclusion(private val edgeZoneFraction: Float) : Ges
 
         other as DefaultGestureInclusion
 
-        return edgeZoneFraction == other.edgeZoneFraction
+        if (edgeZoneFraction != other.edgeZoneFraction) return false
+        if (revealState != other.revealState) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        return edgeZoneFraction.hashCode()
+        var result = edgeZoneFraction.hashCode()
+        result = 31 * result + revealState.hashCode()
+        return result
     }
 }
 
