@@ -208,15 +208,27 @@ class AuthenticatorUtils {
     }
 
     /**
-     * Checks if a <strong>Class 3</strong> (formerly <strong>Strong</strong>) biometric is included
-     * in the given set of allowed authenticator types.
-     *
-     * @param authenticators A bit field representing a set of allowed authenticator types.
-     * @return Whether {@link Authenticators#BIOMETRIC_STRONG} is an allowed authenticator type.
+     * @param sensorStrength    the strength of the sensor
+     * @param requestedStrength the strength that it must meet
+     * @return true only if the sensor is at least as strong as the requested strength
      */
-    static boolean isStrongBiometricAllowed(
-            @BiometricManager.AuthenticatorTypes int authenticators) {
-        return (authenticators & Authenticators.BIOMETRIC_STRONG)
-                == Authenticators.BIOMETRIC_STRONG;
+    @SuppressWarnings("WrongConstant")
+    public static boolean isAtLeastStrength(@BiometricManager.AuthenticatorTypes int sensorStrength,
+            @BiometricManager.AuthenticatorTypes int requestedStrength) {
+        // Clear out any bits that are not reserved for biometric
+        sensorStrength &= Authenticators.BIOMETRIC_MIN_STRENGTH;
+
+        // If the authenticator contains bits outside of the requested strength, it is too weak.
+        if ((sensorStrength & ~requestedStrength) != 0) {
+            return false;
+        }
+
+        for (int i = Authenticators.BIOMETRIC_MAX_STRENGTH;
+                i <= requestedStrength; i = (i << 1) | 1) {
+            if (i == sensorStrength) {
+                return true;
+            }
+        }
+        return false;
     }
 }
