@@ -132,7 +132,7 @@ public fun SwipeToReveal(
         if (revealState.hasBidirectionalAnchors()) {
             bidirectionalGestureInclusion
         } else {
-            gestureInclusion()
+            gestureInclusion(revealState)
         },
     content: @Composable () -> Unit,
 ) {
