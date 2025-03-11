@@ -16,6 +16,7 @@
 
 package androidx.wear.compose.foundation
 
+import androidx.annotation.FloatRange
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.AnimationSpec
@@ -41,6 +42,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -796,29 +798,54 @@ public object SwipeToRevealDefaults {
      * @param edgeZoneFraction The fraction of the screen width from the left edge where gestures
      *   should be ignored. Defaults to [LeftEdgeZoneFraction].
      */
-    public fun gestureInclusion(edgeZoneFraction: Float = LeftEdgeZoneFraction): GestureInclusion =
-        object : GestureInclusion {
-            override fun ignoreGestureStart(
-                offset: Offset,
-                layoutCoordinates: LayoutCoordinates
-            ): Boolean {
-                val screenOffset = layoutCoordinates.localToScreen(offset)
-                val screenWidth = layoutCoordinates.findRootCoordinates().size.width
-                return screenOffset.x <= screenWidth * edgeZoneFraction
-            }
-        }
+    public fun gestureInclusion(
+        @FloatRange(from = 0.0, to = 1.0) edgeZoneFraction: Float = LeftEdgeZoneFraction
+    ): GestureInclusion = DefaultGestureInclusion(edgeZoneFraction)
 
     /**
      * A behaviour for [SwipeToReveal] to handle all gestures, intended for rare cases where
      * bidirectional anchors are used and no swipe events are ignored
      */
-    public fun bidirectionalGestureInclusion(): GestureInclusion =
-        object : GestureInclusion {
-            override fun ignoreGestureStart(
-                offset: Offset,
-                layoutCoordinates: LayoutCoordinates
-            ): Boolean = false
-        }
+    public val bidirectionalGestureInclusion: GestureInclusion
+        get() = BidirectionalGestureInclusion()
+}
+
+@Stable
+private class DefaultGestureInclusion(private val edgeZoneFraction: Float) : GestureInclusion {
+    override fun ignoreGestureStart(offset: Offset, layoutCoordinates: LayoutCoordinates): Boolean {
+        val screenOffset = layoutCoordinates.localToScreen(offset)
+        val screenWidth = layoutCoordinates.findRootCoordinates().size.width
+        return screenOffset.x <= screenWidth * edgeZoneFraction
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DefaultGestureInclusion
+
+        return edgeZoneFraction == other.edgeZoneFraction
+    }
+
+    override fun hashCode(): Int {
+        return edgeZoneFraction.hashCode()
+    }
+}
+
+@Stable
+private class BidirectionalGestureInclusion : GestureInclusion {
+    override fun ignoreGestureStart(offset: Offset, layoutCoordinates: LayoutCoordinates): Boolean =
+        false
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
 }
 
 @Composable

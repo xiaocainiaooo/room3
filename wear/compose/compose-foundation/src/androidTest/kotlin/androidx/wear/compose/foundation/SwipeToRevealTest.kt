@@ -541,7 +541,7 @@ class SwipeToRevealTest {
             onFullSwipe = onFullSwipe,
             gestureInclusion =
                 if (edgeSwipeEnabled) {
-                    SwipeToRevealDefaults.bidirectionalGestureInclusion()
+                    SwipeToRevealDefaults.bidirectionalGestureInclusion
                 } else {
                     SwipeToRevealDefaults.gestureInclusion()
                 },
