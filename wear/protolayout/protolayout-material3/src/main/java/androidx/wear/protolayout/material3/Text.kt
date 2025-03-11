@@ -37,7 +37,7 @@ import androidx.wear.protolayout.types.LayoutString
  * [Typography].
  *
  * @param text The text content for this component.
- * @param modifiers Modifiers to set to this element.
+ * @param modifier Modifiers to set to this element.
  * @param typography The typography from [Typography] to be applied to this text. This will have
  *   predefined default value specified by each components that uses this text, to achieve the
  *   recommended look. If using some of `Typography.NUMERAL_` styles and the provided text is
@@ -62,7 +62,7 @@ import androidx.wear.protolayout.types.LayoutString
 @Suppress("DEPRECATION") // Intentionally using deprecated fallback for old renderer
 public fun MaterialScope.text(
     text: LayoutString,
-    modifiers: LayoutModifier = LayoutModifier,
+    modifier: LayoutModifier = LayoutModifier,
     @TypographyToken typography: Int = defaultTextElementStyle.typography,
     color: LayoutColor = defaultTextElementStyle.color,
     italic: Boolean = defaultTextElementStyle.italic,
@@ -99,6 +99,6 @@ public fun MaterialScope.text(
             } else {
                 overflow
             },
-        modifier = modifiers,
+        modifier = modifier,
         lineHeight = theme.getLineHeight(typography).value,
     )
