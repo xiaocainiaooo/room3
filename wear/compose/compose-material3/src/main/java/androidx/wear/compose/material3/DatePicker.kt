@@ -126,20 +126,19 @@ public fun DatePicker(
         LocalTouchExplorationStateProvider.current.touchExplorationState()
 
     /** The current selected [Picker] index. */
-    var selectedIndex by
-        remember(touchExplorationServicesEnabled) {
-            // When the date picker loads, none of the individual pickers are selected in talkback
-            // mode,
-            // otherwise first picker should be focused (depends on the picker ordering given by
-            // datePickerType)
-            val initiallySelectedIndex =
-                if (touchExplorationServicesEnabled) {
-                    null
-                } else {
-                    0
-                }
-            mutableStateOf(initiallySelectedIndex)
-        }
+    var selectedIndex: Int? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(touchExplorationServicesEnabled) {
+        // When the date picker loads, none of the individual pickers are selected in talkback mode,
+        // otherwise first picker should be focused (depends on the picker ordering given by
+        // datePickerType)
+        selectedIndex =
+            if (touchExplorationServicesEnabled) {
+                null
+            } else {
+                0
+            }
+    }
 
     val isLargeScreen = isLargeScreen()
     val labelTextStyle =
