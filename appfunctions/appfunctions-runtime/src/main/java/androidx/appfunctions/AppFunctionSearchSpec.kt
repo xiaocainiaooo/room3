@@ -62,22 +62,16 @@ constructor(
                     add("packageName:(${getOrQueryExpression(packageNames)})")
                 }
 
-                // Schema fields need to be searched against top level fields as well for legacy
-                // indexer.
                 if (schemaName != null) {
-                    add("(schema.schemaName:\"${schemaName}\" OR schemaName:\"${schemaName}\")")
+                    add("schemaName:\"${schemaName}\"")
                 }
 
                 if (schemaCategory != null) {
-                    add(
-                        "(schema.schemaCategory:\"${schemaCategory}\" OR schemaCategory:\"${schemaCategory}\")"
-                    )
+                    add("schemaCategory:\"${schemaCategory}\"")
                 }
 
                 if (minSchemaVersion > 0) {
-                    add(
-                        "(schema.schemaVersion>=${minSchemaVersion} OR schemaVersion>=${minSchemaVersion})"
-                    )
+                    add("schemaVersion>=${minSchemaVersion}")
                 }
             }
             .joinToString(" ")
