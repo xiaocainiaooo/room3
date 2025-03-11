@@ -1091,7 +1091,8 @@ public final class AppSearchImpl implements Closeable {
             for (int i = 0; i < documents.size(); ++i) {
                 String docId = documents.get(i).getId();
                 PutDocumentStats.Builder pStatsBuilder =
-                        new PutDocumentStats.Builder(packageName, databaseName);
+                        new PutDocumentStats.Builder(packageName, databaseName)
+                                .setLaunchVMEnabled(mIsAegisEnabled);
                 // Previously we always log even if we reach the limit. To keep the behavior
                 // same as before, we will save all the stats created.
                 allStatsList.add(pStatsBuilder);
