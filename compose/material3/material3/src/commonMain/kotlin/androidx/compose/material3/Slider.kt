@@ -841,6 +841,10 @@ private fun SliderImpl(
         val trackOffsetY: Int
         val thumbOffsetX: Int
         var thumbOffsetY: Int
+        val valueAsFraction = state.coercedValueAsFraction
+        val isOnFirstOrLastStep =
+            valueAsFraction == state.tickFractions.firstOrNull() ||
+                valueAsFraction == state.tickFractions.lastOrNull()
         if (state.orientation == Vertical) {
             sliderWidth = max(trackPlaceable.width, thumbPlaceable.width)
             sliderHeight = thumbPlaceable.height + trackPlaceable.height
@@ -848,12 +852,11 @@ private fun SliderImpl(
             trackOffsetY = thumbPlaceable.height / 2
             thumbOffsetX = (sliderWidth - thumbPlaceable.width) / 2
             thumbOffsetY =
-                if (state.steps > 0) {
-                    ((trackPlaceable.height - state.trackCornerSize * 2) *
-                            state.coercedValueAsFraction)
+                if (state.steps > 0 && !isOnFirstOrLastStep) {
+                    ((trackPlaceable.height - state.trackCornerSize * 2) * valueAsFraction)
                         .roundToInt() + state.trackCornerSize
                 } else {
-                    (trackPlaceable.height * state.coercedValueAsFraction).roundToInt()
+                    (trackPlaceable.height * valueAsFraction).roundToInt()
                 }
             if (state.reverseVerticalDirection) {
                 thumbOffsetY = trackPlaceable.height - thumbOffsetY
@@ -864,12 +867,11 @@ private fun SliderImpl(
             trackOffsetX = thumbPlaceable.width / 2
             trackOffsetY = (sliderHeight - trackPlaceable.height) / 2
             thumbOffsetX =
-                if (state.steps > 0) {
-                    ((trackPlaceable.width - state.trackCornerSize * 2) *
-                            state.coercedValueAsFraction)
+                if (state.steps > 0 && !isOnFirstOrLastStep) {
+                    ((trackPlaceable.width - state.trackCornerSize * 2) * valueAsFraction)
                         .roundToInt() + state.trackCornerSize
                 } else {
-                    (trackPlaceable.width * state.coercedValueAsFraction).roundToInt()
+                    (trackPlaceable.width * valueAsFraction).roundToInt()
                 }
             thumbOffsetY = (sliderHeight - thumbPlaceable.height) / 2
         }
@@ -1069,26 +1071,32 @@ private fun RangeSliderImpl(
 
         state.updateMinMaxPx()
 
+        val startValueAsFraction = state.coercedActiveRangeStartAsFraction
+        val isStartOnFirstOrLastStep =
+            startValueAsFraction == state.tickFractions.firstOrNull() ||
+                startValueAsFraction == state.tickFractions.lastOrNull()
+        val endValueAsFraction = state.coercedActiveRangeEndAsFraction
+        val isEndOnFirstOrLastStep =
+            endValueAsFraction == state.tickFractions.firstOrNull() ||
+                endValueAsFraction == state.tickFractions.lastOrNull()
         val trackOffsetX = startThumbPlaceable.width / 2
         val startThumbOffsetX =
-            if (state.steps > 0) {
-                ((trackPlaceable.width - state.trackCornerSize * 2) *
-                        state.coercedActiveRangeStartAsFraction)
+            if (state.steps > 0 && !isStartOnFirstOrLastStep) {
+                ((trackPlaceable.width - state.trackCornerSize * 2) * startValueAsFraction)
                     .roundToInt() + state.trackCornerSize
             } else {
-                (trackPlaceable.width * state.coercedActiveRangeStartAsFraction).roundToInt()
+                (trackPlaceable.width * startValueAsFraction).roundToInt()
             }
         // When start thumb and end thumb have different widths,
         // we need to add a correction for the centering of the slider.
         val endCorrection = (startThumbPlaceable.width - endThumbPlaceable.width) / 2
         val endThumbOffsetX =
-            if (state.steps > 0) {
-                ((trackPlaceable.width - state.trackCornerSize * 2) *
-                        state.coercedActiveRangeEndAsFraction + endCorrection)
+            if (state.steps > 0 && !isEndOnFirstOrLastStep) {
+                ((trackPlaceable.width - state.trackCornerSize * 2) * endValueAsFraction +
+                        endCorrection)
                     .roundToInt() + state.trackCornerSize
             } else {
-                (trackPlaceable.width * state.coercedActiveRangeEndAsFraction + endCorrection)
-                    .roundToInt()
+                (trackPlaceable.width * endValueAsFraction + endCorrection).roundToInt()
             }
         val trackOffsetY = (sliderHeight - trackPlaceable.height) / 2
         val startThumbOffsetY = (sliderHeight - startThumbPlaceable.height) / 2
@@ -1725,8 +1733,15 @@ object SliderDefaults {
         val cornerSize = trackCornerSize.toPx()
         val sliderStart = 0f
         val sliderEnd = if (isVertical) size.height else size.width
+
+        val isStartOnFirstOrLastStep =
+            activeRangeStart == tickFractions.firstOrNull() ||
+                activeRangeStart == tickFractions.lastOrNull()
+        val isEndOnFirstOrLastStep =
+            activeRangeEnd == tickFractions.firstOrNull() ||
+                activeRangeEnd == tickFractions.lastOrNull()
         val sliderValueEnd =
-            if (tickFractions.isNotEmpty()) {
+            if (tickFractions.isNotEmpty() && !isEndOnFirstOrLastStep) {
                 sliderStart +
                     (sliderEnd - sliderStart - cornerSize * 2) * activeRangeEnd +
                     cornerSize
@@ -1734,7 +1749,7 @@ object SliderDefaults {
                 sliderStart + (sliderEnd - sliderStart) * activeRangeEnd
             }
         val sliderValueStart =
-            if (tickFractions.isNotEmpty()) {
+            if (tickFractions.isNotEmpty() && !isStartOnFirstOrLastStep) {
                 sliderStart +
                     (sliderEnd - sliderStart - cornerSize * 2) * activeRangeStart +
                     cornerSize
