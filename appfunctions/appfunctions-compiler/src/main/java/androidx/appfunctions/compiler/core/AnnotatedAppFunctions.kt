@@ -390,15 +390,7 @@ data class AnnotatedAppFunctions(
                 }
                 .toSet()
         val superTypesWithCapabilityAnnotation =
-            appFunctionSerializableType.appFunctionSerializableClass.superTypes
-                .map { it.resolve().declaration as KSClassDeclaration }
-                .filter {
-                    it.annotations.findAnnotation(
-                        IntrospectionHelper.AppFunctionSchemaCapability.CLASS_NAME
-                    ) != null
-                }
-                .toSet()
-
+            appFunctionSerializableType.findSuperTypesWithCapabilityAnnotation()
         if (
             superTypesWithSerializableAnnotation.isEmpty() &&
                 superTypesWithCapabilityAnnotation.isEmpty()
