@@ -65,6 +65,7 @@ package androidx.health.connect.client {
   public interface HealthConnectFeatures {
     method public int getFeatureStatus(int feature);
     field public static final androidx.health.connect.client.HealthConnectFeatures.Companion Companion;
+    field @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi public static final int FEATURE_PERSONAL_HEALTH_RECORD = 6; // 0x6
     field public static final int FEATURE_PLANNED_EXERCISE = 3; // 0x3
     field public static final int FEATURE_READ_HEALTH_DATA_HISTORY = 4; // 0x4
     field public static final int FEATURE_READ_HEALTH_DATA_IN_BACKGROUND = 1; // 0x1
@@ -74,12 +75,14 @@ package androidx.health.connect.client {
   }
 
   public static final class HealthConnectFeatures.Companion {
+    property @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi public static int FEATURE_PERSONAL_HEALTH_RECORD;
     property public static int FEATURE_PLANNED_EXERCISE;
     property public static int FEATURE_READ_HEALTH_DATA_HISTORY;
     property public static int FEATURE_READ_HEALTH_DATA_IN_BACKGROUND;
     property public static int FEATURE_SKIN_TEMPERATURE;
     property public static int FEATURE_STATUS_AVAILABLE;
     property public static int FEATURE_STATUS_UNAVAILABLE;
+    field @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalPersonalHealthRecordApi public static final int FEATURE_PERSONAL_HEALTH_RECORD = 6; // 0x6
     field public static final int FEATURE_PLANNED_EXERCISE = 3; // 0x3
     field public static final int FEATURE_READ_HEALTH_DATA_HISTORY = 4; // 0x4
     field public static final int FEATURE_READ_HEALTH_DATA_IN_BACKGROUND = 1; // 0x1
