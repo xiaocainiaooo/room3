@@ -22,7 +22,12 @@ import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.appfunctions.internal.AppFunctionManagerApi
+import androidx.appfunctions.internal.AppFunctionReader
+import androidx.appfunctions.internal.AppSearchAppFunctionReader
 import androidx.appfunctions.internal.ExtensionAppFunctionManagerApi
+import androidx.appfunctions.internal.TranslatorSelector
+import androidx.appfunctions.internal.TranslatorSelectorImpl
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.android.extensions.appfunctions.AppFunctionManager
 
 /**
@@ -33,9 +38,18 @@ import com.android.extensions.appfunctions.AppFunctionManager
 public class AppFunctionManagerCompat
 internal constructor(
     private val context: Context,
+    private val translatorSelector: TranslatorSelector,
+    private val appFunctionReader: AppFunctionReader,
     private val appFunctionManagerApi: AppFunctionManagerApi
 ) {
-    public constructor(context: Context) : this(context, ExtensionAppFunctionManagerApi(context))
+    public constructor(
+        context: Context
+    ) : this(
+        context,
+        TranslatorSelectorImpl(),
+        AppSearchAppFunctionReader(context),
+        ExtensionAppFunctionManagerApi(context)
+    )
 
     /**
      * Checks whether the AppFunction feature is supported.
@@ -121,7 +135,50 @@ internal constructor(
         request: ExecuteAppFunctionRequest,
     ): ExecuteAppFunctionResponse {
         checkAppFunctionsFeatureSupported()
-        return appFunctionManagerApi.executeAppFunction(request)
+
+        val schemaMetadata: AppFunctionSchemaMetadata? =
+            try {
+                appFunctionReader.getAppFunctionSchemaMetadata(
+                    functionId = request.functionIdentifier,
+                    packageName = request.targetPackageName
+                )
+            } catch (ex: AppFunctionFunctionNotFoundException) {
+                return ExecuteAppFunctionResponse.Error(ex)
+            } catch (ex: Exception) {
+                return ExecuteAppFunctionResponse.Error(
+                    AppFunctionSystemUnknownException(
+                        "Something went wrong when querying the app function from AppSearch: ${ex.message}"
+                    )
+                )
+            }
+
+        // Translate the request when necessary by looking into the target schema version.
+        val translator =
+            if (schemaMetadata?.version == LEGACY_SDK_GLOBAL_SCHEMA_VERSION) {
+                checkNotNull(translatorSelector.getTranslator(schemaMetadata))
+            } else {
+                null
+            }
+        val translatedRequest: ExecuteAppFunctionRequest =
+            if (translator != null) {
+                val functionParametersToExecute =
+                    translator.downgradeRequest(request.functionParameters)
+                request.copy(functionParameters = functionParametersToExecute)
+            } else {
+                request
+            }
+
+        val executeAppFunctionResponse = appFunctionManagerApi.executeAppFunction(translatedRequest)
+
+        // Translate the response back to what the agent app expects.
+        val successResponse =
+            executeAppFunctionResponse as? ExecuteAppFunctionResponse.Success
+                ?: return executeAppFunctionResponse
+        return if (translator != null) {
+            successResponse.copy(translator.upgradeResponse(successResponse.returnValue))
+        } else {
+            successResponse
+        }
     }
 
     private fun checkAppFunctionsFeatureSupported() {
@@ -156,5 +213,8 @@ internal constructor(
          */
         public const val APP_FUNCTION_STATE_DISABLED: Int =
             AppFunctionManager.APP_FUNCTION_STATE_DISABLED
+
+        /** The version shared across all schema defined in the legacy SDK. */
+        private const val LEGACY_SDK_GLOBAL_SCHEMA_VERSION = 1L
     }
 }
