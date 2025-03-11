@@ -61,6 +61,10 @@ import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.stats.InitializeStats;
 import androidx.appsearch.localstorage.stats.OptimizeStats;
+import androidx.appsearch.localstorage.stats.PutDocumentStats;
+import androidx.appsearch.localstorage.stats.RemoveStats;
+import androidx.appsearch.localstorage.stats.SearchStats;
+import androidx.appsearch.localstorage.stats.SetSchemaStats;
 import androidx.appsearch.localstorage.util.PrefixUtil;
 import androidx.appsearch.localstorage.visibilitystore.CallerAccess;
 import androidx.appsearch.localstorage.visibilitystore.VisibilityChecker;
@@ -88,6 +92,7 @@ import com.google.android.icing.proto.DebugInfoVerbosity;
 import com.google.android.icing.proto.DocumentProto;
 import com.google.android.icing.proto.GetOptimizeInfoResultProto;
 import com.google.android.icing.proto.GetSchemaResultProto;
+import com.google.android.icing.proto.IcingSearchEngineOptions;
 import com.google.android.icing.proto.PersistType;
 import com.google.android.icing.proto.PropertyConfigProto;
 import com.google.android.icing.proto.PropertyProto;
@@ -4161,7 +4166,7 @@ public class AppSearchImplTest {
                 Collections.emptyMap());
         assertThat(getResult).isEqualTo(document);
 
-        // Inialize a new instance of AppSearch to test initialization.
+        // Initialize a new instance of AppSearch to test initialization.
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         AppSearchImpl appSearchImpl2 = AppSearchImpl.create(
                 mAppSearchDir,
@@ -4245,7 +4250,7 @@ public class AppSearchImplTest {
                 Collections.emptyMap());
         assertThat(getResult).isEqualTo(document2);
 
-        // Inialize a new instance of AppSearch to test initialization.
+        // Initialize a new instance of AppSearch to test initialization.
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         AppSearchImpl appSearchImpl2 = AppSearchImpl.create(
                 mAppSearchDir,
@@ -4336,7 +4341,7 @@ public class AppSearchImplTest {
                 Collections.emptyMap());
         assertThat(getResult).isEqualTo(document2);
 
-        // Inialize a new instance of AppSearch to test initialization.
+        // Initialize a new instance of AppSearch to test initialization.
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         AppSearchImpl appSearchImpl2 = AppSearchImpl.create(
                 mAppSearchDir,
@@ -4400,7 +4405,7 @@ public class AppSearchImplTest {
                 Collections.emptyMap());
         assertThat(getResult).isEqualTo(document);
 
-        // Inialize a new instance of AppSearch to test initialization.
+        // Initialize a new instance of AppSearch to test initialization.
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         AppSearchImpl appSearchImpl2 = AppSearchImpl.create(
                 mAppSearchDir,
@@ -4484,7 +4489,7 @@ public class AppSearchImplTest {
                 Collections.emptyMap());
         assertThat(getResult).isEqualTo(document2);
 
-        // Inialize a new instance of AppSearch to test initialization.
+        // Initialize a new instance of AppSearch to test initialization.
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         AppSearchImpl appSearchImpl2 = AppSearchImpl.create(
                 mAppSearchDir,
@@ -4811,6 +4816,161 @@ public class AppSearchImplTest {
         // +2 (document and blob db) * (2 for VisibilitySchema +1 for VisibilityOverlay)
         assertThat(debugInfo.getSchemaInfo().getSchema().getTypesList())
                 .hasSize(7);
+    }
+
+    @Test
+    public void testStatsIsLaunchAegis() throws Exception {
+        InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
+        IcingSearchEngineOptions options = mUnlimitedConfig.toIcingSearchEngineOptions(
+                mAppSearchDir.getAbsolutePath());
+        IcingSearchEngine icingSearchEngine = new IcingSearchEngine(options);
+        // the bit mask for only enable launch VM feature.
+        int onlyLaunchVMFeature = 1;
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                mUnlimitedConfig,
+                initStatsBuilder,
+                /*visibilityChecker=*/ null,
+                /*revocableFileDescriptorStore=*/ null,
+                icingSearchEngine,
+                ALWAYS_OPTIMIZE);
+
+        // Initialization and check initStats
+        InitializeStats initStats = initStatsBuilder.build();
+        assertThat(initStats.getEnabledFeatures()).isEqualTo(onlyLaunchVMFeature);
+
+        // Set a schema and check SetSchemaStats
+        List<AppSearchSchema> schemas =
+                Collections.singletonList(new AppSearchSchema.Builder("type").build());
+        SetSchemaStats.Builder setSchemaStatsBuilder = new SetSchemaStats.Builder(
+                "package", "database");
+        InternalSetSchemaResponse internalSetSchemaResponse = mAppSearchImpl.setSchema(
+                "package",
+                "database",
+                schemas,
+                /*visibilityConfigs=*/ Collections.emptyList(),
+                /*forceOverride=*/ false,
+                /*version=*/ 0,
+                setSchemaStatsBuilder);
+        assertThat(internalSetSchemaResponse.isSuccess()).isTrue();
+        SetSchemaStats setSchemaStats = setSchemaStatsBuilder.build();
+        assertThat(setSchemaStats.getEnabledFeatures()).isEqualTo(onlyLaunchVMFeature);
+
+        // Add documents and test putDocumentStats.
+        AppSearchLogger fakeLogger = new AppSearchLogger() {
+            @Override
+            public void logStats(@NonNull PutDocumentStats stats) {
+                assertThat(stats.getEnabledFeatures()).isEqualTo(onlyLaunchVMFeature);
+            }
+
+            @Override
+            public void logStats(@NonNull SearchStats stats) {
+                assertThat(stats.getEnabledFeatures()).isEqualTo(onlyLaunchVMFeature);
+            }
+        };
+        GenericDocument document =
+                new GenericDocument.Builder<>("namespace1", "id1", "type").build();
+        mAppSearchImpl.putDocument(
+                "package",
+                "database",
+                document,
+                /*sendChangeNotifications=*/ false,
+                fakeLogger);
+
+        mAppSearchImpl.query(
+                "package", "database", "",
+                new SearchSpec.Builder().build(), fakeLogger);
+
+        // Delete the document and check remove stats
+        RemoveStats.Builder removeStatsBuilder = new RemoveStats.Builder(
+                "package", "database");
+        mAppSearchImpl.removeByQuery("package", "database", "",
+                new SearchSpec.Builder().addFilterNamespaces("namespace1").setTermMatch(
+                        SearchSpec.TERM_MATCH_EXACT_ONLY).build(), removeStatsBuilder);
+        RemoveStats removeStats = removeStatsBuilder.build();
+        assertThat(removeStats.getEnabledFeatures()).isEqualTo(onlyLaunchVMFeature);
+
+        // Trigger optimize and check optimize stats
+        OptimizeStats.Builder optimizeStatsBuilder = new OptimizeStats.Builder();
+        mAppSearchImpl.optimize(optimizeStatsBuilder);
+        OptimizeStats optimizeStats = optimizeStatsBuilder.build();
+        assertThat(optimizeStats.getEnabledFeatures()).isEqualTo(onlyLaunchVMFeature);
+    }
+
+    @Test
+    public void testStatsIsNotLaunchAegis() throws Exception {
+        InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
+        // the bit mask for nothing enabled feature.
+        int noLaunchFeature = 0;
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                mUnlimitedConfig,
+                initStatsBuilder,
+                /*visibilityChecker=*/ null,
+                /*revocableFileDescriptorStore=*/ null,
+                /*icingSearchEngine=*/ null,
+                ALWAYS_OPTIMIZE);
+
+        // Initialization and check initStats
+        InitializeStats initStats = initStatsBuilder.build();
+        assertThat(initStats.getEnabledFeatures()).isEqualTo(noLaunchFeature);
+
+        // Set a schema and check SetSchemaStats
+        List<AppSearchSchema> schemas =
+                Collections.singletonList(new AppSearchSchema.Builder("type").build());
+        SetSchemaStats.Builder setSchemaStatsBuilder = new SetSchemaStats.Builder(
+                "package", "database");
+        InternalSetSchemaResponse internalSetSchemaResponse = mAppSearchImpl.setSchema(
+                "package",
+                "database",
+                schemas,
+                /*visibilityConfigs=*/ Collections.emptyList(),
+                /*forceOverride=*/ false,
+                /*version=*/ 0,
+                setSchemaStatsBuilder);
+        assertThat(internalSetSchemaResponse.isSuccess()).isTrue();
+        SetSchemaStats setSchemaStats = setSchemaStatsBuilder.build();
+        assertThat(setSchemaStats.getEnabledFeatures()).isEqualTo(noLaunchFeature);
+
+        // Add documents and test putDocumentStats.
+        AppSearchLogger fakeLogger = new AppSearchLogger() {
+            @Override
+            public void logStats(@NonNull PutDocumentStats stats) {
+                assertThat(stats.getEnabledFeatures()).isEqualTo(noLaunchFeature);
+            }
+
+            @Override
+            public void logStats(@NonNull SearchStats stats) {
+                assertThat(stats.getEnabledFeatures()).isEqualTo(noLaunchFeature);
+            }
+        };
+        GenericDocument document =
+                new GenericDocument.Builder<>("namespace1", "id1", "type").build();
+        mAppSearchImpl.putDocument(
+                "package",
+                "database",
+                document,
+                /*sendChangeNotifications=*/ false,
+                fakeLogger);
+
+        mAppSearchImpl.query(
+                "package", "database", "",
+                new SearchSpec.Builder().build(), fakeLogger);
+
+        // Delete the document and check remove stats
+        RemoveStats.Builder removeStatsBuilder = new RemoveStats.Builder(
+                "package", "database");
+        mAppSearchImpl.removeByQuery("package", "database", "",
+                new SearchSpec.Builder().addFilterNamespaces("namespace1").setTermMatch(
+                        SearchSpec.TERM_MATCH_EXACT_ONLY).build(), removeStatsBuilder);
+        RemoveStats removeStats = removeStatsBuilder.build();
+        assertThat(removeStats.getEnabledFeatures()).isEqualTo(noLaunchFeature);
+
+        // Trigger optimize and check optimize stats
+        OptimizeStats.Builder optimizeStatsBuilder = new OptimizeStats.Builder();
+        mAppSearchImpl.optimize(optimizeStatsBuilder);
+        OptimizeStats optimizeStats = optimizeStatsBuilder.build();
+        assertThat(optimizeStats.getEnabledFeatures()).isEqualTo(noLaunchFeature);
     }
 
     @Test
