@@ -207,6 +207,7 @@ public final class AppSearchImpl implements Closeable {
     @GuardedBy("mReadWriteLock")
     @VisibleForTesting
     final IcingSearchEngineInterface mIcingSearchEngineLocked;
+    private final boolean mIsAegisEnabled;
 
     @GuardedBy("mReadWriteLock")
     private final SchemaCache mSchemaCacheLocked = new SchemaCache();
@@ -337,8 +338,10 @@ public final class AppSearchImpl implements Closeable {
                         TAG,
                         "Constructing IcingSearchEngine, response",
                         ObjectsCompat.hashCode(mIcingSearchEngineLocked));
+                mIsAegisEnabled = false;
             } else {
                 mIcingSearchEngineLocked = icingSearchEngine;
+                mIsAegisEnabled = true;
             }
 
             // The core initialization procedure. If any part of this fails, we bail into
@@ -357,7 +360,8 @@ public final class AppSearchImpl implements Closeable {
                             .setStatusCode(
                                     statusProtoToResultCode(initializeResultProto.getStatus()))
                             // TODO(b/173532925) how to get DeSyncs value
-                            .setHasDeSync(false);
+                            .setHasDeSync(false)
+                            .setLaunchVMEnabled(mIsAegisEnabled);
                     AppSearchLoggerHelper.copyNativeStats(
                             initializeResultProto.getInitializeStats(), initStatsBuilder);
                 }
@@ -565,7 +569,8 @@ public final class AppSearchImpl implements Closeable {
             if (setSchemaStatsBuilder != null) {
                 setSchemaStatsBuilder.setJavaLockAcquisitionLatencyMillis(
                         (int) (SystemClock.elapsedRealtime()
-                                - javaLockAcquisitionLatencyStartMillis));
+                                - javaLockAcquisitionLatencyStartMillis))
+                        .setLaunchVMEnabled(mIsAegisEnabled);
             }
             if (mObserverManager.isPackageObserved(packageName)) {
                 return doSetSchemaWithChangeNotificationLocked(
@@ -1256,7 +1261,8 @@ public final class AppSearchImpl implements Closeable {
             throws AppSearchException {
         PutDocumentStats.Builder pStatsBuilder = null;
         if (logger != null) {
-            pStatsBuilder = new PutDocumentStats.Builder(packageName, databaseName);
+            pStatsBuilder = new PutDocumentStats.Builder(packageName, databaseName)
+                    .setLaunchVMEnabled(mIsAegisEnabled);
         }
         long totalStartTimeMillis = SystemClock.elapsedRealtime();
 
@@ -1931,7 +1937,8 @@ public final class AppSearchImpl implements Closeable {
             sStatsBuilder =
                     new SearchStats.Builder(SearchStats.VISIBILITY_SCOPE_LOCAL, packageName)
                             .setDatabase(databaseName)
-                            .setSearchSourceLogTag(searchSpec.getSearchSourceLogTag());
+                            .setSearchSourceLogTag(searchSpec.getSearchSourceLogTag())
+                            .setLaunchVMEnabled(mIsAegisEnabled);
         }
 
         long javaLockAcquisitionLatencyStartMillis = SystemClock.elapsedRealtime();
@@ -2007,7 +2014,8 @@ public final class AppSearchImpl implements Closeable {
                     new SearchStats.Builder(
                             SearchStats.VISIBILITY_SCOPE_GLOBAL,
                             callerAccess.getCallingPackageName())
-                            .setSearchSourceLogTag(searchSpec.getSearchSourceLogTag());
+                            .setSearchSourceLogTag(searchSpec.getSearchSourceLogTag())
+                            .setLaunchVMEnabled(mIsAegisEnabled);
         }
 
         long javaLockAcquisitionLatencyStartMillis = SystemClock.elapsedRealtime();
@@ -2270,7 +2278,8 @@ public final class AppSearchImpl implements Closeable {
             if (sStatsBuilder != null) {
                 sStatsBuilder.setJavaLockAcquisitionLatencyMillis(
                         (int) (SystemClock.elapsedRealtime()
-                                - javaLockAcquisitionLatencyStartMillis));
+                                - javaLockAcquisitionLatencyStartMillis))
+                        .setLaunchVMEnabled(mIsAegisEnabled);
             }
             throwIfClosedLocked();
 
@@ -2446,7 +2455,8 @@ public final class AppSearchImpl implements Closeable {
 
             if (removeStatsBuilder != null) {
                 removeStatsBuilder.setStatusCode(statusProtoToResultCode(
-                        deleteResultProto.getStatus()));
+                        deleteResultProto.getStatus()))
+                        .setLaunchVMEnabled(mIsAegisEnabled);
                 AppSearchLoggerHelper.copyNativeStats(deleteResultProto.getDeleteStats(),
                         removeStatsBuilder);
             }
@@ -2553,7 +2563,8 @@ public final class AppSearchImpl implements Closeable {
             mReadWriteLock.writeLock().unlock();
             if (removeStatsBuilder != null) {
                 removeStatsBuilder.setTotalLatencyMillis(
-                        (int) (SystemClock.elapsedRealtime() - totalLatencyStartTimeMillis));
+                        (int) (SystemClock.elapsedRealtime() - totalLatencyStartTimeMillis))
+                        .setLaunchVMEnabled(mIsAegisEnabled);
             }
         }
     }
@@ -3429,7 +3440,8 @@ public final class AppSearchImpl implements Closeable {
                     TAG,
                     "optimize, response", optimizeResultProto.getStatus(), optimizeResultProto);
             if (builder != null) {
-                builder.setStatusCode(statusProtoToResultCode(optimizeResultProto.getStatus()));
+                builder.setStatusCode(statusProtoToResultCode(optimizeResultProto.getStatus()))
+                        .setLaunchVMEnabled(mIsAegisEnabled);
                 AppSearchLoggerHelper.copyNativeStats(optimizeResultProto.getOptimizeStats(),
                         builder);
             }
