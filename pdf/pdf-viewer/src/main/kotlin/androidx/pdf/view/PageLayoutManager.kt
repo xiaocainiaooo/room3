@@ -45,7 +45,6 @@ import kotlinx.coroutines.withContext
 internal class PageLayoutManager(
     private val pdfDocument: PdfDocument,
     private val backgroundScope: CoroutineScope,
-    private val pagePrefetchRadius: Int,
     // TODO(b/376299551) - Make page margin configurable via XML attribute
     pageSpacingPx: Int = DEFAULT_PAGE_SPACING_PX,
     internal val paginationModel: PaginationModel =
@@ -104,7 +103,7 @@ internal class PageLayoutManager(
             }
         }
 
-        increaseReach(pagePrefetchRadius - 1)
+        increaseReach(DEFAULT_PREFETCH_RADIUS)
     }
 
     /**
@@ -199,13 +198,16 @@ internal class PageLayoutManager(
             _fullyVisiblePages.tryEmit(fullyVisiblePageRange.pages)
         }
 
-        if (prevVisiblePages != newVisiblePages) {
+        if (prevVisiblePages != newVisiblePages || newVisiblePages.layoutInProgress) {
             _visiblePages.tryEmit(newVisiblePages)
+            val peekAhead =
+                if (newVisiblePages.layoutInProgress) {
+                    minOf(newVisiblePages.pages.upper + 2, 100)
+                } else {
+                    DEFAULT_PREFETCH_RADIUS
+                }
             increaseReach(
-                minOf(
-                    newVisiblePages.pages.upper + pagePrefetchRadius,
-                    paginationModel.numPages - 1
-                )
+                minOf(newVisiblePages.pages.upper + peekAhead, paginationModel.numPages - 1)
             )
         }
     }
@@ -238,7 +240,7 @@ internal class PageLayoutManager(
     }
 
     companion object {
-        private const val DEFAULT_PAGE_SPACING_PX: Int = 20
-        private const val INVALID_ID = -1
+        internal const val DEFAULT_PREFETCH_RADIUS = 4
+        private const val DEFAULT_PAGE_SPACING_PX = 20
     }
 }

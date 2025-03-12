@@ -343,10 +343,18 @@ internal class TileBoardRequestHandle(
 /** Represents the [Bitmap] or [Bitmap]s used to render this page */
 internal sealed interface PageContents {
     val bitmapScale: Float
+
+    val needsWhiteBackground: Boolean
 }
 
 /** A singular [Bitmap] depicting the full page, when full page rendering is used */
-internal class FullPageBitmap(val bitmap: Bitmap, override val bitmapScale: Float) : PageContents
+internal class FullPageBitmap(val bitmap: Bitmap, override val bitmapScale: Float) : PageContents {
+    /**
+     * A [FullPageBitmap] never requires a white background, as we don't instantiate one without a
+     * [Bitmap] covering the whole page
+     */
+    override val needsWhiteBackground: Boolean = false
+}
 
 /**
  * A set of [Bitmap]s that depict the full page as a rectangular grid of individual bitmap tiles.
@@ -371,6 +379,13 @@ internal class TileBoard(
 
     /** The [Tile]s in this board */
     val tiles = Array(numRows * numCols) { index -> Tile(index) }
+
+    /**
+     * We need to draw a white background behind a [androidx.pdf.view.TileBoard] until we have a
+     * background [Bitmap] covering the full page
+     */
+    override val needsWhiteBackground: Boolean
+        get() = fullPageBitmap == null
 
     /** An individual [Tile] in this [TileBoard] */
     inner class Tile(val index: Int) {
