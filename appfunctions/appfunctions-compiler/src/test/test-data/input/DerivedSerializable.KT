@@ -8,14 +8,15 @@ public interface AppFunctionOpenable {
     public val stringToOpen: String
 }
 
-@AppFunctionSerializable
-open class StringBaseSerializable(override val stringToOpen: String) : AppFunctionOpenable {}
+public interface OpenableResponse : AppFunctionOpenable {
+    override val stringToOpen: String
+}
 
 @AppFunctionSerializable
 open class LongBaseSerializable(
     open val age: Long,
     override val stringToOpen: String,
-) : StringBaseSerializable(stringToOpen) {}
+) : OpenableResponse {}
 
 @AppFunctionSerializable
 class DerivedSerializable(

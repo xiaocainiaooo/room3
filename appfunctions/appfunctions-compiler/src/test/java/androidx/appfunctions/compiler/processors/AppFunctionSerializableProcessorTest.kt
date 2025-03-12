@@ -78,11 +78,6 @@ class AppFunctionSerializableProcessorTest {
         )
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "\$StringBaseSerializableFactory.kt",
-            goldenFileName = "\$StringBaseSerializableFactory.KT"
-        )
-        compilationTestHelper.assertSuccessWithSourceContent(
-            report = report,
             expectGeneratedSourceFileName = "\$LongBaseSerializableFactory.kt",
             goldenFileName = "\$LongBaseSerializableFactory.KT"
         )
