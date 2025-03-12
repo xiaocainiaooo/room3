@@ -124,7 +124,7 @@ internal enum class TextContextMenuItems(val key: Any, val stringId: Int, val dr
     Cut(
         key = TextContextMenuKeys.CutKey,
         stringId = android.R.string.cut,
-        drawableId = android.R.attr.actionModeCopyDrawable
+        drawableId = android.R.attr.actionModeCutDrawable
     ),
     Copy(
         key = TextContextMenuKeys.CopyKey,
