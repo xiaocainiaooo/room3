@@ -144,6 +144,13 @@ public class BiometricManager {
      * @see BiometricPrompt.PromptInfo.Builder#setAllowedAuthenticators(int)
      */
     public interface Authenticators {
+
+        /**
+         * Placeholder for the theoretical strongest biometric security tier.
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        int BIOMETRIC_MAX_STRENGTH = 0x0001;
+
         /**
          * Any biometric (e.g. fingerprint, iris, or face) on the device that meets or exceeds the
          * requirements for <strong>Class 3</strong> (formerly <strong>Strong</strong>), as defined
@@ -160,6 +167,12 @@ public class BiometricManager {
          * {@code BIOMETRIC_STRONG | BIOMETRIC_WEAK == BIOMETRIC_WEAK}.
          */
         int BIOMETRIC_WEAK = 0x00FF;
+
+        /**
+         * Placeholder for the theoretical weakest biometric security tier.
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        int BIOMETRIC_MIN_STRENGTH = 0x7FFF;
 
         /**
          * The non-biometric credential used to secure the device (i.e. PIN, pattern, or password).
