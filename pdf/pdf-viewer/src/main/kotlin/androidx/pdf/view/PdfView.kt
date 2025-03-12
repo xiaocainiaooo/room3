@@ -316,6 +316,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var gestureInProgress = false
     private var isScrollReleased = false
 
+    // True if the zoom was calculated before the layouting completed and needs to be recalculated
+    private var pendingZoomRecalculation = false
+
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
      *
@@ -572,25 +575,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        if (changed || awaitingFirstLayout) {
-            val positionToRestore = scrollPositionToRestore
-            if (positionToRestore != null) {
-                var resolvedZoom =
-                    if (zoomToRestore != null && zoomToRestore != DEFAULT_INIT_ZOOM) zoomToRestore!!
-                    else zoom
-                resolvedZoom = resolvedZoom * (width.toFloat() / (oldWidth ?: contentWidth))
-                val clampedZoom = MathUtils.clamp(resolvedZoom, minZoom, maxZoom)
-                this.zoom = clampedZoom
-                scrollToRestoredPosition(positionToRestore, clampedZoom)
-                scrollPositionToRestore = null
-                zoomToRestore = DEFAULT_INIT_ZOOM
-            }
-            awaitingFirstLayout = false
+        if (pendingZoomRecalculation) {
+            this.zoom = getDefaultZoom()
+            pendingZoomRecalculation = false
         }
 
-        if (changed) {
-            oldWidth = width
+        val positionToRestore = scrollPositionToRestore
+        if (changed && awaitingFirstLayout && positionToRestore != null) {
+            var resolvedZoom =
+                if (zoomToRestore != null && zoomToRestore != DEFAULT_INIT_ZOOM) zoomToRestore!!
+                else zoom
+            resolvedZoom = resolvedZoom * (width.toFloat() / (oldWidth ?: contentWidth))
+            val clampedZoom = MathUtils.clamp(resolvedZoom, minZoom, maxZoom)
+            this.zoom = clampedZoom
+            scrollToRestoredPosition(positionToRestore, clampedZoom)
+            scrollPositionToRestore = null
+            zoomToRestore = DEFAULT_INIT_ZOOM
         }
+
+        awaitingFirstLayout = false
     }
 
     override fun onAttachedToWindow() {
@@ -715,7 +718,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     @VisibleForTesting
     internal fun getDefaultZoom(): Float {
-        if (contentWidth == 0 || viewportWidth == 0) return DEFAULT_INIT_ZOOM
+        if (contentWidth == 0 || viewportWidth == 0) {
+            if (awaitingFirstLayout) pendingZoomRecalculation = true
+            return DEFAULT_INIT_ZOOM
+        }
         val widthZoom = viewportWidth.toFloat() / contentWidth
         return MathUtils.clamp(widthZoom, minZoom, maxZoom)
     }
