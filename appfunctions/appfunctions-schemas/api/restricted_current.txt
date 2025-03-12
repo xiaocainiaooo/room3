@@ -8,3 +8,83 @@ package androidx.appfunctions {
 
 }
 
+package androidx.appfunctions.schema.files {
+
+  public interface AppFunctionFile {
+    method public String getId();
+    method public String getName();
+    property public abstract String id;
+    property public abstract String name;
+  }
+
+  public final class FilesKt {
+    property public static String APP_FUNCTION_SCHEMA_CATEGORY_FILES;
+    field public static final String APP_FUNCTION_SCHEMA_CATEGORY_FILES = "files";
+  }
+
+  public interface FindFilesAppFunction<Parameters extends androidx.appfunctions.schema.files.FindFilesAppFunction.Parameters, Response extends androidx.appfunctions.schema.files.FindFilesAppFunction.Response> {
+    method public suspend Object? findFiles(androidx.appfunctions.AppFunctionContext appFunctionContext, Parameters params, kotlin.coroutines.Continuation<? super Response>);
+    field public static final androidx.appfunctions.schema.files.FindFilesAppFunction.Companion Companion;
+    field public static final int SCHEMA_VERSION = 2; // 0x2
+  }
+
+  public static final class FindFilesAppFunction.Companion {
+    property public static int SCHEMA_VERSION;
+    field public static final int SCHEMA_VERSION = 2; // 0x2
+  }
+
+  public static interface FindFilesAppFunction.Parameters {
+    method public default java.util.List<java.lang.String> getFileTypes();
+    method public default String? getQuery();
+    property public default java.util.List<java.lang.String> fileTypes;
+    property public default String? query;
+  }
+
+  public static interface FindFilesAppFunction.Response {
+    method public java.util.List<androidx.appfunctions.schema.files.AppFunctionFile> getFiles();
+    property public abstract java.util.List<androidx.appfunctions.schema.files.AppFunctionFile> files;
+  }
+
+  public interface GetFileContentUrisAppFunction<Parameters extends androidx.appfunctions.schema.files.GetFileContentUrisAppFunction.Parameters, Response extends androidx.appfunctions.schema.files.GetFileContentUrisAppFunction.Response> {
+    method public suspend Object? getFileContentUris(androidx.appfunctions.AppFunctionContext appFunctionContext, Parameters params, kotlin.coroutines.Continuation<? super Response>);
+    field public static final androidx.appfunctions.schema.files.GetFileContentUrisAppFunction.Companion Companion;
+    field public static final int SCHEMA_VERSION = 2; // 0x2
+  }
+
+  public static final class GetFileContentUrisAppFunction.Companion {
+    property public static int SCHEMA_VERSION;
+    field public static final int SCHEMA_VERSION = 2; // 0x2
+  }
+
+  public static interface GetFileContentUrisAppFunction.FileContentUri {
+    method public String getId();
+    method public androidx.appfunctions.schema.types.AppFunctionUri getUri();
+    property public abstract String id;
+    property public abstract androidx.appfunctions.schema.types.AppFunctionUri uri;
+  }
+
+  public static interface GetFileContentUrisAppFunction.Parameters {
+    method public java.util.List<java.lang.String> getFileIds();
+    property public abstract java.util.List<java.lang.String> fileIds;
+  }
+
+  public static interface GetFileContentUrisAppFunction.Response {
+    method public java.util.List<androidx.appfunctions.schema.files.GetFileContentUrisAppFunction.FileContentUri> getFileContentUris();
+    property public abstract java.util.List<androidx.appfunctions.schema.files.GetFileContentUrisAppFunction.FileContentUri> fileContentUris;
+  }
+
+}
+
+package androidx.appfunctions.schema.types {
+
+  @androidx.appfunctions.AppFunctionSerializable public final class AppFunctionUri {
+    ctor public AppFunctionUri(android.net.Uri uri);
+    ctor public AppFunctionUri(String value);
+    method public android.net.Uri getUri();
+    method public String getValue();
+    property public android.net.Uri uri;
+    property public String value;
+  }
+
+}
+
