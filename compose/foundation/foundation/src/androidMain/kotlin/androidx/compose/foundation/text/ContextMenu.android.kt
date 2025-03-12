@@ -18,6 +18,8 @@ package androidx.compose.foundation.text
 
 import android.content.res.Resources
 import android.os.Build
+import androidx.compose.foundation.ComposeFoundationFlags
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.R
 import androidx.compose.foundation.contextmenu.ContextMenuScope
 import androidx.compose.foundation.contextmenu.ContextMenuState
@@ -25,6 +27,8 @@ import androidx.compose.foundation.contextmenu.close
 import androidx.compose.foundation.text.contextmenu.builder.TextContextMenuBuilderScope
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuKeys
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuSession
+import androidx.compose.foundation.text.contextmenu.internal.ProvideDefaultTextContextMenuDropdown
+import androidx.compose.foundation.text.contextmenu.modifier.textContextMenuGestures
 import androidx.compose.foundation.text.input.internal.selection.TextFieldSelectionState
 import androidx.compose.foundation.text.input.internal.selection.contextMenuBuilder
 import androidx.compose.foundation.text.selection.SelectionManager
@@ -35,82 +39,114 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal actual fun ContextMenuArea(
     manager: TextFieldSelectionManager,
     content: @Composable () -> Unit
 ) {
-    val state = remember { ContextMenuState() }
-    val coroutineScope = rememberCoroutineScope()
-    val menuItemsAvailability = remember { mutableStateOf(MenuItemsAvailability.None) }
-
-    androidx.compose.foundation.contextmenu.ContextMenuArea(
-        state = state,
-        onDismiss = { state.close() },
-        contextMenuBuilderBlock = manager.contextMenuBuilder(state, menuItemsAvailability),
-        enabled = manager.enabled,
-        onOpenGesture = {
-            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                menuItemsAvailability.value = manager.getContextMenuItemsAvailability()
+    if (ComposeFoundationFlags.isNewContextMenuEnabled) {
+        val modifier =
+            if (manager.enabled) {
+                Modifier.textContextMenuGestures(
+                    onPreShowContextMenu = { manager.updateClipboardEntry() }
+                )
+            } else {
+                Modifier
             }
-        },
-        content = content,
-    )
+        ProvideDefaultTextContextMenuDropdown(modifier, content)
+    } else {
+        val state = remember { ContextMenuState() }
+        val coroutineScope = rememberCoroutineScope()
+        val menuItemsAvailability = remember { mutableStateOf(MenuItemsAvailability.None) }
+
+        androidx.compose.foundation.contextmenu.ContextMenuArea(
+            state = state,
+            onDismiss = { state.close() },
+            contextMenuBuilderBlock = manager.contextMenuBuilder(state, menuItemsAvailability),
+            enabled = manager.enabled,
+            onOpenGesture = {
+                coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    menuItemsAvailability.value = manager.getContextMenuItemsAvailability()
+                }
+            },
+            content = content,
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal actual fun ContextMenuArea(
     selectionState: TextFieldSelectionState,
     enabled: Boolean,
     content: @Composable () -> Unit
 ) {
-    val state = remember { ContextMenuState() }
-    val coroutineScope = rememberCoroutineScope()
-    val menuItemsAvailability = remember { mutableStateOf(MenuItemsAvailability.None) }
-    val menuBuilder =
-        selectionState.contextMenuBuilder(
-            state = state,
-            itemsAvailability = menuItemsAvailability,
-            onMenuItemClicked = { item ->
-                coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    when (item) {
-                        TextContextMenuItems.Cut -> cut()
-                        TextContextMenuItems.Copy -> copy(false)
-                        TextContextMenuItems.Paste -> paste()
-                        TextContextMenuItems.SelectAll -> selectAll()
-                        TextContextMenuItems.Autofill -> autofill()
+    if (ComposeFoundationFlags.isNewContextMenuEnabled) {
+        val modifier =
+            if (enabled) {
+                Modifier.textContextMenuGestures(
+                    onPreShowContextMenu = { selectionState.updateClipboardEntry() }
+                )
+            } else {
+                Modifier
+            }
+        ProvideDefaultTextContextMenuDropdown(modifier, content)
+    } else {
+        val state = remember { ContextMenuState() }
+        val coroutineScope = rememberCoroutineScope()
+        val menuItemsAvailability = remember { mutableStateOf(MenuItemsAvailability.None) }
+        val menuBuilder =
+            selectionState.contextMenuBuilder(
+                state = state,
+                itemsAvailability = menuItemsAvailability,
+                onMenuItemClicked = { item ->
+                    coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                        when (item) {
+                            TextContextMenuItems.Cut -> cut()
+                            TextContextMenuItems.Copy -> copy(false)
+                            TextContextMenuItems.Paste -> paste()
+                            TextContextMenuItems.SelectAll -> selectAll()
+                            TextContextMenuItems.Autofill -> autofill()
+                        }
                     }
                 }
-            }
-        )
+            )
 
-    androidx.compose.foundation.contextmenu.ContextMenuArea(
-        state = state,
-        onDismiss = { state.close() },
-        contextMenuBuilderBlock = menuBuilder,
-        enabled = enabled,
-        onOpenGesture = {
-            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                menuItemsAvailability.value = selectionState.getContextMenuItemsAvailability()
-            }
-        },
-        content = content,
-    )
+        androidx.compose.foundation.contextmenu.ContextMenuArea(
+            state = state,
+            onDismiss = { state.close() },
+            contextMenuBuilderBlock = menuBuilder,
+            enabled = enabled,
+            onOpenGesture = {
+                coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    menuItemsAvailability.value = selectionState.getContextMenuItemsAvailability()
+                }
+            },
+            content = content,
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal actual fun ContextMenuArea(manager: SelectionManager, content: @Composable () -> Unit) {
-    val state = remember { ContextMenuState() }
-    androidx.compose.foundation.contextmenu.ContextMenuArea(
-        state = state,
-        onDismiss = { state.close() },
-        contextMenuBuilderBlock = manager.contextMenuBuilder(state),
-        content = content,
-    )
+    if (ComposeFoundationFlags.isNewContextMenuEnabled) {
+        ProvideDefaultTextContextMenuDropdown(Modifier.textContextMenuGestures(), content)
+    } else {
+        val state = remember { ContextMenuState() }
+        androidx.compose.foundation.contextmenu.ContextMenuArea(
+            state = state,
+            onDismiss = { state.close() },
+            contextMenuBuilderBlock = manager.contextMenuBuilder(state),
+            content = content,
+        )
+    }
 }
 
 /**
