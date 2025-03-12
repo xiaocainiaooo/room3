@@ -122,7 +122,7 @@ AnimatedVisibility(visible = false) {
 Used when typical API interactions involve a developer producing a state-object
 in composition.
 
-If the followiwng criteria are met a composable factory MAY be used for APIs
+If the following criteria are met a composable factory MAY be used for APIs
 where a state object is required as a parameter to a composable or modifier and
 it is *likely* to be created at the call-site.
 
