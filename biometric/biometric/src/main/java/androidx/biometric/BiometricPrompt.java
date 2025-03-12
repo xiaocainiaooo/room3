@@ -168,6 +168,12 @@ public class BiometricPrompt {
     public static final int ERROR_SECURITY_UPDATE_REQUIRED = 15;
 
     /**
+     * The privacy setting has been enabled and will block use of the sensor.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int ERROR_SENSOR_PRIVACY_ENABLED = 18;
+
+    /**
      * Identity Check is currently not active.
      *
      * This device either doesn't have this feature enabled, or it's not considered in a
@@ -208,6 +214,8 @@ public class BiometricPrompt {
         ERROR_HW_NOT_PRESENT,
         ERROR_NEGATIVE_BUTTON,
         ERROR_NO_DEVICE_CREDENTIAL,
+        ERROR_SECURITY_UPDATE_REQUIRED,
+        ERROR_SENSOR_PRIVACY_ENABLED,
         ERROR_IDENTITY_CHECK_NOT_ACTIVE,
         ERROR_NOT_ENABLED_FOR_APPS,
         ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON
