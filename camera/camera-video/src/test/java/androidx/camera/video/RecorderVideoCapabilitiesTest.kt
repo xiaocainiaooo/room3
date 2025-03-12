@@ -43,26 +43,31 @@ import androidx.camera.core.impl.ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FOR
 import androidx.camera.testing.fakes.FakeCameraInfoInternal
 import androidx.camera.testing.impl.EncoderProfilesUtil.PROFILES_2160P
 import androidx.camera.testing.impl.EncoderProfilesUtil.PROFILES_720P
-import androidx.camera.testing.impl.EncoderProfilesUtil.PROFILES_HIGH_SPEED_2160P
-import androidx.camera.testing.impl.EncoderProfilesUtil.PROFILES_HIGH_SPEED_720P
-import androidx.camera.testing.impl.EncoderProfilesUtil.PROFILES_HIGH_SPEED_SDR_HLG_2160P
-import androidx.camera.testing.impl.EncoderProfilesUtil.PROFILES_HIGH_SPEED_SDR_HLG_720P
 import androidx.camera.testing.impl.EncoderProfilesUtil.RESOLUTION_1080P
 import androidx.camera.testing.impl.EncoderProfilesUtil.RESOLUTION_2160P
 import androidx.camera.testing.impl.EncoderProfilesUtil.RESOLUTION_480P
 import androidx.camera.testing.impl.EncoderProfilesUtil.RESOLUTION_720P
+import androidx.camera.testing.impl.EncoderProfilesUtil.createFakeHighSpeedEncoderProfilesProxy
+import androidx.camera.testing.impl.FrameRateUtil.FPS_120_120
+import androidx.camera.testing.impl.FrameRateUtil.FPS_240
+import androidx.camera.testing.impl.FrameRateUtil.FPS_240_240
+import androidx.camera.testing.impl.FrameRateUtil.FPS_30_120
+import androidx.camera.testing.impl.FrameRateUtil.FPS_30_240
+import androidx.camera.testing.impl.FrameRateUtil.FPS_30_480
+import androidx.camera.testing.impl.FrameRateUtil.FPS_480
+import androidx.camera.testing.impl.FrameRateUtil.FPS_480_480
 import androidx.camera.testing.impl.fakes.FakeEncoderProfilesProvider
 import androidx.camera.testing.impl.fakes.FakeVideoEncoderInfo
 import androidx.camera.video.Quality.FHD
 import androidx.camera.video.Quality.HD
 import androidx.camera.video.Quality.HIGHEST
 import androidx.camera.video.Quality.LOWEST
-import androidx.camera.video.Quality.QUALITY_SOURCE_HIGH_SPEED
-import androidx.camera.video.Quality.QUALITY_SOURCE_REGULAR
 import androidx.camera.video.Quality.SD
 import androidx.camera.video.Quality.UHD
 import androidx.camera.video.Recorder.VIDEO_CAPABILITIES_SOURCE_CAMCORDER_PROFILE
 import androidx.camera.video.Recorder.VIDEO_CAPABILITIES_SOURCE_CODEC_CAPABILITIES
+import androidx.camera.video.Recorder.VIDEO_RECORDING_TYPE_HIGH_SPEED
+import androidx.camera.video.Recorder.VIDEO_RECORDING_TYPE_REGULAR
 import androidx.camera.video.internal.VideoValidatedEncoderProfilesProxy
 import androidx.core.util.component1
 import androidx.core.util.component2
@@ -82,26 +87,38 @@ private val DOLBY_VISION_UNSPECIFIED = DynamicRange(ENCODING_DOLBY_VISION, BIT_D
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @DoNotInstrument
 @Config(minSdk = Build.VERSION_CODES.LOLLIPOP)
-class RecorderVideoCapabilitiesTest(private val qualitySource: Int) {
+class RecorderVideoCapabilitiesTest(private val videoCaptureType: Int) {
 
     companion object {
         @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(name = "isHighSpeed={0}")
-        fun data() = listOf(arrayOf(QUALITY_SOURCE_REGULAR), arrayOf(QUALITY_SOURCE_HIGH_SPEED))
+        @ParameterizedRobolectricTestRunner.Parameters(name = "videoCaptureType={0}")
+        fun data() =
+            listOf(arrayOf(VIDEO_RECORDING_TYPE_REGULAR), arrayOf(VIDEO_RECORDING_TYPE_HIGH_SPEED))
     }
+
+    private val isHighSpeed = videoCaptureType == VIDEO_RECORDING_TYPE_HIGH_SPEED
 
     private val defaultProfilesProvider =
         FakeEncoderProfilesProvider.Builder()
             .apply {
-                if (qualitySource == QUALITY_SOURCE_HIGH_SPEED) {
+                if (isHighSpeed) {
+                        val profile2160p240fpsSdrHlg =
+                            createFakeHighSpeedEncoderProfilesProxy(
+                                RESOLUTION_2160P,
+                                videoFrameRate = FPS_240,
+                                dynamicRanges = setOf(SDR, HLG_10_BIT)
+                            )
+                        val profile720p480fpsSdrHlg =
+                            createFakeHighSpeedEncoderProfilesProxy(
+                                RESOLUTION_720P,
+                                videoFrameRate = FPS_480,
+                                dynamicRanges = setOf(SDR, HLG_10_BIT)
+                            )
                         // Add the same profiles to support parameterized test.
-                        add(QUALITY_HIGH_SPEED_HIGH, PROFILES_HIGH_SPEED_SDR_HLG_2160P)
-                        add(
-                            QUALITY_HIGH_SPEED_2160P,
-                            PROFILES_HIGH_SPEED_SDR_HLG_2160P
-                        ) // UHD (2160p)
-                        add(QUALITY_HIGH_SPEED_720P, PROFILES_HIGH_SPEED_SDR_HLG_720P) // HD (720p)
-                        add(QUALITY_HIGH_SPEED_LOW, PROFILES_HIGH_SPEED_SDR_HLG_720P)
+                        add(QUALITY_HIGH_SPEED_HIGH, profile2160p240fpsSdrHlg)
+                        add(QUALITY_HIGH_SPEED_2160P, profile2160p240fpsSdrHlg) // UHD (2160p)
+                        add(QUALITY_HIGH_SPEED_720P, profile720p480fpsSdrHlg) // HD (720p)
+                        add(QUALITY_HIGH_SPEED_LOW, profile720p480fpsSdrHlg)
                     } else {
                         // HLG profiles will be generated by BackupHdrProfileEncoderProfilesProvider
                         add(QUALITY_HIGH, PROFILES_2160P) // UHD (2160p) per above definition
@@ -115,29 +132,61 @@ class RecorderVideoCapabilitiesTest(private val qualitySource: Int) {
     private val defaultDynamicRanges = setOf(SDR, HLG_10_BIT)
     private val cameraInfo =
         FakeCameraInfoInternal().apply {
+            isHighSpeedSupported = isHighSpeed
             encoderProfilesProvider = defaultProfilesProvider
             supportedDynamicRanges = defaultDynamicRanges
             setSupportedResolutions(
                 INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE,
                 listOf(RESOLUTION_2160P, RESOLUTION_1080P, RESOLUTION_720P, RESOLUTION_480P)
             )
+            // 120 FPS -  2160P, 1080P, 720P, 480P
+            setSupportedHighSpeedResolutions(
+                FPS_30_120,
+                listOf(RESOLUTION_2160P, RESOLUTION_1080P, RESOLUTION_720P, RESOLUTION_480P)
+            )
+            setSupportedHighSpeedResolutions(
+                FPS_120_120,
+                listOf(RESOLUTION_2160P, RESOLUTION_1080P, RESOLUTION_720P, RESOLUTION_480P)
+            )
+            // 240 FPS - 2160P, 1080P, 720P, 480P
+            setSupportedHighSpeedResolutions(
+                FPS_30_240,
+                listOf(RESOLUTION_2160P, RESOLUTION_1080P, RESOLUTION_720P, RESOLUTION_480P)
+            )
+            setSupportedHighSpeedResolutions(
+                FPS_240_240,
+                listOf(RESOLUTION_2160P, RESOLUTION_1080P, RESOLUTION_720P, RESOLUTION_480P)
+            )
+            // 480 FPS - 720P, 480P
+            setSupportedHighSpeedResolutions(FPS_30_480, listOf(RESOLUTION_720P, RESOLUTION_480P))
+            setSupportedHighSpeedResolutions(FPS_480_480, listOf(RESOLUTION_720P, RESOLUTION_480P))
         }
     // Note: validated profiles only contain SDR profiles.
     private val validatedProfiles2160p =
         VideoValidatedEncoderProfilesProxy.from(
-            if (qualitySource == QUALITY_SOURCE_HIGH_SPEED) PROFILES_HIGH_SPEED_2160P
+            if (isHighSpeed)
+                createFakeHighSpeedEncoderProfilesProxy(
+                    RESOLUTION_2160P,
+                    videoFrameRate = FPS_240,
+                    dynamicRanges = setOf(SDR)
+                )
             else PROFILES_2160P
         )
     private val validatedProfiles720p =
         VideoValidatedEncoderProfilesProxy.from(
-            if (qualitySource == QUALITY_SOURCE_HIGH_SPEED) PROFILES_HIGH_SPEED_720P
+            if (isHighSpeed)
+                createFakeHighSpeedEncoderProfilesProxy(
+                    RESOLUTION_720P,
+                    videoFrameRate = FPS_480,
+                    dynamicRanges = setOf(SDR)
+                )
             else PROFILES_720P
         )
     private val videoCapabilities =
         RecorderVideoCapabilities(
             VIDEO_CAPABILITIES_SOURCE_CAMCORDER_PROFILE,
             cameraInfo,
-            qualitySource
+            videoCaptureType
         ) {
             FakeVideoEncoderInfo()
         }
@@ -354,19 +403,53 @@ class RecorderVideoCapabilitiesTest(private val qualitySource: Int) {
     }
 
     @Test
+    fun canGetHighSpeedSupportedFrameRateRanges() {
+        assumeTrue(isHighSpeed)
+
+        // UHD
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(UHD, SDR))
+            .containsExactly(FPS_120_120, FPS_240_240)
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(UHD, HLG_10_BIT))
+            .containsExactly(FPS_120_120, FPS_240_240)
+
+        // FHD
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(FHD, SDR)).isEmpty()
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(FHD, HLG_10_BIT)).isEmpty()
+
+        // HD
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(HD, SDR))
+            .containsExactly(FPS_120_120, FPS_240_240, FPS_480_480)
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(HD, HLG_10_BIT))
+            .containsExactly(FPS_120_120, FPS_240_240, FPS_480_480)
+
+        // SD
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(SD, SDR)).isEmpty()
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(SD, HLG_10_BIT)).isEmpty()
+
+        // HIGHEST is UHD
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(HIGHEST, SDR))
+            .containsExactly(FPS_120_120, FPS_240_240)
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(HIGHEST, HLG_10_BIT))
+            .containsExactly(FPS_120_120, FPS_240_240)
+
+        // LOWEST is HD
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(LOWEST, SDR))
+            .containsExactly(FPS_120_120, FPS_240_240, FPS_480_480)
+        assertThat(videoCapabilities.getSupportedFrameRateRanges(LOWEST, HLG_10_BIT))
+            .containsExactly(FPS_120_120, FPS_240_240, FPS_480_480)
+    }
+
+    @Test
     fun createBySourceCodecCapabilities_additionalQualitiesAreSupported() {
         // TODO(b/399585664): Remove this assumption when high speed quality exploration is
         //  supported.
-        assumeTrue(
-            "High speed mode does not yet support quality exploration",
-            qualitySource != QUALITY_SOURCE_HIGH_SPEED
-        )
+        assumeTrue("High speed mode does not yet support quality exploration", !isHighSpeed)
 
         val codecVideoCapabilities =
             RecorderVideoCapabilities(
                 VIDEO_CAPABILITIES_SOURCE_CODEC_CAPABILITIES,
                 cameraInfo,
-                qualitySource
+                videoCaptureType
             ) {
                 FakeVideoEncoderInfo()
             }
@@ -380,17 +463,14 @@ class RecorderVideoCapabilitiesTest(private val qualitySource: Int) {
 
     @Test
     fun noSupportedQuality_shouldCreateDefaultEncoderProfilesProvider() {
-        assumeTrue(
-            "High speed mode doesn't adopt DefaultEncoderProfilesProvider",
-            qualitySource != QUALITY_SOURCE_HIGH_SPEED
-        )
+        assumeTrue("High speed mode doesn't adopt DefaultEncoderProfilesProvider", !isHighSpeed)
 
         cameraInfo.encoderProfilesProvider = EncoderProfilesProvider.EMPTY
         val codecVideoCapabilities =
             RecorderVideoCapabilities(
                 VIDEO_CAPABILITIES_SOURCE_CAMCORDER_PROFILE,
                 cameraInfo,
-                qualitySource
+                videoCaptureType
             ) {
                 FakeVideoEncoderInfo()
             }

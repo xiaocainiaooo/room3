@@ -2134,7 +2134,10 @@ class VideoCaptureTest {
 
         override fun getMediaSpec(): Observable<MediaSpec> = mediaSpecObservable
 
-        override fun getMediaCapabilities(cameraInfo: CameraInfo): VideoCapabilities {
+        override fun getMediaCapabilities(
+            cameraInfo: CameraInfo,
+            sessionType: Int
+        ): VideoCapabilities {
             return videoCapabilities
         }
 
@@ -2390,6 +2393,13 @@ class VideoCaptureTest {
                     dynamicRange: DynamicRange
                 ): Boolean {
                     return videoCapabilitiesMap[dynamicRange]?.isQualitySupported(quality) == true
+                }
+
+                override fun getSupportedFrameRateRanges(
+                    quality: Quality,
+                    dynamicRange: DynamicRange
+                ): Set<Range<Int>> {
+                    return emptySet()
                 }
 
                 override fun isStabilizationSupported(): Boolean {

@@ -20,7 +20,6 @@ import android.media.MediaFormat
 import android.media.MediaRecorder
 import android.util.Size
 import androidx.camera.core.DynamicRange
-import androidx.camera.core.DynamicRange.HLG_10_BIT
 import androidx.camera.core.DynamicRange.SDR
 import androidx.camera.core.impl.EncoderProfilesProxy
 import androidx.camera.core.impl.EncoderProfilesProxy.AudioProfileProxy
@@ -146,16 +145,6 @@ public object EncoderProfilesUtil {
     public val PROFILES_HIGH_SPEED_2160P: EncoderProfilesProxy =
         createFakeHighSpeedEncoderProfilesProxy(RESOLUTION_2160P)
 
-    /** High speed EncoderProfiles with SDR and HLG dynamic ranges */
-    public val PROFILES_HIGH_SPEED_SDR_HLG_480P: EncoderProfilesProxy =
-        createFakeHighSpeedEncoderProfilesProxy(RESOLUTION_480P, setOf(SDR, HLG_10_BIT))
-    public val PROFILES_HIGH_SPEED_SDR_HLG_720P: EncoderProfilesProxy =
-        createFakeHighSpeedEncoderProfilesProxy(RESOLUTION_720P, setOf(SDR, HLG_10_BIT))
-    public val PROFILES_HIGH_SPEED_SDR_HLG_1080P: EncoderProfilesProxy =
-        createFakeHighSpeedEncoderProfilesProxy(RESOLUTION_1080P, setOf(SDR, HLG_10_BIT))
-    public val PROFILES_HIGH_SPEED_SDR_HLG_2160P: EncoderProfilesProxy =
-        createFakeHighSpeedEncoderProfilesProxy(RESOLUTION_2160P, setOf(SDR, HLG_10_BIT))
-
     /** A utility method to create an EncoderProfilesProxy with some default values. */
     public fun createFakeEncoderProfilesProxy(
         videoProfiles: List<VideoProfileProxy>,
@@ -174,10 +163,12 @@ public object EncoderProfilesUtil {
     /** A utility method to create an EncoderProfilesProxy with some default values. */
     public fun createFakeEncoderProfilesProxy(
         videoResolution: Size,
+        videoFrameRate: Int = DEFAULT_VIDEO_FRAME_RATE,
         dynamicRanges: Set<DynamicRange> = setOf(SDR),
-        videoProfileProvider: (Size, Int, Int) -> VideoProfileProxy =
-            { resolution, bitDepth, hdrFormat ->
+        videoProfileProvider: (Size, Int, Int, Int) -> VideoProfileProxy =
+            { resolution, frameRate, bitDepth, hdrFormat ->
                 createFakeVideoProfileProxy(
+                    frameRate = frameRate,
                     videoResolution = resolution,
                     videoBitDepth = bitDepth,
                     videoHdrFormat = hdrFormat
@@ -188,7 +179,7 @@ public object EncoderProfilesUtil {
             dynamicRanges.map { dynamicRange ->
                 val videoBitDepth = dynamicRange.bitDepth
                 val videoHdrFormat = dynamicRangeToVideoProfileHdrFormats(dynamicRange).single()
-                videoProfileProvider(videoResolution, videoBitDepth, videoHdrFormat)
+                videoProfileProvider(videoResolution, videoFrameRate, videoBitDepth, videoHdrFormat)
             }
         return createFakeEncoderProfilesProxy(videoProfiles = videoProfiles)
     }
@@ -196,14 +187,17 @@ public object EncoderProfilesUtil {
     /** A utility method to create a high speed EncoderProfilesProxy with some default values. */
     public fun createFakeHighSpeedEncoderProfilesProxy(
         videoResolution: Size,
+        videoFrameRate: Int = DEFAULT_VIDEO_HIGH_SPEED_FRAME_RATE,
         dynamicRanges: Set<DynamicRange> = setOf(SDR)
     ): EncoderProfilesProxy {
         return createFakeEncoderProfilesProxy(
             videoResolution,
+            videoFrameRate = videoFrameRate,
             dynamicRanges = dynamicRanges,
-            videoProfileProvider = { resolution, bitDepth, hdrFormat ->
+            videoProfileProvider = { resolution, frameRate, bitDepth, hdrFormat ->
                 createFakeHighSpeedVideoProfileProxy(
                     videoResolution = resolution,
+                    frameRate = frameRate,
                     videoBitDepth = bitDepth,
                     videoHdrFormat = hdrFormat
                 )
