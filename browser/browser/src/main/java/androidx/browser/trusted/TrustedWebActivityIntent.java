@@ -35,10 +35,15 @@ public final class TrustedWebActivityIntent {
     private final @NonNull Intent mIntent;
 
     private final @NonNull List<Uri> mSharedFileUris;
+    private final @NonNull List<Uri> mFileHandlingUris;
 
-    TrustedWebActivityIntent(@NonNull Intent intent, @NonNull List<Uri> sharedFileUris) {
+    TrustedWebActivityIntent(
+            @NonNull Intent intent,
+            @NonNull List<Uri> sharedFileUris,
+            @NonNull List<Uri> fileHandlingUris) {
         mIntent = intent;
         mSharedFileUris = sharedFileUris;
+        mFileHandlingUris = fileHandlingUris;
     }
 
     /**
@@ -58,6 +63,11 @@ public final class TrustedWebActivityIntent {
                 TrustedWebActivityIntentBuilder.EXTRA_ORIGINAL_LAUNCH_URL, Uri.class);
     }
 
+    public @Nullable FileHandlingData getFileHandlingData() {
+        return FileHandlingData.fromBundle(
+            getIntent().getBundleExtra(TrustedWebActivityIntentBuilder.EXTRA_FILE_HANDLING_DATA));
+    }
+
     /**
      * Launches a Trusted Web Activity.
      */
@@ -70,6 +80,10 @@ public final class TrustedWebActivityIntent {
         for (Uri uri : mSharedFileUris) {
             context.grantUriPermission(mIntent.getPackage(), uri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        for (Uri uri : mFileHandlingUris) {
+            context.grantUriPermission(mIntent.getPackage(), uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         }
     }
 
