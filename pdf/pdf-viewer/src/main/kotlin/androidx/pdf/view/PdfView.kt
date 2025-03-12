@@ -440,20 +440,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 position.pageNum,
                 getVisibleAreaInContentCoords()
             )
-        // Zoom should match the width of the page
-        val zoom =
-            ZoomUtils.calculateZoomToFit(
-                viewportWidth.toFloat(),
-                viewportHeight.toFloat(),
-                pageRect.width().toFloat(),
-                1f
-            )
 
-        val x = round((pageRect.left + pageRect.width() / 2f) * zoom - (viewportWidth / 2f))
+        val x = round((pageRect.left + position.pagePoint.x) * zoom - (viewportWidth / 2f))
         val y = round((pageRect.top + position.pagePoint.y) * zoom - (viewportHeight / 2f))
 
-        // Set zoom to fit the width of the page, then scroll to the requested point on the page
-        this.zoom = zoom
         scrollTo(x.toInt(), y.toInt())
     }
 
