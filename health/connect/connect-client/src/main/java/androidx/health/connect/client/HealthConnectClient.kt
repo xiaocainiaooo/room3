@@ -517,9 +517,11 @@ interface HealthConnectClient {
      * Deletes [MedicalResource]s based on given filters in
      * [request][DeleteMedicalResourcesRequest].
      *
+     * Only [MedicalResource]s inserted by the calling app will be deleted. If the [request] matches
+     * any other [MedicalResource]s, these will be ignored.
+     *
      * Regarding permissions:
-     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, even then, it
-     *   can only delete its own data.
+     * - Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API.
      * - Deletes are permitted in the foreground or background.
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
