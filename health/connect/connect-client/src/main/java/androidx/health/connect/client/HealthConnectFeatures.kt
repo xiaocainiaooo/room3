@@ -89,9 +89,8 @@ interface HealthConnectFeatures {
         private val SDK_EXT_13_PLATFORM_VERSION: HealthConnectPlatformVersion =
             HealthConnectPlatformVersion(buildVersionCode = 34, sdkExtensionVersion = 13)
 
-        // TODO(b/381533698): change this to 34 and ext ver 16
         private val SDK_EXT_16_PLATFORM_VERSION: HealthConnectPlatformVersion =
-            HealthConnectPlatformVersion(buildVersionCode = 36)
+            HealthConnectPlatformVersion(buildVersionCode = 34, sdkExtensionVersion = 16)
 
         @OptIn(ExperimentalPersonalHealthRecordApi::class)
         internal val FEATURE_TO_VERSION_INFO_MAP: Map<Int, HealthConnectVersionInfo> =

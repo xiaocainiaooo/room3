@@ -50,7 +50,6 @@ android {
     defaultConfig {
         minSdk = 26
     }
-    // TODO(b/381533698): change to compileSdk = 35 and compileSdkExtension 16
-    // compileSdk should always point to the latest publicly available version
+    // TODO(b/381533698): change to compileSdk = 36
     compileSdkPreview = "Baklava"
 }

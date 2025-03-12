@@ -54,12 +54,8 @@ internal class HealthConnectFeaturesPlatformImpl : HealthConnectFeatures {
         ): Int {
             val minimumRequiredVersion =
                 this[feature]?.platformVersion ?: return FEATURE_STATUS_UNAVAILABLE
-            // TODO(b/381533698): remove this check and revert sdkInt back to just
-            //  `Build.VERSION.SDK_INT` once M-02-2025 has been published.
-            val isBaklava = "Baklava".equals(Build.VERSION.CODENAME, ignoreCase = true)
-            val sdkInt = if (isBaklava) 36 else Build.VERSION.SDK_INT
 
-            if (minimumRequiredVersion.buildVersionCode > sdkInt) {
+            if (minimumRequiredVersion.buildVersionCode > Build.VERSION.SDK_INT) {
                 return FEATURE_STATUS_UNAVAILABLE
             }
 
