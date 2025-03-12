@@ -52,7 +52,6 @@ fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers {
 
     this.foldRight(Unit) { _, e ->
         when (e) {
-            is ClearSemanticElement -> semantics = e.mergeTo(semantics)
             is BaseSemanticElement -> semantics = e.mergeTo(semantics)
             is BaseBackgroundElement -> background = e.mergeTo(background)
             is BaseCornerElement -> corners = e.mergeTo(corners)
