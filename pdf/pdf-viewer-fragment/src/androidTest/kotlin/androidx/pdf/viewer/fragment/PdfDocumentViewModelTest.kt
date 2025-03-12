@@ -133,7 +133,7 @@ class PdfDocumentViewModelTest {
     }
 
     @Test
-    fun test_pdfDocumentViewModel_toogleToolboxInLoadingState() = runTest {
+    fun test_pdfDocumentViewModel_toogleImmersiveModeInLoadingState() = runTest {
         val savedState = SavedStateHandle()
         // Not Providing document uri, so the state should be loading
         val pdfViewModel =
@@ -142,14 +142,14 @@ class PdfDocumentViewModelTest {
         // Assert fragmentUiState is set to Loading
         assertTrue(pdfViewModel.fragmentUiScreenState.value is PdfFragmentUiState.Loading)
 
-        pdfViewModel.updateToolboxState(isToolboxActive = true)
+        pdfViewModel.setImmersiveModeDesired(enterImmersive = true)
 
-        // Assert toolboxState never set to visible
-        assertFalse(pdfViewModel.isToolboxVisibleFromState)
+        // Assert immersive mode never set to true
+        assertFalse(pdfViewModel.isImmersiveModeDesired)
     }
 
     @Test
-    fun test_pdfDocumentViewModel_toogleToolboxInDocumentErrorState() = runTest {
+    fun test_pdfDocumentViewModel_toogleImmersiveModeInDocumentErrorState() = runTest {
         val documentUri = openFileAsUri(appContext, CORRUPTED_PDF)
 
         val collectJob = launch {
@@ -171,10 +171,10 @@ class PdfDocumentViewModelTest {
             pdfDocumentViewModel.fragmentUiScreenState.value is PdfFragmentUiState.DocumentError
         )
 
-        pdfDocumentViewModel.updateToolboxState(isToolboxActive = true)
+        pdfDocumentViewModel.setImmersiveModeDesired(enterImmersive = true)
 
-        // Assert toolboxState never set to visible
-        assertFalse(pdfDocumentViewModel.isToolboxVisibleFromState)
+        // Assert immersive mode never set to true
+        assertFalse(pdfDocumentViewModel.isImmersiveModeDesired)
     }
 
     @Test

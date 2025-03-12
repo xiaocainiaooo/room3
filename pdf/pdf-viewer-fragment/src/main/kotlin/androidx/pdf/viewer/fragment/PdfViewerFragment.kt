@@ -135,8 +135,8 @@ public open class PdfViewerFragment constructor() : Fragment() {
         get() = documentViewModel.isTextSearchActiveFromState
         set(value) {
             documentViewModel.updateSearchState(value)
-            // hiding the toolbox when search is active and showing when search is closes
-            isToolboxVisible = !value
+            // entering the immersive mode when search is active and exiting when search is closes
+            documentViewModel.setImmersiveModeDesired(enterImmersive = value)
         }
 
     /**
@@ -147,9 +147,11 @@ public open class PdfViewerFragment constructor() : Fragment() {
      * accordingly.
      */
     public var isToolboxVisible: Boolean
-        get() = documentViewModel.isToolboxVisibleFromState
+        // We can't use toolbox.visibility because toolboxView is the layout here, and
+        // its visibility doesn't change.
+        get() = toolboxView.toolboxVisibility == VISIBLE
         set(value) {
-            documentViewModel.updateToolboxState(isToolboxActive = value)
+            if (value) toolboxView.show() else toolboxView.hide()
         }
 
     /**
@@ -241,12 +243,12 @@ public open class PdfViewerFragment constructor() : Fragment() {
             toolboxGestureDelegate =
                 object : ToolboxGestureDelegate {
                     override fun onSingleTap() {
-                        documentViewModel.updateToolboxState(isToolboxActive = !isToolboxVisible)
+                        documentViewModel.toggleImmersiveModeState()
                         _pdfSearchView.clearFocus()
                     }
 
                     override fun onScroll(position: Int) {
-                        documentViewModel.updateToolboxState(isToolboxActive = (position <= 0))
+                        documentViewModel.setImmersiveModeDesired(enterImmersive = (position > 0))
                     }
                 }
         )
@@ -420,8 +422,8 @@ public open class PdfViewerFragment constructor() : Fragment() {
         }
 
         toolboxStateCollector = collectFlowOnLifecycleScope {
-            documentViewModel.toolboxViewUiState.collect { showToolbox ->
-                if (showToolbox) toolboxView.show() else toolboxView.hide()
+            documentViewModel.immersiveModeFlow.collect { immersiveModeState ->
+                onRequestImmersiveMode(immersiveModeState)
             }
         }
     }
