@@ -750,7 +750,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             PageLayoutManager(
                     localPdfDocument,
                     backgroundScope,
-                    DEFAULT_PAGE_PREFETCH_RADIUS,
                     paginationModel = requireNotNull(localStateToRestore.paginationModel)
                 )
                 .apply { onViewportChanged(scrollY, height, zoom) }
@@ -889,7 +888,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             PageManager(
                 localPdfDocument,
                 backgroundScope,
-                DEFAULT_PAGE_PREFETCH_RADIUS,
                 Point(maxBitmapDimensionPx, maxBitmapDimensionPx),
                 isTouchExplorationEnabled
             )
@@ -922,8 +920,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // instantiate new ones
         if (!maybeRestoreState()) {
             pageLayoutManager =
-                PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
-                    .apply { onViewportChanged(scrollY, height, zoom) }
+                PageLayoutManager(localPdfDocument, backgroundScope).apply {
+                    onViewportChanged(scrollY, height, zoom)
+                }
             selectionStateManager =
                 SelectionStateManager(
                     localPdfDocument,
@@ -1525,8 +1524,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
         /** The duration of the double tap to zoom animation, in milliseconds */
         private const val DOUBLE_TAP_ANIMATION_DURATION_MS = 200L
-
-        private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
 
         private val ZOOM_OR_SCROLL_GESTURES =
             setOf(
