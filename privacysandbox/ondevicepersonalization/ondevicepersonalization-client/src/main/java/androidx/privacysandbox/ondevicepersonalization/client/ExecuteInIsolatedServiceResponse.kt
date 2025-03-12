@@ -18,6 +18,7 @@ package androidx.privacysandbox.ondevicepersonalization.client
 
 import android.adservices.ondevicepersonalization.SurfacePackageToken
 
+@Suppress("DataClassDefinition")
 data class ExecuteInIsolatedServiceResponse
 internal constructor(
     /**
