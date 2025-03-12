@@ -595,7 +595,11 @@ internal actual constructor(
 
     public actual fun contentDeepHashCode(): Int = source.contentDeepHashCode()
 
-    public actual fun contentDeepToString(): String = source.contentDeepToString()
+    public actual fun contentDeepToString(): String {
+        // in order not to overflow Int.MAX_VALUE
+        val length = source.size().coerceAtMost((Int.MAX_VALUE - 2) / 5) * 5 + 2
+        return buildString(length) { source.contentDeepToString(result = this, mutableListOf()) }
+    }
 
     public actual fun toMap(): Map<String, Any?> {
         return buildMap(capacity = source.size()) {
@@ -669,13 +673,7 @@ private fun SavedState.contentDeepHashCode(): Int {
     return result
 }
 
-private fun SavedState.contentDeepToString(): String {
-    // in order not to overflow Int.MAX_VALUE
-    val length = size().coerceAtMost((Int.MAX_VALUE - 2) / 5) * 5 + 2
-    return buildString(length) { contentDeepToStringInternal(this, mutableListOf()) }
-}
-
-private fun SavedState.contentDeepToStringInternal(
+private fun SavedState.contentDeepToString(
     result: StringBuilder,
     processed: MutableList<SavedState>,
 ) {
@@ -694,7 +692,7 @@ private fun SavedState.contentDeepToStringInternal(
         when (@Suppress("DEPRECATION") val element = this[k]) {
             null -> result.append("null")
             // container types
-            is SavedState -> element.contentDeepToStringInternal(result, processed)
+            is SavedState -> element.contentDeepToString(result, processed)
             is Array<*> -> result.append(element.contentDeepToString())
 
             // primitive arrays
