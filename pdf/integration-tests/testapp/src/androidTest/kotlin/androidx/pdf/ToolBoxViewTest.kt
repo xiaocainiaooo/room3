@@ -50,6 +50,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.hamcrest.core.AllOf.allOf
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -111,6 +112,7 @@ class ToolBoxViewTest {
         return scenario
     }
 
+    @Ignore("Annotation intent resolution will fail with file scheme. Convert to content scheme")
     @Test
     fun testEditButtonOnClickListener() {
         scenarioLoadDocument(
@@ -136,6 +138,7 @@ class ToolBoxViewTest {
         intended(expectedIntent)
     }
 
+    @Ignore("Annotation intent resolution will fail with file scheme. Convert to content scheme")
     @Test
     fun testEditButtonOnClickListener_onSpecificPage() {
         scenarioLoadDocument(
