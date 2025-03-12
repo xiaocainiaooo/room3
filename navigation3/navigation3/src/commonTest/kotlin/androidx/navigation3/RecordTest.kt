@@ -32,11 +32,11 @@ class EntryTest {
         val entry =
             NavEntry(
                 key = "myKey",
-                featureMap = mapOf("feature1" to 1, "feature2" to MyObject),
+                metadata = mapOf("feature1" to 1, "feature2" to MyObject),
                 content = {}
             )
-        assertThat(entry.featureMap["feature1"]).isEqualTo(1)
-        assertThat(entry.featureMap["feature2"]).isEqualTo(MyObject)
+        assertThat(entry.metadata["feature1"]).isEqualTo(1)
+        assertThat(entry.metadata["feature2"]).isEqualTo(MyObject)
     }
 
     object MyObject
