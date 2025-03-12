@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
@@ -131,6 +132,7 @@ class DialogTest {
         interaction.assertIsDisplayed()
     }
 
+    @FlakyTest(bugId = 402738067)
     @Test
     fun dialogTest_isDismissed_whenSpecified() {
         setupDialogTest()
@@ -148,6 +150,7 @@ class DialogTest {
         textInteraction.assertDoesNotExist()
     }
 
+    @FlakyTest(bugId = 402738067)
     @Test
     fun dialogTest_isDismissed_whenSpecified_decorFitsFalse() {
         setupDialogTest(dialogProperties = DialogProperties(decorFitsSystemWindows = false))
