@@ -63,8 +63,7 @@ class PageLayoutManagerTest {
     fun setup() {
         // Required because loadPageDimensions jumps to the main thread to update PaginationModel
         Dispatchers.setMain(testDispatcher)
-        paginationManager =
-            PageLayoutManager(pdfDocument, testScope, pagePrefetchRadius = PAGE_PREFETCH_RADIUS)
+        paginationManager = PageLayoutManager(pdfDocument, testScope)
     }
 
     @Test
@@ -136,7 +135,7 @@ class PageLayoutManagerTest {
 
         // Make sure we've fetched all currently measured & visible pages + the page prefetch radius
         testScope.testScheduler.runCurrent()
-        assertThat(paginationManager.reach).isEqualTo(5 + PAGE_PREFETCH_RADIUS)
+        assertThat(paginationManager.reach).isEqualTo(5 + PageLayoutManager.DEFAULT_PREFETCH_RADIUS)
     }
 
     @Test
@@ -205,4 +204,3 @@ class PageLayoutManagerTest {
 }
 
 private const val TOTAL_PAGES = 100
-private const val PAGE_PREFETCH_RADIUS = 5

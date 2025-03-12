@@ -150,9 +150,8 @@ internal class Page(
 
     fun draw(canvas: Canvas, locationInView: Rect, highlights: List<Highlight>) {
         val pageBitmaps = bitmapFetcher?.pageBitmaps
-        if (pageBitmaps == null) {
+        if (pageBitmaps == null || pageBitmaps.needsWhiteBackground) {
             canvas.drawRect(locationInView, BLANK_PAINT)
-            return
         }
         if (pageBitmaps is FullPageBitmap) {
             draw(pageBitmaps, canvas, locationInView)
