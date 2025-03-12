@@ -17,6 +17,7 @@
 package androidx.appfunctions.internal
 
 import android.os.Build
+import androidx.appfunctions.AppFunctionFunctionNotFoundException
 import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.AppFunctionSearchSpec
 import androidx.appfunctions.core.AppFunctionMetadataTestHelper
@@ -31,6 +32,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
@@ -40,9 +42,9 @@ import org.junit.runner.RunWith
 
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @RunWith(TestParameterInjector::class)
-class AppFunctionReaderTest {
+class AppSearchAppFunctionReaderTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val appFunctionReader = AppFunctionReader(context)
+    private val appFunctionReader = AppSearchAppFunctionReader(context)
     private val appFunctionMetadataTestHelper = AppFunctionMetadataTestHelper(context)
     private val appFunctionManagerCompat = AppFunctionManagerCompat(context)
 
@@ -249,6 +251,37 @@ class AppFunctionReaderTest {
                 getTestFunctionIdToMetadataMap(context.packageName).getValue(functionIdToTest)
             assertThat(appFunctionMetadata.isEnabled)
                 .isEqualTo(expectedMetadataWithIsEnabledDefault.isEnabled)
+        }
+
+    @Test
+    fun getAppFunctionSchemaMetadata_found() = runBlocking {
+        val appFunctionSchemaMetadata =
+            appFunctionReader.getAppFunctionSchemaMetadata(
+                FunctionIds.MEDIA_SCHEMA_PRINT,
+                context.packageName
+            )
+
+        val expected = AppFunctionSchemaMetadata("media", "print", 1)
+        assertThat(appFunctionSchemaMetadata).isEqualTo(expected)
+    }
+
+    @Test
+    fun getAppFunctionSchemaMetadata_freeform() = runBlocking {
+        val appFunctionSchemaMetadata =
+            appFunctionReader.getAppFunctionSchemaMetadata(
+                FunctionIds.NO_SCHEMA_EXECUTION_SUCCEED,
+                context.packageName
+            )
+
+        assertThat(appFunctionSchemaMetadata).isNull()
+    }
+
+    @Test
+    fun getAppFunctionSchemaMetadata_notFound() =
+        runBlocking<Unit> {
+            assertFailsWith<AppFunctionFunctionNotFoundException> {
+                appFunctionReader.getAppFunctionSchemaMetadata("notExist", context.packageName)
+            }
         }
 
     private companion object {
