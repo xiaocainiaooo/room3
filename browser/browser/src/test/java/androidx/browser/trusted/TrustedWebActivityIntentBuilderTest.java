@@ -78,6 +78,9 @@ public class TrustedWebActivityIntentBuilderTest {
 
         Uri originalLaunchUrl = Uri.parse("web+test://page");
 
+        FileHandlingData fileHandlingData = new FileHandlingData(
+                Arrays.asList(Uri.parse("content://test.uri")));
+
         CustomTabsSession session = TestUtil.makeMockSession();
 
         ImmersiveMode displayMode = new ImmersiveMode(true,
@@ -93,6 +96,7 @@ public class TrustedWebActivityIntentBuilderTest {
                         .setShareParams(shareTarget, shareData)
                         .setDisplayMode(displayMode)
                         .setOriginalLaunchUrl(originalLaunchUrl)
+                        .setFileHandlingData(fileHandlingData)
                         .build(session)
                         .getIntent();
 
@@ -138,5 +142,10 @@ public class TrustedWebActivityIntentBuilderTest {
 
         assertEquals(originalLaunchUrl, intent.getParcelableExtra(
                 TrustedWebActivityIntentBuilder.EXTRA_ORIGINAL_LAUNCH_URL));
+
+        FileHandlingData fileHandlingDataFromIntent =
+                FileHandlingData.fromBundle(intent.getBundleExtra(
+                        TrustedWebActivityIntentBuilder.EXTRA_FILE_HANDLING_DATA));
+        assertEquals(fileHandlingData.uris.get(0), fileHandlingDataFromIntent.uris.get(0));
     }
 }
