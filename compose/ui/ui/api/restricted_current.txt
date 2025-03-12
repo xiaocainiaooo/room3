@@ -231,7 +231,7 @@ package androidx.compose.ui.autofill {
   }
 
   public final class AutofillModifierKt {
-    method public static androidx.compose.ui.Modifier autofillContentType(androidx.compose.ui.Modifier, androidx.compose.ui.autofill.ContentType contentType);
+    method public static androidx.compose.ui.Modifier contentType(androidx.compose.ui.Modifier, androidx.compose.ui.autofill.ContentType contentType);
   }
 
   @Deprecated public final class AutofillNode {
