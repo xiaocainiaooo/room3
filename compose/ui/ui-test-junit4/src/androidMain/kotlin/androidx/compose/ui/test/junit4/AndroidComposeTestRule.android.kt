@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.Duration
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestDispatcher
 import org.junit.rules.TestRule
@@ -277,7 +278,14 @@ private constructor(
         activityProvider: (R) -> A,
     ) : this(
         activityRule,
-        AndroidComposeUiTestEnvironment(effectContext) { activityProvider(activityRule) },
+        AndroidComposeUiTestEnvironment(
+            effectContext = effectContext,
+            // Since now it calls kotlinx.coroutines.test.runTest under the hood,
+            // to preserve the behaviour compatibility we set an Infinite timeout
+            testTimeout = Duration.INFINITE
+        ) {
+            activityProvider(activityRule)
+        },
     )
 
     /**
