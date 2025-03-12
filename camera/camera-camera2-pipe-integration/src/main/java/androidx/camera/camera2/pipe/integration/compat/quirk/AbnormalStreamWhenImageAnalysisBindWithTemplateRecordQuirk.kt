@@ -40,7 +40,7 @@ public class AbnormalStreamWhenImageAnalysisBindWithTemplateRecordQuirk :
         }
 
         private val isSamsungM55: Boolean
-            get() = isSamsungDevice() && "SM-M556B".equals(Build.MODEL, ignoreCase = true)
+            get() = isSamsungDevice() && Build.MODEL.startsWith("SM-M556", ignoreCase = true)
     }
 
     override fun workaroundByCaptureIntentPreview(): Boolean {
