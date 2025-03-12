@@ -39,7 +39,7 @@ import androidx.camera.integration.core.CameraXService.ACTION_TAKE_PICTURE
 import androidx.camera.integration.core.CameraXService.EXTRA_IMAGE_ANALYSIS_ENABLED
 import androidx.camera.integration.core.CameraXService.EXTRA_IMAGE_CAPTURE_ENABLED
 import androidx.camera.integration.core.CameraXService.EXTRA_VIDEO_CAPTURE_ENABLED
-import androidx.camera.testing.impl.AndroidUtil.isEmulator
+import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSupportedByEmulator
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.CameraUtil.hasCameraWithLensFacing
@@ -204,11 +204,7 @@ class CameraXServiceTest(private val implName: String, private val cameraXConfig
 
     @Test
     fun canRecordVideo() = runBlocking {
-        // Skip test for b/332627961
-        assumeFalse(
-            "Emulator API 28 crashes running this test.",
-            Build.VERSION.SDK_INT == 28 && isEmulator()
-        )
+        skipVideoRecordingTestIfNotSupportedByEmulator()
         // Arrange.
         context.startService(
             createServiceIntent(ACTION_BIND_USE_CASES).apply {
