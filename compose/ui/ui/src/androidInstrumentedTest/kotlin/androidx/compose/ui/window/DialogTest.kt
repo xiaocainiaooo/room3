@@ -64,6 +64,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -145,6 +146,11 @@ class DialogTest {
         rule.mainClock.autoAdvance = false
         rule.mainClock.advanceTimeBy(1000)
 
+        // Wait for the ui to disappear AND events to fully propagate through the non-standard
+        // input system used in this test. We can't rely on waitForIdle() or other methods related
+        // to the ui, because the input events aren't going through that standard input system..
+        rule.waitUntil(timeoutMillis = 2000) { textInteraction.isNotDisplayed() }
+
         textInteraction.assertDoesNotExist()
     }
 
@@ -161,6 +167,11 @@ class DialogTest {
         // pointer input will wait until any other events (clicks) are finished before executing.
         rule.mainClock.autoAdvance = false
         rule.mainClock.advanceTimeBy(1000)
+
+        // Wait for the ui to disappear AND events to fully propagate through the non-standard
+        // input system used in this test. We can't rely on waitForIdle() or other methods related
+        // to the ui, because the input events aren't going through that standard input system.
+        rule.waitUntil(timeoutMillis = 2000) { textInteraction.isNotDisplayed() }
 
         textInteraction.assertDoesNotExist()
     }
