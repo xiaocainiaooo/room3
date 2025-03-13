@@ -118,19 +118,18 @@ public fun TimePicker(
         LocalTouchExplorationStateProvider.current.touchExplorationState()
 
     /** The current selected [Picker] index. */
-    var selectedIndex by
-        remember(touchExplorationServicesEnabled) {
-            // When the time picker loads, none of the individual pickers are selected in talkback
-            // mode,
-            // otherwise hours picker should be focused.
-            val initiallySelectedIndex =
-                if (touchExplorationServicesEnabled) {
-                    null
-                } else {
-                    FocusableElements.Hours.index
-                }
-            mutableStateOf(initiallySelectedIndex)
-        }
+    var selectedIndex: Int? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(touchExplorationServicesEnabled) {
+        // When the time picker loads, none of the individual pickers are selected in talkback mode,
+        // otherwise hours picker should be focused.
+        selectedIndex =
+            if (touchExplorationServicesEnabled) {
+                null
+            } else {
+                FocusableElements.Hours.index
+            }
+    }
 
     val focusRequesterConfirmButton = remember { FocusRequester() }
 
