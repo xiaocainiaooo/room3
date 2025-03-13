@@ -20,6 +20,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.Range
@@ -27,6 +29,7 @@ import androidx.annotation.RestrictTo
 import androidx.core.content.ContextCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.R
+import androidx.pdf.util.buildPageIndicatorLabel
 import com.google.android.material.color.MaterialColors
 
 /**
@@ -90,6 +93,12 @@ public class FastScrollDrawer(
 
     internal var currentPageIndicatorLabel: String = ""
 
+    internal var thumbBounds = RectF()
+        private set
+
+    internal var pageIndicatorBounds = RectF()
+        private set
+
     /**
      * Draws the fast scroller on the canvas.
      *
@@ -117,6 +126,12 @@ public class FastScrollDrawer(
         )
         thumbShadowDrawable?.draw(canvas)
         thumbDrawable.setBounds(thumbLeftPx, thumbTopPx, thumbRightPx, thumbBottomPx)
+        thumbBounds.set(
+            thumbLeftPx.toFloat(),
+            thumbTopPx.toFloat(),
+            thumbRightPx.toFloat(),
+            thumbBottomPx.toFloat()
+        )
         thumbDrawable.draw(canvas)
 
         drawDragHandle(canvas, thumbRightPx, thumbTopPx)
@@ -129,28 +144,25 @@ public class FastScrollDrawer(
         thumbTopPx: Int,
         visiblePages: Range<Int>
     ) {
-        currentPageIndicatorLabel = generateLabel(visiblePages)
-        val labelWidth = textPaint.measureText(currentPageIndicatorLabel)
-        val pageIndicatorWidthPx = (labelWidth + (2 * pageIndicatorTextOffsetPx)).toInt()
-        val pageIndicatorHeightPx = pageIndicatorHeightPx
+        currentPageIndicatorLabel =
+            buildPageIndicatorLabel(
+                context,
+                visiblePages,
+                pdfDocument.pageCount,
+                R.string.label_page_single,
+                R.string.label_page_range
+            )
+        val indicatorBounds =
+            calculatePageIndicatorBounds(currentPageIndicatorLabel, xOffset, thumbTopPx)
 
-        val indicatorRightPx = xOffset - pageIndicatorRightMarginPx
-        val indicatorLeftPx = indicatorRightPx - pageIndicatorWidthPx
-        val indicatorTopPx = thumbTopPx + ((thumbHeightPx - pageIndicatorHeightPx) / 2)
-        val indicatorBottomPx = indicatorTopPx + pageIndicatorHeightPx
-
-        pageIndicatorBackground.setBounds(
-            /* left= */ indicatorLeftPx,
-            /* top= */ indicatorTopPx,
-            /* right= */ indicatorRightPx,
-            /* bottom= */ indicatorBottomPx
-        )
+        pageIndicatorBackground.bounds = indicatorBounds
+        pageIndicatorBounds.set(indicatorBounds)
         pageIndicatorBackground.draw(canvas)
 
-        val xPos = indicatorLeftPx + (pageIndicatorWidthPx / 2)
+        val xPos = indicatorBounds.left + (indicatorBounds.width() / 2)
         val yPos =
-            (indicatorTopPx + (pageIndicatorHeightPx / 2) -
-                ((textPaint.descent() + textPaint.ascent()) / 2))
+            indicatorBounds.top + (indicatorBounds.height() / 2) -
+                ((textPaint.descent() + textPaint.ascent()) / 2)
         canvas.drawText(currentPageIndicatorLabel, xPos.toFloat(), yPos.toFloat(), textPaint)
     }
 
@@ -171,21 +183,21 @@ public class FastScrollDrawer(
         trackDrawable.draw(canvas)
     }
 
-    private fun generateLabel(range: Range<Int>): String {
-        val res = context.resources
+    internal fun calculatePageIndicatorBounds(
+        label: String,
+        xOffset: Int,
+        thumbTopPx: Int,
+    ): Rect {
+        val labelWidth = textPaint.measureText(label)
+        val pageIndicatorWidthPx = (labelWidth + (2 * pageIndicatorTextOffsetPx)).toInt()
+        val pageIndicatorHeightPx = pageIndicatorHeightPx
 
-        return if (range.length() == 0) {
-            res.getString(R.string.label_page_single, range.upper, pdfDocument.pageCount)
-        } else if (range.length() == 1) {
-            res.getString(R.string.label_page_single, range.lower + 1, pdfDocument.pageCount)
-        } else {
-            res.getString(
-                R.string.label_page_range,
-                range.lower + 1,
-                range.upper + 1,
-                pdfDocument.pageCount
-            )
-        }
+        val indicatorRightPx = xOffset - pageIndicatorRightMarginPx
+        val indicatorLeftPx = indicatorRightPx - pageIndicatorWidthPx
+        val indicatorTopPx = thumbTopPx + ((thumbHeightPx - pageIndicatorHeightPx) / 2)
+        val indicatorBottomPx = indicatorTopPx + pageIndicatorHeightPx
+
+        return Rect(indicatorLeftPx, indicatorTopPx, indicatorRightPx, indicatorBottomPx)
     }
 
     public companion object {

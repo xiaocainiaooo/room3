@@ -17,12 +17,18 @@
 package androidx.pdf.view.fastscroll
 
 import android.animation.ValueAnimator
+import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Range
 import androidx.annotation.RestrictTo
+import androidx.core.animation.doOnEnd
+import androidx.core.graphics.toRect
+import androidx.pdf.R
+import androidx.pdf.util.buildPageIndicatorLabel
 
 /**
  * Manages and draws the fast scroller UI element.
@@ -49,6 +55,16 @@ public class FastScroller(
     private var lastScrollY: Int = 0
 
     private var hideValueAnimator: ValueAnimator? = null
+
+    internal var isFastScrollerVisible: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                visibilityChangeListener?.invoke(value)
+            }
+        }
+
+    internal var visibilityChangeListener: ((Boolean) -> Unit)? = null
 
     /**
      * Draws the fast scroller on the canvas.
@@ -128,6 +144,7 @@ public class FastScroller(
 
     public fun show(onAnimationUpdate: () -> Unit) {
         hideValueAnimator?.cancel()
+        isFastScrollerVisible = true
         fastScrollDrawer.alpha = FastScrollDrawer.VISIBLE_ALPHA
         animate(onAnimationUpdate)
     }
@@ -148,12 +165,13 @@ public class FastScroller(
                             fastScrollDrawer.alpha = animation.animatedValue as Int
                             onAnimationUpdate()
                         }
+                        doOnEnd { isFastScrollerVisible = false }
                         start()
                     }
         } else {
             // Handle when animations are disabled
             fastScrollDrawer.alpha = FastScrollDrawer.VISIBLE_ALPHA
-
+            isFastScrollerVisible = false
             Handler(Looper.getMainLooper())
                 .postDelayed(
                     {
@@ -173,6 +191,67 @@ public class FastScroller(
             Settings.Global.ANIMATOR_DURATION_SCALE,
             1f
         ) != 0f
+    }
+
+    /**
+     * Checks if a touch event is within the visible bounds of the fast scroll scrubber.
+     *
+     * @param x x-coordinate of the touch event
+     * @param y y-coordinate of the touch event
+     * @param viewWidth Width of the view in pixels
+     * @return True if the touch event is within the bounds of the scrubber, false otherwise.
+     */
+    internal fun isPointOnThumb(x: Float, y: Float, viewWidth: Int): Boolean {
+        val thumbX = viewWidth - fastScrollDrawer.thumbWidthPx.toFloat()
+        val thumbYRange =
+            fastScrollY.toFloat()..(fastScrollY.toFloat() +
+                    fastScrollDrawer.thumbHeightPx.toFloat())
+        return x > thumbX && y in thumbYRange
+    }
+
+    /**
+     * Checks if a touch event is within the visible bounds of the page indicator.
+     *
+     * @param visiblePages The range of pages that are currently visible.
+     * @param x x-coordinate of the touch event
+     * @param y y-coordinate of the touch event
+     * @param pageCount Total number of pages
+     * @param viewWidth Width of the view in pixels
+     * @param scrollX The raw horizontal scroll position in pixels.
+     * @return True if the touch event is within the bounds of the page indicator, false otherwise.
+     */
+    internal fun isPointOnIndicator(
+        context: Context,
+        visiblePages: Range<Int>,
+        x: Float,
+        y: Float,
+        pageCount: Int,
+        viewWidth: Int,
+        scrollX: Int
+    ): Boolean {
+        val textLabel =
+            buildPageIndicatorLabel(
+                context,
+                visiblePages,
+                pageCount,
+                R.string.label_page_single,
+                R.string.label_page_range
+            )
+        val indicatorRect =
+            fastScrollDrawer.calculatePageIndicatorBounds(
+                textLabel,
+                xOffset = scrollX + viewWidth,
+                thumbTopPx = fastScrollY,
+            )
+        return indicatorRect.contains(x.toInt(), y.toInt())
+    }
+
+    internal fun getThumbScreenBounds(): Rect {
+        return fastScrollDrawer.thumbBounds.toRect()
+    }
+
+    internal fun getIndicatorScreenBounds(): Rect {
+        return fastScrollDrawer.pageIndicatorBounds.toRect()
     }
 
     public companion object {
