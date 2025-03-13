@@ -33,7 +33,12 @@ import com.google.common.truth.Truth.assertThat
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -282,6 +287,37 @@ class AppSearchAppFunctionReaderTest {
             assertFailsWith<AppFunctionFunctionNotFoundException> {
                 appFunctionReader.getAppFunctionSchemaMetadata("notExist", context.packageName)
             }
+        }
+
+    // TODO: Add test to check we don't trigger updates for unrelated changes.
+    @Test
+    fun searchAppFunctions_observeDocumentChanges_returnsListWithUpdatedValue() =
+        runBlocking<Unit> {
+            val functionIdToTest = FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT
+            val searchFunctionSpec =
+                AppFunctionSearchSpec(packageNames = setOf(context.packageName))
+            val appFunctionSearchFlow = appFunctionReader.searchAppFunctions(searchFunctionSpec)
+            val emittedValues = mutableListOf<List<AppFunctionMetadata>>()
+            val job = launch { appFunctionSearchFlow.take(2).toList(emittedValues) }
+            delay(2000) // Allow emitting initial value and registering callback.
+
+            // Modify the runtime document.
+            appFunctionManagerCompat.setAppFunctionEnabled(
+                functionIdToTest,
+                AppFunctionManagerCompat.APP_FUNCTION_STATE_DISABLED
+            )
+
+            job.join()
+            assertThat(emittedValues).hasSize(2)
+            // Assert first result to be default value.
+            assertThat(emittedValues[0].single { it.id == functionIdToTest }.isEnabled)
+                .isEqualTo(
+                    getTestFunctionIdToMetadataMap(context.packageName)
+                        .getValue(functionIdToTest)
+                        .isEnabled
+                )
+            // Assert next update has updated value.
+            assertThat(emittedValues[1].single { it.id == functionIdToTest }.isEnabled).isFalse()
         }
 
     private companion object {
