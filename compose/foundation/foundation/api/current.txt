@@ -111,9 +111,11 @@ package androidx.compose.foundation {
   @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public final class ComposeFoundationFlags {
     property public boolean DragGesturePickUpEnabled;
     property public boolean isDetectTapGesturesImmediateCoroutineDispatchEnabled;
+    property public boolean isPausableCompositionInPrefetchEnabled;
     field public static boolean DragGesturePickUpEnabled;
     field public static final androidx.compose.foundation.ComposeFoundationFlags INSTANCE;
     field public static boolean isDetectTapGesturesImmediateCoroutineDispatchEnabled;
+    field public static boolean isPausableCompositionInPrefetchEnabled;
   }
 
   public final class DarkThemeKt {

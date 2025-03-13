@@ -1728,6 +1728,7 @@ final class androidx.compose.ui.layout/SubcomposeLayoutState { // androidx.compo
     constructor <init>(androidx.compose.ui.layout/SubcomposeSlotReusePolicy) // androidx.compose.ui.layout/SubcomposeLayoutState.<init>|<init>(androidx.compose.ui.layout.SubcomposeSlotReusePolicy){}[0]
     constructor <init>(kotlin/Int) // androidx.compose.ui.layout/SubcomposeLayoutState.<init>|<init>(kotlin.Int){}[0]
 
+    final fun createPausedPrecomposition(kotlin/Any?, kotlin/Function0<kotlin/Unit>): androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition // androidx.compose.ui.layout/SubcomposeLayoutState.createPausedPrecomposition|createPausedPrecomposition(kotlin.Any?;kotlin.Function0<kotlin.Unit>){}[0]
     final fun precompose(kotlin/Any?, kotlin/Function0<kotlin/Unit>): androidx.compose.ui.layout/SubcomposeLayoutState.PrecomposedSlotHandle // androidx.compose.ui.layout/SubcomposeLayoutState.precompose|precompose(kotlin.Any?;kotlin.Function0<kotlin.Unit>){}[0]
 
     abstract interface PrecomposedSlotHandle { // androidx.compose.ui.layout/SubcomposeLayoutState.PrecomposedSlotHandle|null[0]
@@ -1738,6 +1739,15 @@ final class androidx.compose.ui.layout/SubcomposeLayoutState { // androidx.compo
         open fun getSize(kotlin/Int): androidx.compose.ui.unit/IntSize // androidx.compose.ui.layout/SubcomposeLayoutState.PrecomposedSlotHandle.getSize|getSize(kotlin.Int){}[0]
         open fun premeasure(kotlin/Int, androidx.compose.ui.unit/Constraints) // androidx.compose.ui.layout/SubcomposeLayoutState.PrecomposedSlotHandle.premeasure|premeasure(kotlin.Int;androidx.compose.ui.unit.Constraints){}[0]
         open fun traverseDescendants(kotlin/Any?, kotlin/Function1<androidx.compose.ui.node/TraversableNode, androidx.compose.ui.node/TraversableNode.Companion.TraverseDescendantsAction>) // androidx.compose.ui.layout/SubcomposeLayoutState.PrecomposedSlotHandle.traverseDescendants|traverseDescendants(kotlin.Any?;kotlin.Function1<androidx.compose.ui.node.TraversableNode,androidx.compose.ui.node.TraversableNode.Companion.TraverseDescendantsAction>){}[0]
+    }
+
+    sealed interface PausedPrecomposition { // androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition|null[0]
+        abstract val isComplete // androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition.isComplete|{}isComplete[0]
+            abstract fun <get-isComplete>(): kotlin/Boolean // androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition.isComplete.<get-isComplete>|<get-isComplete>(){}[0]
+
+        abstract fun apply(): androidx.compose.ui.layout/SubcomposeLayoutState.PrecomposedSlotHandle // androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition.apply|apply(){}[0]
+        abstract fun cancel() // androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition.cancel|cancel(){}[0]
+        abstract fun resume(androidx.compose.runtime/ShouldPauseCallback): kotlin/Boolean // androidx.compose.ui.layout/SubcomposeLayoutState.PausedPrecomposition.resume|resume(androidx.compose.runtime.ShouldPauseCallback){}[0]
     }
 }
 
