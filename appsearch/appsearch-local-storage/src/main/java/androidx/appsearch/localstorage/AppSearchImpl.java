@@ -207,7 +207,7 @@ public final class AppSearchImpl implements Closeable {
     @GuardedBy("mReadWriteLock")
     @VisibleForTesting
     final IcingSearchEngineInterface mIcingSearchEngineLocked;
-    private final boolean mIsAegisEnabled;
+    private final boolean mIsVMEnabled;
 
     @GuardedBy("mReadWriteLock")
     private final SchemaCache mSchemaCacheLocked = new SchemaCache();
@@ -338,10 +338,10 @@ public final class AppSearchImpl implements Closeable {
                         TAG,
                         "Constructing IcingSearchEngine, response",
                         ObjectsCompat.hashCode(mIcingSearchEngineLocked));
-                mIsAegisEnabled = false;
+                mIsVMEnabled = false;
             } else {
                 mIcingSearchEngineLocked = icingSearchEngine;
-                mIsAegisEnabled = true;
+                mIsVMEnabled = true;
             }
 
             // The core initialization procedure. If any part of this fails, we bail into
@@ -361,7 +361,7 @@ public final class AppSearchImpl implements Closeable {
                                     statusProtoToResultCode(initializeResultProto.getStatus()))
                             // TODO(b/173532925) how to get DeSyncs value
                             .setHasDeSync(false)
-                            .setLaunchVMEnabled(mIsAegisEnabled);
+                            .setLaunchVMEnabled(mIsVMEnabled);
                     AppSearchLoggerHelper.copyNativeStats(
                             initializeResultProto.getInitializeStats(), initStatsBuilder);
                 }
@@ -570,7 +570,7 @@ public final class AppSearchImpl implements Closeable {
                 setSchemaStatsBuilder.setJavaLockAcquisitionLatencyMillis(
                         (int) (SystemClock.elapsedRealtime()
                                 - javaLockAcquisitionLatencyStartMillis))
-                        .setLaunchVMEnabled(mIsAegisEnabled);
+                        .setLaunchVMEnabled(mIsVMEnabled);
             }
             if (mObserverManager.isPackageObserved(packageName)) {
                 return doSetSchemaWithChangeNotificationLocked(
@@ -1092,7 +1092,7 @@ public final class AppSearchImpl implements Closeable {
                 String docId = documents.get(i).getId();
                 PutDocumentStats.Builder pStatsBuilder =
                         new PutDocumentStats.Builder(packageName, databaseName)
-                                .setLaunchVMEnabled(mIsAegisEnabled);
+                                .setLaunchVMEnabled(mIsVMEnabled);
                 // Previously we always log even if we reach the limit. To keep the behavior
                 // same as before, we will save all the stats created.
                 allStatsList.add(pStatsBuilder);
@@ -1263,7 +1263,7 @@ public final class AppSearchImpl implements Closeable {
         PutDocumentStats.Builder pStatsBuilder = null;
         if (logger != null) {
             pStatsBuilder = new PutDocumentStats.Builder(packageName, databaseName)
-                    .setLaunchVMEnabled(mIsAegisEnabled);
+                    .setLaunchVMEnabled(mIsVMEnabled);
         }
         long totalStartTimeMillis = SystemClock.elapsedRealtime();
 
@@ -1939,7 +1939,7 @@ public final class AppSearchImpl implements Closeable {
                     new SearchStats.Builder(SearchStats.VISIBILITY_SCOPE_LOCAL, packageName)
                             .setDatabase(databaseName)
                             .setSearchSourceLogTag(searchSpec.getSearchSourceLogTag())
-                            .setLaunchVMEnabled(mIsAegisEnabled);
+                            .setLaunchVMEnabled(mIsVMEnabled);
         }
 
         long javaLockAcquisitionLatencyStartMillis = SystemClock.elapsedRealtime();
@@ -2016,7 +2016,7 @@ public final class AppSearchImpl implements Closeable {
                             SearchStats.VISIBILITY_SCOPE_GLOBAL,
                             callerAccess.getCallingPackageName())
                             .setSearchSourceLogTag(searchSpec.getSearchSourceLogTag())
-                            .setLaunchVMEnabled(mIsAegisEnabled);
+                            .setLaunchVMEnabled(mIsVMEnabled);
         }
 
         long javaLockAcquisitionLatencyStartMillis = SystemClock.elapsedRealtime();
@@ -2280,7 +2280,7 @@ public final class AppSearchImpl implements Closeable {
                 sStatsBuilder.setJavaLockAcquisitionLatencyMillis(
                         (int) (SystemClock.elapsedRealtime()
                                 - javaLockAcquisitionLatencyStartMillis))
-                        .setLaunchVMEnabled(mIsAegisEnabled);
+                        .setLaunchVMEnabled(mIsVMEnabled);
             }
             throwIfClosedLocked();
 
@@ -2457,7 +2457,7 @@ public final class AppSearchImpl implements Closeable {
             if (removeStatsBuilder != null) {
                 removeStatsBuilder.setStatusCode(statusProtoToResultCode(
                         deleteResultProto.getStatus()))
-                        .setLaunchVMEnabled(mIsAegisEnabled);
+                        .setLaunchVMEnabled(mIsVMEnabled);
                 AppSearchLoggerHelper.copyNativeStats(deleteResultProto.getDeleteStats(),
                         removeStatsBuilder);
             }
@@ -2565,7 +2565,7 @@ public final class AppSearchImpl implements Closeable {
             if (removeStatsBuilder != null) {
                 removeStatsBuilder.setTotalLatencyMillis(
                         (int) (SystemClock.elapsedRealtime() - totalLatencyStartTimeMillis))
-                        .setLaunchVMEnabled(mIsAegisEnabled);
+                        .setLaunchVMEnabled(mIsVMEnabled);
             }
         }
     }
@@ -3442,7 +3442,7 @@ public final class AppSearchImpl implements Closeable {
                     "optimize, response", optimizeResultProto.getStatus(), optimizeResultProto);
             if (builder != null) {
                 builder.setStatusCode(statusProtoToResultCode(optimizeResultProto.getStatus()))
-                        .setLaunchVMEnabled(mIsAegisEnabled);
+                        .setLaunchVMEnabled(mIsVMEnabled);
                 AppSearchLoggerHelper.copyNativeStats(optimizeResultProto.getOptimizeStats(),
                         builder);
             }
