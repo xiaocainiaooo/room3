@@ -56,6 +56,7 @@ import androidx.pdf.view.fastscroll.FastScrollCalculator
 import androidx.pdf.view.fastscroll.FastScrollDrawer
 import androidx.pdf.view.fastscroll.FastScrollGestureDetector
 import androidx.pdf.view.fastscroll.FastScroller
+import androidx.pdf.view.fastscroll.getDimensions
 import java.util.LinkedList
 import java.util.Queue
 import java.util.concurrent.Executors
@@ -745,6 +746,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             PageLayoutManager(
                     localPdfDocument,
                     backgroundScope,
+                    topPageMarginPx = context.getDimensions(R.dimen.top_page_margin).toInt(),
+                    pageSpacingPx = context.getDimensions(R.dimen.page_spacing).toInt(),
                     paginationModel = requireNotNull(localStateToRestore.paginationModel)
                 )
                 .apply { onViewportChanged(scrollY, height, zoom) }
@@ -924,9 +927,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // instantiate new ones
         if (!maybeRestoreState()) {
             pageLayoutManager =
-                PageLayoutManager(localPdfDocument, backgroundScope).apply {
-                    onViewportChanged(scrollY, height, zoom)
-                }
+                PageLayoutManager(
+                        localPdfDocument,
+                        backgroundScope,
+                        topPageMarginPx = context.getDimensions(R.dimen.top_page_margin).toInt(),
+                        pageSpacingPx = context.getDimensions(R.dimen.page_spacing).toInt()
+                    )
+                    .apply { onViewportChanged(scrollY, height, zoom) }
             selectionStateManager =
                 SelectionStateManager(
                     localPdfDocument,
