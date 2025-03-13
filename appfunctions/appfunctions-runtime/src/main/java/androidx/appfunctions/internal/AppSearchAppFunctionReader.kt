@@ -73,19 +73,19 @@ internal class AppSearchAppFunctionReader(private val context: Context) : AppFun
             // Perform initial search immediately
             send(performSearch(session, searchFunctionSpec))
 
-            val appSearchObserver = AppSearchChangeObserver()
+            val appSearchChannelObserver = AppSearchChannelObserver()
             // Register the observer callback
             session.registerObserverCallback(
                 SYSTEM_PACKAGE_NAME,
                 buildObserverSpec(searchFunctionSpec.packageNames ?: emptySet()),
                 Dispatchers.Worker.asExecutor(),
-                appSearchObserver
+                appSearchChannelObserver
             )
 
             // Coroutine to react to updates from the observer
             val observerJob = launch {
                 // TODO: Optimize with debounce
-                appSearchObserver.observe().collect {
+                appSearchChannelObserver.observe().collect {
                     // TODO(b/403264749): Check if we can skip the running a full search again by
                     // caching the results.
                     send(performSearch(session, searchFunctionSpec))
@@ -95,15 +95,15 @@ internal class AppSearchAppFunctionReader(private val context: Context) : AppFun
             // Clean up when collection stops
             awaitClose {
                 observerJob.cancel()
-                appSearchObserver.close()
-                session.unregisterObserverCallback(SYSTEM_PACKAGE_NAME, appSearchObserver)
+                appSearchChannelObserver.close()
+                session.unregisterObserverCallback(SYSTEM_PACKAGE_NAME, appSearchChannelObserver)
                 session.close()
             }
         }
     }
 
-    private class AppSearchChangeObserver : ObserverCallback {
-        val updateChannel = Channel<Unit>(Channel.RENDEZVOUS)
+    private class AppSearchChannelObserver : ObserverCallback {
+        private val updateChannel = Channel<Unit>(Channel.RENDEZVOUS)
 
         override fun onSchemaChanged(changeInfo: SchemaChangeInfo) {
             updateChannel.trySend(Unit)
