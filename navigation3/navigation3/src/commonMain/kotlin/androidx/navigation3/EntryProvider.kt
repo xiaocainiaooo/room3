@@ -95,6 +95,7 @@ public inline fun <reified T : Any> EntryProviderBuilder<*>.entry(
 }
 
 /** Holds a Entry class, metadata, and content for that class */
+@Suppress("DataClassDefinition")
 public data class EntryClassProvider<T : Any>(
     val clazz: KClass<T>,
     val metadata: Map<String, Any>,
@@ -102,6 +103,7 @@ public data class EntryClassProvider<T : Any>(
 )
 
 /** Holds a Entry class, metadata, and content for that key */
+@Suppress("DataClassDefinition")
 public data class EntryProvider<T : Any>(
     val key: T,
     val metadata: Map<String, Any>,
