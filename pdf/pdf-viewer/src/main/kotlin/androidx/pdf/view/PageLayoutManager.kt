@@ -45,10 +45,10 @@ import kotlinx.coroutines.withContext
 internal class PageLayoutManager(
     private val pdfDocument: PdfDocument,
     private val backgroundScope: CoroutineScope,
-    // TODO(b/376299551) - Make page margin configurable via XML attribute
+    topPageMarginPx: Int = 0,
     pageSpacingPx: Int = DEFAULT_PAGE_SPACING_PX,
     internal val paginationModel: PaginationModel =
-        PaginationModel(pageSpacingPx, pdfDocument.pageCount)
+        PaginationModel(pageSpacingPx, pdfDocument.pageCount, topPageMarginPx)
 ) {
     /** The 0-indexed maximum page number whose dimensions are known to this model */
     val reach

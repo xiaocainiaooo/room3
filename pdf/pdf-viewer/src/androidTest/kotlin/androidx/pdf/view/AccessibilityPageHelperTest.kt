@@ -20,6 +20,8 @@ import android.graphics.RectF
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.pdf.R
+import androidx.pdf.view.fastscroll.getDimensions
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -84,6 +86,8 @@ class AccessibilityPageHelperTest {
                 "AccessibilityPageHelper must not be null."
             }
 
+        val topPageMargin = pdfView.context.getDimensions(R.dimen.top_page_margin)
+
         // Wait until layout completes for the required pages
         pdfDocument.waitForLayout(untilPage = 2)
 
@@ -92,7 +96,7 @@ class AccessibilityPageHelperTest {
             listOf(
                 Triple(25f, 25f, 0), // Maps to page 0
                 Triple(25f, 250f, 1), // Maps to page 1
-                Triple(0f, 0f, 0), // Maps to the very start of the first page
+                Triple(0f, topPageMargin, 0), // Maps to the very start of the first page
                 Triple(0f, 100f, 0), // Edge of the first page
                 Triple(110f, 25f, -1), // Outside valid page bounds
                 Triple(-10f, -10f, -1), // Outside viewport
@@ -164,14 +168,16 @@ class AccessibilityPageHelperTest {
                 "AccessibilityPageHelper must not be null."
             }
 
+        val topPageMargin = pdfView.context.getDimensions(R.dimen.top_page_margin)
+
         // Wait until layout completes for the required pages
         pdfDocument.waitForLayout(untilPage = 0)
 
         val testCases =
             listOf(
-                0 to RectF(0f, 0f, 100f, 200f),
-                10 to RectF(25f, 30f, 75f, 50f),
-                11 to RectF(25f, 60f, 75f, 80f)
+                0 to RectF(0f, topPageMargin, 100f, 200f + topPageMargin),
+                10 to RectF(25f, 30f + topPageMargin, 75f, 50f + topPageMargin),
+                11 to RectF(25f, 60f + topPageMargin, 75f, 80f + topPageMargin)
             )
 
         testCases.forEach { (virtualViewId, boundsInParent) ->
