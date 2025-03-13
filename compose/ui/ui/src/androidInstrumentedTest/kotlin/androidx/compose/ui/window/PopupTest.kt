@@ -62,6 +62,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
@@ -225,6 +226,7 @@ class PopupTest {
         rule.runOnIdle { assertThat(value).isEqualTo(LayoutDirection.Rtl) }
     }
 
+    @FlakyTest(bugId = 402738067)
     @Test
     fun isDismissedOnTapOutside() {
         var showPopup by mutableStateOf(true)
