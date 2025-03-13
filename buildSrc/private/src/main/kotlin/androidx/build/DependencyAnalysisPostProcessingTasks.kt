@@ -219,6 +219,14 @@ internal fun Project.configureDependencyAnalysisPlugin() {
     dependencyAnalysisSubExtension.issues { it.onIncorrectConfiguration { it.severity("ignore") } }
     dependencyAnalysisSubExtension.issues { it.onRuntimeOnly { it.severity("ignore") } }
     dependencyAnalysisSubExtension.issues { it.onCompileOnly { it.severity("ignore") } }
+
+    // DAGP currently doesn't support KMP, enable KMP projects when b/394970486 is resolved
+    // Enable CI check for published libraries
+    if (
+        multiplatformExtension == null && androidXExtension.type == SoftwareType.PUBLISHED_LIBRARY
+    ) {
+        addToBuildOnServer(reportDependencyAnalysisAdviceTask)
+    }
 }
 
 /**
