@@ -515,6 +515,8 @@ constructor(
                         enableStreamUseCase = false
                     )
 
+                sessionProcessor!!.initSession(cameraInfoInternal.get(), null)
+
                 val useCaseManagerConfig =
                     UseCaseManagerConfig(
                         useCases,
@@ -556,10 +558,18 @@ constructor(
                 }
             }
         }
-        sessionProcessorManager?.let {
-            it.close()
-            sessionProcessorManager = null
-            pendingSessionProcessorInitialization = false
+        sessionProcessor?.let { sessionProcessor ->
+            val usingLegacyExtensions =
+                sessionProcessor.implementationType.first == SessionProcessor.TYPE_VENDOR_LIBRARY
+            if (usingLegacyExtensions) {
+                sessionProcessorManager?.let {
+                    it.close()
+                    sessionProcessorManager = null
+                    pendingSessionProcessorInitialization = false
+                }
+            } else {
+                sessionProcessor.deInitSession()
+            }
         }
     }
 

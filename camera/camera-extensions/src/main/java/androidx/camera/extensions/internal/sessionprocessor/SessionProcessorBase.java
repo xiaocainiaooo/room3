@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -118,12 +119,13 @@ abstract class SessionProcessorBase implements SessionProcessor, CameraExtension
 
     @Override
     public final @NonNull SessionConfig initSession(@NonNull CameraInfo cameraInfo,
-            @NonNull OutputSurfaceConfiguration outputSurfaceConfiguration) {
+            @Nullable OutputSurfaceConfiguration outputSurfaceConfiguration) {
         CameraInfoInternal cameraInfoInternal = (CameraInfoInternal) cameraInfo;
         Map<String, CameraCharacteristics> characteristicsMap =
                 ExtensionsUtils.getCameraCharacteristicsMap(cameraInfoInternal);
         Camera2SessionConfig camera2SessionConfig = initSessionInternal(
-                cameraInfoInternal.getCameraId(), characteristicsMap, outputSurfaceConfiguration);
+                cameraInfoInternal.getCameraId(), characteristicsMap,
+                Objects.requireNonNull(outputSurfaceConfiguration));
 
         SessionConfig.Builder sessionConfigBuilder = new SessionConfig.Builder();
         synchronized (mLock) {

@@ -57,6 +57,8 @@ public class Camera2ExtensionsVendorExtender(
         mutableMapOf()
     private lateinit var cameraId: String
     private lateinit var cameraExtensionCharacteristics: CameraExtensionCharacteristics
+    private var isExtensionStrengthSupported: Boolean = false
+    private var isCurrentExtensionModeSupported: Boolean = false
 
     override fun isExtensionAvailable(
         cameraId: String,
@@ -100,6 +102,30 @@ public class Camera2ExtensionsVendorExtender(
         cameraId = (cameraInfo as CameraInfoInternal).getCameraId()
         cameraExtensionCharacteristics =
             Preconditions.checkNotNull(getCamera2ExtensionsCharacteristics(cameraId))
+
+        isExtensionStrengthSupported =
+            if (
+                isCamera2ExtensionAvailable() &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+            ) {
+                cameraExtensionCharacteristics
+                    .getAvailableCaptureRequestKeys(camera2ExtensionMode)
+                    .contains(CaptureRequest.EXTENSION_STRENGTH)
+            } else {
+                false
+            }
+
+        isCurrentExtensionModeSupported =
+            if (
+                isCamera2ExtensionAvailable() &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+            ) {
+                cameraExtensionCharacteristics
+                    .getAvailableCaptureResultKeys(camera2ExtensionMode)
+                    .contains(CaptureResult.EXTENSION_CURRENT_TYPE)
+            } else {
+                false
+            }
     }
 
     override fun getEstimatedCaptureLatencyRange(size: Size?): Range<Long>? {
@@ -231,30 +257,12 @@ public class Camera2ExtensionsVendorExtender(
 
     override fun isExtensionStrengthAvailable(): Boolean {
         checkInitialized()
-        return if (
-            isCamera2ExtensionAvailable() &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-        ) {
-            cameraExtensionCharacteristics
-                .getAvailableCaptureRequestKeys(camera2ExtensionMode)
-                .contains(CaptureRequest.EXTENSION_STRENGTH)
-        } else {
-            false
-        }
+        return isExtensionStrengthSupported
     }
 
     override fun isCurrentExtensionModeAvailable(): Boolean {
         checkInitialized()
-        return if (
-            isCamera2ExtensionAvailable() &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-        ) {
-            cameraExtensionCharacteristics
-                .getAvailableCaptureResultKeys(camera2ExtensionMode)
-                .contains(CaptureResult.EXTENSION_CURRENT_TYPE)
-        } else {
-            false
-        }
+        return isCurrentExtensionModeSupported
     }
 
     override fun createSessionProcessor(context: Context): SessionProcessor? {

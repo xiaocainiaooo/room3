@@ -70,12 +70,15 @@ public interface SessionProcessor {
      *
      * @param cameraInfo                 cameraInfo for querying the camera info
      * @param outputSurfaceConfig output surface configuration for preview, image capture,
-     *                                  image analysis and the postview.
+     *                                  image analysis and the postview. This can be null under
+     *                                  Camera2 Extensions implementation mode. In that case, this
+     *                                  function is invoked to setup the necessary stuffs only.
      * @return a {@link SessionConfig} that contains the surfaces and the session parameters and
-     * should be used to configure the camera session.
+     * should be used to configure the camera session. Return null when the input
+     * <code>outputSurfaceConfig</code> is null.
      */
-    @NonNull SessionConfig initSession(@NonNull CameraInfo cameraInfo,
-            @NonNull OutputSurfaceConfiguration outputSurfaceConfig);
+    @Nullable SessionConfig initSession(@NonNull CameraInfo cameraInfo,
+            @Nullable OutputSurfaceConfiguration outputSurfaceConfig);
 
     /**
      * De-initializes the session. This is called after the camera session is closed.

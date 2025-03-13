@@ -18,23 +18,33 @@ package androidx.camera.extensions.internal.sessionprocessor
 
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CaptureRequest
+import android.hardware.camera2.CaptureResult
+import android.os.Build
 import android.util.Pair
 import android.util.Size
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraInfo
 import androidx.camera.core.impl.AdapterCameraInfo
+import androidx.camera.core.impl.CameraCaptureCallback
+import androidx.camera.core.impl.CameraCaptureResult
+import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.impl.Config
 import androidx.camera.core.impl.OutputSurfaceConfiguration
 import androidx.camera.core.impl.RequestProcessor
 import androidx.camera.core.impl.SessionConfig
 import androidx.camera.core.impl.SessionProcessor
 import androidx.camera.core.impl.TagBundle
+import androidx.camera.core.impl.utils.executor.CameraXExecutors
 import androidx.camera.extensions.CameraExtensionsControl
 import androidx.camera.extensions.CameraExtensionsInfo
 import androidx.camera.extensions.ExtensionMode
+import androidx.camera.extensions.internal.Camera2ExtensionsUtil.convertCamera2ModeToCameraXMode
 import androidx.camera.extensions.internal.Camera2ExtensionsUtil.convertCameraXModeToCamera2Mode
 import androidx.camera.extensions.internal.ExtensionsUtils
 import androidx.camera.extensions.internal.VendorExtender
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import java.util.concurrent.atomic.AtomicInteger
 
 @RequiresApi(31)
 public class Camera2ExtensionsSessionProcessor(
@@ -45,23 +55,80 @@ public class Camera2ExtensionsSessionProcessor(
 
     private val camera2ExtensionMode = convertCameraXModeToCamera2Mode(mode)
 
+    private var extensionStrengthLiveData: MutableLiveData<Int>? = null
+    private var currentExtensionTypeLiveData: MutableLiveData<Int>? = null
+    private val extensionStrength: AtomicInteger = AtomicInteger(100)
+    private val currentExtensionType: AtomicInteger = AtomicInteger(mode)
+
     @AdapterCameraInfo.CameraOperation
     private val supportedCameraOperations: Set<Int> =
         ExtensionsUtils.getSupportedCameraOperations(availableCaptureRequestKeys)
 
+    private var cameraInfoInternal: CameraInfoInternal? = null
+    private var cameraCaptureCallback: CameraCaptureCallback? = null
+
+    init {
+        if (isCurrentExtensionModeAvailable()) {
+            currentExtensionTypeLiveData = MutableLiveData<Int>(mode)
+        }
+        if (isExtensionStrengthAvailable()) {
+            extensionStrengthLiveData = MutableLiveData<Int>(100)
+        }
+    }
+
     override fun initSession(
         cameraInfo: CameraInfo,
-        outputSurfaceConfig: OutputSurfaceConfiguration
-    ): SessionConfig {
-        throw UnsupportedOperationException(
-            "Camera2ExtensionsSessionProcessor#initSession should not be invoked!"
+        outputSurfaceConfig: OutputSurfaceConfiguration?
+    ): SessionConfig? {
+        cameraInfoInternal = cameraInfo as CameraInfoInternal
+        // Sets up the CameraCaptureCallback to receive the extensions related info
+        cameraCaptureCallback =
+            object : CameraCaptureCallback() {
+                override fun onCaptureCompleted(
+                    captureConfigId: Int,
+                    cameraCaptureResult: CameraCaptureResult
+                ) {
+                    if (
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                            isCurrentExtensionModeAvailable()
+                    ) {
+                        cameraCaptureResult.captureResult
+                            ?.get(CaptureResult.EXTENSION_CURRENT_TYPE)
+                            ?.let {
+                                val cameraXMode = convertCamera2ModeToCameraXMode(it)
+                                if (currentExtensionType.getAndSet(cameraXMode) != cameraXMode) {
+                                    extensionStrengthLiveData?.postValue(it)
+                                }
+                            }
+                    }
+
+                    if (
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                            isExtensionStrengthAvailable()
+                    ) {
+                        cameraCaptureResult.captureResult
+                            ?.get(CaptureResult.EXTENSION_STRENGTH)
+                            ?.let {
+                                if (extensionStrength.getAndSet(it) != it) {
+                                    extensionStrengthLiveData?.postValue(it)
+                                }
+                            }
+                    }
+                }
+            }
+
+        cameraInfoInternal!!.addSessionCaptureCallback(
+            CameraXExecutors.directExecutor(),
+            cameraCaptureCallback!!
         )
+
+        return null
     }
 
     override fun deInitSession() {
-        throw UnsupportedOperationException(
-            "Camera2ExtensionsSessionProcessor#deInitSession should not be invoked!"
-        )
+        cameraInfoInternal?.apply {
+            cameraCaptureCallback?.let { removeSessionCaptureCallback(it) }
+        }
     }
 
     override fun getSupportedPostviewSize(captureSize: Size): Map<Int, List<Size>> {
@@ -133,4 +200,14 @@ public class Camera2ExtensionsSessionProcessor(
             "Camera2ExtensionsSessionProcessor#abortCapture should not be invoked!"
         )
     }
+
+    override fun isExtensionStrengthAvailable(): Boolean =
+        vendorExtender.isExtensionStrengthAvailable
+
+    override fun getExtensionStrength(): LiveData<Int>? = extensionStrengthLiveData
+
+    override fun isCurrentExtensionModeAvailable(): Boolean =
+        vendorExtender.isCurrentExtensionModeAvailable
+
+    override fun getCurrentExtensionMode(): LiveData<Int>? = currentExtensionTypeLiveData
 }
