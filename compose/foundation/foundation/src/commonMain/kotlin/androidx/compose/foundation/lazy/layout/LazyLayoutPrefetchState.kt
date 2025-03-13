@@ -260,7 +260,7 @@ internal class PrefetchMetrics {
      * is once we encounter a new content type we don't want to start with no averages, instead we
      * use the overall averages initially until we collected more data.
      */
-    private fun getAverage(contentType: Any?): Averages {
+    fun getAverage(contentType: Any?): Averages {
         val lastUsedAverage = this@PrefetchMetrics.lastUsedAverage
         return if (lastUsedContentType === contentType && lastUsedAverage != null) {
             lastUsedAverage
@@ -278,21 +278,9 @@ internal class PrefetchMetrics {
 
     private var lastUsedContentType: Any? = null
     private var lastUsedAverage: Averages? = null
-
-    fun getCompositionTimeNanos(contentType: Any?) = getAverage(contentType).compositionTimeNanos
-
-    fun getMeasureTimeNanos(contentType: Any?) = getAverage(contentType).measureTimeNanos
-
-    fun saveCompositionTime(contentType: Any?, timeNanos: Long) {
-        getAverage(contentType).saveCompositionTimeNanos(timeNanos)
-    }
-
-    fun saveMeasureTime(contentType: Any?, timeNanos: Long) {
-        getAverage(contentType).saveMeasureTimeNanos(timeNanos)
-    }
 }
 
-private class Averages {
+internal class Averages {
     /** Average time the full composition phase has taken. */
     var compositionTimeNanos: Long = 0L
     /** Average time the measure phase has taken. */
@@ -460,23 +448,19 @@ internal class PrefetchHandleProvider(
             }
 
             val contentType = itemProvider.getContentType(index)
+            val average = prefetchMetrics.getAverage(contentType)
 
             // we save the value we get from availableTimeNanos() into a local variable once
             // and manually update it later by calling updateElapsedAndAvailableTime()
             resetAvailableTimeTo(availableTimeNanos())
             traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
             if (!isComposed) {
-                if (
-                    shouldExecute(
-                        availableTimeNanos,
-                        prefetchMetrics.getCompositionTimeNanos(contentType)
-                    )
-                ) {
+                if (shouldExecute(availableTimeNanos, average.compositionTimeNanos)) {
                     trace("compose:lazy:prefetch:compose") {
                         performFullComposition(itemProvider, contentType)
                     }
                     updateElapsedAndAvailableTime()
-                    prefetchMetrics.saveCompositionTime(contentType, elapsedTimeNanos)
+                    average.saveCompositionTimeNanos(elapsedTimeNanos)
                 } else {
                     return true
                 }
@@ -517,15 +501,10 @@ internal class PrefetchHandleProvider(
             traceValue("compose:lazy:prefetch:available_time_nanos", availableTimeNanos)
             val constraints = premeasureConstraints
             if (!isMeasured && constraints != null) {
-                if (
-                    shouldExecute(
-                        availableTimeNanos,
-                        prefetchMetrics.getMeasureTimeNanos(contentType)
-                    )
-                ) {
+                if (shouldExecute(availableTimeNanos, average.measureTimeNanos)) {
                     trace("compose:lazy:prefetch:measure") { performMeasure(constraints) }
                     updateElapsedAndAvailableTime()
-                    prefetchMetrics.saveMeasureTime(contentType, elapsedTimeNanos)
+                    average.saveMeasureTimeNanos(elapsedTimeNanos)
                     onItemPremeasured?.invoke(this@HandleAndRequestImpl)
                 } else {
                     return true
