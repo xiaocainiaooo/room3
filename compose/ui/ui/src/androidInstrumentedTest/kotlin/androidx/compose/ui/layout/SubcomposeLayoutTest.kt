@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.ReusableContentHost
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -3225,6 +3226,232 @@ class SubcomposeLayoutTest {
         rule.runOnIdle { size = 150 }
 
         rule.onNodeWithTag("node").assertWidthIsEqualTo(150.dp)
+    }
+
+    @Test
+    fun precomposePaused_composeAndApply() {
+        val addSlot = mutableStateOf(false)
+        var composingCounter = 0
+        var applyCounter = 0
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = {
+            composingCounter++
+            SideEffect { applyCounter++ }
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                if (addSlot.value) {
+                    subcompose(Unit, content)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        val precomposition =
+            rule.runOnIdle {
+                assertThat(composingCounter).isEqualTo(0)
+                state.createPausedPrecomposition(Unit, content)
+            }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(0)
+            precomposition.resume { false }
+
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(applyCounter).isEqualTo(0)
+
+            precomposition.apply()
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(applyCounter).isEqualTo(1)
+        }
+
+        rule.runOnIdle { addSlot.value = true }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(applyCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposePaused_composeOnly_applyDuringRegularPhase() {
+        val addSlot = mutableStateOf(false)
+        var composingCounter = 0
+        var applyCounter = 0
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = {
+            composingCounter++
+            SideEffect { applyCounter++ }
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                if (addSlot.value) {
+                    subcompose(Unit, content)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        val precomposition =
+            rule.runOnIdle {
+                assertThat(composingCounter).isEqualTo(0)
+                state.createPausedPrecomposition(Unit, content)
+            }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(0)
+            precomposition.resume { false }
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(applyCounter).isEqualTo(0)
+            addSlot.value = true
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(applyCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposePaused_pauseStraightAway_doTheRestDuringRegularPhase() {
+        val addSlot = mutableStateOf(false)
+        var composingCounter = 0
+        var applyCounter = 0
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = {
+            composingCounter++
+            SideEffect { applyCounter++ }
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                if (addSlot.value) {
+                    subcompose(Unit, content)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        val precomposition =
+            rule.runOnIdle {
+                assertThat(composingCounter).isEqualTo(0)
+                state.createPausedPrecomposition(Unit, content)
+            }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(0)
+            precomposition.resume { true }
+        }
+
+        rule.runOnIdle { addSlot.value = true }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(1)
+            assertThat(applyCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun disposePrecomposedPausedItem() {
+        val addSlot = mutableStateOf(false)
+        var composingCounter = 0
+        var applyCounter = 0
+        val state = SubcomposeLayoutState()
+        val content: @Composable () -> Unit = {
+            composingCounter++
+            SideEffect { applyCounter++ }
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                if (addSlot.value) {
+                    subcompose(Unit, content)
+                }
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(composingCounter).isEqualTo(0)
+            val precomposition = state.createPausedPrecomposition(Unit, content)
+            precomposition.resume { false }
+            assertThat(composingCounter).isEqualTo(1)
+            precomposition.cancel()
+        }
+
+        rule.runOnIdle { addSlot.value = true }
+
+        rule.runOnIdle {
+            // as we canceled precomposition, we compose it again during measure
+            assertThat(composingCounter).isEqualTo(2)
+            assertThat(applyCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun precomposePaused_isComplete() {
+        val state = SubcomposeLayoutState()
+
+        rule.setContent { SubcomposeLayout(state) { layout(10, 10) {} } }
+
+        rule.runOnIdle {
+            val precomposition =
+                state.createPausedPrecomposition(Unit) { Box(Modifier.size(100.dp)) }
+            assertThat(precomposition.isComplete).isFalse()
+            while (!precomposition.isComplete) {
+                val result = precomposition.resume { true }
+                assertThat(result).isEqualTo(precomposition.isComplete)
+            }
+        }
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun precomposePaused_applyOnNotCompletedPrecompositionThrows() {
+        val state = SubcomposeLayoutState()
+
+        rule.setContent { SubcomposeLayout(state) { layout(10, 10) {} } }
+
+        rule.runOnIdle {
+            val precomposition =
+                state.createPausedPrecomposition(Unit) { Box(Modifier.size(100.dp)) }
+            assertThat(precomposition.isComplete).isFalse()
+            precomposition.apply()
+        }
+    }
+
+    @Test
+    fun premeasuringAfterPrecomposePaused() {
+        val state = SubcomposeLayoutState()
+        var remeasuresCount = 0
+        val modifier =
+            Modifier.layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    remeasuresCount++
+                    layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+                }
+                .fillMaxSize()
+        val content = @Composable { Box(modifier) }
+        val constraints = Constraints(maxWidth = 100, minWidth = 100)
+
+        rule.setContent { SubcomposeLayout(state) { layout(10, 10) {} } }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(0)
+            val precomposition = state.createPausedPrecomposition(Unit, content)
+            precomposition.resume { false }
+            val handle = precomposition.apply()
+
+            assertThat(remeasuresCount).isEqualTo(0)
+            assertThat(handle.placeablesCount).isEqualTo(1)
+            handle.premeasure(0, constraints)
+
+            assertThat(remeasuresCount).isEqualTo(1)
+        }
     }
 
     private fun alternateLookaheadPlacement(shouldPlaceItem: BooleanArray) {

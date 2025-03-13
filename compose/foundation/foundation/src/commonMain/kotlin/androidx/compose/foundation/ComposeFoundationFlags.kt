@@ -79,4 +79,12 @@ object ComposeFoundationFlags {
      */
     // TODO(grantapher-cm-api-publicize) Make field public
     @Suppress("MutableBareField") @JvmField internal var isNewContextMenuEnabled = false
+
+    /**
+     * Selecting flag to enable the use of new PausableComposition in lazy layout prefetch. This
+     * change allows us to distribute work we need to do during the prefetch better, for example we
+     * can only perform the composition for parts of the LazyColumn's next item during one ui frame,
+     * and then continue composing the rest of it in the next frames.
+     */
+    @Suppress("MutableBareField") @JvmField var isPausableCompositionInPrefetchEnabled = true
 }
