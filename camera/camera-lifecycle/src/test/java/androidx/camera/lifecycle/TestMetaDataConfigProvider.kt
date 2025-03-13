@@ -22,13 +22,13 @@ import androidx.test.filters.SdkSuppress
 import kotlinx.atomicfu.atomic
 
 @SdkSuppress(minSdkVersion = 21)
-public class TestMetaDataConfigProvider : CameraXConfig.Provider {
+internal class TestMetaDataConfigProvider : CameraXConfig.Provider {
 
-    public companion object {
+    companion object {
         private val count = atomic(0)
 
         @JvmStatic
-        public val invokeCount: Int
+        val invokeCount: Int
             get() = count.value
     }
 
