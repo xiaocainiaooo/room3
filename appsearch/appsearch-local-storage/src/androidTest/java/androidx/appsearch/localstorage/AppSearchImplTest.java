@@ -4819,7 +4819,7 @@ public class AppSearchImplTest {
     }
 
     @Test
-    public void testStatsIsLaunchAegis() throws Exception {
+    public void testStatsIsLaunchVM() throws Exception {
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         IcingSearchEngineOptions options = mUnlimitedConfig.toIcingSearchEngineOptions(
                 mAppSearchDir.getAbsolutePath());
@@ -4911,7 +4911,7 @@ public class AppSearchImplTest {
     }
 
     @Test
-    public void testStatsIsNotLaunchAegis() throws Exception {
+    public void testStatsIsNotLaunchVM() throws Exception {
         InitializeStats.Builder initStatsBuilder = new InitializeStats.Builder();
         // the bit mask for nothing enabled feature.
         int noLaunchFeature = 0;
