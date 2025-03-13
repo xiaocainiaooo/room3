@@ -68,7 +68,7 @@ class TypographyScreenshotTest {
     fun arc_large_font_test(@TestParameter font: TextFont) {
         verifyTypographyScreenshot {
             CurvedFontText(
-                text = "ArcLarge",
+                text = "ArcLarge123",
                 font = font,
                 style = MaterialTheme.typography.arcLarge,
                 variationSettings = TypographyVariableFontsTokens.ArcLargeVariationSettings
@@ -80,7 +80,7 @@ class TypographyScreenshotTest {
     fun arc_medium_font_test(@TestParameter font: TextFont) {
         verifyTypographyScreenshot {
             CurvedFontText(
-                text = "ArcMedium",
+                text = "ArcMedium123",
                 font = font,
                 style = MaterialTheme.typography.arcMedium,
                 variationSettings = TypographyVariableFontsTokens.ArcMediumVariationSettings
@@ -92,7 +92,7 @@ class TypographyScreenshotTest {
     fun arc_small_font_test(@TestParameter font: TextFont) {
         verifyTypographyScreenshot {
             CurvedFontText(
-                text = "ArcSmall",
+                text = "ArcSmall123",
                 font = font,
                 style = MaterialTheme.typography.arcSmall,
                 variationSettings = TypographyVariableFontsTokens.ArcSmallVariationSettings
