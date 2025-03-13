@@ -33,10 +33,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertIs
 import org.junit.Assume.assumeTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
-// TODO(b/402340010): Enable the test after unknown KSP failure is fixed
 @LargeTest
 class IntegrationTest {
     private val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
@@ -50,7 +48,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_success() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -72,7 +69,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_voidReturnType_success() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -88,7 +84,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_setFactory_success() = doBlocking {
         // A factory is set to create the enclosing class of the function.
         // See [TestApplication.appFunctionConfiguration].
@@ -114,7 +109,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_functionInLibraryModule_success() = doBlocking {
         var response =
             appFunctionManager.executeAppFunction(
@@ -139,7 +133,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_functionNotFound_fail() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -157,7 +150,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_appThrows_fail() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -176,7 +168,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_createNote() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
