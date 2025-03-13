@@ -17,8 +17,10 @@
 package androidx.compose.material3
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateDecay
@@ -48,8 +50,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingToolbarDefaults.horizontalEnterTransition
@@ -97,27 +101,35 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScrollModifierNode
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.requireDensity
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.util.fastRoundToInt
 import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 /**
  * A horizontal floating toolbar displays navigation and key actions in a [Row]. It can be
@@ -1629,7 +1641,7 @@ private fun HorizontalFloatingToolbarLayout(
                     this.shape = shape
                     this.clip = true
                 }
-                .height(FloatingToolbarDefaults.ContainerSize)
+                .heightIn(min = FloatingToolbarDefaults.ContainerSize)
                 .background(color = colors.toolbarContainerColor, shape = shape)
                 .padding(contentPadding),
         horizontalArrangement = Arrangement.Center,
@@ -1648,21 +1660,27 @@ private fun HorizontalFloatingToolbarLayout(
             Row(
                 modifier =
                     Modifier.parentSemantics {
-                        this.customActions =
-                            customToolbarActions(
-                                expanded = expandedState,
-                                expandAction = {
-                                    onA11yForceCollapse(false)
-                                    true
-                                },
-                                collapseAction = {
-                                    onA11yForceCollapse(true)
-                                    true
-                                },
-                                expandActionLabel = expandToolbarActionLabel,
-                                collapseActionLabel = collapseToolbarActionLabel
-                            )
-                    },
+                            this.customActions =
+                                customToolbarActions(
+                                    expanded = expandedState,
+                                    expandAction = {
+                                        onA11yForceCollapse(false)
+                                        true
+                                    },
+                                    collapseAction = {
+                                        onA11yForceCollapse(true)
+                                        true
+                                    },
+                                    expandActionLabel = expandToolbarActionLabel,
+                                    collapseActionLabel = collapseToolbarActionLabel
+                                )
+                        }
+                        .minimumInteractiveBalancedPadding(
+                            hasVisibleLeadingContent = expanded && leadingContent != null,
+                            hasVisibleTrailingContent = expanded && trailingContent != null,
+                            // Ensures this motion will cause the padding to bounce.
+                            animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
+                        ),
                 content = content
             )
             trailingContent?.let {
@@ -1849,6 +1867,7 @@ private fun VerticalFloatingToolbarLayout(
             if (expanded) expandedShadowElevation else collapsedShadowElevation,
             animationSpec = FloatingToolbarDefaults.animationSpec()
         )
+
     Column(
         modifier =
             modifier
@@ -1861,7 +1880,7 @@ private fun VerticalFloatingToolbarLayout(
                     this.shape = shape
                     this.clip = true
                 }
-                .width(FloatingToolbarDefaults.ContainerSize)
+                .widthIn(min = FloatingToolbarDefaults.ContainerSize)
                 .background(color = colors.toolbarContainerColor, shape = shape)
                 .padding(contentPadding),
         verticalArrangement = Arrangement.Center,
@@ -1880,21 +1899,27 @@ private fun VerticalFloatingToolbarLayout(
             Column(
                 modifier =
                     Modifier.parentSemantics {
-                        this.customActions =
-                            customToolbarActions(
-                                expanded = expandedState,
-                                expandAction = {
-                                    onA11yForceCollapse(false)
-                                    true
-                                },
-                                collapseAction = {
-                                    onA11yForceCollapse(true)
-                                    true
-                                },
-                                expandActionLabel = expandToolbarActionLabel,
-                                collapseActionLabel = collapseToolbarActionLabel
-                            )
-                    },
+                            this.customActions =
+                                customToolbarActions(
+                                    expanded = expandedState,
+                                    expandAction = {
+                                        onA11yForceCollapse(false)
+                                        true
+                                    },
+                                    collapseAction = {
+                                        onA11yForceCollapse(true)
+                                        true
+                                    },
+                                    expandActionLabel = expandToolbarActionLabel,
+                                    collapseActionLabel = collapseToolbarActionLabel
+                                )
+                        }
+                        .minimumInteractiveBalancedPadding(
+                            hasVisibleLeadingContent = expanded && leadingContent != null,
+                            hasVisibleTrailingContent = expanded && trailingContent != null,
+                            // Ensures this motion will cause the padding to bounce.
+                            animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
+                        ),
                 content = content
             )
             trailingContent?.let {
@@ -2052,6 +2077,124 @@ private fun VerticalFloatingToolbarWithFabLayout(
                 shape = fabShape
                 shadowElevation = fabElevation.toPx()
                 clip = true
+            }
+        }
+    }
+}
+
+/**
+ * A [Modifier] that adds padding to visually balance the layout of a clickable component that was
+ * modified by a [minimumInteractiveComponentSize] modifier. It ensures consistent padding across
+ * both axes, particularly when leading or trailing content is hidden.
+ *
+ * The Modifier reads the [AlignmentLine] values generated by [minimumInteractiveComponentSize] to
+ * determine the necessary padding adjustments. These adjustments are animated to provide a smooth
+ * transition when content visibility changes.
+ *
+ * Note that this modifier should be applied *after* a `minimumInteractiveComponentSize` in the
+ * modifier chain.
+ *
+ * @param hasVisibleLeadingContent whether the leading content is visible.
+ * @param hasVisibleTrailingContent whether the trailing content is visible.
+ * @param animationSpec the [AnimationSpec] used to animate the padding.
+ */
+private fun Modifier.minimumInteractiveBalancedPadding(
+    hasVisibleLeadingContent: Boolean,
+    hasVisibleTrailingContent: Boolean,
+    animationSpec: AnimationSpec<Float>
+): Modifier =
+    this then
+        MinimumInteractiveBalancedPaddingElement(
+            hasVisibleLeadingContent,
+            hasVisibleTrailingContent,
+            animationSpec
+        )
+
+private data class MinimumInteractiveBalancedPaddingElement(
+    val hasVisibleLeadingContent: Boolean,
+    val hasVisibleTrailingContent: Boolean,
+    val animationSpec: AnimationSpec<Float>
+) : ModifierNodeElement<MinimumInteractiveBalancedPaddingNode>() {
+
+    override fun create(): MinimumInteractiveBalancedPaddingNode =
+        MinimumInteractiveBalancedPaddingNode(
+            hasVisibleLeadingContent,
+            hasVisibleTrailingContent,
+            animationSpec
+        )
+
+    override fun update(node: MinimumInteractiveBalancedPaddingNode) {
+        node.hasVisibleLeadingContent = hasVisibleLeadingContent
+        node.hasVisibleTrailingContent = hasVisibleTrailingContent
+        node.animationSpec = animationSpec
+        node.updateAnimation()
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "minimumInteractiveBalancedPadding"
+        properties["hasVisibleLeadingContent"] = hasVisibleLeadingContent
+        properties["hasVisibleTrailingContent"] = hasVisibleTrailingContent
+        properties["animationSpec"] = animationSpec
+    }
+}
+
+private class MinimumInteractiveBalancedPaddingNode(
+    var hasVisibleLeadingContent: Boolean,
+    var hasVisibleTrailingContent: Boolean,
+    var animationSpec: AnimationSpec<Float>
+) : Modifier.Node(), LayoutModifierNode {
+
+    private var paddingAnimation: Animatable<Float, AnimationVector1D> =
+        Animatable(if (hasVisibleLeadingContent || hasVisibleTrailingContent) 0f else 1f)
+
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        var verticalPadding = 0
+        var horizontalPadding = 0
+
+        // Resolve the top and left paddings from the alignment lines whenever either of the leading
+        // or trailing content is missing.
+        var totalHorizontalPadding = 0
+        var totalVerticalPadding = 0
+        if (!hasVisibleLeadingContent || !hasVisibleTrailingContent) {
+            val progress = paddingAnimation.value
+            verticalPadding =
+                placeable[MinimumInteractiveTopAlignmentLine].let {
+                    if (it != AlignmentLine.Unspecified) (it * progress).fastRoundToInt() else 0
+                }
+            horizontalPadding =
+                placeable[MinimumInteractiveLeftAlignmentLine].let {
+                    if (it != AlignmentLine.Unspecified) (it * progress).fastRoundToInt() else 0
+                }
+            // In case we are dealing with an imbalanced padding that were added to the component at
+            // the minimumInteractiveComponentSize, add paddings to balance them out visually.
+            if (horizontalPadding != verticalPadding) {
+                totalHorizontalPadding = horizontalPadding * 2
+                totalVerticalPadding = verticalPadding * 2
+            }
+        }
+
+        return layout(
+            width = placeable.width + totalHorizontalPadding,
+            height = placeable.height + totalVerticalPadding
+        ) {
+            if (horizontalPadding != verticalPadding) {
+                placeable.place(horizontalPadding, verticalPadding)
+            } else {
+                placeable.place(0, 0)
+            }
+        }
+    }
+
+    fun updateAnimation() {
+        coroutineScope.launch {
+            if (!(hasVisibleLeadingContent || hasVisibleTrailingContent)) {
+                paddingAnimation.animateTo(1f, animationSpec)
+            } else {
+                paddingAnimation.animateTo(0f, animationSpec)
             }
         }
     }
