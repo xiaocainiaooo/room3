@@ -28,11 +28,7 @@ public object PlatformEventSources {
      */
     @JvmStatic
     @RequiresSchemaVersion(major = 1, minor = 500)
-    public fun isLayoutVisible(): DynamicBool =
-        DynamicBuilders.StateBoolSource.Builder()
-            .setSourceKey(Keys.LAYOUT_VISIBILITY.key)
-            .setSourceNamespace(Keys.LAYOUT_VISIBILITY.namespace)
-            .build()
+    public fun isLayoutVisible(): DynamicBool = DynamicBool.from(Keys.LAYOUT_VISIBILITY)
 
     /**
      * Creates a [DynamicBool] which receives the current state of any pending updates for the
@@ -44,11 +40,7 @@ public object PlatformEventSources {
     @JvmStatic
     @ProtoLayoutExperimental
     @RequiresSchemaVersion(major = 1, minor = 600)
-    public fun isLayoutUpdatePending(): DynamicBool =
-        DynamicBuilders.StateBoolSource.Builder()
-            .setSourceKey(Keys.LAYOUT_UPDATE_PENDING.key)
-            .setSourceNamespace(Keys.LAYOUT_UPDATE_PENDING.namespace)
-            .build()
+    public fun isLayoutUpdatePending(): DynamicBool = DynamicBool.from(Keys.LAYOUT_UPDATE_PENDING)
 
     /** Data sources keys for platform event. */
     public object Keys {
