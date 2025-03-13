@@ -25,4 +25,5 @@ import kotlin.time.ComparableTimeMark
  * @property timeMark at which the state was computed.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+@Suppress("DataClassDefinition")
 public data class CoreState(val timeMark: ComparableTimeMark) {}
