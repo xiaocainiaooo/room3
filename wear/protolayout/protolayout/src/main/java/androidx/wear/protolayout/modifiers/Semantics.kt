@@ -54,7 +54,7 @@ fun LayoutModifier.contentDescription(
 fun LayoutModifier.semanticsRole(@SemanticsRole semanticsRole: Int): LayoutModifier =
     this then BaseSemanticElement(semanticsRole = semanticsRole)
 
-/** Clears the semantic from the modifier. */
+/** Clears the semantics, including [contentDescription] and [semanticsRole], from the modifier. */
 fun LayoutModifier.clearSemantics(): LayoutModifier = this then CLEAR_SEMANTIC_ELEMENT
 
 internal class BaseSemanticElement(
