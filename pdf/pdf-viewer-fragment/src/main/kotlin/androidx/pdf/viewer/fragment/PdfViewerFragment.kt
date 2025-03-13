@@ -44,6 +44,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.pdf.util.AnnotationUtils
 import androidx.pdf.view.PdfView
 import androidx.pdf.view.Selection
 import androidx.pdf.view.ToolBoxView
@@ -104,6 +105,8 @@ public open class PdfViewerFragment constructor() : Fragment() {
         arguments = args
     }
 
+    private var isAnnotationIntentResolvable = false
+
     /**
      * The URI of the PDF document to display defaulting to `null`.
      *
@@ -151,7 +154,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
         // its visibility doesn't change.
         get() = toolboxView.toolboxVisibility == VISIBLE
         set(value) {
-            if (value) toolboxView.show() else toolboxView.hide()
+            if (value && isAnnotationIntentResolvable) toolboxView.show() else toolboxView.hide()
         }
 
     /**
@@ -319,6 +322,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
             _pdfSearchView.searchQueryBox.requestFocus()
 
         super.onResume()
+        pdfView.pdfDocument?.uri?.let { uri -> setAnnotationIntentResolvability(uri) }
     }
 
     /**
@@ -515,6 +519,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
         onLoadDocumentSuccess()
         _pdfView.pdfDocument = uiState.pdfDocument
         toolboxView.setPdfDocument(uiState.pdfDocument)
+        setAnnotationIntentResolvability(uiState.pdfDocument.uri)
         setViewVisibility(
             pdfView = VISIBLE,
             loadingView = GONE,
@@ -522,6 +527,14 @@ public open class PdfViewerFragment constructor() : Fragment() {
         )
         // Start collection of view states like search, toolbox, etc. once document is loaded.
         collectViewStates()
+    }
+
+    private fun setAnnotationIntentResolvability(uri: Uri) {
+        isAnnotationIntentResolvable =
+            AnnotationUtils.resolveAnnotationIntent(requireContext(), uri)
+        if (!isAnnotationIntentResolvable) {
+            toolboxView.hide()
+        }
     }
 
     private fun handleDocumentError(uiState: DocumentError) {
