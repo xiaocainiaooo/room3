@@ -152,7 +152,7 @@ public open class PdfViewerFragment constructor() : Fragment() {
     public var isToolboxVisible: Boolean
         // We can't use toolbox.visibility because toolboxView is the layout here, and
         // its visibility doesn't change.
-        get() = toolboxView.toolboxVisibility == VISIBLE
+        get() = if (::toolboxView.isInitialized) toolboxView.toolboxVisibility == VISIBLE else false
         set(value) {
             if (value && isAnnotationIntentResolvable) toolboxView.show() else toolboxView.hide()
         }
