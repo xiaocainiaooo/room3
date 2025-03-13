@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
@@ -67,6 +68,9 @@ internal interface RefreshableSessionClient : SessionClient {
 
 class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
+    private companion object {
+        private const val TAG = "SandboxedSdkView"
+    }
 
     private val scrollChangedListener =
         ViewTreeObserver.OnScrollChangedListener { signalMeasurer?.maybeSendSignals() }
@@ -505,6 +509,7 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
             sandboxedSdkView?.let { view ->
                 if (this == view.clientSecondary) {
                     view.clientSecondary = null
+                    Log.w(TAG, "Secondary client session error: $throwable")
                     view.refreshCallback?.accept(false)
                 } else {
                     view.onClientClosedSession(throwable)
