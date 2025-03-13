@@ -96,6 +96,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     private fun handleEditFabClick() {
+        val document = pdfDocument ?: return
+
+        if (!AnnotationUtils.resolveAnnotationIntent(context, document.uri)) {
+            hideEditFabAndShowToast()
+            return
+        }
 
         pdfDocument?.let {
             try {
