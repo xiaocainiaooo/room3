@@ -74,6 +74,14 @@
         "resolvedVersion": "1.7.3"
       },
       "toConfiguration": "implementation"
+    },
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "com.google.guava:listenablefuture",
+        "resolvedVersion": "1.0"
+      },
+      "toConfiguration": "implementation"
     }
   ]
 }
