@@ -810,7 +810,7 @@ public object SwipeToRevealDefaults {
      * bidirectional anchors are used and no swipe events are ignored
      */
     public val bidirectionalGestureInclusion: GestureInclusion
-        get() = BidirectionalGestureInclusion()
+        get() = BidirectionalGestureInclusion
 }
 
 @Stable
@@ -845,7 +845,7 @@ private class DefaultGestureInclusion(
 }
 
 @Stable
-private class BidirectionalGestureInclusion : GestureInclusion {
+private object BidirectionalGestureInclusion : GestureInclusion {
     override fun ignoreGestureStart(offset: Offset, layoutCoordinates: LayoutCoordinates): Boolean =
         false
 
