@@ -150,9 +150,15 @@ public fun DatePicker(
         }
     val optionTextStyle =
         if (isLargeScreen) {
-            DatePickerTokens.ContentLargeTypography.value
+            DatePickerTokens.ContentLargeTypography.value.copy(
+                textAlign = TextAlign.Center,
+                fontFeatureSettings = "tnum"
+            )
         } else {
-            DatePickerTokens.ContentTypography.value
+            DatePickerTokens.ContentTypography.value.copy(
+                textAlign = TextAlign.Center,
+                fontFeatureSettings = "tnum"
+            )
         }
     val optionHeight = if (isLargeScreen) 48.dp else 36.dp
 
