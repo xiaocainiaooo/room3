@@ -4877,6 +4877,19 @@ public class AppSearchImplTest {
                 /*sendChangeNotifications=*/ false,
                 fakeLogger);
 
+        List<GenericDocument> documents = new ArrayList<>();
+        documents.add(document);
+        AppSearchBatchResult.Builder<String, Void> resultBuilder =
+                new AppSearchBatchResult.Builder<>();
+        mAppSearchImpl.batchPutDocuments(
+                "package1",
+                "database1",
+                documents,
+                resultBuilder,
+                /*sendChangeNotifications=*/ false,
+                fakeLogger,
+                PersistType.Code.LITE);
+
         mAppSearchImpl.query(
                 "package", "database", "",
                 new SearchSpec.Builder().build(), fakeLogger);
@@ -4952,6 +4965,19 @@ public class AppSearchImplTest {
                 document,
                 /*sendChangeNotifications=*/ false,
                 fakeLogger);
+
+        List<GenericDocument> documents = new ArrayList<>();
+        documents.add(document);
+        AppSearchBatchResult.Builder<String, Void> resultBuilder =
+                new AppSearchBatchResult.Builder<>();
+        mAppSearchImpl.batchPutDocuments(
+                "package1",
+                "database1",
+                documents,
+                resultBuilder,
+                /*sendChangeNotifications=*/ false,
+                fakeLogger,
+                PersistType.Code.LITE);
 
         mAppSearchImpl.query(
                 "package", "database", "",
