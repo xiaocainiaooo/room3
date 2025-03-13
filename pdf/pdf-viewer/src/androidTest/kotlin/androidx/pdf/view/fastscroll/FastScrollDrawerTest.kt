@@ -116,4 +116,52 @@ class FastScrollDrawerTest {
         assertEquals(expectedUpperPageRange, pageRange[2].toString().toInt())
         assertEquals(expectedTotalPages, totalPages.toString().toInt())
     }
+
+    @Test
+    fun testFastScroll_draw_verifyThumbBounds() {
+        val xOffset = 500
+        val yOffset = 100
+        val visiblePages = Range(1, 5)
+
+        fastScrollDrawer.draw(spyCanvas, xOffset, yOffset, visiblePages)
+
+        val expectedThumbLeftRange = Range(400, 600)
+        val expectedThumbTopRange = Range(100, 200)
+        val expectedThumbRightRange = Range(500, 700)
+        val expectedThumbBottomRange = Range(100, 300)
+
+        assertTrue(expectedThumbLeftRange.contains(fastScrollDrawer.thumbBounds.left.toInt()))
+        assertTrue(expectedThumbTopRange.contains(fastScrollDrawer.thumbBounds.top.toInt()))
+        assertTrue(expectedThumbRightRange.contains(fastScrollDrawer.thumbBounds.right.toInt()))
+        assertTrue(expectedThumbBottomRange.contains(fastScrollDrawer.thumbBounds.bottom.toInt()))
+    }
+
+    @Test
+    fun testFastScroll_draw_verifyPageIndicatorBounds() {
+        val xOffset = 500
+        val yOffset = 100
+        val visiblePages = Range(1, 5)
+
+        fastScrollDrawer.draw(spyCanvas, xOffset, yOffset, visiblePages)
+
+        val expectedIndicatorLeftRange = Range(150, 450)
+        val expectedIndicatorTopRange = Range(100, 250)
+        val expectedIndicatorRightRange = Range(300, 650)
+        val expectedIndicatorBottomRange = Range(150, 300)
+
+        assertTrue(
+            expectedIndicatorLeftRange.contains(fastScrollDrawer.pageIndicatorBounds.left.toInt())
+        )
+        assertTrue(
+            expectedIndicatorTopRange.contains(fastScrollDrawer.pageIndicatorBounds.top.toInt())
+        )
+        assertTrue(
+            expectedIndicatorRightRange.contains(fastScrollDrawer.pageIndicatorBounds.right.toInt())
+        )
+        assertTrue(
+            expectedIndicatorBottomRange.contains(
+                fastScrollDrawer.pageIndicatorBounds.bottom.toInt()
+            )
+        )
+    }
 }
