@@ -29,7 +29,17 @@ android {
             arg("appfunctions:aggregateAppFunctions", "true")
         }
     }
+    buildTypes {
+        // Release build is not used when running AndroidX Test. This is only used to
+        // manually examine the output APK.
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt")
+        }
+    }
 }
+
 dependencies {
     api(libs.kotlinStdlib)
     api(libs.kotlinCoroutinesAndroid)
