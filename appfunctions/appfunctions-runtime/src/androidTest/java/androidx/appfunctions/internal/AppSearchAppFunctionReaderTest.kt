@@ -320,6 +320,34 @@ class AppSearchAppFunctionReaderTest {
             assertThat(emittedValues[1].single { it.id == functionIdToTest }.isEnabled).isFalse()
         }
 
+    @Test
+    fun searchAppFunctions_multipleUpdates_returnsUpdatesAfterDebouncing() =
+        runBlocking<Unit> {
+            val functionIdToTest = FunctionIds.NO_SCHEMA_ENABLED_BY_DEFAULT
+            val searchFunctionSpec =
+                AppFunctionSearchSpec(packageNames = setOf(context.packageName))
+            val appFunctionSearchFlow = appFunctionReader.searchAppFunctions(searchFunctionSpec)
+            val emittedValues = mutableListOf<List<AppFunctionMetadata>>()
+            val job = launch { appFunctionSearchFlow.toList(emittedValues) }
+            delay(2000) // Allow emitting initial value and registering callback.
+
+            // Modify the runtime document twice.
+            appFunctionManagerCompat.setAppFunctionEnabled(
+                functionIdToTest,
+                AppFunctionManagerCompat.APP_FUNCTION_STATE_DISABLED
+            )
+            appFunctionManagerCompat.setAppFunctionEnabled(
+                functionIdToTest,
+                AppFunctionManagerCompat.APP_FUNCTION_STATE_ENABLED
+            )
+            delay(2000)
+
+            job.cancel()
+            // Only 2 updates are emitted.
+            assertThat(emittedValues).hasSize(2)
+            assertThat(emittedValues[1].single { it.id == functionIdToTest }.isEnabled).isTrue()
+        }
+
     private companion object {
         fun getTestFunctionIdToMetadataMap(packageName: String) =
             mapOf(

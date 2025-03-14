@@ -40,11 +40,14 @@ import androidx.appsearch.observer.ObserverCallback
 import androidx.appsearch.observer.ObserverSpec
 import androidx.appsearch.observer.SchemaChangeInfo
 import com.android.extensions.appfunctions.AppFunctionManager
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.guava.await
@@ -60,6 +63,8 @@ import kotlinx.coroutines.launch
  */
 @RequiresApi(Build.VERSION_CODES.S)
 internal class AppSearchAppFunctionReader(private val context: Context) : AppFunctionReader {
+
+    @OptIn(FlowPreview::class)
     override fun searchAppFunctions(
         searchFunctionSpec: AppFunctionSearchSpec
     ): Flow<List<AppFunctionMetadata>> {
@@ -84,8 +89,7 @@ internal class AppSearchAppFunctionReader(private val context: Context) : AppFun
 
             // Coroutine to react to updates from the observer
             val observerJob = launch {
-                // TODO: Optimize with debounce
-                appSearchChannelObserver.observe().collect {
+                appSearchChannelObserver.observe().debounce(OBSERVER_DEBOUNCE_MILLIS).collect {
                     // TODO(b/403264749): Check if we can skip the running a full search again by
                     // caching the results.
                     send(performSearch(session, searchFunctionSpec))
@@ -280,6 +284,8 @@ internal class AppSearchAppFunctionReader(private val context: Context) : AppFun
         const val APP_FUNCTIONS_NAMESPACE = "app_functions"
         const val APP_FUNCTIONS_RUNTIME_NAMESPACE = "app_functions_runtime"
         const val APP_FUNCTIONS_STATIC_DATABASE_NAME = "apps-db"
+
+        val OBSERVER_DEBOUNCE_MILLIS = 1.seconds
 
         val RUNTIME_SEARCH_SPEC =
             SearchSpec.Builder()
