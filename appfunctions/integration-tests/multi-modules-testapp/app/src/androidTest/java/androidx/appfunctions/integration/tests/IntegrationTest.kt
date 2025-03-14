@@ -22,6 +22,7 @@ import androidx.appfunctions.AppFunctionInvalidArgumentException
 import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.ExecuteAppFunctionRequest
 import androidx.appfunctions.ExecuteAppFunctionResponse
+import androidx.appfunctions.integration.testapp.library.TestFunctions2Ids
 import androidx.appfunctions.integration.tests.TestUtil.doBlocking
 import androidx.appfunctions.integration.tests.TestUtil.retryAssert
 import androidx.test.filters.LargeTest
@@ -63,7 +64,7 @@ class IntegrationTest {
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        ADD_FUNCTION_ID,
+                        TestFunctionsIds.ADD_ID,
                         AppFunctionData.Builder("").setLong("num1", 1).setLong("num2", 2).build()
                     )
             )
@@ -84,7 +85,7 @@ class IntegrationTest {
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        VOID_FUNCTION_ID,
+                        TestFunctionsIds.VOID_FUNCTION_ID,
                         AppFunctionData.Builder("").build()
                     )
             )
@@ -101,7 +102,7 @@ class IntegrationTest {
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        IS_CREATED_BY_FACTORY_FUNCTION_ID,
+                        TestFactoryIds.IS_CREATED_BY_FACTORY_ID,
                         AppFunctionData.Builder("").build()
                     )
             )
@@ -124,7 +125,7 @@ class IntegrationTest {
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        CONCAT_FUNCTION_ID,
+                        TestFunctions2Ids.CONCAT_ID,
                         AppFunctionData.Builder("")
                             .setString("str1", "log")
                             .setString("str2", "cat")
@@ -165,7 +166,7 @@ class IntegrationTest {
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        DO_THROW_FUNCTION_ID,
+                        TestFunctionsIds.DO_THROW_ID,
                         AppFunctionData.Builder("").build()
                     )
             )
@@ -183,7 +184,7 @@ class IntegrationTest {
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        CREATE_NOTE_FUNCTION_ID,
+                        TestFunctionsIds.CREATE_NOTE_ID,
                         AppFunctionData.Builder("")
                             .setAppFunctionData(
                                 "createNoteParams",
@@ -219,28 +220,14 @@ class IntegrationTest {
     }
 
     private companion object {
-        // AppFunctions that are defined in the top-level module.
-        const val ADD_FUNCTION_ID = "androidx.appfunctions.integration.tests.TestFunctions#add"
-        const val DO_THROW_FUNCTION_ID =
-            "androidx.appfunctions.integration.tests.TestFunctions#doThrow"
-        const val VOID_FUNCTION_ID =
-            "androidx.appfunctions.integration.tests.TestFunctions#voidFunction"
-        const val CREATE_NOTE_FUNCTION_ID =
-            "androidx.appfunctions.integration.tests.TestFunctions#createNote"
-        const val IS_CREATED_BY_FACTORY_FUNCTION_ID =
-            "androidx.appfunctions.integration.tests.TestFactory#isCreatedByFactory"
-
-        // AppFunctions that are defined in a library module.
-        const val CONCAT_FUNCTION_ID =
-            "androidx.appfunctions.integration.testapp.library.TestFunctions2#concat"
         val FUNCTION_IDS =
             setOf(
-                ADD_FUNCTION_ID,
-                DO_THROW_FUNCTION_ID,
-                VOID_FUNCTION_ID,
-                CREATE_NOTE_FUNCTION_ID,
-                IS_CREATED_BY_FACTORY_FUNCTION_ID,
-                CONCAT_FUNCTION_ID
+                TestFunctionsIds.ADD_ID,
+                TestFunctionsIds.DO_THROW_ID,
+                TestFunctionsIds.VOID_FUNCTION_ID,
+                TestFunctionsIds.CREATE_NOTE_ID,
+                TestFactoryIds.IS_CREATED_BY_FACTORY_ID,
+                TestFunctions2Ids.CONCAT_ID
             )
     }
 }
