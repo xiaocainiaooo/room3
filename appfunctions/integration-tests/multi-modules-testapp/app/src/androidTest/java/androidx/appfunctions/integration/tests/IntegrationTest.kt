@@ -44,11 +44,16 @@ class IntegrationTest {
     @Before
     fun setup() = doBlocking {
         assumeTrue(appFunctionManager.isSupported())
-        // This is needed because the test is running under the UID of
-        // "androidx.appfunctions.integration.testapp",
-        // while the app functions are defined under
-        // "androidx.appfunctions.integration.testapp.test"
-        uiAutomation.adoptShellPermissionIdentity("android.permission.EXECUTE_APP_FUNCTIONS")
+        uiAutomation.apply {
+            // This is needed because the test is running under the UID of
+            // "androidx.appfunctions.integration.testapp",
+            // while the app functions are defined under
+            // "androidx.appfunctions.integration.testapp.test"
+            adoptShellPermissionIdentity("android.permission.EXECUTE_APP_FUNCTIONS")
+            executeShellCommand(
+                "device_config put appsearch max_allowed_app_function_doc_size_in_bytes $TEST_APP_FUNCTION_DOC_SIZE_LIMIT"
+            )
+        }
         awaitAppFunctionsIndexed(FUNCTION_IDS)
     }
 
@@ -191,6 +196,10 @@ class IntegrationTest {
                                 AppFunctionData.serialize(
                                     CreateNoteParams(
                                         title = "Test Title",
+                                        content = listOf("1", "2"),
+                                        owner = Owner("test"),
+                                        attachments =
+                                            listOf(Attachment("Uri1", Attachment("nested")))
                                     ),
                                     CreateNoteParams::class.java
                                 )
@@ -203,6 +212,9 @@ class IntegrationTest {
         val expectedNote =
             Note(
                 title = "Test Title",
+                content = listOf("1", "2"),
+                owner = Owner("test"),
+                attachments = listOf(Attachment("Uri1", Attachment("nested")))
             )
         assertThat(
                 successResponse.returnValue
@@ -220,6 +232,8 @@ class IntegrationTest {
     }
 
     private companion object {
+        const val TEST_APP_FUNCTION_DOC_SIZE_LIMIT = 512 * 1024 // 512kb
+
         val FUNCTION_IDS =
             setOf(
                 TestFunctionsIds.ADD_ID,
