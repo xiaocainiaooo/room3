@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.appfunction.integration.tests
+package androidx.appfunctions.integration.tests
 
 import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.AppFunctionFunctionNotFoundException
@@ -22,42 +22,48 @@ import androidx.appfunctions.AppFunctionInvalidArgumentException
 import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.ExecuteAppFunctionRequest
 import androidx.appfunctions.ExecuteAppFunctionResponse
-import androidx.appfunctions.integration.testapp.CreateNoteParams
-import androidx.appfunctions.integration.testapp.Note
-import androidx.appfunctions.integration.tests.AppSearchMetadataHelper
 import androidx.appfunctions.integration.tests.TestUtil.doBlocking
 import androidx.appfunctions.integration.tests.TestUtil.retryAssert
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertIs
+import org.junit.After
 import org.junit.Assume.assumeTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
-// TODO(b/402340010): Enable the test after unknown KSP failure is fixed
 @LargeTest
 class IntegrationTest {
-    private val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private val appFunctionManager = AppFunctionManagerCompat(targetContext)
+    private val targetContext = InstrumentationRegistry.getInstrumentation().context
+    private val appFunctionManager =
+        AppFunctionManagerCompat(InstrumentationRegistry.getInstrumentation().targetContext)
+    private val uiAutomation = InstrumentationRegistry.getInstrumentation().uiAutomation
 
     @Before
     fun setup() = doBlocking {
         assumeTrue(appFunctionManager.isSupported())
-
+        // This is needed because the test is running under the UID of
+        // "androidx.appfunctions.integration.testapp",
+        // while the app functions are defined under
+        // "androidx.appfunctions.integration.testapp.test"
+        uiAutomation.adoptShellPermissionIdentity("android.permission.EXECUTE_APP_FUNCTIONS")
         awaitAppFunctionsIndexed(FUNCTION_IDS)
     }
 
+    @After
+    fun tearDown() {
+        uiAutomation.dropShellPermissionIdentity()
+    }
+
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_success() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        "androidx.appfunctions.integration.testapp.TestFunctions#add",
+                        ADD_FUNCTION_ID,
                         AppFunctionData.Builder("").setLong("num1", 1).setLong("num2", 2).build()
                     )
             )
@@ -72,7 +78,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_voidReturnType_success() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -88,7 +93,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_setFactory_success() = doBlocking {
         // A factory is set to create the enclosing class of the function.
         // See [TestApplication.appFunctionConfiguration].
@@ -114,7 +118,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_functionInLibraryModule_success() = doBlocking {
         var response =
             appFunctionManager.executeAppFunction(
@@ -139,7 +142,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_functionNotFound_fail() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -157,14 +159,13 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_appThrows_fail() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
                 request =
                     ExecuteAppFunctionRequest(
                         targetContext.packageName,
-                        "androidx.appfunctions.integration.testapp.TestFunctions#doThrow",
+                        DO_THROW_FUNCTION_ID,
                         AppFunctionData.Builder("").build()
                     )
             )
@@ -176,7 +177,6 @@ class IntegrationTest {
     }
 
     @Test
-    @Ignore("b/402340010")
     fun executeAppFunction_createNote() = doBlocking {
         val response =
             appFunctionManager.executeAppFunction(
@@ -220,22 +220,22 @@ class IntegrationTest {
 
     private companion object {
         // AppFunctions that are defined in the top-level module.
-        const val APP_FUNCTION_ID = "androidx.appfunctions.integration.testapp.TestFunctions#add"
+        const val ADD_FUNCTION_ID = "androidx.appfunctions.integration.tests.TestFunctions#add"
         const val DO_THROW_FUNCTION_ID =
-            "androidx.appfunctions.integration.testapp.TestFunctions#doThrow"
+            "androidx.appfunctions.integration.tests.TestFunctions#doThrow"
         const val VOID_FUNCTION_ID =
-            "androidx.appfunctions.integration.testapp.TestFunctions#voidFunction"
+            "androidx.appfunctions.integration.tests.TestFunctions#voidFunction"
         const val CREATE_NOTE_FUNCTION_ID =
-            "androidx.appfunctions.integration.testapp.TestFunctions#createNote"
+            "androidx.appfunctions.integration.tests.TestFunctions#createNote"
         const val IS_CREATED_BY_FACTORY_FUNCTION_ID =
-            "androidx.appfunctions.integration.testapp.TestFactory#isCreatedByFactory"
+            "androidx.appfunctions.integration.tests.TestFactory#isCreatedByFactory"
 
         // AppFunctions that are defined in a library module.
         const val CONCAT_FUNCTION_ID =
             "androidx.appfunctions.integration.testapp.library.TestFunctions2#concat"
         val FUNCTION_IDS =
             setOf(
-                APP_FUNCTION_ID,
+                ADD_FUNCTION_ID,
                 DO_THROW_FUNCTION_ID,
                 VOID_FUNCTION_ID,
                 CREATE_NOTE_FUNCTION_ID,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.integration.testapp
+package androidx.appfunctions.integration.tests
 
 import android.app.Application
 import android.util.Log
