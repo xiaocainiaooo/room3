@@ -26,6 +26,10 @@ android {
     namespace = "androidx.browser"
 }
 
+android {
+    compileSdkPreview "Baklava"
+}
+
 dependencies {
     api(libs.jspecify)
     api("androidx.core:core:1.10.0")
