@@ -31,7 +31,15 @@ import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ClassName
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
-data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KSClassDeclaration) {
+data class AnnotatedAppFunctionSerializable(
+    private val appFunctionSerializableClass: KSClassDeclaration
+) {
+    /** The qualified name of the class being annotated with AppFunctionSerializable. */
+    val qualifiedName: String by lazy { appFunctionSerializableClass.toClassName().canonicalName }
+
+    /** The super type of the class being annotated with AppFunctionSerializable */
+    val superTypes: Sequence<KSTypeReference> by lazy { appFunctionSerializableClass.superTypes }
+
     // TODO(b/392587953): throw an error if a property has the same name as one of the factory
     //  method parameters
     /**
