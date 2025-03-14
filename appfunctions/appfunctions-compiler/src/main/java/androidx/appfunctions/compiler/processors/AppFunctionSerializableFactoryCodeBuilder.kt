@@ -63,8 +63,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
     fun appendToAppFunctionDataMethodBody(): CodeBlock {
         return buildCodeBlock {
             add(factoryInitStatements)
-            val qualifiedClassName =
-                checkNotNull(annotatedClass.appFunctionSerializableClass.qualifiedName).asString()
+            val qualifiedClassName = annotatedClass.qualifiedName
             addStatement("val builder = %T(%S)", AppFunctionData.Builder::class, qualifiedClassName)
             for (property in annotatedClass.getProperties()) {
                 val afType = AppFunctionTypeReference(property.type)

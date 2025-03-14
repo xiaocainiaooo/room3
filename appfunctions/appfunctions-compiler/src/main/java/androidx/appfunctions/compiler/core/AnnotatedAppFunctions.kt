@@ -370,10 +370,7 @@ data class AnnotatedAppFunctions(
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
     ) {
-        val serializableTypeQualifiedName =
-            checkNotNull(
-                appFunctionSerializableType.appFunctionSerializableClass.toClassName().canonicalName
-            )
+        val serializableTypeQualifiedName = appFunctionSerializableType.qualifiedName
         // This type has already been added to the sharedDataMap.
         if (seenDataTypeQualifiers.contains(serializableTypeQualifiedName)) {
             return
@@ -381,7 +378,7 @@ data class AnnotatedAppFunctions(
         seenDataTypeQualifiers.add(serializableTypeQualifiedName)
 
         val superTypesWithSerializableAnnotation =
-            appFunctionSerializableType.appFunctionSerializableClass.superTypes
+            appFunctionSerializableType.superTypes
                 .map { it.resolve().declaration as KSClassDeclaration }
                 .filter {
                     it.annotations.findAnnotation(
