@@ -13,6 +13,8 @@
 #  limitations under the License.
 
 # TODO(b/402763650): Generate a mapping instead of using keep
--keepnames,allowoptimization @androidx.appfunctions.AppFunctionSerializable class ** {}
--keep,allowoptimization class ** implements androidx.appfunctions.internal.AppFunctionSerializableFactory {}
+-keepnames @androidx.appfunctions.AppFunctionSerializable class ** {}
+-keep,allowoptimization class ** implements androidx.appfunctions.internal.AppFunctionSerializableFactory {
+  public *;
+}
 
