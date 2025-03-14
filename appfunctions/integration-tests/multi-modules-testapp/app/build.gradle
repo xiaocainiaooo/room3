@@ -41,15 +41,10 @@ android {
 }
 
 dependencies {
-    api(libs.kotlinStdlib)
-    api(libs.kotlinCoroutinesAndroid)
-    implementation(project(":appfunctions:appfunctions-common"))
-    implementation(project(":appfunctions:appfunctions-runtime"))
-    // TODO(b/402340010): Renable KSP once the unknown issue is fixed.
-//    ksp(project(":appfunctions:appfunctions-compiler"))
-    implementation(project(":appfunctions:integration-tests:multi-modules-testapp:shared-library"))
-    implementation('androidx.concurrent:concurrent-futures-ktx:1.1.0')
-
+    androidTestImplementation(libs.kotlinStdlib)
+    androidTestImplementation(libs.kotlinCoroutinesAndroid)
+    androidTestImplementation(project(":appfunctions:appfunctions-common"))
+    androidTestImplementation(project(":appfunctions:appfunctions-runtime"))
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.kotlinCoroutinesTest)
@@ -60,4 +55,6 @@ dependencies {
     androidTestImplementation("androidx.appsearch:appsearch:1.1.0-beta01")
     androidTestImplementation("androidx.appsearch:appsearch-platform-storage:1.1.0-beta01")
     androidTestImplementation('androidx.concurrent:concurrent-futures-ktx:1.1.0')
+    androidTestImplementation(project(":appfunctions:integration-tests:multi-modules-testapp:shared-library"))
+    kspAndroidTest(project(":appfunctions:appfunctions-compiler"))
 }
