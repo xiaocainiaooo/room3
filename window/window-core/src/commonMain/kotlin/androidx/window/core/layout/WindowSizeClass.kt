@@ -195,7 +195,7 @@ class WindowSizeClass(
 
         /**
          * The recommended breakpoints for window size classes. This includes all the breakpoints
-         * from [BREAKPOINTS_V1] plus new breakpoints to account for Large and Extra Large width
+         * from [BREAKPOINTS_V1] plus new breakpoints to account for the Large and Extra Large width
          * breakpoints.
          *
          * @sample androidx.window.core.samples.layout.calculateWindowSizeClass

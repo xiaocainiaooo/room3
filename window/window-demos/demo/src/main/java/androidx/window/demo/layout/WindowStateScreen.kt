@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.window.demo.coresdk
+package androidx.window.demo.layout
 
 import android.graphics.Rect
 import android.view.Surface.ROTATION_0
@@ -144,7 +144,7 @@ fun WindowStateScreenPreview() {
                 activityDisplayBounds = Rect(0, 0, 2208, 1840),
             ),
             WindowState(
-                name = stringResource(R.string.display_feature_title),
+                name = stringResource(R.string.window_layout_info_flow_title),
                 applicationDisplayBounds = Rect(0, 0, 960, 2142),
                 activityDisplayBounds = Rect(0, 0, 960, 2142),
             ),
