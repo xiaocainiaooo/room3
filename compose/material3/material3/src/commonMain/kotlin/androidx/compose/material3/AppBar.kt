@@ -117,8 +117,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design small top app bar</a>.
+ * [Material Design small top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -175,8 +174,7 @@ fun TopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design small top app bar</a>.
+ * [Material Design small top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -244,8 +242,8 @@ fun TopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design center-aligned small top app bar</a>.
+ * [Material Design center-aligned small top app
+ * bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -301,8 +299,8 @@ fun CenterAlignedTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design center-aligned small top app bar</a>.
+ * [Material Design center-aligned small top app
+ * bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -369,8 +367,7 @@ fun CenterAlignedTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design small top app bar</a>.
+ * [Material Design small top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -440,8 +437,7 @@ fun TopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design medium top app bar</a>.
+ * [Material Design medium top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -501,8 +497,7 @@ fun MediumTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design medium top app bar</a>.
+ * [Material Design medium top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -589,8 +584,8 @@ fun MediumTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design medium flexible top app bar</a>.
+ * [Material Design medium flexible top app
+ * bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -693,8 +688,7 @@ fun MediumFlexibleTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design large top app bar</a>.
+ * [Material Design large top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -754,8 +748,7 @@ fun LargeTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design large top app bar</a>.
+ * [Material Design large top app bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -842,8 +835,8 @@ fun LargeTopAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/top-app-bar/overview" class="external"
- * target="_blank">Material Design large flexible top app bar</a>.
+ * [Material Design large flexible top app
+ * bar](https://m3.material.io/components/top-app-bar/overview)
  *
  * Top app bars display information and actions at the top of a screen.
  *
@@ -1056,8 +1049,7 @@ fun TwoRowsTopAppBar(
 }
 
 /**
- * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
- * target="_blank">Material Design bottom app bar</a>.
+ * [Material Design bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
  *
  * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
@@ -1112,8 +1104,7 @@ fun BottomAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
- * target="_blank">Material Design bottom app bar</a>.
+ * [Material Design bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
  *
  * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
@@ -1193,8 +1184,7 @@ fun BottomAppBar(
     }
 
 /**
- * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
- * target="_blank">Material Design bottom app bar</a>.
+ * [Material Design bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
  *
  * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
@@ -1242,8 +1232,7 @@ fun BottomAppBar(
     )
 
 /**
- * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
- * target="_blank">Material Design bottom app bar</a>.
+ * [Material Design bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
  *
  * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
@@ -1301,8 +1290,8 @@ fun BottomAppBar(
 
 // TODO missing image of the flexible bottom app bar.
 /**
- * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
- * target="_blank">Material Design flexible bottom app bar</a>.
+ * [Material Design flexible bottom app
+ * bar](https://m3.material.io/components/bottom-app-bar/overview)
  *
  * A flexible bottom app bar displays navigation and key actions at the bottom of small screens.
  *

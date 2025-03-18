@@ -62,8 +62,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design button</a>.
+ * [Material Design button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post.
@@ -173,8 +172,7 @@ fun Button(
 
 // TODO add link to image of pressed button
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design button</a>.
+ * [Material Design button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post. It also morphs between the shapes provided in [shapes] depending on the state of the
@@ -277,8 +275,7 @@ fun Button(
 }
 
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design elevated button</a>.
+ * [Material Design elevated button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post.
@@ -351,8 +348,7 @@ fun ElevatedButton(
 
 // TODO add link to image of pressed elevated button
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design elevated button</a>.
+ * [Material Design elevated button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post. It also morphs between the shapes provided in [shapes] depending on the state of the
@@ -428,8 +424,7 @@ fun ElevatedButton(
     )
 
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design filled tonal button</a>.
+ * [Material Design filled tonal button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post.
@@ -503,8 +498,7 @@ fun FilledTonalButton(
 
 // TODO add link to image of pressed filled tonal button
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design filled tonal button</a>.
+ * [Material Design filled tonal button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post. It also morphs between the shapes provided in [shapes] depending on the state of the
@@ -581,8 +575,7 @@ fun FilledTonalButton(
     )
 
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design outlined button</a>.
+ * [Material Design outlined button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post.
@@ -655,8 +648,7 @@ fun OutlinedButton(
 
 // TODO add link to image of pressed outlined button
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design outlined button</a>.
+ * [Material Design outlined button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post. It also morphs between the shapes provided in [shapes] depending on the state of the
@@ -732,8 +724,7 @@ fun OutlinedButton(
     )
 
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design text button</a>.
+ * [Material Design text button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post.
@@ -807,8 +798,7 @@ fun TextButton(
 
 // TODO add link to image of pressed text button
 /**
- * <a href="https://m3.material.io/components/buttons/overview" class="external"
- * target="_blank">Material Design text button</a>.
+ * [Material Design text button](https://m3.material.io/components/buttons/overview)
  *
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post. It also morphs between the shapes provided in [shapes] depending on the state of the

@@ -129,8 +129,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design slider</a>.
+ * [Material Design slider](https://m3.material.io/components/sliders/overview)
  *
  * Sliders allow users to make selections from a range of values.
  *
@@ -211,8 +210,7 @@ fun Slider(
 }
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design slider</a>.
+ * [Material Design slider](https://m3.material.io/components/sliders/overview)
  *
  * Sliders allow users to make selections from a range of values.
  *
@@ -310,8 +308,7 @@ fun Slider(
 }
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design slider</a>.
+ * [Material Design slider](https://m3.material.io/components/sliders/overview)
  *
  * Sliders allow users to make selections from a range of values.
  *
@@ -390,8 +387,7 @@ fun Slider(
 }
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design slider</a>.
+ * [Material Design slider](https://m3.material.io/components/sliders/overview)
  *
  * Vertical Sliders allow users to make selections from a range of values.
  *
@@ -465,8 +461,7 @@ fun VerticalSlider(
 }
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design Range slider</a>.
+ * [Material Design range slider](https://m3.material.io/components/sliders/overview)
  *
  * Range Sliders expand upon [Slider] using the same concepts but allow the user to select 2 values.
  *
@@ -548,8 +543,7 @@ fun RangeSlider(
 }
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design Range slider</a>.
+ * [Material Design range slider](https://m3.material.io/components/sliders/overview)
  *
  * Range Sliders expand upon [Slider] using the same concepts but allow the user to select 2 values.
  *
@@ -666,8 +660,7 @@ fun RangeSlider(
 }
 
 /**
- * <a href="https://m3.material.io/components/sliders/overview" class="external"
- * target="_blank">Material Design Range slider</a>.
+ * [Material Design range slider](https://m3.material.io/components/sliders/overview)
  *
  * Range Sliders expand upon [Slider] using the same concepts but allow the user to select 2 values.
  *
