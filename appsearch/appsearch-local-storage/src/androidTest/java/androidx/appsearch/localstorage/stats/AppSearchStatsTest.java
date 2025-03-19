@@ -471,6 +471,12 @@ public class AppSearchStatsTest {
         @RemoveStats.DeleteType int deleteType = 2;
         int documentDeletedCount = 3;
         int enabledFeatures = 1;
+        int queryLength = 4;
+        int numTerms = 5;
+        int numNamespacesFiltered = 6;
+        int numSchemaTypesFiltered = 7;
+        int parseQueryLatencyMillis = 8;
+        int documentRemovalLatencyMillis = 9;
 
         final RemoveStats rStats = new RemoveStats.Builder(TEST_PACKAGE_NAME,
                 TEST_DATA_BASE)
@@ -480,6 +486,12 @@ public class AppSearchStatsTest {
                 .setDeleteType(deleteType)
                 .setDeletedDocumentCount(documentDeletedCount)
                 .setLaunchVMEnabled(true)
+                .setQueryLength(queryLength)
+                .setNumTerms(numTerms)
+                .setNumNamespacesFiltered(numNamespacesFiltered)
+                .setNumSchemaTypesFiltered(numSchemaTypesFiltered)
+                .setParseQueryLatencyMillis(parseQueryLatencyMillis)
+                .setDocumentRemovalLatencyMillis(documentRemovalLatencyMillis)
                 .build();
 
 
@@ -491,6 +503,13 @@ public class AppSearchStatsTest {
         assertThat(rStats.getDeleteType()).isEqualTo(deleteType);
         assertThat(rStats.getDeletedDocumentCount()).isEqualTo(documentDeletedCount);
         assertThat(rStats.getEnabledFeatures()).isEqualTo(enabledFeatures);
+        assertThat(rStats.getQueryLength()).isEqualTo(queryLength);
+        assertThat(rStats.getNumTerms()).isEqualTo(numTerms);
+        assertThat(rStats.getNumNamespacesFiltered()).isEqualTo(numNamespacesFiltered);
+        assertThat(rStats.getNumSchemaTypesFiltered()).isEqualTo(numSchemaTypesFiltered);
+        assertThat(rStats.getParseQueryLatencyMillis()).isEqualTo(parseQueryLatencyMillis);
+        assertThat(rStats.getDocumentRemovalLatencyMillis())
+                .isEqualTo(documentRemovalLatencyMillis);
     }
 
     @Test
