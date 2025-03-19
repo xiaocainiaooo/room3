@@ -83,3 +83,17 @@ runs:
       working-directory: ${{ inputs.project-root }}
       shell: bash
       run: ./gradlew playgroundCIHostTests ${{ inputs.gradle-flags }}
+
+    - name: "Upload build artifacts"
+      continue-on-error: true
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifacts_${{ inputs.project }}
+        path: ~/dist
+    - name: "Upload daemon logs"
+      continue-on-error: true
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: gradle-daemon-logs_${{ inputs.project }}
+        path: ~/.gradle/daemon

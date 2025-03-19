@@ -157,21 +157,3 @@ jobs:
           gradle-enterprise-access-key: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           gradle-flags: ${{ needs.setup.outputs.gradlew_flags }}
-      # Upload artifacts task should be in the build-single-project
-      # action but they have a tendency to fail and continue-on-error
-      # is not supported there yet.
-      # https://github.com/actions/runner/issues/1457
-      - name: "Upload build artifacts"
-        continue-on-error: true
-        if: ${{ steps.check-ci-config.outputs.enabled == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifacts_${{ matrix.project }}
-          path: ~/dist
-      - name: "Upload daemon logs"
-        continue-on-error: true
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-daemon-logs_${{ matrix.project }}
-          path: ~/.gradle/daemon
