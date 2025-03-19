@@ -313,6 +313,9 @@ public class AppSearchLoggerTest {
         long nativeStorageSizeBeforeBytes = Integer.MAX_VALUE + 1;
         long nativeStorageSizeAfterBytes = Integer.MAX_VALUE + 2;
         long nativeTimeSinceLastOptimizeMillis = Integer.MAX_VALUE + 3;
+        int indexRestorationMode = OptimizeStats.FULL_INDEX_REBUILD;
+        int numOriginalNamespaces = 7;
+        int numDeletedNamespaces = 8;
         OptimizeStatsProto optimizeStatsProto = OptimizeStatsProto.newBuilder()
                 .setLatencyMs(nativeLatencyMillis)
                 .setDocumentStoreOptimizeLatencyMs(nativeDocumentStoreOptimizeLatencyMillis)
@@ -323,6 +326,10 @@ public class AppSearchLoggerTest {
                 .setStorageSizeBefore(nativeStorageSizeBeforeBytes)
                 .setStorageSizeAfter(nativeStorageSizeAfterBytes)
                 .setTimeSinceLastOptimizeMs(nativeTimeSinceLastOptimizeMillis)
+                .setIndexRestorationMode(
+                        OptimizeStatsProto.IndexRestorationMode.forNumber(indexRestorationMode))
+                .setNumOriginalNamespaces(numOriginalNamespaces)
+                .setNumDeletedNamespaces(numDeletedNamespaces)
                 .build();
         OptimizeStats.Builder oBuilder = new OptimizeStats.Builder();
 
@@ -341,6 +348,9 @@ public class AppSearchLoggerTest {
         assertThat(oStats.getStorageSizeAfterBytes()).isEqualTo(nativeStorageSizeAfterBytes);
         assertThat(oStats.getTimeSinceLastOptimizeMillis()).isEqualTo(
                 nativeTimeSinceLastOptimizeMillis);
+        assertThat(oStats.getIndexRestorationMode()).isEqualTo(indexRestorationMode);
+        assertThat(oStats.getNumOriginalNamespaces()).isEqualTo(numOriginalNamespaces);
+        assertThat(oStats.getNumDeletedNamespaces()).isEqualTo(numDeletedNamespaces);
     }
 
     @Test

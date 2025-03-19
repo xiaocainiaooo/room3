@@ -505,6 +505,9 @@ public class AppSearchStatsTest {
         long nativeStorageSizeBeforeBytes = Integer.MAX_VALUE + 1;
         long nativeStorageSizeAfterBytes = Integer.MAX_VALUE + 2;
         long nativeTimeSinceLastOptimizeMillis = Integer.MAX_VALUE + 3;
+        int indexRestorationMode = 1;
+        int numOriginalNamespaces = 7;
+        int numDeletedNamespaces = 8;
 
         final OptimizeStats oStats = new OptimizeStats.Builder()
                 .setStatusCode(TEST_STATUS_CODE)
@@ -519,6 +522,9 @@ public class AppSearchStatsTest {
                 .setStorageSizeAfterBytes(nativeStorageSizeAfterBytes)
                 .setTimeSinceLastOptimizeMillis(nativeTimeSinceLastOptimizeMillis)
                 .setLaunchVMEnabled(true)
+                .setIndexRestorationMode(indexRestorationMode)
+                .setNumOriginalNamespaces(numOriginalNamespaces)
+                .setNumDeletedNamespaces(numDeletedNamespaces)
                 .build();
 
         assertThat(oStats.getStatusCode()).isEqualTo(TEST_STATUS_CODE);
@@ -537,5 +543,8 @@ public class AppSearchStatsTest {
         assertThat(oStats.getTimeSinceLastOptimizeMillis()).isEqualTo(
                 nativeTimeSinceLastOptimizeMillis);
         assertThat(oStats.getEnabledFeatures()).isEqualTo(enabledFeatures);
+        assertThat(oStats.getIndexRestorationMode()).isEqualTo(indexRestorationMode);
+        assertThat(oStats.getNumOriginalNamespaces()).isEqualTo(numOriginalNamespaces);
+        assertThat(oStats.getNumDeletedNamespaces()).isEqualTo(numDeletedNamespaces);
     }
 }
