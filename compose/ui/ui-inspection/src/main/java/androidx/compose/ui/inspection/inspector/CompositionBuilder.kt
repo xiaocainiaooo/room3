@@ -56,6 +56,7 @@ import kotlin.math.roundToInt
  * The interval -10000..-2 is reserved for the generated ids.
  */
 @VisibleForTesting const val RESERVED_FOR_GENERATED_IDS = -10000L
+private const val LAZY_ITEM = "LazyLayoutPinnableItem"
 
 private val unwantedCalls =
     setOf(
@@ -76,6 +77,7 @@ internal class CompositionBuilder(
     private val subCompositions = mutableMapOf<Any?, MutableList<SubCompositionResult>>()
     private var capturingSubCompositions =
         mutableMapOf<MutableInspectorNode, MutableList<SubCompositionResult>>()
+    private var listIndex = -1
 
     /**
      * Build a list of [InspectorNode] trees from a single [root] composition, and insert the
@@ -89,7 +91,7 @@ internal class CompositionBuilder(
         reset(root, childCompositions)
         val node = root.mapTree(::convert, contextCache) ?: newNode()
         updateSubCompositionsAtEnd(node)
-        val result = SubCompositionResult(composition, ownerView, node.children.toList())
+        val result = SubCompositionResult(composition, ownerView, node.children.toList(), listIndex)
         release(node)
         reset(null, emptyList())
         return result
@@ -105,6 +107,7 @@ internal class CompositionBuilder(
                 subCompositions.getOrPut(result.group) { mutableListOf() }.add(result)
             }
         capturingSubCompositions.clear()
+        listIndex = -1
     }
 
     /**
@@ -221,6 +224,10 @@ internal class CompositionBuilder(
         node.inlined = context.isInline
         node.box = context.bounds.emptyCheck()
 
+        if (node.name == LAZY_ITEM) {
+            listIndex = getListIndexOfLazyItem(context)
+        }
+
         // If this node is associated with an android View, set the node's viewId to point to
         // the hosted view. We use the parent's uniqueDrawingId since the interopView returned here
         // will be the view itself, but we want to use the `AndroidViewHolder` that hosts the view
@@ -269,6 +276,16 @@ internal class CompositionBuilder(
             addParameters(context, node)
         }
         return node
+    }
+
+    /**
+     * LazyLayoutPinnableItem is used in reusable compositions and has the index as the 2nd
+     * parameter.
+     */
+    private fun getListIndexOfLazyItem(context: SourceContext): Int {
+        val parameters = context.parameters
+        if (parameters.size < 2) return -1
+        return (parameters[1].value as? Int) ?: -1
     }
 
     private fun IntRect.union(other: IntRect): IntRect {
@@ -516,7 +533,13 @@ internal class SubCompositionResult(
     val ownerView: View?,
 
     /** The parsed sub-composition, that may be replaced later */
-    var nodes: List<InspectorNode>
+    var nodes: List<InspectorNode>,
+
+    /**
+     * The index of this reusable sub-composition or -1 if this is not reusable content. Example: an
+     * item in a LazyColumn.
+     */
+    val listIndex: Int
 ) {
     /**
      * The identity of the parent [CompositionGroup] where this composition belongs in a parent

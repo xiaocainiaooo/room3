@@ -90,6 +90,39 @@ class LazyColumnTest {
         }
     }
 
+    @Test
+    fun rowsInOrder(): Unit = runBlocking {
+        setUpDelayedExtraction()
+        rootId = getGlobalWindowViews().map { it.uniqueDrawingId }.single().toLong()
+        textComponentsInOrder(0)
+        rule.onNode(hasScrollAction()).performScrollToIndex(30)
+        textComponentsInOrder(30)
+        rule.onNode(hasScrollAction()).performScrollToIndex(85)
+        textComponentsInOrder(85)
+        rule.onNode(hasScrollAction()).performScrollToIndex(15)
+        textComponentsInOrder(15)
+    }
+
+    private suspend fun textComponentsInOrder(startIndex: Int): Int {
+        generation++
+        val composables =
+            inspectorTester
+                .sendCommand(GetComposablesCommand(rootId, generation = generation))
+                .getComposablesResponse
+        val texts = composables.filter("Text")
+        assertThat(texts.size).isAtLeast(10)
+
+        var index = startIndex
+        var top = texts[0].bounds.layout.y
+        texts.forEach { text ->
+            assertThat(text.bounds.layout.y).isEqualTo(top)
+            assertThat(text.textParameter).isEqualTo("Hello number: $index")
+            top += text.bounds.layout.h
+            index++
+        }
+        return startIndex + texts.size
+    }
+
     private suspend fun setUpDelayedExtraction() {
         val updated =
             inspectorTester
