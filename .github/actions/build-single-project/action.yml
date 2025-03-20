@@ -15,6 +15,10 @@ inputs:
     description: "key for gradle configuration cache encryption"
   gradle-flags:
     description: "flags to pass while invoking gradle"
+  gradle-version:
+    description: "Version of gradle to use. Defaults to the version of gradlew if not specified."
+    required: false
+    default: wrapper
 runs:
   using: "composite"
   steps:
@@ -65,6 +69,8 @@ runs:
           caches/jars-9
           caches/transforms-3
 
+        gradle-version: ${{ inputs.gradle-version }}
+
     - name: "gradle buildOnServer zipTestConfigsWithApks"
       env:
         JAVA_HOME: ${{ steps.setup-java.outputs.path }}
@@ -73,7 +79,7 @@ runs:
         GRADLE_ENCRYPTION_KEY: ${{ inputs.gradle-encryption-key }}
       working-directory: ${{ inputs.project-root }}
       shell: bash
-      run: ./gradlew buildOnServer zipTestConfigsWithApks ${{ inputs.gradle-flags }}
+      run: gradle buildOnServer zipTestConfigsWithApks ${{ inputs.gradle-flags }}
     - name: "gradle playgroundCIHostTests"
       env:
         JAVA_HOME: ${{ steps.setup-java.outputs.path }}
@@ -82,7 +88,7 @@ runs:
         GRADLE_ENCRYPTION_KEY: ${{ inputs.gradle-encryption-key }}
       working-directory: ${{ inputs.project-root }}
       shell: bash
-      run: ./gradlew playgroundCIHostTests ${{ inputs.gradle-flags }}
+      run: gradle playgroundCIHostTests ${{ inputs.gradle-flags }}
 
     # Zip artifacts because some paths contain ":", which upload-artifact does not accept.
     - name: "Zip build artifacts"
