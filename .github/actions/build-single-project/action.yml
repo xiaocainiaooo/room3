@@ -84,12 +84,18 @@ runs:
       shell: bash
       run: ./gradlew playgroundCIHostTests ${{ inputs.gradle-flags }}
 
+    # Zip artifacts because some paths contain ":", which upload-artifact does not accept.
+    - name: "Zip build artifacts"
+      continue-on-error: true
+      shell: bash
+      run: zip -r artifacts_${{ inputs.project }}.zip ~/dist
     - name: "Upload build artifacts"
       continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
         name: artifacts_${{ inputs.project }}
-        path: ~/dist
+        path: artifacts_${{ inputs.project }}.zip
+
     - name: "Upload daemon logs"
       continue-on-error: true
       if: failure()
