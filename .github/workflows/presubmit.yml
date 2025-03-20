@@ -37,7 +37,7 @@ jobs:
       affectedFileArgs: ${{ steps.affected-file-args.outputs.files }}
     env:
       GRADLE_BUILD_CACHE_PASSWORD: ${{ secrets.GRADLE_BUILD_CACHE_PASSWORD }}
-      GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
       GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
     steps:
       - name: Pull request format
@@ -90,7 +90,7 @@ jobs:
           echo "files=$AFFECTED_FILES" >> $GITHUB_OUTPUT
 
       - name: "Setup Gradle"
-        uses: gradle/gradle-build-action@v3-beta
+        uses: gradle/actions/setup-gradle@v4
         with:
           # Only save Gradle User Home state for builds on the 'androidx-main' branch.
           # Builds on other branches will only read existing entries from the cache.
@@ -134,7 +134,7 @@ jobs:
       artifact-id: ${{matrix.project}}
       project-root: playground-projects/${{matrix.project-root || matrix.project}}-playground
       GRADLE_BUILD_CACHE_PASSWORD: ${{ secrets.GRADLE_BUILD_CACHE_PASSWORD }}
-      GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
       GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
     steps:
       - name: "Checkout androidx repo"
