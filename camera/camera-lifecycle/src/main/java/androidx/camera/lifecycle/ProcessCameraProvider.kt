@@ -27,7 +27,9 @@ import androidx.camera.core.CameraInfoUnavailableException
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
 import androidx.camera.core.ConcurrentCamera
+import androidx.camera.core.ExperimentalSessionConfig
 import androidx.camera.core.InitializationException
+import androidx.camera.core.SessionConfig
 import androidx.camera.core.UseCase
 import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.impl.utils.executor.CameraXExecutors
@@ -70,6 +72,12 @@ private constructor(private val lifecycleCameraProvider: LifecycleCameraProvider
         return lifecycleCameraProvider.unbind(*useCases)
     }
 
+    @ExperimentalSessionConfig
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    override fun unbind(sessionConfig: SessionConfig) {
+        return lifecycleCameraProvider.unbind(sessionConfig)
+    }
+
     @MainThread
     override fun unbindAll() {
         return lifecycleCameraProvider.unbindAll()
@@ -91,6 +99,20 @@ private constructor(private val lifecycleCameraProvider: LifecycleCameraProvider
         useCaseGroup: UseCaseGroup
     ): Camera {
         return lifecycleCameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup)
+    }
+
+    @ExperimentalSessionConfig
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    override fun bindToLifecycle(
+        lifecycleOwner: LifecycleOwner,
+        cameraSelector: CameraSelector,
+        sessionConfig: SessionConfig
+    ): Camera {
+        return lifecycleCameraProvider.bindToLifecycle(
+            lifecycleOwner,
+            cameraSelector,
+            sessionConfig
+        )
     }
 
     @MainThread
