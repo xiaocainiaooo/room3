@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.toSize
 import java.util.ArrayDeque
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -233,6 +235,22 @@ internal class CompositionBuilder(
         if (layoutInfo != null) {
             return parseLayoutInfo(layoutInfo, context, node)
         }
+
+        // If any of the children has an unknown location, we need to:
+        // - change the calculated size to the children with known location
+        // - or mark this node as an unknown location and unwanted if the size
+        //   originates from children with unknown locations.
+        if (children.any { it.unknownLocation } && !node.box.isEmpty) {
+            var box = emptyBox
+            children.filter { !it.unknownLocation }.forEach { child -> box = box.union(child.box) }
+            if (box.isEmpty) {
+                node.unknownLocation = true
+                node.markUnwanted()
+            } else {
+                node.box = box
+            }
+        }
+
         // Keep an empty node if we are capturing nodes into sub-compositions.
         // Mark it unwanted after copying the node to the sub-compositions.
         if (
@@ -251,6 +269,17 @@ internal class CompositionBuilder(
             addParameters(context, node)
         }
         return node
+    }
+
+    private fun IntRect.union(other: IntRect): IntRect {
+        if (this == emptyBox) return other else if (other == emptyBox) return this
+
+        return IntRect(
+            left = min(left, other.left),
+            top = min(top, other.top),
+            bottom = max(bottom, other.bottom),
+            right = max(right, other.right)
+        )
     }
 
     /**
@@ -342,7 +371,12 @@ internal class CompositionBuilder(
         val size = box.size.toSize()
         val coordinates = layoutInfo.coordinates
         var bounds: QuadBounds? = null
-        if (layoutInfo.isAttached && coordinates.isAttached) {
+        if (!layoutInfo.isAttached || !coordinates.isAttached || !layoutInfo.isPlaced) {
+            // This could happen for extra items generated for reusable content like the
+            // items in a LazyColumn. Mark these nodes unwanted i.e. filter them out.
+            node.unknownLocation = true
+            node.markUnwanted()
+        } else {
             val topLeft = toIntOffset(coordinates.localToWindow(Offset.Zero))
             val topRight = toIntOffset(coordinates.localToWindow(Offset(size.width, 0f)))
             val bottomRight =
