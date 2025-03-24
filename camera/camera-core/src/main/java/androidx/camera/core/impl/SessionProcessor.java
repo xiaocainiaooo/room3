@@ -17,12 +17,14 @@
 package androidx.camera.core.impl;
 
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraExtensionSession;
 import android.media.ImageReader;
 import android.os.Build;
 import android.util.Pair;
 import android.util.Range;
 import android.util.Size;
 
+import androidx.annotation.IntRange;
 import androidx.camera.core.CameraInfo;
 
 import org.jspecify.annotations.NonNull;
@@ -245,6 +247,20 @@ public interface SessionProcessor {
     }
 
     /**
+     * Sets a {@link CaptureSessionRequestProcessor} for retrieving specific information from the
+     * camera capture session or submitting requests.
+     *
+     * <p>This is used for the SessionProcessor implementation that needs to directly interact
+     * with the camera capture session to retrieve specific information or submit requests.
+     *
+     * <p>Callers should clear this by calling with null to avoid the session processor to hold
+     * the camera capture session related resources.
+     */
+    default void setCaptureSessionRequestProcessor(
+            @Nullable CaptureSessionRequestProcessor processor) {
+    }
+
+    /**
      * Callback for {@link #startRepeating} and {@link #startCapture}.
      */
     interface CaptureCallback {
@@ -333,5 +349,27 @@ public interface SessionProcessor {
          * @param progress             Value between 0 and 100.
          */
         default void onCaptureProcessProgressed(int progress) {}
+    }
+
+    /**
+     * An interface for retrieving specific information from the camera capture session or
+     * submitting requests.
+     */
+    interface CaptureSessionRequestProcessor {
+        /**
+         * Returns the realtime still capture latency information.
+         *
+         * @see CameraExtensionSession#getRealtimeStillCaptureLatency()
+         */
+        @Nullable
+        Pair<Long, Long> getRealtimeStillCaptureLatency();
+
+        /**
+         * Sets the strength of the extension post-processing effect.
+         *
+         * @param strength the new extension strength value
+         * @see android.hardware.camera2.CaptureRequest#EXTENSION_STRENGTH
+         */
+        void setExtensionStrength(@IntRange(from = 0, to = 100) int strength);
     }
 }

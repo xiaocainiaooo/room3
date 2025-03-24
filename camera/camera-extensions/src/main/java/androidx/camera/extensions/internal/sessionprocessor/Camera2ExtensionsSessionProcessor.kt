@@ -22,6 +22,7 @@ import android.hardware.camera2.CaptureResult
 import android.os.Build
 import android.util.Pair
 import android.util.Size
+import androidx.annotation.GuardedBy
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraInfo
 import androidx.camera.core.impl.AdapterCameraInfo
@@ -33,6 +34,7 @@ import androidx.camera.core.impl.OutputSurfaceConfiguration
 import androidx.camera.core.impl.RequestProcessor
 import androidx.camera.core.impl.SessionConfig
 import androidx.camera.core.impl.SessionProcessor
+import androidx.camera.core.impl.SessionProcessor.CaptureSessionRequestProcessor
 import androidx.camera.core.impl.TagBundle
 import androidx.camera.core.impl.utils.executor.CameraXExecutors
 import androidx.camera.extensions.CameraExtensionsControl
@@ -66,6 +68,11 @@ public class Camera2ExtensionsSessionProcessor(
 
     private var cameraInfoInternal: CameraInfoInternal? = null
     private var cameraCaptureCallback: CameraCaptureCallback? = null
+
+    private val lock = Any()
+
+    @GuardedBy("lock")
+    private var captureSessionRequestProcessor: CaptureSessionRequestProcessor? = null
 
     init {
         if (isCurrentExtensionModeAvailable()) {
@@ -210,4 +217,18 @@ public class Camera2ExtensionsSessionProcessor(
         vendorExtender.isCurrentExtensionModeAvailable
 
     override fun getCurrentExtensionMode(): LiveData<Int>? = currentExtensionTypeLiveData
+
+    override fun getRealtimeCaptureLatency(): Pair<Long, Long>? {
+        synchronized(lock) {
+            return captureSessionRequestProcessor?.realtimeStillCaptureLatency
+        }
+    }
+
+    override fun setExtensionStrength(strength: Int) {
+        synchronized(lock) { captureSessionRequestProcessor?.setExtensionStrength(strength) }
+    }
+
+    override fun setCaptureSessionRequestProcessor(processor: CaptureSessionRequestProcessor?) {
+        synchronized(lock) { captureSessionRequestProcessor = processor }
+    }
 }

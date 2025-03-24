@@ -26,6 +26,7 @@ import android.hardware.camera2.params.SessionConfiguration.SESSION_HIGH_SPEED
 import android.hardware.camera2.params.SessionConfiguration.SESSION_REGULAR
 import android.media.MediaCodec
 import android.os.Build
+import android.util.Pair
 import androidx.annotation.GuardedBy
 import androidx.annotation.VisibleForTesting
 import androidx.camera.camera2.pipe.CameraDevices
@@ -42,6 +43,7 @@ import androidx.camera.camera2.pipe.OutputStream
 import androidx.camera.camera2.pipe.OutputStream.DynamicRangeProfile
 import androidx.camera.camera2.pipe.RequestTemplate
 import androidx.camera.camera2.pipe.StreamFormat
+import androidx.camera.camera2.pipe.StreamId
 import androidx.camera.camera2.pipe.compat.CameraPipeKeys
 import androidx.camera.camera2.pipe.core.Log
 import androidx.camera.camera2.pipe.integration.adapter.CameraStateAdapter
@@ -568,6 +570,7 @@ constructor(
                     pendingSessionProcessorInitialization = false
                 }
             } else {
+                sessionProcessor.setCaptureSessionRequestProcessor(null)
                 sessionProcessor.deInitSession()
             }
         }
@@ -624,6 +627,8 @@ constructor(
                 control.requestControl = camera?.requestControl
             }
 
+            setCaptureSessionRequestProcessor(sessionConfigAdapter, cameraGraph)
+
             camera?.setActiveResumeMode(activeResumeEnabled)
 
             refreshRunningUseCases()
@@ -634,6 +639,56 @@ constructor(
             useCase.onCameraControlReady()
         }
         pendingUseCasesToNotifyCameraControlReady.clear()
+    }
+
+    private fun setCaptureSessionRequestProcessor(
+        sessionConfigAdapter: SessionConfigAdapter,
+        cameraGraph: CameraGraph
+    ) {
+        val useCamera2Extension =
+            sessionProcessor?.implementationType?.first == SessionProcessor.TYPE_CAMERA2_EXTENSION
+        if (useCamera2Extension) {
+            val stillCaptureStreamId: StreamId? =
+                sessionConfigAdapter.getValidSessionConfigOrNull()?.let { sessionConfig ->
+                    val repeatingSurfaces = sessionConfig.repeatingCaptureConfig.surfaces
+                    sessionConfig.surfaces
+                        .find { surface ->
+                            surface !in repeatingSurfaces
+                        } // Find the first non-repeating surface (nullable)
+                        ?.let { surface -> // If found...
+                            useCaseGraphConfig?.getStreamIdsFromSurfaces(
+                                listOf(surface)
+                            ) // Get its StreamIds (nullable list)
+                        }
+                        ?.firstOrNull() // Get the first StreamId or null
+                }
+
+            sessionProcessor?.setCaptureSessionRequestProcessor(
+                object : SessionProcessor.CaptureSessionRequestProcessor {
+                    override fun getRealtimeStillCaptureLatency(): Pair<Long, Long>? {
+                        val outputLatency =
+                            cameraGraph.streams.getOutputLatency(stillCaptureStreamId!!)
+                                ?: return null
+                        val captureLatencyMs =
+                            outputLatency.estimatedCaptureLatencyNs.div(1_000_000)
+                        val processingLatencyMs =
+                            outputLatency.estimatedProcessingLatencyNs.div(1_000_000)
+                        return Pair.create(captureLatencyMs, processingLatencyMs)
+                    }
+
+                    override fun setExtensionStrength(strength: Int) {
+                        if (Build.VERSION.SDK_INT >= 34) {
+                            camera
+                                ?.requestControl
+                                ?.setParametersAsync(
+                                    values =
+                                        mutableMapOf(CaptureRequest.EXTENSION_STRENGTH to strength)
+                                )
+                        }
+                    }
+                }
+            )
+        }
     }
 
     @GuardedBy("lock")
