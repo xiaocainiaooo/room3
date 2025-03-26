@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.ModifierNodeElement
@@ -198,4 +199,24 @@ internal class TextContextMenuToolbarHandlerNode(
         if (isAttached) computeContentBounds(destinationCoordinates) else Rect.Zero
 
     override fun data(): TextContextMenuData = derivedData
+}
+
+/**
+ * Translates the [rootContentBounds] computed from the [localCoordinates] to the
+ * [destinationCoordinates].
+ */
+internal fun translateRootToDestination(
+    rootContentBounds: Rect,
+    localCoordinates: LayoutCoordinates,
+    destinationCoordinates: LayoutCoordinates
+): Rect {
+    if (!localCoordinates.isAttached || !destinationCoordinates.isAttached) return Rect.Zero
+    val rootContentPosition = rootContentBounds.topLeft
+    val rootCoordinates = localCoordinates.findRootCoordinates()
+    val destinationContentPosition =
+        destinationCoordinates.localPositionOf(
+            sourceCoordinates = rootCoordinates,
+            relativeToSource = rootContentPosition
+        )
+    return Rect(destinationContentPosition, rootContentBounds.size)
 }
