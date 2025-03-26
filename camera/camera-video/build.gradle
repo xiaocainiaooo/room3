@@ -56,7 +56,6 @@ dependencies {
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.mockitoCore)
     androidTestImplementation(libs.dexmakerMockito)
-    androidTestImplementation(libs.autoValueAnnotations)
     androidTestImplementation(project(":camera:camera-lifecycle"))
     androidTestImplementation(project(":camera:camera-testing")) {
         // Ensure camera-testing does not pull in androidx.test dependencies
@@ -64,7 +63,6 @@ dependencies {
     }
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.kotlinCoroutinesAndroid)
-    androidTestImplementation(libs.atomicFu)
     androidTestImplementation(project(":concurrent:concurrent-futures-ktx"))
     androidTestImplementation(project(":internal-testutils-truth"))
     androidTestImplementation(project(":camera:camera-camera2-pipe-integration"))

@@ -44,10 +44,7 @@ dependencies {
     implementation(libs.autoValueAnnotations)
     implementation("androidx.appcompat:appcompat:1.1.0")
 
-    annotationProcessor(libs.autoValue)
-
     testImplementation(libs.testRunner)
-    testImplementation(libs.mockitoCore4)
     testImplementation(libs.robolectric)
     testImplementation(libs.kotlinStdlib)
     testImplementation(libs.truth)
@@ -57,6 +54,7 @@ dependencies {
     testImplementation(project(":camera:camera-testing"))
 
     androidTestImplementation(libs.mockitoCore)
+    androidTestImplementation(libs.dexmakerMockito)
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testRunner)
@@ -71,8 +69,6 @@ dependencies {
     }
     androidTestImplementation(project(":camera:camera-camera2-pipe-integration"))
     androidTestImplementation(project(":internal-testutils-truth"))
-    androidTestImplementation(libs.mockitoCore)
-    androidTestImplementation(libs.dexmakerMockito)
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 android {
