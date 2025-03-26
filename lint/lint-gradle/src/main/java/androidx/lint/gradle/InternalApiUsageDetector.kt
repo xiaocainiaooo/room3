@@ -30,11 +30,13 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UImportStatement
+import org.jetbrains.uast.UQualifiedReferenceExpression
 
 class InternalApiUsageDetector : Detector(), Detector.UastScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement>> =
         listOf(
             UImportStatement::class.java,
+            UQualifiedReferenceExpression::class.java,
         )
 
     override fun createUastHandler(context: JavaContext): UElementHandler =
@@ -49,20 +51,60 @@ class InternalApiUsageDetector : Detector(), Detector.UastScanner {
                     }
 
                     if (resolved is PsiClass) {
-                        if (resolved.isInternalGradleApi()) {
-                            reportIncidentForNode(
-                                INTERNAL_GRADLE_ISSUE,
+                        checkClassUsage(resolved, node)
+                    }
+                }
+            }
+
+            override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
+                val element = node.resolve() ?: return
+                // PsiMethod covers both method calls and kotlin property access
+                when (element) {
+                    is PsiMethod -> checkMethodUsage(element, node)
+                    is PsiField ->
+                        element.containingClass?.let {
+                            checkClassUsage(
+                                it,
                                 node,
-                                "Avoid using internal Gradle APIs"
-                            )
-                        } else if (resolved.isInternalAgpApi()) {
-                            reportIncidentForNode(
-                                INTERNAL_AGP_ISSUE,
-                                node,
-                                "Avoid using internal Android Gradle Plugin APIs"
+                                " (field ${element.name} from ${it.qualifiedName})"
                             )
                         }
-                    }
+                }
+            }
+
+            fun checkMethodUsage(method: PsiMethod, node: UElement) {
+                val cls = method.containingClass ?: return
+                // Check that the class the method is implemented in is internal, and also all super
+                // methods that this method overrides are also internal.
+                val contextMsg = "(method ${method.name} from ${cls.qualifiedName})"
+                if (cls.isInternalGradleApi() && method.hasOnlyInternalSuperMethods()) {
+                    reportIncidentForNode(
+                        INTERNAL_GRADLE_ISSUE,
+                        node,
+                        "Avoid using internal Gradle APIs $contextMsg"
+                    )
+                } else if (cls.isInternalAgpApi() && method.hasOnlyInternalSuperMethods()) {
+                    reportIncidentForNode(
+                        INTERNAL_AGP_ISSUE,
+                        node,
+                        "Avoid using internal Android Gradle Plugin APIs $contextMsg"
+                    )
+                }
+            }
+
+            fun checkClassUsage(cls: PsiClass, node: UElement, contextMsg: String = "") {
+                if (cls.isInternalGradleApi()) {
+                    reportIncidentForNode(
+                        INTERNAL_GRADLE_ISSUE,
+                        node,
+                        "Avoid using internal Gradle APIs$contextMsg"
+                    )
+                } else if (cls.isInternalAgpApi()) {
+                    reportIncidentForNode(
+                        INTERNAL_AGP_ISSUE,
+                        node,
+                        "Avoid using internal Android Gradle Plugin APIs$contextMsg"
+                    )
                 }
             }
 
@@ -85,6 +127,17 @@ class InternalApiUsageDetector : Detector(), Detector.UastScanner {
                 val className = qualifiedName ?: return false
                 return className.startsWith("com.android.build.") &&
                     className.contains(".internal.")
+            }
+
+            /**
+             * Checks that this method's super methods are all implemented in either internal gradle
+             * or AGP classes.
+             */
+            private fun PsiMethod.hasOnlyInternalSuperMethods(): Boolean {
+                return findSuperMethods().all {
+                    it.containingClass?.isInternalGradleApi() == true &&
+                        it.containingClass?.isInternalAgpApi() == true
+                }
             }
         }
 
