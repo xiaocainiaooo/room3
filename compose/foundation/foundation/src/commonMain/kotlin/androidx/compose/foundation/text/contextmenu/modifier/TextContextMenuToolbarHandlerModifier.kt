@@ -88,13 +88,14 @@ internal class ToolbarRequesterImpl : ToolbarRequester() {
  * @param onHide A `suspend` lambda called when the toolbar is hidden.
  * @param computeContentBounds Lambda that tells the toolbar where to position around. This is used
  *   for computing [TextContextMenuDataProvider.contentBounds]. The resulting bounds should be
- *   relative to the input [LayoutCoordinates].
+ *   relative to the input [LayoutCoordinates]. If null is returned, then the previous bound results
+ *   will be used. If null is returned on the first invocation, then [Rect.Zero] will be used.
  */
 internal fun Modifier.textContextMenuToolbarHandler(
     requester: ToolbarRequester,
     onShow: (suspend () -> Unit)? = null,
     onHide: (suspend () -> Unit)? = null,
-    computeContentBounds: (destinationCoordinates: LayoutCoordinates) -> Rect,
+    computeContentBounds: (destinationCoordinates: LayoutCoordinates) -> Rect?,
 ): Modifier =
     this then TextContextMenuToolbarHandlerElement(requester, onShow, onHide, computeContentBounds)
 
@@ -102,7 +103,7 @@ private class TextContextMenuToolbarHandlerElement(
     private val requester: ToolbarRequester,
     private val onShow: (suspend () -> Unit)?,
     private val onHide: (suspend () -> Unit)?,
-    private val computeContentBounds: (LayoutCoordinates) -> Rect,
+    private val computeContentBounds: (LayoutCoordinates) -> Rect?,
 ) : ModifierNodeElement<TextContextMenuToolbarHandlerNode>() {
     override fun create(): TextContextMenuToolbarHandlerNode =
         TextContextMenuToolbarHandlerNode(requester, onShow, onHide, computeContentBounds)
@@ -147,7 +148,7 @@ internal class TextContextMenuToolbarHandlerNode(
     var requester: ToolbarRequester,
     var onShow: (suspend () -> Unit)?,
     var onHide: (suspend () -> Unit)?,
-    var computeContentBounds: (LayoutCoordinates) -> Rect,
+    var computeContentBounds: (LayoutCoordinates) -> Rect?,
 ) : DelegatingNode(), CompositionLocalConsumerModifierNode, TextContextMenuDataProvider {
 
     /** [Job] that is showing the text toolbar. */
@@ -158,6 +159,8 @@ internal class TextContextMenuToolbarHandlerNode(
         // so return empty if we aren't attached to avoid crashing.
         if (isAttached) collectTextContextMenuData() else TextContextMenuData.Empty
     }
+
+    private var previousContentBounds: Rect = Rect.Zero
 
     override fun onAttach() {
         super.onAttach()
@@ -195,8 +198,15 @@ internal class TextContextMenuToolbarHandlerNode(
 
     // This can update as the modifier is getting disposed,
     // so return zero if we aren't attached to avoid crashing.
-    override fun contentBounds(destinationCoordinates: LayoutCoordinates): Rect =
-        if (isAttached) computeContentBounds(destinationCoordinates) else Rect.Zero
+    override fun contentBounds(destinationCoordinates: LayoutCoordinates): Rect {
+        if (!isAttached) return previousContentBounds
+
+        val computedContentBounds = computeContentBounds(destinationCoordinates)
+        if (computedContentBounds == null) return previousContentBounds
+
+        previousContentBounds = computedContentBounds
+        return computedContentBounds
+    }
 
     override fun data(): TextContextMenuData = derivedData
 }

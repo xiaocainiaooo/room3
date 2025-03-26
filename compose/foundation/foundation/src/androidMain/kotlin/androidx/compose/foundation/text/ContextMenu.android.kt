@@ -28,7 +28,6 @@ import androidx.compose.foundation.text.contextmenu.builder.TextContextMenuBuild
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuKeys
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuSession
 import androidx.compose.foundation.text.contextmenu.internal.ProvideDefaultPlatformTextContextMenuProviders
-import androidx.compose.foundation.text.contextmenu.internal.ProvideDefaultTextContextMenuDropdown
 import androidx.compose.foundation.text.contextmenu.modifier.textContextMenuGestures
 import androidx.compose.foundation.text.input.internal.selection.TextFieldSelectionState
 import androidx.compose.foundation.text.input.internal.selection.contextMenuBuilder
@@ -130,7 +129,7 @@ internal actual fun ContextMenuArea(
 @Composable
 internal actual fun ContextMenuArea(manager: SelectionManager, content: @Composable () -> Unit) {
     if (ComposeFoundationFlags.isNewContextMenuEnabled) {
-        ProvideDefaultTextContextMenuDropdown(Modifier.textContextMenuGestures(), content)
+        ProvideDefaultPlatformTextContextMenuProviders(manager.contextMenuAreaModifier, content)
     } else {
         val state = remember { ContextMenuState() }
         androidx.compose.foundation.contextmenu.ContextMenuArea(
