@@ -20,12 +20,16 @@ import androidx.compose.foundation.text.contextmenu.modifier.ToolbarRequester
 
 internal class FakeToolbarRequester : ToolbarRequester() {
     var shown = false
+    var showCount = 0
+    var hideCount = 0
 
     override fun show() {
+        showCount++
         shown = true
     }
 
     override fun hide() {
+        hideCount++
         shown = false
     }
 }

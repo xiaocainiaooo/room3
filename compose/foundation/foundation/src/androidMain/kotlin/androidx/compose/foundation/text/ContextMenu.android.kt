@@ -52,15 +52,7 @@ internal actual fun ContextMenuArea(
     content: @Composable () -> Unit
 ) {
     if (ComposeFoundationFlags.isNewContextMenuEnabled) {
-        val modifier =
-            if (manager.enabled) {
-                Modifier.textContextMenuGestures(
-                    onPreShowContextMenu = { manager.updateClipboardEntry() }
-                )
-            } else {
-                Modifier
-            }
-        ProvideDefaultTextContextMenuDropdown(modifier, content)
+        ProvideDefaultPlatformTextContextMenuProviders(manager.contextMenuAreaModifier, content)
     } else {
         val state = remember { ContextMenuState() }
         val coroutineScope = rememberCoroutineScope()
