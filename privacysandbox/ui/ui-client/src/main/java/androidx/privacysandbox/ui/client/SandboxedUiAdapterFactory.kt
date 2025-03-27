@@ -33,7 +33,6 @@ import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
 import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.RemoteCallManager.addBinderDeathListener
-import androidx.privacysandbox.ui.core.RemoteCallManager.closeRemoteSession
 import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions
@@ -161,7 +160,7 @@ object SandboxedUiAdapterFactory {
                     Proxy.newProxyInstance(
                         uiProviderBinder.javaClass.classLoader,
                         arrayOf(targetSessionClientClass),
-                        SessionClientProxyHandler(client)
+                        SessionClientProxyHandler(uiProviderVersion, client)
                     )
 
                 openLocalSessionMethod.invoke(
@@ -184,6 +183,7 @@ object SandboxedUiAdapterFactory {
         }
 
         private class SessionClientProxyHandler(
+            private val uiProviderVersion: Int,
             private val origClient: SandboxedUiAdapter.SessionClient,
         ) : InvocationHandler {
 
@@ -194,7 +194,7 @@ object SandboxedUiAdapterFactory {
                         // recognize Session class on targetClassLoader. We need proxy for it
                         // on local ClassLoader.
                         args!! // This method will always have an argument, so safe to !!
-                        origClient.onSessionOpened(SessionProxy(args[0]))
+                        origClient.onSessionOpened(SessionProxy(uiProviderVersion, args[0]))
                     }
                     "onSessionError" -> {
                         args!! // This method will always have an argument, so safe to !!
@@ -216,72 +216,6 @@ object SandboxedUiAdapterFactory {
                         )
                     }
                 }
-            }
-        }
-
-        /** Create [SandboxedUiAdapter.Session] that proxies to [origSession] */
-        private class SessionProxy(
-            private val origSession: Any,
-        ) : SandboxedUiAdapter.Session {
-
-            private val targetClass =
-                Class.forName(
-                        "androidx.privacysandbox.ui.core.SandboxedUiAdapter\$Session",
-                        /* initialize = */ false,
-                        origSession.javaClass.classLoader
-                    )
-                    .also { it.cast(origSession) }
-
-            private val getViewMethod = targetClass.getMethod("getView")
-            private val notifyResizedMethod =
-                targetClass.getMethod("notifyResized", Int::class.java, Int::class.java)
-            private val getSignalOptionsMethod = targetClass.getMethod("getSignalOptions")
-            private val notifyZOrderChangedMethod =
-                targetClass.getMethod("notifyZOrderChanged", Boolean::class.java)
-            private val notifyConfigurationChangedMethod =
-                targetClass.getMethod("notifyConfigurationChanged", Configuration::class.java)
-            private val notifyUiChangedMethod =
-                targetClass.getMethod("notifyUiChanged", Bundle::class.java)
-            private val notifySessionRenderedMethod =
-                targetClass.getMethod("notifySessionRendered", Set::class.java)
-            private val closeMethod = targetClass.getMethod("close")
-
-            override val view: View
-                get() = getViewMethod.invoke(origSession) as View
-
-            override val signalOptions: Set<String>
-                @Suppress("UNCHECKED_CAST") // using reflection on library classes
-                get() = getSignalOptionsMethod.invoke(origSession) as Set<String>
-
-            override fun notifyResized(width: Int, height: Int) {
-                val parentView = view.parent as View
-                view.layout(
-                    parentView.paddingLeft,
-                    parentView.paddingTop,
-                    parentView.paddingLeft + width,
-                    parentView.paddingTop + height
-                )
-                notifyResizedMethod.invoke(origSession, width, height)
-            }
-
-            override fun notifyZOrderChanged(isZOrderOnTop: Boolean) {
-                notifyZOrderChangedMethod.invoke(origSession, isZOrderOnTop)
-            }
-
-            override fun notifyConfigurationChanged(configuration: Configuration) {
-                notifyConfigurationChangedMethod.invoke(origSession, configuration)
-            }
-
-            override fun notifyUiChanged(uiContainerInfo: Bundle) {
-                notifyUiChangedMethod.invoke(origSession, uiContainerInfo)
-            }
-
-            override fun notifySessionRendered(supportedSignalOptions: Set<String>) {
-                notifySessionRenderedMethod.invoke(origSession, supportedSignalOptions)
-            }
-
-            override fun close() {
-                closeMethod.invoke(origSession)
             }
         }
     }
@@ -322,12 +256,13 @@ object SandboxedUiAdapterFactory {
                     initialWidth,
                     initialHeight,
                     isZOrderOnTop,
-                    RemoteSessionClient(context, client, clientExecutor)
+                    RemoteSessionClient(uiProviderVersion, context, client, clientExecutor)
                 )
             }
         }
 
         class RemoteSessionClient(
+            val uiProviderVersion: Int,
             val context: Context,
             val client: SandboxedUiAdapter.SessionClient,
             val clientExecutor: Executor
@@ -341,7 +276,9 @@ object SandboxedUiAdapterFactory {
                 isZOrderOnTop: Boolean,
                 signalOptions: List<String>
             ) {
-                contentView = ContentView(context, remoteSessionController)
+                val remoteSessionControllerWithVersionCheck =
+                    RemoteSessionController(uiProviderVersion, remoteSessionController)
+                contentView = ContentView(context, remoteSessionControllerWithVersionCheck)
                 contentView.setChildSurfacePackage(surfacePackage)
                 contentView.setZOrderOnTop(isZOrderOnTop)
                 contentView.addOnAttachStateChangeListener(
@@ -351,9 +288,7 @@ object SandboxedUiAdapterFactory {
 
                         override fun onViewAttachedToWindow(v: View) {
                             if (hasViewBeenPreviouslyAttached) {
-                                tryToCallRemoteObject(remoteSessionController) {
-                                    this.notifyFetchUiForSession()
-                                }
+                                remoteSessionControllerWithVersionCheck.notifyFetchUiForSession()
                             } else {
                                 hasViewBeenPreviouslyAttached = true
                             }
@@ -367,7 +302,7 @@ object SandboxedUiAdapterFactory {
                     client.onSessionOpened(
                         SessionImpl(
                             contentView,
-                            remoteSessionController,
+                            remoteSessionControllerWithVersionCheck,
                             surfacePackage,
                             signalOptions.toSet()
                         )
@@ -393,7 +328,7 @@ object SandboxedUiAdapterFactory {
 
         private class SessionImpl(
             val contentView: ContentView,
-            val remoteSessionController: IRemoteSessionController,
+            val remoteSessionController: androidx.privacysandbox.ui.client.IRemoteSessionController,
             val surfacePackage: SurfaceControlViewHost.SurfacePackage,
             override val signalOptions: Set<String>
         ) : SandboxedUiAdapter.Session {
@@ -401,9 +336,7 @@ object SandboxedUiAdapterFactory {
             override val view: View = contentView
 
             override fun notifyConfigurationChanged(configuration: Configuration) {
-                tryToCallRemoteObject(remoteSessionController) {
-                    this.notifyConfigurationChanged(configuration)
-                }
+                remoteSessionController.notifyConfigurationChanged(configuration)
             }
 
             override fun notifyResized(width: Int, height: Int) {
@@ -420,9 +353,7 @@ object SandboxedUiAdapterFactory {
                 }
 
                 val providerResizeRunnable = Runnable {
-                    tryToCallRemoteObject(remoteSessionController) {
-                        this.notifyResized(width, height)
-                    }
+                    remoteSessionController.notifyResized(width, height)
                 }
 
                 val syncGroup = SurfaceSyncGroup("AppAndSdkViewsSurfaceSync")
@@ -434,25 +365,19 @@ object SandboxedUiAdapterFactory {
 
             override fun notifyZOrderChanged(isZOrderOnTop: Boolean) {
                 contentView.setZOrderOnTop(isZOrderOnTop)
-                tryToCallRemoteObject(remoteSessionController) {
-                    this.notifyZOrderChanged(isZOrderOnTop)
-                }
+                remoteSessionController.notifyZOrderChanged(isZOrderOnTop)
             }
 
             override fun notifyUiChanged(uiContainerInfo: Bundle) {
-                tryToCallRemoteObject(remoteSessionController) {
-                    this.notifyUiChanged(uiContainerInfo)
-                }
+                remoteSessionController.notifyUiChanged(uiContainerInfo)
             }
 
             override fun notifySessionRendered(supportedSignalOptions: Set<String>) {
-                tryToCallRemoteObject(remoteSessionController) {
-                    this.notifySessionRendered(supportedSignalOptions.toList())
-                }
+                remoteSessionController.notifySessionRendered(supportedSignalOptions.toList())
             }
 
             override fun close() {
-                closeRemoteSession(remoteSessionController)
+                remoteSessionController.close()
             }
         }
     }
