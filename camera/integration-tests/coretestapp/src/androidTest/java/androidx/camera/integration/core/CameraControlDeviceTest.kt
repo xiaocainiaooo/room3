@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.camera.integration.core.camera2
+
+package androidx.camera.integration.core
 
 import android.content.Context
 import android.os.Build
@@ -230,7 +231,7 @@ class CameraControlDeviceTest(
                 .setTorchStrengthLevel(camera.cameraInfo.maxTorchStrengthLevel)
                 .get()
         } catch (e: ExecutionException) {
-            assertThat(e.cause).isInstanceOf(java.lang.UnsupportedOperationException::class.java)
+            assertThat(e.cause).isInstanceOf(UnsupportedOperationException::class.java)
             return
         }
 
