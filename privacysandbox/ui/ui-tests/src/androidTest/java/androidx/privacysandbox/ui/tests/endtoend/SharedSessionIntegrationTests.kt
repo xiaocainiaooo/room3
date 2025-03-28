@@ -151,7 +151,7 @@ class SharedSessionIntegrationTests(private val invokeBackwardsCompatFlow: Boole
         val testSession = sdkAdapter.session as TestSharedUiAdapter.TestSession
         val client = testSession.sessionClient
 
-        assertThat(client.toString()).isEqualTo(testSessionClient.toString())
+        assertThat(client.toString()).contains(testSessionClient.toString())
         assertThat(client.equals(client)).isTrue()
         assertThat(client).isNotEqualTo(testSessionClient)
         assertThat(client.hashCode()).isEqualTo(client.hashCode())
