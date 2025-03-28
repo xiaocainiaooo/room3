@@ -24,9 +24,11 @@ import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.IRemoteSharedUiSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSharedUiSessionController
 import androidx.privacysandbox.ui.core.ISharedUiAdapter
+import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.RemoteCallManager.addBinderDeathListener
 import androidx.privacysandbox.ui.core.RemoteCallManager.closeRemoteSession
 import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
+import androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions
 import androidx.privacysandbox.ui.core.SharedUiAdapter
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
@@ -41,12 +43,9 @@ import java.util.concurrent.Executor
 @ExperimentalFeatures.SharedUiPresentationApi
 object SharedUiAdapterFactory {
 
-    // Bundle key is a binary compatibility requirement
-    private const val SHARED_UI_ADAPTER_BINDER = "sharedUiAdapterBinder"
-
     private val uiAdapterFactoryDelegate =
         object : UiAdapterFactoryDelegate() {
-            override val uiAdapterBinderKey: String = SHARED_UI_ADAPTER_BINDER
+            override val uiAdapterBinderKey: String = ProtocolConstants.sharedUiAdapterBinderKey
             override val adapterDescriptor: String = ISharedUiAdapter.DESCRIPTOR
         }
 
@@ -60,8 +59,6 @@ object SharedUiAdapterFactory {
     @SuppressLint("NullAnnotationGroup")
     @ExperimentalFeatures.SharedUiPresentationApi
     fun createFromCoreLibInfo(coreLibInfo: Bundle): SharedUiAdapter {
-        val uiAdapterBinder = uiAdapterFactoryDelegate.requireNotNullAdapterBinder(coreLibInfo)
-
         return if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
                 !uiAdapterFactoryDelegate.shouldUseLocalAdapter(coreLibInfo)
@@ -74,13 +71,16 @@ object SharedUiAdapterFactory {
 
     /**
      * [LocalAdapter] communicates with a provider living on same process as the client but on a
-     * different class loader.
+     * different class loader. We should also perform ui-provider version check before calling any
+     * newly introduced api / modified api.
      */
     @SuppressLint("BanUncheckedReflection") // using reflection on library classes
     private class LocalAdapter(adapterBundle: Bundle) :
         SharedUiAdapter, ClientAdapter(adapterBundle) {
         private val uiProviderBinder =
             uiAdapterFactoryDelegate.requireNotNullAdapterBinder(adapterBundle)
+        private val uiProviderVersion =
+            uiAdapterFactoryDelegate.requireNotNullUiProviderVersion(adapterBundle)
 
         private val targetSharedSessionClientClass =
             Class.forName(
@@ -94,11 +94,16 @@ object SharedUiAdapterFactory {
         // need reflection to get hold of it.
         private val openSessionMethod: Method =
             Class.forName(
-                    "androidx.privacysandbox.ui.core.SharedUiAdapter",
+                    "androidx.privacysandbox.ui.core.LocalSharedUiAdapter",
                     /* initialize = */ false,
                     uiProviderBinder.javaClass.classLoader
                 )
-                .getMethod("openSession", Executor::class.java, targetSharedSessionClientClass)
+                .getMethod(
+                    "openLocalSession",
+                    Int::class.java,
+                    Executor::class.java,
+                    targetSharedSessionClientClass
+                )
 
         override fun openSession(clientExecutor: Executor, client: SharedUiAdapter.SessionClient) {
             try {
@@ -108,7 +113,12 @@ object SharedUiAdapterFactory {
                         arrayOf(targetSharedSessionClientClass),
                         SessionClientProxyHandler(client)
                     )
-                openSessionMethod.invoke(uiProviderBinder, clientExecutor, sessionClientProxy)
+                openSessionMethod.invoke(
+                    uiProviderBinder,
+                    SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel,
+                    clientExecutor,
+                    sessionClientProxy
+                )
             } catch (exception: Throwable) {
                 client.onSessionError(exception)
             }
@@ -163,16 +173,23 @@ object SharedUiAdapterFactory {
 
     /**
      * [RemoteAdapter] maintains a shared session with a UI provider living in a different process.
+     * We should also perform ui-provider version check before calling any newly introduced api /
+     * modified api.
      */
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private class RemoteAdapter(adapterBundle: Bundle) :
         SharedUiAdapter, ClientAdapter(adapterBundle) {
         val uiAdapterBinder = uiAdapterFactoryDelegate.requireNotNullAdapterBinder(adapterBundle)
         val adapterInterface: ISharedUiAdapter = ISharedUiAdapter.Stub.asInterface(uiAdapterBinder)
+        val uiProviderVersion =
+            uiAdapterFactoryDelegate.requireNotNullUiProviderVersion(adapterBundle)
 
         override fun openSession(clientExecutor: Executor, client: SharedUiAdapter.SessionClient) {
             tryToCallRemoteObject(adapterInterface) {
-                this.openRemoteSession(RemoteSharedUiSessionClient(client, clientExecutor))
+                this.openRemoteSession(
+                    SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel,
+                    RemoteSharedUiSessionClient(client, clientExecutor)
+                )
             }
         }
 

@@ -20,15 +20,21 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
+import androidx.privacysandbox.ui.client.SharedUiAdapterFactory
 import androidx.privacysandbox.ui.core.BackwardCompatUtil
+import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.IRemoteSessionClient
+import androidx.privacysandbox.ui.core.IRemoteSharedUiSessionClient
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ISharedUiAdapter
+import androidx.privacysandbox.ui.core.LocalSharedUiAdapter
 import androidx.privacysandbox.ui.core.LocalUiAdapter
 import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter.SessionClient
 import androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions
 import androidx.privacysandbox.ui.core.SessionData
+import androidx.privacysandbox.ui.core.SharedUiAdapter
 import androidx.privacysandbox.ui.core.test.TestProtocolConstants
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
@@ -43,6 +49,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalFeatures.SharedUiPresentationApi::class)
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class ClientVersionTest {
@@ -74,6 +81,32 @@ class ClientVersionTest {
         val bundle = getSandboxedUiAdapterBundle(stubBinderAdapterDelegate, true)
         SandboxedUiAdapterFactory.createFromCoreLibInfo(bundle)
             .openSession(context, SessionData(null, null), 0, 0, false, {}, StubSessionClient())
+
+        stubBinderAdapterDelegate.assertClientVersionIsPresentInRemoteSession(
+            SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel
+        )
+    }
+
+    @Test
+    fun nativeAd_openLocalSession_clientVersionIsPassed() {
+        val stubBinderAdapterDelegate = StubSharedBinderDelegateAdapter()
+        val bundle = getSharedUiAdapterBundle(stubBinderAdapterDelegate)
+        SharedUiAdapterFactory.createFromCoreLibInfo(bundle)
+            .openSession({}, StubSharedSessionClient())
+        stubBinderAdapterDelegate.assertClientVersionIsPresentInLocalSession(
+            SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel
+        )
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    @Test
+    fun nativeAd_openRemoteSession_clientVersionIsPassed() {
+        assumeTrue(BackwardCompatUtil.canProviderBeRemote())
+
+        val stubBinderAdapterDelegate = StubSharedBinderDelegateAdapter()
+        val bundle = getSharedUiAdapterBundle(stubBinderAdapterDelegate, true)
+        SharedUiAdapterFactory.createFromCoreLibInfo(bundle)
+            .openSession({}, StubSharedSessionClient())
 
         stubBinderAdapterDelegate.assertClientVersionIsPresentInRemoteSession(
             SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel
@@ -143,6 +176,63 @@ class ClientVersionTest {
             assertThat(openRemoteSessionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)).isTrue()
             assertThat(clientVersion).isEqualTo(actualVersion)
         }
+    }
+
+    private fun getSharedUiAdapterBundle(
+        stubSharedBinderAdapterDelegate: StubSharedBinderDelegateAdapter,
+        useRemoteAdapter: Boolean = false
+    ): Bundle {
+        val bundle = Bundle()
+        bundle.putInt(
+            ProtocolConstants.uiProviderVersionKey,
+            SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel
+        )
+        bundle.putBinder(
+            ProtocolConstants.sharedUiAdapterBinderKey,
+            stubSharedBinderAdapterDelegate
+        )
+        bundle.putBoolean(TestProtocolConstants.testOnlyUseRemoteAdapterKey, useRemoteAdapter)
+        return bundle
+    }
+
+    private class StubSharedBinderDelegateAdapter() :
+        LocalSharedUiAdapter, ISharedUiAdapter.Stub() {
+        private var clientVersion: Int = -1
+        private val openLocalSessionLatch = CountDownLatch(1)
+        private val openRemoteSessionLatch = CountDownLatch(1)
+
+        override fun openLocalSession(
+            clientVersion: Int,
+            clientExecutor: Executor,
+            client: SharedUiAdapter.SessionClient
+        ) {
+            this.clientVersion = clientVersion
+            openLocalSessionLatch.countDown()
+        }
+
+        override fun openRemoteSession(
+            clientVersion: Int,
+            remoteSessionClient: IRemoteSharedUiSessionClient?
+        ) {
+            this.clientVersion = clientVersion
+            openRemoteSessionLatch.countDown()
+        }
+
+        fun assertClientVersionIsPresentInLocalSession(actualVersion: Int) {
+            assertThat(openLocalSessionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clientVersion).isEqualTo(actualVersion)
+        }
+
+        fun assertClientVersionIsPresentInRemoteSession(actualVersion: Int) {
+            assertThat(openRemoteSessionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)).isTrue()
+            assertThat(clientVersion).isEqualTo(actualVersion)
+        }
+    }
+
+    private class StubSharedSessionClient() : SharedUiAdapter.SessionClient {
+        override fun onSessionOpened(session: SharedUiAdapter.Session) {}
+
+        override fun onSessionError(throwable: Throwable) {}
     }
 
     private companion object {

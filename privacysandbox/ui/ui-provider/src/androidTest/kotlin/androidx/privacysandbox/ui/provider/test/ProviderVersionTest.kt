@@ -17,10 +17,12 @@
 package androidx.privacysandbox.ui.provider.test
 
 import android.content.Context
+import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions
 import androidx.privacysandbox.ui.core.SessionData
+import androidx.privacysandbox.ui.core.SharedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -31,6 +33,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalFeatures.SharedUiPresentationApi::class)
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class ProviderVersionTest {
@@ -50,6 +53,15 @@ class ProviderVersionTest {
         assertThat(uiProviderVersion).isEqualTo(actualVersion)
     }
 
+    @Test
+    fun sharedUiAdapter_toCoreLibInfo_containsProviderVersion() {
+        val testSharedUiAdapter = StubSharedUiAdapter()
+        val bundle = testSharedUiAdapter.toCoreLibInfo()
+        val uiProviderVersion = bundle.getInt(ProtocolConstants.uiProviderVersionKey)
+        val actualVersion = SdkRuntimeUiLibVersions.CURRENT_VERSION.apiLevel
+        assertThat(uiProviderVersion).isEqualTo(actualVersion)
+    }
+
     private class StubSandboxedUiAdapter() : SandboxedUiAdapter {
         override fun openSession(
             context: Context,
@@ -60,5 +72,9 @@ class ProviderVersionTest {
             clientExecutor: Executor,
             client: SandboxedUiAdapter.SessionClient
         ) {}
+    }
+
+    private class StubSharedUiAdapter() : SharedUiAdapter {
+        override fun openSession(clientExecutor: Executor, client: SharedUiAdapter.SessionClient) {}
     }
 }

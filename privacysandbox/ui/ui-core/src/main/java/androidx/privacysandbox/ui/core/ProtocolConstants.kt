@@ -28,4 +28,5 @@ object ProtocolConstants {
     const val delegateKey = "delegate"
     const val uiAdapterBinderKey = "uiAdapterBinder"
     const val uiProviderVersionKey = "uiProviderVersion"
+    const val sharedUiAdapterBinderKey = "sharedUiAdapterBinder"
 }
