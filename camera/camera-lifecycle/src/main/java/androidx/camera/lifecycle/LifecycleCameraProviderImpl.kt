@@ -180,6 +180,16 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
         return false
     }
 
+    override fun isBound(sessionConfig: SessionConfig): Boolean {
+        for (lifecycleCamera: LifecycleCamera in lifecycleCameraRepository.lifecycleCameras) {
+            if (lifecycleCamera.isBound(sessionConfig)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
     @MainThread
     override fun unbind(vararg useCases: UseCase?): Unit =
         trace("CX:unbind") {

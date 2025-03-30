@@ -67,6 +67,12 @@ private constructor(private val lifecycleCameraProvider: LifecycleCameraProvider
         return lifecycleCameraProvider.isBound(useCase)
     }
 
+    @ExperimentalSessionConfig
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    override fun isBound(sessionConfig: SessionConfig): Boolean {
+        return lifecycleCameraProvider.isBound(sessionConfig)
+    }
+
     @MainThread
     override fun unbind(vararg useCases: UseCase?) {
         return lifecycleCameraProvider.unbind(*useCases)

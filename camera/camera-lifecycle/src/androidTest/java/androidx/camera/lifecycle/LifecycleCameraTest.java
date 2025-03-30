@@ -265,6 +265,24 @@ public class LifecycleCameraTest {
     }
 
     @Test
+    public void bindSessionConfig_isBoundIsCorrect() throws CameraUseCaseAdapter.CameraException {
+        mLifecycleCamera = new LifecycleCamera(mLifecycleOwner, mCameraUseCaseAdapter);
+        mLifecycleOwner.start();
+
+        SessionConfig sessionConfig =
+                new SessionConfig.Builder(Arrays.asList(mFakeUseCase))
+                        .setViewPort(mViewPort)
+                        .addEffect(mEffect)
+                        .build();
+        assertThat(mLifecycleCamera.isBound(sessionConfig)).isFalse();
+        assertThat(mLifecycleCamera.isBound(mFakeUseCase)).isFalse();
+        mLifecycleCamera.bind(sessionConfig);
+
+        assertThat(mLifecycleCamera.isBound(sessionConfig)).isTrue();
+        assertThat(mLifecycleCamera.isBound(mFakeUseCase)).isTrue();
+    }
+
+    @Test
     public void bindLegacySessionConfig_willBindToCameraInternal()
             throws CameraUseCaseAdapter.CameraException {
         mLifecycleCamera = new LifecycleCamera(mLifecycleOwner, mCameraUseCaseAdapter);

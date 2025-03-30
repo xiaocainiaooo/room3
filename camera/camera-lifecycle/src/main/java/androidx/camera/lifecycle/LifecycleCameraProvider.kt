@@ -57,12 +57,24 @@ import com.google.common.util.concurrent.ListenableFuture
 @RestrictTo(Scope.LIBRARY_GROUP)
 public interface LifecycleCameraProvider : CameraProvider {
     /**
-     * Returns `true` if the [UseCase] is bound to a lifecycle. Otherwise returns `false`.
+     * Returns `true` if this [UseCase] is bound to a lifecycle or included in a bound
+     * [SessionConfig]. Otherwise returns `false`.
      *
      * After binding a use case, use cases remain bound until the lifecycle reaches a
      * [Lifecycle.State.DESTROYED] state or if is unbound by calls to [unbind] or [unbindAll].
      */
     public fun isBound(useCase: UseCase): Boolean
+
+    /**
+     * Returns `true` if the [SessionConfig] is bound to a lifecycle. Otherwise returns `false`.
+     *
+     * After binding a [SessionConfig], this [SessionConfig] remains bound until the lifecycle
+     * reaches a [Lifecycle.State.DESTROYED] state or if is unbound by calls to [unbind] or
+     * [unbindAll].
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    @ExperimentalSessionConfig
+    public fun isBound(sessionConfig: SessionConfig): Boolean
 
     /**
      * Unbinds all specified use cases from the lifecycle provider.

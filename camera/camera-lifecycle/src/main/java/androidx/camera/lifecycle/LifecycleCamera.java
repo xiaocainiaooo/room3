@@ -32,6 +32,7 @@ import androidx.camera.core.SessionConfig;
 import androidx.camera.core.UseCase;
 import androidx.camera.core.impl.CameraConfig;
 import androidx.camera.core.internal.CameraUseCaseAdapter;
+import androidx.core.util.Preconditions;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LifecycleObserver;
@@ -181,9 +182,23 @@ public final class LifecycleCamera implements LifecycleObserver, Camera {
         }
     }
 
+    /**
+     * Returns if the [UseCase] is bound to this camera.
+     */
     public boolean isBound(@NonNull UseCase useCase) {
         synchronized (mLock) {
             return mCameraUseCaseAdapter.getUseCases().contains(useCase);
+        }
+    }
+
+    /**
+     * Returns if the [SessionConfig] is bound to this camera.
+     */
+    public boolean isBound(@NonNull SessionConfig sessionConfig) {
+        // Should only be invoked on SessionConfig disallowing multiple binding.
+        Preconditions.checkState(!sessionConfig.isMultipleBindingAllowed());
+        synchronized (mLock) {
+            return mBoundSessionConfig == sessionConfig;
         }
     }
 
