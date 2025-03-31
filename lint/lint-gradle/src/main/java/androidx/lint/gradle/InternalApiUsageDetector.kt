@@ -26,17 +26,28 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
+import org.jetbrains.uast.UAnnotation
+import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UDeclaration
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UImportStatement
 import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.UTryExpression
+import org.jetbrains.uast.UTypeReferenceExpression
+import org.jetbrains.uast.getContainingUFile
 
 class InternalApiUsageDetector : Detector(), Detector.UastScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement>> =
         listOf(
             UImportStatement::class.java,
             UQualifiedReferenceExpression::class.java,
+            UDeclaration::class.java,
+            UTypeReferenceExpression::class.java,
+            UTryExpression::class.java,
+            UAnnotation::class.java,
         )
 
     override fun createUastHandler(context: JavaContext): UElementHandler =
@@ -51,7 +62,7 @@ class InternalApiUsageDetector : Detector(), Detector.UastScanner {
                     }
 
                     if (resolved is PsiClass) {
-                        checkClassUsage(resolved, node)
+                        checkClassUsage(resolved, node, isImport = true)
                     }
                 }
             }
@@ -66,10 +77,39 @@ class InternalApiUsageDetector : Detector(), Detector.UastScanner {
                             checkClassUsage(
                                 it,
                                 node,
-                                " (field ${element.name} from ${it.qualifiedName})"
+                                isImport = false,
+                                contextMsg = " (field ${element.name} from ${it.qualifiedName})"
                             )
                         }
+                    is PsiClass -> checkClassUsage(element, node, isImport = false)
                 }
+            }
+
+            override fun visitDeclaration(node: UDeclaration) {
+                if (node is UClass) {
+                    // uastSuperTypes gets just the declared super types, not parents of those types
+                    for (superType in node.uastSuperTypes) {
+                        visitTypeReferenceExpression(superType)
+                    }
+                }
+            }
+
+            override fun visitTryExpression(node: UTryExpression) {
+                for (catchClause in node.catchClauses) {
+                    for (typeReference in catchClause.typeReferences) {
+                        visitTypeReferenceExpression(typeReference)
+                    }
+                }
+            }
+
+            override fun visitTypeReferenceExpression(node: UTypeReferenceExpression) {
+                (node.type as? PsiClassType)?.resolve()?.let {
+                    checkClassUsage(it, node, isImport = false)
+                }
+            }
+
+            override fun visitAnnotation(node: UAnnotation) {
+                node.resolve()?.let { checkClassUsage(it, node, false) }
             }
 
             fun checkMethodUsage(method: PsiMethod, node: UElement) {
@@ -92,20 +132,41 @@ class InternalApiUsageDetector : Detector(), Detector.UastScanner {
                 }
             }
 
-            fun checkClassUsage(cls: PsiClass, node: UElement, contextMsg: String = "") {
+            /**
+             * Reports if the [cls] is an internal gradle or AGP API. [node] is the context element
+             * used for the incident. To avoid extra lint errors, this always reports when
+             * [isImport] is true, but otherwise only reports if the class wasn't imported into the
+             * file, since there will already be a lint error on the import line if it was.
+             */
+            fun checkClassUsage(
+                cls: PsiClass,
+                node: UElement,
+                isImport: Boolean,
+                contextMsg: String = ""
+            ) {
                 if (cls.isInternalGradleApi()) {
-                    reportIncidentForNode(
-                        INTERNAL_GRADLE_ISSUE,
-                        node,
-                        "Avoid using internal Gradle APIs$contextMsg"
-                    )
+                    if (isImport || !isImported(cls, node)) {
+                        reportIncidentForNode(
+                            INTERNAL_GRADLE_ISSUE,
+                            node,
+                            "Avoid using internal Gradle APIs$contextMsg"
+                        )
+                    }
                 } else if (cls.isInternalAgpApi()) {
-                    reportIncidentForNode(
-                        INTERNAL_AGP_ISSUE,
-                        node,
-                        "Avoid using internal Android Gradle Plugin APIs$contextMsg"
-                    )
+                    if (isImport || !isImported(cls, node)) {
+                        reportIncidentForNode(
+                            INTERNAL_AGP_ISSUE,
+                            node,
+                            "Avoid using internal Android Gradle Plugin APIs$contextMsg"
+                        )
+                    }
                 }
+            }
+
+            /** Checks if the class [cls] was imported into the containing file of [context]. */
+            fun isImported(cls: PsiClass, context: UElement): Boolean {
+                val file = context.getContainingUFile() ?: return false
+                return file.imports.any { it.resolve() == cls }
             }
 
             private fun reportIncidentForNode(issue: Issue, node: UElement, message: String) {
