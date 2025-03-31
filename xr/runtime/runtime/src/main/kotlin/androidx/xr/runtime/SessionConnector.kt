@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package androidx.xr.runtime.internal
+package androidx.xr.runtime
 
 import androidx.annotation.RestrictTo
-
-/** Custom class for exceptions that returned from [Session.configure()]. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-open public class ConfigurationException(message: String) : Exception(message)
+import androidx.xr.runtime.internal.JxrPlatformAdapter
 
 /**
- * A [Feature] attempting to be enabled did not have their required permission(s) granted before
- * configuration.
+ * Describes classes that have a lifecycle equivalent of a particular [Session] (i.e. singletons)
+ * and provide Session-level functionality via extension functions. The Session is responsible for
+ * owning these objects.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public class PermissionNotGrantedException() :
-    ConfigurationException("Failed to configure session, required permission(s) are not granted.")
+@Suppress("NotCloseable")
+public interface SessionConnector {
+    /** Initializes the [SessionConnector]. */
+    public fun initialize(platformAdapter: JxrPlatformAdapter)
+
+    /** Closes the [SessionConnector]. Called when the [Session] is destroyed. */
+    public fun close()
+}

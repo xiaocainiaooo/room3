@@ -17,11 +17,12 @@
 package androidx.xr.runtime
 
 import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.asCoroutineDispatcher
 
-/** Provides the [CoroutineDispatcher] objects for all coroutines in Jetpack XR Runtime. */
-internal object CoroutineDispatchers {
+/** Provides the [CoroutineContext] objects for all coroutines in Jetpack XR Runtime. */
+internal object CoroutineContexts {
 
-    /** A [CoroutineDispatcher] for lightweight tasks that are small and non-blocking. */
-    val Lightweight = Executors.newCachedThreadPool().asCoroutineDispatcher()
+    /** A [CoroutineContext] for lightweight tasks that are small and non-blocking. */
+    val Lightweight: CoroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 }
