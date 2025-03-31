@@ -1589,7 +1589,7 @@ package androidx.compose.foundation.relocation {
   }
 
   public final class BringIntoViewRequesterKt {
-    method public static androidx.compose.foundation.relocation.BringIntoViewRequester BringIntoViewRequester();
+    method @androidx.compose.runtime.annotation.RememberInComposition public static androidx.compose.foundation.relocation.BringIntoViewRequester BringIntoViewRequester();
     method public static androidx.compose.ui.Modifier bringIntoViewRequester(androidx.compose.ui.Modifier, androidx.compose.foundation.relocation.BringIntoViewRequester bringIntoViewRequester);
     method @Deprecated public static androidx.compose.ui.Modifier bringIntoViewResponder(androidx.compose.ui.Modifier, androidx.compose.foundation.relocation.BringIntoViewResponder responder);
   }
