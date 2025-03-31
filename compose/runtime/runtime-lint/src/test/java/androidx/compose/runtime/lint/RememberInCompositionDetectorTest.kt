@@ -42,13 +42,14 @@ class RememberInCompositionDetectorTest(
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(RememberInCompositionDetector.RememberInComposition)
 
-    private val RememberInCompositionStub =
-        bytecodeStub(
-            filename = "RememberInComposition.kt",
-            filepath = "androidx/compose/runtime/annotation",
-            checksum = 0x7e266ed0,
-            source =
-                """
+    companion object {
+        internal val RememberInCompositionStub =
+            bytecodeStub(
+                filename = "RememberInComposition.kt",
+                filepath = "androidx/compose/runtime/annotation",
+                checksum = 0x7e266ed0,
+                source =
+                    """
         package androidx.compose.runtime.annotation
 
         @MustBeDocumented
@@ -60,13 +61,13 @@ class RememberInCompositionDetectorTest(
         @Retention(AnnotationRetention.BINARY)
         annotation class RememberInComposition
         """,
-            """
+                """
         META-INF/main.kotlin_module:
         H4sIAAAAAAAA/2NgYGBmYGBgAmJGBijgUuOSSMxLKcrPTKnQS87PLcgvTtUr
         Ks0rycxNFeIKSs1NzU1KLfIu4ZLgYk/Lz9dLSiwS4ggtTkxPLfYuEWKO9y5R
         YtBiAACw9BbcWgAAAA==
         """,
-            """
+                """
         androidx/compose/runtime/annotation/RememberInComposition.class:
         H4sIAAAAAAAA/51SXW8SQRQ9s0hB0JZaP6C19sNK7YtbG19Mn4BS3QRYsmxN
         Gh7MwE6aLfvRsLPY+sSb/8kHQ3z0RxnvlAiYbDQxk5y5c++55947Mz9+fv0G
@@ -81,9 +82,8 @@ class RememberInCompositionDetectorTest(
         97FM/hWBAlbxgGhr0+NDPMJjZXahCTxBUUEeJaSxTiIGNgw8NbCJZ7Rjy8A2
         drpgEXbxnFIi7EV48QtSR8AWxQMAAA==
         """
-        )
+            )
 
-    companion object {
         private val Definitions =
             kotlinAndBytecodeStub(
                 filename = "Definitions.kt",

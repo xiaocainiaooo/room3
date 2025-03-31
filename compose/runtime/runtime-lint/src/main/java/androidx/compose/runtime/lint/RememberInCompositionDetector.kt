@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.USimpleNameReferenceExpression
+import org.jetbrains.uast.util.isConstructorCall
 
 /**
  * Detector to ensure that @RememberInComposition annotated constructors, functions, and property
@@ -123,6 +124,23 @@ class RememberInCompositionDetector : Detector(), SourceCodeScanner {
     }
 
     private fun report(node: UElement, context: JavaContext) {
+        // Handle existing suppressions for the old lint checks that are now merged into this one -
+        // we don't want to re-warn if they are already suppressed from before
+        if (node is UCallExpression) {
+            val method = node.resolve()
+            if (context.driver.isSuppressed(context, UnrememberedAnimatable, node)) {
+                if (node.isConstructorCall()) {
+                    if (method?.containingClass?.name == Names.Animation.Core.Animatable.shortName)
+                        return
+                } else {
+                    if (node.methodName == Names.Animation.Core.Animatable.shortName) return
+                }
+            }
+
+            if (context.driver.isSuppressed(context, UnrememberedMutableInteractionSource, node)) {
+                if (node.methodName == "MutableInteractionSource") return
+            }
+        }
         context.report(
             RememberInComposition,
             node,
@@ -144,6 +162,31 @@ class RememberInCompositionDetector : Detector(), SourceCodeScanner {
                     RememberInCompositionDetector::class.java,
                     EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
                 )
+            )
+
+        // Removed issues so we can still check suppressions against the old issue
+        private val UnrememberedAnimatable =
+            Issue.create(
+                id = "UnrememberedAnimatable",
+                briefDescription = "Removed issue, exists for suppression checking.",
+                explanation = "Removed issue, exists for suppression checking.",
+                category = Category.USABILITY,
+                priority = 5,
+                severity = Severity.ERROR,
+                implementation =
+                    Implementation(RememberInCompositionDetector::class.java, Scope.EMPTY),
+            )
+
+        private val UnrememberedMutableInteractionSource =
+            Issue.create(
+                id = "UnrememberedMutableInteractionSource",
+                briefDescription = "Removed issue, exists for suppression checking.",
+                explanation = "Removed issue, exists for suppression checking.",
+                category = Category.USABILITY,
+                priority = 5,
+                severity = Severity.ERROR,
+                implementation =
+                    Implementation(RememberInCompositionDetector::class.java, Scope.EMPTY),
             )
     }
 }
