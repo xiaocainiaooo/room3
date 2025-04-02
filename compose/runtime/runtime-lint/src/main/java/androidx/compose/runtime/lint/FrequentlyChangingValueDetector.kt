@@ -74,6 +74,10 @@ class FrequentlyChangingValueDetector : Detector(), SourceCodeScanner {
     }
 
     private fun report(node: UElement, context: JavaContext) {
+        // Ignore existing suppressions from the previous check
+        if (context.driver.isSuppressed(context, FrequentlyChangedStateReadInComposition, node)) {
+            return
+        }
         context.report(
             FrequentlyChangingValue,
             node,
@@ -104,6 +108,19 @@ Reading a value annotated with @FrequentlyChangingValue inside composition can c
                     FrequentlyChangingValueDetector::class.java,
                     EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
                 )
+            )
+
+        // Removed issue so we can still check suppressions against the old issue
+        private val FrequentlyChangedStateReadInComposition =
+            Issue.create(
+                id = "FrequentlyChangedStateReadInComposition",
+                briefDescription = "Removed issue, exists for suppression checking.",
+                explanation = "Removed issue, exists for suppression checking.",
+                category = Category.USABILITY,
+                priority = 5,
+                severity = Severity.ERROR,
+                implementation =
+                    Implementation(RememberInCompositionDetector::class.java, Scope.EMPTY)
             )
     }
 }

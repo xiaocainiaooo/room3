@@ -649,4 +649,34 @@ src/androidx/compose/runtime/foo/test.kt:14: Warning: Reading a value annotated 
             .run()
             .expectClean()
     }
+
+    @Test
+    fun suppressions() {
+        lint()
+            .files(
+                kotlin(
+                    """
+                package androidx.compose.runtime.foo
+
+                import androidx.compose.runtime.*
+
+                @Composable
+                fun Test(bar: Bar) {
+                    // New suppression
+                    @Suppress("FrequentlyChangingValue")
+                    test()
+
+                    // Old suppression
+                    @Suppress("FrequentlyChangedStateReadInComposition")
+                    test()
+                }
+            """
+                ),
+                Stubs.Composable,
+                FrequentlyChangingValueStub,
+                definitionsStub,
+            )
+            .run()
+            .expectClean()
+    }
 }
