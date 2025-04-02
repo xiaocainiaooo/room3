@@ -1038,6 +1038,78 @@ package androidx.wear.compose.material3 {
     method public static androidx.compose.ui.Modifier rangeSemantics(androidx.compose.ui.Modifier, float value, boolean enabled, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange, kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, int steps);
   }
 
+  @kotlin.jvm.JvmInline public final value class RevealActionType {
+    method public int getValue();
+    property public int value;
+    field public static final androidx.wear.compose.material3.RevealActionType.Companion Companion;
+  }
+
+  public static final class RevealActionType.Companion {
+    method public int getNone();
+    method public int getPrimaryAction();
+    method public int getSecondaryAction();
+    method public int getUndoAction();
+    property public int None;
+    property public int PrimaryAction;
+    property public int SecondaryAction;
+    property public int UndoAction;
+  }
+
+  @kotlin.jvm.JvmInline public final value class RevealDirection {
+    method public int getValue();
+    property public int value;
+    field public static final androidx.wear.compose.material3.RevealDirection.Companion Companion;
+  }
+
+  public static final class RevealDirection.Companion {
+    method public int getBidirectional();
+    method public int getRightToLeft();
+    property public int Bidirectional;
+    property public int RightToLeft;
+  }
+
+  public final class RevealState {
+    ctor public RevealState(int initialValue, java.util.Map<androidx.wear.compose.material3.RevealValue,java.lang.Float> anchors);
+    method public suspend Object? animateTo(int targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public int getCurrentValue();
+    method public int getLastActionType();
+    method public float getOffset();
+    method public float getRevealThreshold();
+    method public int getTargetValue();
+    method public androidx.compose.runtime.MutableFloatState getWidth();
+    method public boolean hasBidirectionalAnchors();
+    method public boolean isAnimationRunning();
+    method public void setLastActionType(int);
+    method public suspend Object? snapTo(int targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public int currentValue;
+    property public boolean hasBidirectionalAnchors;
+    property public boolean isAnimationRunning;
+    property public int lastActionType;
+    property public float offset;
+    property public float revealThreshold;
+    property public int targetValue;
+    property public androidx.compose.runtime.MutableFloatState width;
+  }
+
+  @kotlin.jvm.JvmInline public final value class RevealValue {
+    method public int getValue();
+    property public int value;
+    field public static final androidx.wear.compose.material3.RevealValue.Companion Companion;
+  }
+
+  public static final class RevealValue.Companion {
+    method public int getCovered();
+    method public int getLeftRevealed();
+    method public int getLeftRevealing();
+    method public int getRightRevealed();
+    method public int getRightRevealing();
+    property public int Covered;
+    property public int LeftRevealed;
+    property public int LeftRevealing;
+    property public int RightRevealed;
+    property public int RightRevealing;
+  }
+
   public final class RippleKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.IndicationNodeFactory ripple(androidx.compose.ui.graphics.ColorProducer color, optional boolean bounded, optional float radius);
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.IndicationNodeFactory ripple(optional boolean bounded, optional float radius, optional long color);
@@ -1398,21 +1470,32 @@ package androidx.wear.compose.material3 {
   }
 
   public final class SwipeToRevealDefaults {
-    method @androidx.compose.runtime.Composable public java.util.Map<androidx.wear.compose.foundation.RevealValue,java.lang.Float> anchors(optional float anchorWidth, optional boolean useAnchoredActions);
-    method @androidx.compose.runtime.Composable public java.util.Map<androidx.wear.compose.foundation.RevealValue,java.lang.Float> bidirectionalAnchors(optional float anchorWidth, optional boolean useAnchoredActions);
+    method @androidx.compose.runtime.Composable public java.util.Map<androidx.wear.compose.material3.RevealValue,java.lang.Float> anchors(optional float anchorWidth, optional boolean useAnchoredActions);
+    method @androidx.compose.runtime.Composable public java.util.Map<androidx.wear.compose.material3.RevealValue,java.lang.Float> bidirectionalAnchors(optional float anchorWidth, optional boolean useAnchoredActions);
+    method public java.util.Map<androidx.wear.compose.material3.RevealValue,java.lang.Float> createRevealAnchors(optional float coveredAnchor, optional float revealingAnchor, optional float revealedAnchor, optional int revealDirection);
+    method public androidx.wear.compose.foundation.GestureInclusion gestureInclusion(androidx.wear.compose.material3.RevealState state, optional @FloatRange(from=0.0, to=1.0) float edgeZoneFraction);
+    method public androidx.wear.compose.foundation.GestureInclusion getBidirectionalGestureInclusion();
     method public float getDoubleActionAnchorWidth();
     method public float getLargeActionButtonHeight();
+    method public float getLeftEdgeZoneFraction();
+    method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getPositionalThreshold();
+    method public float getRevealingRatio();
     method public float getSingleActionAnchorWidth();
     method public float getSmallActionButtonHeight();
     property public float DoubleActionAnchorWidth;
     property public float LargeActionButtonHeight;
+    property public float LeftEdgeZoneFraction;
+    property public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> PositionalThreshold;
+    property public float RevealingRatio;
     property public float SingleActionAnchorWidth;
     property public float SmallActionButtonHeight;
+    property public androidx.wear.compose.foundation.GestureInclusion bidirectionalGestureInclusion;
     field public static final androidx.wear.compose.material3.SwipeToRevealDefaults INSTANCE;
   }
 
   public final class SwipeToRevealKt {
-    method @androidx.compose.runtime.Composable public static void SwipeToReveal(kotlin.jvm.functions.Function1<? super androidx.wear.compose.material3.SwipeToRevealScope,kotlin.Unit> actions, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.foundation.RevealState revealState, optional float actionButtonHeight, optional androidx.wear.compose.foundation.GestureInclusion gestureInclusion, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void SwipeToReveal(kotlin.jvm.functions.Function1<? super androidx.wear.compose.material3.SwipeToRevealScope,kotlin.Unit> actions, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.RevealState revealState, optional float actionButtonHeight, optional androidx.wear.compose.foundation.GestureInclusion gestureInclusion, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static androidx.wear.compose.material3.RevealState rememberRevealState(optional int initialValue, optional java.util.Map<androidx.wear.compose.material3.RevealValue,java.lang.Float> anchors);
   }
 
   public final class SwipeToRevealScope {
