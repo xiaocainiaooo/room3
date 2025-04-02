@@ -735,17 +735,19 @@ internal class PrefetchHandleProvider(
 
             pauseRequested = false
 
-            composition.resume {
-                if (!pauseRequested) {
-                    updateElapsedAndAvailableTime()
-                    averages.saveResumeTimeNanos(elapsedTimeNanos)
-                    pauseRequested =
-                        !shouldExecute(
-                            availableTimeNanos,
-                            averages.resumeTimeNanos + averages.pauseTimeNanos
-                        )
+            while (!composition.isComplete && !pauseRequested) {
+                composition.resume {
+                    if (!pauseRequested) {
+                        updateElapsedAndAvailableTime()
+                        averages.saveResumeTimeNanos(elapsedTimeNanos)
+                        pauseRequested =
+                            !shouldExecute(
+                                availableTimeNanos,
+                                averages.resumeTimeNanos + averages.pauseTimeNanos
+                            )
+                    }
+                    pauseRequested
                 }
-                pauseRequested
             }
 
             updateElapsedAndAvailableTime()
