@@ -54,29 +54,26 @@ import androidx.wear.compose.material3.rememberRevealState
 @Sampled
 fun SwipeToRevealSample() {
     SwipeToReveal(
-        // Use the double action anchor width when revealing two actions
-        revealState =
-            rememberRevealState(
-                anchors =
-                    SwipeToRevealDefaults.anchors(
-                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
-                    )
-            ),
-        actions = {
-            primaryAction(
+        primaryAction = {
+            PrimaryActionButton(
                 onClick = { /* This block is called when the primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
                 text = { Text("Delete") }
             )
-            secondaryAction(
+        },
+        onFullSwipe = { /* This block is called when the full swipe gesture is performed. */ },
+        secondaryAction = {
+            SecondaryActionButton(
                 onClick = { /* This block is called when the secondary action is executed. */ },
                 icon = { Icon(Icons.Outlined.MoreVert, contentDescription = "Options") }
             )
-            undoPrimaryAction(
+        },
+        undoPrimaryAction = {
+            UndoActionButton(
                 onClick = { /* This block is called when the undo primary action is executed. */ },
                 text = { Text("Undo Delete") },
             )
-        }
+        },
     ) {
         Button(
             modifier =
@@ -105,18 +102,21 @@ fun SwipeToRevealSample() {
 @Sampled
 fun SwipeToRevealSingleActionCardSample() {
     SwipeToReveal(
-        actionButtonHeight = SwipeToRevealDefaults.LargeActionButtonHeight,
-        actions = {
-            primaryAction(
+        primaryAction = {
+            PrimaryActionButton(
                 onClick = { /* This block is called when the primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
                 text = { Text("Delete") }
             )
-            undoPrimaryAction(
+        },
+        onFullSwipe = { /* This block is called when the full swipe gesture is performed. */ },
+        undoPrimaryAction = {
+            UndoActionButton(
                 onClick = { /* This block is called when the undo primary action is executed. */ },
                 text = { Text("Undo Delete") },
             )
-        }
+        },
+        actionButtonHeight = SwipeToRevealDefaults.LargeActionButtonHeight,
     ) {
         Card(
             modifier =
@@ -144,22 +144,22 @@ fun SwipeToRevealSingleActionCardSample() {
 @Sampled
 fun SwipeToRevealNonAnchoredSample() {
     SwipeToReveal(
-        revealState =
-            rememberRevealState(
-                anchors = SwipeToRevealDefaults.anchors(useAnchoredActions = false)
-            ),
-        actions = {
-            primaryAction(
+        primaryAction = {
+            PrimaryActionButton(
                 onClick = { /* This block is called when the primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
                 text = { Text("Delete") }
             )
-            undoPrimaryAction(
+        },
+        onFullSwipe = { /* This block is called when the full swipe gesture is performed. */ },
+        undoPrimaryAction = {
+            UndoActionButton(
                 onClick = { /* This block is called when the undo primary action is executed. */ },
                 icon = { Icon(Icons.Outlined.Refresh, contentDescription = "Undo") },
                 text = { Text("Undo") },
             )
-        }
+        },
+        hasPartiallyRevealedState = false
     ) {
         Button(
             modifier =
@@ -193,13 +193,7 @@ fun SwipeToRevealWithTransformingLazyColumnSample() {
         modifier = Modifier.background(Color.Black)
     ) {
         items(count = 100) { index ->
-            val revealState =
-                rememberRevealState(
-                    anchors =
-                        SwipeToRevealDefaults.anchors(
-                            anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
-                        )
-                )
+            val revealState = rememberRevealState()
 
             // SwipeToReveal is covered on scroll.
             LaunchedEffect(tlcState.isScrollInProgress) {
@@ -211,7 +205,16 @@ fun SwipeToRevealWithTransformingLazyColumnSample() {
             }
 
             SwipeToReveal(
+                primaryAction = {
+                    PrimaryActionButton(
+                        onClick = { /* Called when the primary action is executed. */ },
+                        icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") }
+                    )
+                },
                 revealState = revealState,
+                onFullSwipe = { /* This block is called when the full swipe gesture is performed. */
+                },
                 modifier =
                     Modifier.transformedHeight(this@items, transformationSpec).graphicsLayer {
                         with(transformationSpec) { applyContainerTransformation(scrollProgress) }
@@ -219,13 +222,6 @@ fun SwipeToRevealWithTransformingLazyColumnSample() {
                         compositingStrategy = CompositingStrategy.ModulateAlpha
                         clip = false
                     },
-                actions = {
-                    primaryAction(
-                        onClick = { /* Called when the primary action is executed. */ },
-                        icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                        text = { Text("Delete") }
-                    )
-                }
             ) {
                 TransformExclusion {
                     TitleCard(

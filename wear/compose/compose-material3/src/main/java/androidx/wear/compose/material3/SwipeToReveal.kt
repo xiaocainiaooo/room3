@@ -53,7 +53,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -103,8 +102,10 @@ import androidx.wear.compose.material3.RevealValue.Companion.LeftRevealed
 import androidx.wear.compose.material3.RevealValue.Companion.LeftRevealing
 import androidx.wear.compose.material3.RevealValue.Companion.RightRevealed
 import androidx.wear.compose.material3.RevealValue.Companion.RightRevealing
+import androidx.wear.compose.material3.SwipeToRevealDefaults.DoubleActionAnchorWidth
+import androidx.wear.compose.material3.SwipeToRevealDefaults.LeftEdgeZoneFraction
+import androidx.wear.compose.material3.SwipeToRevealDefaults.SingleActionAnchorWidth
 import androidx.wear.compose.material3.SwipeToRevealDefaults.bidirectionalGestureInclusion
-import androidx.wear.compose.material3.SwipeToRevealDefaults.createRevealAnchors
 import androidx.wear.compose.material3.SwipeToRevealDefaults.gestureInclusion
 import androidx.wear.compose.material3.tokens.SwipeToRevealTokens
 import androidx.wear.compose.materialcore.CustomTouchSlopProvider
@@ -119,15 +120,17 @@ import kotlinx.coroutines.launch
 
 /**
  * [SwipeToReveal] Material composable. This adds the option to configure up to two additional
- * actions on a Composable: a mandatory [SwipeToRevealScope.primaryAction] and an optional
- * [SwipeToRevealScope.secondaryAction]. These actions are initially hidden and revealed only when
- * the [content] is swiped. These additional actions can be triggered by clicking on them after they
- * are revealed. [SwipeToRevealScope.primaryAction] will be triggered on full swipe of the
- * [content].
+ * actions on a Composable: a mandatory [primaryAction] and an optional [secondaryAction]. These
+ * actions are initially hidden (unless [RevealState] is created with an initial value other than
+ * [RevealValue.Covered]) and revealed only when the [content] is swiped. These additional actions
+ * can be triggered by clicking on them after they are revealed. A full swipe of the [content] will
+ * trigger the [onFullSwipe] callback, which is expected to match the [primaryAction]'s onClick
+ * callback. The actions revealed on swipe are the same on both sides if [revealDirection] is set to
+ * [RevealDirection.Bidirectional].
  *
- * For actions like "Delete", consider adding [SwipeToRevealScope.undoPrimaryAction] (displayed when
- * the [SwipeToRevealScope.primaryAction] is activated). Adding undo composables allow users to undo
- * the action that they just performed.
+ * For actions like "Delete", consider adding [undoPrimaryAction], which is displayed when the
+ * [primaryAction] is performed via click or swipe. Adding undo composables allow users to undo the
+ * action that they just performed.
  *
  * [SwipeToReveal] composable adds the [CustomAccessibilityAction]s using the labels from primary
  * and secondary actions.
@@ -148,16 +151,32 @@ import kotlinx.coroutines.launch
  * Example of [SwipeToReveal] with a [TransformingLazyColumn]
  *
  * @sample androidx.wear.compose.material3.samples.SwipeToRevealWithTransformingLazyColumnSample
- * @param actions Actions of the [SwipeToReveal] composable, such as
- *   [SwipeToRevealScope.primaryAction]. [actions] should always include exactly one
- *   [SwipeToRevealScope.primaryAction]. [SwipeToRevealScope.secondaryAction],
- *   [SwipeToRevealScope.undoPrimaryAction] and [SwipeToRevealScope.undoSecondaryAction] are
- *   optional.
- * @param modifier [Modifier] to be applied on the composable
- * @param revealState [RevealState] of the [SwipeToReveal]
+ * @param primaryAction The primary action of this component.
+ *   [SwipeToRevealScope.PrimaryActionButton] should be used to create a button for this slot.
+ * @param onFullSwipe A callback which will be triggered when a full swipe is performed. It is
+ *   expected that the same callback is given to [SwipeToRevealScope.PrimaryActionButton]s onClick
+ *   action.
+ * @param modifier [Modifier] to be applied on the composable.
+ * @param secondaryAction Optional secondary action of this component.
+ *   [SwipeToRevealScope.SecondaryActionButton] should be used to create a button for this slot.
+ * @param undoPrimaryAction Optional undo action for the primary action of this component.
+ *   [SwipeToRevealScope.UndoActionButton] should be used to create a button for this slot.
+ * @param undoSecondaryAction Optional undo action for the secondary action of this component -
+ *   ignored if the secondary action has not been specified. [SwipeToRevealScope.UndoActionButton]
+ *   should be used to create a button for this slot.
+ * @param revealState [RevealState] of the [SwipeToReveal].
+ * @param revealDirection The direction from which [SwipeToReveal] can reveal the actions. It is
+ *   strongly recommended to respect the default value of [RightToLeft] to avoid conflicting with
+ *   the system-side swipe-to-dismiss gesture.
  * @param actionButtonHeight Desired height of the revealed action buttons. In case the content is a
  *   Button composable, it's suggested to use [SwipeToRevealDefaults.SmallActionButtonHeight], and
  *   for a Card composable, it's suggested to use [SwipeToRevealDefaults.LargeActionButtonHeight].
+ * @param hasPartiallyRevealedState Determines whether the intermediate states [RightRevealing] and
+ *   [LeftRevealing] are used. These indicate a settled state, where the primary action is partially
+ *   revealed. By default, partially revealed state is allowed for single actions - set to false to
+ *   make actions complete when swiped instead. This flag has no effect if a secondary action is
+ *   provided (when there are two actions, the component always allows the partially revealed
+ *   states).
  * @param gestureInclusion Provides fine-grained control so that touch gestures can be excluded when
  *   they start in a certain region. An instance of [GestureInclusion] can be passed in here which
  *   will determine via [GestureInclusion.ignoreGestureStart] whether the gesture should proceed or
@@ -170,12 +189,18 @@ import kotlinx.coroutines.launch
  */
 @Composable
 public fun SwipeToReveal(
-    actions: SwipeToRevealScope.() -> Unit,
+    primaryAction: @Composable SwipeToRevealScope.() -> Unit,
+    onFullSwipe: () -> Unit,
     modifier: Modifier = Modifier,
-    revealState: RevealState = rememberRevealState(anchors = SwipeToRevealDefaults.anchors()),
+    secondaryAction: (@Composable SwipeToRevealScope.() -> Unit)? = null,
+    undoPrimaryAction: (@Composable SwipeToRevealScope.() -> Unit)? = null,
+    undoSecondaryAction: (@Composable SwipeToRevealScope.() -> Unit)? = null,
+    revealState: RevealState = rememberRevealState(),
+    revealDirection: RevealDirection = RevealDirection.RightToLeft,
     actionButtonHeight: Dp = SwipeToRevealDefaults.SmallActionButtonHeight,
+    hasPartiallyRevealedState: Boolean = true,
     gestureInclusion: GestureInclusion =
-        if (revealState.hasBidirectionalAnchors) {
+        if (revealDirection == Bidirectional) {
             bidirectionalGestureInclusion
         } else {
             gestureInclusion(revealState)
@@ -183,90 +208,47 @@ public fun SwipeToReveal(
     content: @Composable () -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
-    val children = SwipeToRevealScope()
-    with(children, actions)
-    val primaryAction = children.primaryAction
-    require(primaryAction != null) {
-        "PrimaryAction should be provided in actions by calling the PrimaryAction method"
-    }
 
-    val hasSecondaryAction = children.secondaryAction != null
-    val iconStartFadeInFraction =
-        if (hasSecondaryAction) {
-            DOUBLE_ICON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+    @SuppressLint("PrimitiveInCollection")
+    val anchors: Set<RevealValue> =
+        if (revealDirection == Bidirectional) {
+            BidirectionalAnchors
         } else {
-            SINGLE_ICON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
-        }
-    val iconEndFadeInFraction =
-        if (hasSecondaryAction) {
-            DOUBLE_ICON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
-        } else {
-            SINGLE_ICON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+            UnidirectionAnchors
         }
 
-    SwipeToReveal(
-        modifier = modifier.fillMaxWidth(),
-        primaryAction = {
-            ActionButton(
-                revealState,
-                primaryAction,
-                RevealActionType.PrimaryAction,
-                actionButtonHeight,
-                iconStartFadeInFraction,
-                iconEndFadeInFraction,
-                children.undoPrimaryAction != null,
+    val swipeToRevealScope =
+        remember(
+            revealState,
+            secondaryAction,
+            undoPrimaryAction,
+            undoSecondaryAction,
+            actionButtonHeight
+        ) {
+            SwipeToRevealScope(
+                revealState = revealState,
+                hasSecondaryAction = secondaryAction != null,
+                hasPrimaryUndo = undoPrimaryAction != null,
+                hasSecondaryUndo = undoSecondaryAction != null,
+                actionButtonHeight = actionButtonHeight,
             )
-        },
-        secondaryAction =
-            children.secondaryAction?.let {
-                {
-                    ActionButton(
-                        revealState,
-                        it,
-                        RevealActionType.SecondaryAction,
-                        actionButtonHeight,
-                        iconStartFadeInFraction,
-                        iconEndFadeInFraction,
-                        children.undoSecondaryAction != null,
-                    )
-                }
-            },
+        }
+
+    SwipeToRevealImpl(
+        primaryAction = { primaryAction(swipeToRevealScope) },
+        onFullSwipe = onFullSwipe,
+        anchors = anchors,
+        modifier = modifier.fillMaxWidth(),
+        state = revealState,
+        revealDirection = revealDirection,
+        secondaryAction = secondaryAction?.let { { secondaryAction(swipeToRevealScope) } },
         undoAction =
             when (revealState.lastActionType) {
                 RevealActionType.SecondaryAction ->
-                    children.undoSecondaryAction?.let {
-                        {
-                            ActionButton(
-                                revealState,
-                                it,
-                                RevealActionType.UndoAction,
-                                actionButtonHeight,
-                                iconStartFadeInFraction,
-                                iconEndFadeInFraction,
-                            )
-                        }
-                    }
-                else ->
-                    children.undoPrimaryAction?.let {
-                        {
-                            ActionButton(
-                                revealState,
-                                it,
-                                RevealActionType.UndoAction,
-                                actionButtonHeight,
-                                iconStartFadeInFraction,
-                                iconEndFadeInFraction,
-                            )
-                        }
-                    }
+                    undoSecondaryAction?.let { { undoSecondaryAction(swipeToRevealScope) } }
+                else -> undoPrimaryAction?.let { { undoPrimaryAction(swipeToRevealScope) } }
             },
-        onFullSwipe = {
-            // Full swipe triggers the main action, but does not set the click type.
-            // Explicitly set the click type as main action when full swipe occurs.
-            revealState.lastActionType = RevealActionType.PrimaryAction
-            primaryAction.onClick()
-        },
-        state = revealState,
+        hasPartiallyRevealedState = hasPartiallyRevealedState,
         gestureInclusion = gestureInclusion,
         content = content,
     )
@@ -282,244 +264,129 @@ public fun SwipeToReveal(
  * Scope for the actions of a [SwipeToReveal] composable. Used to define the primary, secondary,
  * undo primary and undo secondary actions.
  */
-public class SwipeToRevealScope {
+public class SwipeToRevealScope
+internal constructor(
+    internal val revealState: RevealState,
+    internal val hasSecondaryAction: Boolean,
+    internal val hasPrimaryUndo: Boolean,
+    internal val hasSecondaryUndo: Boolean,
+    internal val actionButtonHeight: Dp
+) {
     /**
-     * Adds the primary action to a [SwipeToReveal]. This is required and exactly one primary action
-     * should be specified. In case there are multiple, only the latest one will be displayed.
+     * Provides a button for the primary action of a [SwipeToReveal].
      *
      * When first revealed the primary action displays an icon and then, if fully swiped, it
      * additionally shows text.
      *
-     * @param onClick Callback to be executed when the action is performed via a full swipe, or a
-     *   button click.
+     * @param onClick Callback to be executed when the action is performed via a button click.
      * @param icon Icon composable to be displayed for this action.
      * @param text Text composable to be displayed when the user fully swipes to execute the primary
      *   action.
-     * @param containerColor Container color for this action.
-     * @param contentColor Content color for this action.
+     * @param modifier [Modifier] to be applied on the composable.
+     * @param containerColor Container color for this action. This can be [Color.Unspecified], and
+     *   in case it is, a default color will be used.
+     * @param contentColor Content color for this action. This can be [Color.Unspecified], and in
+     *   case it is, a default color will be used.
      */
-    public fun primaryAction(
+    @Composable
+    public fun PrimaryActionButton(
         onClick: () -> Unit,
         icon: @Composable () -> Unit,
         text: @Composable () -> Unit,
+        modifier: Modifier = Modifier,
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified
     ) {
-        primaryAction = SwipeToRevealAction(onClick, icon, text, containerColor, contentColor)
+        ActionButton(
+            revealState = revealState,
+            action = SwipeToRevealAction(onClick, icon, text, containerColor, contentColor),
+            revealActionType = RevealActionType.PrimaryAction,
+            buttonHeight = actionButtonHeight,
+            iconStartFadeInFraction = startFadeInFraction(hasSecondaryAction),
+            iconEndFadeInFraction = endFadeInFraction(hasSecondaryAction),
+            modifier = modifier,
+            hasUndo = hasPrimaryUndo,
+        )
     }
 
     /**
-     * Adds the secondary action to a [SwipeToReveal]. This is optional and at most one secondary
-     * action should be specified. In case there are multiple, only the latest one will be
-     * displayed.
+     * Provides a button for the optional secondary action of a [SwipeToReveal].
      *
      * Secondary action only displays an icon, because, unlike the primary action, it is never
      * extended to full width so does not have room to display text.
      *
      * @param onClick Callback to be executed when the action is performed via a button click.
      * @param icon Icon composable to be displayed for this action.
-     * @param containerColor Container color for this action.
-     * @param contentColor Content color for this action.
+     * @param modifier [Modifier] to be applied on the composable.
+     * @param containerColor Container color for this action.This can be [Color.Unspecified], and in
+     *   case it is, a default color will be used.
+     * @param contentColor Content color for this action. This can be [Color.Unspecified], and in
+     *   case it is, a default color will be used.
      */
-    public fun secondaryAction(
+    @Composable
+    public fun SecondaryActionButton(
         onClick: () -> Unit,
         icon: @Composable () -> Unit,
+        modifier: Modifier = Modifier,
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified
     ) {
-        secondaryAction = SwipeToRevealAction(onClick, icon, null, containerColor, contentColor)
+        ActionButton(
+            revealState,
+            SwipeToRevealAction(onClick, icon, null, containerColor, contentColor),
+            RevealActionType.SecondaryAction,
+            actionButtonHeight,
+            iconStartFadeInFraction = startFadeInFraction(hasSecondaryAction),
+            iconEndFadeInFraction = endFadeInFraction(hasSecondaryAction),
+            modifier = modifier,
+            hasSecondaryUndo
+        )
     }
 
     /**
-     * Adds the undo action for the primary action to a [SwipeToReveal]. Displayed after the user
-     * performs the primary action. This is optional and at most one undo primary action should be
-     * specified. In case there are multiple, only the latest one will be displayed.
+     * Provides a button for the undo action of a [SwipeToReveal]. Displayed after the user performs
+     * either a primary or a secondary action.
      *
      * @param onClick Callback to be executed when the action is performed via a button click.
      * @param text Text composable to indicate what the undo action is, to be displayed when the
      *   user executes the primary action. This should include appropriated semantics for
      *   accessibility.
+     * @param modifier [Modifier] to be applied on the composable.
      * @param icon Optional Icon composable to be displayed for this action.
-     * @param containerColor Container color for this action.
-     * @param contentColor Content color for this action.
+     * @param containerColor Container color for this action. This can be [Color.Unspecified], and
+     *   in case it is, a default color will be used.
+     * @param contentColor Content color for this action. This can be [Color.Unspecified], and in
+     *   case it is, a default color will be used.
      */
-    public fun undoPrimaryAction(
+    @Composable
+    public fun UndoActionButton(
         onClick: () -> Unit,
         text: @Composable () -> Unit,
+        modifier: Modifier = Modifier,
         icon: @Composable (() -> Unit)? = null,
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified
     ) {
-        undoPrimaryAction = SwipeToRevealAction(onClick, icon, text, containerColor, contentColor)
+        ActionButton(
+            revealState,
+            SwipeToRevealAction(onClick, icon, text, containerColor, contentColor),
+            RevealActionType.UndoAction,
+            actionButtonHeight,
+            iconStartFadeInFraction = startFadeInFraction(hasSecondaryAction),
+            iconEndFadeInFraction = endFadeInFraction(hasSecondaryAction),
+            modifier = modifier,
+        )
     }
-
-    /**
-     * Adds the undo action for the secondary action to a [SwipeToReveal]. Displayed after the user
-     * performs the secondary action.This is optional and at most one undo secondary action should
-     * be specified. In case there are multiple, only the latest one will be displayed.
-     *
-     * @param onClick Callback to be executed when the action is performed via a button click.
-     * @param text Text composable to indicate what the undo action is, to be displayed when the
-     *   user executes the primary action. This should include appropriated semantics for
-     *   accessibility.
-     * @param icon Optional Icon composable to be displayed for this action.
-     * @param containerColor Container color for this action.
-     * @param contentColor Content color for this action.
-     */
-    public fun undoSecondaryAction(
-        onClick: () -> Unit,
-        text: @Composable () -> Unit,
-        icon: @Composable (() -> Unit)? = null,
-        containerColor: Color = Color.Unspecified,
-        contentColor: Color = Color.Unspecified
-    ) {
-        undoSecondaryAction = SwipeToRevealAction(onClick, icon, text, containerColor, contentColor)
-    }
-
-    internal var primaryAction: SwipeToRevealAction? = null
-    internal var undoPrimaryAction: SwipeToRevealAction? = null
-    internal var secondaryAction: SwipeToRevealAction? = null
-    internal var undoSecondaryAction: SwipeToRevealAction? = null
 }
 
+/** Defaults for Material 3 [SwipeToReveal]. */
 public object SwipeToRevealDefaults {
-
-    /** Width that's required to display both actions in a [SwipeToReveal] composable. */
-    public val DoubleActionAnchorWidth: Dp = 130.dp
-
-    /** Width that's required to display a single action in a [SwipeToReveal] composable. */
-    public val SingleActionAnchorWidth: Dp = 64.dp
 
     /** Standard height for a small revealed action, such as when the swiped item is a Button. */
     public val SmallActionButtonHeight: Dp = 52.dp
 
     /** Standard height for a large revealed action, such as when the swiped item is a Card. */
     public val LargeActionButtonHeight: Dp = 84.dp
-
-    internal val IconSize = 26.dp
-
-    /**
-     * Creates the required anchors to which the top content can be swiped, to reveal the actions.
-     * Each value should be in the range [0..1], where 0 represents right most end and 1 represents
-     * the full width of the top content starting from right and ending on left.
-     *
-     * @param coveredAnchor Anchor for the [Covered] value
-     * @param revealingAnchor Anchor for the [LeftRevealing] or [RightRevealing] value
-     * @param revealedAnchor Anchor for the [LeftRevealed] or [RightRevealed] value
-     * @param revealDirection The direction in which the content can be swiped. It's strongly
-     *   advised to keep the default [RevealDirection.RightToLeft] in order to preserve
-     *   compatibility with the system wide swipe to dismiss gesture.
-     */
-    @SuppressWarnings("PrimitiveInCollection")
-    public fun createRevealAnchors(
-        coveredAnchor: Float = 0f,
-        revealingAnchor: Float = RevealingRatio,
-        revealedAnchor: Float = 1f,
-        revealDirection: RevealDirection = RightToLeft
-    ): Map<RevealValue, Float> {
-        if (revealDirection == Bidirectional) {
-            return mapOf(
-                LeftRevealed to -revealedAnchor,
-                LeftRevealing to -revealingAnchor,
-                Covered to coveredAnchor,
-                RightRevealing to revealingAnchor,
-                RightRevealed to revealedAnchor
-            )
-        }
-        return mapOf(
-            Covered to coveredAnchor,
-            RightRevealing to revealingAnchor,
-            RightRevealed to revealedAnchor
-        )
-    }
-
-    /**
-     * Creates the recommended anchors to support right-to-left swiping to reveal additional action
-     * buttons.
-     *
-     * @param anchorWidth Absolute width, in dp, of the screen revealed items should be displayed
-     *   in. Ignored if [useAnchoredActions] is set to false, as the items won't be anchored to the
-     *   screen. For a single action SwipeToReveal component, this should be
-     *   [SwipeToRevealDefaults.SingleActionAnchorWidth], and for a double action SwipeToReveal,
-     *   [SwipeToRevealDefaults.DoubleActionAnchorWidth] to be able to display both action buttons.
-     * @param useAnchoredActions Whether the actions should stay revealed, or bounce back to hidden
-     *   when the user stops swiping. This is relevant for SwipeToReveal components with a single
-     *   action. If the developer wants a swipe to clear behaviour, this should be set to false.
-     */
-    @SuppressLint("PrimitiveInCollection")
-    @Composable
-    public fun anchors(
-        anchorWidth: Dp = SingleActionAnchorWidth,
-        useAnchoredActions: Boolean = true,
-    ): Map<RevealValue, Float> =
-        createAnchors(anchorWidth = anchorWidth, useAnchoredActions = useAnchoredActions)
-
-    /**
-     * Creates anchors that allow the user to swipe either left-to-right or right-to-left to reveal
-     * or execute the actions. This should not be used if the component is part of an activity, as
-     * the gesture might conflict with the swipe-to-dismiss gesture. This is only supported for rare
-     * cases where the current screen does not support swipe to dismiss.
-     *
-     * @param anchorWidth Absolute width, in dp, of the screen revealed items should be displayed
-     *   in. Ignored if [useAnchoredActions] is set to false, as the items won't be anchored to the
-     *   screen. For a single action SwipeToReveal component, this should be
-     *   [SwipeToRevealDefaults.SingleActionAnchorWidth], and for a double action SwipeToReveal,
-     *   [SwipeToRevealDefaults.DoubleActionAnchorWidth] to be able to display both action buttons.
-     * @param useAnchoredActions Whether the actions should stay revealed, or bounce back to hidden
-     *   when the user stops swiping. This is relevant for SwipeToReveal components with a single
-     *   action. If the developer wants a swipe to clear behaviour, this should be set to false.
-     */
-    @SuppressLint("PrimitiveInCollection")
-    @Composable
-    public fun bidirectionalAnchors(
-        anchorWidth: Dp = SingleActionAnchorWidth,
-        useAnchoredActions: Boolean = true,
-    ): Map<RevealValue, Float> =
-        createAnchors(
-            anchorWidth = anchorWidth,
-            useAnchoredActions = useAnchoredActions,
-            revealDirection = Bidirectional
-        )
-
-    @SuppressLint("PrimitiveInCollection")
-    @Composable
-    internal fun createAnchors(
-        anchorWidth: Dp = SingleActionAnchorWidth,
-        useAnchoredActions: Boolean = true,
-        revealDirection: RevealDirection = RightToLeft,
-    ): Map<RevealValue, Float> {
-        val screenWidthDp = LocalConfiguration.current.screenWidthDp
-        val anchorFraction = anchorWidth.value / screenWidthDp
-        return createRevealAnchors(
-            revealingAnchor = if (useAnchoredActions) anchorFraction else 0f,
-            revealDirection = revealDirection,
-        )
-    }
-
-    /** Default animation spec used when moving between states. */
-    internal val AnimationSpec: AnimationSpec<Float> =
-        tween(durationMillis = RAPID_ANIMATION, easing = FastOutSlowInEasing)
-
-    /** Default padding space between action slots. */
-    internal val Padding = 4.dp
-
-    /**
-     * Default ratio of the content displayed when in [RightRevealing] state, i.e. all the actions
-     * are revealed and the top content is not being swiped. For example, a value of 0.7 means that
-     * 70% of the width is used to place the actions.
-     */
-    public val RevealingRatio: Float = 0.7f
-
-    /**
-     * Default position threshold that needs to be swiped in order to transition to the next state.
-     * Used in conjunction with [RevealingRatio]; for example, a threshold of 0.5 with a revealing
-     * ratio of 0.7 means that the user needs to swipe at least 35% (0.5 * 0.7) of the component
-     * width to go from [Covered] to [RightRevealing] and at least 85% (0.7 + 0.5 * (1 - 0.7)) of
-     * the component width to go from [RightRevealing] to [RightRevealed].
-     */
-    public val PositionalThreshold: (totalDistance: Float) -> Float = { totalDistance: Float ->
-        totalDistance * 0.5f
-    }
 
     /**
      * The default value used to configure the size of the left edge zone in a [SwipeToReveal]. The
@@ -549,6 +416,32 @@ public object SwipeToRevealDefaults {
      */
     public val bidirectionalGestureInclusion: GestureInclusion
         get() = BidirectionalGestureInclusion
+
+    /** Width that's required to display both actions in a [SwipeToReveal] composable. */
+    internal val DoubleActionAnchorWidth: Dp = 130.dp
+
+    /** Width that's required to display a single action in a [SwipeToReveal] composable. */
+    internal val SingleActionAnchorWidth: Dp = 64.dp
+
+    internal val IconSize = 26.dp
+
+    /** Default animation spec used when moving between states. */
+    internal val AnimationSpec: AnimationSpec<Float> =
+        tween(durationMillis = RAPID_ANIMATION, easing = FastOutSlowInEasing)
+
+    /** Default padding space between action slots. */
+    internal val Padding = 4.dp
+
+    /**
+     * Default position threshold that needs to be swiped in order to transition to the next state.
+     * For example, a threshold of 0.5 with a revealing ratio of 0.7 means that the user needs to
+     * swipe at least 35% (0.5 * 0.7) of the component width to go from [Covered] to
+     * [RightRevealing] and at least 85% (0.7 + 0.5 * (1 - 0.7)) of the component width to go from
+     * [RightRevealing] to [RightRevealed].
+     */
+    internal val PositionalThreshold: (totalDistance: Float) -> Float = { totalDistance: Float ->
+        totalDistance * 0.5f
+    }
 }
 
 @Composable
@@ -559,6 +452,7 @@ internal fun ActionButton(
     buttonHeight: Dp,
     iconStartFadeInFraction: Float,
     iconEndFadeInFraction: Float,
+    modifier: Modifier = Modifier,
     hasUndo: Boolean = false,
 ) {
     val containerColor =
@@ -612,7 +506,8 @@ internal fun ActionButton(
     val coroutineScope = rememberCoroutineScope()
     Button(
         modifier =
-            Modifier.height(buttonHeight)
+            modifier
+                .height(buttonHeight)
                 .padding(startPadding, 0.dp, endPadding, 0.dp)
                 .fillMaxWidth()
                 .graphicsLayer {
@@ -663,7 +558,14 @@ internal fun ActionButton(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val primaryActionTextRevealed = remember { mutableStateOf(false) }
+            val primaryActionTextRevealed =
+                remember(revealState) {
+                    derivedStateOf {
+                        abs(revealState.offset) > revealState.revealThreshold &&
+                            (revealState.targetValue == RightRevealed ||
+                                revealState.targetValue == LeftRevealed)
+                    }
+                }
             action.icon?.let {
                 ActionIconWrapper(revealState, iconStartFadeInFraction, iconEndFadeInFraction, it)
             }
@@ -679,13 +581,6 @@ internal fun ActionButton(
                                 shrinkHorizontally(spring(stiffness = Spring.StiffnessMedium)),
                     ) {
                         ActionText(action, contentColor)
-                    }
-
-                    LaunchedEffect(revealState.offset) {
-                        primaryActionTextRevealed.value =
-                            abs(revealState.offset) > revealState.revealThreshold &&
-                                (revealState.targetValue == RightRevealed ||
-                                    revealState.targetValue == LeftRevealed)
                     }
                 }
                 RevealActionType.UndoAction -> ActionText(action, contentColor)
@@ -860,67 +755,15 @@ public value class RevealDirection private constructor(public val value: Int) {
 }
 
 /**
- * Different values which can trigger the state change from one [RevealValue] to another. These are
- * not set by themselves and need to be set appropriately with [RevealState.snapTo] and
- * [RevealState.animateTo].
- */
-@JvmInline
-public value class RevealActionType private constructor(public val value: Int) {
-    public companion object {
-        /**
-         * Represents the primary action composable of [SwipeToReveal]. This corresponds to the
-         * mandatory `primaryAction` parameter of [SwipeToReveal].
-         */
-        public val PrimaryAction: RevealActionType = RevealActionType(0)
-
-        /**
-         * Represents the secondary action composable of [SwipeToReveal]. This corresponds to the
-         * optional `secondaryAction` composable of [SwipeToReveal].
-         */
-        public val SecondaryAction: RevealActionType = RevealActionType(1)
-
-        /**
-         * Represents the undo action composable of [SwipeToReveal]. This corresponds to the
-         * `undoAction` composable of [SwipeToReveal] which is shown once an action is performed.
-         */
-        public val UndoAction: RevealActionType = RevealActionType(2)
-
-        /** Default value when none of the above are applicable. */
-        public val None: RevealActionType = RevealActionType(-1)
-    }
-}
-
-/**
  * A class to keep track of the state of the composable. It can be used to customise the behavior
  * and state of the composable.
  *
  * @param initialValue The initial value of this state.
- * @param anchors Defines the anchors for revealable content. These anchors are used to determine
- *   the width at which the revealable content can be revealed to and stopped without requiring any
- *   input from the user. Each anchor should be a fraction in the range [0..1].
  * @constructor Create a [RevealState].
  */
-@SuppressLint("PrimitiveInCollection")
 public class RevealState(
     initialValue: RevealValue,
-    internal val anchors: Map<RevealValue, Float>,
 ) {
-    internal val nestedScrollDispatcher: NestedScrollDispatcher = NestedScrollDispatcher()
-
-    /** [androidx.wear.compose.materialcore.SwipeableV2State] internal instance for the state. */
-    internal val swipeableState =
-        SwipeableV2State(
-            initialValue = initialValue,
-            animationSpec = SwipeToRevealDefaults.AnimationSpec,
-            confirmValueChange = { revealValue -> confirmValueChangeAndReset(revealValue) },
-            positionalThreshold = { totalDistance ->
-                SwipeToRevealDefaults.PositionalThreshold(totalDistance)
-            },
-            nestedScrollDispatcher = nestedScrollDispatcher,
-        )
-
-    public var lastActionType: RevealActionType by mutableStateOf(RevealActionType.None)
-
     /**
      * The current [RevealValue] based on the status of the component.
      *
@@ -956,22 +799,6 @@ public class RevealState(
         get() = swipeableState.offset ?: 0f
 
     /**
-     * The threshold, in pixels, where the revealed actions are fully visible but the existing
-     * content would be left in place if the reveal action was stopped. This threshold is used to
-     * create the anchor for [RightRevealing]. If there is no such anchor defined for
-     * [RightRevealing], it returns 0.0f.
-     */
-    /* @FloatRange(from = 0.0) */
-    public val revealThreshold: Float
-        get() = width.floatValue * (anchors[RightRevealing] ?: 0.0f)
-
-    /**
-     * The total width of the component in pixels. Initialise to zero, updated when the width
-     * changes.
-     */
-    public val width: MutableFloatState = mutableFloatStateOf(0.0f)
-
-    /**
      * Snaps to the [targetValue] without any animation.
      *
      * @param targetValue The target [RevealValue] where the [currentValue] will be changed to.
@@ -1004,10 +831,36 @@ public class RevealState(
         }
     }
 
-    /** Indicate if this state was created with bidirectional anchors. */
-    @get:JvmName("hasBidirectionalAnchors")
-    public val hasBidirectionalAnchors: Boolean
-        get() = this.anchors.keys.any { it == LeftRevealing || it == LeftRevealed }
+    internal val nestedScrollDispatcher: NestedScrollDispatcher = NestedScrollDispatcher()
+
+    /** [androidx.wear.compose.materialcore.SwipeableV2State] internal instance for the state. */
+    internal val swipeableState =
+        SwipeableV2State(
+            initialValue = initialValue,
+            animationSpec = SwipeToRevealDefaults.AnimationSpec,
+            confirmValueChange = { revealValue -> confirmValueChangeAndReset(revealValue) },
+            positionalThreshold = { totalDistance ->
+                SwipeToRevealDefaults.PositionalThreshold(totalDistance)
+            },
+            nestedScrollDispatcher = nestedScrollDispatcher,
+        )
+
+    internal var lastActionType: RevealActionType by mutableStateOf(RevealActionType.None)
+
+    /**
+     * The threshold, in pixels, where the revealed actions are fully visible but the existing
+     * content would be left in place if the reveal action was stopped. This threshold is defined by
+     * the [RightRevealing] anchor. If there is no such anchor defined for [RightRevealing], it
+     * returns 0.0f.
+     */
+    /* @FloatRange(from = 0.0) */
+    internal var revealThreshold: Float by mutableFloatStateOf(0.0f)
+
+    /**
+     * The total width of the component in pixels. Initialise to zero, updated when the width
+     * changes.
+     */
+    internal var width: Float by mutableFloatStateOf(0.0f)
 
     /**
      * Require the current offset.
@@ -1047,64 +900,29 @@ public class RevealState(
  * Create and [remember] a [RevealState].
  *
  * @param initialValue The initial value of the [RevealValue].
- * @param anchors A map of [RevealValue] to the fraction where the content can be revealed to reach
- *   that value. Each anchor should be between [0..1] which will be adjusted based on total width.
  */
 @Composable
-@SuppressLint("PrimitiveInCollection")
 public fun rememberRevealState(
     initialValue: RevealValue = Covered,
-    anchors: Map<RevealValue, Float> = createRevealAnchors(),
 ): RevealState =
     remember(initialValue) {
         RevealState(
             initialValue = initialValue,
-            anchors = anchors,
         )
     }
 
-/**
- * A composable that can be used to add extra actions to a composable (up to two) which will be
- * revealed when the original composable is swiped to the left. This composable requires a primary
- * swipe/click action, a secondary optional click action can also be provided.
- *
- * When the composable reaches the state where all the actions are revealed and the swipe continues
- * beyond the positional threshold defined in [RevealState], the primary action is automatically
- * triggered.
- *
- * An optional undo action can also be added. This undo action will be visible to users once the
- * [RevealValue] becomes [RightRevealed].
- *
- * It is strongly recommended to have icons represent the actions and maybe a text and icon for the
- * undo action.
- *
- * @param primaryAction The primary action that will be triggered in the event of a completed swipe.
- *   We also strongly recommend to trigger the action when it is clicked.
- * @param modifier Optional [Modifier] for this component.
- * @param onFullSwipe An optional lambda which will be triggered when a full swipe from either of
- *   the anchors is performed.
- * @param state The [RevealState] of this component. It can be used to customise the anchors and
- *   threshold config of the swipeable modifier which is applied.
- * @param secondaryAction An optional action that can be added to the component. We strongly
- *   recommend triggering the action when it is clicked.
- * @param undoAction The optional undo action that will be applied to the component once the
- *   [RevealState.currentValue] becomes [RightRevealed].
- * @param gestureInclusion Provides fine-grained control so that touch gestures can be excluded when
- *   they start in a certain region. An instance of [GestureInclusion] can be passed in here which
- *   will determine via [GestureInclusion.ignoreGestureStart] whether the gesture should proceed or
- *   not. By default, [gestureInclusion] allows gestures everywhere except a zone on the left edge,
- *   which is used for swipe-to-dismiss (see [SwipeToRevealDefaults.gestureInclusion]).
- * @param content The content that will be initially displayed over the other actions provided.
- */
 @Composable
-internal fun SwipeToReveal(
+internal fun SwipeToRevealImpl(
     primaryAction: @Composable () -> Unit,
+    onFullSwipe: () -> Unit,
+    @SuppressLint("PrimitiveInCollection") anchors: Set<RevealValue>,
     modifier: Modifier = Modifier,
-    onFullSwipe: () -> Unit = {},
     state: RevealState = rememberRevealState(),
+    revealDirection: RevealDirection = RightToLeft,
     secondaryAction: (@Composable () -> Unit)? = null,
     undoAction: (@Composable () -> Unit)? = null,
-    gestureInclusion: GestureInclusion = SwipeToRevealDefaults.gestureInclusion(state = state),
+    hasPartiallyRevealedState: Boolean = true,
+    gestureInclusion: GestureInclusion = gestureInclusion(state = state),
     content: @Composable () -> Unit
 ) {
     // A no-op NestedScrollConnection which does not consume scroll/fling events
@@ -1113,6 +931,17 @@ internal fun SwipeToReveal(
     var globalPosition by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     var allowSwipe by remember { mutableStateOf(true) }
+
+    val screenWidthPx =
+        with(LocalDensity.current) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
+    val anchorWidthPx =
+        with(LocalDensity.current) {
+            if (secondaryAction == null) {
+                SingleActionAnchorWidth.toPx()
+            } else {
+                DoubleActionAnchorWidth.toPx()
+            }
+        }
 
     CustomTouchSlopProvider(
         newTouchSlop = LocalViewConfiguration.current.touchSlop * CustomTouchSlopMultiplier
@@ -1141,15 +970,42 @@ internal fun SwipeToReveal(
                                 state.currentValue != LeftRevealed &&
                                 state.currentValue != RightRevealed,
                     )
-                    .swipeAnchors(
-                        state = state.swipeableState,
-                        possibleValues = state.anchors.keys
-                    ) { value, layoutSize ->
-                        val swipeableWidth = layoutSize.width.toFloat()
+                    .swipeAnchors(state = state.swipeableState, possibleValues = anchors) {
+                        value,
+                        layoutSize ->
+                        val swipeableWidthPx = layoutSize.width.toFloat()
                         // Update the total width which will be used to calculate the anchors
-                        state.width.floatValue = swipeableWidth
+                        state.width = swipeableWidthPx
                         // Multiply the anchor with -1f to get the actual swipeable anchor
-                        state.anchors[value]?.let { anchor -> -anchor * swipeableWidth }
+                        when (value) {
+                            Covered -> 0f
+                            LeftRevealing,
+                            RightRevealing -> {
+                                if (secondaryAction == null && !hasPartiallyRevealedState) {
+                                    0f
+                                } else {
+                                    val anchorSideMultiplier =
+                                        if (value == RightRevealing) -1 else 1
+
+                                    val result =
+                                        (anchorWidthPx / screenWidthPx) *
+                                            swipeableWidthPx *
+                                            anchorSideMultiplier
+
+                                    if (value == RightRevealing) {
+                                        state.revealThreshold = abs(result)
+                                    }
+
+                                    result
+                                }
+                            }
+                            LeftRevealed,
+                            RightRevealed -> {
+                                val anchorSideMultiplier = if (value == RightRevealed) -1 else 1
+                                swipeableWidthPx * anchorSideMultiplier
+                            }
+                            else -> null
+                        }
                     }
                     // NestedScrollDispatcher sends the scroll/fling events from the node to its
                     // parent
@@ -1164,7 +1020,7 @@ internal fun SwipeToReveal(
             val isWithinRevealOffset by remember {
                 derivedStateOf { abs(state.offset) <= state.revealThreshold }
             }
-            val canSwipeRight = (state.anchors.minOfOrNull { (_, offset) -> offset } ?: 0f) < 0f
+            val canSwipeRight = revealDirection == Bidirectional
 
             // Determines whether the secondary action will be visible based on the current
             // reveal offset
@@ -1342,15 +1198,49 @@ internal fun SwipeToReveal(
             ) {
                 content()
             }
-            LaunchedEffect(state.currentValue) {
+            LaunchedEffect(state.currentValue, state.lastActionType) {
                 if (
                     (state.currentValue == LeftRevealed || state.currentValue == RightRevealed) &&
                         state.lastActionType == RevealActionType.None
                 ) {
+                    // Full swipe triggers the main action, but does not set the click type.
+                    // Explicitly set the click type as main action when full swipe occurs.
+                    state.lastActionType = RevealActionType.PrimaryAction
                     onFullSwipe()
                 }
             }
         }
+    }
+}
+
+/**
+ * Different values which can trigger the state change from one [RevealValue] to another. These are
+ * not set by themselves and need to be set appropriately with [RevealState.snapTo] and
+ * [RevealState.animateTo].
+ */
+@JvmInline
+internal value class RevealActionType private constructor(public val value: Int) {
+    public companion object {
+        /**
+         * Represents the primary action composable of [SwipeToReveal]. This corresponds to the
+         * mandatory `primaryAction` parameter of [SwipeToReveal].
+         */
+        public val PrimaryAction: RevealActionType = RevealActionType(0)
+
+        /**
+         * Represents the secondary action composable of [SwipeToReveal]. This corresponds to the
+         * optional `secondaryAction` composable of [SwipeToReveal].
+         */
+        public val SecondaryAction: RevealActionType = RevealActionType(1)
+
+        /**
+         * Represents the undo action composable of [SwipeToReveal]. This corresponds to the
+         * `undoAction` composable of [SwipeToReveal] which is shown once an action is performed.
+         */
+        public val UndoAction: RevealActionType = RevealActionType(2)
+
+        /** Default value when none of the above are applicable. */
+        public val None: RevealActionType = RevealActionType(-1)
     }
 }
 
@@ -1478,6 +1368,20 @@ private fun calculateVerticalOffsetBasedOnScreenPosition(
     return desiredCenter - actualCenter
 }
 
+private fun startFadeInFraction(hasSecondaryAction: Boolean) =
+    if (hasSecondaryAction) {
+        DOUBLE_ICON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+    } else {
+        SINGLE_ICON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+    }
+
+private fun endFadeInFraction(hasSecondaryAction: Boolean) =
+    if (hasSecondaryAction) {
+        DOUBLE_ICON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+    } else {
+        SINGLE_ICON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+    }
+
 internal const val CustomTouchSlopMultiplier = 1.20f
 
 /** Short animation in milliseconds. */
@@ -1518,3 +1422,9 @@ private const val SINGLE_ICON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE =
 private const val DOUBLE_ICON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE = 0.36f
 
 private val FULL_SCREEN_PADDING_FRACTION = 0.0625f
+
+@SuppressLint("PrimitiveInCollection")
+private val BidirectionalAnchors: Set<RevealValue> =
+    setOf(LeftRevealed, LeftRevealing, Covered, RightRevealing, RightRevealed)
+@SuppressLint("PrimitiveInCollection")
+private val UnidirectionAnchors: Set<RevealValue> = setOf(Covered, RightRevealing, RightRevealed)
