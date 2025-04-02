@@ -560,6 +560,7 @@ open class androidx.navigation/NavGraphNavigator : androidx.navigation/Navigator
         final fun <get-backStack>(): kotlinx.coroutines.flow/StateFlow<kotlin.collections/List<androidx.navigation/NavBackStackEntry>> // androidx.navigation/NavGraphNavigator.backStack.<get-backStack>|<get-backStack>(){}[0]
 
     open fun createDestination(): androidx.navigation/NavGraph // androidx.navigation/NavGraphNavigator.createDestination|createDestination(){}[0]
+    open fun navigate(kotlin.collections/List<androidx.navigation/NavBackStackEntry>, androidx.navigation/NavOptions?, androidx.navigation/Navigator.Extras?) // androidx.navigation/NavGraphNavigator.navigate|navigate(kotlin.collections.List<androidx.navigation.NavBackStackEntry>;androidx.navigation.NavOptions?;androidx.navigation.Navigator.Extras?){}[0]
 }
 
 open class androidx.navigation/NavigatorProvider { // androidx.navigation/NavigatorProvider|null[0]
