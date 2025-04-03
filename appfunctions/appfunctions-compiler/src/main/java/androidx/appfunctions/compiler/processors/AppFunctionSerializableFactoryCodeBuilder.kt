@@ -36,12 +36,15 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerial
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.ToAppFunctionDataMethod.APP_FUNCTION_SERIALIZABLE_PARAM_NAME
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
+import androidx.appfunctions.compiler.core.isOfType
+import androidx.appfunctions.compiler.core.toPascalCase
 import androidx.appfunctions.compiler.core.toTypeName
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.buildCodeBlock
 
 /**
@@ -836,7 +839,7 @@ class AppFunctionSerializableFactoryCodeBuilder(
                     )
                 }
                 is AnnotatedParameterizedAppFunctionSerializable -> {
-                    TODO("b/405063847 - Initialize parameterized factory")
+                    addParameterizedFactoryInitStatement(paramName, annotatedSerializable)
                 }
                 else -> {
                     addStatement(
@@ -851,6 +854,56 @@ class AppFunctionSerializableFactoryCodeBuilder(
             }
         }
         add("\n")
+    }
+
+    private fun CodeBlock.Builder.addParameterizedFactoryInitStatement(
+        paramName: String,
+        annotatedSerializable: AnnotatedParameterizedAppFunctionSerializable,
+    ) {
+        add(
+            "val %L = %T",
+            paramName,
+            ClassName(
+                annotatedSerializable.originalClassName.packageName,
+                "$${annotatedSerializable.originalClassName.simpleName}Factory"
+            )
+        )
+        add("<")
+        for ((index, typeArgumentReference) in
+            annotatedSerializable.typeParameterMap.values.withIndex()) {
+            add("%T", typeArgumentReference.toTypeName())
+            if (index != annotatedSerializable.typeParameterMap.size - 1) {
+                add(",")
+            }
+        }
+        addStatement(">(")
+        indent()
+        for (typeArgumentReference in annotatedSerializable.typeParameterMap.values) {
+            val typeArgument = typeArgumentReference.resolve()
+            val typeParameterTypeName =
+                if (typeArgumentReference.isOfType(LIST)) {
+                    IntrospectionHelper.AppFunctionSerializableFactoryClass.TypeParameterClass
+                        .ListTypeParameterClass
+                        .CLASS_NAME
+                } else {
+                    IntrospectionHelper.AppFunctionSerializableFactoryClass.TypeParameterClass
+                        .PrimitiveTypeParameterClass
+                        .CLASS_NAME
+                }
+            val typeParameterArg =
+                if (typeArgumentReference.isOfType(LIST)) {
+                    checkNotNull(typeArgument.arguments.first().type).toTypeName()
+                } else {
+                    typeArgumentReference.toTypeName()
+                }
+            addStatement(
+                "%1T(%2T::class.java),",
+                typeParameterTypeName,
+                typeParameterArg,
+            )
+        }
+        unindent()
+        addStatement(")")
     }
 
     private fun KSTypeReference.getTypeShortName(): String {
@@ -882,8 +935,20 @@ class AppFunctionSerializableFactoryCodeBuilder(
     private fun getSerializableFactoryVariableName(
         annotatedSerializable: AnnotatedAppFunctionSerializable
     ): String {
-        // TODO(b/405063847): Provide parameterized factory variable name
-        return "${annotatedSerializable.originalClassName.simpleName.lowerFirstChar()}Factory"
+        return when (annotatedSerializable) {
+            is AnnotatedParameterizedAppFunctionSerializable -> {
+                val typeArgumentSuffix =
+                    annotatedSerializable.typeParameterMap.values
+                        .joinToString { typeArgument ->
+                            typeArgument.toTypeName().toString().replace(Regex("[_<>]"), "_")
+                        }
+                        .toPascalCase()
+                "${annotatedSerializable.originalClassName.simpleName.lowerFirstChar()}${typeArgumentSuffix}Factory"
+            }
+            else -> {
+                "${annotatedSerializable.originalClassName.simpleName.lowerFirstChar()}Factory"
+            }
+        }
     }
 
     companion object {
