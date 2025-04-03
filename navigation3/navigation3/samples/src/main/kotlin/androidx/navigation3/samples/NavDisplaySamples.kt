@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavEntryDecorator
-import androidx.navigation3.NavBackStackProvider
+import androidx.navigation3.DecoratedNavEntryProvider
 import androidx.navigation3.NavEntry
 import androidx.navigation3.NavEntryDecorator
 import androidx.navigation3.SaveableStateNavEntryDecorator
@@ -130,7 +130,7 @@ fun <T : Any> CustomBasicDisplay(
     entryProvider: (key: T) -> NavEntry<out T>
 ) {
     BackHandler(backstack.size > 1, onBack)
-    NavBackStackProvider(backstack, entryProvider, localProviders) { entries ->
+    DecoratedNavEntryProvider(backstack, entryProvider, localProviders) { entries ->
         val entry = entries.last()
         Box(modifier = modifier) { entry.content.invoke(entry.key) }
     }

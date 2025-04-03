@@ -147,7 +147,7 @@ public fun <T : Any> SinglePaneNavDisplay(
     val transitionAwareLifecycleNavEntryDecorator = remember {
         TransitionAwareLifecycleNavEntryDecorator()
     }
-    NavBackStackProvider(
+    DecoratedNavEntryProvider(
         backStack,
         entryProvider,
         localProviders + transitionAwareLifecycleNavEntryDecorator

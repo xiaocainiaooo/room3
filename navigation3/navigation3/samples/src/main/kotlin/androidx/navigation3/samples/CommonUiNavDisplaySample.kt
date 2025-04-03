@@ -35,7 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.NavBackStackProvider
+import androidx.navigation3.DecoratedNavEntryProvider
 import androidx.navigation3.NavEntry
 import androidx.navigation3.NavEntryDecorator
 import androidx.navigation3.samples.CommonUiNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
@@ -107,7 +107,7 @@ fun <T : Any> CommonUiNavDisplay(
     entryProvider: (key: T) -> NavEntry<out T>
 ) {
     BackHandler(backstack.size > 1, onBack)
-    NavBackStackProvider(backstack, entryProvider, localProviders) { entries ->
+    DecoratedNavEntryProvider(backstack, entryProvider, localProviders) { entries ->
         // Make a copy shallow copy so that transition.currentState and transition.targetState are
         // different backstack instances. This ensures currentState reflects the old backstack when
         // the backstack (targetState) is updated.

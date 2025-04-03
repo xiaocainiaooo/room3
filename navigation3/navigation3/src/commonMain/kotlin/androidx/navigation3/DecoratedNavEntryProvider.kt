@@ -33,7 +33,7 @@ import androidx.compose.runtime.Composable
  * @param content the content to be displayed
  */
 @Composable
-public fun <T : Any> NavBackStackProvider(
+public fun <T : Any> DecoratedNavEntryProvider(
     backStack: List<T>,
     entryProvider: (key: T) -> NavEntry<out T>,
     localProviders: List<NavEntryDecorator> = listOf(SaveableStateNavEntryDecorator),

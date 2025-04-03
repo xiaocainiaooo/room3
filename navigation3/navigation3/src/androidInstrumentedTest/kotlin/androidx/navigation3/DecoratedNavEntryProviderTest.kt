@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class NavBackStackProviderTest {
+class DecoratedNavEntryProviderTest {
     @get:Rule val composeTestRule = createComposeRule()
 
     @Test
@@ -46,7 +46,7 @@ class NavBackStackProviderTest {
             )
 
         composeTestRule.setContent {
-            NavBackStackProvider(
+            DecoratedNavEntryProvider(
                 backStack = listOf("something"),
                 localProviders = listOf(provider),
                 entryProvider = { NavEntry("something") {} }
@@ -73,7 +73,7 @@ class NavBackStackProviderTest {
             )
 
         composeTestRule.setContent {
-            NavBackStackProvider(
+            DecoratedNavEntryProvider(
                 backStack = listOf("something"),
                 localProviders = listOf(provider, provider),
                 entryProvider = { NavEntry("something") {} }
@@ -107,7 +107,7 @@ class NavBackStackProviderTest {
 
         composeTestRule.setContent {
             backStack = remember { mutableStateListOf("something") }
-            NavBackStackProvider(
+            DecoratedNavEntryProvider(
                 backStack = backStack,
                 localProviders = listOf(provider),
                 entryProvider = { NavEntry("something") {} }
@@ -157,7 +157,7 @@ class NavBackStackProviderTest {
 
         composeTestRule.setContent {
             backStack = remember { mutableStateListOf("something") }
-            NavBackStackProvider(
+            DecoratedNavEntryProvider(
                 backStack = backStack,
                 localProviders = listOf(outerProvider, innerProvider),
                 entryProvider = { NavEntry("something") {} }
@@ -196,7 +196,7 @@ class NavBackStackProviderTest {
         lateinit var backStack: MutableList<Any>
         composeTestRule.setContent {
             backStack = remember { mutableStateListOf("something") }
-            NavBackStackProvider(
+            DecoratedNavEntryProvider(
                 backStack = backStack,
                 localProviders =
                     listOf(
@@ -254,7 +254,7 @@ class NavBackStackProviderTest {
 
         composeTestRule.setContent {
             backStack = remember { mutableStateListOf("something") }
-            NavBackStackProvider(
+            DecoratedNavEntryProvider(
                 backStack = backStack,
                 localProviders = listOf(outerProvider, innerProvider),
                 entryProvider = { NavEntry("something") {} }

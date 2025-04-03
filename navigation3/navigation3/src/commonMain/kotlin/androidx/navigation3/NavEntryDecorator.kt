@@ -30,7 +30,7 @@ public interface NavEntryDecorator {
     /**
      * Allows a [NavEntryDecorator] to provide to the entire backstack.
      *
-     * This function is called by the [NavBackStackProvider] and should not be called directly.
+     * This function is called by the [DecoratedNavEntryProvider] and should not be called directly.
      */
     @Composable
     public fun DecorateBackStack(backStack: List<Any>, content: @Composable () -> Unit): Unit =
