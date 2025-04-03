@@ -29,7 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.NavBackStackProvider
 import androidx.navigation3.NavEntry
-import androidx.navigation3.NavLocalProvider
+import androidx.navigation3.NavEntryDecorator
 import androidx.navigation3.samples.ListDetailNavDisplay.IS_SUPPORTING_PANE
 
 object ListDetailNavDisplay {
@@ -43,7 +43,7 @@ object ListDetailNavDisplay {
 fun <T : Any> ListDetailNavDisplay(
     backstack: List<T>,
     modifier: Modifier = Modifier,
-    localProviders: List<NavLocalProvider> = emptyList(),
+    localProviders: List<NavEntryDecorator> = emptyList(),
     onBack: () -> Unit = { if (backstack is MutableList) backstack.removeAt(backstack.size - 1) },
     windowWidthSizeClass: WindowWidthSizeClass =
         calculateWindowSizeClass(LocalActivity.current!!).widthSizeClass,

@@ -37,7 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.NavBackStackProvider
 import androidx.navigation3.NavEntry
-import androidx.navigation3.NavLocalProvider
+import androidx.navigation3.NavEntryDecorator
 import androidx.navigation3.samples.CommonUiNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.navigation3.samples.CommonUiNavDisplay.ENTER_TRANSITION_KEY
 import androidx.navigation3.samples.CommonUiNavDisplay.EXIT_TRANSITION_KEY
@@ -84,7 +84,7 @@ fun <T : Any> CommonUiNavDisplay(
     topLevelRoutes: List<TopLevelRoute>,
     onItemClick: (TopLevelRoute) -> Unit,
     modifier: Modifier = Modifier,
-    localProviders: List<NavLocalProvider> = emptyList(),
+    localProviders: List<NavEntryDecorator> = emptyList(),
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
     enterTransition: EnterTransition =

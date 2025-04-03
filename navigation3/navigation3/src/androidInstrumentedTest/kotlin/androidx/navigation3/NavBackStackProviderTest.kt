@@ -37,12 +37,12 @@ class NavBackStackProviderTest {
         var calledWrapBackStack = false
         var calledWrapContent = false
         val provider =
-            createTestNavLocalProvider<Any>(
-                provideToBackStack = { _, content ->
+            createTestNavEntryDecorator<Any>(
+                decorateBackStack = { _, content ->
                     calledWrapBackStack = true
                     content.invoke()
                 },
-                provideToEntry = { _ -> calledWrapContent = true }
+                decorateEntry = { _ -> calledWrapContent = true }
             )
 
         composeTestRule.setContent {
@@ -64,12 +64,12 @@ class NavBackStackProviderTest {
         var calledWrapBackStackCount = 0
         var calledWrapContentCount = 0
         val provider =
-            createTestNavLocalProvider<Any>(
-                provideToBackStack = { _, content ->
+            createTestNavEntryDecorator<Any>(
+                decorateBackStack = { _, content ->
                     calledWrapBackStackCount++
                     content.invoke()
                 },
-                provideToEntry = { _ -> calledWrapContentCount++ }
+                decorateEntry = { _ -> calledWrapContentCount++ }
             )
 
         composeTestRule.setContent {
@@ -92,12 +92,12 @@ class NavBackStackProviderTest {
         var backStackProvider: Int = -1
         var entryProvider: Int = -1
         val provider =
-            createTestNavLocalProvider<Any>(
-                provideToBackStack = { _, content ->
+            createTestNavEntryDecorator<Any>(
+                decorateBackStack = { _, content ->
                     backStackProvider = ++callOrder
                     content.invoke()
                 },
-                provideToEntry = { entry ->
+                decorateEntry = { entry ->
                     entryProvider = ++callOrder
                     entry.content.invoke(entry.key)
                 }
@@ -130,24 +130,24 @@ class NavBackStackProviderTest {
         var innerBackStackProvider: Int = -1
         var innerEntryProvider: Int = -1
         val innerProvider =
-            createTestNavLocalProvider<Any>(
-                provideToBackStack = { _, content ->
+            createTestNavEntryDecorator<Any>(
+                decorateBackStack = { _, content ->
                     innerBackStackProvider = ++callOrder
                     content.invoke()
                 },
-                provideToEntry = { entry ->
+                decorateEntry = { entry ->
                     innerEntryProvider = ++callOrder
                     entry.content.invoke(entry.key)
                 }
             )
 
         val outerProvider =
-            createTestNavLocalProvider<Any>(
-                provideToBackStack = { _, content ->
+            createTestNavEntryDecorator<Any>(
+                decorateBackStack = { _, content ->
                     outerBackStackProvider = ++callOrder
                     content.invoke()
                 },
-                provideToEntry = { entry ->
+                decorateEntry = { entry ->
                     outerEntryProvider = ++callOrder
                     entry.content.invoke(entry.key)
                 }
@@ -180,14 +180,14 @@ class NavBackStackProviderTest {
         var backStackProvider: Int = -1
         var entryProvider: Int = -1
         val provider =
-            createTestNavLocalProvider(
-                provideToBackStack = { backStack, content ->
+            createTestNavEntryDecorator(
+                decorateBackStack = { backStack, content ->
                     DisposableEffect(backStack.lastOrNull()) {
                         onDispose { backStackProvider = ++callOrder }
                     }
                     content.invoke()
                 },
-                provideToEntry = { entry ->
+                decorateEntry = { entry ->
                     DisposableEffect(entry.key) { onDispose { entryProvider = ++callOrder } }
                     entry.content.invoke(entry.key)
                 }
@@ -223,28 +223,28 @@ class NavBackStackProviderTest {
         var innerBackStackProvider: Int = -1
         var innerEntryProvider: Int = -1
         val innerProvider =
-            createTestNavLocalProvider(
-                provideToBackStack = { backStack, content ->
+            createTestNavEntryDecorator(
+                decorateBackStack = { backStack, content ->
                     DisposableEffect(backStack.lastOrNull()) {
                         onDispose { innerBackStackProvider = ++callOrder }
                     }
                     content.invoke()
                 },
-                provideToEntry = { entry ->
+                decorateEntry = { entry ->
                     DisposableEffect(entry.key) { onDispose { innerEntryProvider = ++callOrder } }
                     entry.content.invoke(entry.key)
                 }
             )
 
         val outerProvider =
-            createTestNavLocalProvider(
-                provideToBackStack = { backStack, content ->
+            createTestNavEntryDecorator(
+                decorateBackStack = { backStack, content ->
                     DisposableEffect(backStack.lastOrNull()) {
                         onDispose { outerBackStackProvider = ++callOrder }
                     }
                     content.invoke()
                 },
-                provideToEntry = { entry ->
+                decorateEntry = { entry ->
                     DisposableEffect(entry.key) { onDispose { outerEntryProvider = ++callOrder } }
                     entry.content.invoke(entry.key)
                 }
