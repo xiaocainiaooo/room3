@@ -161,11 +161,15 @@ internal class CompositionBuilder(
             ?.let { nodeHostingAndroidView -> parentNode.viewId = nodeHostingAndroidView.viewId }
 
         var id: Long? = null
+        val isUnwantedDrawComposable = isUnwantedDrawComposable(parentNode)
         input.forEach { node ->
             if (node.isUnwanted) {
-                parentNode.hasDrawModifier = parentNode.hasDrawModifier or node.hasDrawModifier
+                parentNode.hasDrawModifier =
+                    !isUnwantedDrawComposable &&
+                        (parentNode.hasDrawModifier or node.hasDrawModifier)
                 parentNode.hasChildDrawModifier =
-                    parentNode.hasChildDrawModifier or node.hasChildDrawModifier
+                    !isUnwantedDrawComposable &&
+                        (parentNode.hasChildDrawModifier or node.hasChildDrawModifier)
                 parentNode.children.addAll(node.children)
                 if (node.hasLayerId) {
                     // If multiple siblings with a render ids are dropped:

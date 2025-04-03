@@ -99,7 +99,8 @@ internal fun GetParametersByAnchorIdCommand(
 
 internal fun GetAllParametersCommand(
     rootViewId: Long,
-    skipSystemComposables: Boolean = true
+    skipSystemComposables: Boolean = true,
+    generation: Int = 1,
 ): Command =
     Command.newBuilder()
         .apply {
@@ -108,6 +109,7 @@ internal fun GetAllParametersCommand(
                     .apply {
                         this.rootViewId = rootViewId
                         this.skipSystemComposables = skipSystemComposables
+                        this.generation = generation
                     }
                     .build()
         }
