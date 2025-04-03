@@ -20,6 +20,7 @@ import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializable
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializableProxy
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializableProxy.ResolvedAnnotatedSerializableProxies
+import androidx.appfunctions.compiler.core.AnnotatedParameterizedAppFunctionSerializable
 import androidx.appfunctions.compiler.core.AppFunctionPropertyDeclaration
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.PRIMITIVE_ARRAY
@@ -36,6 +37,7 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerial
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
 import androidx.appfunctions.compiler.core.toTypeName
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.ClassName
@@ -497,12 +499,12 @@ class AppFunctionSerializableFactoryCodeBuilder(
         paramName: String,
         afType: AppFunctionTypeReference
     ): CodeBlock.Builder {
-        val typeName = afType.selfTypeReference.getTypeShortName()
+        val annotatedSerializable = getAnnotatedSerializable(afType)
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to paramName,
                 "param_type" to afType.selfTypeReference.toTypeName(),
-                "factory_name" to "${typeName}Factory".lowerFirstChar(),
+                "factory_name" to getSerializableFactoryVariableName(annotatedSerializable),
                 "app_function_data_param_name" to APP_FUNCTION_DATA_PARAM_NAME,
                 "getter_name" to getAppFunctionDataGetterName(afType),
                 "from_app_function_data_method_name" to FromAppFunctionDataMethod.METHOD_NAME,
@@ -711,11 +713,11 @@ class AppFunctionSerializableFactoryCodeBuilder(
         paramName: String,
         afType: AppFunctionTypeReference
     ): CodeBlock.Builder {
-        val typeName = afType.selfTypeReference.getTypeShortName()
+        val annotatedSerializable = getAnnotatedSerializable(afType)
         val formatStringMap =
             mapOf<String, Any>(
                 "param_name" to paramName,
-                "factory_name" to "${typeName}Factory".lowerFirstChar(),
+                "factory_name" to getSerializableFactoryVariableName(annotatedSerializable),
                 "setter_name" to getAppFunctionDataSetterName(afType),
             )
 
@@ -798,36 +800,55 @@ class AppFunctionSerializableFactoryCodeBuilder(
     }
 
     private val factoryInitStatements = buildCodeBlock {
-        val factoryInstanceNameToClassMap: Map<String, ClassName> = buildMap {
-            for (serializableType in annotatedClass.getSerializablePropertyTypeReferences()) {
-                val qualifiedName =
-                    serializableType.selfOrItemTypeReference.ensureQualifiedTypeName()
-                put(
-                    "${qualifiedName.getShortName().lowerFirstChar()}Factory",
-                    ClassName(
-                        qualifiedName.getQualifier(),
-                        "`\$${qualifiedName.getShortName()}Factory`"
+        val factoryInstanceNameToAnnotatedClassMap: Map<String, AnnotatedAppFunctionSerializable> =
+            buildMap {
+                for (serializableTypeReference in
+                    annotatedClass.getSerializablePropertyTypeReferences()) {
+                    val annotatedSerializable = getAnnotatedSerializable(serializableTypeReference)
+                    put(
+                        getSerializableFactoryVariableName(annotatedSerializable),
+                        annotatedSerializable,
                     )
-                )
-            }
+                }
 
-            for (proxyTypeReference in
-                annotatedClass.getSerializableProxyPropertyTypeReferences()) {
-                val targetSerializableProxy =
-                    resolvedAnnotatedSerializableProxies.getSerializableProxyForTypeReference(
-                        proxyTypeReference
+                for (proxyTypeReference in
+                    annotatedClass.getSerializableProxyPropertyTypeReferences()) {
+                    val targetSerializableProxy =
+                        resolvedAnnotatedSerializableProxies.getSerializableProxyForTypeReference(
+                            proxyTypeReference
+                        )
+                    put(
+                        getSerializableFactoryVariableName(targetSerializableProxy),
+                        targetSerializableProxy
                     )
-                put(
-                    "${targetSerializableProxy.originalClassName.simpleName.lowerFirstChar()}Factory",
-                    ClassName(
-                        targetSerializableProxy.originalClassName.packageName,
-                        "`\$${targetSerializableProxy.targetClassDeclaration.simpleName.asString()}Factory`"
-                    )
-                )
+                }
             }
-        }
-        for (entry in factoryInstanceNameToClassMap) {
-            addStatement("val %L = %T()", entry.key, entry.value)
+        for ((paramName, annotatedSerializable) in factoryInstanceNameToAnnotatedClassMap) {
+            when (annotatedSerializable) {
+                is AnnotatedAppFunctionSerializableProxy -> {
+                    addStatement(
+                        "val %L = %T()",
+                        paramName,
+                        ClassName(
+                            annotatedSerializable.originalClassName.packageName,
+                            "$${annotatedSerializable.targetClassDeclaration.simpleName.asString()}Factory"
+                        )
+                    )
+                }
+                is AnnotatedParameterizedAppFunctionSerializable -> {
+                    TODO("b/405063847 - Initialize parameterized factory")
+                }
+                else -> {
+                    addStatement(
+                        "val %L = %T()",
+                        paramName,
+                        ClassName(
+                            annotatedSerializable.originalClassName.packageName,
+                            "$${annotatedSerializable.originalClassName.simpleName}Factory"
+                        )
+                    )
+                }
+            }
         }
         add("\n")
     }
@@ -847,6 +868,22 @@ class AppFunctionSerializableFactoryCodeBuilder(
     private fun getSerializableParamName(annotatedClass: AnnotatedAppFunctionSerializable): String {
         return "${annotatedClass.originalClassName.simpleName.replaceFirstChar {
                 it -> it.lowercase() }}_appFunctionSerializable"
+    }
+
+    private fun getAnnotatedSerializable(
+        typeReference: AppFunctionTypeReference
+    ): AnnotatedAppFunctionSerializable {
+        val serializableType = typeReference.selfOrItemTypeReference.resolve()
+        val serializableDeclaration = serializableType.declaration as KSClassDeclaration
+        return AnnotatedAppFunctionSerializable(serializableDeclaration)
+            .parameterizedBy(serializableType.arguments)
+    }
+
+    private fun getSerializableFactoryVariableName(
+        annotatedSerializable: AnnotatedAppFunctionSerializable
+    ): String {
+        // TODO(b/405063847): Provide parameterized factory variable name
+        return "${annotatedSerializable.originalClassName.simpleName.lowerFirstChar()}Factory"
     }
 
     companion object {
