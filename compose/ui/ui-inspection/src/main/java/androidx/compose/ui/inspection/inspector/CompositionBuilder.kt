@@ -181,8 +181,15 @@ internal class CompositionBuilder(
                     (node.hasDrawModifier || node.hasChildDrawModifier) &&
                         systemPackages.contains(node.packageHash)
                 ) {
-                    parentNode.hasChildDrawModifier = true
-                    node.hasChildDrawModifier = false
+                    if (isUnwantedDrawComposable) {
+                        updateTree(node) {
+                            it.hasDrawModifier = false
+                            it.hasChildDrawModifier = false
+                        }
+                    } else {
+                        parentNode.hasChildDrawModifier = true
+                        node.hasChildDrawModifier = false
+                    }
                 }
                 node.id = if (node.hasAssignedId) node.id else --generatedId
                 val withSemantics = node.packageHash !in systemPackages
@@ -533,6 +540,32 @@ internal class CompositionBuilder(
         }
         // The anchorId is an Int
         return anchorId.toLong() - Int.MAX_VALUE.toLong() + RESERVED_FOR_GENERATED_IDS
+    }
+
+    /**
+     * Make an update to a InspectorNode tree. Only use this for smaller trees or implement a non
+     * recursive implementation.
+     */
+    private fun updateTree(
+        node: MutableInspectorNode,
+        modification: (MutableInspectorNode) -> Unit
+    ) {
+        val oldChildren = node.children.toList()
+        node.children.clear()
+        oldChildren.mapTo(node.children) { updateTree(it, modification) }
+        modification(node)
+    }
+
+    private fun updateTree(
+        node: InspectorNode,
+        modification: (MutableInspectorNode) -> Unit
+    ): InspectorNode {
+        val newNode = newNode()
+        newNode.shallowCopy(node)
+        node.children.mapTo(newNode.children) { updateTree(it, modification) }
+        modification(newNode)
+        val withSemantics = node.packageHash !in systemPackages
+        return newNode.build(withSemantics)
     }
 
     private fun IntRect.emptyCheck(): IntRect =

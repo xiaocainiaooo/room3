@@ -62,6 +62,10 @@ class AllParametersChecks(
     private val composableStrings = composableResponse.stringsList.toMap()
     private val parametersStrings = parametersResponse.stringsList.toMap()
 
+    fun assertIconNode(composable: ComposableNode) {
+        assertNode(composable, "Icon")
+    }
+
     fun assertTextNode(composable: ComposableNode, expectedText: String) {
         // TODO(b/408492167) "$0" should be "text"
         assertNode(composable, "Text", "$0", expectedText)

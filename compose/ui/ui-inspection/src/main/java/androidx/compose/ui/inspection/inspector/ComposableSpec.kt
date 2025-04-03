@@ -27,7 +27,10 @@ package androidx.compose.ui.inspection.inspector
 private val unwantedDrawComposables =
     listOf(
         // Avoid the ReusableComposeNode in the implementation of SubcomposeLayout.
-        createSpec("ReusableComposeNode", "SubcomposeLayout.kt", "androidx.compose.ui.layout")
+        createSpec("ReusableComposeNode", "SubcomposeLayout.kt", "androidx.compose.ui.layout"),
+
+        // Avoid the scrim in a navigation drawer.
+        createSpec("Scrim", "NavigationDrawer.kt", "androidx.compose.material3"),
     )
 
 /**
