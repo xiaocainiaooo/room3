@@ -128,7 +128,7 @@ package androidx.appsearch.builtintypes {
     method public androidx.appsearch.builtintypes.ContactPoint.Builder setUrl(String?);
   }
 
-  @androidx.appsearch.annotation.Document(name="builtin:Event") public class Event extends androidx.appsearch.builtintypes.Thing {
+  @RequiresApi(api=android.os.Build.VERSION_CODES.O) @androidx.appsearch.annotation.Document(name="builtin:Event") public class Event extends androidx.appsearch.builtintypes.Thing {
     ctor protected Event(String, String, int, long, long, String?, java.util.List<java.lang.String!>?, String?, String?, String?, java.util.List<androidx.appsearch.builtintypes.PotentialAction!>, java.time.Instant?, java.time.Instant?, java.time.Duration?, String?, androidx.appsearch.builtintypes.ImageObject?);
     method public java.time.Duration? getDuration();
     method public java.time.Instant? getEndDate();
@@ -336,7 +336,7 @@ package androidx.appsearch.builtintypes {
     method public androidx.appsearch.builtintypes.PotentialAction.Builder setUri(String?);
   }
 
-  @androidx.appsearch.annotation.Document(name="builtin:SportsEvent") public class SportsEvent extends androidx.appsearch.builtintypes.Event {
+  @RequiresApi(api=android.os.Build.VERSION_CODES.O) @androidx.appsearch.annotation.Document(name="builtin:SportsEvent") public class SportsEvent extends androidx.appsearch.builtintypes.Event {
     ctor protected SportsEvent(String, String, int, long, long, String?, java.util.List<java.lang.String!>?, String?, String?, String?, java.util.List<androidx.appsearch.builtintypes.PotentialAction!>, java.time.Instant, java.time.Instant?, java.time.Duration?, String?, androidx.appsearch.builtintypes.ImageObject?, String, androidx.appsearch.builtintypes.Organization?, long, String, String?, String?, androidx.appsearch.builtintypes.SportsTeam, String?, String?, double, androidx.appsearch.builtintypes.SportsTeam, String?, String?, double, boolean, long);
     method public androidx.appsearch.builtintypes.SportsTeam getAwayTeam();
     method public String? getAwayTeamAccessoryScore();

@@ -16,9 +16,12 @@
 
 package androidx.appsearch.builtintypes;
 
+import android.os.Build;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
 import androidx.annotation.OptIn;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.Document;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
@@ -38,6 +41,7 @@ import java.util.List;
 /**
  * AppSearch document representing a {@link SportsEvent} entity.
  */
+@RequiresApi(api = Build.VERSION_CODES.O)
 @Document(name = "builtin:SportsEvent")
 public class SportsEvent extends Event {
 
