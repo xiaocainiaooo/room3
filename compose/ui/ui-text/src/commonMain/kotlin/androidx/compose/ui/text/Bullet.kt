@@ -31,18 +31,20 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 
 /**
- * A bullet annotation applied to the AnnotatedString that draws a bullet.
+ * Draws a bullet point next to a paragraph.
  *
- * Note that it's up to the caller of this API to make sure there's enough space between the edge of
- * the text composable and the start of the paragraph inside that composable to fit the bullet with
- * its padding.
+ * Bullets do not add indentation. The call site must provide sufficient leading space to
+ * accommodate the bullet and its padding, preventing overlap with the text.
  *
- * @param shape a shape of the bullet to draw
- * @param width a width of the bullet
- * @param height a height of the bullet
- * @param padding a padding between the end of the bullet and the start of the paragraph
- * @param brush a brush to draw a bullet with. If `null` is passed, the bullet will be drawn like
- *   the rest of the text
+ * There are several ways to achieve this leading space. One common approach is to use
+ * `ParagraphStyle` with `textIndent` within an `AnnotatedString`.
+ *
+ * @param shape the shape of the bullet to draw
+ * @param width the width of the bullet
+ * @param height the height of the bullet
+ * @param padding the padding between the end of the bullet and the start of the paragraph
+ * @param brush brush to draw a bullet with. If `null` is passed, the bullet will be drawn like the
+ *   rest of the text
  * @param alpha opacity to be applied to [brush] drawing a bullet from 0.0f to 1.0f representing
  *   fully transparent to fully opaque respectively. When [Float.NaN] is passed, the alpha will not
  *   be changed and the one used for drawing rest of the text is used
@@ -97,19 +99,18 @@ class Bullet(
     }
 
     override fun toString(): String {
-        return "Bullet(shape=$shape, size=($width, $height), padding=$padding, brush=$brush, alpha=$alpha, drawStyle=$drawStyle)"
+        return "Bullet(shape=$shape, size=($width, $height), padding=$padding, brush=$brush, " +
+            "alpha=$alpha, drawStyle=$drawStyle)"
     }
 
     companion object {
-        /**
-         * Default indentation between the start edge of the Text composable and start of paragraph
-         */
+        /** Indentation required to fit [Default] bullet. */
         val DefaultIndentation = 1.em
 
-        /** Default width and height of the bullet */
+        /** Height and width for [Default] bullet. */
         val DefaultSize = 0.25.em
 
-        /** Default padding between a bullet and start of a paragraph */
+        /** Padding between bullet and start of paragraph for [Default] bullet */
         val DefaultPadding = 0.25.em
 
         /** Default bullet used in AnnotatedString's bullet list */
