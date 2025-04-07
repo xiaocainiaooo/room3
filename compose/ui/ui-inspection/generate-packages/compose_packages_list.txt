@@ -68,3 +68,9 @@ androidx.wear.compose.material3.macrobenchmark.common
 androidx.wear.compose.material3.macrobenchmark.common.baselineprofile
 androidx.wear.compose.materialcore
 androidx.wear.compose.navigation
+androidx.xr.compose.material3
+androidx.xr.compose.platform
+androidx.xr.compose.spatial
+androidx.xr.compose.subspace
+androidx.xr.compose.subspace.layout
+androidx.xr.compose.testing

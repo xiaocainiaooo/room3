@@ -83,11 +83,10 @@ val systemPackages =
         packageNameHash("androidx.wear.compose.material3.macrobenchmark.common.baselineprofile"),
         packageNameHash("androidx.wear.compose.materialcore"),
         packageNameHash("androidx.wear.compose.navigation"),
-        // TODO(b/375593578): Remove hardcoded packages
-        1538710489, // "a.x.c.s"
-        2001804959, // "a.x.c.u"
-        48603481, // "a.x.c.u.l"
-        1228925967, // "a.x.c.u.n"
-        1665712414, // "a.x.c.u.p"
-        1306660555, // "a.x.c.u.s"
+        packageNameHash("androidx.xr.compose.material3"),
+        packageNameHash("androidx.xr.compose.platform"),
+        packageNameHash("androidx.xr.compose.spatial"),
+        packageNameHash("androidx.xr.compose.subspace"),
+        packageNameHash("androidx.xr.compose.subspace.layout"),
+        packageNameHash("androidx.xr.compose.testing"),
     )
