@@ -17,11 +17,21 @@
 package androidx.navigation3
 
 import androidx.activity.compose.PredictiveBackHandler
+import androidx.collection.mutableObjectFloatMapOf
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.SeekableTransitionState
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.rememberTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -38,10 +48,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastForEachReversed
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation3.SceneNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
+import androidx.navigation3.SceneNavDisplay.ENTER_TRANSITION_KEY
+import androidx.navigation3.SceneNavDisplay.EXIT_TRANSITION_KEY
+import androidx.navigation3.SceneNavDisplay.POP_ENTER_TRANSITION_KEY
+import androidx.navigation3.SceneNavDisplay.POP_EXIT_TRANSITION_KEY
 import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
+
+/** Object that indicates the features that can be handled by the [SceneNavDisplay] */
+public object SceneNavDisplay {
+    /**
+     * Function to be called on the [NavEntry.metadata] to notify the [SceneNavDisplay] that the
+     * content should be animated using the provided transitions.
+     */
+    public fun transition(enter: EnterTransition?, exit: ExitTransition?): Map<String, Any> =
+        if (enter == null || exit == null) emptyMap()
+        else mapOf(ENTER_TRANSITION_KEY to enter, EXIT_TRANSITION_KEY to exit)
+
+    /**
+     * Function to be called on the [NavEntry.metadata] to notify the [SceneNavDisplay] that, when
+     * popping from backstack, the content should be animated using the provided transitions.
+     */
+    public fun popTransition(enter: EnterTransition?, exit: ExitTransition?): Map<String, Any> =
+        if (enter == null || exit == null) emptyMap()
+        else mapOf(POP_ENTER_TRANSITION_KEY to enter, POP_EXIT_TRANSITION_KEY to exit)
+
+    internal const val ENTER_TRANSITION_KEY = "enterTransition"
+    internal const val EXIT_TRANSITION_KEY = "exitTransition"
+    internal const val POP_ENTER_TRANSITION_KEY = "popEnterTransition"
+    internal const val POP_EXIT_TRANSITION_KEY = "popExitTransition"
+
+    internal const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 700
+}
 
 /**
  * A nav display that renders and animates between different [Scene]s, each of which can render one
@@ -61,6 +109,7 @@ import kotlinx.coroutines.flow.filter
  *
  * @param backStack the collection of keys that represents the state that needs to be handled
  * @param modifier the modifier to be applied to the layout.
+ * @param contentAlignment The [Alignment] of the [AnimatedContent]
  * @param onBack a callback for handling system back press. The passed [Int] refers to the number of
  *   entries to pop from the end of the backstack, as calculated by the [sceneStrategy].
  * @param preEntryDecorators a list of [NavEntryDecorator]s to include before the entry content
@@ -68,6 +117,11 @@ import kotlinx.coroutines.flow.filter
  * @param postEntryDecorators a list of [NavEntryDecorator]s to include after the entry content
  *   invocation is made unique.
  * @param sceneStrategy the [SceneStrategy] to determine which scene to render a list of entries.
+ * @param sizeTransform the [SizeTransform] for the [AnimatedContent].
+ * @param enterTransition Default [EnterTransition] when navigating to [NavEntry]s.
+ * @param exitTransition Default [ExitTransition] when navigating to [NavEntry]s.
+ * @param popEnterTransition Default [EnterTransition] when popping [NavEntry]s.
+ * @param popExitTransition Default [ExitTransition] when popping [NavEntry]s.
  * @param entryProvider lambda used to construct each possible [NavEntry]
  * @sample androidx.navigation3.samples.SceneNav
  * @sample androidx.navigation3.samples.SceneNavSharedEntrySample
@@ -77,6 +131,7 @@ import kotlinx.coroutines.flow.filter
 public fun <T : Any> SceneNavDisplay(
     backStack: List<T>,
     modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.TopStart,
     onBack: (Int) -> Unit = {
         if (backStack is MutableList<T>) {
             repeat(it) { backStack.removeAt(backStack.lastIndex) }
@@ -85,9 +140,42 @@ public fun <T : Any> SceneNavDisplay(
     preEntryDecorators: List<NavEntryDecorator> = emptyList(),
     postEntryDecorators: List<NavEntryDecorator> = emptyList(),
     sceneStrategy: SceneStrategy<T> = SinglePaneSceneStrategy(),
+    sizeTransform: SizeTransform? = null,
+    enterTransition: EnterTransition =
+        fadeIn(
+            animationSpec =
+                tween(
+                    DEFAULT_TRANSITION_DURATION_MILLISECOND,
+                )
+        ),
+    exitTransition: ExitTransition =
+        fadeOut(
+            animationSpec =
+                tween(
+                    DEFAULT_TRANSITION_DURATION_MILLISECOND,
+                )
+        ),
+    popEnterTransition: EnterTransition =
+        fadeIn(
+            animationSpec =
+                tween(
+                    DEFAULT_TRANSITION_DURATION_MILLISECOND,
+                )
+        ),
+    popExitTransition: ExitTransition =
+        fadeOut(
+            animationSpec =
+                tween(
+                    DEFAULT_TRANSITION_DURATION_MILLISECOND,
+                )
+        ),
     entryProvider: (key: T) -> NavEntry<T>,
 ) {
     require(backStack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
+
+    val transitionAwareLifecycleNavEntryDecorator = remember {
+        TransitionAwareLifecycleNavEntryDecorator()
+    }
 
     DecoratedNavEntryProvider(
         backStack = backStack,
@@ -106,7 +194,8 @@ public fun <T : Any> SceneNavDisplay(
                     // sites
                     // while maintaining their instance
                     MovableContentNavEntryDecorator,
-                    SaveableStateNavEntryDecorator
+                    SaveableStateNavEntryDecorator,
+                    transitionAwareLifecycleNavEntryDecorator,
                 ) +
                 postEntryDecorators,
         entryProvider = entryProvider
@@ -146,6 +235,33 @@ public fun <T : Any> SceneNavDisplay(
 
         val transition = rememberTransition(transitionState, label = sceneKey.toString())
 
+        /** Keep track of the previous entries for the transition's current scene. */
+        val transitionCurrentStateEntries = remember(transition.currentState) { entries.toList() }
+
+        // Consider this a pop if the current entries match the previous entries we have recorded
+        // from the current state of the transition
+        val isPop =
+            isPop(
+                transitionCurrentStateEntries.map { it.key },
+                entries.map { it.key },
+            )
+        val finalEnterTransition =
+            if (isPop || inPredictiveBack) {
+                entries.lastOrNull()?.metadata[POP_ENTER_TRANSITION_KEY] as? EnterTransition
+                    ?: popEnterTransition
+            } else {
+                entries.lastOrNull()?.metadata[ENTER_TRANSITION_KEY] as? EnterTransition
+                    ?: enterTransition
+            }
+        val finalExitTransition =
+            if (isPop || inPredictiveBack) {
+                entries.lastOrNull()?.metadata[POP_EXIT_TRANSITION_KEY] as? ExitTransition
+                    ?: popExitTransition
+            } else {
+                entries.lastOrNull()?.metadata[EXIT_TRANSITION_KEY] as? ExitTransition
+                    ?: exitTransition
+            }
+
         if (inPredictiveBack) {
             val peekSceneResult =
                 sceneStrategy.calculateSceneWithSinglePaneFallback(sceneResult.previousEntries)
@@ -158,6 +274,33 @@ public fun <T : Any> SceneNavDisplay(
             LaunchedEffect(sceneKey) {
                 if (transitionState.currentState != sceneKey) {
                     transitionState.animateTo(sceneKey)
+                }
+                // This ensures we don't animate after the back gesture is cancelled and we
+                // are already on the current state
+                if (transitionState.currentState != sceneKey) {
+                    transitionState.animateTo(sceneKey)
+                } else {
+                    // convert from nanoseconds to milliseconds
+                    val totalDuration = transition.totalDurationNanos / 1000000
+                    // When the predictive back gesture is cancelled, we need to manually animate
+                    // the SeekableTransitionState from where it left off, to zero and then
+                    // snapTo the final position.
+                    animate(
+                        transitionState.fraction,
+                        0f,
+                        animationSpec = tween((transitionState.fraction * totalDuration).toInt())
+                    ) { value, _ ->
+                        this@LaunchedEffect.launch {
+                            if (value > 0) {
+                                // Seek the original transition back to the currentState
+                                transitionState.seekTo(value)
+                            }
+                            if (value == 0f) {
+                                // Once we animate to the start, we need to snap to the right state.
+                                transitionState.snapTo(sceneKey)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -196,7 +339,31 @@ public fun <T : Any> SceneNavDisplay(
                 }
             }
 
-        transition.AnimatedContent(modifier = modifier) { targetSceneKey ->
+        val zIndices = remember { mutableObjectFloatMapOf<Pair<KClass<*>, Any>>() }
+        val initialKey = transition.currentState
+        val targetKey = transition.targetState
+        val initialZIndex = zIndices.getOrPut(initialKey) { 0f }
+        val targetZIndex =
+            when {
+                initialKey == targetKey -> initialZIndex
+                isPop || inPredictiveBack -> initialZIndex - 1f
+                else -> initialZIndex + 1f
+            }
+        zIndices[targetKey] = targetZIndex
+
+        transition.AnimatedContent(
+            contentAlignment = contentAlignment,
+            modifier = modifier,
+            transitionSpec = {
+                ContentTransform(
+                    targetContentEnter = finalEnterTransition,
+                    initialContentExit = finalExitTransition,
+                    // z-index increases during navigate and decreases during pop.
+                    targetContentZIndex = targetZIndex,
+                    sizeTransform = sizeTransform
+                )
+            },
+        ) { targetSceneKey ->
             val targetScene = scenes.getValue(targetSceneKey)
             CompositionLocalProvider(
                 LocalNavAnimatedContentScope provides this,
@@ -224,7 +391,26 @@ public fun <T : Any> SceneNavDisplay(
                     }
                 }
         }
+
+        LaunchedEffect(transition.currentState, transition.targetState) {
+            // If we've reached the targetState, our animation has settled
+            val settled = transition.currentState == transition.targetState
+            transitionAwareLifecycleNavEntryDecorator.isSettled = settled
+        }
     }
+}
+
+private fun <T : Any> isPop(oldBackStack: List<T>, newBackStack: List<T>): Boolean {
+    // entire stack replaced
+    if (oldBackStack.first() != newBackStack.first()) return false
+    // navigated
+    if (newBackStack.size > oldBackStack.size) return false
+
+    val divergingIndex =
+        newBackStack.indices.firstOrNull { index -> newBackStack[index] != oldBackStack[index] }
+    // if newBackStack never diverged from oldBackStack, then it is a clean subset of the oldStack
+    // and is a pop
+    return divergingIndex == null && newBackStack.size != oldBackStack.size
 }
 
 /**
@@ -350,3 +536,93 @@ public val LocalEntriesToRenderInCurrentScene: ProvidableCompositionLocal<Set<An
                 "to SceneNavDisplay."
         )
     }
+
+private val LocalTransitionAwareLifecycleNavLocalInfo =
+    compositionLocalOf<TransitionAwareLifecycleNavLocalInfo> {
+        error(
+            "CompositionLocal LocalTransitionAwareLifecycleNavLocalInfo not present. You must " +
+                "call DecorateBackStack before calling DecorateEntry."
+        )
+    }
+
+private class TransitionAwareLifecycleNavEntryDecorator : NavEntryDecorator {
+
+    var isSettled by mutableStateOf(true)
+
+    @Composable
+    override fun DecorateBackStack(backStack: List<Any>, content: @Composable (() -> Unit)) {
+        val localInfo = remember(backStack) { TransitionAwareLifecycleNavLocalInfo(backStack) }
+        CompositionLocalProvider(LocalTransitionAwareLifecycleNavLocalInfo provides localInfo) {
+            content.invoke()
+        }
+    }
+
+    @Composable
+    override fun <T : Any> DecorateEntry(entry: NavEntry<T>) {
+        val backStack = LocalTransitionAwareLifecycleNavLocalInfo.current.backStack
+        // TODO: Handle duplicate keys
+        val isInBackStack = entry.key in backStack
+        val maxLifecycle =
+            when {
+                isInBackStack && isSettled -> Lifecycle.State.RESUMED
+                isInBackStack && !isSettled -> Lifecycle.State.STARTED
+                else /* !isInBackStack */ -> Lifecycle.State.CREATED
+            }
+        LifecycleOwner(maxLifecycle = maxLifecycle) { entry.content.invoke(entry.key) }
+    }
+}
+
+private class TransitionAwareLifecycleNavLocalInfo(val backStack: List<Any>)
+
+@Composable
+private fun LifecycleOwner(
+    maxLifecycle: Lifecycle.State = Lifecycle.State.RESUMED,
+    parentLifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    content: @Composable () -> Unit
+) {
+    val childLifecycleOwner = remember(parentLifecycleOwner) { ChildLifecycleOwner() }
+    // Pass LifecycleEvents from the parent down to the child
+    DisposableEffect(childLifecycleOwner, parentLifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            childLifecycleOwner.handleLifecycleEvent(event)
+        }
+
+        parentLifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose { parentLifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    // Ensure that the child lifecycle is capped at the maxLifecycle
+    LaunchedEffect(childLifecycleOwner, maxLifecycle) {
+        childLifecycleOwner.maxLifecycle = maxLifecycle
+    }
+    // Now install the LifecycleOwner as a composition local
+    CompositionLocalProvider(LocalLifecycleOwner provides childLifecycleOwner) { content.invoke() }
+}
+
+private class ChildLifecycleOwner : LifecycleOwner {
+    private val lifecycleRegistry = LifecycleRegistry(this)
+
+    override val lifecycle: Lifecycle
+        get() = lifecycleRegistry
+
+    var maxLifecycle: Lifecycle.State = Lifecycle.State.INITIALIZED
+        set(maxState) {
+            field = maxState
+            updateState()
+        }
+
+    private var parentLifecycleState: Lifecycle.State = Lifecycle.State.CREATED
+
+    fun handleLifecycleEvent(event: Lifecycle.Event) {
+        parentLifecycleState = event.targetState
+        updateState()
+    }
+
+    fun updateState() {
+        if (parentLifecycleState.ordinal < maxLifecycle.ordinal) {
+            lifecycleRegistry.currentState = parentLifecycleState
+        } else {
+            lifecycleRegistry.currentState = maxLifecycle
+        }
+    }
+}

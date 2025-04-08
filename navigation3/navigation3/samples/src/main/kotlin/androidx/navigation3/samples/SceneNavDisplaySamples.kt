@@ -29,6 +29,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavEntryDecorator
 import androidx.navigation3.LocalNavAnimatedContentScope
@@ -40,6 +41,10 @@ import androidx.navigation3.Scene
 import androidx.navigation3.SceneNavDisplay
 import androidx.navigation3.entry
 import androidx.navigation3.entryProvider
+
+class ProfileViewModel : ViewModel() {
+    val name = "no user"
+}
 
 @Sampled
 @Composable
