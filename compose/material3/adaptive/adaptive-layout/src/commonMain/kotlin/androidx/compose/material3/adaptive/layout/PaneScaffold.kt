@@ -183,7 +183,7 @@ internal abstract class PaneScaffoldScopeImpl(
 
     override fun Modifier.preferredHeight(height: Dp): Modifier {
         require(height == Dp.Unspecified || height > 0.dp) { "invalid height" }
-        return this.then(PreferredWidthElement(height))
+        return this.then(PreferredHeightElement(height))
     }
 }
 
@@ -259,7 +259,7 @@ private class PreferredHeightElement(
 private class PreferredHeightNode(var height: Dp) : ParentDataModifierNode, Modifier.Node() {
     override fun Density.modifyParentData(parentData: Any?) =
         ((parentData as? PaneScaffoldParentDataImpl) ?: PaneScaffoldParentDataImpl()).also {
-            it.preferredWidth = height
+            it.preferredHeight = height
         }
 }
 
