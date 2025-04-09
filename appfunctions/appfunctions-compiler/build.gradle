@@ -44,7 +44,7 @@ dependencies {
     apiAarAsJar(project(":appfunctions:appfunctions"))
 
     testImplementationAarAsJar(project(":appfunctions:appfunctions"))
-    testImplementationAarAsJar(project(":appfunctions:appfunctions-runtime"))
+    testImplementationAarAsJar(project(":appfunctions:appfunctions-service"))
     testImplementation(project(":room:room-compiler-processing-testing"))
     testImplementation(libs.junit)
     testImplementation(libs.truth)

@@ -39,7 +39,7 @@ dependencies {
     implementation("androidx.annotation:annotation:1.8.1")
 
     // Compile only dependencies required for KDoc
-    compileOnly(project(":appfunctions:appfunctions-runtime"))
+    compileOnly(project(":appfunctions:appfunctions-service"))
     compileOnly(project(":work:work-runtime"))
     ksp(project(":appfunctions:appfunctions-compiler"))
 
