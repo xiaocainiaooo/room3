@@ -80,6 +80,7 @@ androidXMultiplatform {
         androidInstrumentedTest {
             dependsOn(commonTest)
             dependencies {
+                implementation(libs.testRunner)
             }
         }
 
