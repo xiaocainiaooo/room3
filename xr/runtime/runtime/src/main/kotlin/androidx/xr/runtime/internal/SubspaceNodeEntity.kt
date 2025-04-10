@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.xr.arcore
+package androidx.xr.runtime.internal
 
-public typealias TrackingState = androidx.xr.runtime.internal.TrackingState
+import androidx.annotation.RestrictTo
+
+/** Represents an entity that manages a subspace node. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+public interface SubspaceNodeEntity : Entity {
+    /** The size of the [SubspaceNodeEntity] in meters, in unscaled local space. */
+    public var size: Dimensions
+}
