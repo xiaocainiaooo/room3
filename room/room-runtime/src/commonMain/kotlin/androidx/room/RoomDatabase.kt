@@ -518,7 +518,7 @@ internal fun validateMigrationsNotRequired(
 internal fun RoomDatabase.validateAutoMigrations(configuration: DatabaseConfiguration) {
     val autoMigrationSpecs = mutableMapOf<KClass<out AutoMigrationSpec>, AutoMigrationSpec>()
     val requiredAutoMigrationSpecs = getRequiredAutoMigrationSpecClasses()
-    val usedSpecs = BooleanArray(requiredAutoMigrationSpecs.size)
+    val usedSpecs = BooleanArray(configuration.autoMigrationSpecs.size)
     for (spec in requiredAutoMigrationSpecs) {
         var foundIndex = -1
         for (providedIndex in configuration.autoMigrationSpecs.indices.reversed()) {
