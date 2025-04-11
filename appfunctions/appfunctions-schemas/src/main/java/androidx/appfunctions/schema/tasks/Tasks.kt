@@ -34,6 +34,66 @@ import java.time.ZoneId
  */
 public const val APP_FUNCTION_SCHEMA_CATEGORY_TASKS: String = "tasks"
 
+/** Finds tasks matching the given parameters. */
+@AppFunctionSchemaDefinition(
+    name = "findTasks",
+    version = FindTasksAppFunction.SCHEMA_VERSION,
+    category = APP_FUNCTION_SCHEMA_CATEGORY_TASKS
+)
+public interface FindTasksAppFunction<
+    Parameters : FindTasksAppFunction.Parameters,
+    Response : FindTasksAppFunction.Response
+> {
+    /**
+     * Finds tasks matching the given parameters.
+     *
+     * @param appFunctionContext The AppFunction execution context.
+     * @param parameters The parameters for finding tasks.
+     * @return The response including a list of tasks that match the parameters.
+     */
+    public suspend fun findTasks(
+        appFunctionContext: AppFunctionContext,
+        parameters: Parameters,
+    ): Response
+
+    /** The parameters for finding tasks. */
+    public interface Parameters {
+        /**
+         * The search query to be processed. A null value means to query all tasks with the
+         * remaining parameters.
+         *
+         * This parameter is analogous to the caller typing a query into a search box. The app
+         * providing the app function has full control over how the query is interpreted and
+         * processed; for example by name matching or semantic analysis.
+         */
+        public val query: String?
+            get() = null
+
+        /** The status of the task. */
+        @TaskStatus
+        public val status: String?
+            get() = null
+
+        /** The lower bound (inclusive) of the [AppFunctionTask.schedule] time. */
+        public val scheduledAfter: Instant?
+            get() = null
+
+        /** The upper bound (exclusive) of the [AppFunctionTask.schedule] time. */
+        public val scheduledBefore: Instant?
+            get() = null
+    }
+
+    /** The response including the list of tasks that match the parameters. */
+    public interface Response {
+        public val tasks: List<AppFunctionTask>
+    }
+
+    public companion object {
+        /** Current schema version. */
+        @RestrictTo(LIBRARY_GROUP) internal const val SCHEMA_VERSION: Int = 2
+    }
+}
+
 /** Creates an [AppFunctionTask]. */
 @AppFunctionSchemaDefinition(
     name = "createTask",
