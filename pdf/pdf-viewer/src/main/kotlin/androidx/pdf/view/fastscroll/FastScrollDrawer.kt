@@ -42,7 +42,6 @@ import com.google.android.material.color.MaterialColors
  * @param context The UI context used for loading resources and respecting configuration changes
  * @param pdfDocument The PDF document being displayed.
  * @param thumbDrawable The drawable used for the fast scroller thumb.
- * @param trackDrawable The drawable used for the fast scroller track (drag handle).
  * @param pageIndicatorBackground The drawable used for the background of the page indicator.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
@@ -50,16 +49,11 @@ public class FastScrollDrawer(
     internal val context: Context,
     private val pdfDocument: PdfDocument,
     private val thumbDrawable: Drawable,
-    private val trackDrawable: Drawable,
     private val pageIndicatorBackground: Drawable,
 ) {
-
-    internal val thumbWidthPx = context.getDimensions(R.dimen.default_thumb_width).toInt()
-    internal val thumbHeightPx = context.getDimensions(R.dimen.default_thumb_height).toInt()
-    private val trackWidthPx = context.getDimensions(R.dimen.default_track_width).toInt()
-    private val trackHeightPx = context.getDimensions(R.dimen.default_track_height).toInt()
-    private val scrubberEdgeOffsetPx = context.getDimensions(R.dimen.scrubber_edge_offset).toInt()
-    private val pageIndicatorHeightPx = context.getDimensions(R.dimen.page_indicator_height).toInt()
+    internal val thumbWidthPx = thumbDrawable.intrinsicWidth
+    internal val thumbHeightPx = thumbDrawable.intrinsicHeight
+    private val pageIndicatorHeightPx = pageIndicatorBackground.intrinsicHeight
     private val pageIndicatorRightMarginPx =
         context.getDimensions(R.dimen.page_indicator_right_margin).toInt()
     private val pageIndicatorTextOffsetPx =
@@ -85,7 +79,6 @@ public class FastScrollDrawer(
     public var alpha: Int = GONE_ALPHA // Initially fast scroller should be hidden
         set(value) {
             thumbDrawable.alpha = value
-            trackDrawable.alpha = value
             pageIndicatorBackground.alpha = value
             thumbShadowDrawable?.alpha = value
             textPaint.alpha = value
@@ -113,10 +106,10 @@ public class FastScrollDrawer(
      * @param visiblePages The range of pages that are currently visible.
      */
     public fun draw(canvas: Canvas, xOffset: Int, yOffset: Int, visiblePages: Range<Int>) {
-        val thumbLeftPx = (xOffset - (thumbWidthPx - scrubberEdgeOffsetPx)).toInt()
+        val thumbLeftPx = (xOffset - (thumbWidthPx)).toInt()
         val thumbTopPx = yOffset
         val thumbBottomPx = thumbTopPx + thumbHeightPx
-        val thumbRightPx = (xOffset + scrubberEdgeOffsetPx).toInt()
+        val thumbRightPx = (xOffset).toInt()
 
         thumbShadowDrawable?.setBounds(
             thumbLeftPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
@@ -134,7 +127,6 @@ public class FastScrollDrawer(
         )
         thumbDrawable.draw(canvas)
 
-        drawDragHandle(canvas, thumbRightPx, thumbTopPx)
         drawPageIndicator(canvas, xOffset, thumbTopPx, visiblePages)
     }
 
@@ -164,23 +156,6 @@ public class FastScrollDrawer(
             indicatorBounds.top + (indicatorBounds.height() / 2) -
                 ((textPaint.descent() + textPaint.ascent()) / 2)
         canvas.drawText(currentPageIndicatorLabel, xPos.toFloat(), yPos.toFloat(), textPaint)
-    }
-
-    private fun drawDragHandle(canvas: Canvas, thumbRight: Int, thumbTop: Int) {
-        val thumbCenterX = thumbRight - thumbWidthPx / 2
-        val thumbCenterY = thumbTop + thumbHeightPx / 2
-
-        // Calculate the top-left corner of the track to center it
-        val trackLeft = thumbCenterX - trackWidthPx / 2
-        val trackTop = thumbCenterY - trackHeightPx / 2
-
-        trackDrawable.setBounds(
-            trackLeft,
-            trackTop,
-            trackLeft + trackWidthPx,
-            trackTop + trackHeightPx
-        )
-        trackDrawable.draw(canvas)
     }
 
     internal fun calculatePageIndicatorBounds(

@@ -45,7 +45,6 @@ class FastScrollDrawerTest {
 
     private lateinit var pdfDocument: PdfDocument
     private lateinit var thumbDrawable: Drawable
-    private lateinit var trackDrawable: Drawable
     private lateinit var pageIndicatorBackgroundDrawable: Drawable
     private lateinit var spyCanvas: Canvas
     private lateinit var fastScrollDrawer: FastScrollDrawer
@@ -55,19 +54,12 @@ class FastScrollDrawerTest {
         context = ApplicationProvider.getApplicationContext()
         pdfDocument = FakePdfDocument.newInstance()
         thumbDrawable = spy(ContextCompat.getDrawable(context, R.drawable.fastscroll_background)!!)
-        trackDrawable = ContextCompat.getDrawable(context, R.drawable.drag_indicator)!!
         pageIndicatorBackgroundDrawable =
             ContextCompat.getDrawable(context, R.drawable.page_indicator_background)!!
         spyCanvas = spy(Canvas())
 
         fastScrollDrawer =
-            FastScrollDrawer(
-                context,
-                pdfDocument,
-                thumbDrawable,
-                trackDrawable,
-                pageIndicatorBackgroundDrawable
-            )
+            FastScrollDrawer(context, pdfDocument, thumbDrawable, pageIndicatorBackgroundDrawable)
     }
 
     @Test

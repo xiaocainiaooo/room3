@@ -97,15 +97,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     View(context, attrs, defStyle) {
 
     public val fastScrollVerticalThumbDrawable: Drawable?
-    private val fastScrollVerticalTrackDrawable: Drawable?
     private val fastScrollPageIndicatorBackgroundDrawable: Drawable?
 
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PdfView)
         fastScrollVerticalThumbDrawable =
             typedArray.getDrawable(R.styleable.PdfView_fastScrollVerticalThumbDrawable)
-        fastScrollVerticalTrackDrawable =
-            typedArray.getDrawable(R.styleable.PdfView_fastScrollVerticalTrackDrawable)
         fastScrollPageIndicatorBackgroundDrawable =
             typedArray.getDrawable(R.styleable.PdfView_fastScrollPageIndicatorBackgroundDrawable)
         typedArray.recycle()
@@ -1019,7 +1016,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
         if (
             fastScrollVerticalThumbDrawable != null &&
-                fastScrollVerticalTrackDrawable != null &&
                 fastScrollPageIndicatorBackgroundDrawable != null
         ) {
 
@@ -1029,7 +1025,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     context,
                     localPdfDocument,
                     fastScrollVerticalThumbDrawable,
-                    fastScrollVerticalTrackDrawable,
                     fastScrollPageIndicatorBackgroundDrawable
                 )
 
