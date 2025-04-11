@@ -1972,8 +1972,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
         // Used to handle frame rate information
         if (isArrEnabled) {
-            super.setRequestedFrameRate(currentFrameRate)
-            frameRateCategoryView.requestedFrameRate = currentFrameRateCategory
+            Api35Impl.setRequestedFrameRate(this, currentFrameRate)
+            Api35Impl.setRequestedFrameRate(frameRateCategoryView, currentFrameRateCategory)
 
             if (!currentFrameRateCategory.isNaN()) {
                 frameRateCategoryView.invalidate()
@@ -2911,7 +2911,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     }
 
     @RequiresApi(VANILLA_ICE_CREAM)
-    override fun setRequestedFrameRate(frameRate: Float) {
+    override fun voteFrameRate(frameRate: Float) {
         if (isArrEnabled) {
             if (frameRate > 0) {
                 if (currentFrameRate.isNaN() || frameRate > currentFrameRate) {
@@ -2922,15 +2922,6 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                     currentFrameRateCategory = frameRate // set frame rate category
                 }
             }
-        } else {
-            super.setRequestedFrameRate(frameRate)
-        }
-    }
-
-    @RequiresApi(VANILLA_ICE_CREAM)
-    override fun voteFrameRate(frameRate: Float) {
-        if (isArrEnabled) {
-            requestedFrameRate = frameRate
         }
     }
 
@@ -3335,4 +3326,13 @@ private class BringIntoViewOnScreenResponderNode(var view: ViewGroup) :
 @RequiresApi(30)
 private object Api30Impl {
     @DoNotInline fun isShowingLayoutBounds(view: View) = view.isShowingLayoutBounds
+}
+
+@RequiresApi(35)
+private object Api35Impl {
+    @JvmStatic
+    @DoNotInline
+    fun setRequestedFrameRate(view: View, frameRate: Float) {
+        view.requestedFrameRate = frameRate
+    }
 }
