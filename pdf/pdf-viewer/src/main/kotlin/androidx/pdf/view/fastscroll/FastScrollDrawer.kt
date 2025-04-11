@@ -26,7 +26,6 @@ import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.Range
 import androidx.annotation.RestrictTo
-import androidx.core.content.ContextCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.R
 import androidx.pdf.util.buildPageIndicatorLabel
@@ -56,8 +55,6 @@ public class FastScrollDrawer(
     internal val thumbWidthPx = thumbDrawable?.intrinsicWidth ?: 0
     internal val thumbHeightPx = thumbDrawable?.intrinsicHeight ?: 0
     private val pageIndicatorHeightPx = pageIndicatorBackground?.intrinsicHeight ?: 0
-    private val pageIndicatorRightMarginPx =
-        context.getDimensions(R.dimen.page_indicator_right_margin).toInt()
     private val pageIndicatorTextOffsetPx =
         context.getDimensions(R.dimen.page_indicator_text_offset).toInt()
     private val pageIndicatorTextSize = context.getDimensions(R.dimen.page_indicator_text_size)
@@ -75,14 +72,10 @@ public class FastScrollDrawer(
             isAntiAlias = true
         }
 
-    private val thumbShadowDrawable: Drawable? =
-        ContextCompat.getDrawable(context, R.drawable.drag_indicator_shadow)
-
     public var alpha: Int = GONE_ALPHA // Initially fast scroller should be hidden
         set(value) {
             thumbDrawable?.alpha = value
             pageIndicatorBackground?.alpha = value
-            thumbShadowDrawable?.alpha = value
             textPaint.alpha = value
         }
 
@@ -112,18 +105,13 @@ public class FastScrollDrawer(
         if (thumbWidthPx < 0 || thumbHeightPx < 0 || pageIndicatorHeightPx < 0) {
             return
         }
-        val thumbLeftPx = (xOffset - (thumbWidthPx)).toInt()
+        val thumbLeftPx = (xOffset - (thumbWidthPx + thumbMarginEnd))
         val thumbTopPx = yOffset
         val thumbBottomPx = thumbTopPx + thumbHeightPx
-        val thumbRightPx = (xOffset).toInt()
+        val thumbRightPx = (xOffset - thumbMarginEnd)
 
-        thumbShadowDrawable?.setBounds(
-            thumbLeftPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
-            thumbTopPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
-            thumbRightPx + SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
-            thumbBottomPx + SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context)
-        )
-        thumbShadowDrawable?.draw(canvas)
+        // TODO: b/410457433 - Add Shadow for the default fast scroller drawable
+
         thumbDrawable?.setBounds(thumbLeftPx, thumbTopPx, thumbRightPx, thumbBottomPx)
         thumbBounds.set(
             thumbLeftPx.toFloat(),
@@ -173,7 +161,7 @@ public class FastScrollDrawer(
         val pageIndicatorWidthPx = (labelWidth + (2 * pageIndicatorTextOffsetPx)).toInt()
         val pageIndicatorHeightPx = pageIndicatorHeightPx
 
-        val indicatorRightPx = xOffset - pageIndicatorRightMarginPx
+        val indicatorRightPx = xOffset - pageIndicatorMarginEnd
         val indicatorLeftPx = indicatorRightPx - pageIndicatorWidthPx
         val indicatorTopPx = thumbTopPx + ((thumbHeightPx - pageIndicatorHeightPx) / 2)
         val indicatorBottomPx = indicatorTopPx + pageIndicatorHeightPx
@@ -182,7 +170,6 @@ public class FastScrollDrawer(
     }
 
     public companion object {
-        private const val SHADOW_OFFSET_FROM_SCRUBBER_DP = 2
         public const val VISIBLE_ALPHA: Int = 255
         public const val GONE_ALPHA: Int = 0
     }
