@@ -56,10 +56,20 @@ class FastScrollDrawerTest {
         thumbDrawable = spy(ContextCompat.getDrawable(context, R.drawable.fastscroll_background)!!)
         pageIndicatorBackgroundDrawable =
             ContextCompat.getDrawable(context, R.drawable.page_indicator_background)!!
+        val fastScrollVerticalThumbMarginEnd = 0
+        val fastScrollPageIndicatorMarginEnd =
+            context.getDimensions(R.dimen.page_indicator_right_margin).toInt()
         spyCanvas = spy(Canvas())
 
         fastScrollDrawer =
-            FastScrollDrawer(context, pdfDocument, thumbDrawable, pageIndicatorBackgroundDrawable)
+            FastScrollDrawer(
+                context,
+                pdfDocument,
+                thumbDrawable,
+                pageIndicatorBackgroundDrawable,
+                fastScrollVerticalThumbMarginEnd,
+                fastScrollPageIndicatorMarginEnd
+            )
     }
 
     @Test
