@@ -119,12 +119,14 @@ class AppFunctionMetadataCreatorHelper {
             }
 
             val dataTypeMetadata =
-                parameter.type.toAppFunctionDataTypeMetadata(
-                    sharedDataTypeMap,
-                    seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies,
-                    allowSerializableInterfaceTypes,
-                )
+                parameter.type
+                    .resolveSelfOrUpperBoundType()
+                    .toAppFunctionDataTypeMetadata(
+                        sharedDataTypeMap,
+                        seenDataTypeQualifiers,
+                        resolvedAnnotatedSerializableProxies,
+                        allowSerializableInterfaceTypes,
+                    )
 
             add(
                 AppFunctionParameterMetadata(
@@ -220,11 +222,7 @@ class AppFunctionMetadataCreatorHelper {
                     allowSerializableInterfaceTypes,
                 )
                 AppFunctionReferenceTypeMetadata(
-                    referenceDataType =
-                        appFunctionTypeReference.selfTypeReference
-                            .toTypeName()
-                            .ignoreNullable()
-                            .toString(),
+                    referenceDataType = annotatedAppFunctionSerializable.qualifiedName,
                     isNullable = appFunctionTypeReference.isNullable,
                 )
             }
@@ -249,11 +247,7 @@ class AppFunctionMetadataCreatorHelper {
                 AppFunctionArrayTypeMetadata(
                     itemType =
                         AppFunctionReferenceTypeMetadata(
-                            referenceDataType =
-                                appFunctionTypeReference.itemTypeReference
-                                    .toTypeName()
-                                    .ignoreNullable()
-                                    .toString(),
+                            referenceDataType = annotatedAppFunctionSerializable.qualifiedName,
                             isNullable =
                                 AppFunctionTypeReference(appFunctionTypeReference.itemTypeReference)
                                     .isNullable,
@@ -581,7 +575,15 @@ class AppFunctionMetadataCreatorHelper {
         }
     }
 
-    // TODO(b/403525399): Return @AppFunctionSerializableInterface
+    /**
+     * Gets the [AnnotatedAppFunctionSerializable] based on the [appFunctionTypeReference].
+     *
+     * If the [appFunctionTypeReference] is annotated with @AppFunctionSerializable, then it returns
+     * [AnnotatedAppFunctionSerializable].
+     *
+     * If the [appFunctionTypeReference] is annotated with @AppFunctionSerializableInterface, then
+     * it returns [AnnotatedAppFunctionSerializableInterface].
+     */
     private fun getAnnotatedAppFunctionSerializable(
         appFunctionTypeReference: AppFunctionTypeReference,
         allowSerializableInterfaceTypes: Boolean,
@@ -589,11 +591,22 @@ class AppFunctionMetadataCreatorHelper {
         val appFunctionSerializableClassDeclaration =
             appFunctionTypeReference.selfOrItemTypeReference.resolve().declaration
                 as KSClassDeclaration
-        return AnnotatedAppFunctionSerializable(
-                appFunctionSerializableClassDeclaration,
-            )
-            .parameterizedBy(appFunctionTypeReference.selfOrItemTypeReference.resolve().arguments)
-            .validate(allowSerializableInterfaceTypes)
+        val isSerializableInterface =
+            appFunctionSerializableClassDeclaration.annotations.findAnnotation(
+                IntrospectionHelper.AppFunctionSerializableInterfaceAnnotation.CLASS_NAME
+            ) != null
+        return if (isSerializableInterface) {
+            AnnotatedAppFunctionSerializableInterface(appFunctionSerializableClassDeclaration)
+                .validate(allowSerializableInterfaceTypes)
+        } else {
+            AnnotatedAppFunctionSerializable(
+                    appFunctionSerializableClassDeclaration,
+                )
+                .parameterizedBy(
+                    appFunctionTypeReference.selfOrItemTypeReference.resolve().arguments
+                )
+                .validate(allowSerializableInterfaceTypes)
+        }
     }
 
     /**
