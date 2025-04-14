@@ -16,7 +16,6 @@
 
 package androidx.appfunctions.compiler.core
 
-import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializableInterface]. */
@@ -34,7 +33,7 @@ class AnnotatedAppFunctionSerializableInterface(
 
     override fun getProperties(): List<AppFunctionPropertyDeclaration> {
         return classDeclaration
-            .getDeclaredProperties()
+            .getAllProperties()
             .map { AppFunctionPropertyDeclaration(it) }
             .toList()
     }

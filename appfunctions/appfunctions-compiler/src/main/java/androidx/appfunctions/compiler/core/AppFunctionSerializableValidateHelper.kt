@@ -91,6 +91,22 @@ class AppFunctionSerializableValidateHelper(
                 .associateBy { checkNotNull(it.name) }
                 .toMutableMap()
 
+        if (annotatedSerializable !is AnnotatedAppFunctionSerializableInterface) {
+            validateSuperTypes(parametersToValidate, allowSerializableInterfaceTypes)
+        }
+
+        // Validate the remaining parameters
+        if (parametersToValidate.isNotEmpty()) {
+            for ((_, parameterToValidate) in parametersToValidate) {
+                validateSerializableParameter(parameterToValidate, allowSerializableInterfaceTypes)
+            }
+        }
+    }
+
+    private fun validateSuperTypes(
+        parametersToValidate: MutableMap<String, AppFunctionPropertyDeclaration>,
+        allowSerializableInterfaceTypes: Boolean,
+    ) {
         val superTypesWithSerializableAnnotation =
             annotatedSerializable.findSuperTypesWithSerializableAnnotation()
         val superTypesWithCapabilityAnnotation =
@@ -130,13 +146,6 @@ class AppFunctionSerializableValidateHelper(
                     )
                 }
                 validateSerializableParameter(parameterInSuperType, allowSerializableInterfaceTypes)
-            }
-        }
-
-        // Validate the remaining parameters
-        if (parametersToValidate.isNotEmpty()) {
-            for ((_, parameterToValidate) in parametersToValidate) {
-                validateSerializableParameter(parameterToValidate, allowSerializableInterfaceTypes)
             }
         }
     }

@@ -1,6 +1,7 @@
 package appfunctions_aggregated_deps
 
 import androidx.appfunctions.`internal`.SchemaAppFunctionInventory
+import androidx.appfunctions.metadata.AppFunctionAllOfTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionArrayTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
@@ -19,8 +20,121 @@ import kotlin.collections.Map
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
 public class `$SchemaAppFunctionInventory_Impl` : SchemaAppFunctionInventory() {
   override val functionIdToMetadataMap: Map<String, CompileTimeAppFunctionMetadata> = mapOf(
+    "note/showNote/2" to NoteShowNote2MetadataObject.APP_FUNCTION_METADATA,
     "note/updateNote/2" to NoteUpdateNote2MetadataObject.APP_FUNCTION_METADATA,
   )
+
+  private object NoteShowNote2MetadataObject {
+    private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
+        AppFunctionSchemaMetadata(category= "note", name="showNote", version=2)
+
+    private val PARAMETER_METADATA_PARAMETERS_REFERENCE_DATA_TYPE: AppFunctionReferenceTypeMetadata
+        = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.ShowNoteFunction.Parameters",
+            isNullable = false
+        )
+
+    private val PARAMETERS_PARAMETER_METADATA: AppFunctionParameterMetadata =
+        AppFunctionParameterMetadata(
+            name = "parameters",
+            isRequired = true,
+            dataType = PARAMETER_METADATA_PARAMETERS_REFERENCE_DATA_TYPE
+        )
+
+    private val PARAMETER_METADATA_LIST: List<AppFunctionParameterMetadata> = listOf(
+      PARAMETERS_PARAMETER_METADATA,
+    )
+
+    private val REFERENCE_RESPONSE_VALUE_TYPE: AppFunctionReferenceTypeMetadata =
+        AppFunctionReferenceTypeMetadata(
+            referenceDataType = "com.testdata.ShowNoteFunction.Response",
+            isNullable = false
+        )
+
+    private val RESPONSE_METADATA: AppFunctionResponseMetadata = AppFunctionResponseMetadata(
+            valueType = REFERENCE_RESPONSE_VALUE_TYPE
+        )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE_PROPERTIES_MAP_NOTEID:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 8,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "noteId" to COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE_PROPERTIES_MAP_NOTEID,
+    )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "noteId",
+    )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.ShowNoteFunction.Parameters",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_PENDINGINTENT:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 13,
+            isNullable = false
+        )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "pendingIntent" to COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP_PENDINGINTENT,
+    )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST:
+        List<String> = listOf(
+      "pendingIntent",
+    )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0:
+        AppFunctionObjectTypeMetadata = AppFunctionObjectTypeMetadata(
+            properties = COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_PROPERTIES_MAP,
+            required = COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "com.testdata.AppFunctionOpenable",
+            isNullable = true
+        )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST:
+        List<AppFunctionDataTypeMetadata> = listOf(
+      COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST_ITEM_0,
+    )
+
+    private val COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE:
+        AppFunctionAllOfTypeMetadata = AppFunctionAllOfTypeMetadata(
+            matchAll = COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE_MATCH_ALL_LIST,
+            qualifiedName = "com.testdata.ShowNoteFunction.Response",
+            isNullable = true
+        )
+
+    private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
+        mapOf(
+      "com.testdata.ShowNoteFunction.Parameters" to COM_TESTDATA_SHOWNOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE,
+      "com.testdata.ShowNoteFunction.Response" to COM_TESTDATA_SHOWNOTEFUNCTION_RESPONSE_ALL_OF_DATA_TYPE,
+      )
+
+    private val COMPONENTS_METADATA: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(
+            dataTypes = COMPONENTS_METADATA_DATA_TYPES_MAP
+        )
+
+    public val APP_FUNCTION_METADATA: CompileTimeAppFunctionMetadata =
+        CompileTimeAppFunctionMetadata(
+            id = "note/showNote/2",
+            isEnabledByDefault = true,
+            schema =  SCHEMA_METADATA,
+            parameters = PARAMETER_METADATA_LIST,
+            response = RESPONSE_METADATA,
+            components = COMPONENTS_METADATA
+        )
+  }
 
   private object NoteUpdateNote2MetadataObject {
     private val SCHEMA_METADATA: AppFunctionSchemaMetadata? =
@@ -203,6 +317,78 @@ public class `$SchemaAppFunctionInventory_Impl` : SchemaAppFunctionInventory() {
             isNullable = true
         )
 
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_YEAR:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_MONTH:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_DAYOFMONTH:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_HOUR:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_MINUTE:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_SECOND:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_NANOOFSECOND:
+        AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
+            type = 7,
+            isNullable = false
+        )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP:
+        Map<String, AppFunctionDataTypeMetadata> = mapOf(
+      "year" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_YEAR,
+      "month" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_MONTH,
+      "dayOfMonth" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_DAYOFMONTH,
+      "hour" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_HOUR,
+      "minute" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_MINUTE,
+      "second" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_SECOND,
+      "nanoOfSecond" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP_NANOOFSECOND,
+    )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST: List<String> =
+        listOf(
+      "year",
+      "month",
+      "dayOfMonth",
+      "hour",
+      "minute",
+      "second",
+      "nanoOfSecond",
+    )
+
+    private val JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
+        AppFunctionObjectTypeMetadata(
+            properties = JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_PROPERTIES_MAP,
+            required = JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
+            qualifiedName = "java.time.LocalDateTime",
+            isNullable = true
+        )
+
     private val COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_ID:
         AppFunctionPrimitiveTypeMetadata = AppFunctionPrimitiveTypeMetadata(
             type = 8,
@@ -239,12 +425,19 @@ public class `$SchemaAppFunctionInventory_Impl` : SchemaAppFunctionInventory() {
             isNullable = false
         )
 
+    private val COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_CREATETIME:
+        AppFunctionReferenceTypeMetadata = AppFunctionReferenceTypeMetadata(
+            referenceDataType = "java.time.LocalDateTime",
+            isNullable = true
+        )
+
     private val COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP:
         Map<String, AppFunctionDataTypeMetadata> = mapOf(
       "id" to COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_ID,
       "title" to COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_TITLE,
       "content" to COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_CONTENT,
       "attachments" to COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_ATTACHMENTS,
+      "createTime" to COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_CREATETIME,
     )
 
     private val COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST: List<String> = listOf(
@@ -252,6 +445,7 @@ public class `$SchemaAppFunctionInventory_Impl` : SchemaAppFunctionInventory() {
       "title",
       "content",
       "attachments",
+      "createTime",
     )
 
     private val COM_TESTDATA_NOTE_OBJECT_DATA_TYPE: AppFunctionObjectTypeMetadata =
@@ -293,6 +487,7 @@ public class `$SchemaAppFunctionInventory_Impl` : SchemaAppFunctionInventory() {
       "com.testdata.Attachment" to COM_TESTDATA_ATTACHMENT_OBJECT_DATA_TYPE,
       "com.testdata.SetField<kotlin.collections.List<com.testdata.Attachment>>" to COM_TESTDATA_SETFIELD_KOTLIN_COLLECTIONS_LIST_COM_TESTDATA_ATTACHMENT___OBJECT_DATA_TYPE,
       "com.testdata.UpdateNoteFunction.Parameters" to COM_TESTDATA_UPDATENOTEFUNCTION_PARAMETERS_OBJECT_DATA_TYPE,
+      "java.time.LocalDateTime" to JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE,
       "com.testdata.Note" to COM_TESTDATA_NOTE_OBJECT_DATA_TYPE,
       "com.testdata.UpdateNoteFunction.Response" to COM_TESTDATA_UPDATENOTEFUNCTION_RESPONSE_OBJECT_DATA_TYPE,
       )
