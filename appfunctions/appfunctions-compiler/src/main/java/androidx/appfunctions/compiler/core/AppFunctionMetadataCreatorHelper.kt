@@ -20,6 +20,8 @@ import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializableProxy
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.PRIMITIVE_ARRAY
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.PRIMITIVE_LIST
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.PRIMITIVE_SINGULAR
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_INTERFACE_LIST
+import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_INTERFACE_SINGULAR
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_LIST
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_PROXY_LIST
 import androidx.appfunctions.compiler.core.AppFunctionTypeReference.AppFunctionSupportedTypeCategory.SERIALIZABLE_PROXY_SINGULAR
@@ -87,7 +89,6 @@ class AppFunctionMetadataCreatorHelper {
         return AppFunctionAnnotationProperties(enabled, schemaName, schemaVersion, schemaCategory)
     }
 
-    // TODO(b/403525399): Process @AppFunctionSerializableInterface
     /**
      * Builds a [List] of [AppFunctionParameterMetadata] from [parameters].
      *
@@ -99,6 +100,9 @@ class AppFunctionMetadataCreatorHelper {
      * @param seenDataTypeQualifiers a set of seen data type qualifiers. This set is used to avoid
      *   processing the same serializable type multiple times.
      * @param resolvedAnnotatedSerializableProxies The resolved annotated serializable proxies.
+     * @param allowSerializableInterfaceTypes Whether to allow the serializable to use serializable
+     *   interface types. The @AppFunctionSerializableInterface should only be considered as a
+     *   supported type when processing schema definitions.
      * @return A list of [AppFunctionParameterMetadata].
      */
     fun buildParameterTypeMetadataList(
@@ -106,6 +110,7 @@ class AppFunctionMetadataCreatorHelper {
         resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies,
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
+        allowSerializableInterfaceTypes: Boolean = false,
     ): List<AppFunctionParameterMetadata> = buildList {
         for (parameter in parameters) {
             if (parameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
@@ -117,7 +122,8 @@ class AppFunctionMetadataCreatorHelper {
                 parameter.type.toAppFunctionDataTypeMetadata(
                     sharedDataTypeMap,
                     seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies
+                    resolvedAnnotatedSerializableProxies,
+                    allowSerializableInterfaceTypes,
                 )
 
             add(
@@ -131,7 +137,6 @@ class AppFunctionMetadataCreatorHelper {
         }
     }
 
-    // TODO(b/403525399): Process @AppFunctionSerializableInterface
     /**
      * Builds an [AppFunctionDataTypeMetadata] for [returnType].
      *
@@ -143,6 +148,9 @@ class AppFunctionMetadataCreatorHelper {
      * @param seenDataTypeQualifiers a set of seen data type qualifiers. This set is used to avoid
      *   processing the same serializable type multiple times.
      * @param resolvedAnnotatedSerializableProxies The resolved annotated serializable proxies.
+     * @param allowSerializableInterfaceTypes Whether to allow the serializable to use serializable
+     *   interface types. The @AppFunctionSerializableInterface should only be considered as a
+     *   supported type when processing schema definitions.
      * @return An [AppFunctionDataTypeMetadata].
      */
     fun buildResponseTypeMetadata(
@@ -150,18 +158,21 @@ class AppFunctionMetadataCreatorHelper {
         resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies,
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
+        allowSerializableInterfaceTypes: Boolean = false,
     ): AppFunctionDataTypeMetadata {
         return returnType.toAppFunctionDataTypeMetadata(
             sharedDataTypeMap,
             seenDataTypeQualifiers,
-            resolvedAnnotatedSerializableProxies
+            resolvedAnnotatedSerializableProxies,
+            allowSerializableInterfaceTypes,
         )
     }
 
     private fun KSTypeReference.toAppFunctionDataTypeMetadata(
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
-        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies
+        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies,
+        allowSerializableInterfaceTypes: Boolean,
     ): AppFunctionDataTypeMetadata {
         val appFunctionTypeReference = AppFunctionTypeReference(this)
         return when (appFunctionTypeReference.typeCategory) {
@@ -190,9 +201,13 @@ class AppFunctionMetadataCreatorHelper {
                         ),
                     isNullable = appFunctionTypeReference.isNullable,
                 )
+            SERIALIZABLE_INTERFACE_SINGULAR,
             SERIALIZABLE_SINGULAR -> {
                 val annotatedAppFunctionSerializable =
-                    getAnnotatedAppFunctionSerializable(appFunctionTypeReference)
+                    getAnnotatedAppFunctionSerializable(
+                        appFunctionTypeReference,
+                        allowSerializableInterfaceTypes
+                    )
                 addSerializableTypeMetadataToSharedDataTypeMap(
                     annotatedAppFunctionSerializable,
                     annotatedAppFunctionSerializable
@@ -201,7 +216,8 @@ class AppFunctionMetadataCreatorHelper {
                         .toMutableMap(),
                     sharedDataTypeMap,
                     seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies
+                    resolvedAnnotatedSerializableProxies,
+                    allowSerializableInterfaceTypes,
                 )
                 AppFunctionReferenceTypeMetadata(
                     referenceDataType =
@@ -212,9 +228,13 @@ class AppFunctionMetadataCreatorHelper {
                     isNullable = appFunctionTypeReference.isNullable,
                 )
             }
+            SERIALIZABLE_INTERFACE_LIST,
             SERIALIZABLE_LIST -> {
                 val annotatedAppFunctionSerializable =
-                    getAnnotatedAppFunctionSerializable(appFunctionTypeReference)
+                    getAnnotatedAppFunctionSerializable(
+                        appFunctionTypeReference,
+                        allowSerializableInterfaceTypes
+                    )
                 addSerializableTypeMetadataToSharedDataTypeMap(
                     annotatedAppFunctionSerializable,
                     annotatedAppFunctionSerializable
@@ -223,7 +243,8 @@ class AppFunctionMetadataCreatorHelper {
                         .toMutableMap(),
                     sharedDataTypeMap,
                     seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies
+                    resolvedAnnotatedSerializableProxies,
+                    allowSerializableInterfaceTypes,
                 )
                 AppFunctionArrayTypeMetadata(
                     itemType =
@@ -253,7 +274,8 @@ class AppFunctionMetadataCreatorHelper {
                         .toMutableMap(),
                     sharedDataTypeMap,
                     seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies
+                    resolvedAnnotatedSerializableProxies,
+                    allowSerializableInterfaceTypes,
                 )
                 AppFunctionReferenceTypeMetadata(
                     referenceDataType =
@@ -277,7 +299,8 @@ class AppFunctionMetadataCreatorHelper {
                         .toMutableMap(),
                     sharedDataTypeMap,
                     seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies
+                    resolvedAnnotatedSerializableProxies,
+                    allowSerializableInterfaceTypes,
                 )
                 AppFunctionArrayTypeMetadata(
                     itemType =
@@ -313,6 +336,9 @@ class AppFunctionMetadataCreatorHelper {
      * @param seenDataTypeQualifiers a set of seen data type qualifiers. This set is used to avoid
      *   processing the same serializable type multiple times.
      * @param resolvedAnnotatedSerializableProxies The resolved annotated serializable proxies.
+     * @param allowSerializableInterfaceTypes Whether to allow the serializable to use serializable
+     *   interface types. The @AppFunctionSerializableInterface should only be considered as a
+     *   supported type when processing schema definitions.
      */
     // TODO: Document traversal rules.
     private fun addSerializableTypeMetadataToSharedDataTypeMap(
@@ -320,7 +346,8 @@ class AppFunctionMetadataCreatorHelper {
         unvisitedSerializableProperties: MutableMap<String, AppFunctionPropertyDeclaration>,
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
-        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies
+        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies,
+        allowSerializableInterfaceTypes: Boolean,
     ) {
         val serializableTypeQualifiedName =
             if (appFunctionSerializableType is AnnotatedAppFunctionSerializableProxy) {
@@ -352,7 +379,8 @@ class AppFunctionMetadataCreatorHelper {
                     unvisitedSerializableProperties,
                     sharedDataTypeMap,
                     seenDataTypeQualifiers,
-                    resolvedAnnotatedSerializableProxies
+                    resolvedAnnotatedSerializableProxies,
+                    allowSerializableInterfaceTypes,
                 )
             )
         } else {
@@ -365,7 +393,8 @@ class AppFunctionMetadataCreatorHelper {
                         unvisitedSerializableProperties,
                         sharedDataTypeMap,
                         seenDataTypeQualifiers,
-                        resolvedAnnotatedSerializableProxies
+                        resolvedAnnotatedSerializableProxies,
+                        allowSerializableInterfaceTypes,
                     )
                     add(
                         AppFunctionReferenceTypeMetadata(
@@ -390,7 +419,8 @@ class AppFunctionMetadataCreatorHelper {
                             unvisitedSerializableProperties,
                             sharedDataTypeMap,
                             seenDataTypeQualifiers,
-                            resolvedAnnotatedSerializableProxies
+                            resolvedAnnotatedSerializableProxies,
+                            allowSerializableInterfaceTypes,
                         )
                     )
                 }
@@ -405,7 +435,8 @@ class AppFunctionMetadataCreatorHelper {
                             unvisitedSerializableProperties,
                             sharedDataTypeMap,
                             seenDataTypeQualifiers,
-                            resolvedAnnotatedSerializableProxies
+                            resolvedAnnotatedSerializableProxies,
+                            allowSerializableInterfaceTypes,
                         )
                     )
                 }
@@ -447,6 +478,9 @@ class AppFunctionMetadataCreatorHelper {
      * @param seenDataTypeQualifiers a set of seen data type qualifiers. This set is used to avoid
      *   processing the same serializable type multiple times.
      * @param resolvedAnnotatedSerializableProxies The resolved annotated serializable proxies.
+     * @param allowSerializableInterfaceTypes Whether to allow the serializable to use serializable
+     *   interface types. The @AppFunctionSerializableInterface should only be considered as a
+     *   supported type when processing schema definitions.
      * @return an [AppFunctionObjectTypeMetadata] for the serializable type.
      */
     private fun buildObjectTypeMetadataForObjectParameters(
@@ -455,7 +489,8 @@ class AppFunctionMetadataCreatorHelper {
         unvisitedSerializableProperties: MutableMap<String, AppFunctionPropertyDeclaration>,
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
-        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies
+        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies,
+        allowSerializableInterfaceTypes: Boolean,
     ): AppFunctionObjectTypeMetadata {
         val currentSerializableProperties: List<AppFunctionPropertyDeclaration> = buildList {
             for (property in currentPropertiesList) {
@@ -473,7 +508,8 @@ class AppFunctionMetadataCreatorHelper {
             currentSerializableProperties,
             sharedDataTypeMap,
             seenDataTypeQualifiers,
-            resolvedAnnotatedSerializableProxies
+            resolvedAnnotatedSerializableProxies,
+            allowSerializableInterfaceTypes,
         )
     }
 
@@ -482,7 +518,8 @@ class AppFunctionMetadataCreatorHelper {
         currentSerializableProperties: List<AppFunctionPropertyDeclaration>,
         sharedDataTypeMap: MutableMap<String, AppFunctionDataTypeMetadata>,
         seenDataTypeQualifiers: MutableSet<String>,
-        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies
+        resolvedAnnotatedSerializableProxies: ResolvedAnnotatedSerializableProxies,
+        allowSerializableInterfaceTypes: Boolean,
     ): AppFunctionObjectTypeMetadata {
         val requiredPropertiesList: MutableList<String> = mutableListOf()
         val appFunctionSerializablePropertiesMap: Map<String, AppFunctionDataTypeMetadata> =
@@ -492,7 +529,8 @@ class AppFunctionMetadataCreatorHelper {
                         property.type.toAppFunctionDataTypeMetadata(
                             sharedDataTypeMap,
                             seenDataTypeQualifiers,
-                            resolvedAnnotatedSerializableProxies
+                            resolvedAnnotatedSerializableProxies,
+                            allowSerializableInterfaceTypes,
                         )
                     put(property.name, innerAppFunctionDataTypeMetadata)
                     // TODO(b/394553462): Parse required state from annotation.
@@ -513,10 +551,12 @@ class AppFunctionMetadataCreatorHelper {
     private fun AppFunctionTypeReference.toAppFunctionDataType(): Int {
         return when (this.typeCategory) {
             PRIMITIVE_SINGULAR -> selfTypeReference.toAppFunctionDatatype()
+            SERIALIZABLE_INTERFACE_SINGULAR,
             SERIALIZABLE_PROXY_SINGULAR,
             SERIALIZABLE_SINGULAR -> AppFunctionObjectTypeMetadata.TYPE
             PRIMITIVE_ARRAY,
             PRIMITIVE_LIST,
+            SERIALIZABLE_INTERFACE_LIST,
             SERIALIZABLE_PROXY_LIST,
             SERIALIZABLE_LIST -> AppFunctionArrayTypeMetadata.TYPE
         }
@@ -524,11 +564,13 @@ class AppFunctionMetadataCreatorHelper {
 
     private fun AppFunctionTypeReference.determineArrayItemType(): Int {
         return when (this.typeCategory) {
+            SERIALIZABLE_INTERFACE_LIST,
             SERIALIZABLE_LIST -> AppFunctionObjectTypeMetadata.TYPE
             PRIMITIVE_ARRAY -> selfTypeReference.toAppFunctionDatatype()
             PRIMITIVE_LIST -> itemTypeReference.toAppFunctionDatatype()
             SERIALIZABLE_PROXY_LIST -> itemTypeReference.toAppFunctionDatatype()
             PRIMITIVE_SINGULAR,
+            SERIALIZABLE_INTERFACE_SINGULAR,
             SERIALIZABLE_PROXY_SINGULAR,
             SERIALIZABLE_SINGULAR ->
                 throw ProcessingException(
@@ -539,8 +581,10 @@ class AppFunctionMetadataCreatorHelper {
         }
     }
 
+    // TODO(b/403525399): Return @AppFunctionSerializableInterface
     private fun getAnnotatedAppFunctionSerializable(
-        appFunctionTypeReference: AppFunctionTypeReference
+        appFunctionTypeReference: AppFunctionTypeReference,
+        allowSerializableInterfaceTypes: Boolean,
     ): AnnotatedAppFunctionSerializable {
         val appFunctionSerializableClassDeclaration =
             appFunctionTypeReference.selfOrItemTypeReference.resolve().declaration
@@ -549,7 +593,7 @@ class AppFunctionMetadataCreatorHelper {
                 appFunctionSerializableClassDeclaration,
             )
             .parameterizedBy(appFunctionTypeReference.selfOrItemTypeReference.resolve().arguments)
-            .validate()
+            .validate(allowSerializableInterfaceTypes)
     }
 
     /**

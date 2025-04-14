@@ -104,12 +104,17 @@ open class AnnotatedAppFunctionSerializable(
     /**
      * Validates that the class annotated with AppFunctionSerializable follows app function's spec.
      *
+     * @param allowSerializableInterfaceTypes Whether to allow the serializable to use serializable
+     *   interface types. The @AppFunctionSerializableInterface should only be considered as a
+     *   supported type when processing schema definitions.
      * @throws ProcessingException if the class does not adhere to the requirements
      */
-    open fun validate(): AnnotatedAppFunctionSerializable {
+    open fun validate(
+        allowSerializableInterfaceTypes: Boolean = false
+    ): AnnotatedAppFunctionSerializable {
         val validateHelper = AppFunctionSerializableValidateHelper(this)
         validateHelper.validatePrimaryConstructor()
-        validateHelper.validateParameters()
+        validateHelper.validateParameters(allowSerializableInterfaceTypes)
         return this
     }
 
