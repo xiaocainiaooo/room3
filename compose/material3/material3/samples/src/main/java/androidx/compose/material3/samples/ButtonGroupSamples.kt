@@ -33,8 +33,8 @@ import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
@@ -56,7 +56,7 @@ fun ButtonGroupSample() {
     val numButtons = 10
     ButtonGroup(
         overflowIndicator = { menuState ->
-            IconButton(
+            FilledIconButton(
                 onClick = {
                     if (menuState.isExpanded) {
                         menuState.dismiss()
