@@ -363,6 +363,43 @@ package androidx.appsearch.builtintypes {
     method public androidx.appsearch.builtintypes.SportsOrganization.Builder setUrl(String?);
   }
 
+  @androidx.appsearch.annotation.Document(name="builtin:SportsTeam") public class SportsTeam extends androidx.appsearch.builtintypes.SportsOrganization {
+    ctor protected SportsTeam(String, String, int, long, long, String?, java.util.List<java.lang.String!>?, String?, String?, String?, java.util.List<androidx.appsearch.builtintypes.PotentialAction!>, androidx.appsearch.builtintypes.ImageObject?, String, android.graphics.Color?, long, long, long, long, long, String?);
+    method public String? getFormattedRecord();
+    method public long getLosses();
+    method public long getOvertimeLosses();
+    method public long getOvertimeWins();
+    method public long getTies();
+    method public long getWins();
+  }
+
+  @androidx.appsearch.annotation.Document.BuilderProducer public static final class SportsTeam.Builder {
+    ctor public SportsTeam.Builder(androidx.appsearch.builtintypes.SportsTeam);
+    ctor public SportsTeam.Builder(String, String, String);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder addAlternateName(String);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.SportsTeam.Builder addPotentialAction(androidx.appsearch.builtintypes.PotentialAction);
+    method public androidx.appsearch.builtintypes.SportsTeam build();
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder clearAlternateNames();
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.SportsTeam.Builder clearPotentialActions();
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setAccentColor(android.graphics.Color?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setAlternateNames(java.util.List<java.lang.String!>?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setCreationTimestampMillis(long);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setDescription(String?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setDocumentScore(int);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setDocumentTtlMillis(long);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setFormattedRecord(String?);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.SportsTeam.Builder setImage(String?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setLogo(androidx.appsearch.builtintypes.ImageObject?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setLosses(long);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setName(String?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setOvertimeLosses(long);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setOvertimeWins(long);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.SportsTeam.Builder setPotentialActions(java.util.List<androidx.appsearch.builtintypes.PotentialAction!>?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setTies(long);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setUrl(String?);
+    method public androidx.appsearch.builtintypes.SportsTeam.Builder setWins(long);
+  }
+
   @androidx.appsearch.annotation.Document(name="builtin:Stopwatch") public class Stopwatch extends androidx.appsearch.builtintypes.Thing {
     method public long calculateBaseTimeMillis(android.content.Context);
     method public long calculateCurrentAccumulatedDurationMillis(android.content.Context);
