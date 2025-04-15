@@ -19,6 +19,7 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
 import androidx.annotation.StringDef
 import androidx.appfunctions.AppFunctionContext
+import androidx.appfunctions.AppFunctionOpenable
 import androidx.appfunctions.AppFunctionSchemaDefinition
 import androidx.appfunctions.schema.tasks.AppFunctionTask.Schedule
 import java.time.Instant
@@ -155,6 +156,56 @@ public interface CreateTaskAppFunction<
         /** The created task. */
         public val createdTask: AppFunctionTask
     }
+
+    public companion object {
+        /** Current schema version. */
+        @RestrictTo(LIBRARY_GROUP) internal const val SCHEMA_VERSION: Int = 2
+    }
+}
+
+/**
+ * Shows the task.
+ *
+ * @param Parameters The parameters of the task to show.
+ * @param Response The response including the [AppFunctionOpenable] to show the task.
+ */
+@AppFunctionSchemaDefinition(
+    name = "showTask",
+    version = ShowTaskAppFunction.SCHEMA_VERSION,
+    category = APP_FUNCTION_SCHEMA_CATEGORY_TASKS
+)
+public interface ShowTaskAppFunction<
+    Parameters : ShowTaskAppFunction.Parameters,
+    Response : ShowTaskAppFunction.Response
+> {
+    /**
+     * Shows the task.
+     *
+     * The implementing app should throw an appropriate subclass of
+     * [androidx.appfunctions.AppFunctionException] in exceptional cases.
+     *
+     * @param appFunctionContext The AppFunction execution context.
+     * @param parameters The params of the task to show.
+     * @return The response including the intent to show the task.
+     */
+    public suspend fun showTask(
+        appFunctionContext: AppFunctionContext,
+        parameters: Parameters
+    ): Response
+
+    /** The parameters for [showTask]. */
+    public interface Parameters {
+        /**
+         * The [AppFunctionTask.id] of the task to show.
+         *
+         * [androidx.appfunctions.AppFunctionElementNotFoundException] should be thrown when a task
+         * with the specified taskId doesn't exist.
+         */
+        public val taskId: String
+    }
+
+    /** The [AppFunctionOpenable] response for [showTask]. */
+    public interface Response : AppFunctionOpenable
 
     public companion object {
         /** Current schema version. */
