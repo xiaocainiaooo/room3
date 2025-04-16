@@ -20,7 +20,7 @@ public class `$ResponseFactory` : AppFunctionSerializableFactory<CreateNoteFunct
     val response_appFunctionSerializable = appFunctionSerializable
     val myNoteFactory = `$MyNoteFactory`()
 
-    val builder = AppFunctionData.Builder("com.testdata.CreateNoteFunction.Response")
+    val builder = AppFunctionData.Builder("com.testdata.CreateNoteFunction${'$'}Response")
     val createdNote = response_appFunctionSerializable.createdNote
     builder.setAppFunctionData("createdNote", myNoteFactory.toAppFunctionData(createdNote))
 

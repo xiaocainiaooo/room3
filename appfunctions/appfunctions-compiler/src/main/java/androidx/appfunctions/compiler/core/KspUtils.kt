@@ -115,6 +115,49 @@ fun KSDeclaration.toClassName(): ClassName {
 }
 
 /**
+ * Gets the JVM qualified name from [KSDeclaration].
+ *
+ * This ensures that the multi-layer declaration would return the right JVM qualified name. For
+ * example,
+ * ```
+ * package com.example
+ *
+ * class Something {
+ *   class AnotherThing
+ * }
+ * ````
+ *
+ * Calling this function on AnotherThing's declaration would return
+ * `com.example.Something$AnotherThing`.
+ */
+fun KSDeclaration.getJvmQualifiedName(): String {
+    val packageName = this.packageName.asString()
+    val simpleNames =
+        buildList {
+                var currentDeclaration: KSDeclaration? = this@getJvmQualifiedName
+                while (currentDeclaration != null) {
+                    add(currentDeclaration.simpleName.asString())
+                    val parent = currentDeclaration.parentDeclaration
+                    if (parent == null || parent is KSFile) {
+                        break
+                    }
+                    currentDeclaration = parent
+                }
+            }
+            .reversed()
+    return buildString {
+        append(packageName)
+        append(".")
+        for ((index, simpleName) in simpleNames.withIndex()) {
+            append(simpleName)
+            if (index != simpleNames.size - 1) {
+                append("$")
+            }
+        }
+    }
+}
+
+/**
  * Resolves the type reference to the parameterized type if it is a list.
  *
  * @return the resolved type reference

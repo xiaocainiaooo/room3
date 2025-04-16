@@ -21,7 +21,7 @@ public class `$MyNoteFactory` : AppFunctionSerializableFactory<CreateNoteFunctio
     val myNote_appFunctionSerializable = appFunctionSerializable
     val myAttachmentFactory = `$MyAttachmentFactory`()
 
-    val builder = AppFunctionData.Builder("com.testdata.CreateNoteFunction.Data.MyNote")
+    val builder = AppFunctionData.Builder("com.testdata.CreateNoteFunction${'$'}Data${'$'}MyNote")
     val id = myNote_appFunctionSerializable.id
     builder.setString("id", id)
     val attachment = myNote_appFunctionSerializable.attachment
