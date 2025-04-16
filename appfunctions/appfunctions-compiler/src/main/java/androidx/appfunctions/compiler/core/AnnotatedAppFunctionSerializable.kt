@@ -61,12 +61,7 @@ open class AnnotatedAppFunctionSerializable(
     }
 
     /** The original [ClassName] of the AppFunctionSerializable. */
-    val originalClassName: ClassName by lazy {
-        ClassName(
-            appFunctionSerializableClass.packageName.asString(),
-            appFunctionSerializableClass.simpleName.asString()
-        )
-    }
+    val originalClassName: ClassName by lazy { appFunctionSerializableClass.toClassName() }
 
     /** The [TypeName] of the AppFunctionSerializable. */
     val typeName: TypeName by lazy {
