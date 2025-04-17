@@ -149,5 +149,5 @@ object ComposeUiFlags {
      */
     @Suppress("MutableBareField")
     @JvmField
-    var isPointerInteropFilterDispatchingFixEnabled: Boolean = true
+    var isPointerInteropFilterDispatchingFixEnabled: Boolean = false // b/411337075
 }
