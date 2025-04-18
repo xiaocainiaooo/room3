@@ -65,7 +65,20 @@ object SensorPatternUtil {
     enum class ColorChannel {
         RED,
         GREEN,
-        BLUE
+        BLUE;
+
+        /**
+         * Converts the [ColorChannel] enum to an [android.graphics.Color] int value.
+         *
+         * @return The [android.graphics.Color] int value corresponding to the color channel.
+         */
+        fun toColor(): Int {
+            return when (this) {
+                RED -> Color.RED
+                GREEN -> Color.GREEN
+                BLUE -> Color.BLUE
+            }
+        }
     }
 
     /**
