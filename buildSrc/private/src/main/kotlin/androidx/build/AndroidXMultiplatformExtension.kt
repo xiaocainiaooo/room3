@@ -691,49 +691,52 @@ abstract class AndroidXMultiplatformExtension(val project: Project) {
     }
 
     @JvmOverloads
-    fun js(block: Action<KotlinJsTargetDsl>? = null): KotlinJsTargetDsl? {
-        if (buildFeatures.isIsolatedProjectsEnabled()) return null
-        supportedPlatforms.add(PlatformIdentifier.JS)
-        return if (project.enableJs()) {
-            kotlinExtension.js() {
-                block?.execute(this)
-                binaries.library()
-                project.configureJs()
-                project.configureKotlinJsTests()
-                configureBrowserForTests(project)
-            }
-        } else {
-            null
-        }
-    }
+    fun js(block: Action<KotlinJsTargetDsl>? = null): KotlinJsTargetDsl? =
+        project.configureWebTarget(
+            platform = PlatformIdentifier.JS,
+            isEnabled = project.enableJs(),
+            createTarget = { configure -> kotlinExtension.js(configure) },
+            block = block,
+        )
 
     @OptIn(ExperimentalWasmDsl::class)
     @JvmOverloads
-    fun wasmJs(block: Action<KotlinJsTargetDsl>? = null): KotlinWasmTargetDsl? {
+    fun wasmJs(block: Action<KotlinJsTargetDsl>? = null): KotlinWasmTargetDsl? =
+        project.configureWebTarget(
+            platform = PlatformIdentifier.WASM_JS,
+            isEnabled = project.enableWasmJs(),
+            createTarget = { configure -> kotlinExtension.wasmJs(configure) },
+            block = block,
+        )
+
+    private fun <T> Project.configureWebTarget(
+        platform: PlatformIdentifier,
+        isEnabled: Boolean,
+        createTarget: (KotlinJsTargetDsl.() -> Unit) -> T,
+        block: Action<KotlinJsTargetDsl>? = null,
+    ): T? {
         if (buildFeatures.isIsolatedProjectsEnabled()) return null
-        supportedPlatforms.add(PlatformIdentifier.WASM_JS)
-        return if (project.enableWasmJs()) {
-            kotlinExtension.wasmJs("wasmJs") {
+        supportedPlatforms.add(platform)
+        return if (isEnabled) {
+            createTarget {
                 block?.execute(this)
                 binaries.library()
-                project.configureWasm()
-                project.configureKotlinJsTests()
-                configureBrowserForTests(project)
-            }
-        } else {
-            null
-        }
-    }
-
-    private fun KotlinJsTargetDsl.configureBrowserForTests(project: Project) {
-        browser {
-            testTask {
-                it.useKarma {
-                    useChromeHeadless()
-                    useConfigDirectory(File(project.getSupportRootFolder(), "buildSrc/karmaconfig"))
+                browser {
+                    testTask {
+                        it.useKarma {
+                            useChromeHeadless()
+                            useConfigDirectory(File(getSupportRootFolder(), "buildSrc/karmaconfig"))
+                        }
+                    }
                 }
+                // Do not place the config functions below before the browser DSL as the
+                // settings will be overridden
+                configureBinaryen()
+                configureDefaultIncrementalSyncTask()
+                configureKotlinJsTests()
+                configureNode()
             }
-        }
+        } else null
     }
 
     /** Locates a project by path. */
@@ -750,38 +753,30 @@ abstract class AndroidXMultiplatformExtension(val project: Project) {
     }
 }
 
-private fun Project.configureJs() {
-    configureNode()
-    configureBinaryen()
-    // Use DSL API when https://youtrack.jetbrains.com/issue/KT-70029 is closed for all tasks below
-    tasks.named("jsDevelopmentLibraryCompileSync", DefaultIncrementalSyncTask::class.java) {
-        it.destinationDirectory.set(file(layout.buildDirectory.dir("js/packages/js/dev/kotlin")))
-    }
-    tasks.named("jsProductionLibraryCompileSync", DefaultIncrementalSyncTask::class.java) {
-        it.destinationDirectory.set(file(layout.buildDirectory.dir("js/packages/js/prod/kotlin")))
-    }
-}
-
-private fun Project.configureWasm() {
-    configureNode()
-    configureBinaryen()
-    // Use DSL API when https://youtrack.jetbrains.com/issue/KT-70029 is closed for all tasks below
-    tasks.named("wasmJsDevelopmentLibraryCompileSync", DefaultIncrementalSyncTask::class.java) {
-        it.destinationDirectory.set(
-            file(layout.buildDirectory.dir("js/packages/wasm-js/dev/kotlin"))
+// TODO(https://youtrack.jetbrains.com/issue/KT-76874/):
+// Remove this function when the default destinationDirectory is different for each task
+private fun Project.configureDefaultIncrementalSyncTask() {
+    val destinationPaths =
+        mapOf(
+            "jsDevelopmentLibraryCompileSync" to "js/packages/js/dev/kotlin",
+            "jsProductionLibraryCompileSync" to "js/packages/js/prod/kotlin",
+            "jsTestTestDevelopmentExecutableCompileSync" to "js/packages/js-test/dev/kotlin",
+            "jsTestTestProductionExecutableCompileSync" to "js/packages/js-test/prod/kotlin",
+            "wasmJsDevelopmentLibraryCompileSync" to "js/packages/wasm-js/dev/kotlin",
+            "wasmJsProductionLibraryCompileSync" to "js/packages/wasm-js/prod/kotlin",
+            "wasmJsTestTestDevelopmentExecutableCompileSync" to
+                "js/packages/wasm-js-test/dev/kotlin",
+            "wasmJsTestTestProductionExecutableCompileSync" to
+                "js/packages/wasm-js-test/prod/kotlin"
         )
-    }
-    tasks.named("wasmJsProductionLibraryCompileSync", DefaultIncrementalSyncTask::class.java) {
-        it.destinationDirectory.set(
-            file(layout.buildDirectory.dir("js/packages/wasm-js/prod/kotlin"))
-        )
-    }
 
-    // Compiler Arg needed for tests only: https://youtrack.jetbrains.com/issue/KT-59081
-    tasks.withType(Kotlin2JsCompile::class.java).configureEach { task ->
-        if (task.name.lowercase().contains("test")) {
-            task.compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
-        }
+    tasks.withType(DefaultIncrementalSyncTask::class.java).configureEach { task ->
+        val relativePath =
+            destinationPaths[task.name]
+                ?: throw IllegalArgumentException(
+                    "No destination path configured for incremental‑sync task '${task.name}'"
+                )
+        task.destinationDirectory.set(file(layout.buildDirectory.dir(relativePath)))
     }
 }
 
@@ -820,7 +815,7 @@ private fun Project.configureBinaryen() {
     }
 }
 
-private fun Project.configureKotlinJsTests() =
+private fun Project.configureKotlinJsTests() {
     tasks.withType(KotlinJsTest::class.java).configureEach { task ->
         if (!ProjectLayoutType.isPlayground(this)) {
             val unzipChromeBuildServiceProvider =
@@ -839,6 +834,14 @@ private fun Project.configureKotlinJsTests() =
         // From: https://nodejs.org/api/cli.html
         task.nodeJsArgs.addAll(listOf("--trace-warnings", "--trace-uncaught", "--trace-sigint"))
     }
+
+    // Compiler Arg needed for tests only: https://youtrack.jetbrains.com/issue/KT-59081
+    tasks.withType(Kotlin2JsCompile::class.java).configureEach { task ->
+        if (task.name.lowercase().contains("test")) {
+            task.compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
+        }
+    }
+}
 
 fun Project.validatePublishedMultiplatformHasDefault() {
     val extension = project.extensions.getByType(AndroidXMultiplatformExtension::class.java)
