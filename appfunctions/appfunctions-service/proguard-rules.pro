@@ -13,10 +13,10 @@
 #  limitations under the License.
 
 # Keeps Aggregated inventory/invoker only as they are created from reflection.
--keep,allowoptimization class * implements androidx.appfunctions.internal.AggregatedAppFunctionInvoker {
+-keep,allowoptimization class * implements androidx.appfunctions.service.internal.AggregatedAppFunctionInvoker {
     public *;
 }
--keep,allowoptimization class * implements androidx.appfunctions.internal.AggregatedAppFunctionInventory {
+-keep,allowoptimization class * implements androidx.appfunctions.service.internal.AggregatedAppFunctionInventory {
     public *;
 }
 
@@ -25,5 +25,5 @@
     public *;
 }
 
--keep class androidx.appfunctions.internal.AggregatedAppFunctionInvoker { *; }
--keep class androidx.appfunctions.internal.AggregatedAppFunctionInventory { *; }
+-keep class androidx.appfunctions.service.internal.AggregatedAppFunctionInvoker { *; }
+-keep class androidx.appfunctions.service.internal.AggregatedAppFunctionInventory { *; }

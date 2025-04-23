@@ -22,7 +22,7 @@ import android.os.OutcomeReceiver
 import androidx.annotation.RestrictTo
 import androidx.appfunctions.internal.Dependencies
 import androidx.appfunctions.internal.Dispatchers
-import androidx.appfunctions.internal.ServiceDependencies
+import androidx.appfunctions.service.internal.ServiceDependencies
 import com.android.extensions.appfunctions.AppFunctionException as ExtensionAppFunctionException
 import com.android.extensions.appfunctions.AppFunctionService
 import com.android.extensions.appfunctions.ExecuteAppFunctionRequest as ExtensionExecuteAppFunctionRequest
