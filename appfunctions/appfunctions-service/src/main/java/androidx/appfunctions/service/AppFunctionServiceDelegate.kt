@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions
+package androidx.appfunctions.service
 
 import android.content.Context
 import android.os.Build
 import android.os.OutcomeReceiver
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.appfunctions.AppFunctionAppUnknownException
+import androidx.appfunctions.AppFunctionCancelledException
+import androidx.appfunctions.AppFunctionContext
+import androidx.appfunctions.AppFunctionException
+import androidx.appfunctions.AppFunctionFunctionNotFoundException
+import androidx.appfunctions.ExecuteAppFunctionRequest
+import androidx.appfunctions.ExecuteAppFunctionResponse
 import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
 import androidx.appfunctions.internal.Translator
 import androidx.appfunctions.internal.TranslatorSelector

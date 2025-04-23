@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions
+package androidx.appfunctions.service
 
 import android.annotation.SuppressLint
 import android.os.CancellationSignal
 import android.os.OutcomeReceiver
 import androidx.annotation.RestrictTo
+import androidx.appfunctions.AppFunctionException
+import androidx.appfunctions.ExecuteAppFunctionRequest
+import androidx.appfunctions.ExecuteAppFunctionResponse
 import androidx.appfunctions.internal.Dependencies
 import androidx.appfunctions.internal.Dispatchers
 import androidx.appfunctions.service.internal.ServiceDependencies
@@ -57,7 +60,7 @@ public class ExtensionAppFunctionService : AppFunctionService() {
     ) {
         val executionJob =
             delegate.onExecuteFunction(
-                androidx.appfunctions.ExecuteAppFunctionRequest.fromPlatformExtensionClass(request),
+                ExecuteAppFunctionRequest.fromPlatformExtensionClass(request),
                 callingPackage,
                 object :
                     OutcomeReceiver<

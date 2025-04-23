@@ -26,6 +26,7 @@ import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata.Companion
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import androidx.appfunctions.metadata.CompileTimeAppFunctionMetadata
+import androidx.appfunctions.service.AppFunctionServiceDelegate
 import androidx.appfunctions.service.internal.AggregatedAppFunctionInventory
 import androidx.appfunctions.service.internal.AggregatedAppFunctionInvoker
 import androidx.appfunctions.service.internal.AppFunctionInventory

@@ -18,7 +18,7 @@ package androidx.appfunctions.service.internal
 
 import android.content.Context
 import android.content.ContextWrapper
-import androidx.appfunctions.AppFunctionConfiguration
+import androidx.appfunctions.service.AppFunctionConfiguration
 import androidx.appfunctions.service.internal.ConfigurableAppFunctionFactory.AppFunctionInstantiationException
 import org.junit.Assert.assertThrows
 import org.junit.Before

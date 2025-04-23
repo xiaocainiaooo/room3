@@ -19,8 +19,8 @@ package androidx.appfunctions.service.internal
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RestrictTo
-import androidx.appfunctions.AppFunctionConfiguration
 import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
+import androidx.appfunctions.service.AppFunctionConfiguration
 import java.lang.reflect.InvocationTargetException
 
 /**
