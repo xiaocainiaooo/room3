@@ -149,7 +149,7 @@ class AnchorTest {
         runTest {
             val runtimeAnchor = FakeRuntimeAnchor(Pose())
             val underTest = Anchor(runtimeAnchor, xrResourcesManager)
-            check(runtimeAnchor.persistenceState == RuntimeAnchor.PersistenceState.NotPersisted)
+            check(runtimeAnchor.persistenceState == RuntimeAnchor.PersistenceState.NOT_PERSISTED)
 
             var uuid: UUID? = null
             val persistJob = launch { uuid = underTest.persist() }
@@ -159,7 +159,7 @@ class AnchorTest {
 
             assertThat(uuid).isNotNull()
             assertThat(runtimeAnchor.persistenceState)
-                .isEqualTo(RuntimeAnchor.PersistenceState.Persisted)
+                .isEqualTo(RuntimeAnchor.PersistenceState.PERSISTED)
         }
     }
 

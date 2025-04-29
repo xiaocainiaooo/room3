@@ -217,14 +217,14 @@ internal constructor(
             return
         }
         when (runtimeAnchor.persistenceState) {
-            RuntimeAnchor.PersistenceState.Pending -> {
+            RuntimeAnchor.PersistenceState.PENDING -> {
                 // Do nothing while we wait for the anchor to be persisted.
             }
-            RuntimeAnchor.PersistenceState.Persisted -> {
+            RuntimeAnchor.PersistenceState.PERSISTED -> {
                 persistContinuation?.resume(runtimeAnchor.uuid!!)
                 persistContinuation = null
             }
-            RuntimeAnchor.PersistenceState.NotPersisted -> {
+            RuntimeAnchor.PersistenceState.NOT_PERSISTED -> {
                 persistContinuation?.resumeWithException(
                     RuntimeException("Anchor was not persisted.")
                 )

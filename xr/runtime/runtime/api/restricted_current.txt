@@ -376,15 +376,15 @@ package androidx.xr.runtime.internal {
 
   public static final class Anchor.PersistenceState {
     field public static final androidx.xr.runtime.internal.Anchor.PersistenceState.Companion Companion;
-    field public static final androidx.xr.runtime.internal.Anchor.PersistenceState NotPersisted;
-    field public static final androidx.xr.runtime.internal.Anchor.PersistenceState Pending;
-    field public static final androidx.xr.runtime.internal.Anchor.PersistenceState Persisted;
+    field public static final androidx.xr.runtime.internal.Anchor.PersistenceState NOT_PERSISTED;
+    field public static final androidx.xr.runtime.internal.Anchor.PersistenceState PENDING;
+    field public static final androidx.xr.runtime.internal.Anchor.PersistenceState PERSISTED;
   }
 
   public static final class Anchor.PersistenceState.Companion {
-    property public androidx.xr.runtime.internal.Anchor.PersistenceState NotPersisted;
-    property public androidx.xr.runtime.internal.Anchor.PersistenceState Pending;
-    property public androidx.xr.runtime.internal.Anchor.PersistenceState Persisted;
+    property public androidx.xr.runtime.internal.Anchor.PersistenceState NOT_PERSISTED;
+    property public androidx.xr.runtime.internal.Anchor.PersistenceState PENDING;
+    property public androidx.xr.runtime.internal.Anchor.PersistenceState PERSISTED;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface AnchorEntity extends androidx.xr.runtime.internal.SystemSpaceEntity {

@@ -1068,7 +1068,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
                         mSharedAnchorToken,
                         new Pose(),
                         TrackingState.TRACKING,
-                        PersistenceState.NotPersisted,
+                        PersistenceState.NOT_PERSISTED,
                         null);
         androidx.xr.arcore.Anchor perceptionAnchor = new androidx.xr.arcore.Anchor(fakeAnchor);
 
@@ -1087,7 +1087,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
                         mSharedAnchorToken,
                         new Pose(),
                         TrackingState.TRACKING,
-                        PersistenceState.NotPersisted,
+                        PersistenceState.NOT_PERSISTED,
                         null);
         androidx.xr.arcore.Anchor perceptionAnchor = new androidx.xr.arcore.Anchor(fakeAnchor);
 
@@ -1113,7 +1113,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
                         null,
                         new Pose(),
                         TrackingState.TRACKING,
-                        PersistenceState.NotPersisted,
+                        PersistenceState.NOT_PERSISTED,
                         null);
         androidx.xr.arcore.Anchor perceptionAnchor = new androidx.xr.arcore.Anchor(fakeAnchor);
 
