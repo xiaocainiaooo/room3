@@ -92,7 +92,7 @@ internal class PlaneRenderer(val session: Session, val coroutineScope: Coroutine
         val renderJob =
             coroutineScope.launch(updateJob) {
                 plane.state.collect { state ->
-                    if (state.trackingState == TrackingState.Tracking) {
+                    if (state.trackingState == TrackingState.TRACKING) {
                         if (state.label == Plane.Label.Unknown) {
                             entity.setHidden(true)
                         } else {
@@ -119,7 +119,7 @@ internal class PlaneRenderer(val session: Session, val coroutineScope: Coroutine
                                 counter = 0
                             }
                         }
-                    } else if (state.trackingState == TrackingState.Stopped) {
+                    } else if (state.trackingState == TrackingState.STOPPED) {
                         entity.setHidden(true)
                     }
                 }

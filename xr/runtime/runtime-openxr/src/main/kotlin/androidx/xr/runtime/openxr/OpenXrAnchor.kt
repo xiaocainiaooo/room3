@@ -38,7 +38,7 @@ internal constructor(
     override var pose: Pose = Pose()
         private set
 
-    override var trackingState: TrackingState = TrackingState.Paused
+    override var trackingState: TrackingState = TrackingState.PAUSED
         private set
 
     override var persistenceState: Anchor.PersistenceState = Anchor.PersistenceState.NotPersisted

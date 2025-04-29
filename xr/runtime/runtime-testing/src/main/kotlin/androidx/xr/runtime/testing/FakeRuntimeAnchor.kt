@@ -42,7 +42,7 @@ public class FakeRuntimeAnchor(
         }
     }
 
-    override var trackingState: TrackingState = TrackingState.Tracking
+    override var trackingState: TrackingState = TrackingState.TRACKING
 
     override var persistenceState: RuntimeAnchor.PersistenceState =
         RuntimeAnchor.PersistenceState.NotPersisted

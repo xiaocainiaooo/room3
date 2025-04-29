@@ -255,7 +255,7 @@ class PersistentAnchorsActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             anchor.state.collect { anchorState ->
-                if (anchorState.trackingState == TrackingState.Tracking) {
+                if (anchorState.trackingState == TrackingState.TRACKING) {
                     val panelEntity =
                         PanelEntity.create(
                             session,

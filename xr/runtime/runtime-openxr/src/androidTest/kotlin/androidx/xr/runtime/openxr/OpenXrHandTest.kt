@@ -60,14 +60,14 @@ class OpenXrHandTest {
     @Test
     fun update_updatesActiveStatus() = initOpenXrManagerAndRunTest {
         val xrTime = 50L * 1_000_000 // 50 milliseconds in nanoseconds.
-        check(underTest.trackingState != TrackingState.Tracking)
+        check(underTest.trackingState != TrackingState.TRACKING)
 
         underTest.update(xrTime)
 
         // TODO - b/346615429: Define values here using the stub's Kotlin API. For the time being
         // they
         // come from `kPose` defined in //third_party/jetpack_xr_natives/openxr/openxr_stub.cc
-        assertThat(underTest.trackingState).isEqualTo(TrackingState.Tracking)
+        assertThat(underTest.trackingState).isEqualTo(TrackingState.TRACKING)
     }
 
     @Test

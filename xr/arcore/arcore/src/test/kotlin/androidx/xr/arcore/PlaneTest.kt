@@ -182,17 +182,17 @@ class PlaneTest {
     fun update_trackingStateMatchesRuntime() = runBlocking {
         // arrange
         val runtimePlane = FakeRuntimePlane()
-        runtimePlane.trackingState = TrackingState.Stopped
+        runtimePlane.trackingState = TrackingState.STOPPED
         xrResourcesManager.syncTrackables(listOf(runtimePlane))
         val underTest = xrResourcesManager.trackablesMap.values.first() as Plane
-        check(underTest.state.value.trackingState == TrackingState.Stopped)
+        check(underTest.state.value.trackingState == TrackingState.STOPPED)
 
         // act
-        runtimePlane.trackingState = TrackingState.Tracking
+        runtimePlane.trackingState = TrackingState.TRACKING
         underTest.update()
 
         // assert
-        assertThat(underTest.state.value.trackingState).isEqualTo(TrackingState.Tracking)
+        assertThat(underTest.state.value.trackingState).isEqualTo(TrackingState.TRACKING)
     }
 
     @Test

@@ -77,7 +77,7 @@ class OpenXrAnchorTest {
     @Test
     fun update_updatesTrackingState() = initOpenXrManagerAndRunTest {
         val xrTime = 50L * 1_000_000 // 50 milliseconds in nanoseconds.
-        check(underTest.trackingState == TrackingState.Paused)
+        check(underTest.trackingState == TrackingState.PAUSED)
 
         underTest.update(xrTime)
 
@@ -85,7 +85,7 @@ class OpenXrAnchorTest {
         // they
         // come from the tracking state corresponding to `kLocationFlags` defined in
         // //third_party/jetpack_xr_natives/openxr/openxr_stub.cc
-        assertThat(underTest.trackingState).isEqualTo(TrackingState.Tracking)
+        assertThat(underTest.trackingState).isEqualTo(TrackingState.TRACKING)
     }
 
     @Test

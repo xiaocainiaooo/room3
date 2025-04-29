@@ -48,7 +48,7 @@ internal constructor(
     override var subsumedBy: Plane? = null
         private set
 
-    override var trackingState: TrackingState = TrackingState.Paused
+    override var trackingState: TrackingState = TrackingState.PAUSED
         private set
 
     override fun createAnchor(pose: Pose): Anchor {

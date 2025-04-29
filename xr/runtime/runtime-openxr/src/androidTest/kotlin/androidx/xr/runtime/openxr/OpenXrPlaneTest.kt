@@ -113,11 +113,11 @@ class OpenXrPlaneTest {
     @Test
     fun update_updatesTrackingState() = initOpenXrManagerAndRunTest {
         val xrTime = 50L * 1_000_000 // 50 milliseconds in nanoseconds.
-        check(underTest.trackingState.equals(TrackingState.Paused))
+        check(underTest.trackingState.equals(TrackingState.PAUSED))
 
         underTest.update(xrTime)
 
-        assertThat(underTest.trackingState).isEqualTo(TrackingState.Tracking)
+        assertThat(underTest.trackingState).isEqualTo(TrackingState.TRACKING)
     }
 
     @Test

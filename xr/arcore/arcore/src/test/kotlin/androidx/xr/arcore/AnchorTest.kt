@@ -117,14 +117,14 @@ class AnchorTest {
     @Test
     fun update_trackingStateMatchesRuntimeTrackingState() = runBlocking {
         val runtimeAnchor = FakeRuntimeAnchor(Pose())
-        runtimeAnchor.trackingState = TrackingState.Paused
+        runtimeAnchor.trackingState = TrackingState.PAUSED
         val underTest = Anchor(runtimeAnchor, xrResourcesManager)
-        check(underTest.state.value.trackingState.equals(TrackingState.Paused))
-        runtimeAnchor.trackingState = TrackingState.Tracking
+        check(underTest.state.value.trackingState.equals(TrackingState.PAUSED))
+        runtimeAnchor.trackingState = TrackingState.TRACKING
 
         underTest.update()
 
-        assertThat(underTest.state.value.trackingState).isEqualTo(TrackingState.Tracking)
+        assertThat(underTest.state.value.trackingState).isEqualTo(TrackingState.TRACKING)
     }
 
     @Test
