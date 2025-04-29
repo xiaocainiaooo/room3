@@ -28,11 +28,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TransactionElement
 import androidx.room.coroutines.RawConnectionAccessor
 import androidx.room.coroutines.runBlockingUninterruptible
-import androidx.room.driver.SupportSQLiteConnection
 import androidx.room.withTransactionContext
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQuery
+import androidx.sqlite.driver.SupportSQLiteConnection
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException

@@ -16,17 +16,15 @@
 
 package androidx.room
 
-import androidx.room.coroutines.AndroidSQLiteDriverConnectionPool
 import androidx.room.coroutines.ConnectionPool
+import androidx.room.coroutines.PassthroughConnectionPool
 import androidx.room.coroutines.newConnectionPool
 import androidx.room.coroutines.newSingleConnectionPool
-import androidx.room.driver.SupportSQLiteConnection
-import androidx.room.driver.SupportSQLiteConnectionPool
-import androidx.room.driver.SupportSQLiteDriver
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import androidx.sqlite.driver.AndroidSQLiteDriver
+import androidx.sqlite.driver.SupportSQLiteConnection
+import androidx.sqlite.driver.SupportSQLiteDriver
 
 /**
  * An Android platform specific [RoomConnectionManager] with backwards compatibility with
@@ -41,7 +39,6 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
     internal val connectionPool: ConnectionPool
 
     internal val supportOpenHelper: SupportSQLiteOpenHelper?
-        get() = (connectionPool as? SupportSQLiteConnectionPool)?.supportDriver?.openHelper
 
     private var supportDatabase: SupportSQLiteDatabase? = null
 
@@ -53,8 +50,8 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
             // Compatibility mode due to no driver provided, instead a driver (SupportSQLiteDriver)
             // is created that wraps SupportSQLite* APIs. The underlying SupportSQLiteDatabase will
             // be migrated through the SupportOpenHelperCallback or through old gen code using
-            // RoomOpenHelper. A ConnectionPool is also created that skips common opening
-            // procedure and has no real connection management logic.
+            // RoomOpenHelper. A pass-through connection pool is also created that skips common
+            // opening procedure and has no real connection management logic.
             requireNotNull(config.sqliteOpenHelperFactory) {
                 "SQLiteManager was constructed with both null driver and open helper factory!"
             }
@@ -63,16 +60,20 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
                     .name(config.name)
                     .callback(SupportOpenHelperCallback(openDelegate.version))
                     .build()
+            this.supportOpenHelper = config.sqliteOpenHelperFactory.create(openHelperConfig)
             this.connectionPool =
-                SupportSQLiteConnectionPool(
-                    SupportSQLiteDriver(config.sqliteOpenHelperFactory.create(openHelperConfig))
+                PassthroughConnectionPool(
+                    driver = SupportSQLiteDriver(supportOpenHelper),
+                    fileName = config.name ?: ":memory:"
                 )
         } else {
+            this.supportOpenHelper = null
             this.connectionPool =
-                if (config.sqliteDriver is AndroidSQLiteDriver) {
-                    // Special-case the Android driver and use a pass-through pool since the Android
-                    // bindings internally already have a thread-confined connection pool.
-                    AndroidSQLiteDriverConnectionPool(
+                if (config.sqliteDriver.hasConnectionPool) {
+                    // If the driver already has a connection pool then use a pass-through pool to
+                    // support drivers such as the Android since internally it already has a
+                    // thread-confined connection pool.
+                    PassthroughConnectionPool(
                         driver = DriverWrapper(config.sqliteDriver),
                         fileName = config.name ?: ":memory:"
                     )
@@ -102,15 +103,15 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
         this.openDelegate = NoOpOpenDelegate()
         this.callbacks = config.callbacks ?: emptyList()
         // Compatibility mode due to no driver provided, the SupportSQLiteDriver and
-        // SupportConnectionPool are created. A Room onOpen callback is installed so that the
+        // pass-through connection pool are created. A Room onOpen callback is installed so that the
         // SupportSQLiteDatabase is extracted out of the RoomOpenHelper installed.
         val configWithCompatibilityCallback =
             config.installOnOpenCallback { db -> supportDatabase = db }
+        this.supportOpenHelper = supportOpenHelperFactory.invoke(configWithCompatibilityCallback)
         this.connectionPool =
-            SupportSQLiteConnectionPool(
-                SupportSQLiteDriver(
-                    supportOpenHelperFactory.invoke(configWithCompatibilityCallback)
-                )
+            PassthroughConnectionPool(
+                driver = SupportSQLiteDriver(supportOpenHelper),
+                fileName = config.name ?: ":memory:"
             )
         init()
     }
@@ -136,6 +137,7 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
 
     fun close() {
         connectionPool.close()
+        supportOpenHelper?.close()
     }
 
     // TODO(b/316944352): Figure out auto-close with driver APIs

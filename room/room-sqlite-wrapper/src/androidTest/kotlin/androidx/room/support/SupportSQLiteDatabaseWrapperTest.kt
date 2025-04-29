@@ -28,6 +28,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
 import androidx.sqlite.SQLITE_DATA_BLOB
 import androidx.sqlite.SQLITE_DATA_FLOAT
 import androidx.sqlite.SQLITE_DATA_INTEGER
@@ -102,6 +103,12 @@ class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
         @Query("SELECT * FROM TestEntity") fun getEntities(): List<TestEntity>
 
         @Insert fun insert(entity: TestEntity)
+
+        @Transaction
+        fun insertAndReturn(entity: TestEntity): List<TestEntity> {
+            insert(entity)
+            return getEntities()
+        }
     }
 
     @Entity data class TestEntity(@PrimaryKey val id: Long)
@@ -655,6 +662,20 @@ class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
         } finally {
             wrapper.endTransaction()
         }
+    }
+
+    @Test
+    fun combineTransactionWithDao_transaction() {
+        wrapper.beginTransaction()
+        try {
+            assertThat(database.dao().insertAndReturn(TestEntity(1))).containsExactly(TestEntity(1))
+            wrapper.setTransactionSuccessful()
+        } finally {
+            wrapper.endTransaction()
+        }
+
+        val resultEntities = database.dao().getEntities()
+        assertThat(resultEntities).containsExactly(TestEntity(1))
     }
 
     @Test

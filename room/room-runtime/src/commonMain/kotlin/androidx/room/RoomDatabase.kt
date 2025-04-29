@@ -189,7 +189,8 @@ public expect abstract class RoomDatabase() {
      * be used by Room generated code paths. For the public version see [useReaderConnection] and
      * [useWriterConnection].
      */
-    internal suspend fun <R> useConnection(isReadOnly: Boolean, block: suspend (Transactor) -> R): R
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public suspend fun <R> useConnection(isReadOnly: Boolean, block: suspend (Transactor) -> R): R
 
     /**
      * Journal modes for SQLite database.

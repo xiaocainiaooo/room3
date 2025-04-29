@@ -33,10 +33,7 @@ import androidx.annotation.WorkerThread
 import androidx.arch.core.executor.ArchTaskExecutor
 import androidx.room.Room.LOG_TAG
 import androidx.room.concurrent.CloseBarrier
-import androidx.room.coroutines.AndroidSQLiteDriverConnectionPool
-import androidx.room.coroutines.ConnectionPool
 import androidx.room.coroutines.runBlockingUninterruptible
-import androidx.room.driver.SupportSQLiteConnection
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.room.support.AutoCloser
@@ -56,8 +53,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteStatement
-import androidx.sqlite.db.framework.FrameworkSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import androidx.sqlite.driver.SupportSQLiteConnection
 import java.io.File
 import java.io.InputStream
 import java.util.TreeMap
@@ -139,10 +136,11 @@ public actual abstract class RoomDatabase {
                         "SupportSQLiteOpenHelper.Factory was configured with Room."
                 )
 
-    private lateinit var connectionManager: RoomConnectionManager
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public val driver: SQLiteDriver
+        get() = configuration.sqliteDriver ?: error("No SQLiteDriver was configured with Room.")
 
-    internal val connectionPool: ConnectionPool
-        get() = connectionManager.connectionPool
+    private lateinit var connectionManager: RoomConnectionManager
 
     /**
      * The invalidation tracker for this database.
@@ -602,7 +600,8 @@ public actual abstract class RoomDatabase {
      * be used by Room generated code paths. For the public version see [useReaderConnection] and
      * [useWriterConnection].
      */
-    internal actual suspend fun <R> useConnection(
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public actual suspend fun <R> useConnection(
         isReadOnly: Boolean,
         block: suspend (Transactor) -> R
     ): R {
@@ -2181,10 +2180,3 @@ public fun RoomDatabase.invalidationTrackerFlow(
     vararg tables: String,
     emitInitialState: Boolean = true
 ): Flow<Set<String>> = invalidationTracker.createFlow(*tables, emitInitialState = emitInitialState)
-
-// TODO(b/408010324): Avoid exposing this restricted APIs, create separation of concerns.
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public fun RoomDatabase.getAndroidDriverDatabase(): SupportSQLiteDatabase? =
-    (connectionPool as? AndroidSQLiteDriverConnectionPool)?.androidConnection?.db?.let {
-        FrameworkSQLiteDatabase(it)
-    }
