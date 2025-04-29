@@ -560,9 +560,7 @@ public final class ModifiersBuilders {
             }
         }
 
-        /**
-         * Gets whether this element should be marked as heading for accessibility.
-         */
+        /** Gets whether this element should be marked as heading for accessibility. */
         @RestrictTo(Scope.LIBRARY_GROUP)
         public boolean isHeading() {
             return mImpl.getHeading();
