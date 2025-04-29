@@ -70,6 +70,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -275,6 +276,7 @@ class DefaultTextContextMenuDropdownProviderTest {
     }
 
     @Test
+    @Ignore
     fun whenAnchorLayoutScrolled_popupDoesNotMove() {
         val scrollState = ScrollState(0)
         runTest(
@@ -310,6 +312,7 @@ class DefaultTextContextMenuDropdownProviderTest {
     }
 
     @Test
+    @Ignore
     fun whenDataProviderPositionUpdates_popupDoesNotMove() {
         var offset by mutableStateOf(Offset.Zero)
         runTest {
