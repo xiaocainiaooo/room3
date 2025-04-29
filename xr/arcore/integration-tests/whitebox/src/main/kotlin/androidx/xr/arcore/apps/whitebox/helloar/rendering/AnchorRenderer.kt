@@ -104,7 +104,7 @@ internal class AnchorRenderer(
                                     // planes once we can
                                     // support rendering them.
                                     (it.trackable as? Plane)?.state?.value?.label !=
-                                        Plane.Label.Unknown
+                                        Plane.Label.UNKNOWN
                                 }
                                 ?.let { hitResult ->
                                     val anchorResult = Anchor.create(session, hitResult.hitPose)
