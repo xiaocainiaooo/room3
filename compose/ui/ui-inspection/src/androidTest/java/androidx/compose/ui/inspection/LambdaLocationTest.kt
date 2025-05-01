@@ -20,6 +20,7 @@ import androidx.compose.ui.inspection.rules.JvmtiRule
 import androidx.compose.ui.inspection.testdata.TestLambdas
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.android.tools.deploy.liveedit.SourceLocationAware
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -82,8 +83,31 @@ class LambdaLocationTest {
 
     @Test
     fun testLambdaSelector() {
-        assertThat(findLambdaSelector("com.example.Compose\$MainActivityKt\$lambda-10\$1\$2\$2\$1"))
+        assertThat(findLambdaSelector("com.example.Compose\$MainActivityKt\$lambda-10$1$2$2$1"))
             .isEqualTo("lambda-10\$1\$2\$2\$1")
         assertThat(findLambdaSelector("com.example.Class\$f1\$3\$2")).isEqualTo("3$2")
     }
+
+    @Test
+    fun testLiveEditLambda() {
+        @Suppress("ObjectLiteralToLambda")
+        val lambda =
+            object : SourceLocationAware {
+                override fun getSourceLocationInfo(): Map<String, Any> =
+                    mapOf(
+                        "lambda" to "com.example.Fct$1$2",
+                        "file" to "MainActivity.kt",
+                        "startLine" to 34,
+                        "endLine" to 78,
+                    )
+            }
+        val location = LambdaLocation.resolve(lambda) ?: error("Location didn't resolve")
+        assertThat(location.packageName).isEqualTo("com.example")
+        assertThat(location.lambdaName).isEqualTo("1$2")
+        assertThat(location.fileName).isEqualTo("MainActivity.kt")
+        assertThat(location.startLine).isEqualTo(34)
+        assertThat(location.endLine).isEqualTo(78)
+    }
+
+    interface Foo
 }

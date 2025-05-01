@@ -15,8 +15,12 @@
  */
 package androidx.compose.ui.inspection
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+
+private const val SourceLocationAware = "com.android.tools.deploy.liveedit.SourceLocationAware"
+private const val SourceLocationMethodName = "getSourceLocationInfo"
 
 data class LambdaLocation(
     val lambdaClassName: String,
@@ -56,7 +60,7 @@ data class LambdaLocation(
         }
 
         fun resolve(o: Any): LambdaLocation? {
-            return resolveWithJvmTI(o::class.java)
+            return resolveWithLiveEdit(o) ?: resolveWithJvmTI(o::class.java)
         }
 
         @JvmStatic private external fun resolveWithJvmTI(clazz: Class<*>): LambdaLocation?
@@ -75,3 +79,25 @@ private val SELECTOR_EXPR = Regex("(\\\$(lambda-)?[0-9]+)+$")
 @VisibleForTesting
 fun findLambdaSelector(lambdaClassName: String): String =
     SELECTOR_EXPR.find(lambdaClassName)?.value?.substring(1) ?: ""
+
+/** Extract the LambdaLocation from the Live Edit class. */
+private fun resolveWithLiveEdit(lambda: Any): LambdaLocation? {
+    val location = lambda.getSourceLineLocationInfo() ?: return null
+    val internalName = location["lambda"] as? String ?: return null
+    val fileName = location["file"] as? String ?: return null
+    val startLine = location["startLine"] as? Int ?: return null
+    val endLine = location["endLine"] as? Int ?: return null
+    return LambdaLocation(internalName, fileName, startLine, endLine)
+}
+
+@SuppressLint("BanUncheckedReflection")
+private fun Any.getSourceLineLocationInfo(): Map<*, *>? {
+    try {
+        val iAware = javaClass.interfaces.find { it.name == SourceLocationAware }
+        val method = iAware?.getDeclaredMethod(SourceLocationMethodName)
+        method?.isAccessible = true
+        return method?.invoke(this) as? Map<*, *>
+    } catch (_: Exception) {
+        return null
+    }
+}
