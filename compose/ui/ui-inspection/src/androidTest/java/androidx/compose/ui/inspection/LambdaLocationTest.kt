@@ -34,14 +34,56 @@ class LambdaLocationTest {
     @Test
     fun test() {
         assertThat(LambdaLocation.resolve(TestLambdas.short))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 22, 22))
+            .isEqualTo(
+                LambdaLocation(
+                    "androidx.compose.ui.inspection.testdata.TestLambdas\$short\$1",
+                    "TestLambdas.kt",
+                    22,
+                    22
+                )
+            )
         assertThat(LambdaLocation.resolve(TestLambdas.long))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 24, 26))
+            .isEqualTo(
+                LambdaLocation(
+                    "androidx.compose.ui.inspection.testdata.TestLambdas\$long\$1",
+                    "TestLambdas.kt",
+                    24,
+                    26
+                )
+            )
         assertThat(LambdaLocation.resolve(TestLambdas.inlined))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 29, 30))
+            .isEqualTo(
+                LambdaLocation(
+                    "androidx.compose.ui.inspection.testdata.TestLambdas\$inlined\$1",
+                    "TestLambdas.kt",
+                    29,
+                    30
+                )
+            )
         assertThat(LambdaLocation.resolve(TestLambdas.inlinedParameter))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 32, 32))
+            .isEqualTo(
+                LambdaLocation(
+                    "androidx.compose.ui.inspection.testdata.TestLambdas\$inlinedParameter\$1",
+                    "TestLambdas.kt",
+                    32,
+                    32
+                )
+            )
         assertThat(LambdaLocation.resolve(TestLambdas.unnamed))
-            .isEqualTo(LambdaLocation("TestLambdas.kt", 33, 33))
+            .isEqualTo(
+                LambdaLocation(
+                    "androidx.compose.ui.inspection.testdata.TestLambdas\$unnamed\$1",
+                    "TestLambdas.kt",
+                    33,
+                    33
+                )
+            )
+    }
+
+    @Test
+    fun testLambdaSelector() {
+        assertThat(findLambdaSelector("com.example.Compose\$MainActivityKt\$lambda-10\$1\$2\$2\$1"))
+            .isEqualTo("lambda-10\$1\$2\$2\$1")
+        assertThat(findLambdaSelector("com.example.Class\$f1\$3\$2")).isEqualTo("3$2")
     }
 }
