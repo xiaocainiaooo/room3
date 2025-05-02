@@ -93,11 +93,13 @@ package androidx.activity {
     ctor public ComponentDialog(android.content.Context context);
     ctor public ComponentDialog(android.content.Context context, optional @StyleRes int themeResId);
     method public androidx.lifecycle.Lifecycle getLifecycle();
+    method public final androidx.navigationevent.NavigationEventDispatcher getNavigationEventDispatcher();
     method public final androidx.activity.OnBackPressedDispatcher getOnBackPressedDispatcher();
     method public androidx.savedstate.SavedStateRegistry getSavedStateRegistry();
     method @CallSuper public void initializeViewTreeOwners();
     method @CallSuper public void onBackPressed();
     property public androidx.lifecycle.Lifecycle lifecycle;
+    property public final androidx.navigationevent.NavigationEventDispatcher navigationEventDispatcher;
     property public final androidx.activity.OnBackPressedDispatcher onBackPressedDispatcher;
     property public androidx.savedstate.SavedStateRegistry savedStateRegistry;
   }
