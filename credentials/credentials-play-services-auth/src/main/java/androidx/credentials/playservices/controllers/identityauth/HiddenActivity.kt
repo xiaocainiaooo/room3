@@ -58,11 +58,9 @@ open class HiddenActivity : Activity() {
         }
 
         when (type) {
-            CredentialProviderBaseController.BEGIN_SIGN_IN_TAG -> {
-                handleBeginSignIn()
-            }
+            CredentialProviderBaseController.BEGIN_SIGN_IN_TAG,
             CredentialProviderBaseController.CREATE_PASSWORD_TAG -> {
-                handleCreatePassword()
+                handleCredentialFlow(type)
             }
             CredentialProviderBaseController.CREATE_PUBLIC_KEY_CREDENTIAL_TAG -> {
                 handleCreatePublicKeyCredential()
@@ -212,9 +210,9 @@ open class HiddenActivity : Activity() {
     }
 
     @Suppress("deprecation")
-    private fun handleBeginSignIn() {
+    private fun handleCredentialFlow(type: String) {
         val pendingIntent: PendingIntent? =
-            intent.getParcelableExtra(CredentialProviderBaseController.EXTRA_GET_CREDENTIAL_INTENT)
+            intent.getParcelableExtra(CredentialProviderBaseController.EXTRA_FLOW_PENDING_INTENT)
 
         val requestCode: Int =
             intent.getIntExtra(
@@ -235,78 +233,51 @@ open class HiddenActivity : Activity() {
                     null
                 )
             } catch (e: IntentSender.SendIntentException) {
-                setupFailure(
-                    resultReceiver!!,
-                    CredentialProviderBaseController.Companion.GET_UNKNOWN,
-                    "During begin sign in, one tap ui intent sender " + "failure: ${e.message}"
-                )
+                setupIntentSenderFailureByType(type, e)
             }
         } else {
-            setupFailure(
-                resultReceiver!!,
-                CredentialProviderBaseController.Companion.GET_UNKNOWN,
-                "internal error"
-            )
+            setupPendingIntentFailureByType(type)
         }
     }
 
-    @Suppress("deprecation")
-    private fun handleCreatePassword() {
-        val params: com.google.android.gms.auth.api.identity.SavePasswordRequest? =
-            intent.getParcelableExtra(CredentialProviderBaseController.REQUEST_TAG)
-        val requestCode: Int =
-            intent.getIntExtra(
-                CredentialProviderBaseController.ACTIVITY_REQUEST_CODE_TAG,
-                DEFAULT_VALUE
-            )
-        params?.let {
-            com.google.android.gms.auth.api.identity.Identity.getCredentialSavingClient(this)
-                .savePassword(params)
-                .addOnSuccessListener {
-                    try {
-                        mWaitingForActivityResult = true
-                        startIntentSenderForResult(
-                            it.pendingIntent.intentSender,
-                            requestCode,
-                            null,
-                            0,
-                            0,
-                            0,
-                            null
-                        )
-                    } catch (e: IntentSender.SendIntentException) {
-                        setupFailure(
-                            resultReceiver!!,
-                            CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
-                            "During save password, found UI intent sender " +
-                                "failure: ${e.message}"
-                        )
-                    }
-                }
-                .addOnFailureListener { e: Exception ->
-                    var errName: String = CredentialProviderBaseController.Companion.CREATE_UNKNOWN
-                    if (
-                        e is ApiException &&
-                            e.statusCode in CredentialProviderBaseController.retryables
-                    ) {
-                        errName = CredentialProviderBaseController.Companion.CREATE_INTERRUPTED
-                    }
-                    setupFailure(
-                        resultReceiver!!,
-                        errName,
-                        "During save password, found " +
-                            "password failure response from one tap ${e.message}"
-                    )
-                }
-        }
-            ?: run {
-                Log.i(
-                    TAG,
-                    "During save password, params is null, nothing to launch for create" +
-                        " password"
+    private fun setupIntentSenderFailureByType(type: String, e: IntentSender.SendIntentException) {
+        when (type) {
+            CredentialProviderBaseController.BEGIN_SIGN_IN_TAG -> {
+                setupFailure(
+                    resultReceiver!!,
+                    CredentialProviderBaseController.Companion.GET_UNKNOWN,
+                    "During begin sign in, one tap ui intent sender " + "failure: " + "${e.message}"
                 )
-                finish()
             }
+            CredentialProviderBaseController.CREATE_PASSWORD_TAG -> {
+                setupFailure(
+                    resultReceiver!!,
+                    CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
+                    "During save password, found UI intent sender " + "failure: ${e.message}"
+                )
+            }
+        // TODO(b/415819849) : Finish adding the rest
+        }
+    }
+
+    private fun setupPendingIntentFailureByType(type: String) {
+        when (type) {
+            CredentialProviderBaseController.BEGIN_SIGN_IN_TAG -> {
+                setupFailure(
+                    resultReceiver!!,
+                    CredentialProviderBaseController.Companion.GET_UNKNOWN,
+                    "internal error during the begin sign in operation"
+                )
+            }
+            CredentialProviderBaseController.CREATE_PASSWORD_TAG -> {
+                setupFailure(
+                    resultReceiver!!,
+                    CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
+                    "internal error during password creation"
+                )
+            }
+        // TODO(b/415819849) : Finish adding the rest
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
