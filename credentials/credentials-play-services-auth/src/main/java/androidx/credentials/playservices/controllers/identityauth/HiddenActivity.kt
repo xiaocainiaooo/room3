@@ -28,8 +28,6 @@ import androidx.credentials.playservices.controllers.CredentialProviderBaseContr
 import androidx.credentials.playservices.controllers.CredentialProviderBaseController.Companion.reportError
 import androidx.credentials.playservices.controllers.CredentialProviderBaseController.Companion.reportResult
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.fido.Fido
-import com.google.android.gms.fido.fido2.api.common.PublicKeyCredentialCreationOptions
 
 /** An activity used to ensure all required API versions work as intended. */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -59,11 +57,9 @@ open class HiddenActivity : Activity() {
 
         when (type) {
             CredentialProviderBaseController.BEGIN_SIGN_IN_TAG,
-            CredentialProviderBaseController.CREATE_PASSWORD_TAG -> {
-                handleCredentialFlow(type)
-            }
+            CredentialProviderBaseController.CREATE_PASSWORD_TAG,
             CredentialProviderBaseController.CREATE_PUBLIC_KEY_CREDENTIAL_TAG -> {
-                handleCreatePublicKeyCredential()
+                handleCredentialFlow(type)
             }
             CredentialProviderBaseController.SIGN_IN_INTENT_TAG -> {
                 handleGetSignInIntent()
@@ -79,65 +75,6 @@ open class HiddenActivity : Activity() {
         if (savedInstanceState != null) {
             mWaitingForActivityResult = savedInstanceState.getBoolean(KEY_AWAITING_RESULT, false)
         }
-    }
-
-    @Suppress("deprecation")
-    private fun handleCreatePublicKeyCredential() {
-        val fidoRegistrationRequest: PublicKeyCredentialCreationOptions? =
-            intent.getParcelableExtra(CredentialProviderBaseController.REQUEST_TAG)
-        val requestCode: Int =
-            intent.getIntExtra(
-                CredentialProviderBaseController.ACTIVITY_REQUEST_CODE_TAG,
-                DEFAULT_VALUE
-            )
-        fidoRegistrationRequest?.let {
-            Fido.getFido2ApiClient(this)
-                .getRegisterPendingIntent(fidoRegistrationRequest)
-                .addOnSuccessListener { result: PendingIntent ->
-                    try {
-                        mWaitingForActivityResult = true
-                        startIntentSenderForResult(
-                            result.intentSender,
-                            requestCode,
-                            null,
-                            /* fillInIntent= */ 0,
-                            /* flagsMask= */ 0,
-                            /* flagsValue= */ 0,
-                            /* extraFlags= */ null
-                        /* options= */ )
-                    } catch (e: IntentSender.SendIntentException) {
-                        setupFailure(
-                            resultReceiver!!,
-                            CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
-                            "During public key credential, found IntentSender " +
-                                "failure on public key creation: ${e.message}"
-                        )
-                    }
-                }
-                .addOnFailureListener { e: Exception ->
-                    var errName: String = CredentialProviderBaseController.Companion.CREATE_UNKNOWN
-                    if (
-                        e is ApiException &&
-                            e.statusCode in CredentialProviderBaseController.retryables
-                    ) {
-                        errName = CredentialProviderBaseController.Companion.CREATE_INTERRUPTED
-                    }
-                    setupFailure(
-                        resultReceiver!!,
-                        errName,
-                        "During create public key credential, fido registration " +
-                            "failure: ${e.message}"
-                    )
-                }
-        }
-            ?: run {
-                Log.w(
-                    TAG,
-                    "During create public key credential, request is null, so nothing to " +
-                        "launch for public key credentials"
-                )
-                finish()
-            }
     }
 
     private fun setupFailure(resultReceiver: ResultReceiver, errName: String, errMsg: String) {
@@ -256,6 +193,14 @@ open class HiddenActivity : Activity() {
                     "During save password, found UI intent sender " + "failure: ${e.message}"
                 )
             }
+            CredentialProviderBaseController.CREATE_PUBLIC_KEY_CREDENTIAL_TAG -> {
+                setupFailure(
+                    resultReceiver!!,
+                    CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
+                    "During public key credential, found IntentSender " +
+                        "failure on public key creation: ${e.message}"
+                )
+            }
         // TODO(b/415819849) : Finish adding the rest
         }
     }
@@ -274,6 +219,13 @@ open class HiddenActivity : Activity() {
                     resultReceiver!!,
                     CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
                     "internal error during password creation"
+                )
+            }
+            CredentialProviderBaseController.CREATE_PUBLIC_KEY_CREDENTIAL_TAG -> {
+                setupFailure(
+                    resultReceiver!!,
+                    CredentialProviderBaseController.Companion.CREATE_UNKNOWN,
+                    "internal error during public key credential creation"
                 )
             }
         // TODO(b/415819849) : Finish adding the rest
