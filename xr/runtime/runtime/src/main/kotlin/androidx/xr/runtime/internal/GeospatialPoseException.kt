@@ -16,15 +16,14 @@
 
 package androidx.xr.runtime.internal
 
-import android.app.Activity
 import androidx.annotation.RestrictTo
 
-/** Factory for creating instances of JxrPlatformAdapter. */
+/** Custom class for exceptions related to Geospatial Pose APIs. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public interface JxrPlatformAdapterFactory : Service {
-    /** Creates a [JxrPlatformAdapter] instance */
-    public fun createPlatformAdapter(
-        activity: Activity,
-        unscaledGravityAlignedActivitySpace: Boolean = false,
-    ): JxrPlatformAdapter
-}
+open public class GeospatialPoseException(message: String, cause: Throwable? = null) :
+    Exception(message, cause)
+
+/** Earth is not tracking when attempting to create a geospatial pose. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+public class GeospatialPoseNotTrackingException(cause: Throwable? = null) :
+    GeospatialPoseException("Unable to create geospatial pose. Earth is not tracking.", cause)
