@@ -26,8 +26,8 @@ import androidx.xr.runtime.math.Vector2
 /** Test-only implementation of [Plane] */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeRuntimePlane(
-    override val type: RuntimePlane.Type = RuntimePlane.Type.HorizontalUpwardFacing,
-    override val label: RuntimePlane.Label = RuntimePlane.Label.Floor,
+    override val type: RuntimePlane.Type = RuntimePlane.Type.HORIZONTAL_UPWARD_FACING,
+    override val label: RuntimePlane.Label = RuntimePlane.Label.FLOOR,
     override var trackingState: TrackingState = TrackingState.TRACKING,
     override var centerPose: Pose = Pose(),
     override var extents: Vector2 = Vector2.Zero,

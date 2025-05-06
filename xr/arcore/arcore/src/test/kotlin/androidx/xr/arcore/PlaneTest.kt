@@ -83,15 +83,15 @@ class PlaneTest {
     fun constructor_convertsRuntimePlaneType() {
         val plane1 =
             Plane(
-                FakeRuntimePlane(type = RuntimePlane.Type.HorizontalUpwardFacing),
+                FakeRuntimePlane(type = RuntimePlane.Type.HORIZONTAL_UPWARD_FACING),
                 xrResourcesManager
             )
         val plane2 =
             Plane(
-                FakeRuntimePlane(type = RuntimePlane.Type.HorizontalDownwardFacing),
+                FakeRuntimePlane(type = RuntimePlane.Type.HORIZONTAL_DOWNWARD_FACING),
                 xrResourcesManager
             )
-        val plane3 = Plane(FakeRuntimePlane(type = RuntimePlane.Type.Vertical), xrResourcesManager)
+        val plane3 = Plane(FakeRuntimePlane(type = RuntimePlane.Type.VERTICAL), xrResourcesManager)
 
         assertThat(plane1.type).isEqualTo(Plane.Type.HORIZONTAL_UPWARD_FACING)
         assertThat(plane2.type).isEqualTo(Plane.Type.HORIZONTAL_DOWNWARD_FACING)
@@ -100,11 +100,11 @@ class PlaneTest {
 
     @Test
     fun constructor_convertsRuntimePlaneLabel() {
-        val plane1 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.Unknown), xrResourcesManager)
-        val plane2 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.Wall), xrResourcesManager)
-        val plane3 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.Floor), xrResourcesManager)
-        val plane4 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.Ceiling), xrResourcesManager)
-        val plane5 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.Table), xrResourcesManager)
+        val plane1 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.UNKNOWN), xrResourcesManager)
+        val plane2 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.WALL), xrResourcesManager)
+        val plane3 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.FLOOR), xrResourcesManager)
+        val plane4 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.CEILING), xrResourcesManager)
+        val plane5 = Plane(FakeRuntimePlane(label = RuntimePlane.Label.TABLE), xrResourcesManager)
 
         assertThat(plane1.state.value.label).isEqualTo(Plane.Label.UNKNOWN)
         assertThat(plane2.state.value.label).isEqualTo(Plane.Label.WALL)

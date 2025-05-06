@@ -64,7 +64,12 @@ class OpenXrPlaneTest {
     fun setUp() {
         xrResources = XrResources()
         underTest =
-            OpenXrPlane(planeId, Plane.Type.HorizontalUpwardFacing, OpenXrTimeSource(), xrResources)
+            OpenXrPlane(
+                planeId,
+                Plane.Type.HORIZONTAL_UPWARD_FACING,
+                OpenXrTimeSource(),
+                xrResources
+            )
         xrResources.addTrackable(planeId, underTest)
         xrResources.addUpdatable(underTest as Updatable)
     }
@@ -171,7 +176,7 @@ class OpenXrPlaneTest {
         val planeSubsumed: OpenXrPlane =
             OpenXrPlane(
                 planeSubsumedId,
-                Plane.Type.HorizontalUpwardFacing,
+                Plane.Type.HORIZONTAL_UPWARD_FACING,
                 OpenXrTimeSource(),
                 xrResources,
             )
@@ -199,7 +204,7 @@ class OpenXrPlaneTest {
     fun fromOpenXrType_withValidValue_convertsType() {
         val planeType: Plane.Type = Plane.Type.fromOpenXrType(0)
 
-        assertThat(planeType).isEqualTo(Plane.Type.HorizontalDownwardFacing)
+        assertThat(planeType).isEqualTo(Plane.Type.HORIZONTAL_DOWNWARD_FACING)
     }
 
     @Test
@@ -211,7 +216,7 @@ class OpenXrPlaneTest {
     fun fromOpenXrLabel_withValidValue_convertsLabel() {
         val planeLabel: Plane.Label = Plane.Label.fromOpenXrLabel(0)
 
-        assertThat(planeLabel).isEqualTo(Plane.Label.Unknown)
+        assertThat(planeLabel).isEqualTo(Plane.Label.UNKNOWN)
     }
 
     @Test

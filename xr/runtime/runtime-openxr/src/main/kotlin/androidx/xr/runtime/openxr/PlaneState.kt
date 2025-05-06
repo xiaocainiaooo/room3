@@ -35,7 +35,7 @@ import androidx.xr.runtime.math.Vector2
  */
 internal data class PlaneState(
     val trackingState: TrackingState = TrackingState.PAUSED,
-    val label: Plane.Label = Plane.Label.Unknown,
+    val label: Plane.Label = Plane.Label.UNKNOWN,
     val centerPose: Pose = Pose(),
     val extents: Vector2 = Vector2.Zero,
     val vertices: Array<Vector2> = emptyArray(),

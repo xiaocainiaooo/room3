@@ -217,19 +217,19 @@ internal constructor(
 
     private fun typeFromRuntimeType(): Type =
         when (runtimePlane.type) {
-            RuntimePlane.Type.HorizontalUpwardFacing -> Type.HORIZONTAL_UPWARD_FACING
-            RuntimePlane.Type.HorizontalDownwardFacing -> Type.HORIZONTAL_DOWNWARD_FACING
-            RuntimePlane.Type.Vertical -> Type.VERTICAL
+            RuntimePlane.Type.HORIZONTAL_UPWARD_FACING -> Type.HORIZONTAL_UPWARD_FACING
+            RuntimePlane.Type.HORIZONTAL_DOWNWARD_FACING -> Type.HORIZONTAL_DOWNWARD_FACING
+            RuntimePlane.Type.VERTICAL -> Type.VERTICAL
             else -> Type.HORIZONTAL_UPWARD_FACING
         }
 
     private fun labelFromRuntimeType(): Label =
         when (runtimePlane.label) {
-            RuntimePlane.Label.Unknown -> Label.UNKNOWN
-            RuntimePlane.Label.Wall -> Label.WALL
-            RuntimePlane.Label.Floor -> Label.FLOOR
-            RuntimePlane.Label.Ceiling -> Label.CEILING
-            RuntimePlane.Label.Table -> Label.TABLE
+            RuntimePlane.Label.UNKNOWN -> Label.UNKNOWN
+            RuntimePlane.Label.WALL -> Label.WALL
+            RuntimePlane.Label.FLOOR -> Label.FLOOR
+            RuntimePlane.Label.CEILING -> Label.CEILING
+            RuntimePlane.Label.TABLE -> Label.TABLE
             else -> Label.UNKNOWN
         }
 
