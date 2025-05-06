@@ -30,6 +30,7 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.navigationevent.NavigationEventDispatcher
 import androidx.navigationevent.NavigationEventDispatcherOwner
+import androidx.navigationevent.setViewTreeNavigationEventDispatcherOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
@@ -145,5 +146,6 @@ constructor(context: Context, @StyleRes themeResId: Int = 0) :
         window!!.decorView.setViewTreeLifecycleOwner(this)
         window!!.decorView.setViewTreeOnBackPressedDispatcherOwner(this)
         window!!.decorView.setViewTreeSavedStateRegistryOwner(this)
+        window!!.decorView.setViewTreeNavigationEventDispatcherOwner(this)
     }
 }

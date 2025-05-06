@@ -95,6 +95,7 @@ import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.navigationevent.NavigationEventDispatcher
 import androidx.navigationevent.NavigationEventDispatcherOwner
 import androidx.navigationevent.NavigationInputHandler
+import androidx.navigationevent.setViewTreeNavigationEventDispatcherOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
@@ -423,6 +424,7 @@ open class ComponentActivity() :
         window.decorView.setViewTreeSavedStateRegistryOwner(this)
         window.decorView.setViewTreeOnBackPressedDispatcherOwner(this)
         window.decorView.setViewTreeFullyDrawnReporterOwner(this)
+        window.decorView.setViewTreeNavigationEventDispatcherOwner(this)
     }
 
     override fun peekAvailableContext(): Context? {
