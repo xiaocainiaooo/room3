@@ -129,7 +129,7 @@ class OpenXrPerceptionManagerTest {
         // TODO: b/345314278 -- Add more meaningful tests once trackables are implemented properly
         // and
         // a fake perception library can be used mock trackables.
-        openXrManager.configure(Config(planeTracking = Config.PlaneTrackingMode.Disabled))
+        openXrManager.configure(Config(planeTracking = Config.PlaneTrackingMode.DISABLED))
 
         underTest.updatePlanes(XR_TIME)
 
@@ -228,7 +228,7 @@ class OpenXrPerceptionManagerTest {
 
     @Test
     fun hitTest_planeTrackingDisabled_throwsIllegalStateException() = initOpenXrManagerAndRunTest {
-        openXrManager.configure(Config(planeTracking = Config.PlaneTrackingMode.Disabled))
+        openXrManager.configure(Config(planeTracking = Config.PlaneTrackingMode.DISABLED))
         underTest.updatePlanes(XR_TIME)
         underTest.update(XR_TIME)
 
@@ -321,8 +321,8 @@ class OpenXrPerceptionManagerTest {
             openXrManager.resume()
             openXrManager.configure(
                 Config(
-                    planeTracking = Config.PlaneTrackingMode.HorizontalAndVertical,
-                    handTracking = Config.HandTrackingMode.Enabled,
+                    planeTracking = Config.PlaneTrackingMode.HORIZONTAL_AND_VERTICAL,
+                    handTracking = Config.HandTrackingMode.ENABLED,
                 )
             )
 

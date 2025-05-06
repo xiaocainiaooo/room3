@@ -103,7 +103,7 @@ class OpenXrHandTest {
     @Test
     fun update_handTrackingDisabled_throwsIllegalStateException() = initOpenXrManagerAndRunTest {
         val xrTime = 50L * 1_000_000 // 50 milliseconds in nanoseconds.
-        openXrManager.configure(Config(handTracking = Config.HandTrackingMode.Disabled))
+        openXrManager.configure(Config(handTracking = Config.HandTrackingMode.DISABLED))
 
         assertFailsWith<IllegalStateException> { underTest.update(xrTime) }
     }
@@ -115,7 +115,7 @@ class OpenXrHandTest {
             openXrManager = OpenXrManager(it, perceptionManager, timeSource)
             openXrManager.create()
             openXrManager.resume()
-            openXrManager.configure(Config(handTracking = Config.HandTrackingMode.Enabled))
+            openXrManager.configure(Config(handTracking = Config.HandTrackingMode.ENABLED))
 
             testBody()
 

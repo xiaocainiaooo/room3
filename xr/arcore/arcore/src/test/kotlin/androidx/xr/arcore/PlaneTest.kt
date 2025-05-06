@@ -136,7 +136,7 @@ class PlaneTest {
     fun subscribe_planeTrackingDisabled_throwsIllegalStateException() =
         createTestSessionAndRunTest(testDispatcher) {
             runTest(testDispatcher) {
-                session.configure(Config(planeTracking = PlaneTrackingMode.Disabled))
+                session.configure(Config(planeTracking = PlaneTrackingMode.DISABLED))
 
                 assertFailsWith<IllegalStateException> { Plane.subscribe(session) }
             }
@@ -173,7 +173,7 @@ class PlaneTest {
             val runtimePlane = FakeRuntimePlane()
             xrResourcesManager.syncTrackables(listOf(runtimePlane))
             val underTest = xrResourcesManager.trackablesMap.values.first() as Plane
-            session.configure(Config(planeTracking = PlaneTrackingMode.Disabled))
+            session.configure(Config(planeTracking = PlaneTrackingMode.DISABLED))
 
             assertFailsWith<IllegalStateException> { underTest.createAnchor(Pose()) }
         }

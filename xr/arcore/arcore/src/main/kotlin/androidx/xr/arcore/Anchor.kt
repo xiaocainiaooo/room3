@@ -77,7 +77,7 @@ internal constructor(
          */
         @JvmStatic
         public fun getPersistedAnchorUuids(session: Session): List<UUID> {
-            check(session.config.anchorPersistence != AnchorPersistenceMode.Disabled) {
+            check(session.config.anchorPersistence != AnchorPersistenceMode.DISABLED) {
                 "Config.AnchorPersistenceMode is set to Disabled."
             }
             return session.runtime.perceptionManager.getPersistedAnchorUuids()
@@ -92,7 +92,7 @@ internal constructor(
          */
         @JvmStatic
         public fun load(session: Session, uuid: UUID): AnchorCreateResult {
-            check(session.config.anchorPersistence != AnchorPersistenceMode.Disabled) {
+            check(session.config.anchorPersistence != AnchorPersistenceMode.DISABLED) {
                 "Config.AnchorPersistenceMode is set to Disabled."
             }
 
@@ -125,7 +125,7 @@ internal constructor(
          */
         @JvmStatic
         public fun unpersist(session: Session, uuid: UUID) {
-            check(session.config.anchorPersistence != AnchorPersistenceMode.Disabled) {
+            check(session.config.anchorPersistence != AnchorPersistenceMode.DISABLED) {
                 "Config.AnchorPersistenceMode is set to Disabled."
             }
             session.runtime.perceptionManager.unpersistAnchor(uuid)
@@ -189,7 +189,7 @@ internal constructor(
      */
     public suspend fun persist(): UUID {
         val config = xrResourceManager.lifecycleManager.config
-        check(config.anchorPersistence != AnchorPersistenceMode.Disabled) {
+        check(config.anchorPersistence != AnchorPersistenceMode.DISABLED) {
             "Config.AnchorPersistenceMode is set to Disabled."
         }
         runtimeAnchor.persist()

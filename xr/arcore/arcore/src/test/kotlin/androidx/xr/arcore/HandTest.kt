@@ -127,7 +127,7 @@ class HandTest {
     @Test
     fun left_handTrackingDisabled_throwsIllegalStateException() =
         createTestSessionAndRunTest(testDispatcher) {
-            session.configure(Config(handTracking = HandTrackingMode.Disabled))
+            session.configure(Config(handTracking = HandTrackingMode.DISABLED))
 
             assertFailsWith<IllegalStateException> { Hand.left(session) }
         }
@@ -172,7 +172,7 @@ class HandTest {
     @Test
     fun right_handTrackingDisabled_throwsIllegalStateException() =
         createTestSessionAndRunTest(testDispatcher) {
-            session.configure(Config(handTracking = HandTrackingMode.Disabled))
+            session.configure(Config(handTracking = HandTrackingMode.DISABLED))
 
             assertFailsWith<IllegalStateException> { Hand.right(session) }
         }

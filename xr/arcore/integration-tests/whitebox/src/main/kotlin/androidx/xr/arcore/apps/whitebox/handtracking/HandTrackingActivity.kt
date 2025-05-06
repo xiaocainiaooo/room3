@@ -143,7 +143,7 @@ class HandTrackingActivity : ComponentActivity() {
         sessionHelper =
             SessionLifecycleHelper(
                 this,
-                Config(handTracking = Config.HandTrackingMode.Enabled),
+                Config(handTracking = Config.HandTrackingMode.ENABLED),
                 onSessionAvailable = { session ->
                     this.session = session
 

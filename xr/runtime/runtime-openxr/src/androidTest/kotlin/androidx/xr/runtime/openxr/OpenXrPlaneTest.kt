@@ -232,7 +232,7 @@ class OpenXrPlaneTest {
             openXrManager.create()
             openXrManager.resume()
             openXrManager.configure(
-                Config(planeTracking = Config.PlaneTrackingMode.HorizontalAndVertical)
+                Config(planeTracking = Config.PlaneTrackingMode.HORIZONTAL_AND_VERTICAL)
             )
 
             testBody()

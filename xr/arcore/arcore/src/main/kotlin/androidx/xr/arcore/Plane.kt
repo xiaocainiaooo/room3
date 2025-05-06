@@ -48,7 +48,7 @@ internal constructor(
          */
         @JvmStatic
         public fun subscribe(session: Session): StateFlow<Collection<Plane>> {
-            check(session.config.planeTracking != PlaneTrackingMode.Disabled) {
+            check(session.config.planeTracking != PlaneTrackingMode.DISABLED) {
                 "Config.PlaneTrackingMode is set to Disabled."
             }
 
@@ -186,7 +186,7 @@ internal constructor(
      */
     override fun createAnchor(pose: Pose): AnchorCreateResult {
         check(
-            xrResourceManager.lifecycleManager.config.planeTracking != PlaneTrackingMode.Disabled
+            xrResourceManager.lifecycleManager.config.planeTracking != PlaneTrackingMode.DISABLED
         ) {
             "Config.PlaneTrackingMode is set to Disabled."
         }
