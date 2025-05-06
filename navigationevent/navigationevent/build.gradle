@@ -58,7 +58,9 @@ androidXMultiplatform {
 
         androidMain {
             dependsOn(commonMain)
-            dependencies { }
+            dependencies {
+                implementation("androidx.core:core-viewtree:1.0.0")
+            }
         }
 
         androidInstrumentedTest {
