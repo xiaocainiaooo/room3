@@ -29,6 +29,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.navigationevent.NavigationEventDispatcher
+import androidx.navigationevent.NavigationEventDispatcherOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
@@ -41,6 +42,7 @@ constructor(context: Context, @StyleRes themeResId: Int = 0) :
     Dialog(context, themeResId),
     LifecycleOwner,
     OnBackPressedDispatcherOwner,
+    NavigationEventDispatcherOwner,
     SavedStateRegistryOwner {
 
     private var _lifecycleRegistry: LifecycleRegistry? = null
@@ -92,7 +94,7 @@ constructor(context: Context, @StyleRes themeResId: Int = 0) :
      * This dispatcher acts as the central point for back navigation events. When a navigation event
      * occurs (e.g., a back gesture), it safely invokes [ComponentDialog.onBackPressed].
      */
-    val navigationEventDispatcher: NavigationEventDispatcher = NavigationEventDispatcher {
+    override val navigationEventDispatcher: NavigationEventDispatcher = NavigationEventDispatcher {
         @Suppress("DEPRECATION") super.onBackPressed()
     }
 

@@ -53,6 +53,11 @@ package androidx.navigationevent {
     method @MainThread public void removeCallback(androidx.navigationevent.NavigationEventCallback callback);
   }
 
+  public interface NavigationEventDispatcherOwner {
+    method public androidx.navigationevent.NavigationEventDispatcher getNavigationEventDispatcher();
+    property public abstract androidx.navigationevent.NavigationEventDispatcher navigationEventDispatcher;
+  }
+
   @kotlin.jvm.JvmInline public final value class NavigationEventPriority {
     field public static final androidx.navigationevent.NavigationEventPriority.Companion Companion;
   }

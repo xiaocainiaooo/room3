@@ -93,6 +93,7 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.navigationevent.NavigationEventDispatcher
+import androidx.navigationevent.NavigationEventDispatcherOwner
 import androidx.navigationevent.NavigationInputHandler
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
@@ -118,6 +119,7 @@ open class ComponentActivity() :
     HasDefaultViewModelProviderFactory,
     SavedStateRegistryOwner,
     OnBackPressedDispatcherOwner,
+    NavigationEventDispatcherOwner,
     ActivityResultRegistryOwner,
     ActivityResultCaller,
     OnConfigurationChangedProvider,
@@ -608,7 +610,7 @@ open class ComponentActivity() :
      * This dispatcher acts as the central point for back navigation events. When a navigation event
      * occurs (e.g., a back gesture), it safely invokes [ComponentActivity.onBackPressed].
      */
-    val navigationEventDispatcher: NavigationEventDispatcher by lazy {
+    override val navigationEventDispatcher: NavigationEventDispatcher by lazy {
         NavigationEventDispatcher(fallbackOnBackPressed = ::tryOnBackPressed).also { dispatcher ->
             if (Build.VERSION.SDK_INT >= 33) {
                 if (Looper.myLooper() != Looper.getMainLooper()) {
