@@ -31,10 +31,12 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.requireLayoutDirection
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 
 /**
@@ -108,6 +110,10 @@ private class DraggableAnchorsNodeV2<T>(
         didLookahead = false
     }
 
+    private val isReverseDirection: Boolean
+        get() =
+            requireLayoutDirection() == LayoutDirection.Rtl && orientation == Orientation.Horizontal
+
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -130,7 +136,8 @@ private class DraggableAnchorsNodeV2<T>(
                 if (isLookingAhead) {
                     state.anchors.positionOf(state.targetValue)
                 } else state.requireOffset()
-            val xOffset = if (orientation == Orientation.Horizontal) offset else 0f
+            val rtlModifier = if (isReverseDirection) -1f else 1f
+            val xOffset = if (orientation == Orientation.Horizontal) offset * rtlModifier else 0f
             val yOffset = if (orientation == Orientation.Vertical) offset else 0f
             // Tagging as motion frame of reference placement, meaning the placement
             // contains scrolling. This allows the consumer of this placement offset to
