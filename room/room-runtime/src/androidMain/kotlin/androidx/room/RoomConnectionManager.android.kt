@@ -18,6 +18,7 @@ package androidx.room
 
 import androidx.room.coroutines.ConnectionPool
 import androidx.room.coroutines.PassthroughConnectionPool
+import androidx.room.coroutines.TransactionWrapper
 import androidx.room.coroutines.newConnectionPool
 import androidx.room.coroutines.newSingleConnectionPool
 import androidx.sqlite.SQLiteConnection
@@ -42,7 +43,11 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
 
     private var supportDatabase: SupportSQLiteDatabase? = null
 
-    constructor(config: DatabaseConfiguration, openDelegate: RoomOpenDelegate) {
+    constructor(
+        config: DatabaseConfiguration,
+        openDelegate: RoomOpenDelegate,
+        transactionWrapper: TransactionWrapper<*>
+    ) {
         this.configuration = config
         this.openDelegate = openDelegate
         this.callbacks = config.callbacks ?: emptyList()
@@ -64,7 +69,8 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
             this.connectionPool =
                 PassthroughConnectionPool(
                     driver = SupportSQLiteDriver(supportOpenHelper),
-                    fileName = config.name ?: ":memory:"
+                    fileName = config.name ?: ":memory:",
+                    transactionWrapper = transactionWrapper
                 )
         } else {
             this.supportOpenHelper = null
@@ -75,7 +81,8 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
                     // thread-confined connection pool.
                     PassthroughConnectionPool(
                         driver = DriverWrapper(config.sqliteDriver),
-                        fileName = config.name ?: ":memory:"
+                        fileName = config.name ?: ":memory:",
+                        transactionWrapper = transactionWrapper
                     )
                 } else if (config.name == null) {
                     // An in-memory database must use a single connection pool.
@@ -97,7 +104,8 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
 
     constructor(
         config: DatabaseConfiguration,
-        supportOpenHelperFactory: (DatabaseConfiguration) -> SupportSQLiteOpenHelper
+        supportOpenHelperFactory: (DatabaseConfiguration) -> SupportSQLiteOpenHelper,
+        transactionWrapper: TransactionWrapper<*>
     ) {
         this.configuration = config
         this.openDelegate = NoOpOpenDelegate()
@@ -111,7 +119,8 @@ internal actual class RoomConnectionManager : BaseRoomConnectionManager {
         this.connectionPool =
             PassthroughConnectionPool(
                 driver = SupportSQLiteDriver(supportOpenHelper),
-                fileName = config.name ?: ":memory:"
+                fileName = config.name ?: ":memory:",
+                transactionWrapper = transactionWrapper
             )
         init()
     }

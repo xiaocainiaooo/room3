@@ -25,6 +25,8 @@ import androidx.sqlite.SQLiteException
 import androidx.sqlite.SQLiteStatement
 import androidx.sqlite.execSQL
 
+internal typealias TransactionWrapper<T> = suspend (suspend () -> T) -> T
+
 /**
  * An implementation of a connection pool that doesn't do any connection management.
  *
@@ -35,10 +37,13 @@ import androidx.sqlite.execSQL
  */
 internal class PassthroughConnectionPool(
     private val driver: SQLiteDriver,
-    private val fileName: String
+    private val fileName: String,
+    private val transactionWrapper: TransactionWrapper<*>? = null,
 ) : ConnectionPool {
 
-    private val connection = lazy { PassthroughPooledConnection(driver.open(fileName)) }
+    private val connection = lazy {
+        PassthroughPooledConnection(transactionWrapper, driver.open(fileName))
+    }
 
     override suspend fun <R> useConnection(
         isReadOnly: Boolean,
@@ -54,8 +59,10 @@ internal class PassthroughConnectionPool(
     }
 }
 
-private class PassthroughPooledConnection(val delegate: SQLiteConnection) :
-    Transactor, RawConnectionAccessor {
+private class PassthroughPooledConnection(
+    val transactionWrapper: TransactionWrapper<*>?,
+    val delegate: SQLiteConnection
+) : Transactor, RawConnectionAccessor {
 
     private var nestedTransactionCount = AtomicInt(0)
     private var currentTransactionType: Transactor.SQLiteTransactionType? = null
@@ -67,12 +74,16 @@ private class PassthroughPooledConnection(val delegate: SQLiteConnection) :
         return delegate.prepare(sql).use { block.invoke(it) }
     }
 
-    // TODO(b/408010324, b/415006268): Add coroutine confinement like RoomDatabase.withTransaction
     override suspend fun <R> withTransaction(
         type: Transactor.SQLiteTransactionType,
         block: suspend TransactionScope<R>.() -> R
     ): R {
-        return transaction(type, block)
+        return if (transactionWrapper != null) {
+            @Suppress("UNCHECKED_CAST") // Safe to cast since it just pipes the result
+            transactionWrapper.invoke { transaction(type, block) } as R
+        } else {
+            transaction(type, block)
+        }
     }
 
     private suspend fun <R> transaction(

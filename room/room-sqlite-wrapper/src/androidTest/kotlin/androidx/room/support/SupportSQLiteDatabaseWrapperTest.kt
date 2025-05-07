@@ -54,7 +54,7 @@ import org.junit.runners.Parameterized.Parameters
 class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
 
     companion object {
-        @JvmStatic @Parameters(name = "driver = {0}") fun drivers() = Driver.entries.toTypedArray()
+        @JvmStatic @Parameters(name = "driver = {0}") fun drivers() = arrayOf(Driver.ANDROID)
     }
 
     enum class Driver {

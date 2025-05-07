@@ -21,23 +21,19 @@ import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.room.RoomDatabase
 import androidx.room.Transactor
 import androidx.room.Transactor.SQLiteTransactionType
-import androidx.room.util.activeThreadTransactionContext
+import androidx.room.useReaderConnection
+import androidx.room.useWriterConnection
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -45,22 +41,13 @@ import kotlinx.coroutines.withContext
 internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
     private val isClosed = AtomicBoolean(false)
 
-    // A single thread dispatcher used for drivers that have an internal connection pool. It is
-    // unknown if the driver's internal pool has thread-confined semantics (like Android) or
-    // something entirely different, but to avoid any assumptions all database operations will be
-    // dispatched to this thread while there is an active transaction.
-    // TODO(b/408010324, b/415006268): Combine with RoomDatabase.withTransaction semantics
-    private val threadTransactionDispatcher: ExecutorCoroutineDispatcher? =
-        if (roomDatabase.driver.hasConnectionPool) {
-            Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-        } else {
-            null
-        }
-
     // The thread confined transaction object. If this thread local is set, then there is an active
     // transaction in this thread and a coroutine holding the connection with the transaction is
     // active and awaiting for the transaction to end.
     private val threadTransaction = ThreadLocal<ThreadTransaction>()
+
+    private val threadTransactionContext: ThreadLocal<CoroutineContext>
+        get() = roomDatabase.suspendingTransactionContext
 
     val path: String?
         get() = roomDatabase.path
@@ -81,7 +68,7 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
         isReadOnly: Boolean,
         block: suspend (Transactor) -> T
     ): T {
-        val context = threadTransaction.get()?.getCoroutineContext() ?: EmptyCoroutineContext
+        val context = roomDatabase.suspendingTransactionContext.get() ?: EmptyCoroutineContext
         return runBlockingNonInterruptible(context) {
             roomDatabase.useConnection(isReadOnly, block)
         }
@@ -107,15 +94,10 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
     fun beginTransaction(type: SQLiteTransactionType, listener: SQLiteTransactionListener? = null) {
         val currentTransaction =
             threadTransaction.get()
-                ?: ThreadTransaction.create(
-                        db = roomDatabase,
-                        transactionDispatcher = threadTransactionDispatcher,
-                        type = type
-                    )
-                    .also {
-                        threadTransaction.set(it)
-                        activeThreadTransactionContext.set(it.getCoroutineContext())
-                    }
+                ?: ThreadTransaction.create(roomDatabase, type).also {
+                    threadTransaction.set(it)
+                    threadTransactionContext.set(it.getCoroutineContext())
+                }
         currentTransaction.begin(listener)
     }
 
@@ -123,7 +105,7 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
         val currentTransaction = threadTransaction.get() ?: error("Not in a transaction")
         val transactionEnded = currentTransaction.end()
         if (transactionEnded) {
-            activeThreadTransactionContext.set(null)
+            threadTransactionContext.set(null)
             threadTransaction.set(null)
         }
     }
@@ -145,7 +127,6 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
     fun close() {
         if (isClosed.compareAndSet(false, true)) {
             threadTransaction.get()?.end()
-            threadTransactionDispatcher?.close()
             roomDatabase.close()
         }
     }
@@ -159,25 +140,18 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
  * [RoomSupportSQLiteSession.endTransaction] the coroutine is finished which marks the end of the
  * transaction.
  *
- * @property context The connection confined coroutine context. If there is an on-going transaction,
- *   this context should be used when bridging blocking APIs with the [RoomDatabase] coroutine APIs.
- *   See [RoomSupportSQLiteSession.useConnectionBlocking] and [activeThreadTransactionContext].
- * @property dispatcher An optional dispatcher to execute database operations for the on-going
- *   transaction.
  * @property completable A completable to finish the transaction, the value will determine if the
  *   transaction is committed or rolled back.
  */
 private class ThreadTransaction
 private constructor(
-    private val context: CoroutineContext,
-    private val dispatcher: CoroutineDispatcher?,
+    private val connectionContext: CoroutineContext,
     private val completable: TransactionCompletable,
 ) {
     private val stack = ArrayDeque<TransactionItem>()
 
     fun getCoroutineContext(): CoroutineContext {
-        val baseContext = context.minusKey(ContinuationInterceptor)
-        return dispatcher?.let { baseContext + it } ?: baseContext
+        return connectionContext
     }
 
     fun begin(listener: SQLiteTransactionListener?) {
@@ -205,6 +179,10 @@ private constructor(
     /**
      * A [CompletableDeferred] that also awaits for the [latch] which is only released when the
      * transaction coroutine is completed.
+     *
+     * @property delegate The actual [CompletableDeferred] that once completed will release the
+     *   active transaction coroutine.
+     * @property latch The latch to await for the completion of the transaction coroutine.
      */
     private class TransactionCompletable(
         private val delegate: CompletableDeferred<Boolean>,
@@ -228,43 +206,38 @@ private constructor(
     }
 
     companion object {
-        fun create(
-            db: RoomDatabase,
-            transactionDispatcher: CoroutineDispatcher?,
-            type: SQLiteTransactionType
-        ): ThreadTransaction {
+        fun create(db: RoomDatabase, type: SQLiteTransactionType): ThreadTransaction {
             val transactionFuture =
                 CallbackToFutureAdapter.getFuture { completer ->
                     // a latch to wait (blocking) for the coroutine to finish
                     val completionLatch = CountDownLatch(1)
-                    val transactionBody: suspend (Transactor) -> Unit = { connection ->
-                        connection.withTransaction(type) {
+                    val transactionBlock: suspend (Transactor) -> Unit = {
+                        it.withTransaction(type) {
                             // a completable to commit or rollback the transaction
                             val successSignal = CompletableDeferred<Boolean>()
                             // the transaction object that will be stored in a thread local
-                            ThreadTransaction(
-                                    context = coroutineContext,
-                                    dispatcher = transactionDispatcher,
+                            val threadTransaction =
+                                ThreadTransaction(
+                                    connectionContext = coroutineContext,
                                     completable =
                                         TransactionCompletable(successSignal, completionLatch)
                                 )
-                                .also { completer.set(it) }
+                            completer.set(threadTransaction)
                             val success = successSignal.await()
                             if (!success) {
                                 rollback(Unit)
                             }
                         }
                     }
-                    val transactionScope =
-                        transactionDispatcher?.let { CoroutineScope(it) } ?: db.getCoroutineScope()
                     // launch a transaction coroutine that will be kept alive until the transaction
                     // object ends.
-                    transactionScope
+                    db.getCoroutineScope()
                         .launch(CoroutineName("RoomSupportSQLiteTransaction")) {
-                            db.useConnection(
-                                isReadOnly = type == SQLiteTransactionType.DEFERRED,
-                                block = transactionBody
-                            )
+                            if (type == SQLiteTransactionType.DEFERRED) {
+                                db.useReaderConnection(transactionBlock)
+                            } else {
+                                db.useWriterConnection(transactionBlock)
+                            }
                         }
                         .invokeOnCompletion { error ->
                             if (error != null) {
