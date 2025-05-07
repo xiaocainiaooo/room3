@@ -19,7 +19,6 @@ package androidx.camera.viewfinder.compose
 import android.os.Build
 import android.util.Size
 import android.view.Surface
-import androidx.annotation.RequiresApi
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
@@ -33,35 +32,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.TruthJUnit.assume
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
+import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class ViewfinderTest {
+@RunWith(Parameterized::class)
+class ViewfinderTest(private val implementationMode: ImplementationMode) {
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "implementationMode = {0}")
+        fun data(): Array<ImplementationMode> =
+            arrayOf(ImplementationMode.EXTERNAL, ImplementationMode.EMBEDDED)
+    }
+
     @get:Rule val rule = createComposeRule()
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
-    @Test
-    fun canRetrievePerformanceSurface() = runBlocking {
-        assertCanRetrieveSurface(implementationMode = ImplementationMode.EXTERNAL)
-    }
-
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
-    @Test
-    fun canRetrieveCompatibleSurface() = runBlocking {
-        assertCanRetrieveSurface(implementationMode = ImplementationMode.EMBEDDED)
-    }
-
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
     fun coordinatesTransformationSameSizeNoRotation(): Unit = runBlocking {
         val coordinateTransformer = MutableCoordinateTransformer()
@@ -84,7 +80,6 @@ class ViewfinderTest {
         assertThat(coordinateTransformer.transformMatrix.values).isEqualTo(expectedMatrix.values)
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
     fun coordinatesTransformationSameSizeWithHalfCrop(): Unit = runBlocking {
         // Viewfinder size: 1080x1920
@@ -97,12 +92,6 @@ class ViewfinderTest {
             with(LocalDensity.current) {
                 TestViewfinder(
                     modifier = Modifier.size(540.toDp(), 960.toDp()),
-                    surfaceRequest =
-                        ViewfinderSurfaceRequest(
-                            width = ViewfinderTestParams.Default.sourceResolution.width,
-                            height = ViewfinderTestParams.Default.sourceResolution.height,
-                            implementationMode = ImplementationMode.EXTERNAL,
-                        ),
                     transformationInfo =
                         TransformationInfo(
                             sourceRotation = 0,
@@ -127,115 +116,135 @@ class ViewfinderTest {
         assertThat(coordinateTransformer.transformMatrix.values).isEqualTo(expectedMatrix.values)
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M) // Needed for Surface.lockHardwareCanvas()
+    @Test
+    fun canRetrieveSurface() = runBlocking {
+        testWithSession {
+            val surface = awaitSurface()
+            surface.lockHardwareCanvas().apply {
+                try {
+                    assertThat(Size(width, height))
+                        .isEqualTo(ViewfinderTestParams.Default.sourceResolution)
+                } finally {
+                    surface.unlockCanvasAndPost(this)
+                }
+            }
+        }
+    }
+
     @Test
     fun verifySurfacesAreReleased_surfaceRequestReleased_thenComposableDestroyed(): Unit =
         runBlocking {
-            val surfaceDeferred = CompletableDeferred<Surface>()
-            val sessionCompleteDeferred = CompletableDeferred<Unit>()
+            testWithSession {
+                val surface = awaitSurface()
+                assertThat(surface.isValid).isTrue()
 
-            val showViewfinder = mutableStateOf(true)
+                allowSessionCompletion()
+                rule.awaitIdle()
+                assertThat(surface.isValid).isTrue()
 
-            rule.setContent {
-                val showView by remember { showViewfinder }
-                TestViewfinder(showViewfinder = showView) {
-                    onSurfaceSession {
-                        surfaceDeferred.complete(surface)
-                        sessionCompleteDeferred.await()
-                    }
-                }
+                hideViewfinder()
+                rule.awaitIdle()
+                assertThat(surface.isValid).isFalse()
             }
-
-            val surface = surfaceDeferred.await()
-            assertThat(surface.isValid).isTrue()
-
-            sessionCompleteDeferred.complete(Unit)
-            rule.awaitIdle()
-            assertThat(surface.isValid).isTrue()
-
-            showViewfinder.value = false
-            rule.awaitIdle()
-            assertThat(surface.isValid).isFalse()
         }
 
-    @Ignore("b/390508238: Surface release needs to be delayed by TextureView/SurfaceView ")
     @Test
     fun verifySurfacesAreReleased_composableDestroyed_thenSurfaceRequestReleased(): Unit =
         runBlocking {
-            val surfaceDeferred = CompletableDeferred<Surface>()
-            val sessionCompleteDeferred = CompletableDeferred<Unit>()
+            assume()
+                .withMessage(
+                    "EXTERNAL implamentation on API < 29 is not yet able to delay surface destruction by the Viewfinder."
+                )
+                .that(
+                    Build.VERSION.SDK_INT >= 29 || implementationMode != ImplementationMode.EXTERNAL
+                )
+                .isTrue()
+            testWithSession {
+                val surface = awaitSurface()
+                assertThat(surface.isValid).isTrue()
 
-            val showViewfinder = mutableStateOf(true)
+                hideViewfinder()
+                rule.awaitIdle()
+                assertThat(surface.isValid).isTrue()
 
-            rule.setContent {
-                val showView by remember { showViewfinder }
-                TestViewfinder(showViewfinder = showView) {
-                    onSurfaceSession { surfaceDeferred.complete(surface) }
+                allowSessionCompletion()
+                rule.awaitIdle()
+                assertThat(surface.isValid).isFalse()
+            }
+        }
+
+    private interface SessionTestScope {
+        fun hideViewfinder()
+
+        suspend fun awaitSurface(): Surface
+
+        fun allowSessionCompletion()
+    }
+
+    private suspend fun testWithSession(block: suspend SessionTestScope.() -> Unit) {
+        val surfaceDeferred = CompletableDeferred<Surface>()
+        val sessionCompleteDeferred = CompletableDeferred<Unit>()
+
+        val showViewfinder = mutableStateOf(true)
+
+        rule.setContent {
+            val showView by remember { showViewfinder }
+            TestViewfinder(showViewfinder = showView) {
+                onSurfaceSession {
+                    surfaceDeferred.complete(surface)
+                    withContext(NonCancellable) { sessionCompleteDeferred.await() }
+                }
+            }
+        }
+
+        val sessionTestScope =
+            object : SessionTestScope {
+                override fun hideViewfinder() {
+                    showViewfinder.value = false
+                }
+
+                override suspend fun awaitSurface(): Surface {
+                    return surfaceDeferred.await()
+                }
+
+                override fun allowSessionCompletion() {
+                    sessionCompleteDeferred.complete(Unit)
                 }
             }
 
-            val surface = surfaceDeferred.await()
-            assertThat(surface.isValid).isTrue()
-
-            showViewfinder.value = false
-            rule.awaitIdle()
-            assertThat(surface.isValid).isTrue()
-
-            sessionCompleteDeferred.complete(Unit)
-            rule.awaitIdle()
-            assertThat(surface.isValid).isFalse()
+        try {
+            block.invoke(sessionTestScope)
+        } finally {
+            sessionCompleteDeferred.cancel()
         }
+    }
 
-    @RequiresApi(Build.VERSION_CODES.M) // Needed for Surface.lockHardwareCanvas()
-    private suspend fun assertCanRetrieveSurface(implementationMode: ImplementationMode) {
-        val surfaceDeferred = CompletableDeferred<Surface>()
-        val surfaceRequest =
+    @Composable
+    fun TestViewfinder(
+        modifier: Modifier = Modifier.size(ViewfinderTestParams.Default.viewfinderSize),
+        showViewfinder: Boolean = true,
+        transformationInfo: TransformationInfo = ViewfinderTestParams.Default.transformationInfo,
+        surfaceRequest: ViewfinderSurfaceRequest = remember {
             ViewfinderSurfaceRequest(
                 width = ViewfinderTestParams.Default.sourceResolution.width,
                 height = ViewfinderTestParams.Default.sourceResolution.height,
                 implementationMode = implementationMode,
             )
-        rule.setContent {
-            TestViewfinder(surfaceRequest = surfaceRequest) {
-                onSurfaceSession { surfaceDeferred.complete(surface) }
+        },
+        coordinateTransformer: MutableCoordinateTransformer? = null,
+        onInit: ViewfinderInitScope.() -> Unit,
+    ) {
+        Column {
+            if (showViewfinder) {
+                Viewfinder(
+                    modifier = modifier,
+                    surfaceRequest = surfaceRequest,
+                    transformationInfo = transformationInfo,
+                    coordinateTransformer = coordinateTransformer,
+                    onInit = onInit,
+                )
             }
-        }
-
-        val surface = surfaceDeferred.await()
-        surface.lockHardwareCanvas().apply {
-            try {
-                assertThat(Size(width, height))
-                    .isEqualTo(ViewfinderTestParams.Default.sourceResolution)
-            } finally {
-                surface.unlockCanvasAndPost(this)
-            }
-        }
-    }
-}
-
-@Composable
-fun TestViewfinder(
-    modifier: Modifier = Modifier.size(ViewfinderTestParams.Default.viewfinderSize),
-    showViewfinder: Boolean = true,
-    transformationInfo: TransformationInfo = ViewfinderTestParams.Default.transformationInfo,
-    surfaceRequest: ViewfinderSurfaceRequest = remember {
-        ViewfinderSurfaceRequest(
-            width = ViewfinderTestParams.Default.sourceResolution.width,
-            height = ViewfinderTestParams.Default.sourceResolution.height,
-            implementationMode = ImplementationMode.EXTERNAL,
-        )
-    },
-    coordinateTransformer: MutableCoordinateTransformer? = null,
-    onInit: ViewfinderInitScope.() -> Unit,
-) {
-    Column {
-        if (showViewfinder) {
-            Viewfinder(
-                modifier = modifier,
-                surfaceRequest = surfaceRequest,
-                transformationInfo = transformationInfo,
-                coordinateTransformer = coordinateTransformer,
-                onInit = onInit,
-            )
         }
     }
 }
