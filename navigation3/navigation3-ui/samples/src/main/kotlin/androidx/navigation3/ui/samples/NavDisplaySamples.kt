@@ -46,6 +46,8 @@ import androidx.navigation3.runtime.SavedStateNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.navEntryDecorator
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.runtime.samples.Dashboard
 import androidx.navigation3.runtime.samples.DialogBase
 import androidx.navigation3.runtime.samples.DialogContent
@@ -69,7 +71,7 @@ fun SceneNav() {
         entryDecorators =
             listOf(
                 SceneSetupNavEntryDecorator,
-                SavedStateNavEntryDecorator,
+                rememberSavedStateNavEntryDecorator(),
                 ViewModelStoreNavEntryDecorator
             ),
         onBack = { backStack.removeAt(backStack.lastIndex) },
@@ -119,22 +121,19 @@ fun SceneNavSharedEntrySample() {
      * A [NavEntryDecorator] that wraps each entry in a shared element that is controlled by the
      * [Scene].
      */
-    val sharedEntryInSceneNavEntryDecorator =
-        object : NavEntryDecorator {
-            @Composable
-            override fun <T : Any> DecorateEntry(entry: NavEntry<T>) {
-                with(localNavSharedTransitionScope.current) {
-                    Box(
-                        Modifier.sharedElement(
-                            rememberSharedContentState(entry.key),
-                            animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                        ),
-                    ) {
-                        entry.content(entry.key)
-                    }
-                }
+    val sharedEntryInSceneNavEntryDecorator = navEntryDecorator { entry ->
+        with(localNavSharedTransitionScope.current) {
+            Box(
+                Modifier.sharedElement(
+                    rememberSharedContentState(entry.key),
+                    animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                ),
+            ) {
+                entry.content(entry.key)
             }
         }
+    }
+
 
     val backStack = rememberNavBackStack(CatList)
     SharedTransitionLayout {
@@ -146,7 +145,7 @@ fun SceneNavSharedEntrySample() {
                     listOf(
                         sharedEntryInSceneNavEntryDecorator,
                         SceneSetupNavEntryDecorator,
-                        SavedStateNavEntryDecorator
+                        rememberSavedStateNavEntryDecorator()
                     ),
                 entryProvider =
                     entryProvider {
