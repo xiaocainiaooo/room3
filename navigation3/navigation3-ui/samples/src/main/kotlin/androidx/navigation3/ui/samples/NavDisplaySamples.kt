@@ -42,11 +42,10 @@ import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.SavedStateNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.navEntryDecorator
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.runtime.samples.Dashboard
 import androidx.navigation3.runtime.samples.DialogBase
@@ -58,7 +57,7 @@ import androidx.navigation3.runtime.samples.Scrollable
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.Scene
-import androidx.navigation3.ui.SceneSetupNavEntryDecorator
+import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import kotlinx.serialization.Serializable
 
 @Sampled
@@ -70,7 +69,7 @@ fun SceneNav() {
         backStack = backStack,
         entryDecorators =
             listOf(
-                SceneSetupNavEntryDecorator,
+                rememberSceneSetupNavEntryDecorator(),
                 rememberSavedStateNavEntryDecorator(),
                 ViewModelStoreNavEntryDecorator
             ),
@@ -134,7 +133,6 @@ fun SceneNavSharedEntrySample() {
         }
     }
 
-
     val backStack = rememberNavBackStack(CatList)
     SharedTransitionLayout {
         CompositionLocalProvider(localNavSharedTransitionScope provides this) {
@@ -144,7 +142,7 @@ fun SceneNavSharedEntrySample() {
                 entryDecorators =
                     listOf(
                         sharedEntryInSceneNavEntryDecorator,
-                        SceneSetupNavEntryDecorator,
+                        rememberSceneSetupNavEntryDecorator(),
                         rememberSavedStateNavEntryDecorator()
                     ),
                 entryProvider =
