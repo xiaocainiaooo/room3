@@ -264,13 +264,16 @@ package androidx.xr.runtime.testing {
     method public void setConfig(androidx.xr.runtime.Config);
     method public void setHasCreatePermission(boolean);
     method public void setHasMissingPermission(boolean);
+    method public void setShouldSupportFaceTracking(boolean);
     method public void setShouldSupportPlaneTracking(boolean);
+    method public boolean shouldSupportFaceTracking();
     method public boolean shouldSupportPlaneTracking();
     method public void stop();
     method public suspend Object? update(kotlin.coroutines.Continuation<? super kotlin.time.ComparableTimeMark>);
     property public androidx.xr.runtime.Config config;
     property public boolean hasCreatePermission;
     property public boolean hasMissingPermission;
+    property @RestrictTo({androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX}) public boolean shouldSupportFaceTracking;
     property public boolean shouldSupportPlaneTracking;
     property public androidx.xr.runtime.testing.FakeLifecycleManager.State state;
     property public kotlin.time.TestTimeSource timeSource;

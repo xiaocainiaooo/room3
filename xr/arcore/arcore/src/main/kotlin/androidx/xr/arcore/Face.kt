@@ -17,7 +17,9 @@
 package androidx.xr.arcore
 
 import androidx.annotation.RestrictTo
+import androidx.xr.runtime.Config.FaceTrackingMode
 import androidx.xr.runtime.FaceBlendShapeType
+import androidx.xr.runtime.Session
 import androidx.xr.runtime.TrackingState
 import androidx.xr.runtime.internal.Face as RuntimeFace
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,29 @@ import kotlinx.coroutines.flow.asStateFlow
 /** Contains the tracking information of a detected human face. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Face internal constructor(internal val runtimeFace: RuntimeFace) : Updatable {
+    public companion object {
+        /**
+         * Returns the Face object that corresponds to the user
+         *
+         * @param session the currently active [Session].
+         * @throws [IllegalStateException] if [FaceTrackingMode] is set to
+         *   [FaceTrackingMode.DISABLED].
+         */
+        @JvmStatic
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+        public fun getUserFace(session: Session): Face? {
+            val perceptionStateExtender: PerceptionStateExtender? =
+                session.stateExtenders.filterIsInstance<PerceptionStateExtender>().first()
+            check(perceptionStateExtender != null) { "PerceptionStateExtender is not available." }
+
+            val config = perceptionStateExtender.xrResourcesManager.lifecycleManager.config
+            check(config.faceTracking != FaceTrackingMode.DISABLED) {
+                "Config.FaceTrackingMode is set to Disabled."
+            }
+            return perceptionStateExtender.xrResourcesManager.userFace
+        }
+    }
+
     /**
      * The representation of the current state of [Face].
      *

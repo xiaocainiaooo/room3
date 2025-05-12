@@ -16,27 +16,36 @@
 
 package androidx.xr.arcore
 
-import android.app.Activity
 import android.content.ContentResolver
-import androidx.test.core.app.ActivityScenario
+import androidx.activity.ComponentActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import androidx.xr.runtime.Config
+import androidx.xr.runtime.Config.FaceTrackingMode
 import androidx.xr.runtime.Session
 import androidx.xr.runtime.SessionCreateSuccess
 import androidx.xr.runtime.TrackingState
+import androidx.xr.runtime.testing.FakeLifecycleManager
+import androidx.xr.runtime.testing.FakePerceptionManager
 import androidx.xr.runtime.testing.FakeRuntimeFace
+import androidx.xr.runtime.testing.FakeRuntimeFactory
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.test.assertFailsWith
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
+import org.robolectric.Robolectric
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.android.controller.ActivityController
 
 @RunWith(AndroidJUnit4::class)
 class FaceTest {
@@ -44,6 +53,8 @@ class FaceTest {
     private lateinit var testDispatcher: TestDispatcher
     private lateinit var testScope: TestScope
     private lateinit var session: Session
+    private lateinit var activityController: ActivityController<ComponentActivity>
+    private lateinit var activity: ComponentActivity
 
     @get:Rule
     val grantPermissionRule = GrantPermissionRule.grant("android.permission.FACE_TRACKING")
@@ -52,15 +63,67 @@ class FaceTest {
 
     @Before
     fun setUp() {
-        xrResourcesManager = XrResourcesManager()
         testDispatcher = StandardTestDispatcher()
         testScope = TestScope(testDispatcher)
-        mockContentResolver = mock<ContentResolver>()
+
+        activityController = Robolectric.buildActivity(ComponentActivity::class.java)
+        activity = activityController.get()
+        xrResourcesManager = XrResourcesManager()
+        mockContentResolver = activity.contentResolver
+
+        val shadowApplication = shadowOf(activity.application)
+        shadowApplication.grantPermissions("android.permission.FACE_TRACKING")
+        FakeLifecycleManager.TestPermissions.forEach { permission ->
+            shadowApplication.grantPermissions(permission)
+        }
+
+        FakeRuntimeFactory.hasCreatePermission = true
+
+        activityController.create()
+
+        session = (Session.create(activity, testDispatcher) as SessionCreateSuccess).session
+        session.configure(Config(faceTracking = FaceTrackingMode.USER))
+        xrResourcesManager.lifecycleManager = session.runtime.lifecycleManager
     }
 
     @After
     fun tearDown() {
         xrResourcesManager.clear()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun userFace_returnsFaceWithUpdatedTrackingStateAndBlendShapes() {
+        runTest(testDispatcher) {
+            val perceptionManager = session.runtime.perceptionManager as FakePerceptionManager
+            val userFace = Face.getUserFace(session)
+            check(userFace != null)
+            check(userFace.state.value.trackingState != TrackingState.TRACKING)
+            check(userFace.state.value.blendShapeValues.isEmpty())
+            check(userFace.state.value.confidenceValues.isEmpty())
+
+            val runtimeFace = perceptionManager.userFace!! as FakeRuntimeFace
+            runtimeFace.trackingState = TrackingState.TRACKING
+            val expectedBlendShapeValues = floatArrayOf(0.1f, 0.2f, 0.3f)
+            val expectedConfidenceValues = floatArrayOf(0.4f, 0.5f, 0.6f)
+            runtimeFace.blendShapeValues = expectedBlendShapeValues
+            runtimeFace.confidenceValues = expectedConfidenceValues
+
+            activityController.resume()
+            advanceUntilIdle()
+            activityController.pause()
+
+            assertThat(userFace.state.value.trackingState).isEqualTo(TrackingState.TRACKING)
+            assertThat(userFace.state.value.blendShapeValues).isEqualTo(expectedBlendShapeValues)
+            assertThat(userFace.state.value.confidenceValues).isEqualTo(expectedConfidenceValues)
+        }
+    }
+
+    @Test
+    fun userFace_faceTrackingDisabled_throwsIllegalStateException() {
+        session.configure(Config(faceTracking = FaceTrackingMode.DISABLED))
+
+        assertFailsWith<IllegalStateException> { Face.getUserFace(session) }
     }
 
     @Test
@@ -85,20 +148,5 @@ class FaceTest {
             .isEqualTo(expectedBlendShapeValues.size)
         assertThat(underTest.state.value.blendShapes.values.size)
             .isEqualTo(expectedBlendShapeValues.size)
-    }
-
-    private fun createTestSessionAndRunTest(
-        coroutineDispatcher: CoroutineDispatcher = StandardTestDispatcher(),
-        testBody: () -> Unit,
-    ) {
-        ActivityScenario.launch(Activity::class.java).use {
-            it.onActivity { activity ->
-                session =
-                    (Session.create(activity, coroutineDispatcher) as SessionCreateSuccess).session
-                xrResourcesManager.lifecycleManager = session.runtime.lifecycleManager
-
-                testBody()
-            }
-        }
     }
 }
