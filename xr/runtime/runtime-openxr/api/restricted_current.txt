@@ -103,6 +103,20 @@ package androidx.xr.runtime.openxr {
     property public androidx.xr.runtime.internal.Earth.State state;
   }
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class OpenXrFace implements androidx.xr.runtime.internal.Face {
+    ctor public OpenXrFace();
+    method public float[] getBlendShapeValues();
+    method public float[] getConfidenceValues();
+    method public androidx.xr.runtime.TrackingState getTrackingState();
+    method public boolean isValid();
+    method public void setValid(boolean);
+    method public void update(long xrTime);
+    property public float[] blendShapeValues;
+    property public float[] confidenceValues;
+    property public boolean isValid;
+    property public androidx.xr.runtime.TrackingState trackingState;
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class OpenXrHand implements androidx.xr.runtime.internal.Hand {
     method public java.nio.FloatBuffer getHandJointsBuffer();
     method public androidx.xr.runtime.TrackingState getTrackingState();

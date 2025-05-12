@@ -113,8 +113,7 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
         get() = xrResources.viewCameras
 
     override val userFace: Face?
-        // TODO(b/409367825): Implemented in cl/753652046
-        get() = throw NotImplementedError()
+        get() = xrResources.userFace
 
     override val earth: OpenXrEarth = xrResources.earth
 
