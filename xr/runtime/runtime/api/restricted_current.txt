@@ -540,8 +540,10 @@ package androidx.xr.runtime.internal {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface CameraViewActivityPose extends androidx.xr.runtime.internal.ActivityPose {
     method public int getCameraType();
+    method public androidx.xr.runtime.internal.PixelDimensions getDisplayResolutionInPixels();
     method public androidx.xr.runtime.internal.CameraViewActivityPose.Fov getFov();
     property @androidx.xr.runtime.internal.CameraViewActivityPose.CameraType public abstract int cameraType;
+    property public abstract androidx.xr.runtime.internal.PixelDimensions displayResolutionInPixels;
     property public abstract androidx.xr.runtime.internal.CameraViewActivityPose.Fov fov;
   }
 
