@@ -243,6 +243,13 @@ package androidx.xr.compose.subspace.layout {
 
 package androidx.xr.compose.subspace.node {
 
+  public interface CompositionLocalConsumerSubspaceModifierNode {
+  }
+
+  public final class CompositionLocalConsumerSubspaceModifierNodeKt {
+    method public static <T> T currentValueOf(androidx.xr.compose.subspace.node.CompositionLocalConsumerSubspaceModifierNode, androidx.compose.runtime.CompositionLocal<T> local);
+  }
+
   public interface SubspaceSemanticsModifierNode {
     method public void applySemantics(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
   }
