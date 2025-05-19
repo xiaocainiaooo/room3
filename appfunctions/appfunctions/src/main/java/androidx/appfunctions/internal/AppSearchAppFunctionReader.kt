@@ -137,7 +137,12 @@ internal class AppSearchAppFunctionReader(
         ObserverSpec.Builder()
             .addFilterSchemas(
                 packageNames.flatMap {
-                    listOf("AppFunctionStaticMetadata-$it", "AppFunctionRuntimeMetadata-$it")
+                    listOf(
+                        "AppFunctionStaticMetadata-$it",
+                        "AppFunctionRuntimeMetadata-$it",
+                        // TODO: b/418723242 - Add tests for observing changes in components
+                        "AppFunctionComponentMetadataDocument-$it",
+                    )
                 }
             )
             .build()
