@@ -26,9 +26,10 @@ import java.util.UUID
 
 /** Test-only implementation of [RuntimeAnchor] */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public class FakeRuntimeAnchor(
+public class FakeRuntimeAnchor
+internal constructor(
     override var pose: Pose,
-    public val anchorHolder: AnchorHolder? = null,
+    internal val anchorHolder: AnchorHolder? = null,
     /** Flag to represent available tracking state of the camera when creating the anchor. */
     public val isTrackingAvailable: Boolean = true,
 ) : RuntimeAnchor {
