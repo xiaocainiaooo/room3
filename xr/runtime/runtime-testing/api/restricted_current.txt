@@ -477,15 +477,6 @@ package androidx.xr.runtime.testing {
     property public java.util.List<androidx.xr.runtime.math.Vector2> vertices;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeSessionConnector implements androidx.xr.runtime.SessionConnector {
-    ctor public FakeSessionConnector();
-    method public void close();
-    method public void initialize(androidx.xr.runtime.internal.LifecycleManager lifecycleManager, androidx.xr.runtime.internal.JxrPlatformAdapter platformAdapter);
-    method public boolean isInitialized();
-    method public void setInitialized(boolean);
-    property public boolean isInitialized;
-  }
-
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeSoundPoolExtensionsWrapper implements androidx.xr.runtime.internal.SoundPoolExtensionsWrapper {
     ctor public FakeSoundPoolExtensionsWrapper();
     method @androidx.xr.runtime.internal.SpatializerConstants.SourceType public int getSpatialSourceType(android.media.SoundPool soundPool, int streamId);
