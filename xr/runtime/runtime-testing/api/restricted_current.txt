@@ -273,7 +273,7 @@ package androidx.xr.runtime.testing {
     property public androidx.xr.runtime.internal.PixelDimensions sizeInPixels;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakePerceptionManager implements androidx.xr.runtime.internal.PerceptionManager {
+  public final class FakePerceptionManager implements androidx.xr.runtime.internal.PerceptionManager {
     ctor public FakePerceptionManager();
     method public void addHitResult(androidx.xr.runtime.internal.HitResult hitResult);
     method public void addTrackable(androidx.xr.runtime.internal.Trackable trackable);
@@ -282,7 +282,7 @@ package androidx.xr.runtime.testing {
     method public androidx.xr.runtime.internal.Anchor createAnchor(androidx.xr.runtime.math.Pose pose);
     method public void detachAnchor(androidx.xr.runtime.internal.Anchor anchor);
     method public java.util.List<androidx.xr.runtime.internal.Anchor> getAnchors();
-    method public androidx.xr.runtime.testing.FakeRuntimeArDevice getArDevice();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.runtime.testing.FakeRuntimeArDevice getArDevice();
     method public androidx.xr.runtime.internal.Earth getEarth();
     method public androidx.xr.runtime.internal.Hand? getLeftHand();
     method public java.util.List<java.util.UUID> getPersistedAnchorUuids();
@@ -296,7 +296,7 @@ package androidx.xr.runtime.testing {
     method public void setTrackingAvailable(boolean);
     method public void unpersistAnchor(java.util.UUID uuid);
     property public java.util.List<androidx.xr.runtime.internal.Anchor> anchors;
-    property public androidx.xr.runtime.testing.FakeRuntimeArDevice arDevice;
+    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.runtime.testing.FakeRuntimeArDevice arDevice;
     property public androidx.xr.runtime.internal.Earth earth;
     property public boolean isTrackingAvailable;
     property public androidx.xr.runtime.internal.Hand? leftHand;
