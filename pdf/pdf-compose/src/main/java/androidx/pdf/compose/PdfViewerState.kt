@@ -29,13 +29,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.core.util.keyIterator
+import androidx.pdf.view.Highlight
 import androidx.pdf.view.PdfPoint
 import androidx.pdf.view.PdfView
+import androidx.pdf.view.Selection
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -83,12 +86,14 @@ public class PdfViewerState(
             pdfViewObserver?.let {
                 field?.removeOnViewportChangedListener(it)
                 field?.removeOnGestureStateChangedListener(it)
+                field?.removeOnSelectionChangedListener(it)
             }
             firstVisiblePage = pdfView?.firstVisiblePage ?: 0
             visiblePagesCount = pdfView?.visiblePagesCount ?: 0
             gestureState = pdfView?.gestureState ?: GESTURE_STATE_IDLE
             zoom = pdfView?.zoom ?: PdfView.DEFAULT_INIT_ZOOM
             pageOffsetsState.clear()
+            currentSelection = pdfView?.currentSelection
             // Cancel any in-progress mutations to release the mutex. MutatorMutex only supports
             // cancellation by enqueuing higher-priority mutations.
             coroutineScope.launch {
@@ -100,6 +105,7 @@ public class PdfViewerState(
                     PdfViewObserver().also { observer ->
                         pdfView.addOnViewportChangedListener(observer)
                         pdfView.addOnGestureStateChangedListener(observer)
+                        pdfView.addOnSelectionChangedListener(observer)
                     }
                 pdfViewPositioner = PdfViewPositioner(pdfView)
             }
@@ -137,6 +143,10 @@ public class PdfViewerState(
      * [GESTURE_STATE_SETTLING], or [GESTURE_STATE_INTERACTING]
      */
     public var gestureState: Int by mutableIntStateOf(GESTURE_STATE_IDLE)
+        private set
+
+    /** The currently-selected content in the PDF, or null if nothing is selected */
+    public var currentSelection: Selection? by mutableStateOf(null)
         private set
 
     // No mutableState*Of infrastructure for primitive collection types
@@ -187,9 +197,26 @@ public class PdfViewerState(
         pdfViewPositioner?.let { zoomScrollMutex.mutateWith(it) { block() } }
     }
 
+    /** Clears the current selection, if one exists. No-op if there is no current [Selection] */
+    public fun clearSelection() {
+        pdfView?.clearSelection()
+    }
+
+    /**
+     * Applies a set of [Highlight] to be drawn over this PDF. Each [Highlight] may be a different
+     * color. This overrides any previous highlights, there is no merging of new and previous
+     * values. [highlights] are defensively copied and the list or its contents may be modified
+     * after providing it here.
+     */
+    public fun setHighlights(highlights: List<Highlight>) {
+        pdfView?.setHighlights(highlights)
+    }
+
     /** Listens to [PdfView] state to update the containing PdfViewerState. */
     private inner class PdfViewObserver() :
-        PdfView.OnViewportChangedListener, PdfView.OnGestureStateChangedListener {
+        PdfView.OnViewportChangedListener,
+        PdfView.OnGestureStateChangedListener,
+        PdfView.OnSelectionChangedListener {
         private var interactionSession: UserInteractionSession? = null
 
         override fun onViewportChanged(
@@ -239,6 +266,10 @@ public class PdfViewerState(
                     gestureState = GESTURE_STATE_SETTLING
                 }
             }
+        }
+
+        override fun onSelectionChanged(previousSelection: Selection?, newSelection: Selection?) {
+            currentSelection = newSelection
         }
     }
 

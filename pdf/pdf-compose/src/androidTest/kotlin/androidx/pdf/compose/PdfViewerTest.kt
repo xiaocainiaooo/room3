@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.pdf.view.PdfPoint
 import androidx.pdf.view.PdfView
+import androidx.pdf.view.Selection
+import androidx.pdf.view.TextSelection
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -469,6 +471,91 @@ class PdfViewerTest {
         assertThat(gestureStates[1]).isEqualTo(PdfViewerState.GESTURE_STATE_INTERACTING)
         assertThat(gestureStates[2]).isEqualTo(PdfViewerState.GESTURE_STATE_SETTLING)
         assertThat(gestureStates[3]).isEqualTo(PdfViewerState.GESTURE_STATE_IDLE)
+    }
+
+    @Test
+    fun pdfViewerState_observeSelection() {
+        val pdfDocument =
+            FakePdfDocument(List(10) { Point(425, 225) }, pageSelector = SIMPLE_SELECTOR)
+        val selections = mutableListOf<Selection?>()
+
+        lateinit var pdfViewerState: PdfViewerState
+        rule.setContent {
+            pdfViewerState = rememberPdfViewerState()
+            // Only record the selection state when that state changes. Don't log it on every
+            // Composition
+            LaunchedEffect(pdfViewerState.currentSelection) {
+                selections.add(pdfViewerState.currentSelection)
+            }
+            PdfViewer(
+                modifier =
+                    Modifier.requiredSize(width = 850.toDp(context), height = 550.toDp(context))
+                        .testTag(PDF_VIEW_TAG),
+                state = pdfViewerState,
+                pdfDocument = pdfDocument,
+            )
+        }
+
+        // PdfViewer will adjust zoom to fit the width of the content. Once this has happened we
+        // know the initial pages have been laid out.
+        rule.waitUntil { pdfViewerState.zoom == 2.0F }
+        // Somewhere around the middle of page 0
+        val longClickPosition =
+            requireNotNull(pdfViewerState.toOffset(PdfPoint(0, PointF(212F, 112F))))
+        // b/418866416 - longClick() doesn't work w/ Android Views, so we send a down event without
+        // an up event and just wait.
+        rule.onNodeWithTag(PDF_VIEW_TAG).performTouchInput { down(longClickPosition) }
+        rule.waitUntil { selections.size > 1 }
+
+        assertThat(selections.size).isEqualTo(2)
+        assertThat(selections[0]).isNull()
+        // Just make sure we have a text selection, i.e. the one produced by SIMPLE_SELECTOR
+        // The bounds of the selection, text, etc are all dictated by FakePdfDocument and not worth
+        // asserting on here.
+        assertThat(selections[1]).isInstanceOf(TextSelection::class.java)
+        val textSelection = selections[1] as TextSelection
+        assertThat(textSelection.text).isEqualTo(SIMPLE_SELECTOR_STATIC_TEXT)
+    }
+
+    @Test
+    fun pdfViewerState_clearSelection() {
+        val pdfDocument =
+            FakePdfDocument(List(10) { Point(425, 225) }, pageSelector = SIMPLE_SELECTOR)
+        val selections = mutableListOf<Selection?>()
+
+        lateinit var pdfViewerState: PdfViewerState
+        rule.setContent {
+            pdfViewerState = rememberPdfViewerState()
+            // Only record the selection state when that state changes. Don't log it on every
+            // Composition
+            LaunchedEffect(pdfViewerState.currentSelection) {
+                selections.add(pdfViewerState.currentSelection)
+            }
+            PdfViewer(
+                modifier =
+                    Modifier.requiredSize(width = 850.toDp(context), height = 550.toDp(context))
+                        .testTag(PDF_VIEW_TAG),
+                state = pdfViewerState,
+                pdfDocument = pdfDocument,
+            )
+        }
+
+        // Step 1: select content to clear, see pdfViewerState_observeSelection RE how this works
+        rule.waitUntil { pdfViewerState.zoom == 2.0F }
+        val longClickPosition =
+            requireNotNull(pdfViewerState.toOffset(PdfPoint(0, PointF(212F, 112F))))
+        rule.onNodeWithTag(PDF_VIEW_TAG).performTouchInput { down(longClickPosition) }
+        rule.waitUntil { selections.size > 1 }
+
+        // Step 2: Clear the selection
+        pdfViewerState.clearSelection()
+        rule.waitUntil { selections.size > 2 }
+
+        assertThat(selections.size).isEqualTo(3)
+        // Nothing selected -> something selected -> nothing selected
+        assertThat(selections[0]).isNull()
+        assertThat(selections[1]).isInstanceOf(TextSelection::class.java)
+        assertThat(selections[2]).isNull()
     }
 }
 
