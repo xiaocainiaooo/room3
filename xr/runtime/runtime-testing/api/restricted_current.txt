@@ -448,7 +448,7 @@ package androidx.xr.runtime.testing {
   public static final class FakeRuntimeHand.Companion {
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeRuntimePlane implements androidx.xr.runtime.internal.Plane {
+  public final class FakeRuntimePlane implements androidx.xr.runtime.internal.Plane {
     ctor public FakeRuntimePlane();
     ctor public FakeRuntimePlane(optional androidx.xr.runtime.internal.Plane.Type type, optional androidx.xr.runtime.internal.Plane.Label label, optional androidx.xr.runtime.TrackingState trackingState, optional androidx.xr.runtime.math.Pose centerPose, optional androidx.xr.runtime.math.Vector2 extents, optional java.util.List<androidx.xr.runtime.math.Vector2> vertices, optional androidx.xr.runtime.internal.Plane? subsumedBy, optional java.util.Collection<androidx.xr.runtime.internal.Anchor> anchors);
     method public androidx.xr.runtime.internal.Anchor createAnchor(androidx.xr.runtime.math.Pose pose);
