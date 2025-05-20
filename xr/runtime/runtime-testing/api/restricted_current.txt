@@ -342,7 +342,7 @@ package androidx.xr.runtime.testing {
     property public androidx.xr.runtime.testing.FakePerceptionManager perceptionManager;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeRuntimeAnchor implements androidx.xr.runtime.internal.Anchor {
+  public final class FakeRuntimeAnchor implements androidx.xr.runtime.internal.Anchor {
     method public void detach();
     method public static int getAnchorsCreated();
     method public androidx.xr.runtime.internal.Anchor.PersistenceState getPersistenceState();
