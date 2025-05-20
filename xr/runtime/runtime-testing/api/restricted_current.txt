@@ -197,7 +197,7 @@ package androidx.xr.runtime.testing {
     property public java.util.Set<androidx.xr.runtime.internal.Feature> requirements;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeLifecycleManager implements androidx.xr.runtime.internal.LifecycleManager {
+  public final class FakeLifecycleManager implements androidx.xr.runtime.internal.LifecycleManager {
     ctor public FakeLifecycleManager();
     ctor public FakeLifecycleManager(optional boolean hasCreatePermission);
     method public void allowOneMoreCallToUpdate();
