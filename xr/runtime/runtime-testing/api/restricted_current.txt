@@ -433,7 +433,7 @@ package androidx.xr.runtime.testing {
     property public Exception? lifecycleCreateException;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeRuntimeHand implements androidx.xr.runtime.internal.Hand {
+  public final class FakeRuntimeHand implements androidx.xr.runtime.internal.Hand {
     ctor public FakeRuntimeHand();
     ctor public FakeRuntimeHand(optional androidx.xr.runtime.TrackingState trackingState, optional java.nio.FloatBuffer handJointsBuffer);
     method public java.nio.FloatBuffer getHandJointsBuffer();
