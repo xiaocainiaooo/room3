@@ -41,6 +41,16 @@ sealed interface SurfaceControlCompat {
     /** Reparent the surface control to null. */
     fun detach()
 
+    /**
+     * Reparents this surface control to a new parent [SurfaceControlCompat].
+     *
+     * On older API levels, this is a no-op and will return `false`.
+     *
+     * @param newParent The new parent [SurfaceControlCompat].
+     * @return `true` if the reparent operation was performed, `false` otherwise.
+     */
+    fun reparent(newParent: SurfaceControlCompat): Boolean
+
     companion object {
         /**
          * Creates a SurfaceControl or a stub implementation.
@@ -183,6 +193,21 @@ sealed interface SurfaceControlCompat {
                 transaction.reparent(surfaceControl, null).apply()
             }
         }
+
+        override fun reparent(newParent: SurfaceControlCompat): Boolean {
+            if (surfaceControl.isValid) {
+                SurfaceControl.Transaction().use { transaction ->
+                    transaction
+                        .reparent(
+                            surfaceControl,
+                            (newParent as SurfaceControlApi29Impl).surfaceControl,
+                        )
+                        .apply()
+                }
+                return true
+            }
+            return false
+        }
     }
 
     /** Stub implementation of [SurfaceControlCompat] for older APIs. */
@@ -200,5 +225,7 @@ sealed interface SurfaceControlCompat {
         override fun detach() {
             // No-op for older APIs
         }
+
+        override fun reparent(newParent: SurfaceControlCompat) = false // No-op for older APIs
     }
 }

@@ -17,6 +17,7 @@
 package androidx.camera.viewfinder.compose.internal
 
 import android.graphics.SurfaceTexture
+import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import androidx.camera.viewfinder.core.impl.RefCounted
@@ -30,7 +31,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.CoroutineScope
 
-private class ViewfinderEmbeddedExternalSurfaceHolder(surfaceTexture: SurfaceTexture) :
+private const val TAG = "VfEmbeddedSurface"
+
+private class ViewfinderEmbeddedExternalSurfaceHolder(private val surfaceTexture: SurfaceTexture) :
     ViewfinderSurfaceHolder {
     override val refCountedSurface: RefCounted<Surface> = RefCounted {
         it.release()
@@ -50,6 +53,24 @@ private class ViewfinderEmbeddedExternalSurfaceHolder(surfaceTexture: SurfaceTex
             isDetached = true
         }
     }
+
+    fun tryAttach(textureView: TextureView) {
+        if (isDetached) {
+            refCountedSurface.acquire()?.let {
+                textureView.setSurfaceTexture(surfaceTexture)
+                Log.d(TAG, "Reattached $surfaceTexture to $textureView")
+                isDetached = false
+            }
+                ?: run {
+                    Log.d(
+                        TAG,
+                        "Unable to reattach $surfaceTexture to $textureView. Already released.",
+                    )
+                }
+        } else {
+            Log.d(TAG, "Unable to reattach $surfaceTexture to $textureView. Still attached.")
+        }
+    }
 }
 
 private class ViewfinderEmbeddedExternalSurfaceState(scope: CoroutineScope) :
@@ -65,11 +86,11 @@ private class ViewfinderEmbeddedExternalSurfaceState(scope: CoroutineScope) :
         width: Int,
         height: Int,
     ) {
+        viewfinderSurfaceHolder = ViewfinderEmbeddedExternalSurfaceHolder(surfaceTexture)
+
         if (surfaceSize != IntSize.Zero) {
             surfaceTexture.setDefaultBufferSize(surfaceSize.width, surfaceSize.height)
         }
-
-        viewfinderSurfaceHolder = ViewfinderEmbeddedExternalSurfaceHolder(surfaceTexture)
 
         dispatchSurfaceCreated(viewfinderSurfaceHolder)
     }
@@ -86,7 +107,8 @@ private class ViewfinderEmbeddedExternalSurfaceState(scope: CoroutineScope) :
 
     override fun onSurfaceTextureDestroyed(surfaceTexture: SurfaceTexture): Boolean {
         viewfinderSurfaceHolder.detach()
-        cancelSurfaceJob()
+        // If the composable hasn't yet been disposed, this surface could be reattached, so we won't
+        // stop the surface job here.
 
         // Do not release the SurfaceTexture. It will be released by the refCountedSurface when
         // the ref count reaches zero.
@@ -96,6 +118,12 @@ private class ViewfinderEmbeddedExternalSurfaceState(scope: CoroutineScope) :
     override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
         // onSurfaceTextureUpdated is called when the content of the SurfaceTexture
         // has changed, which is not relevant to us since we are the producer here
+    }
+
+    fun tryReattachViewfinderSurfaceHolder(textureView: TextureView) {
+        if (::viewfinderSurfaceHolder.isInitialized) {
+            viewfinderSurfaceHolder.tryAttach(textureView)
+        }
     }
 }
 
@@ -129,7 +157,14 @@ internal fun ViewfinderEmbeddedExternalSurface(
     val state = rememberViewfinderEmbeddedExternalSurfaceState()
 
     AndroidView(
-        factory = { TextureView(it) },
+        factory = {
+            object : TextureView(it) {
+                override fun onAttachedToWindow() {
+                    super.onAttachedToWindow()
+                    state.tryReattachViewfinderSurfaceHolder(this)
+                }
+            }
+        },
         modifier = modifier,
         onReset = {},
         update = { view ->

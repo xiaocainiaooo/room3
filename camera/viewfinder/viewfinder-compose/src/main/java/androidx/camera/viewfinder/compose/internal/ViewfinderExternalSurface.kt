@@ -17,6 +17,7 @@
 package androidx.camera.viewfinder.compose.internal
 
 import android.graphics.PixelFormat
+import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -29,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.CoroutineScope
+
+private const val TAG = "VfExternalSurface"
 
 private class ViewfinderExternalSurfaceHolder(
     initialSurface: Surface,
@@ -44,23 +47,50 @@ private class ViewfinderExternalSurfaceHolder(
             "ViewfinderExternalSurfaceHolder-${hashCode()}",
         )
 
-    override val refCountedSurface: RefCounted<Surface> = RefCounted {
-        it.release()
-        surfaceControl.release()
-    }
+    override val refCountedSurface: RefCounted<Surface>
+
     var isDetached = false
         private set
 
     init {
-        refCountedSurface.initialize(surfaceControl.newSurface() ?: initialSurface)
+        val surface = surfaceControl.newSurface() ?: initialSurface
+        refCountedSurface = RefCounted {
+            surfaceControl.detach()
+            // Only release the surface if it's not the parent surface. i.e., it's a new surface
+            // we've created from SurfaceControl.
+            // On some API levels, SurfaceControlCompat is a no-op wrapper, and we don't have
+            // control over the surface lifecycle and should leave it to the SurfaceView.
+            if (surface != initialSurface) {
+                surface.release()
+            }
+        }
+        refCountedSurface.initialize(surface)
     }
 
     override fun detach() {
         if (!isDetached) {
             surfaceControl.detach()
+            // Release for refCountedSurface.initialize()
             refCountedSurface.release()
             isDetached = true
         }
+    }
+
+    fun tryAttach(parent: SurfaceControlCompat): Boolean {
+        check(isDetached) { "tryAttach() can only be called when detached" }
+        return refCountedSurface.acquire()?.let {
+            if (surfaceControl.reparent(parent)) {
+                Log.d(TAG, "Reattached $it to $parent")
+                isDetached = false
+                true
+            } else {
+                // In this else-condition, it's likely the API level doesn't support SurfaceControl
+                // Release the refcount we just acquired.
+                Log.d(TAG, "Unable to attach $it to $parent")
+                refCountedSurface.release()
+                false
+            }
+        } == true
     }
 }
 
@@ -82,15 +112,15 @@ private class ViewfinderExternalSurfaceState(scope: CoroutineScope) :
         lastWidth = frame.width()
         lastHeight = frame.height()
 
-        viewfinderSurfaceHolder =
-            ViewfinderExternalSurfaceHolder(
-                holder.surface,
-                lastWidth,
-                lastHeight,
-                SurfaceControlCompat.wrap(surfaceView),
-            )
+        val parent = SurfaceControlCompat.wrap(surfaceView)
+        if (
+            !::viewfinderSurfaceHolder.isInitialized || !viewfinderSurfaceHolder.tryAttach(parent)
+        ) {
+            viewfinderSurfaceHolder =
+                ViewfinderExternalSurfaceHolder(holder.surface, lastWidth, lastHeight, parent)
 
-        dispatchSurfaceCreated(viewfinderSurfaceHolder)
+            dispatchSurfaceCreated(viewfinderSurfaceHolder)
+        }
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -100,7 +130,6 @@ private class ViewfinderExternalSurfaceState(scope: CoroutineScope) :
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         viewfinderSurfaceHolder.detach()
-        cancelSurfaceJob()
     }
 }
 

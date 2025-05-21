@@ -18,16 +18,18 @@ package androidx.camera.viewfinder.compose
 
 import android.os.Build
 import android.util.Size
-import android.view.Surface
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
+import androidx.camera.viewfinder.core.ViewfinderSurfaceSessionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.platform.LocalDensity
@@ -36,10 +38,16 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.TruthJUnit.assume
-import kotlinx.coroutines.CompletableDeferred
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -120,7 +128,7 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
     @Test
     fun canRetrieveSurface() = runBlocking {
         testWithSession {
-            val surface = awaitSurface()
+            val surface = awaitSurfaceSession().surface
             surface.lockHardwareCanvas().apply {
                 try {
                     assertThat(Size(width, height))
@@ -135,11 +143,11 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
     @Test
     fun verifySurfacesAreReleased_surfaceRequestReleased_thenComposableDestroyed(): Unit =
         runBlocking {
-            testWithSession {
-                val surface = awaitSurface()
+            testHideableWithSession {
+                val surface = awaitSurfaceSession().surface
                 assertThat(surface.isValid).isTrue()
 
-                allowSessionCompletion()
+                allowNextSessionCompletion()
                 rule.awaitIdle()
                 assertThat(surface.isValid).isTrue()
 
@@ -160,70 +168,178 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
                     Build.VERSION.SDK_INT >= 29 || implementationMode != ImplementationMode.EXTERNAL
                 )
                 .isTrue()
-            testWithSession {
-                val surface = awaitSurface()
+            testHideableWithSession {
+                val surface = awaitSurfaceSession().surface
                 assertThat(surface.isValid).isTrue()
 
                 hideViewfinder()
                 rule.awaitIdle()
                 assertThat(surface.isValid).isTrue()
 
-                allowSessionCompletion()
+                allowNextSessionCompletion()
                 rule.awaitIdle()
                 assertThat(surface.isValid).isFalse()
             }
         }
 
+    @Test
+    fun movableContentOf_afterMove_validSurfaceIsAvailable(): Unit = runBlocking {
+        testMovableWithSession {
+            val surfaceSession = awaitSurfaceSession()
+            assertThat(surfaceSession.surface.isValid).isTrue()
+
+            moveViewfinder()
+            rule.awaitIdle()
+
+            when (implementationMode) {
+                ImplementationMode.EMBEDDED -> assertThat(surfaceSession.surface.isValid).isTrue()
+                ImplementationMode.EXTERNAL ->
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        assertThat(surfaceSession.surface.isValid).isTrue()
+                    } else {
+                        // A new surface would need to be created on API 28 and lower, wait for
+                        // the new surface session
+                        allowNextSessionCompletion()
+
+                        val newSurfaceSession =
+                            withTimeoutOrNull(5.seconds) {
+                                awaitSurfaceSession { it !== surfaceSession }
+                            }
+                        assertThat(newSurfaceSession).isNotNull()
+                        assertThat(newSurfaceSession!!.surface.isValid).isTrue()
+                    }
+            }
+        }
+    }
+
     private interface SessionTestScope {
+
+        suspend fun awaitSurfaceSession(
+            predicate: ((ViewfinderSurfaceSessionScope) -> Boolean)? = null
+        ): ViewfinderSurfaceSessionScope
+
+        fun allowNextSessionCompletion()
+    }
+
+    private interface HideableSessionTestScope : SessionTestScope {
         fun hideViewfinder()
+    }
 
-        suspend fun awaitSurface(): Surface
+    private interface MovableSessionTestScope : SessionTestScope {
+        fun moveViewfinder()
+    }
 
-        fun allowSessionCompletion()
+    private suspend fun <T : SessionTestScope> testWithSessionInternal(
+        scopeProvider: (SessionTestScope) -> T,
+        composeContent: @Composable (onInit: ViewfinderInitScope.() -> Unit) -> Unit,
+        block: suspend T.() -> Unit,
+    ) {
+        val surfaceSessionFlow = MutableStateFlow<ViewfinderSurfaceSessionScope?>(null)
+        val sessionCompleteCount = MutableStateFlow(0)
+
+        var numSessions = 0
+        val onInit: ViewfinderInitScope.() -> Unit = {
+            onSurfaceSession {
+                numSessions++
+                surfaceSessionFlow.value = this@onSurfaceSession
+                withContext(NonCancellable) { sessionCompleteCount.first { it >= numSessions } }
+            }
+        }
+
+        rule.setContent { composeContent(onInit) }
+
+        val baseSessionTestScope = BaseSessionTestScope(surfaceSessionFlow, sessionCompleteCount)
+        val specificSessionTestScope = scopeProvider(baseSessionTestScope)
+
+        try {
+            block.invoke(specificSessionTestScope)
+        } finally {
+            sessionCompleteCount.value = Int.MAX_VALUE
+        }
+    }
+
+    private suspend fun testMovableWithSession(block: suspend MovableSessionTestScope.() -> Unit) {
+        val moveViewfinderState = mutableStateOf(false)
+
+        testWithSessionInternal(
+            scopeProvider = { baseScope ->
+                object : SessionTestScope by baseScope, MovableSessionTestScope {
+                    override fun moveViewfinder() {
+                        moveViewfinderState.value = true
+                    }
+                }
+            },
+            composeContent = { onInit ->
+                var moveView by remember { moveViewfinderState }
+                val content = remember { movableContentOf { TestViewfinder(onInit = onInit) } }
+
+                Column {
+                    if (moveView) {
+                        content()
+                    } else {
+                        content()
+                    }
+                }
+            },
+            block = block,
+        )
     }
 
     private suspend fun testWithSession(block: suspend SessionTestScope.() -> Unit) {
-        val surfaceDeferred = CompletableDeferred<Surface>()
-        val sessionCompleteDeferred = CompletableDeferred<Unit>()
+        testWithSessionInternal(
+            scopeProvider = { it },
+            composeContent = { onInit -> TestViewfinder(onInit = onInit) },
+            block = block,
+        )
+    }
 
-        val showViewfinder = mutableStateOf(true)
+    private suspend fun testHideableWithSession(
+        block: suspend HideableSessionTestScope.() -> Unit
+    ) {
+        val showViewfinderState = mutableStateOf(true)
 
-        rule.setContent {
-            val showView by remember { showViewfinder }
-            TestViewfinder(showViewfinder = showView) {
-                onSurfaceSession {
-                    surfaceDeferred.complete(surface)
-                    withContext(NonCancellable) { sessionCompleteDeferred.await() }
+        testWithSessionInternal(
+            scopeProvider = { baseScope ->
+                object : SessionTestScope by baseScope, HideableSessionTestScope {
+                    override fun hideViewfinder() {
+                        showViewfinderState.value = false
+                    }
+                }
+            },
+            composeContent = { onInit ->
+                val showView by remember { showViewfinderState }
+                if (showView) {
+                    TestViewfinder(onInit = onInit)
+                }
+            },
+            block = block,
+        )
+    }
+
+    class BaseSessionTestScope(
+        val surfaceFlow: StateFlow<ViewfinderSurfaceSessionScope?>,
+        val sessionCompletionCount: MutableStateFlow<Int>,
+    ) : SessionTestScope {
+        override suspend fun awaitSurfaceSession(
+            predicate: ((ViewfinderSurfaceSessionScope) -> Boolean)?
+        ): ViewfinderSurfaceSessionScope {
+            return surfaceFlow.filterNotNull().run {
+                if (predicate != null) {
+                    this.first(predicate)
+                } else {
+                    this.first()
                 }
             }
         }
 
-        val sessionTestScope =
-            object : SessionTestScope {
-                override fun hideViewfinder() {
-                    showViewfinder.value = false
-                }
-
-                override suspend fun awaitSurface(): Surface {
-                    return surfaceDeferred.await()
-                }
-
-                override fun allowSessionCompletion() {
-                    sessionCompleteDeferred.complete(Unit)
-                }
-            }
-
-        try {
-            block.invoke(sessionTestScope)
-        } finally {
-            sessionCompleteDeferred.cancel()
+        override fun allowNextSessionCompletion() {
+            sessionCompletionCount.update { it + 1 }
         }
     }
 
     @Composable
     fun TestViewfinder(
         modifier: Modifier = Modifier.size(ViewfinderTestParams.Default.viewfinderSize),
-        showViewfinder: Boolean = true,
         transformationInfo: TransformationInfo = ViewfinderTestParams.Default.transformationInfo,
         surfaceRequest: ViewfinderSurfaceRequest = remember {
             ViewfinderSurfaceRequest(
@@ -235,16 +351,12 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
         coordinateTransformer: MutableCoordinateTransformer? = null,
         onInit: ViewfinderInitScope.() -> Unit,
     ) {
-        Column {
-            if (showViewfinder) {
-                Viewfinder(
-                    modifier = modifier,
-                    surfaceRequest = surfaceRequest,
-                    transformationInfo = transformationInfo,
-                    coordinateTransformer = coordinateTransformer,
-                    onInit = onInit,
-                )
-            }
-        }
+        Viewfinder(
+            modifier = modifier,
+            surfaceRequest = surfaceRequest,
+            transformationInfo = transformationInfo,
+            coordinateTransformer = coordinateTransformer,
+            onInit = onInit,
+        )
     }
 }

@@ -19,7 +19,8 @@ package androidx.camera.viewfinder.compose.internal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /** Base class for [ViewfinderExternalSurface] and [ViewfinderEmbeddedExternalSurface] state. */
@@ -51,20 +52,16 @@ internal abstract class BaseViewfinderExternalSurfaceState(val scope: CoroutineS
         if (onSurface != null) {
             job =
                 scope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    job?.cancelAndJoin()
-                    val receiver =
-                        object : ViewfinderSurfaceCoroutineScope, CoroutineScope by this {}
-                    onSurface?.invoke(receiver, holder)
+                    job?.apply {
+                        cancel("Surface replaced")
+                        join()
+                    }
+                    if (isActive) {
+                        val receiver =
+                            object : ViewfinderSurfaceCoroutineScope, CoroutineScope by this {}
+                        onSurface?.invoke(receiver, holder)
+                    }
                 }
         }
-    }
-
-    /**
-     * Cancels the job initiated by [dispatchSurfaceCreated] when the surface is being destroyed.
-     * This method ensures that any ongoing operations within the `onSurface` lambda are stopped.
-     * Must be invoked from the main thread.
-     */
-    fun cancelSurfaceJob() {
-        job?.cancel()
     }
 }
