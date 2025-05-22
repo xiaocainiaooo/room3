@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -607,7 +608,6 @@ class SwipeToRevealTest {
         )
     }
 
-    @Ignore("b/419229763")
     @Test
     fun onMultiSnap_differentComponents_lastOneGetsReset() {
         verifyStateMultipleSwipeToReveal(
@@ -638,7 +638,6 @@ class SwipeToRevealTest {
         )
     }
 
-    @Ignore("b/419229763")
     @Test
     fun onMultiSnapRight_differentComponents_lastOneGetsReset() {
         verifyStateMultipleSwipeToReveal(
@@ -656,7 +655,6 @@ class SwipeToRevealTest {
         )
     }
 
-    @Ignore("b/419229763")
     @Test
     fun onMultiSnapRight_sameComponents_doesNotReset() {
         val lastValue = LeftRevealed
@@ -672,7 +670,6 @@ class SwipeToRevealTest {
         )
     }
 
-    @Ignore("b/419229763")
     @Test
     fun onMultiSnapRightAndLeft_differentComponents_lastOneGetsReset() {
         verifyStateMultipleSwipeToReveal(
@@ -690,7 +687,6 @@ class SwipeToRevealTest {
         )
     }
 
-    @Ignore("b/419229763")
     @Test
     fun onMultiSnapLeftAndRight_differentComponents_lastOneGetsReset() {
         verifyStateMultipleSwipeToReveal(
@@ -1101,9 +1097,8 @@ class SwipeToRevealTest {
                 }
             }
 
-            val coroutineScope = rememberCoroutineScope()
-            coroutineScope.launch {
-                actionsSuspended?.invoke(revealStateOne, revealStateTwo, density)
+            LaunchedEffect(Unit) {
+                launch { actionsSuspended?.invoke(revealStateOne, revealStateTwo, density) }
             }
         }
 
