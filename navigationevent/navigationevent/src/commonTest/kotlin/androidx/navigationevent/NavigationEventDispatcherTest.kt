@@ -294,6 +294,46 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
+    fun fallback_is_not_called_when_all_enabled_callbacks_are_pass_through() {
+        val history = mutableListOf<String>()
+        val dispatcher =
+            NavigationEventDispatcher(fallbackOnBackPressed = { history += "fallback called" })
+
+        val callback1 =
+            object : NavigationEventCallback(isEnabled = true) {
+                override fun onEventStarted(event: NavigationEvent) {
+                    history += "callback1 onEventStarted"
+                }
+
+                override fun onEventCompleted() {
+                    history += "callback1 onEventCompleted"
+                }
+            }
+        callback1.isPassThrough = true
+
+        dispatcher.addCallback(callback1)
+
+        val callback2 =
+            object : NavigationEventCallback(isEnabled = true) {
+                override fun onEventStarted(event: NavigationEvent) {
+                    history += "callback2 onEventStarted"
+                }
+
+                override fun onEventCompleted() {
+                    history += "callback2 onEventCompleted"
+                }
+            }
+        callback2.isPassThrough = true
+
+        dispatcher.addCallback(callback2)
+
+        dispatcher.dispatchOnCompleted()
+
+        assertThat(history)
+            .containsExactly("callback2 onEventCompleted", "callback1 onEventCompleted")
+    }
+
+    @Test
     fun overlay_callbacks_gets_called_even_when_added_before_normal_callbacks() {
         val history = mutableListOf<String>()
         val dispatcher = NavigationEventDispatcher {}
