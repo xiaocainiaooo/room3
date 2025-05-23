@@ -186,8 +186,7 @@ class FeatureCombinationDeviceTest(
         testIfBindAndQueryApiResultsMatch(listOf(preview, videoCapture), setOf(FPS_60))
     }
 
-    // TODO: b/419804400 - Add @Test after fixing Preview Stabilization setting issue for feature
-    //  combo APIs
+    @Test
     fun bindToLifecycle_previewStabilization_bindResultMatchesQueryResult(): Unit = runBlocking {
         testIfBindAndQueryApiResultsMatch(
             listOf(preview, videoCapture),
