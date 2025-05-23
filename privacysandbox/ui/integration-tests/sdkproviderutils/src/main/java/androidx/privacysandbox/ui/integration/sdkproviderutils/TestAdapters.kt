@@ -303,10 +303,19 @@ class TestAdapters(private val sdkContext: Context) {
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                         )
                 }
+            var initialScrollPositionX = 0f
+            var initialScrollPositionY = 0f
 
             scrollView.setOnTouchListener { _, motionEvent ->
                 if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    initialScrollPositionX = scrollView.scrollX.toFloat()
+                    initialScrollPositionY = scrollView.scrollY.toFloat()
                     scrollView.requestDisallowInterceptTouchEvent(!appCanScroll)
+                }
+                if (motionEvent.action == MotionEvent.ACTION_UP) {
+                    val scrollX = scrollView.scrollX.toFloat() - initialScrollPositionX
+                    val scrollY = scrollView.scrollY.toFloat() - initialScrollPositionY
+                    automatedTestCallback?.onGestureFinished(scrollX, scrollY)
                 }
                 false
             }

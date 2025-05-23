@@ -152,8 +152,11 @@ abstract class AutomatedEndToEndTest(
         var remoteViewWidth: Int? = null
         var remoteViewHeight: Int? = null
         var remoteViewConfiguration: Configuration? = null
+        var dragX: Float? = null
+        var dragY: Float? = null
         val resizeLatch = CountDownLatch(1)
         val configLatch = CountDownLatch(1)
+        val dragLatch = CountDownLatch(1)
 
         override fun onResizeOccurred(width: Int, height: Int) {
             remoteViewWidth = width
@@ -164,6 +167,12 @@ abstract class AutomatedEndToEndTest(
         override fun onConfigurationChanged(configuration: Configuration) {
             remoteViewConfiguration = configuration
             configLatch.countDown()
+        }
+
+        override fun onGestureFinished(totalChangeInX: Float, totalChangeInY: Float) {
+            dragX = totalChangeInX
+            dragY = totalChangeInY
+            dragLatch.countDown()
         }
     }
 }

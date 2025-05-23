@@ -16,6 +16,7 @@
 
 package androidx.privacysandbox.ui.integration.testapp.endtoend
 
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.UiFrameworkOption
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.ZOrderOption
@@ -25,38 +26,114 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
+import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiScrollable
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.TimeUnit
 import org.junit.Before
 import org.junit.Test
+import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@LargeTest
-@RunWith(Parameterized::class)
-class UserInteractionTests(
-    @UiFrameworkOption private val uiFrameworkOption: String,
-    @MediationOption private val mediationOption: String,
-    @ZOrderOption private val zOrdering: String,
+@RunWith(Enclosed::class)
+class UserInteractionTests() {
+
+    @RunWith(Parameterized::class)
+    @LargeTest
+    class ClickableRemoteView(
+        @UiFrameworkOption private val uiFrameworkOption: String,
+        @MediationOption private val mediationOption: String,
+        @ZOrderOption private val zOrdering: String,
+    ) :
+        AbstractUserInteractionInScrollTest(
+            uiFrameworkOption,
+            mediationOption,
+            zOrdering,
+            adType = FragmentOptions.AD_TYPE_NON_WEBVIEW,
+        ) {
+        companion object {
+            @JvmStatic
+            @Parameterized.Parameters(
+                name = "uiFrameworkOption={0}, mediationOption={1}, zOrdering={2}"
+            )
+            fun parameters(): Collection<Array<String>> {
+                return baseParameters()
+            }
+        }
+
+        @Test
+        fun clickOnRemoteViewTest() {
+            clickOnContentView()
+
+            ensureThatChromeStarted()
+
+            pressBack()
+        }
+    }
+
+    @RunWith(Parameterized::class)
+    @LargeTest
+    class ClientAppNotAllowedToScroll(
+        @UiFrameworkOption private val uiFrameworkOption: String,
+        @MediationOption private val mediationOption: String,
+        @ZOrderOption private val zOrdering: String,
+    ) :
+        AbstractUserInteractionInScrollTest(
+            uiFrameworkOption = uiFrameworkOption,
+            mediationOption = mediationOption,
+            zOrdering = zOrdering,
+            adType = FragmentOptions.AD_TYPE_SCROLL_VIEW_APP_CAN_NOT_SCROLL,
+        ) {
+
+        companion object {
+            @JvmStatic
+            @Parameterized.Parameters(
+                name = "uiFrameworkOption={0}, mediationOption={1}, zOrdering={2}"
+            )
+            fun parameters(): Collection<Array<String>> {
+                return baseParameters()
+            }
+        }
+
+        @Test
+        fun contentViewConsumesScroll() {
+            val scrollViewLastItemIdBefore = getLastVisibleItemId()
+
+            scrollContentViewDown()
+
+            assertThat(sdkToClientCallback.dragLatch.await(CALLBACK_WAIT_MS, TimeUnit.MILLISECONDS))
+                .isTrue()
+            assertThat(sdkToClientCallback.dragX).isEqualTo(0)
+            assertThat(sdkToClientCallback.dragY).isGreaterThan(0)
+            assertThat(getLastVisibleItemId()).isEqualTo(scrollViewLastItemIdBefore)
+        }
+    }
+}
+
+/**
+ * When extending this class, the client app must show a vertical scrollable list with first item to
+ * be either SandboxedSdkView or SandboxedSdkUi with an established Session.
+ */
+open class AbstractUserInteractionInScrollTest(
+    @UiFrameworkOption private val uiFrameworkOption: String = FragmentOptions.UI_FRAMEWORK_VIEW,
+    @MediationOption
+    private val mediationOption: String = FragmentOptions.MEDIATION_TYPE_NON_MEDIATED,
+    @ZOrderOption private val zOrdering: String = FragmentOptions.Z_ORDER_BELOW,
+    @SdkApiConstants.Companion.AdType
+    private val adType: String = FragmentOptions.AD_TYPE_NON_WEBVIEW,
 ) :
     AutomatedEndToEndTest(
         FragmentOptions.FRAGMENT_SCROLL_HIDDEN,
         uiFrameworkOption,
         mediationOption,
         zOrdering,
-        adType = FragmentOptions.AD_TYPE_NON_WEBVIEW,
+        adType,
     ) {
     companion object {
-        @JvmStatic
-        @Parameterized.Parameters(
-            name = "uiFrameworkOption={0}, mediationOption={1}, zOrdering={2}"
-        )
-        fun parameters(): Collection<Array<String>> {
-            return baseParameters()
-        }
-
+        const val MAX_ITEM_IN_LIST = 20
         const val CHROME_PACKAGE_NAME = "com.android.chrome"
     }
 
@@ -72,20 +149,47 @@ class UserInteractionTests(
             uiScrollable.getChild(UiSelector().index(0)).getChild(UiSelector().index(0))
     }
 
-    @Test
-    fun clickOnRemoteViewTest() {
-        clickOnContentView()
+    fun getLastVisibleItemId(): Int {
+        var lastVisibleItemId = -1
+        var lasVisibleItem: UiObject? = null
+        for (i in 1..MAX_ITEM_IN_LIST) {
+            try {
+                lasVisibleItem =
+                    uiScrollable.getChildByText(
+                        UiSelector().className("android.widget.TextView"),
+                        "ClientItem $i",
+                        false,
+                    )
+                lastVisibleItemId = i
+            } catch (_: UiObjectNotFoundException) {}
+        }
 
-        ensureThatChromeStarted()
+        assertThat(lasVisibleItem).isNotNull()
+        assertThat(lastVisibleItemId).isGreaterThan(-1)
 
-        device.pressBack()
+        return lastVisibleItemId
     }
 
-    internal fun clickOnContentView() {
+    fun scrollContentViewDown() {
+        val contentViewCenterX = contentViewUiObject.bounds.centerX()
+        val contentViewCenterY = contentViewUiObject.bounds.centerY()
+
+        val scrollYAmount = contentViewUiObject.bounds.height() / 2
+        val steps = 10
+        device.swipe(
+            contentViewCenterX,
+            contentViewCenterY,
+            contentViewCenterX,
+            contentViewCenterY - scrollYAmount,
+            steps,
+        )
+    }
+
+    fun clickOnContentView() {
         device.click(contentViewUiObject.bounds.centerX(), contentViewUiObject.bounds.centerY())
     }
 
-    internal fun ensureThatChromeStarted() {
+    fun ensureThatChromeStarted() {
         assertThat(
                 device.wait(
                     Until.hasObject(By.pkg(CHROME_PACKAGE_NAME).depth(0)),
@@ -93,5 +197,9 @@ class UserInteractionTests(
                 )
             )
             .isTrue()
+    }
+
+    fun pressBack() {
+        device.pressBack()
     }
 }

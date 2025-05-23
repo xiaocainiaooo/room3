@@ -22,4 +22,9 @@ package androidx.privacysandbox.ui.integration.sdkproviderutils;
 interface IAutomatedTestCallback {
     void onResizeOccurred(int width, int height);
     void onConfigurationChanged(in Configuration configuration);
+    /**
+    * This callback reports a touch gesture applied on the remote content.
+    * It returns the deltas in X and Y between Action DOWN and Action UP.
+    */
+    void onGestureFinished(in float totalChangeInX, in float totalChangeInY);
 }
