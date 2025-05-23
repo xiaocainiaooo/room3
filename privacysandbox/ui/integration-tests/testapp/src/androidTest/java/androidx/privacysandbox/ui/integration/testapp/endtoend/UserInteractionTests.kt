@@ -32,6 +32,7 @@ import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
@@ -109,6 +110,109 @@ class UserInteractionTests() {
             assertThat(sdkToClientCallback.dragX).isEqualTo(0)
             assertThat(sdkToClientCallback.dragY).isGreaterThan(0)
             assertThat(getLastVisibleItemId()).isEqualTo(scrollViewLastItemIdBefore)
+        }
+    }
+
+    @RunWith(Enclosed::class)
+    class ClientAppAllowedToScroll() {
+
+        // TODO(b/374270009): This might change after this bug gets fixed.
+        @RunWith(Parameterized::class)
+        @LargeTest
+        class ContentInAboveMode(
+            @UiFrameworkOption private val uiFrameworkOption: String,
+            @MediationOption private val mediationOption: String,
+        ) :
+            AbstractUserInteractionInScrollTest(
+                uiFrameworkOption = uiFrameworkOption,
+                mediationOption = mediationOption,
+                zOrdering = FragmentOptions.Z_ORDER_ABOVE,
+                adType = FragmentOptions.AD_TYPE_SCROLL_VIEW,
+            ) {
+
+            @Before
+            fun before() {
+                // Z-Above mode is only meaningful in case that SDK is loaded in a remote process.
+                assumeTrue(sdkToClientCallback.isRemoteSession)
+            }
+
+            companion object {
+                @JvmStatic
+                @Parameterized.Parameters(name = "uiFrameworkOption={0}, mediationOption={1}")
+                fun parameters(): Collection<Array<String>> {
+                    return customParams(
+                        arrayOf(
+                            FragmentOptions.UI_FRAMEWORK_VIEW
+                            // TODO(b/419824125): Enable this option.
+                            // FragmentOptions.UI_FRAMEWORK_COMPOSE
+                        ),
+                        arrayOf(
+                            // In-App Mediated is not tested as z-level above is not meaningful
+                            // in this mode.
+                            FragmentOptions.MEDIATION_TYPE_NON_MEDIATED,
+                            FragmentOptions.MEDIATION_TYPE_IN_RUNTIME,
+                        ),
+                    )
+                }
+            }
+
+            @Test
+            fun clientAppCanNotScroll() {
+                val scrollViewLastItemIdBefore = getLastVisibleItemId()
+
+                scrollContentViewDown()
+
+                assertThat(
+                        sdkToClientCallback.dragLatch.await(CALLBACK_WAIT_MS, TimeUnit.MILLISECONDS)
+                    )
+                    .isTrue()
+                assertThat(getLastVisibleItemId()).isEqualTo(scrollViewLastItemIdBefore)
+            }
+        }
+
+        @RunWith(Parameterized::class)
+        @LargeTest
+        class ContentInBelowMode(
+            @UiFrameworkOption private val uiFrameworkOption: String,
+            @MediationOption private val mediationOption: String,
+        ) :
+            AbstractUserInteractionInScrollTest(
+                uiFrameworkOption = uiFrameworkOption,
+                mediationOption = mediationOption,
+                zOrdering = FragmentOptions.Z_ORDER_BELOW,
+                adType = FragmentOptions.AD_TYPE_SCROLL_VIEW,
+            ) {
+
+            companion object {
+                @JvmStatic
+                @Parameterized.Parameters(name = "uiFrameworkOption={0}, mediationOption={1}")
+                fun parameters(): Collection<Array<String>> {
+                    return customParams(
+                        arrayOf(
+                            FragmentOptions.UI_FRAMEWORK_VIEW,
+                            FragmentOptions.UI_FRAMEWORK_COMPOSE,
+                        ),
+                        arrayOf(
+                            FragmentOptions.MEDIATION_TYPE_NON_MEDIATED,
+                            FragmentOptions.MEDIATION_TYPE_IN_APP,
+                            FragmentOptions.MEDIATION_TYPE_IN_RUNTIME,
+                        ),
+                    )
+                }
+            }
+
+            @Test
+            fun clientAppCanScroll() {
+                val scrollViewLastItemIdBefore = getLastVisibleItemId()
+
+                scrollContentViewDown()
+
+                assertThat(
+                        sdkToClientCallback.dragLatch.await(CALLBACK_WAIT_MS, TimeUnit.MILLISECONDS)
+                    )
+                    .isFalse()
+                assertThat(getLastVisibleItemId()).isGreaterThan(scrollViewLastItemIdBefore)
+            }
         }
     }
 }

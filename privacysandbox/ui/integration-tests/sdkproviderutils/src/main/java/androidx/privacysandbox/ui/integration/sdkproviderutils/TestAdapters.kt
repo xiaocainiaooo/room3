@@ -26,9 +26,11 @@ import android.graphics.Color.BLACK
 import android.graphics.Color.WHITE
 import android.graphics.Paint
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Process
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
@@ -100,7 +102,15 @@ class TestAdapters(private val sdkContext: Context) {
                         }
                         adView = adViewWithConsumeScrollOverlay
                     }
-                    clientExecutor.execute { client.onSessionOpened(BannerAdSession(adView)) }
+                    clientExecutor.execute {
+                        if (
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                Process.isSdkSandbox()
+                        ) {
+                            automatedTestCallback?.onRemoteSession()
+                        }
+                        client.onSessionOpened(BannerAdSession(adView))
+                    }
                 }
             )
         }
