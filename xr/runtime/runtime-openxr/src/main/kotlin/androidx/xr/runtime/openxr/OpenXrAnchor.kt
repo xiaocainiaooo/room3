@@ -77,11 +77,11 @@ internal constructor(
     }
 
     override fun update(xrTime: Long) {
-        val anchorState: AnchorState =
-            nativeGetAnchorState(nativePointer, xrTime)
-                ?: throw IllegalStateException(
-                    "Could not retrieve data for anchor. Is the anchor valid?"
-                )
+        val anchorState = nativeGetAnchorState(nativePointer, xrTime)
+        if (anchorState == null) {
+            trackingState = TrackingState.PAUSED
+            return
+        }
 
         trackingState = anchorState.trackingState
         anchorState.pose?.let { pose = it }
