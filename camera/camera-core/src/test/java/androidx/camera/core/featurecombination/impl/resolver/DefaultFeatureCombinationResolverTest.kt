@@ -698,7 +698,7 @@ class DefaultFeatureCombinationResolverTest {
     }
 
     @Test
-    fun resolveFeatureCombination_containsRequiredFeature_featureCombinationResolutionsAllowed() {
+    fun resolveFeatureCombination_containsRequiredFeature_passesTrueForIsFeatureComboInvocation() {
         val defaultResolver =
             DefaultFeatureCombinationResolver(
                 FakeCameraInfoInternal(
@@ -710,10 +710,10 @@ class DefaultFeatureCombinationResolverTest {
                             attachedUseCases: List<UseCase>,
                             cameraConfig: CameraConfig,
                             targetHighSpeedFrameRate: Range<Int>,
-                            allowFeatureCombinationResolutions: Boolean,
+                            isFeatureComboInvocation: Boolean,
                             findMaxSupportedFrameRate: Boolean,
                         ): StreamSpecQueryResult {
-                            assertThat(allowFeatureCombinationResolutions).isEqualTo(true)
+                            assertThat(isFeatureComboInvocation).isEqualTo(true)
                             return StreamSpecQueryResult()
                         }
                     }
@@ -726,7 +726,7 @@ class DefaultFeatureCombinationResolverTest {
     }
 
     @Test
-    fun resolveFeatureCombination_containsPreferredFeature_featureCombinationResolutionsAllowed() {
+    fun resolveFeatureCombination_containsPreferredFeature_passesTrueForIsFeatureComboInvocation() {
         val defaultResolver =
             DefaultFeatureCombinationResolver(
                 FakeCameraInfoInternal(
@@ -738,10 +738,10 @@ class DefaultFeatureCombinationResolverTest {
                             attachedUseCases: List<UseCase>,
                             cameraConfig: CameraConfig,
                             targetHighSpeedFrameRate: Range<Int>,
-                            allowFeatureCombinationResolutions: Boolean,
+                            isFeatureComboInvocation: Boolean,
                             findMaxSupportedFrameRate: Boolean,
                         ): StreamSpecQueryResult {
-                            assertThat(allowFeatureCombinationResolutions).isEqualTo(true)
+                            assertThat(isFeatureComboInvocation).isEqualTo(true)
                             return StreamSpecQueryResult()
                         }
                     }
