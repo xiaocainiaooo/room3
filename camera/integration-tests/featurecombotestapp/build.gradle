@@ -46,10 +46,20 @@ dependencies {
 
     // Camera
     implementation(project(":camera:camera-camera2"))
+    implementation(project(":camera:camera-camera2-pipe-integration"))
     implementation(project(":camera:camera-core"))
     implementation(project(":camera:camera-lifecycle"))
     implementation(project(":camera:camera-view"))
     implementation(project(":camera:featurecombinationquery:featurecombinationquery-play-services"))
+
+    // Testing framework
+    androidTestImplementation(libs.testCore)
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.kotlinStdlib)
+    androidTestImplementation(libs.kotlinCoroutinesAndroid)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(project(":camera:camera-testing"))
 }
 
 android {
