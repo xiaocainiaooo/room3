@@ -99,21 +99,24 @@ public open class PdfView
 constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     View(context, attrs, defStyle) {
 
-    public var fastScrollVerticalThumbDrawable: Drawable? = null
+    public var fastScrollVerticalThumbDrawable: Drawable =
+        requireNotNull(context.getDrawable(R.drawable.fast_scroll_thumb_drawable))
         set(value) {
             field = value
             fastScroller?.fastScrollDrawer?.thumbDrawable = value
             invalidate()
         }
 
-    public var fastScrollPageIndicatorBackgroundDrawable: Drawable? = null
+    public var fastScrollPageIndicatorBackgroundDrawable: Drawable =
+        requireNotNull(context.getDrawable(R.drawable.page_indicator_background))
         set(value) {
             field = value
             fastScroller?.fastScrollDrawer?.pageIndicatorBackground = value
             invalidate()
         }
 
-    public var fastScrollVerticalThumbMarginEnd: Int = 0
+    public var fastScrollVerticalThumbMarginEnd: Int =
+        context.getDimensions(R.dimen.scroll_thumb_margin_end).toInt()
         set(value) {
             field = value
             fastScroller?.fastScrollDrawer?.thumbMarginEnd = value
@@ -128,7 +131,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             invalidate()
         }
 
-    public var isFormFillingEnabled: Boolean
+    public var isFormFillingEnabled: Boolean = false
+
+    /** The maximum scaling factor that can be applied to this View using the [zoom] property */
+    public var maxZoom: Float = DEFAULT_MAX_ZOOM
+
+    /** The minimum scaling factor that can be applied to this View using the [zoom] property */
+    public var minZoom: Float = DEFAULT_MIN_ZOOM
 
     // After the pagination model has loaded and the first set of pages are made visible (or if
     // the view is not attached to a window, we fetch all the dimensions to optimize subsequent
@@ -137,12 +146,42 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PdfView)
-        fastScrollVerticalThumbDrawable =
-            typedArray.getDrawable(R.styleable.PdfView_fastScrollVerticalThumbDrawable)
-        fastScrollPageIndicatorBackgroundDrawable =
-            typedArray.getDrawable(R.styleable.PdfView_fastScrollPageIndicatorBackgroundDrawable)
-        isFormFillingEnabled =
-            typedArray.getBoolean(R.styleable.PdfView_isFormFillingEnabled, false)
+        if (typedArray.hasValue(R.styleable.PdfView_fastScrollVerticalThumbDrawable)) {
+            val drawable =
+                typedArray.getDrawable(R.styleable.PdfView_fastScrollVerticalThumbDrawable)
+            if (drawable != null) fastScrollVerticalThumbDrawable = drawable
+        }
+        if (typedArray.hasValue(R.styleable.PdfView_fastScrollPageIndicatorBackgroundDrawable)) {
+            val drawable =
+                typedArray.getDrawable(
+                    R.styleable.PdfView_fastScrollPageIndicatorBackgroundDrawable
+                )
+            if (drawable != null) fastScrollPageIndicatorBackgroundDrawable = drawable
+        }
+        if (typedArray.hasValue(R.styleable.PdfView_fastScrollPageIndicatorMarginEnd)) {
+            fastScrollPageIndicatorMarginEnd =
+                typedArray.getDimensionPixelSize(
+                    R.styleable.PdfView_fastScrollPageIndicatorMarginEnd,
+                    fastScrollPageIndicatorMarginEnd,
+                )
+        }
+        if (typedArray.hasValue(R.styleable.PdfView_fastScrollVerticalThumbMarginEnd)) {
+            fastScrollVerticalThumbMarginEnd =
+                typedArray.getDimensionPixelSize(
+                    R.styleable.PdfView_fastScrollVerticalThumbMarginEnd,
+                    fastScrollVerticalThumbMarginEnd,
+                )
+        }
+        if (typedArray.hasValue(R.styleable.PdfView_isFormFillingEnabled)) {
+            isFormFillingEnabled =
+                typedArray.getBoolean(R.styleable.PdfView_isFormFillingEnabled, false)
+        }
+        if (typedArray.hasValue(R.styleable.PdfView_minZoom)) {
+            minZoom = typedArray.getFloat(R.styleable.PdfView_minZoom, minZoom)
+        }
+        if (typedArray.hasValue(R.styleable.PdfView_maxZoom)) {
+            maxZoom = typedArray.getFloat(R.styleable.PdfView_maxZoom, maxZoom)
+        }
         typedArray.recycle()
     }
 
@@ -157,14 +196,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 onDocumentSet()
             }
         }
-
-    /** The maximum scaling factor that can be applied to this View using the [zoom] property */
-    // TODO(b/376299551) - Make maxZoom configurable via XML attribute
-    public var maxZoom: Float = DEFAULT_MAX_ZOOM
-
-    /** The minimum scaling factor that can be applied to this View using the [zoom] property */
-    // TODO(b/376299551) - Make minZoom configurable via XML attribute
-    public var minZoom: Float = DEFAULT_MIN_ZOOM
 
     /**
      * The zoom level of this view, as a factor of the content's natural size with when 1 pixel is
@@ -266,7 +297,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     /** The listener that is notified when a link in the PDF is clicked. */
-    public var linkClickListener: LinkClickListener? = null
+    private var linkClickListener: LinkClickListener? = null
 
     /** The [ActionMode.Callback2] for selection */
     public var selectionActionModeCallback: DefaultSelectionActionModeCallback =
@@ -510,6 +541,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             deferredScrollPosition = position
             deferredScrollPage = null
         }
+    }
+
+    /**
+     * Registers [listener] as the callback to be invoked when an external link in the PDF is
+     * clicked. Supply `null` to clear any current listener.
+     */
+    public fun setLinkClickListener(listener: LinkClickListener?) {
+        linkClickListener = listener
     }
 
     /**
