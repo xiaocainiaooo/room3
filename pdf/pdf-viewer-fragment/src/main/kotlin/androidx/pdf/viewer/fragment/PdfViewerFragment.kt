@@ -563,11 +563,11 @@ public open class PdfViewerFragment constructor() : Fragment() {
                 if (uiState !is SearchViewUiState.Closed) {
                     _pdfView.apply {
                         clearSelection()
-                        forcedFastScrollVisibility = false
+                        fastScrollVisibility = PdfView.FastScrollVisibility.ALWAYS_HIDE
                     }
                 } else {
                     // Let PdfView internally control fast scroller visibility.
-                    _pdfView.forcedFastScrollVisibility = null
+                    _pdfView.fastScrollVisibility = PdfView.FastScrollVisibility.AUTO_HIDE
                 }
             }
         }

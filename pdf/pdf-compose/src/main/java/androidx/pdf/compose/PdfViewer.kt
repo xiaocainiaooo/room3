@@ -38,12 +38,12 @@ import kotlin.random.Random
  * @param minZoom the minimum zoom / scaling factor that can be applied to the PDF viewer
  * @param maxZoom the maximum zoom / scaling factor that can be applied to the PDF viewer
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @Composable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public fun PdfViewer(
-    modifier: Modifier = Modifier,
-    state: PdfViewerState,
     pdfDocument: PdfDocument?,
+    state: PdfViewerState,
+    modifier: Modifier = Modifier,
     minZoom: Float = PdfView.DEFAULT_MIN_ZOOM,
     maxZoom: Float = PdfView.DEFAULT_MAX_ZOOM,
     @DrawableRes fastScrollVerticalThumbDrawable: Int = R.drawable.fast_scroll_thumb_drawable,

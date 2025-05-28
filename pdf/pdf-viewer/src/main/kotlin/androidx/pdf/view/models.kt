@@ -158,8 +158,8 @@ public class Highlight(public val area: PdfRect, @ColorInt public val color: Int
     }
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
 /** Represents PDF content that has been selected */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public interface Selection {
     /**
      * The [PdfRect] bounds of this selection. May contain multiple [PdfRect] if this selection

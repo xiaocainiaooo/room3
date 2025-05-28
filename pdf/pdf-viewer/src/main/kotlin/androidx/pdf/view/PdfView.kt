@@ -131,6 +131,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             invalidate()
         }
 
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public var isFormFillingEnabled: Boolean = false
 
     /** The maximum scaling factor that can be applied to this View using the [zoom] property */
@@ -300,6 +302,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var linkClickListener: LinkClickListener? = null
 
     /** The [ActionMode.Callback2] for selection */
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public var selectionActionModeCallback: DefaultSelectionActionModeCallback =
         DefaultSelectionActionModeCallback(this)
 
@@ -309,10 +313,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             return selectionStateManager?.selectionModel?.value?.documentSelection?.selection
         }
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public var requestFailedListener: EventListener? = null
 
     @VisibleForTesting
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public val currentPageIndicatorLabel: String
         get() = fastScroller?.fastScrollDrawer?.currentPageIndicatorLabel ?: ""
 
@@ -364,6 +370,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      */
     private var deferViewportUpdate: Boolean = false
 
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public enum class FastScrollVisibility {
+        AUTO_HIDE,
+        ALWAYS_SHOW,
+        ALWAYS_HIDE,
+    }
+
     /**
      * Indicates whether the fast scroller's visibility is managed externally.
      *
@@ -372,19 +385,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      *
      * This allows an external source to manage the visibility.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public var forcedFastScrollVisibility: Boolean? = null
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public var fastScrollVisibility: FastScrollVisibility = FastScrollVisibility.AUTO_HIDE
         set(value) {
             field = value
-            if (value == true) fastScroller?.show { postInvalidate() }
-            else if (value == false) fastScroller?.hide()
+            if (value == FastScrollVisibility.ALWAYS_SHOW) fastScroller?.show { postInvalidate() }
+            else if (value == FastScrollVisibility.ALWAYS_HIDE) fastScroller?.hide()
         }
 
     // Stores width set from onSizeChanged or while restoring state
     private var oldWidth: Int? = null
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @VisibleForTesting
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public var fastScroller: FastScroller? = null
     private var fastScrollGestureDetector: FastScrollGestureDetector? = null
 
@@ -399,7 +414,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     internal var lastFastScrollerVisibility: Boolean = false
 
     @VisibleForTesting
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public var isAutoScrollingEnabled: Boolean = true
 
     private var isAutoScrolling = false
@@ -452,6 +468,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
     @VisibleForTesting
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun arePagesFullyRendered(): Boolean {
         // If no document is set, there are no pages to render. In that case, we assume all pages
         // are rendered. For testing purposes, the idling resource can be registered before
@@ -734,13 +751,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         scrollTo(x, y)
     }
 
-    override fun dispatchHoverEvent(event: MotionEvent): Boolean {
-        return pdfViewAccessibilityManager?.dispatchHoverEvent(event) == true ||
+    override fun dispatchHoverEvent(event: MotionEvent?): Boolean {
+        return event?.let { pdfViewAccessibilityManager?.dispatchHoverEvent(it) } == true ||
             super.dispatchHoverEvent(event)
     }
 
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        return pdfViewAccessibilityManager?.dispatchKeyEvent(event) == true ||
+    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        return event?.let { pdfViewAccessibilityManager?.dispatchKeyEvent(it) } == true ||
             super.dispatchKeyEvent(event)
     }
 
@@ -820,13 +837,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     private fun maybeShowFastScroller() {
-        if (forcedFastScrollVisibility != null) return // Forced visibility takes precedence
+        // Forced visibility takes precedence
+        if (fastScrollVisibility != FastScrollVisibility.AUTO_HIDE) return
 
         fastScroller?.show { postInvalidate() }
     }
 
     private fun maybeHideFastScroller() {
-        if (forcedFastScrollVisibility != null) return // Forced visibility takes precedence
+        // Forced visibility takes precedence
+        if (fastScrollVisibility != FastScrollVisibility.AUTO_HIDE) return
 
         fastScroller?.hide()
     }
@@ -1651,28 +1670,28 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     public open class DefaultSelectionActionModeCallback(private val pdfView: PdfView) :
         ActionMode.Callback2() {
         @CallSuper
-        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             pdfView.selectionActionMode = mode
 
             // Inflate the menu resource providing context menu items.
-            val inflater = mode.menuInflater
-            inflater.inflate(R.menu.context_menu, menu)
+            val inflater = mode?.menuInflater
+            inflater?.inflate(R.menu.context_menu, menu)
             return true
         }
 
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             return false
         }
 
         @CallSuper
-        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            if (item.itemId == R.id.action_selectAll) {
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.action_selectAll) {
                 // We can't select all if we don't know what page the selection is on, or if
                 // we don't know the size of that page
                 val page = pdfView.currentSelection?.bounds?.first()?.pageNum ?: return false
                 pdfView.selectionStateManager?.selectAllTextOnPageAsync(page)
                 return true
-            } else if (item.itemId == R.id.action_copy) {
+            } else if (item?.itemId == R.id.action_copy) {
                 // We can't copy the current selection if no text is selected
                 val text = (pdfView.currentSelection as? TextSelection)?.text ?: return false
                 copyToClipboard(text)
@@ -1689,11 +1708,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             manager.setPrimaryClip(clip)
         }
 
-        override fun onDestroyActionMode(mode: ActionMode) {
+        override fun onDestroyActionMode(mode: ActionMode?) {
             // No-op
         }
 
-        override fun onGetContentRect(mode: ActionMode, view: View, outRect: Rect) {
+        override fun onGetContentRect(mode: ActionMode?, view: View?, outRect: Rect?) {
             // If we don't know about page layout, defer to the default implementation
             val localPageLayoutManager =
                 pdfView.pageMetadataLoader ?: return super.onGetContentRect(mode, view, outRect)
@@ -1710,7 +1729,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                         viewport.intersects(it.left, it.top, it.right, it.bottom)
                     } == true
                 ) {
-                    outRect.set(pdfView.toViewRect(boundsInView))
+                    outRect?.set(pdfView.toViewRect(boundsInView))
                     return
                 }
             }
@@ -1724,7 +1743,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                         viewport.intersects(it.left, it.top, it.right, it.bottom)
                     } == true
                 ) {
-                    outRect.set(pdfView.toViewRect(boundsInView))
+                    outRect?.set(pdfView.toViewRect(boundsInView))
                     return
                 }
             }
@@ -1732,7 +1751,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             // Else, center the context menu in view
             val centerX = (pdfView.x + pdfView.width / 2).roundToInt()
             val centerY = (pdfView.y + pdfView.height / 2).roundToInt()
-            outRect.set(centerX, centerY, centerX + 1, centerY + 1)
+            outRect?.set(centerX, centerY, centerX + 1, centerY + 1)
         }
     }
 
@@ -2076,9 +2095,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
          */
         public const val GESTURE_STATE_SETTLING: Int = 2
 
-        public const val DEFAULT_INIT_ZOOM: Float = 1.0f
-        public const val DEFAULT_MAX_ZOOM: Float = 25.0f
-        public const val DEFAULT_MIN_ZOOM: Float = 0.5f
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val DEFAULT_INIT_ZOOM: Float = 1.0f
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val DEFAULT_MAX_ZOOM: Float = 25.0f
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val DEFAULT_MIN_ZOOM: Float = 0.5f
 
         /** The ratio of vertical to horizontal scroll that is assumed to be vertical only */
         private const val SCROLL_CORRECTION_RATIO = 1.5f
