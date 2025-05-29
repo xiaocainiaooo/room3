@@ -49,6 +49,7 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -80,6 +81,7 @@ import androidx.xr.compose.subspace.Volume
 import androidx.xr.compose.subspace.layout.SpatialAlignment
 import androidx.xr.compose.subspace.layout.SpatialRoundedCornerShape
 import androidx.xr.compose.subspace.layout.SubspaceModifier
+import androidx.xr.compose.subspace.layout.aspectRatio
 import androidx.xr.compose.subspace.layout.depth
 import androidx.xr.compose.subspace.layout.fillMaxHeight
 import androidx.xr.compose.subspace.layout.fillMaxWidth
@@ -216,6 +218,8 @@ class SpatialComposeAppActivity : ComponentActivity() {
                     AppPanel(modifier = sidePanelModifier, text = "Panel Top Right")
                     SpatialLayoutSpacer(modifier = SubspaceModifier.height(20.dp))
                     AppPanel(modifier = sidePanelModifier, text = "Panel Bottom Right")
+                    SpatialLayoutSpacer(modifier = SubspaceModifier.height(30.dp))
+                    AspectRatioPanel()
                 }
             }
         }
@@ -372,6 +376,24 @@ class SpatialComposeAppActivity : ComponentActivity() {
                         gltfEntity.setPose(Pose(rotation = q))
                     }
                 }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @SubspaceComposable
+    @Composable
+    fun AspectRatioPanel() {
+        var aspectRatioValue by remember { mutableFloatStateOf(1f) }
+        SpatialPanel(modifier = SubspaceModifier.fillMaxWidth().aspectRatio(aspectRatioValue)) {
+            Column(
+                modifier = Modifier.fillMaxSize().background(Color.LightGray).padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text("Change Aspect Ratio")
+                Button(onClick = { aspectRatioValue = 16f / 11f }) { Text("16 : 11") }
+                Button(onClick = { aspectRatioValue = 9f / 14f }) { Text("9 : 14") }
             }
         }
     }
