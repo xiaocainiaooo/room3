@@ -395,6 +395,9 @@ public class SupportedSurfaceCombination(
                 newUseCaseConfigs,
                 useCasesPriorityOrder,
             )
+
+        debug { "resolvedDynamicRanges = $resolvedDynamicRanges" }
+
         val isUltraHdrOn = isUltraHdrOn(attachedSurfaces, filteredNewUseCaseConfigsSupportedSizeMap)
 
         // Calculates the target FPS range

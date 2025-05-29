@@ -57,6 +57,7 @@ import androidx.camera.testing.impl.Camera2CaptureCallbackImpl
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.GLUtil
+import androidx.camera.testing.impl.IgnoreProblematicDeviceRule.Companion.isMediumPhoneApi35Emulator
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.SurfaceTextureProvider.createSurfaceTextureProvider
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
@@ -76,6 +77,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.After
+import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
@@ -182,6 +184,10 @@ class FeatureCombinationDeviceTest(
 
     @Test
     fun bindToLifecycle_hlg10_bindResultMatchesQueryResult(): Unit = runBlocking {
+        assumeFalse(
+            "Medium phone API 35 doesn't support HLG10 HDR properly despite camera framework API reporting it as supported",
+            isMediumPhoneApi35Emulator,
+        )
         testIfBindAndQueryApiResultsMatch(listOf(preview, videoCapture), setOf(HDR_HLG10))
     }
 
@@ -211,6 +217,12 @@ class FeatureCombinationDeviceTest(
     @Test
     fun bindToLifecycle_bothHdrAndPrvwStabilizationRequired_bindResultMatchesQueryResult(): Unit =
         runBlocking {
+            assumeFalse(
+                "Medium phone API 35 doesn't support HLG10 HDR properly despite camera" +
+                    " framework API reporting it as supported",
+                isMediumPhoneApi35Emulator,
+            )
+
             testIfBindAndQueryApiResultsMatch(
                 listOf(preview, videoCapture),
                 setOf(HDR_HLG10, PREVIEW_STABILIZATION),
@@ -220,6 +232,12 @@ class FeatureCombinationDeviceTest(
     @Test
     fun bindToLifecycle_moreThanTwoFeaturesRequired_bindResultMatchesQueryResult(): Unit =
         runBlocking {
+            assumeFalse(
+                "Medium phone API 35 doesn't support HLG10 HDR properly despite camera" +
+                    " framework API reporting it as supported",
+                isMediumPhoneApi35Emulator,
+            )
+
             testIfBindAndQueryApiResultsMatch(
                 listOf(preview, videoCapture),
                 setOf(HDR_HLG10, FPS_60, PREVIEW_STABILIZATION),

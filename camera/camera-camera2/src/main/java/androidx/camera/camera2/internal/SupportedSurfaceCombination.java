@@ -720,6 +720,8 @@ final class SupportedSurfaceCombination {
                 mDynamicRangeResolver.resolveAndValidateDynamicRanges(attachedSurfaces,
                         newUseCaseConfigs, useCasesPriorityOrder);
 
+        Logger.d(TAG, "resolvedDynamicRanges = " + resolvedDynamicRanges);
+
         boolean isUltraHdrOn = isUltraHdrOn(attachedSurfaces, newUseCaseConfigsSupportedSizeMap);
 
         // Calculates the target FPS range
