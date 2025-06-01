@@ -26,14 +26,21 @@ import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.camera.viewfinder.core.ViewfinderSurfaceSessionScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -229,6 +236,47 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
         }
     }
 
+    @Test
+    fun viewfinderInPagerWithDefaultOffscreenPageCount_afterMoveOffThenOnScreen_validSurfaceIsAvailable():
+        Unit = runBlocking {
+        testPageableWithSession(beyondViewportPageCount = 0) {
+            val firstSurfaceSession = awaitSurfaceSession()
+            assertThat(firstSurfaceSession.surface.isValid).isTrue()
+
+            scrollToPage(1)
+
+            rule.awaitIdleWithPausedRendering()
+            // Moving off screen will remove the View from the composition, so the session should
+            // be completed.
+            allowNextSessionCompletion()
+
+            scrollToPage(0)
+            rule.awaitIdleWithPausedRendering()
+            val secondSurfaceSession = awaitSurfaceSession()
+
+            assertThat(secondSurfaceSession.surface.isValid).isTrue()
+        }
+    }
+
+    @Test
+    fun viewfinderInPagerWithOneOffscreenPageCount_afterMoveOffThenOnScreen_validSurfaceIsAvailable():
+        Unit = runBlocking {
+        // When the beyondViewportPageCount keeps the underlying View alive, we don't expect
+        // the session to be recreated since the composable is never removed from the composition.
+        testPageableWithSession(beyondViewportPageCount = 1) {
+            val surfaceSession = awaitSurfaceSession()
+            assertThat(surfaceSession.surface.isValid).isTrue()
+
+            scrollToPage(1)
+            rule.awaitIdleWithPausedRendering()
+
+            scrollToPage(0)
+            rule.awaitIdleWithPausedRendering()
+
+            assertThat(surfaceSession.surface.isValid).isTrue()
+        }
+    }
+
     private interface SessionTestScope {
 
         suspend fun awaitSurfaceSession(
@@ -246,6 +294,10 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
 
     private interface MovableSessionTestScope : SessionTestScope {
         fun moveViewfinder()
+    }
+
+    private interface PageableSessionTestScope : SessionTestScope {
+        suspend fun scrollToPage(page: Int)
     }
 
     private suspend inline fun <T : SessionTestScope> testWithSessionInternal(
@@ -301,6 +353,52 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
         } finally {
             sessionCompleteCount.value = Int.MAX_VALUE
         }
+    }
+
+    private suspend inline fun testPageableWithSession(
+        beyondViewportPageCount: Int,
+        crossinline block: suspend PageableSessionTestScope.() -> Unit,
+    ) {
+        val selectedPageFlow = MutableStateFlow(0)
+        val settledPageFlow = MutableStateFlow(0)
+        testWithSessionInternal(
+            scopeProvider = { baseScope ->
+                object : SessionTestScope by baseScope, PageableSessionTestScope {
+                    override suspend fun scrollToPage(page: Int) {
+                        selectedPageFlow.value = page
+                        settledPageFlow.first { it == page }
+                    }
+                }
+            },
+            composeContent = { onInit ->
+                val pagerState = rememberPagerState(pageCount = { 3 })
+
+                HorizontalPager(
+                    modifier = Modifier.fillMaxSize(),
+                    state = pagerState,
+                    beyondViewportPageCount = beyondViewportPageCount,
+                ) { page ->
+                    when (page) {
+                        0 -> TestViewfinder(onInit = onInit)
+                        1 -> Box(modifier = Modifier.fillMaxSize().background(Color.Red))
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    selectedPageFlow.collectLatest { selectedPage ->
+                        withContext(AndroidUiDispatcher.Main) {
+                            pagerState.animateScrollToPage(selectedPage)
+                        }
+
+                        // Wait for the page to settle
+                        snapshotFlow { pagerState.settledPage }.first { it == selectedPage }
+
+                        settledPageFlow.value = selectedPage
+                    }
+                }
+            },
+            block = block,
+        )
     }
 
     private suspend fun testMovableWithSession(block: suspend MovableSessionTestScope.() -> Unit) {
@@ -411,7 +509,7 @@ class ViewfinderTest(private val implementationMode: ImplementationMode) {
         onInit: ViewfinderInitScope.() -> Unit,
     ) {
         Viewfinder(
-            modifier = modifier.size(ViewfinderTestParams.Default.viewfinderSize),
+            modifier = modifier.fillMaxSize(),
             surfaceRequest = surfaceRequest,
             transformationInfo = transformationInfo,
             coordinateTransformer = coordinateTransformer,
