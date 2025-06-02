@@ -19,8 +19,10 @@ package androidx.xr.scenecore
 import android.content.Context
 import android.view.View
 import androidx.annotation.RestrictTo
+import androidx.xr.runtime.Config
 import androidx.xr.runtime.Session
 import androidx.xr.runtime.internal.JxrPlatformAdapter
+import androidx.xr.runtime.internal.LifecycleManager
 import androidx.xr.runtime.internal.PanelEntity as RtPanelEntity
 import androidx.xr.runtime.math.FloatSize3d
 import androidx.xr.runtime.math.IntSize2d
@@ -114,6 +116,7 @@ public sealed class BasePanelEntity<out RtPanelEntityType : RtPanelEntity>(
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public open class PanelEntity
 internal constructor(
+    private val lifecycleManager: LifecycleManager,
     rtEntity: RtPanelEntity,
     entityManager: EntityManager,
     // TODO(ricknels): move isMainPanelEntity check to JxrPlatformAdapter.
@@ -122,6 +125,7 @@ internal constructor(
 
     public companion object {
         internal fun create(
+            lifecycleManager: LifecycleManager,
             context: Context,
             adapter: JxrPlatformAdapter,
             entityManager: EntityManager,
@@ -131,6 +135,7 @@ internal constructor(
             pose: Pose = Pose.Identity,
         ): PanelEntity =
             PanelEntity(
+                lifecycleManager,
                 adapter.createPanelEntity(
                     context,
                     pose,
@@ -143,6 +148,7 @@ internal constructor(
             )
 
         internal fun create(
+            lifecycleManager: LifecycleManager,
             context: Context,
             adapter: JxrPlatformAdapter,
             entityManager: EntityManager,
@@ -152,6 +158,7 @@ internal constructor(
             pose: Pose = Pose.Identity,
         ): PanelEntity =
             PanelEntity(
+                lifecycleManager,
                 adapter.createPanelEntity(
                     context,
                     pose,
@@ -183,6 +190,7 @@ internal constructor(
             pose: Pose = Pose.Identity,
         ): PanelEntity =
             PanelEntity.create(
+                session.runtime.lifecycleManager,
                 session.activity,
                 session.platformAdapter,
                 session.scene.entityManager,
@@ -213,6 +221,7 @@ internal constructor(
             pose: Pose = Pose.Identity,
         ): PanelEntity =
             PanelEntity.create(
+                session.runtime.lifecycleManager,
                 session.activity,
                 session.platformAdapter,
                 session.scene.entityManager,
@@ -224,10 +233,16 @@ internal constructor(
 
         /** Returns the PanelEntity backed by the main window for the Activity. */
         internal fun createMainPanelEntity(
+            lifecycleManager: LifecycleManager,
             adapter: JxrPlatformAdapter,
             entityManager: EntityManager,
         ): PanelEntity =
-            PanelEntity(adapter.mainPanelEntity, entityManager, isMainPanelEntity = true)
+            PanelEntity(
+                lifecycleManager,
+                adapter.mainPanelEntity,
+                entityManager,
+                isMainPanelEntity = true,
+            )
     }
 
     /**
@@ -247,10 +262,14 @@ internal constructor(
      *     - [PerceivedResolutionResult.InvalidCameraView] if the camera information required for
      *       the calculation is invalid or unavailable.
      *
-     * @throws IllegalStateException if HEAD_TRACKING permission is not configured.
+     * @throws [IllegalStateException] if [Session.config.headTracking] is set to
+     *   [Config.HeadTrackingMode.DISABLED].
      * @see PerceivedResolutionResult
      */
     public fun getPerceivedResolution(): PerceivedResolutionResult {
+        check(lifecycleManager.config.headTracking != Config.HeadTrackingMode.DISABLED) {
+            "Config.HeadTrackingMode is set to Disabled."
+        }
         return rtEntity.getPerceivedResolution().toPerceivedResolutionResult()
     }
 }
