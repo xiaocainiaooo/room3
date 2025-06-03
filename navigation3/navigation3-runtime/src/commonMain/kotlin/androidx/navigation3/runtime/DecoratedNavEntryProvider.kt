@@ -80,7 +80,7 @@ internal fun <T : Any> decorateEntry(
         object : NavEntryWrapper<T>(entry) {
             @Composable
             override fun Content() {
-                val key = entry.key
+                val key = entry.contentKey
                 // Tracks whether the key is changed
                 var keyChanged = false
                 val localInfo = LocalNavEntryDecoratorLocalInfo.current

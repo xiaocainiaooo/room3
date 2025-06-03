@@ -74,7 +74,7 @@ public fun SavedStateNavEntryDecorator(
     }
 
     return navEntryDecorator(onPop = onPop) { entry ->
-        val key = entry.key
+        val key = entry.contentKey
         val id = getIdForKey(key)
 
         val childRegistry by
