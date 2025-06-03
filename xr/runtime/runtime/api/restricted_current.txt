@@ -510,6 +510,15 @@ package androidx.xr.runtime.internal {
     method public android.media.AudioTrack.Builder setSoundFieldAttributes(android.media.AudioTrack.Builder builder, androidx.xr.runtime.internal.SoundFieldAttributes attributes);
   }
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface AugmentedObject extends androidx.xr.runtime.internal.Trackable {
+    method public androidx.xr.runtime.AugmentedObjectCategory getCategory();
+    method public androidx.xr.runtime.math.Pose getCenterPose();
+    method public androidx.xr.runtime.math.Vector3 getExtents();
+    property public abstract androidx.xr.runtime.AugmentedObjectCategory category;
+    property public abstract androidx.xr.runtime.math.Pose centerPose;
+    property public abstract androidx.xr.runtime.math.Vector3 extents;
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface CameraViewActivityPose extends androidx.xr.runtime.internal.ActivityPose {
     method public int getCameraType();
     method public androidx.xr.runtime.internal.PixelDimensions getDisplayResolutionInPixels();
