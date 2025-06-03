@@ -32,13 +32,17 @@ import androidx.annotation.RequiresApi
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
 import androidx.camera.camera2.pipe.integration.adapter.awaitUntil
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
 import androidx.camera.core.DynamicRange
 import androidx.camera.core.ExperimentalSessionConfig
 import androidx.camera.core.ExtendableBuilder
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCapture.getImageCaptureCapabilities
 import androidx.camera.core.Preview
+import androidx.camera.core.Preview.getPreviewCapabilities
 import androidx.camera.core.SessionConfig
 import androidx.camera.core.UseCase
 import androidx.camera.core.featurecombination.Feature
@@ -46,6 +50,7 @@ import androidx.camera.core.featurecombination.Feature.Companion.FPS_60
 import androidx.camera.core.featurecombination.Feature.Companion.HDR_HLG10
 import androidx.camera.core.featurecombination.Feature.Companion.IMAGE_ULTRA_HDR
 import androidx.camera.core.featurecombination.Feature.Companion.PREVIEW_STABILIZATION
+import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.takePicture
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.testing.impl.Camera2CaptureCallbackImpl
@@ -227,17 +232,20 @@ class FeatureCombinationDeviceTest(
         val orderedFeatures = listOf(HDR_HLG10, FPS_60, PREVIEW_STABILIZATION)
         val selectedFeatures = mutableSetOf<Feature>()
 
-        withContext(Dispatchers.Main) {
-            cameraProvider.bindToLifecycle(
-                fakeLifecycleOwner,
-                cameraSelector,
-                SessionConfig(useCases = useCases, preferredFeatures = orderedFeatures).apply {
-                    setFeatureSelectionListener { features -> selectedFeatures.addAll(features) }
-                },
-            )
-        }
+        val camera =
+            withContext(Dispatchers.Main) {
+                cameraProvider.bindToLifecycle(
+                    fakeLifecycleOwner,
+                    cameraSelector,
+                    SessionConfig(useCases = useCases, preferredFeatures = orderedFeatures).apply {
+                        setFeatureSelectionListener { features ->
+                            selectedFeatures.addAll(features)
+                        }
+                    },
+                )
+            }
 
-        selectedFeatures.verifyFeatures(useCases)
+        selectedFeatures.verifyFeatures(useCases, camera.cameraInfo)
     }
 
     // TODO: b/419766630 - Add tests where FCQ provides extra support compared to non-FCQ bind flow,
@@ -257,52 +265,67 @@ class FeatureCombinationDeviceTest(
                 .getCameraInfo(cameraSelector)
                 .isFeatureCombinationSupported(sessionConfig)
 
-        bindAndVerify(sessionConfig, isSupported)
+        val camera = bindAndVerify(sessionConfig, isSupported)
 
         if (isSupported) {
-            features.verifyFeatures(useCases)
+            features.verifyFeatures(useCases, requireNotNull(camera?.cameraInfo))
         }
     }
 
     private suspend fun bindAndVerify(
         sessionConfig: SessionConfig,
         isExpectedToBeSupported: Boolean,
-    ) {
+    ): Camera? {
         var caughtException: Exception? = null
-        try {
-            withContext(Dispatchers.Main) {
-                cameraProvider.bindToLifecycle(fakeLifecycleOwner, cameraSelector, sessionConfig)
+        val camera =
+            try {
+                withContext(Dispatchers.Main) {
+                    cameraProvider.bindToLifecycle(
+                        fakeLifecycleOwner,
+                        cameraSelector,
+                        sessionConfig,
+                    )
+                }
+            } catch (e: IllegalArgumentException) {
+                caughtException = e
+                null
             }
-        } catch (e: IllegalArgumentException) {
-            caughtException = e
-        }
 
         // If binding is expected to be supported, there should be no exception
         assertThat(caughtException == null).isEqualTo(isExpectedToBeSupported)
+
+        return camera
     }
 
     @SuppressLint("NewApi")
-    private suspend fun Set<Feature>.verifyFeatures(useCases: List<UseCase>) {
+    private suspend fun Set<Feature>.verifyFeatures(
+        useCases: List<UseCase>,
+        cameraInfo: CameraInfo,
+    ) {
         forEach {
             when (it) {
                 HDR_HLG10 -> {
                     // Reaching this stage before API 33 means query API didn't work correctly
                     require(Build.VERSION.SDK_INT >= 33)
-                    verifyHlg10Hdr(useCases)
+                    verifyHlg10Hdr(useCases, cameraInfo)
                 }
-                FPS_60 -> verify60Fps()
-                PREVIEW_STABILIZATION -> verifyPreviewStabilization()
+                FPS_60 -> verify60Fps(cameraInfo)
+                PREVIEW_STABILIZATION ->
+                    verifyPreviewStabilization(cameraInfo as CameraInfoInternal)
                 IMAGE_ULTRA_HDR -> {
                     // Reaching this stage before API 34 means query API didn't work correctly
                     require(Build.VERSION.SDK_INT >= 34)
-                    verifyUltraHdr(useCases)
+                    verifyUltraHdr(useCases, cameraInfo)
                 }
             }
         }
     }
 
     @RequiresApi(33)
-    private suspend fun verifyHlg10Hdr(useCases: List<UseCase>) {
+    private suspend fun verifyHlg10Hdr(useCases: List<UseCase>, cameraInfo: CameraInfo) {
+        assertThat(cameraInfo.querySupportedDynamicRanges(setOf(DynamicRange.HLG_10_BIT)))
+            .contains(DynamicRange.HLG_10_BIT)
+
         useCases.forEach {
             when (it) {
                 is Preview -> {
@@ -335,11 +358,15 @@ class FeatureCombinationDeviceTest(
         assertThat(dataspaceTransfer).isEqualTo(TRANSFER_HLG)
     }
 
-    private suspend fun verify60Fps() {
+    private suspend fun verify60Fps(cameraInfo: CameraInfo) {
+        assertThat(cameraInfo.supportedFrameRateRanges).contains(Range(60, 60))
+
         verifyCaptureResult(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, Range(60, 60))
     }
 
-    private suspend fun verifyPreviewStabilization() {
+    private suspend fun verifyPreviewStabilization(cameraInfo: CameraInfo) {
+        assertThat(getPreviewCapabilities(cameraInfo).isStabilizationSupported).isTrue()
+
         verifyCaptureResult(
             CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
             CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION,
@@ -347,7 +374,10 @@ class FeatureCombinationDeviceTest(
     }
 
     @RequiresApi(34)
-    private suspend fun verifyUltraHdr(useCases: List<UseCase>) {
+    private suspend fun verifyUltraHdr(useCases: List<UseCase>, cameraInfo: CameraInfo) {
+        assertThat(getImageCaptureCapabilities(cameraInfo).supportedOutputFormats)
+            .contains(ImageCapture.OUTPUT_FORMAT_JPEG_ULTRA_HDR)
+
         val imageCapture = useCases.filterIsInstance<ImageCapture>().first()
 
         val saveLocation = temporaryFolder.newFile("test.jpg")
