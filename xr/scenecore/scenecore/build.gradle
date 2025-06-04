@@ -54,6 +54,7 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.mockitoCore4)
     testImplementation(libs.mockitoKotlin4)
+    testImplementation(libs.kotlinCoroutinesTest)
     testImplementation(project(":xr:scenecore:scenecore-testing"))
     testImplementation(project(":xr:runtime:runtime-testing"))
     testImplementation("androidx.appcompat:appcompat:1.2.0")
@@ -64,6 +65,7 @@ dependencies {
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.mockitoAndroid5)
+    androidTestImplementation(libs.kotlinCoroutinesTest)
     androidTestImplementation("androidx.appcompat:appcompat:1.2.0")
     androidTestImplementation(project(":xr:scenecore:scenecore-testing"))
 
