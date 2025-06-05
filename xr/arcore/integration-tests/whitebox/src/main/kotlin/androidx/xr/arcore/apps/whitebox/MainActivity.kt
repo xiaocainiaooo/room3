@@ -39,7 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.xr.arcore.apps.whitebox.depthmaps.DepthMapActivity
 import androidx.xr.arcore.apps.whitebox.handtracking.HandTrackingActivity
-import androidx.xr.arcore.apps.whitebox.helloar.HelloArActivity
+import androidx.xr.arcore.apps.whitebox.helloar.HelloArObjectActivity
+import androidx.xr.arcore.apps.whitebox.helloar.HelloArPlaneActivity
 import androidx.xr.arcore.apps.whitebox.persistentanchors.PersistentAnchorsActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -97,9 +98,14 @@ fun WhiteboxSessionMenu() {
         )
         HorizontalDivider()
         TextButton(
-            onClick = { context.startActivity(Intent(context, HelloArActivity::class.java)) }
+            onClick = { context.startActivity(Intent(context, HelloArPlaneActivity::class.java)) }
         ) {
-            Text("Hello AR")
+            Text("Hello AR (Planes)")
+        }
+        TextButton(
+            onClick = { context.startActivity(Intent(context, HelloArObjectActivity::class.java)) }
+        ) {
+            Text("Hello AR (Objects)")
         }
         TextButton(
             onClick = {
