@@ -16,6 +16,9 @@
 package androidx.xr.glimmer
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
@@ -35,6 +39,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.xr.glimmer.samples.SurfaceSample
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,12 +60,111 @@ class SurfaceScreenshotTest() {
     }
 
     @Test
+    fun surface_focused_defaultRoundRectBorder() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(interactionSource = AlwaysFocusedInteractionSource)
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        rule.assertRootAgainstGolden("surface_focused_defaultBorder", screenshotRule)
+    }
+
+    @Test
+    fun surface_focused_defaultRoundRectBorder_animation() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(interactionSource = AlwaysFocusedInteractionSource)
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        rule.mainClock.advanceTimeBy(1500)
+        rule.assertRootAgainstGolden("surface_focused_defaultBorder_animation", screenshotRule)
+    }
+
+    @Test
+    fun surface_focused_rectBorder() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(
+                        shape = RectangleShape,
+                        interactionSource = AlwaysFocusedInteractionSource,
+                    )
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        rule.assertRootAgainstGolden("surface_focused_rectBorder", screenshotRule)
+    }
+
+    @Test
+    fun surface_focused_rectBorder_animation() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(
+                        shape = RectangleShape,
+                        interactionSource = AlwaysFocusedInteractionSource,
+                    )
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        rule.mainClock.advanceTimeBy(1500)
+        rule.assertRootAgainstGolden("surface_focused_rectBorder_animation", screenshotRule)
+    }
+
+    @Test
+    fun surface_focused_genericBorder() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.size(100.dp)
+                    .surface(
+                        shape = DoubleTriangleShape,
+                        interactionSource = AlwaysFocusedInteractionSource,
+                    )
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+                contentAlignment = Alignment.Center,
+            ) {}
+        }
+        rule.assertRootAgainstGolden("surface_focused_genericBorder", screenshotRule)
+    }
+
+    @Test
+    fun surface_focused_genericBorder_animation() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.size(100.dp)
+                    .surface(
+                        shape = DoubleTriangleShape,
+                        interactionSource = AlwaysFocusedInteractionSource,
+                    )
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+                contentAlignment = Alignment.Center,
+            ) {}
+        }
+        rule.mainClock.advanceTimeBy(1500)
+        rule.assertRootAgainstGolden("surface_focused_genericBorder_animation", screenshotRule)
+    }
+
+    @Test
     fun custom_surface() {
         rule.setGlimmerThemeContent {
             Box(
                 Modifier.size(100.dp)
                     .surface(
-                        shape = TriangleShape,
+                        shape = DoubleTriangleShape,
                         color = Color.Red,
                         border =
                             BorderStroke(
@@ -76,15 +181,25 @@ class SurfaceScreenshotTest() {
         rule.assertRootAgainstGolden("surface_custom", screenshotRule)
     }
 
-    private object TriangleShape : Shape {
+    private object DoubleTriangleShape : Shape {
         override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density) =
             Outline.Generic(
                 Path().apply {
-                    moveTo(size.width / 2f, 0f)
+                    lineTo(size.width / 2f, size.height / 2f)
+                    lineTo(size.width, 0f)
                     lineTo(size.width, size.height)
+                    lineTo(size.width / 2f, size.height / 2f)
                     lineTo(0f, size.height)
                     close()
                 }
             )
+    }
+
+    private object AlwaysFocusedInteractionSource : MutableInteractionSource {
+        override val interactions: Flow<Interaction> = flowOf(FocusInteraction.Focus())
+
+        override suspend fun emit(interaction: Interaction) {}
+
+        override fun tryEmit(interaction: Interaction): Boolean = true
     }
 }

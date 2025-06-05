@@ -22,6 +22,7 @@ import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.getValue
@@ -36,8 +37,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalDensity
@@ -57,6 +61,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.screenshot.matchers.MSSIMMatcher
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -83,28 +88,81 @@ class SurfaceTest {
     }
 
     @Test
-    fun equality() {
+    fun equality_providedInteractionSource() {
         lateinit var surface: Modifier
         lateinit var surfaceWithSameParameters: Modifier
         lateinit var surfaceWithDifferentParameters: Modifier
+
+        val interactionSource1 = MutableInteractionSource()
+        val interactionSource2 = MutableInteractionSource()
+
         rule.setGlimmerThemeContent {
             surface =
                 Modifier.surface(
+                    focusable = true,
                     shape = RectangleShape,
                     color = Color.Blue,
                     contentColor = Color.Magenta,
                     border = BorderStroke(1.dp, Color.Red),
+                    interactionSource = interactionSource1,
                 )
             surfaceWithSameParameters =
                 Modifier.surface(
+                    focusable = true,
+                    shape = RectangleShape,
+                    color = Color.Blue,
+                    contentColor = Color.Magenta,
+                    border = BorderStroke(1.dp, Color.Red),
+                    interactionSource = interactionSource1,
+                )
+            surfaceWithDifferentParameters =
+                Modifier.surface(
+                    focusable = true,
+                    shape = CircleShape,
+                    color = Color.Blue,
+                    contentColor = Color.Magenta,
+                    border = BorderStroke(1.dp, Color.Red),
+                    interactionSource = interactionSource2,
+                )
+        }
+
+        rule.runOnIdle {
+            assertThat(surface).isEqualTo(surfaceWithSameParameters)
+            assertThat(surface).isNotEqualTo(surfaceWithDifferentParameters)
+        }
+    }
+
+    /**
+     * Test for recomposition equality when interactionSource is not provided. In this case the
+     * interaction source will be remembered inside, but it means that calling the same modifier at
+     * different call sites will not compare equal, because the interaction source internally
+     * differs.
+     *
+     * However the interaction source internally should be remembered for the same modifier, to make
+     * sure we don't cause any work for unrelated recompositions.
+     */
+    @Test
+    fun equality_noProvidedInteractionSource() {
+        val surfaces = mutableListOf<Modifier>()
+        lateinit var surfaceWithSameParametersInDifferentCallSite: Modifier
+
+        var invalidation by mutableStateOf(false)
+
+        rule.setGlimmerThemeContent {
+            invalidation
+            surfaces.add(
+                Modifier.surface(
+                    focusable = true,
                     shape = RectangleShape,
                     color = Color.Blue,
                     contentColor = Color.Magenta,
                     border = BorderStroke(1.dp, Color.Red),
                 )
-            surfaceWithDifferentParameters =
+            )
+            surfaceWithSameParametersInDifferentCallSite =
                 Modifier.surface(
-                    shape = CircleShape,
+                    focusable = true,
+                    shape = RectangleShape,
                     color = Color.Blue,
                     contentColor = Color.Magenta,
                     border = BorderStroke(1.dp, Color.Red),
@@ -112,8 +170,15 @@ class SurfaceTest {
         }
 
         rule.runOnIdle {
-            assertThat(surface).isEqualTo(surfaceWithSameParameters)
-            assertThat(surface).isNotEqualTo(surfaceWithDifferentParameters)
+            assertThat(surfaces).hasSize(1)
+            assertThat(surfaces[0]).isNotEqualTo(surfaceWithSameParametersInDifferentCallSite)
+            // force recomposition
+            invalidation = !invalidation
+        }
+
+        rule.runOnIdle {
+            assertThat(surfaces).hasSize(2)
+            assertThat(surfaces[0]).isEqualTo(surfaces[1])
         }
     }
 
@@ -167,14 +232,13 @@ class SurfaceTest {
         rule.setContent {
             val modifiers = Modifier.surface().toList()
             assertThat((modifiers[0] as InspectableValue).nameFallback).isEqualTo("graphicsLayer")
-            assertThat((modifiers[1] as InspectableValue).nameFallback).isEqualTo("border")
-            assertThat((modifiers[2] as InspectableValue).nameFallback).isEqualTo("background")
-            val surfaceModifier = modifiers[3] as InspectableValue
+            val surfaceModifier = modifiers[1] as InspectableValue
             assertThat(surfaceModifier.nameFallback).isEqualTo("surface")
             assertThat(surfaceModifier.valueOverride).isNull()
             assertThat(surfaceModifier.inspectableElements.map { it.name }.asIterable())
-                .containsExactly("contentColor")
-            assertThat((modifiers[4] as InspectableValue).nameFallback).isEqualTo("focusable")
+                .containsExactly("shape", "contentColor", "border", "interactionSource")
+            assertThat((modifiers[2] as InspectableValue).nameFallback).isEqualTo("background")
+            assertThat((modifiers[3] as InspectableValue).nameFallback).isEqualTo("focusable")
         }
     }
 
@@ -405,4 +469,268 @@ class SurfaceTest {
                 .isEqualTo(interactions[0])
         }
     }
+
+    @Test
+    fun focusable_focusHighlight_appearsAndDisappearsWithFocusChange() {
+        rule.mainClock.autoAdvance = false
+
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
+
+        rule.setGlimmerThemeContent {
+            Column {
+                Box(
+                    Modifier.size(100.dp)
+                        .focusRequester(focusRequester)
+                        .surface(shape = RectangleShape, border = BorderStroke(2.dp, Color.Red))
+                        .testTag("surface")
+                )
+                Box(Modifier.size(100.dp).focusRequester(otherFocusRequester).surface())
+            }
+        }
+
+        // Border should be red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isEqualTo(Color.Red)
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Capture the first frame of the focused animation - the focused highlight should show,
+        // so the start of the border will not be fully red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isNotEqualTo(Color.Red)
+        }
+
+        rule.runOnIdle { otherFocusRequester.requestFocus() }
+
+        // Focused highlight should disappear, so the border should be red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isEqualTo(Color.Red)
+        }
+    }
+
+    @Test
+    fun focusable_focusHighlight_animationPlaysOnce() {
+        rule.mainClock.autoAdvance = false
+
+        val matcher = MSSIMMatcher()
+        val focusRequester = FocusRequester()
+
+        rule.setGlimmerThemeContent {
+            Column {
+                Box(
+                    Modifier.size(100.dp)
+                        .focusRequester(focusRequester)
+                        .surface(shape = RectangleShape, border = BorderStroke(2.dp, Color.Red))
+                        .testTag("surface")
+                )
+            }
+        }
+
+        // Border should be red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isEqualTo(Color.Red)
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Capture the initial focus state before the animation starts
+        val initialFrame = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.mainClock.advanceTimeBy(1000)
+
+        // Capture the focus state during the animation
+        val midAnimation = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.runOnIdle {
+            // Initial state and mid animation should be different
+            val result =
+                matcher.compareBitmaps(
+                    initialFrame.toIntArray(),
+                    midAnimation.toIntArray(),
+                    initialFrame.width,
+                    initialFrame.height,
+                )
+            assertThat(result.matches).isFalse()
+        }
+
+        // Advance past the end of the animation
+        rule.mainClock.advanceTimeBy(7000)
+
+        // Capture the focus state after the animation has settled
+        val afterAnimation = rule.onNodeWithTag("surface").captureToImage()
+
+        // Advance a bit forward again to make sure there is no change
+        rule.mainClock.advanceTimeBy(1000)
+
+        // Capture a second image after the extra delay - this should be the same
+        val afterAnimation2 = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.runOnIdle {
+            // The initial state should be equal to the state after the animation
+            val afterAnimationResult =
+                matcher.compareBitmaps(
+                    initialFrame.toIntArray(),
+                    afterAnimation.toIntArray(),
+                    initialFrame.width,
+                    initialFrame.height,
+                )
+            assertThat(afterAnimationResult.matches).isTrue()
+            // The initial state should be equal to the second state after the animation, since
+            // no further animation is happening
+            val afterAnimation2Result =
+                matcher.compareBitmaps(
+                    initialFrame.toIntArray(),
+                    afterAnimation2.toIntArray(),
+                    initialFrame.width,
+                    initialFrame.height,
+                )
+            assertThat(afterAnimation2Result.matches).isTrue()
+        }
+    }
+
+    @Test
+    fun focusable_focusHighlight_animationResetsWhenBecomingFocusedAgain() {
+        rule.mainClock.autoAdvance = false
+
+        val matcher = MSSIMMatcher()
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
+
+        rule.setGlimmerThemeContent {
+            Column {
+                Box(
+                    Modifier.size(100.dp)
+                        .focusRequester(focusRequester)
+                        .surface(shape = RectangleShape, border = BorderStroke(2.dp, Color.Red))
+                        .testTag("surface")
+                )
+                Box(Modifier.size(100.dp).focusRequester(otherFocusRequester).surface())
+            }
+        }
+
+        // Border should be red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isEqualTo(Color.Red)
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Capture the initial focus state before the animation starts
+        val initialFrame = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.mainClock.advanceTimeBy(1000)
+
+        // Capture the focus state during the animation
+        val midAnimation = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.runOnIdle {
+            // Initial state and mid animation should be different
+            val result =
+                matcher.compareBitmaps(
+                    initialFrame.toIntArray(),
+                    midAnimation.toIntArray(),
+                    initialFrame.width,
+                    initialFrame.height,
+                )
+            assertThat(result.matches).isFalse()
+            // Move focus away
+            otherFocusRequester.requestFocus()
+        }
+
+        // Move focus back to the initial surface
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Capture the initial focus state before the animation starts
+        val initialFrame2 = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.mainClock.advanceTimeBy(1000)
+
+        // Capture the focus state during the animation
+        val midAnimation2 = rule.onNodeWithTag("surface").captureToImage()
+
+        rule.runOnIdle {
+            // The initial state and mid animation state the first time the surface was focused
+            // should match the state the second time it was focused
+            val initialResult =
+                matcher.compareBitmaps(
+                    initialFrame.toIntArray(),
+                    initialFrame2.toIntArray(),
+                    initialFrame.width,
+                    initialFrame.height,
+                )
+            assertThat(initialResult.matches).isTrue()
+            val midResult =
+                matcher.compareBitmaps(
+                    midAnimation.toIntArray(),
+                    midAnimation2.toIntArray(),
+                    midAnimation.width,
+                    midAnimation.height,
+                )
+            assertThat(midResult.matches).isTrue()
+        }
+    }
+
+    @Test
+    fun focusable_focusHighlight_resetWhenChangingInteractionSource() {
+        rule.mainClock.autoAdvance = false
+
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
+        var interactionSource by mutableStateOf(MutableInteractionSource())
+
+        rule.setGlimmerThemeContent {
+            Column {
+                Box(
+                    Modifier.size(100.dp)
+                        .focusRequester(focusRequester)
+                        .surface(
+                            shape = RectangleShape,
+                            border = BorderStroke(2.dp, Color.Red),
+                            interactionSource = interactionSource,
+                        )
+                        .testTag("surface")
+                )
+                Box(Modifier.size(100.dp).focusRequester(otherFocusRequester).surface())
+            }
+        }
+
+        // Border should be red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isEqualTo(Color.Red)
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Capture the first frame of the focused animation - the focused highlight should show,
+        // so the start of the border will not be fully red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isNotEqualTo(Color.Red)
+        }
+
+        // Change the interaction source - even though the node is technically still focused, we
+        // should reset the highlight as the interaction source changed. In the future if we
+        // directly delegate to focusable we would be able to maintain focus in that case
+        rule.runOnIdle { interactionSource = MutableInteractionSource() }
+        rule.mainClock.advanceTimeByFrame()
+
+        // Focused highlight should disappear, so the border should be red
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isEqualTo(Color.Red)
+        }
+
+        // Move focus away from and back to the surface
+        rule.runOnIdle { otherFocusRequester.requestFocus() }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // The new interaction source will see the new focus, so the first frame of the focused
+        // highlight should show again
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(1, 1)).isNotEqualTo(Color.Red)
+        }
+    }
+}
+
+private fun ImageBitmap.toIntArray(): IntArray {
+    val bitmapArray = IntArray(width * height)
+    asAndroidBitmap().getPixels(bitmapArray, 0, width, 0, 0, width, height)
+    return bitmapArray
 }

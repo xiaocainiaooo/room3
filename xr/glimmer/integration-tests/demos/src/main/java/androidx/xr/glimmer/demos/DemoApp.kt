@@ -30,13 +30,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -44,7 +39,6 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.xr.glimmer.GlimmerTheme
-import androidx.xr.glimmer.SurfaceDefaults
 import androidx.xr.glimmer.Text
 import androidx.xr.glimmer.surface
 
@@ -88,14 +82,10 @@ internal fun ListItem(
     onClick: () -> Unit = {},
     content: @Composable (() -> Unit),
 ) {
-    var isFocused by remember { mutableStateOf(false) }
     Box(
         modifier
             .fillMaxWidth()
-            .onFocusChanged { isFocused = it.isFocused }
-            .surface(
-                border = if (isFocused) SurfaceDefaults.border(4.dp) else SurfaceDefaults.border()
-            )
+            .surface()
             .clickable(onClick = onClick)
             .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
