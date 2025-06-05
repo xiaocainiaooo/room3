@@ -27,14 +27,34 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
 dependencies {
     api(libs.kotlinStdlib)
-    // Add dependencies here
+
+    implementation(project(":appfunctions:appfunctions"))
+    implementation(project(":appfunctions:appfunctions-service"))
+
+    // Internal dependencies
+    implementation("androidx.annotation:annotation:1.9.0-rc01")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.14")
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinCoroutinesTest)
+    testImplementation(libs.testRunner)
+    testImplementation(libs.guavaAndroid)
+    testImplementation(libs.testMonitor)
+    kspTest(project(":appfunctions:appfunctions-compiler"))
+}
+
+ksp {
+    arg("appfunctions:aggregateAppFunctions", "true")
 }
 
 android {
+    compileSdk = 36
     namespace = "androidx.appfunctions.testing"
 }
 
