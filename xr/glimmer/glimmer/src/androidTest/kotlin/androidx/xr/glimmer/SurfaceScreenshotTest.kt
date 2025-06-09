@@ -19,11 +19,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -40,7 +42,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.xr.glimmer.samples.SurfaceSample
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.asFlow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,7 +66,7 @@ class SurfaceScreenshotTest() {
         rule.mainClock.autoAdvance = false
         rule.setGlimmerThemeContent {
             Box(
-                Modifier.surface(interactionSource = AlwaysFocusedInteractionSource)
+                Modifier.surface(interactionSource = alwaysFocusedInteractionSource)
                     .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
                 Text("This is a surface")
@@ -78,7 +80,7 @@ class SurfaceScreenshotTest() {
         rule.mainClock.autoAdvance = false
         rule.setGlimmerThemeContent {
             Box(
-                Modifier.surface(interactionSource = AlwaysFocusedInteractionSource)
+                Modifier.surface(interactionSource = alwaysFocusedInteractionSource)
                     .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
                 Text("This is a surface")
@@ -95,7 +97,7 @@ class SurfaceScreenshotTest() {
             Box(
                 Modifier.surface(
                         shape = RectangleShape,
-                        interactionSource = AlwaysFocusedInteractionSource,
+                        interactionSource = alwaysFocusedInteractionSource,
                     )
                     .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
@@ -112,7 +114,7 @@ class SurfaceScreenshotTest() {
             Box(
                 Modifier.surface(
                         shape = RectangleShape,
-                        interactionSource = AlwaysFocusedInteractionSource,
+                        interactionSource = alwaysFocusedInteractionSource,
                     )
                     .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
@@ -131,7 +133,7 @@ class SurfaceScreenshotTest() {
                 Modifier.size(100.dp)
                     .surface(
                         shape = DoubleTriangleShape,
-                        interactionSource = AlwaysFocusedInteractionSource,
+                        interactionSource = alwaysFocusedInteractionSource,
                     )
                     .padding(horizontal = 24.dp, vertical = 20.dp),
                 contentAlignment = Alignment.Center,
@@ -148,7 +150,7 @@ class SurfaceScreenshotTest() {
                 Modifier.size(100.dp)
                     .surface(
                         shape = DoubleTriangleShape,
-                        interactionSource = AlwaysFocusedInteractionSource,
+                        interactionSource = alwaysFocusedInteractionSource,
                     )
                     .padding(horizontal = 24.dp, vertical = 20.dp),
                 contentAlignment = Alignment.Center,
@@ -156,6 +158,67 @@ class SurfaceScreenshotTest() {
         }
         rule.mainClock.advanceTimeBy(1500)
         rule.assertRootAgainstGolden("surface_focused_genericBorder_animation", screenshotRule)
+    }
+
+    /**
+     * Practically a surface cannot be pressed without also being focused, but we test them in
+     * isolation as well to make it easier to identify changes. See [surface_focused_and_pressed]
+     * for the combined state.
+     */
+    @Test
+    fun surface_pressed() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(interactionSource = alwaysPressedInteractionSource, onClick = {})
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        // Skip until after the animation has finished
+        rule.mainClock.advanceTimeBy(5000)
+        rule.assertRootAgainstGolden("surface_pressed", screenshotRule)
+    }
+
+    /**
+     * Practically a surface cannot be pressed without also being focused, but we test them in
+     * isolation as well to make it easier to identify changes. See [surface_focused_and_pressed]
+     * for the combined state.
+     */
+    @Test
+    fun surface_pressed_animation() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(interactionSource = alwaysPressedInteractionSource, onClick = {})
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        // Advance to partway through the animation
+        rule.mainClock.advanceTimeBy(200)
+        rule.assertRootAgainstGolden("surface_pressed_animation", screenshotRule)
+    }
+
+    @Test
+    fun surface_focused_and_pressed() {
+        rule.mainClock.autoAdvance = false
+        rule.setGlimmerThemeContent {
+            Box(
+                Modifier.surface(
+                        interactionSource = alwaysFocusedAndPressedInteractionSource,
+                        onClick = {},
+                    )
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                Text("This is a surface")
+            }
+        }
+        // Skip until after the animation has finished
+        rule.mainClock.advanceTimeBy(5000)
+        rule.assertRootAgainstGolden("surface_focused_and_pressed", screenshotRule)
     }
 
     @Test
@@ -195,8 +258,21 @@ class SurfaceScreenshotTest() {
             )
     }
 
-    private object AlwaysFocusedInteractionSource : MutableInteractionSource {
-        override val interactions: Flow<Interaction> = flowOf(FocusInteraction.Focus())
+    private val alwaysFocusedInteractionSource =
+        StaticMutableInteractionSource(FocusInteraction.Focus())
+
+    private val alwaysPressedInteractionSource =
+        StaticMutableInteractionSource(PressInteraction.Press(Offset.Zero))
+
+    private val alwaysFocusedAndPressedInteractionSource =
+        StaticMutableInteractionSource(
+            FocusInteraction.Focus(),
+            PressInteraction.Press(Offset.Zero),
+        )
+
+    private class StaticMutableInteractionSource(vararg interactionsToShow: Interaction) :
+        MutableInteractionSource {
+        override val interactions: Flow<Interaction> = interactionsToShow.asFlow()
 
         override suspend fun emit(interaction: Interaction) {}
 

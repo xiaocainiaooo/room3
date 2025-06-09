@@ -17,18 +17,23 @@
 package androidx.xr.glimmer
 
 import android.graphics.Matrix
+import androidx.annotation.FloatRange
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,7 +61,6 @@ import androidx.compose.ui.node.traverseAncestors
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.xr.glimmer.SurfaceDefaults.Shape
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -64,17 +68,27 @@ import kotlinx.coroutines.launch
  * A surface is a fundamental building block in Glimmer. A surface represents a distinct visual area
  * or 'physical' boundary for components such as buttons and cards. A surface is responsible for:
  * 1) Clipping: a surface clips its children to the shape specified by [shape]
- * 2) Border: a surface draws an inner [border] to emphasize the boundary of the component. When
- *    focused, a surface draws a wider border with a focused highlight on top to indicate the focus
- *    state.
+ * 2) Border: a surface draws an inner [border] to emphasize the boundary of the component.
  * 3) Background: a surface has a background color of [color].
  * 4) Content color: a surface provides a [contentColor] for text and icons inside the surface. By
  *    default this is calculated from the provided background color.
+ * 5) Interaction states: when focused, a surface displays draws a wider border with a focused
+ *    highlight on top. When pressed, a surface draws a pressed overlay. This happens for
+ *    interactions emitted from [interactionSource], whether this surface is [focusable] or not.
  *
  * This surface is focusable by default - set [focusable] to false for un-interactive / decorative
- * surfaces.
+ * surfaces. For handling clicks, use the other [surface] overload with an `onClick` parameter.
+ *
+ * Simple usage:
  *
  * @sample androidx.xr.glimmer.samples.SurfaceSample
+ *
+ * For custom gesture handling, add the gesture modifier after this [surface], and provide a shared
+ * [MutableInteractionSource] to enable this surface to handle focus / press states. You should also
+ * pass `false` for [focusable] if that modifier already includes a focus target by default. For
+ * example, to create a toggleable surface:
+ *
+ * @sample androidx.xr.glimmer.samples.ToggleableSurfaceSample
  * @param focusable whether this surface is focusable, true by default. Most surfaces should be
  *   focusable to allow navigation between surfaces in a screen. Unfocusable surfaces may be used
  *   for decorative only elements, such as surfaces used in a compound component with a separate
@@ -102,6 +116,55 @@ public fun Modifier.surface(
         .then(SurfaceNodeElement(shape, contentColor, border, interactionSource))
         .background(color = color, shape = shape)
         .focusable(enabled = focusable, interactionSource = interactionSource)
+}
+
+/**
+ * A surface is a fundamental building block in Glimmer. A surface represents a distinct visual area
+ * or 'physical' boundary for components such as buttons and cards. A surface is responsible for:
+ * 1) Clipping: a surface clips its children to the shape specified by [shape]
+ * 2) Border: a surface draws an inner [border] to emphasize the boundary of the component. When
+ *    focused, a surface draws a wider border with a focused highlight on top to indicate the focus
+ *    state.
+ * 3) Background: a surface has a background color of [color].
+ * 4) Content color: a surface provides a [contentColor] for text and icons inside the surface. By
+ *    default this is calculated from the provided background color.
+ * 5) Interaction states: when focused, a surface displays draws a wider border with a focused
+ *    highlight on top. When pressed, a surface draws a pressed overlay. This happens for
+ *    interactions emitted from [interactionSource], whether this surface is [enabled] or not.
+ *
+ * This surface is focusable and handles clicks. For non-clickable surfaces, use the other overload
+ * of [surface] instead. For surfaces with custom gesture handling, refer to the sample and guidance
+ * on the other overload of [surface].
+ *
+ * @sample androidx.xr.glimmer.samples.ClickableSurfaceSample
+ * @param enabled whether this surface is enabled, true by default. When false, this surface will
+ *   not respond to user input, and will not be focusable.
+ * @param shape the [Shape] used to clip this surface, and also used to draw the background and
+ *   border
+ * @param color the background [Color] for this surface
+ * @param contentColor the [Color] for content inside this surface
+ * @param border an optional inner border for this surface
+ * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
+ *   emitting [Interaction]s for this surface. Note that if `null` is provided, interactions will
+ *   still happen internally.
+ * @param onClick callback invoked when this surface is clicked
+ */
+@Composable
+public fun Modifier.surface(
+    enabled: Boolean = true,
+    shape: Shape = SurfaceDefaults.Shape,
+    color: Color = GlimmerTheme.colors.surface,
+    contentColor: Color = calculateContentColor(color),
+    border: BorderStroke? = SurfaceDefaults.border(),
+    interactionSource: MutableInteractionSource? = null,
+    onClick: () -> Unit,
+): Modifier {
+    val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+    return this.clip(shape)
+        .then(SurfaceNodeElement(shape, contentColor, border, interactionSource))
+        .background(color = color, shape = shape)
+        // TODO: b/423573184 align on disabled behavior / state
+        .clickable(enabled = enabled, interactionSource = interactionSource, onClick = onClick)
 }
 
 /** Default values used for [surface]. */
@@ -257,8 +320,9 @@ private class SurfaceNode(
 
     private var interactionCollectionJob: Job? = null
 
-    private var rotationProgress: Animatable<Float, AnimationVector1D>? = null
-    private var animationJob: Job? = null
+    private var focusedHighlightRotationProgress: Animatable<Float, AnimationVector1D>? = null
+    private var focusedAnimationJob: Job? = null
+    private var pressedOverlayProgress: Animatable<Float, AnimationVector1D>? = null
 
     fun update(
         shape: Shape,
@@ -290,9 +354,9 @@ private class SurfaceNode(
             if (field != value) {
                 field = value
                 if (value) {
-                    startAnimation()
+                    startFocusAnimation()
                 } else {
-                    stopAnimation()
+                    stopFocusAnimation()
                 }
                 // No need to invalidate the border cache - we build it ahead of time to account for
                 // focus changes. Just invalidate draw so we can switch to drawing the correct
@@ -301,44 +365,72 @@ private class SurfaceNode(
             }
         }
 
+    var isPressed = false
+        set(value) {
+            if (field != value) {
+                field = value
+                if (value) {
+                    pressedOverlayProgress = pressedOverlayProgress ?: Animatable(0f)
+                    coroutineScope.launch {
+                        pressedOverlayProgress?.animateTo(1f, PressedOverlayAnimationSpec)
+                    }
+                } else {
+                    pressedOverlayProgress?.let { progress ->
+                        coroutineScope.launch {
+                            progress.animateTo(0f, PressedOverlayAnimationSpec)
+                        }
+                    }
+                }
+                invalidateDraw()
+            }
+        }
+
     private fun observeInteractions() {
         interactionCollectionJob?.cancel()
         interactionCollectionJob = null
         isFocused = false
+        isPressed = false
         interactionSource?.let { source ->
             interactionCollectionJob =
                 coroutineScope.launch {
-                    source.interactions.collect {
-                        if (it is FocusInteraction.Focus) {
-                            isFocused = true
+                    var focusCount = 0
+                    var pressCount = 0
+                    source.interactions.collect { interaction ->
+                        when (interaction) {
+                            is FocusInteraction.Focus -> focusCount++
+                            is FocusInteraction.Unfocus -> focusCount--
+                            is PressInteraction.Press -> pressCount++
+                            is PressInteraction.Release -> pressCount--
+                            is PressInteraction.Cancel -> pressCount--
                         }
-                        if (it is FocusInteraction.Unfocus) {
-                            isFocused = false
-                        }
+                        isFocused = focusCount > 0
+                        isPressed = pressCount > 0
                     }
                 }
         }
     }
 
-    private fun startAnimation() {
-        stopAnimation()
-        rotationProgress = Animatable(0f)
-        animationJob =
+    private fun startFocusAnimation() {
+        stopFocusAnimation()
+        focusedHighlightRotationProgress = Animatable(0f)
+        focusedAnimationJob =
             coroutineScope.launch {
-                rotationProgress?.animateTo(
+                focusedHighlightRotationProgress?.animateTo(
                     targetValue = 1f,
                     animationSpec = FocusedHighlightAnimationSpec,
                 )
             }
     }
 
-    private fun stopAnimation() {
-        animationJob?.cancel()
-        rotationProgress = null
+    private fun stopFocusAnimation() {
+        focusedAnimationJob?.cancel()
+        focusedHighlightRotationProgress = null
     }
 
     override fun ContentDrawScope.draw() {
         drawContent()
+        val pressedOverlayColor = pressedOverlayColor(pressedOverlayProgress?.value ?: 0f)
+        drawRect(color = pressedOverlayColor)
         if (border != null) {
             val border = border!!
             if (isFocused) {
@@ -346,7 +438,7 @@ private class SurfaceNode(
                 shaderBrush = shaderBrush ?: ShaderBrush(shader!!)
                 shaderMatrix = shaderMatrix ?: Matrix().also { shader!!.getLocalMatrix(it) }
                 shaderMatrix!!.setRotate(
-                    (rotationProgress?.value ?: 1f) * 360f,
+                    (focusedHighlightRotationProgress?.value ?: 1f) * 360f,
                     size.width / 2,
                     size.height / 2,
                 )
@@ -383,6 +475,12 @@ private class SurfaceNode(
                 drawUnfocusedBorder!!()
             }
         }
+    }
+
+    override fun onDetach() {
+        focusedHighlightRotationProgress = null
+        pressedOverlayProgress = null
+        invalidateBorderCaches()
     }
 
     // Invalidation for border caches
@@ -422,6 +520,11 @@ private fun focusedHighlightShader(size: Size): Shader {
     )
 }
 
+private fun pressedOverlayColor(@FloatRange(from = 0.0, to = 1.0) progress: Float): Color {
+    val alpha = progress * PressedOverlayAlpha
+    return Color.White.copy(alpha = alpha)
+}
+
 /** Default border width for a [surface]. */
 private val DefaultSurfaceBorderWidth = 2.dp
 
@@ -442,5 +545,10 @@ private val FocusedHighlightColorStops = listOf(0f, 0.3f, 0.66f, 1f)
 
 private val FocusedHighlightAnimationSpec: AnimationSpec<Float> =
     tween(durationMillis = 7000, easing = LinearOutSlowInEasing)
+
+private const val PressedOverlayAlpha = 0.16f
+
+private val PressedOverlayAnimationSpec: AnimationSpec<Float> =
+    spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessVeryLow)
 
 private const val SurfaceNodeTraverseKey = "androidx.xr.glimmer.SurfaceNode"
