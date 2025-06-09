@@ -47,8 +47,6 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isFocusable
@@ -188,19 +186,11 @@ class SurfaceTest {
         rule.setGlimmerThemeContent {
             Box(Modifier.size(100.dp).focusRequester(focusRequester).surface().testTag("surface"))
         }
-        rule
-            .onNodeWithTag("surface")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.IsTraversalGroup, true))
-            .assert(isFocusable())
-            .assert(isNotFocused())
+        rule.onNodeWithTag("surface").assert(isFocusable()).assert(isNotFocused())
 
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        rule
-            .onNodeWithTag("surface")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.IsTraversalGroup, true))
-            .assert(isFocusable())
-            .assert(isFocused())
+        rule.onNodeWithTag("surface").assert(isFocusable()).assert(isFocused())
     }
 
     @Test
@@ -214,17 +204,11 @@ class SurfaceTest {
                     .testTag("surface")
             )
         }
-        rule
-            .onNodeWithTag("surface")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.IsTraversalGroup, true))
-            .assert(isNotFocusable())
+        rule.onNodeWithTag("surface").assert(isNotFocusable())
 
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        rule
-            .onNodeWithTag("surface")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.IsTraversalGroup, true))
-            .assert(isNotFocusable())
+        rule.onNodeWithTag("surface").assert(isNotFocusable())
     }
 
     @Test

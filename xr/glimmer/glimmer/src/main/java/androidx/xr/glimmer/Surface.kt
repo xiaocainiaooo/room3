@@ -50,15 +50,13 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.TraversableNode
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.traverseAncestors
 import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.xr.glimmer.SurfaceDefaults.Shape
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -221,7 +219,7 @@ private class SurfaceNode(
     contentColor: Color,
     private var border: BorderStroke?,
     private var interactionSource: InteractionSource?,
-) : SemanticsModifierNode, TraversableNode, DrawModifierNode, Modifier.Node() {
+) : TraversableNode, DrawModifierNode, Modifier.Node() {
 
     override val shouldAutoInvalidate = false
 
@@ -409,10 +407,6 @@ private class SurfaceNode(
         shaderBrush = null
         shaderMatrix = null
         invalidateDraw()
-    }
-
-    override fun SemanticsPropertyReceiver.applySemantics() {
-        isTraversalGroup = true
     }
 
     override val traverseKey: String = SurfaceNodeTraverseKey
