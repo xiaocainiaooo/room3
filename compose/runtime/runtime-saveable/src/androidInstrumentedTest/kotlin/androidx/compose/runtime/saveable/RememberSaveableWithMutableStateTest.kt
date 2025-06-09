@@ -119,7 +119,9 @@ class RememberSaveableWithMutableStateTest {
         var state: MutableState<Holder>? = null
         restorationTester.setContent {
             state =
-                rememberSaveable(stateSerializer = HolderSerializer) { mutableStateOf(Holder(0)) }
+                rememberSerializable(stateSerializer = HolderSerializer) {
+                    mutableStateOf(Holder(0))
+                }
         }
 
         rule.runOnIdle {
