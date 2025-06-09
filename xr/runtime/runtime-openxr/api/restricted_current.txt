@@ -93,6 +93,7 @@ package androidx.xr.runtime.openxr {
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class OpenXrPerceptionManager implements androidx.xr.runtime.internal.PerceptionManager {
     method public androidx.xr.runtime.internal.Anchor createAnchor(androidx.xr.runtime.math.Pose pose);
     method public androidx.xr.runtime.openxr.OpenXrDevice getArDevice();
+    method public java.util.List<androidx.xr.runtime.internal.DepthMap> getDepthMaps();
     method public androidx.xr.runtime.openxr.OpenXrEarth getEarth();
     method public androidx.xr.runtime.internal.Hand getLeftHand();
     method public java.util.List<java.util.UUID> getPersistedAnchorUuids();
@@ -105,6 +106,7 @@ package androidx.xr.runtime.openxr {
     method public void unpersistAnchor(java.util.UUID uuid);
     method public void update(long xrTime);
     property public androidx.xr.runtime.openxr.OpenXrDevice arDevice;
+    property public java.util.List<androidx.xr.runtime.internal.DepthMap> depthMaps;
     property public androidx.xr.runtime.openxr.OpenXrEarth earth;
     property public androidx.xr.runtime.internal.Hand leftHand;
     property public androidx.xr.runtime.internal.Hand rightHand;

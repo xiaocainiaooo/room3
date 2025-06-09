@@ -20,6 +20,7 @@ import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.Anchor
 import androidx.xr.runtime.internal.AnchorInvalidUuidException
 import androidx.xr.runtime.internal.AnchorResourcesExhaustedException
+import androidx.xr.runtime.internal.DepthMap
 import androidx.xr.runtime.internal.Hand
 import androidx.xr.runtime.internal.HitResult
 import androidx.xr.runtime.internal.PerceptionManager
@@ -109,6 +110,8 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
         get() = xrResources.viewCameras
 
     override val earth: OpenXrEarth = xrResources.earth
+
+    override val depthMaps: List<DepthMap> = emptyList()
 
     private var lastUpdateXrTime: Long = 0L
 

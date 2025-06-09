@@ -153,10 +153,10 @@ class OpenXrManagerTest {
         assertThrows(IllegalStateException::class.java) {
             underTest.configure(
                 Config(
-                    Config.PlaneTrackingMode.DISABLED,
+                    Config.PlaneTrackingMode.HORIZONTAL_AND_VERTICAL,
                     Config.HandTrackingMode.DISABLED,
                     Config.HeadTrackingMode.DISABLED,
-                    Config.DepthEstimationMode.SMOOTH_AND_RAW,
+                    Config.DepthEstimationMode.DISABLED,
                     Config.AnchorPersistenceMode.DISABLED,
                 )
             )
