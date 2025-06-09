@@ -16,12 +16,15 @@
 
 package androidx.wear.compose.material3
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.Composable
@@ -33,12 +36,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -46,11 +54,22 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.GeneralLocation
+import androidx.test.espresso.action.GeneralSwipeAction
+import androidx.test.espresso.action.Press
+import androidx.test.espresso.action.Swipe
+import androidx.test.espresso.action.ViewActions.actionWithAssertions
+import androidx.test.espresso.matcher.ViewMatchers.withTagValue
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.wear.compose.foundation.BasicSwipeToDismissBox
 import androidx.wear.compose.foundation.GestureInclusion
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
 import androidx.wear.compose.material3.RevealActionType.Companion.None
@@ -64,17 +83,20 @@ import androidx.wear.compose.material3.RevealValue.Companion.LeftRevealed
 import androidx.wear.compose.material3.RevealValue.Companion.LeftRevealing
 import androidx.wear.compose.material3.RevealValue.Companion.RightRevealed
 import androidx.wear.compose.material3.RevealValue.Companion.RightRevealing
+import androidx.wear.compose.material3.SwipeToRevealDefaults.DoubleActionAnchorWidth
 import androidx.wear.compose.material3.SwipeToRevealDefaults.SingleActionAnchorWidth
 import androidx.wear.compose.material3.SwipeToRevealDefaults.bidirectionalGestureInclusion
 import androidx.wear.compose.material3.SwipeToRevealDefaults.gestureInclusion
 import androidx.wear.compose.materialcore.CustomTouchSlopProvider
 import androidx.wear.compose.materialcore.LARGE_SCREEN_WIDTH_DP
+import androidx.wear.widget.SwipeDismissFrameLayout
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -1014,6 +1036,95 @@ class SwipeToRevealTest {
         assertThrowsHelpfulMessage(initialValue = LeftRevealed)
     }
 
+    @Test
+    @Suppress("UNCHECKED_CAST")
+    fun onSwipeLeft_withSlcInSwipeToDismissLayout_ableToSwipeRightToCovered() {
+        val swipeItemText = "SWIPE"
+
+        val androidTestRule =
+            rule as AndroidComposeTestRule<ActivityScenarioRule<Activity>, Activity>
+        lateinit var revealState: RevealState
+        var density = 0f
+        androidTestRule.activityRule.scenario.onActivity { activity ->
+            val composeView = ComposeView(context = activity)
+            val swipeLayout = SwipeDismissFrameLayout(activity)
+            swipeLayout.tag = swipeItemText
+            swipeLayout.addView(composeView)
+            composeView.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
+            composeView.setContent {
+                with(LocalDensity.current) { density = this.density }
+                revealState = rememberRevealState()
+                ScalingLazyColumn(
+                    state = rememberScalingLazyListState(initialCenterItemIndex = 1)
+                ) {
+                    item { SwipeToRevealWithTouchSlop() }
+                    item { SwipeToRevealWithTouchSlop(TEST_TAG, revealState) }
+                    item { SwipeToRevealWithTouchSlop() }
+                }
+            }
+
+            activity.setContentView(swipeLayout)
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
+            swipeLeftToRevealing(density, DoubleActionAnchorWidth)
+        }
+
+        rule.runOnIdle { assertEquals(RightRevealing, revealState.currentValue) }
+
+        // Swipe on a view rather than node in order to simulate user behavior. Swiping on a node
+        // skips a big part of touch logic, specifically global swipe to dismiss
+        onView(withTagValue(equalTo(swipeItemText)))
+            .perform(
+                actionWithAssertions(
+                    GeneralSwipeAction(
+                        Swipe.FAST,
+                        GeneralLocation.translate(GeneralLocation.CENTER_LEFT, 0.2f, 0f),
+                        GeneralLocation.CENTER_RIGHT,
+                        Press.FINGER,
+                    )
+                )
+            )
+
+        rule.runOnIdle { assertEquals(Covered, revealState.currentValue) }
+    }
+
+    @Composable
+    fun SwipeToRevealWithTouchSlop(
+        text: String = "other-item",
+        revealState: RevealState = rememberRevealState(),
+    ) {
+        CustomTouchSlopProvider(32f) {
+            SwipeToReveal(
+                modifier = Modifier.semantics { testTag = text },
+                primaryAction = {
+                    PrimaryActionButton(
+                        onClick = {},
+                        icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") },
+                    )
+                },
+                onSwipePrimaryAction = {},
+                secondaryAction = {
+                    SecondaryActionButton(
+                        onClick = {},
+                        icon = { Icon(Icons.Filled.MoreVert, contentDescription = "Duplicate") },
+                    )
+                },
+                undoPrimaryAction = {
+                    UndoActionButton(onClick = {}, text = { Text("Undo Delete") })
+                },
+                revealDirection = RightToLeft,
+                revealState = revealState,
+            ) {
+                Button({}, Modifier.fillMaxWidth().padding(horizontal = 4.dp)) { Text(text) }
+            }
+        }
+    }
+
     private fun assertThrowsHelpfulMessage(initialValue: RevealValue) {
         val assertionError =
             assertThrows(IllegalArgumentException::class.java) {
@@ -1274,13 +1385,19 @@ class SwipeToRevealTest {
         Button({}, modifier.fillMaxWidth()) { Text("Swipe me!") }
     }
 
-    private fun TouchInjectionScope.swipeLeftToRevealing(density: Float) {
-        val singleActionAnchorWidthPx = SingleActionAnchorWidth.value * density
+    private fun TouchInjectionScope.swipeLeftToRevealing(
+        density: Float,
+        anchorWidth: Dp = SingleActionAnchorWidth,
+    ) {
+        val singleActionAnchorWidthPx = anchorWidth.value * density
         swipeLeft(startX = right, endX = right - (singleActionAnchorWidthPx * 0.75f))
     }
 
-    private fun TouchInjectionScope.swipeRightToRevealing(density: Float) {
-        val singleActionAnchorWidthPx = SingleActionAnchorWidth.value * density
+    private fun TouchInjectionScope.swipeRightToRevealing(
+        density: Float,
+        anchorWidth: Dp = SingleActionAnchorWidth,
+    ) {
+        val singleActionAnchorWidthPx = anchorWidth.value * density
         swipeRight(startX = left, endX = left + (singleActionAnchorWidthPx * 0.75f))
     }
 

@@ -94,6 +94,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.semantics.ScrollAxisRange
+import androidx.compose.ui.semantics.horizontalScrollAxisRange
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -359,6 +362,34 @@ public fun SwipeToReveal(
                         }
                         revealState.anchoredDraggableState.updateAnchors(draggableAnchors)
                     }
+                    .then(
+                        Modifier.semantics {
+                            // Set a fake scroll range axis so that the AndroidComposeView can
+                            // correctly report whether scrolling is supported via canScroll
+                            horizontalScrollAxisRange =
+                                ScrollAxisRange(
+                                    value = {
+                                        val minOffset =
+                                            revealState.anchoredDraggableState.anchors.minPosition()
+                                        val maxOffset =
+                                            revealState.anchoredDraggableState.anchors.maxPosition()
+                                        // Avoid dividing by 0.
+                                        if (minOffset == maxOffset) {
+                                            0f
+                                        } else {
+                                            val clampedOffset =
+                                                revealState.offset.coerceIn(minOffset, maxOffset)
+                                            // [0f, 1f] representing the fraction between the swipe
+                                            // bounds.
+                                            // Return the remaining fraction available to swipe.
+                                            (maxOffset - clampedOffset) / (maxOffset - minOffset)
+                                        }
+                                    },
+                                    maxValue = { 1f },
+                                    reverseScrolling = false,
+                                )
+                        }
+                    )
         ) {
             val canSwipeRight = revealDirection == Bidirectional
 
