@@ -23,6 +23,42 @@ import androidx.compose.runtime.saveable.serialization.serializableSaver
 import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.serialization.SavedStateConfiguration.Companion.DEFAULT
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
+
+/**
+ * Remember the value produced by [init], and persist it across activity or process recreation using
+ * a [KSerializer] for saving and restoring via the saved instance state mechanism.
+ *
+ * This function automatically finds a [KSerializer] for the `reified` type `T`, making it a
+ * convenient way to use [rememberSaveable] with types that are [Serializable].
+ *
+ * This behaves similarly to [remember], but will survive configuration changes (such as screen
+ * rotations) and process death by saving the value into the instance state.
+ *
+ * @param inputs A set of inputs which, when changed, will cause the stored state to reset and
+ *   [init] to be re-executed. Note that previously saved values are not validated against these
+ *   inputs during restoration.
+ * @param configuration Optional [SavedStateConfiguration] to customize how the serialized data is
+ *   stored and restored. Defaults to [SavedStateConfiguration.DEFAULT].
+ * @param init A factory function used to provide the initial value when no previously saved value
+ *   exists.
+ * @return The remembered and possibly restored value.
+ * @sample androidx.compose.runtime.saveable.samples.RememberSaveableWithSerializer
+ * @see rememberSerializable
+ */
+@Composable
+inline fun <reified T : Any> rememberSerializable(
+    vararg inputs: Any?,
+    configuration: SavedStateConfiguration = DEFAULT,
+    noinline init: () -> T,
+): T {
+    return rememberSerializable(
+        inputs = inputs,
+        serializer = configuration.serializersModule.serializer<T>(),
+        configuration = configuration,
+        init = init,
+    )
+}
 
 /**
  * Remember the value produced by [init], and persist it across activity or process recreation using
@@ -59,6 +95,42 @@ fun <T : Any> rememberSerializable(
     val saver = serializableSaver(serializer, configuration)
     @Suppress("DEPRECATION")
     return rememberSaveable(*inputs, saver = saver, key = null, init = init)
+}
+
+/**
+ * Remember a [MutableState] produced by [init], and persist it across activity or process
+ * recreation using a [KSerializer] from `kotlinx.serialization`.
+ *
+ * This function automatically finds a [KSerializer] for the `reified` type `T`, making it a
+ * convenient way to use [rememberSaveable] with types that are [Serializable].
+ *
+ * This behaves similarly to [remember], but the state will survive configuration changes (like
+ * screen rotations) and process recreation. It is designed for state types that cannot be stored in
+ * a `Bundle` directly but can be serialized.
+ *
+ * @param inputs A set of inputs which, when changed, will cause the stored state to reset and
+ *   [init] to be re-executed. Note that previously saved values are not validated against these
+ *   inputs during restoration.
+ * @param configuration Optional [SavedStateConfiguration] to customize how the serialization is
+ *   handled, such as specifying a custom format (e.g. JSON). Defaults to
+ *   [SavedStateConfiguration.DEFAULT].
+ * @param init A factory function to produce the initial `MutableState` to be remembered.
+ * @return The remembered and possibly restored `MutableState`.
+ * @sample androidx.compose.runtime.saveable.samples.RememberSaveableWithSerializerAndMutableState
+ * @see rememberSerializable
+ */
+@Composable
+inline fun <reified T : Any> rememberSerializable(
+    vararg inputs: Any?,
+    configuration: SavedStateConfiguration = DEFAULT,
+    noinline init: () -> MutableState<T>,
+): MutableState<T> {
+    return rememberSerializable(
+        inputs = inputs,
+        stateSerializer = configuration.serializersModule.serializer<T>(),
+        configuration = configuration,
+        init = init,
+    )
 }
 
 /**
