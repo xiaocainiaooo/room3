@@ -281,6 +281,7 @@ constructor(
                 captureSessionState,
                 graphConfig.sessionTemplate.value,
                 graphConfig.sessionParameters,
+                graphConfig.sessionColorSpace,
             )
 
         if (!cameraDevice.createCaptureSession(sessionConfig)) {
