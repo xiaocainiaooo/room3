@@ -693,8 +693,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 ?: return null
         val ret =
             PointF(
-                toViewCoord(pageLocation.left + pdfPoint.pagePoint.x, zoom, scroll = scrollX),
-                toViewCoord(pageLocation.top + pdfPoint.pagePoint.y, zoom, scroll = scrollY),
+                toViewCoord(pageLocation.left + pdfPoint.x, zoom, scroll = scrollX),
+                toViewCoord(pageLocation.top + pdfPoint.y, zoom, scroll = scrollY),
             )
         return ret
     }
@@ -745,8 +745,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 getVisibleAreaInContentCoords(),
             )
 
-        val x = ((pageRect.left + position.pagePoint.x) * zoom - (viewportWidth / 2f)).roundToInt()
-        val y = ((pageRect.top + position.pagePoint.y) * zoom - (viewportHeight / 2f)).roundToInt()
+        val x = ((pageRect.left + position.x) * zoom - (viewportWidth / 2f)).roundToInt()
+        val y = ((pageRect.top + position.y) * zoom - (viewportHeight / 2f)).roundToInt()
 
         scrollTo(x, y)
     }
@@ -1478,24 +1478,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val topEdge =
             localSelection.bounds
                 .filter { it.pageNum == firstPage }
-                .minByOrNull { it.pageRect.top }
+                .minByOrNull { it.top }
                 ?.let { localPageLayoutManager.getViewRect(it, viewport) }
                 ?.top ?: return false
         val bottomEdge =
             localSelection.bounds
                 .filter { it.pageNum == lastPage }
-                .maxByOrNull { it.pageRect.bottom }
+                .maxByOrNull { it.bottom }
                 ?.let { localPageLayoutManager.getViewRect(it, viewport) }
                 ?.bottom ?: return false
         // The left or right edge may be on any page
         val leftEdge =
             localSelection.bounds
-                .minByOrNull { it.pageRect.left }
+                .minByOrNull { it.left }
                 ?.let { localPageLayoutManager.getViewRect(it, viewport) }
                 ?.left ?: return false
         val rightEdge =
             localSelection.bounds
-                .maxByOrNull { it.pageRect.right }
+                .maxByOrNull { it.right }
                 ?.let { localPageLayoutManager.getViewRect(it, viewport) }
                 ?.right ?: return false
 
@@ -2004,8 +2004,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 ) ?: return super.onSingleTapConfirmed(e)
 
             pageManager?.getLinkAtTapPoint(touchPoint)?.let { links ->
-                if (handleGotoLinks(links, touchPoint.pagePoint)) return true
-                if (handleExternalLinks(links, touchPoint.pagePoint)) return true
+                val touchPointOnPage = PointF(touchPoint.x, touchPoint.y)
+                if (handleGotoLinks(links, touchPointOnPage)) return true
+                if (handleExternalLinks(links, touchPointOnPage)) return true
             }
 
             pageManager?.getWidgetAtTapPoint(touchPoint)?.let { widgets ->
@@ -2065,13 +2066,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             formWidgetInfos: List<FormWidgetInfo>,
             touchPoint: PdfPoint,
         ): Boolean {
-            val pdfCoordinates = touchPoint.pagePoint
             formWidgetInfos.forEach { formWidgetInfo ->
                 // TODO: b/410008790 Implement business logic to perform action on form widget
                 if (
                     formWidgetInfo.widgetRect.contains(
-                        pdfCoordinates.x.roundToInt(),
-                        pdfCoordinates.y.roundToInt(),
+                        touchPoint.x.roundToInt(),
+                        touchPoint.y.roundToInt(),
                     )
                 ) {
                     formWidgetInteractionHandler?.handleInteraction(touchPoint, formWidgetInfo)

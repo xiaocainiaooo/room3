@@ -112,8 +112,7 @@ class PdfViewFormFillingTest {
         }
 
         pdfClickPoint = requireNotNull(pdfClickPoint)
-        val formWidgetClickPoint =
-            Point(pdfClickPoint.pagePoint.x.roundToInt(), pdfClickPoint.pagePoint.y.roundToInt())
+        val formWidgetClickPoint = Point(pdfClickPoint.x.roundToInt(), pdfClickPoint.y.roundToInt())
         // Confirm that fakePdfDocument.applyEdit is called.
         assertThat(fakePdfDocument.editHistory).hasSize(1)
         assertThat(fakePdfDocument.editHistory[0])
