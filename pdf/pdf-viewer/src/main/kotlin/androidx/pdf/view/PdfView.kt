@@ -1066,6 +1066,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
         state.documentUri = pdfDocument?.uri
         state.paginationModel = pageMetadataLoader?.paginationModel
+        state.pdfFormFillingState = pageMetadataLoader?.pdfFormFillingState
         state.selectionModel = selectionStateManager?.selectionModel?.value
         return state
     }
@@ -1175,6 +1176,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     topPageMarginPx = context.getDimensions(R.dimen.top_page_margin),
                     pageSpacingPx = context.getDimensions(R.dimen.page_spacing),
                     paginationModel = requireNotNull(localStateToRestore.paginationModel),
+                    pdfFormFillingState = requireNotNull(localStateToRestore.pdfFormFillingState),
                     errorFlow = errorFlow,
                     isFormFillingEnabled = isFormFillingEnabled,
                 )
