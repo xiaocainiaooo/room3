@@ -82,6 +82,7 @@ class SdkApiConstants {
                 const val POOLING_CONTAINER = 2
                 const val RESIZE_HIDDEN = 3
                 const val OCCLUSIONS_HIDDEN = 4
+                const val USER_INTERACTIONS = 5
             }
         }
 
