@@ -1689,6 +1689,45 @@ class SurfaceTest {
             assertThat(get(width / 2, height / 2)).isEqualTo(Color.Black)
         }
     }
+
+    @Test
+    fun clickableSurface_pressedOverlay_hasAMinimumDuration() {
+        rule.mainClock.autoAdvance = false
+
+        rule.setGlimmerThemeContent {
+            Column { Box(Modifier.size(100.dp).surface(onClick = {}).testTag("surface")) }
+        }
+
+        // The center of the surface should be black
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(width / 2, height / 2)).isEqualTo(Color.Black)
+        }
+
+        // Start a press, and immediately release
+        rule.onNodeWithTag("surface").performTouchInput {
+            down(center)
+            up()
+        }
+
+        // Advance a short amount of time
+        rule.mainClock.advanceTimeBy(150)
+
+        // The press overlay should continue to animate for a minimum duration, and then fade out.
+        // If there was no minimum duration, the animation would have ended already - so
+        // make sure the color is not equal to the base color.
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(width / 2, height / 2)).isNotEqualTo(Color.Black)
+        }
+
+        // Advance until after the animation has finished
+        rule.mainClock.advanceTimeBy(5000)
+
+        // The press overlay should disappear after the minimum duration, so the center of the
+        // surface should be black again
+        rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
+            assertThat(get(width / 2, height / 2)).isEqualTo(Color.Black)
+        }
+    }
 }
 
 private fun ImageBitmap.toIntArray(): IntArray {

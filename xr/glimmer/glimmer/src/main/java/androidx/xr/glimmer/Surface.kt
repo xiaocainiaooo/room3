@@ -16,8 +16,7 @@
 
 package androidx.xr.glimmer
 
-import android.graphics.Matrix
-import androidx.annotation.FloatRange
+import android.graphics.RuntimeShader
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
@@ -42,12 +41,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -61,8 +56,11 @@ import androidx.compose.ui.node.traverseAncestors
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.xr.glimmer.SurfaceDefaults.Shape
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.Language
 
 /**
  * A surface is a fundamental building block in Glimmer. A surface represents a distinct visual area
@@ -312,17 +310,19 @@ private class SurfaceNode(
     var drawFocusedBaseBorder: (DrawScope.() -> Unit)? = null
     var drawFocusedHighlight: (DrawScope.() -> Unit)? = null
 
-    // Highlight shader / brush. We use the same shader and brush instance and just
-    // set a rotation matrix on the shader to animate it when focused.
-    var shader: Shader? = null
+    // Highlight shader / brush
+    var shader: RuntimeShader? = null
     var shaderBrush: Brush? = null
-    var shaderMatrix: Matrix? = null
 
     private var interactionCollectionJob: Job? = null
 
     private var focusedHighlightRotationProgress: Animatable<Float, AnimationVector1D>? = null
     private var focusedAnimationJob: Job? = null
-    private var pressedOverlayProgress: Animatable<Float, AnimationVector1D>? = null
+
+    private var pressedOverlayAlpha: Animatable<Float, AnimationVector1D>? = null
+    // Job that runs for a minimum duration to make sure quick presses are still visible
+    private var minimumPressDuration: Job? = null
+    private var pressReleaseAnimation: Job? = null
 
     fun update(
         shape: Shape,
@@ -370,15 +370,25 @@ private class SurfaceNode(
             if (field != value) {
                 field = value
                 if (value) {
-                    pressedOverlayProgress = pressedOverlayProgress ?: Animatable(0f)
+                    pressedOverlayAlpha = pressedOverlayAlpha ?: Animatable(0f)
+                    pressReleaseAnimation?.cancel()
+                    minimumPressDuration?.cancel()
+
+                    minimumPressDuration =
+                        coroutineScope.launch { delay(PressedOverlayMinimumDurationMillis) }
                     coroutineScope.launch {
-                        pressedOverlayProgress?.animateTo(1f, PressedOverlayAnimationSpec)
+                        pressedOverlayAlpha?.animateTo(
+                            PressedOverlayAlpha,
+                            PressedOverlayAnimationSpec,
+                        )
                     }
                 } else {
-                    pressedOverlayProgress?.let { progress ->
-                        coroutineScope.launch {
-                            progress.animateTo(0f, PressedOverlayAnimationSpec)
-                        }
+                    pressedOverlayAlpha?.let { progress ->
+                        pressReleaseAnimation =
+                            coroutineScope.launch {
+                                minimumPressDuration?.join()
+                                progress.animateTo(0f, PressedOverlayAnimationSpec)
+                            }
                     }
                 }
                 invalidateDraw()
@@ -429,20 +439,16 @@ private class SurfaceNode(
 
     override fun ContentDrawScope.draw() {
         drawContent()
-        val pressedOverlayColor = pressedOverlayColor(pressedOverlayProgress?.value ?: 0f)
+        val pressedOverlayColor = PressedOverlayColor.copy(alpha = pressedOverlayAlpha?.value ?: 0f)
         drawRect(color = pressedOverlayColor)
         if (border != null) {
             val border = border!!
             if (isFocused) {
-                shader = shader ?: focusedHighlightShader(size)
+                shader = shader ?: RuntimeShader(FocusedHighlightShader)
                 shaderBrush = shaderBrush ?: ShaderBrush(shader!!)
-                shaderMatrix = shaderMatrix ?: Matrix().also { shader!!.getLocalMatrix(it) }
-                shaderMatrix!!.setRotate(
-                    (focusedHighlightRotationProgress?.value ?: 1f) * 360f,
-                    size.width / 2,
-                    size.height / 2,
-                )
-                shader!!.setLocalMatrix(shaderMatrix)
+                val rotationRadians = (focusedHighlightRotationProgress?.value ?: 0f) * Math.TAU
+                shader!!.setFloatUniform("iResolution", size.width, size.height)
+                shader!!.setFloatUniform("iRotation", rotationRadians.toFloat())
                 focusedBorderLogic = focusedBorderLogic ?: BorderLogic()
                 focusedHighlightBorderLogic = focusedHighlightBorderLogic ?: BorderLogic()
                 drawFocusedBaseBorder =
@@ -479,7 +485,7 @@ private class SurfaceNode(
 
     override fun onDetach() {
         focusedHighlightRotationProgress = null
-        pressedOverlayProgress = null
+        pressedOverlayAlpha = null
         invalidateBorderCaches()
     }
 
@@ -503,26 +509,10 @@ private class SurfaceNode(
         drawFocusedHighlight = null
         shader = null
         shaderBrush = null
-        shaderMatrix = null
         invalidateDraw()
     }
 
     override val traverseKey: String = SurfaceNodeTraverseKey
-}
-
-/** @return the [Shader] used to render the highlight on top of the border when focused */
-private fun focusedHighlightShader(size: Size): Shader {
-    return LinearGradientShader(
-        colors = FocusedHighlightColors,
-        colorStops = FocusedHighlightColorStops,
-        from = Offset.Zero,
-        to = Offset(size.width, size.height),
-    )
-}
-
-private fun pressedOverlayColor(@FloatRange(from = 0.0, to = 1.0) progress: Float): Color {
-    val alpha = progress * PressedOverlayAlpha
-    return Color.White.copy(alpha = alpha)
 }
 
 /** Default border width for a [surface]. */
@@ -531,24 +521,78 @@ private val DefaultSurfaceBorderWidth = 2.dp
 /** Focused border width for a [surface]. */
 private val FocusedSurfaceBorderWidth = 5.dp
 
-@Suppress("PrimitiveInCollection")
-private val FocusedHighlightColors =
-    listOf(
-        Color.White.copy(alpha = 0.8f),
-        Color.White.copy(alpha = 0f),
-        Color.White.copy(alpha = 0f),
-        Color.White.copy(alpha = 0.2f),
-    )
-
-@Suppress("PrimitiveInCollection")
-private val FocusedHighlightColorStops = listOf(0f, 0.3f, 0.66f, 1f)
-
 private val FocusedHighlightAnimationSpec: AnimationSpec<Float> =
     tween(durationMillis = 7000, easing = LinearOutSlowInEasing)
+
+private val PressedOverlayColor = Color.White
 
 private const val PressedOverlayAlpha = 0.16f
 
 private val PressedOverlayAnimationSpec: AnimationSpec<Float> =
     spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessVeryLow)
+
+private const val PressedOverlayMinimumDurationMillis = 300L
+
+@Language(value = "AGSL")
+private const val FocusedHighlightShader =
+    """
+/**
+ * Rotating linear gradient shader, where rotation is controlled by iRotation uniform.
+ * This is essentially the same as:
+ * LinearGradientShader(
+ *     colors = FocusedHighlightColors,
+ *     colorStops = FocusedHighlightColorStops,
+ *     from = Offset.Zero,
+ *     to = Offset(size.width, size.height),
+ * )
+ * But allowing for efficient rotation, instead of needing to create a new shader / brush every
+ * frame with new coordinates.
+ */
+// Width / height
+uniform float2 iResolution;
+// Rotation in radians. 0 radians means a horizontal gradient.
+// Positive values will have the effect of rotating the gradient clockwise.
+uniform float iRotation;
+
+half4 main(float2 fragCoord) {
+    // Horizontal gradient
+    half4 colors[4];
+    colors[0] = half4(1.0, 1.0, 1.0, 0.8); // White with 80% alpha
+    colors[1] = half4(1.0, 1.0, 1.0, 0.0); // Transparent
+    colors[2] = half4(1.0, 1.0, 1.0, 0.0); // Transparent
+    colors[3] = half4(1.0, 1.0, 1.0, 0.2); // White with 20% alpha
+
+    // Stops for the horizontal gradient
+    float stops[4];
+    stops[0] = 0.0;
+    stops[1] = 0.3;
+    stops[2] = 0.66;
+    stops[3] = 1.0;
+
+    // Normalize
+    half2 uv = fragCoord.xy / iResolution.xy;
+
+    // Offset around a rotational center
+    half2 rotationCenter = half2(0.5, 0.5);
+    uv -= rotationCenter;
+
+    // Rotate
+    // We rotate in the opposite direction as we are rotating the coordinate we sample the gradient
+    // from. To create the effect of a gradient 'moving' clockwise, we need to move the
+    // coordinate in the opposite direction (counter-clockwise).
+    float2x2 matrix = float2x2(cos(-iRotation),-sin(-iRotation),sin(-iRotation),cos(-iRotation));
+    uv *= matrix;
+
+    // Translate back into [0,1] space
+    uv += rotationCenter;
+
+    // Blend through stops using the x coordinate, since we have a horizontal gradient
+    half4 color = mix(colors[0], colors[1], smoothstep(stops[0], stops[1], uv.x));
+    color = mix(color, colors[2], smoothstep(stops[1], stops[2], uv.x));
+    color = mix(color, colors[3], smoothstep(stops[2], stops[3], uv.x));
+
+    return color;
+}
+"""
 
 private const val SurfaceNodeTraverseKey = "androidx.xr.glimmer.SurfaceNode"
