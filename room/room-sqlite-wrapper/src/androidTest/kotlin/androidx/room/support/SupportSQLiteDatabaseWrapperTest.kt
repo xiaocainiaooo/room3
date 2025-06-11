@@ -38,7 +38,9 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.driver.AndroidSQLiteDriver
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 import kotlin.use
 import kotlinx.coroutines.Dispatchers
@@ -516,6 +518,56 @@ class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
         assertThat(wrapper.inTransaction()).isTrue()
         wrapper.endTransaction()
         assertThat(wrapper.inTransaction()).isFalse()
+    }
+
+    @Test
+    @LargeTest
+    fun yieldIfContendedSafely() {
+        wrapper.beginTransaction()
+        // yield but since there is no contention, expect a false result
+        assertThat(wrapper.yieldIfContendedSafely()).isFalse()
+
+        // insert some initial data, it should be visible to other if the transaction yields
+        wrapper.execSQL("INSERT INTO TestEntity VALUES (1)")
+        assertThat(database.dao().getEntities()).containsExactly(TestEntity(1))
+
+        // On another thread, begin a transaction causing a contention. When the test thread
+        // yields, the second thread begin its own transaction and any changes done by the test
+        // thread should be visible, then this second thread finishes once test thread should
+        // continue.
+        val barrier = CountDownLatch(1)
+        val waiter = thread {
+            barrier.countDown()
+            wrapper.beginTransaction()
+            assertThat(database.dao().getEntities()).containsExactly(TestEntity(1))
+            wrapper.execSQL("INSERT INTO TestEntity VALUES (2)")
+            assertThat(database.dao().getEntities()).containsExactly(TestEntity(1), TestEntity(2))
+            wrapper.setTransactionSuccessful()
+            wrapper.endTransaction()
+        }
+
+        // wait for waiter thread to start
+        barrier.await()
+        // the barrier can only get us so far, just before we actually invoke begin(), so we sleep a
+        // bit such that begin() actually gets blocked attempting to start a transaction, otherwise
+        // we'll yield too early when there is no contention
+        @Suppress("BanThreadSleep") // got no other choice
+        Thread.sleep(200)
+
+        // yield and since there is a contention, expect a true result
+        assertThat(wrapper.yieldIfContendedSafely()).isTrue()
+        // The second thread finished, assert we can see its changes
+        assertThat(database.dao().getEntities()).containsExactly(TestEntity(1), TestEntity(2))
+
+        // finish the transaction that yielded
+        wrapper.execSQL("INSERT INTO TestEntity VALUES (3)")
+        wrapper.setTransactionSuccessful()
+        wrapper.endTransaction()
+
+        assertThat(database.dao().getEntities())
+            .containsExactly(TestEntity(1), TestEntity(2), TestEntity(3))
+
+        waiter.join()
     }
 
     @Test
