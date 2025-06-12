@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
@@ -57,6 +56,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.xr.glimmer.SurfaceDefaults.Shape
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -287,28 +287,23 @@ private class SurfaceNode(
     var contentColor by mutableStateOf(contentColor)
         private set
 
-    // Cached border properties
-
-    private val unfocusedBorderLogic: BorderLogic = BorderLogic()
-    private var focusedBorderLogic: BorderLogic? = null
-    private var focusedHighlightBorderLogic: BorderLogic? = null
-
     // Cache borders and highlight for unfocused and focused states. This means we
     // can avoid recreating these for a given surface, if the border and shape never
     // change. Changing between unfocused and focus states only requires a draw
     // invalidation, as the borders are already cached.
 
     // Unfocused border
-    var drawUnfocusedBorder: (DrawScope.() -> Unit)? = null
-
+    private val unfocusedBorderLogic: BorderLogic = BorderLogic()
+    private val unfocusedBorderWidth: () -> Dp = { border?.width ?: 0.dp }
     // Focused border - this consists of two layers. A 'base' layer (which is the
     // unfocused border with a different size) and the highlight we draw on top of
     // this base layer. We need to increase the size of the underlying border to
     // make sure that the highlight area fully matches the underlying border, to
     // avoid inconsistent areas of coverage due to the transparency of the
     // highlight.
-    var drawFocusedBaseBorder: (DrawScope.() -> Unit)? = null
-    var drawFocusedHighlight: (DrawScope.() -> Unit)? = null
+    private var focusedBorderLogic: BorderLogic? = null
+    private var focusedHighlightBorderLogic: BorderLogic? = null
+    private var focusedBorderWidth: (() -> Dp)? = null
 
     // Highlight shader / brush
     var shader: RuntimeShader? = null
@@ -332,12 +327,12 @@ private class SurfaceNode(
     ) {
         if (this.shape != shape) {
             this.shape = shape
-            invalidateBorderCaches()
+            invalidateDraw()
         }
         this.contentColor = contentColor
         if (this.border != border) {
             this.border = border
-            invalidateBorderCaches()
+            invalidateDraw()
         }
         if (this.interactionSource != interactionSource) {
             this.interactionSource = interactionSource
@@ -375,8 +370,10 @@ private class SurfaceNode(
                     minimumPressDuration?.cancel()
 
                     minimumPressDuration =
-                        coroutineScope.launch { delay(PressedOverlayMinimumDurationMillis) }
-                    coroutineScope.launch {
+                        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                            delay(PressedOverlayMinimumDurationMillis)
+                        }
+                    coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                         pressedOverlayAlpha?.animateTo(
                             PressedOverlayAlpha,
                             PressedOverlayAnimationSpec,
@@ -385,7 +382,7 @@ private class SurfaceNode(
                 } else {
                     pressedOverlayAlpha?.let { progress ->
                         pressReleaseAnimation =
-                            coroutineScope.launch {
+                            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                                 minimumPressDuration?.join()
                                 progress.animateTo(0f, PressedOverlayAnimationSpec)
                             }
@@ -402,7 +399,7 @@ private class SurfaceNode(
         isPressed = false
         interactionSource?.let { source ->
             interactionCollectionJob =
-                coroutineScope.launch {
+                coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     var focusCount = 0
                     var pressCount = 0
                     source.interactions.collect { interaction ->
@@ -424,7 +421,7 @@ private class SurfaceNode(
         stopFocusAnimation()
         focusedHighlightRotationProgress = Animatable(0f)
         focusedAnimationJob =
-            coroutineScope.launch {
+            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
                 focusedHighlightRotationProgress?.animateTo(
                     targetValue = 1f,
                     animationSpec = FocusedHighlightAnimationSpec,
@@ -438,6 +435,7 @@ private class SurfaceNode(
     }
 
     override fun ContentDrawScope.draw() {
+        val outline = shape.createOutline(size, layoutDirection, this)
         drawContent()
         val pressedOverlayColor = PressedOverlayColor.copy(alpha = pressedOverlayAlpha?.value ?: 0f)
         drawRect(color = pressedOverlayColor)
@@ -449,36 +447,21 @@ private class SurfaceNode(
                 val rotationRadians = (focusedHighlightRotationProgress?.value ?: 0f) * Math.TAU
                 shader!!.setFloatUniform("iResolution", size.width, size.height)
                 shader!!.setFloatUniform("iRotation", rotationRadians.toFloat())
+
                 focusedBorderLogic = focusedBorderLogic ?: BorderLogic()
                 focusedHighlightBorderLogic = focusedHighlightBorderLogic ?: BorderLogic()
-                drawFocusedBaseBorder =
-                    drawFocusedBaseBorder
-                        ?: focusedBorderLogic!!.createDrawBorder(
-                            this,
-                            FocusedSurfaceBorderWidth,
-                            border.brush,
-                            shape,
-                        )
-                drawFocusedHighlight =
-                    drawFocusedHighlight
-                        ?: focusedHighlightBorderLogic!!.createDrawBorder(
-                            this,
-                            FocusedSurfaceBorderWidth,
-                            shaderBrush!!,
-                            shape,
-                        )
-                drawFocusedBaseBorder!!()
-                drawFocusedHighlight!!()
+                focusedBorderWidth = focusedBorderWidth ?: { FocusedSurfaceBorderWidth }
+
+                focusedBorderLogic!!.drawBorder(this, focusedBorderWidth!!, border.brush, outline)
+
+                focusedHighlightBorderLogic!!.drawBorder(
+                    this,
+                    focusedBorderWidth!!,
+                    shaderBrush!!,
+                    outline,
+                )
             } else {
-                drawUnfocusedBorder =
-                    drawUnfocusedBorder
-                        ?: unfocusedBorderLogic.createDrawBorder(
-                            this,
-                            border.width,
-                            border.brush,
-                            shape,
-                        )
-                drawUnfocusedBorder!!()
+                unfocusedBorderLogic.drawBorder(this, unfocusedBorderWidth, border.brush, outline)
             }
         }
     }
@@ -486,30 +469,6 @@ private class SurfaceNode(
     override fun onDetach() {
         focusedHighlightRotationProgress = null
         pressedOverlayAlpha = null
-        invalidateBorderCaches()
-    }
-
-    // Invalidation for border caches
-
-    override fun onMeasureResultChanged() {
-        invalidateBorderCaches()
-    }
-
-    override fun onDensityChange() {
-        invalidateBorderCaches()
-    }
-
-    override fun onLayoutDirectionChange() {
-        invalidateBorderCaches()
-    }
-
-    private fun invalidateBorderCaches() {
-        drawUnfocusedBorder = null
-        drawFocusedBaseBorder = null
-        drawFocusedHighlight = null
-        shader = null
-        shaderBrush = null
-        invalidateDraw()
     }
 
     override val traverseKey: String = SurfaceNodeTraverseKey

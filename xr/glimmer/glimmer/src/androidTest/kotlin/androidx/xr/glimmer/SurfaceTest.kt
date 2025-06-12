@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,12 +36,20 @@ import androidx.compose.testutils.toList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component1
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component2
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.compositeOver
@@ -69,7 +78,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -605,6 +616,317 @@ class SurfaceTest {
             assertThat(defaultBorder.width).isEqualTo(2.dp)
             assertThat((customBorder.brush as SolidColor).value).isEqualTo(Color.Red)
             assertThat(customBorder.width).isEqualTo(2.dp)
+        }
+    }
+
+    @Test
+    fun focusableSurface_changeShape_borderChanges() {
+        var roundedCorners by mutableStateOf(true)
+
+        rule.setContent {
+            with(LocalDensity.current) {
+                Box(
+                    Modifier.size(40f.toDp())
+                        .background(Color.Blue)
+                        .surface(
+                            shape = if (roundedCorners) RoundedCornerShape(5f) else RectangleShape,
+                            border = BorderStroke(1f.toDp(), Color.Red),
+                        )
+                        .testTag("surface")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should be rounded, so the top and bottom of the left edge will be blue, and the
+            // center will be red
+            assertThat(Color.Blue).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Blue).isEqualTo(map[0, height - 1])
+        }
+
+        rule.runOnIdle { roundedCorners = false }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should no longer be rounded, so left edge should be fully red
+            assertThat(Color.Red).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Red).isEqualTo(map[0, height - 1])
+        }
+    }
+
+    @Test
+    fun clickableSurface_changeShape_borderChanges() {
+        var roundedCorners by mutableStateOf(true)
+
+        rule.setContent {
+            with(LocalDensity.current) {
+                Box(
+                    Modifier.size(40f.toDp())
+                        .background(Color.Blue)
+                        .surface(
+                            shape = if (roundedCorners) RoundedCornerShape(5f) else RectangleShape,
+                            border = BorderStroke(1f.toDp(), Color.Red),
+                            onClick = {},
+                        )
+                        .testTag("surface")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should be rounded, so the top and bottom of the left edge will be blue, and the
+            // center will be red
+            assertThat(Color.Blue).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Blue).isEqualTo(map[0, height - 1])
+        }
+
+        rule.runOnIdle { roundedCorners = false }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should no longer be rounded, so left edge should be fully red
+            assertThat(Color.Red).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Red).isEqualTo(map[0, height - 1])
+        }
+    }
+
+    @Test
+    fun focusableSurface_observableShape_roundedOutline_borderChanges() {
+        var roundedCorners by mutableStateOf(true)
+        val roundedCornersShape =
+            object : Shape {
+                override fun createOutline(
+                    size: Size,
+                    layoutDirection: LayoutDirection,
+                    density: Density,
+                ): Outline {
+                    val roundRect =
+                        if (roundedCorners) {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius(5f))
+                        } else {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius.Zero)
+                        }
+                    return Outline.Rounded(roundRect)
+                }
+            }
+
+        rule.setContent {
+            with(LocalDensity.current) {
+                Box(
+                    Modifier.size(40f.toDp())
+                        .background(Color.Blue)
+                        .surface(
+                            shape = roundedCornersShape,
+                            border = BorderStroke(1f.toDp(), Color.Red),
+                        )
+                        .testTag("surface")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should be rounded, so the top and bottom of the left edge will be blue, and the
+            // center will be red
+            assertThat(Color.Blue).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Blue).isEqualTo(map[0, height - 1])
+        }
+
+        rule.runOnIdle { roundedCorners = false }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should no longer be rounded, so left edge should be fully red
+            assertThat(Color.Red).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Red).isEqualTo(map[0, height - 1])
+        }
+    }
+
+    @Test
+    fun clickableSurface_observableShape_roundedOutline_borderChanges() {
+        var roundedCorners by mutableStateOf(true)
+        val roundedCornersShape =
+            object : Shape {
+                override fun createOutline(
+                    size: Size,
+                    layoutDirection: LayoutDirection,
+                    density: Density,
+                ): Outline {
+                    val roundRect =
+                        if (roundedCorners) {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius(5f))
+                        } else {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius.Zero)
+                        }
+                    return Outline.Rounded(roundRect)
+                }
+            }
+
+        rule.setContent {
+            with(LocalDensity.current) {
+                Box(
+                    Modifier.size(40f.toDp())
+                        .background(Color.Blue)
+                        .surface(
+                            shape = roundedCornersShape,
+                            border = BorderStroke(1f.toDp(), Color.Red),
+                            onClick = {},
+                        )
+                        .testTag("surface")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should be rounded, so the top and bottom of the left edge will be blue, and the
+            // center will be red
+            assertThat(Color.Blue).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Blue).isEqualTo(map[0, height - 1])
+        }
+
+        rule.runOnIdle { roundedCorners = false }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should no longer be rounded, so left edge should be fully red
+            assertThat(Color.Red).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            assertThat(Color.Red).isEqualTo(map[0, height - 1])
+        }
+    }
+
+    @Test
+    fun focusableSurface_observableShape_genericOutline_samePath_borderChanges() {
+        var roundedCorners by mutableStateOf(true)
+        val roundedCornersShape =
+            object : Shape {
+                val path = Path()
+
+                override fun createOutline(
+                    size: Size,
+                    layoutDirection: LayoutDirection,
+                    density: Density,
+                ): Outline {
+                    val roundRect =
+                        if (roundedCorners) {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius(50f))
+                        } else {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius.Zero)
+                        }
+                    path.reset()
+                    path.addRoundRect(roundRect)
+                    return Outline.Generic(path)
+                }
+            }
+
+        rule.setContent {
+            with(LocalDensity.current) {
+                Box(
+                    Modifier.size(400f.toDp())
+                        .background(Color.Blue)
+                        .surface(
+                            shape = roundedCornersShape,
+                            border = BorderStroke(1f.toDp(), Color.Red),
+                        )
+                        .testTag("surface")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should be rounded, so the top and bottom of the left edge will be blue, and the
+            // center will be red
+            assertThat(Color.Blue).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            // The last pixel fails to render properly on some emulators, so just assert the one
+            // before instead - b/267371353
+            assertThat(Color.Blue).isEqualTo(map[0, height - 2])
+        }
+
+        rule.runOnIdle { roundedCorners = false }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should no longer be rounded, so left edge should be fully red
+            assertThat(Color.Red).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            // The last pixel fails to render properly on some emulators, so just assert the one
+            // before instead - b/267371353
+            assertThat(Color.Red).isEqualTo(map[0, height - 2])
+        }
+    }
+
+    @Test
+    fun clickableSurface_observableShape_genericOutline_samePath_borderChanges() {
+        var roundedCorners by mutableStateOf(true)
+        val roundedCornersShape =
+            object : Shape {
+                val path = Path()
+
+                override fun createOutline(
+                    size: Size,
+                    layoutDirection: LayoutDirection,
+                    density: Density,
+                ): Outline {
+                    val roundRect =
+                        if (roundedCorners) {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius(50f))
+                        } else {
+                            RoundRect(Rect(Offset.Zero, size), cornerRadius = CornerRadius.Zero)
+                        }
+                    path.reset()
+                    path.addRoundRect(roundRect)
+                    return Outline.Generic(path)
+                }
+            }
+
+        rule.setContent {
+            with(LocalDensity.current) {
+                Box(
+                    Modifier.size(400f.toDp())
+                        .background(Color.Blue)
+                        .surface(
+                            shape = roundedCornersShape,
+                            border = BorderStroke(1f.toDp(), Color.Red),
+                            onClick = {},
+                        )
+                        .testTag("surface")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should be rounded, so the top and bottom of the left edge will be blue, and the
+            // center will be red
+            assertThat(Color.Blue).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            // The last pixel fails to render properly on some emulators, so just assert the one
+            // before instead - b/267371353
+            assertThat(Color.Blue).isEqualTo(map[0, height - 2])
+        }
+
+        rule.runOnIdle { roundedCorners = false }
+
+        rule.onNodeWithTag("surface").captureToImage().run {
+            val map = toPixelMap()
+            // We should no longer be rounded, so left edge should be fully red
+            assertThat(Color.Red).isEqualTo(map[0, 0])
+            assertThat(Color.Red).isEqualTo(map[0, (height - 1) / 2])
+            // The last pixel fails to render properly on some emulators, so just assert the one
+            // before instead - b/267371353
+            assertThat(Color.Red).isEqualTo(map[0, height - 2])
         }
     }
 
