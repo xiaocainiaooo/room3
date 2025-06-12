@@ -18,6 +18,7 @@ package androidx.xr.runtime.testing
 
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.SpatialEnvironment
+import java.util.concurrent.Executor
 import java.util.function.Consumer
 
 // TODO: b/405218432 - Implement this correctly instead of stubbing it out.
@@ -32,7 +33,10 @@ public class FakeSpatialEnvironment : SpatialEnvironment {
 
     @get:Suppress("AutoBoxing") override val passthroughOpacityPreference: Float? = null
 
-    override fun addOnPassthroughOpacityChangedListener(listener: Consumer<Float>) {}
+    override fun addOnPassthroughOpacityChangedListener(
+        executor: Executor,
+        listener: Consumer<Float>,
+    ) {}
 
     override fun removeOnPassthroughOpacityChangedListener(listener: Consumer<Float>) {}
 
@@ -48,7 +52,10 @@ public class FakeSpatialEnvironment : SpatialEnvironment {
     ): @SpatialEnvironment.SetPassthroughOpacityPreferenceResult Int =
         SpatialEnvironment.SetPassthroughOpacityPreferenceResult.CHANGE_PENDING
 
-    override fun addOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>) {}
+    override fun addOnSpatialEnvironmentChangedListener(
+        executor: Executor,
+        listener: Consumer<Boolean>,
+    ) {}
 
     override fun removeOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>) {}
 }

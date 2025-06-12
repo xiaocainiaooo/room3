@@ -518,8 +518,8 @@ package androidx.xr.runtime.testing {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeSpatialEnvironment implements androidx.xr.runtime.internal.SpatialEnvironment {
     ctor public FakeSpatialEnvironment();
-    method public void addOnPassthroughOpacityChangedListener(java.util.function.Consumer<java.lang.Float> listener);
-    method public void addOnSpatialEnvironmentChangedListener(java.util.function.Consumer<java.lang.Boolean> listener);
+    method public void addOnPassthroughOpacityChangedListener(java.util.concurrent.Executor executor, java.util.function.Consumer<java.lang.Float> listener);
+    method public void addOnSpatialEnvironmentChangedListener(java.util.concurrent.Executor executor, java.util.function.Consumer<java.lang.Boolean> listener);
     method public float getCurrentPassthroughOpacity();
     method public Float? getPassthroughOpacityPreference();
     method public androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference? getSpatialEnvironmentPreference();

@@ -17,6 +17,7 @@
 package androidx.xr.scenecore.impl;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -221,8 +222,8 @@ public final class SpatialEnvironmentImplTest {
         @SuppressWarnings(value = "unchecked")
         Consumer<Float> listener2 = (Consumer<Float>) mock(Consumer.class);
 
-        mEnvironment.addOnPassthroughOpacityChangedListener(listener1);
-        mEnvironment.addOnPassthroughOpacityChangedListener(listener2);
+        mEnvironment.addOnPassthroughOpacityChangedListener(directExecutor(), listener1);
+        mEnvironment.addOnPassthroughOpacityChangedListener(directExecutor(), listener2);
 
         float opacity = mEnvironment.getCurrentPassthroughOpacity();
 
@@ -621,8 +622,8 @@ public final class SpatialEnvironmentImplTest {
         SpatialState spatialState = ShadowSpatialState.create();
         mEnvironment.setSpatialState(spatialState);
 
-        mEnvironment.addOnSpatialEnvironmentChangedListener(listener1);
-        mEnvironment.addOnSpatialEnvironmentChangedListener(listener2);
+        mEnvironment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener1);
+        mEnvironment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener2);
 
         boolean isSpatialEnvironmentPreferenceActive =
                 mEnvironment.isSpatialEnvironmentPreferenceActive();
@@ -644,7 +645,7 @@ public final class SpatialEnvironmentImplTest {
 
         SpatialState spatialState = ShadowSpatialState.create();
         mEnvironment.setSpatialState(spatialState);
-        mEnvironment.addOnSpatialEnvironmentChangedListener(listener);
+        mEnvironment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener);
 
         boolean isSpatialEnvironmentPreferenceActive =
                 mEnvironment.isSpatialEnvironmentPreferenceActive();
@@ -661,7 +662,7 @@ public final class SpatialEnvironmentImplTest {
     public void dispose_clearsPassthroughOpacityPreferenceListeners() {
         @SuppressWarnings(value = "unchecked")
         Consumer<Float> listener = (Consumer<Float>) mock(Consumer.class);
-        mEnvironment.addOnPassthroughOpacityChangedListener(listener);
+        mEnvironment.addOnPassthroughOpacityChangedListener(directExecutor(), listener);
 
         float opacity = mEnvironment.getCurrentPassthroughOpacity();
 

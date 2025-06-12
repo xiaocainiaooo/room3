@@ -478,7 +478,7 @@ public final class JxrPlatformAdapterAxrTest {
         @SuppressWarnings(value = "unchecked")
         Consumer<Boolean> listener = (Consumer<Boolean>) mock(Consumer.class);
 
-        environment.addOnSpatialEnvironmentChangedListener(listener);
+        environment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener);
 
         assertThat(environment.isSpatialEnvironmentPreferenceActive()).isFalse();
 
@@ -558,7 +558,7 @@ public final class JxrPlatformAdapterAxrTest {
         @SuppressWarnings(value = "unchecked")
         Consumer<Float> listener = (Consumer<Float>) mock(Consumer.class);
 
-        environment.addOnPassthroughOpacityChangedListener(listener);
+        environment.addOnPassthroughOpacityChangedListener(directExecutor(), listener);
 
         assertThat(environment.getCurrentPassthroughOpacity()).isZero();
 

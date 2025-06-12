@@ -19,6 +19,7 @@ package androidx.xr.runtime.internal
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
 import java.util.Objects
+import java.util.concurrent.Executor
 import java.util.function.Consumer
 
 /**
@@ -66,9 +67,9 @@ public interface SpatialEnvironment {
     /**
      * Notifies an application when the passthrough state changes, such as when the application
      * enters or exits passthrough or when the passthrough opacity changes. This [listener] will be
-     * called on the Application's UI thread.
+     * called on the provided [executor].
      */
-    public fun addOnPassthroughOpacityChangedListener(listener: Consumer<Float>)
+    public fun addOnPassthroughOpacityChangedListener(executor: Executor, listener: Consumer<Float>)
 
     /** Remove a listener previously added by [addOnPassthroughOpacityChangedListener]. */
     public fun removeOnPassthroughOpacityChangedListener(listener: Consumer<Float>)
@@ -140,17 +141,20 @@ public interface SpatialEnvironment {
      * Notifies an application whether or not the preferred spatial environment for the application
      * is active.
      *
-     * <p>The environment will try to transition to the application environment when a non-null
+     * The environment will try to transition to the application environment when a non-null
      * preference is set through [setSpatialEnvironmentPreference] and the application has the
      * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS] capability. The environment
      * preferences will otherwise not be active.
      *
-     * <p>The listener consumes a boolean value that is true if the environment preference is active
+     * The listener consumes a boolean value that is true if the environment preference is active
      * when the listener is notified.
      *
-     * <p>This listener will be invoked on the Application's UI thread.
+     * This [listener] will be invoked on the provided [executor].
      */
-    public fun addOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>)
+    public fun addOnSpatialEnvironmentChangedListener(
+        executor: Executor,
+        listener: Consumer<Boolean>,
+    )
 
     /** Remove a listener previously added by [addOnSpatialEnvironmentChangedListener]. */
     public fun removeOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>)

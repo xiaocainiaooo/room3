@@ -49,18 +49,18 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /** Concrete implementation of SpatialEnvironment / XR Wallpaper for Android XR. */
 // TODO(b/373435470): Remove "deprecation"
 @SuppressLint("NewApi") // TODO: b/413661481 - Remove this suppression prior to JXR stable release.
-@SuppressWarnings({"deprecation", "BanSynchronizedMethods"})
+@SuppressWarnings({"deprecation", "BanSynchronizedMethods", "BanConcurrentHashMap"})
 final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consumer<Node>> {
     public static final String TAG = "SpatialEnvironmentImpl";
 
@@ -89,11 +89,12 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
     private final Supplier<SpatialState> mSpatialStateProvider;
     private SpatialState mPreviousSpatialState = null;
 
-    private final Set<Consumer<Boolean>> mOnSpatialEnvironmentChangedListeners =
-            Collections.synchronizedSet(new HashSet<>());
+    // Store listeners with their executors
+    private final Map<Consumer<Boolean>, Executor> mOnSpatialEnvironmentChangedListeners =
+            new ConcurrentHashMap<>();
 
-    private final Set<Consumer<Float>> mOnPassthroughOpacityChangedListeners =
-            Collections.synchronizedSet(new HashSet<>());
+    private final Map<Consumer<Float>, Executor> mOnPassthroughOpacityChangedListeners =
+            new ConcurrentHashMap<>();
 
     SpatialEnvironmentImpl(
             @NonNull Activity activity,
@@ -278,18 +279,20 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
 
     // This is called on the Activity's UI thread - so we should be careful to not block it.
     synchronized void firePassthroughOpacityChangedEvent() {
-        for (Consumer<Float> listener : mOnPassthroughOpacityChangedListeners) {
-            listener.accept(getCurrentPassthroughOpacity());
-        }
+        mOnPassthroughOpacityChangedListeners.forEach(
+                (listener, executor) -> {
+                    executor.execute(() -> listener.accept(getCurrentPassthroughOpacity()));
+                });
     }
 
     @Override
-    public void addOnPassthroughOpacityChangedListener(Consumer<Float> listener) {
-        mOnPassthroughOpacityChangedListeners.add(listener);
+    public void addOnPassthroughOpacityChangedListener(
+            @NonNull Executor executor, @NonNull Consumer<Float> listener) {
+        mOnPassthroughOpacityChangedListeners.put(listener, executor);
     }
 
     @Override
-    public void removeOnPassthroughOpacityChangedListener(Consumer<Float> listener) {
+    public void removeOnPassthroughOpacityChangedListener(@NonNull Consumer<Float> listener) {
         mOnPassthroughOpacityChangedListeners.remove(listener);
     }
 
@@ -528,18 +531,21 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
 
     // This is called on the Activity's UI thread - so we should be careful to not block it.
     synchronized void fireOnSpatialEnvironmentChangedEvent() {
-        for (Consumer<Boolean> listener : mOnSpatialEnvironmentChangedListeners) {
-            listener.accept(mIsSpatialEnvironmentPreferenceActive);
-        }
+        final boolean isActive = mIsSpatialEnvironmentPreferenceActive;
+        mOnSpatialEnvironmentChangedListeners.forEach(
+                (listener, executor) -> {
+                    executor.execute(() -> listener.accept(isActive));
+                });
     }
 
     @Override
-    public void addOnSpatialEnvironmentChangedListener(Consumer<Boolean> listener) {
-        mOnSpatialEnvironmentChangedListeners.add(listener);
+    public void addOnSpatialEnvironmentChangedListener(
+            @NonNull Executor executor, @NonNull Consumer<Boolean> listener) {
+        mOnSpatialEnvironmentChangedListeners.put(listener, executor);
     }
 
     @Override
-    public void removeOnSpatialEnvironmentChangedListener(Consumer<Boolean> listener) {
+    public void removeOnSpatialEnvironmentChangedListener(@NonNull Consumer<Boolean> listener) {
         mOnSpatialEnvironmentChangedListeners.remove(listener);
     }
 

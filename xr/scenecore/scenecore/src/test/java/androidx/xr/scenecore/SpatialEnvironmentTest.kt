@@ -22,6 +22,7 @@ import androidx.xr.runtime.internal.JxrPlatformAdapter
 import androidx.xr.runtime.internal.MaterialResource as RtMaterialResource
 import androidx.xr.runtime.internal.SpatialEnvironment as RtSpatialEnvironment
 import com.google.common.truth.Truth.assertThat
+import com.google.common.util.concurrent.MoreExecutors.directExecutor
 import java.util.function.Consumer
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +31,7 @@ import org.junit.runners.JUnit4
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -129,9 +131,40 @@ class SpatialEnvironmentTest {
         val captor = argumentCaptor<Consumer<Float>>()
         val listener = Consumer<Float> { floatValue: Float -> listenerCalledWithValue = floatValue }
         environment!!.addOnPassthroughOpacityChangedListener(listener)
-        verify(mockRtEnvironment!!).addOnPassthroughOpacityChangedListener(captor.capture())
+        verify(mockRtEnvironment!!).addOnPassthroughOpacityChangedListener(any(), captor.capture())
         captor.firstValue.accept(0.3f)
         assertThat(listenerCalledWithValue).isEqualTo(0.3f)
+    }
+
+    @Test
+    fun addOnPassthroughOpacityChangedListener_withExecutor_receivesEventsOnExecutor() {
+        var listenerCalledWithValue = 0.0f
+        var listenerThread: Thread? = null
+        val rtListenerCaptor = argumentCaptor<Consumer<Float>>()
+        val executor = directExecutor()
+
+        val listener =
+            Consumer<Float> { floatValue: Float ->
+                listenerCalledWithValue = floatValue
+                listenerThread = Thread.currentThread()
+            }
+        environment!!.addOnPassthroughOpacityChangedListener(executor, listener)
+        verify(mockRtEnvironment!!)
+            .addOnPassthroughOpacityChangedListener(eq(executor), rtListenerCaptor.capture())
+
+        val eventValue = 0.3f
+        executor.execute { rtListenerCaptor.firstValue.accept(eventValue) }
+
+        assertThat(listenerCalledWithValue).isEqualTo(eventValue)
+        assertThat(listenerThread).isNotNull()
+    }
+
+    @Test
+    fun addOnPassthroughOpacityChangedListener_withoutExecutor_usesMainThreadExecutor() {
+        val listener = Consumer<Float> {}
+        environment!!.addOnPassthroughOpacityChangedListener(listener)
+        verify(mockRtEnvironment!!)
+            .addOnPassthroughOpacityChangedListener(eq(HandlerExecutor.mainThreadExecutor), any())
     }
 
     @Test
@@ -303,9 +336,41 @@ class SpatialEnvironmentTest {
         val captor = argumentCaptor<Consumer<Boolean>>()
         val listener = Consumer<Boolean> { called: Boolean -> listenerCalled = called }
         environment!!.addOnSpatialEnvironmentChangedListener(listener)
-        verify(mockRtEnvironment!!).addOnSpatialEnvironmentChangedListener(captor.capture())
+        verify(mockRtEnvironment!!).addOnSpatialEnvironmentChangedListener(any(), captor.capture())
         captor.firstValue.accept(true)
         assertThat(listenerCalled).isTrue()
+    }
+
+    @Test
+    fun addOnSpatialEnvironmentChangedListener_withExecutor_receivesEventsOnExecutor() {
+        var listenerCalledWithValue = false
+        var listenerThread: Thread? = null
+        val rtListenerCaptor = argumentCaptor<Consumer<Boolean>>()
+        val executor = directExecutor()
+
+        val listener =
+            Consumer<Boolean> { boolValue: Boolean ->
+                listenerCalledWithValue = boolValue
+                listenerThread = Thread.currentThread()
+            }
+        environment!!.addOnSpatialEnvironmentChangedListener(executor, listener)
+        verify(mockRtEnvironment!!)
+            .addOnSpatialEnvironmentChangedListener(eq(executor), rtListenerCaptor.capture())
+
+        val eventValue = true
+        executor.execute { rtListenerCaptor.firstValue.accept(eventValue) }
+
+        assertThat(listenerCalledWithValue).isEqualTo(eventValue)
+        assertThat(listenerThread).isNotNull()
+    }
+
+    @Test
+    fun addOnSpatialEnvironmentChangedListener_withoutExecutor_usesMainThreadExecutor() {
+        val listener = Consumer<Boolean> {}
+        environment!!.addOnSpatialEnvironmentChangedListener(listener)
+        // Verify that the rtEnvironment's method was called with the main thread executor
+        verify(mockRtEnvironment!!)
+            .addOnSpatialEnvironmentChangedListener(eq(HandlerExecutor.mainThreadExecutor), any())
     }
 
     @Test

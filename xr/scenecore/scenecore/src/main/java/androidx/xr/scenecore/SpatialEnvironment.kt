@@ -26,6 +26,7 @@ import androidx.xr.runtime.internal.SpatialEnvironment.SetPassthroughOpacityPref
 import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult as RtSetSpatialEnvironmentPreferenceResult
 import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference as RtSpatialEnvironmentPreference
 import com.google.errorprone.annotations.CanIgnoreReturnValue
+import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
@@ -248,7 +249,23 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      * @param listener The [Consumer<Float>] to be added to listen for passthrough opacity changes.
      */
     public fun addOnPassthroughOpacityChangedListener(listener: Consumer<Float>) {
-        rtEnvironment.addOnPassthroughOpacityChangedListener(listener)
+        addOnPassthroughOpacityChangedListener(HandlerExecutor.mainThreadExecutor, listener)
+    }
+
+    /**
+     * Notifies an application when the user visible passthrough state changes, such as when the
+     * application enters or exits passthrough or when the passthrough opacity changes.
+     *
+     * This listener will be invoked on the given [Executor].
+     *
+     * @param executor The [Executor] to invoke the listener on.
+     * @param listener The [Consumer<Float>] to be added to listen for passthrough opacity changes.
+     */
+    public fun addOnPassthroughOpacityChangedListener(
+        executor: Executor,
+        listener: Consumer<Float>,
+    ) {
+        rtEnvironment.addOnPassthroughOpacityChangedListener(executor, listener)
     }
 
     /**
@@ -368,7 +385,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
             .toSetSpatialEnvironmentPreferenceResult()
     }
 
-    // TODO: b/370957362 - Add overloads for the add...Listener methods to take in an executor
     /**
      * Notifies an application whether or not the preferred spatial environment for the application
      * is active.
@@ -387,7 +403,32 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      *   changes.
      */
     public fun addOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>) {
-        rtEnvironment.addOnSpatialEnvironmentChangedListener(listener)
+        addOnSpatialEnvironmentChangedListener(HandlerExecutor.mainThreadExecutor, listener)
+    }
+
+    /**
+     * Notifies an application whether or not the preferred spatial environment for the application
+     * is active.
+     *
+     * The environment will try to transition to the application environment when a non-null
+     * preference is set through [setSpatialEnvironmentPreference] and the application has the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT] capability. The environment
+     * preferences will otherwise not be active.
+     *
+     * The listener consumes a boolean value that is true if the environment preference is active
+     * when the listener is notified.
+     *
+     * This listener will be invoked on the given [Executor].
+     *
+     * @param executor The [Executor] to invoke the listener on.
+     * @param listener The [Consumer<Boolean>] to be added to listen for spatial environment
+     *   changes.
+     */
+    public fun addOnSpatialEnvironmentChangedListener(
+        executor: Executor,
+        listener: Consumer<Boolean>,
+    ) {
+        rtEnvironment.addOnSpatialEnvironmentChangedListener(executor, listener)
     }
 
     /**
