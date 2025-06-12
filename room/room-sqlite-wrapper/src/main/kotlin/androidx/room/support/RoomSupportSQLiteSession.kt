@@ -109,16 +109,34 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
                 }
             }
         currentTransaction.begin(listener)
+        try {
+            currentTransaction.listener?.onBegin()
+        } catch (ex: Throwable) {
+            currentTransaction.mark(success = false)
+            endTransaction()
+            throw ex
+        }
     }
 
     fun endTransaction() {
         val currentTransaction =
             threadTransaction.get()
                 ?: error("Cannot perform this operation because there is no current transaction.")
-        val transactionEnded = currentTransaction.end()
-        if (transactionEnded) {
-            threadTransactionContext.set(null)
-            threadTransaction.set(null)
+        try {
+            if (currentTransaction.isSuccessful()) {
+                currentTransaction.listener?.onCommit()
+            } else {
+                currentTransaction.listener?.onRollback()
+            }
+        } catch (ex: Throwable) {
+            currentTransaction.mark(success = false)
+            throw ex
+        } finally {
+            val transactionEnded = currentTransaction.end()
+            if (transactionEnded) {
+                threadTransactionContext.set(null)
+                threadTransaction.set(null)
+            }
         }
     }
 
@@ -130,7 +148,7 @@ internal class RoomSupportSQLiteSession(val roomDatabase: RoomDatabase) {
             "Cannot perform this operation because the transaction has already been marked" +
                 "successful."
         }
-        currentTransaction.markSuccessful()
+        currentTransaction.mark(success = true)
     }
 
     fun inTransaction(): Boolean {
@@ -226,9 +244,9 @@ private constructor(
         stack.addLast(TransactionItem(listener))
     }
 
-    fun markSuccessful() {
+    fun mark(success: Boolean) {
         check(stack.isNotEmpty())
-        stack[stack.lastIndex].markedSuccessful = true
+        stack[stack.lastIndex].markedSuccessful = success
     }
 
     fun end(): Boolean {
@@ -242,6 +260,12 @@ private constructor(
             stack[stack.lastIndex].childFailed = !successful
             return false
         }
+    }
+
+    fun isSuccessful(): Boolean {
+        check(stack.isNotEmpty())
+        val item = stack[stack.lastIndex]
+        return item.markedSuccessful && !item.childFailed
     }
 
     /**

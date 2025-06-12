@@ -18,6 +18,7 @@ package androidx.room.support
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteTransactionListener
 import androidx.kruth.assertThat
 import androidx.kruth.assertThrows
 import androidx.room.Dao
@@ -446,6 +447,23 @@ class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
     }
 
     @Test
+    fun commitTransaction_withListener() {
+        val listener = TestTransactionListener()
+        wrapper.beginTransactionWithListener(listener)
+
+        assertThat(listener.onBeginCalled).isTrue()
+        assertThat(listener.onCommitCalled).isFalse()
+        assertThat(listener.onRollbackCalled).isFalse()
+
+        wrapper.setTransactionSuccessful()
+        wrapper.endTransaction()
+
+        assertThat(listener.onBeginCalled).isTrue()
+        assertThat(listener.onCommitCalled).isTrue()
+        assertThat(listener.onRollbackCalled).isFalse()
+    }
+
+    @Test
     fun commitNestedTransaction() {
         wrapper.beginTransaction()
         try {
@@ -509,6 +527,22 @@ class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
             .contains("UNIQUE constraint failed")
 
         assertThat(database.dao().getEntities()).isEmpty()
+    }
+
+    @Test
+    fun rollbackTransaction_withListener() {
+        val listener = TestTransactionListener()
+        wrapper.beginTransactionWithListener(listener)
+
+        assertThat(listener.onBeginCalled).isTrue()
+        assertThat(listener.onCommitCalled).isFalse()
+        assertThat(listener.onRollbackCalled).isFalse()
+
+        wrapper.endTransaction()
+
+        assertThat(listener.onBeginCalled).isTrue()
+        assertThat(listener.onCommitCalled).isFalse()
+        assertThat(listener.onRollbackCalled).isTrue()
     }
 
     @Test
@@ -738,5 +772,23 @@ class SupportSQLiteDatabaseWrapperTest(private val driver: Driver) {
         val wrapper1 = database.getSupportWrapper()
         val wrapper2 = database.getSupportWrapper()
         assertThat(wrapper1).isSameInstanceAs(wrapper2)
+    }
+
+    private class TestTransactionListener : SQLiteTransactionListener {
+        var onBeginCalled = false
+        var onCommitCalled = false
+        var onRollbackCalled = false
+
+        override fun onBegin() {
+            onBeginCalled = true
+        }
+
+        override fun onCommit() {
+            onCommitCalled = true
+        }
+
+        override fun onRollback() {
+            onRollbackCalled = true
+        }
     }
 }
