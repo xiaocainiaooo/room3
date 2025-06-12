@@ -1275,13 +1275,18 @@ class SurfaceTest {
 
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        // Capture the first frame of the focused animation - the focused highlight should show,
-        // so the start of the border will not be fully red
+        // There is an enter animation, so advance a small time after the animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        // The focused highlight should show, so the start of the border will not be fully red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
             assertThat(get(1, 1)).isNotEqualTo(Color.Red)
         }
 
         rule.runOnIdle { otherFocusRequester.requestFocus() }
+
+        // Advance past the exit animation
+        rule.mainClock.advanceTimeBy(500)
 
         // Focused highlight should disappear, so the border should be red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
@@ -1318,13 +1323,18 @@ class SurfaceTest {
 
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        // Capture the first frame of the focused animation - the focused highlight should show,
-        // so the start of the border will not be fully red
+        // There is an enter animation, so advance a small time after the animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        // The focused highlight should show, so the start of the border will not be fully red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
             assertThat(get(1, 1)).isNotEqualTo(Color.Red)
         }
 
         rule.runOnIdle { otherFocusRequester.requestFocus() }
+
+        // Advance past the exit animation
+        rule.mainClock.advanceTimeBy(500)
 
         // Focused highlight should disappear, so the border should be red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
@@ -1390,25 +1400,15 @@ class SurfaceTest {
         val afterAnimation2 = rule.onNodeWithTag("surface").captureToImage()
 
         rule.runOnIdle {
-            // The initial state should be equal to the state after the animation
+            // Both images after the animation has finished should be the same
             val afterAnimationResult =
                 matcher.compareBitmaps(
-                    initialFrame.toIntArray(),
                     afterAnimation.toIntArray(),
-                    initialFrame.width,
-                    initialFrame.height,
+                    afterAnimation2.toIntArray(),
+                    afterAnimation.width,
+                    afterAnimation.height,
                 )
             assertThat(afterAnimationResult.matches).isTrue()
-            // The initial state should be equal to the second state after the animation, since
-            // no further animation is happening
-            val afterAnimation2Result =
-                matcher.compareBitmaps(
-                    initialFrame.toIntArray(),
-                    afterAnimation2.toIntArray(),
-                    initialFrame.width,
-                    initialFrame.height,
-                )
-            assertThat(afterAnimation2Result.matches).isTrue()
         }
     }
 
@@ -1474,25 +1474,15 @@ class SurfaceTest {
         val afterAnimation2 = rule.onNodeWithTag("surface").captureToImage()
 
         rule.runOnIdle {
-            // The initial state should be equal to the state after the animation
+            // Both images after the animation has finished should be the same
             val afterAnimationResult =
                 matcher.compareBitmaps(
-                    initialFrame.toIntArray(),
                     afterAnimation.toIntArray(),
-                    initialFrame.width,
-                    initialFrame.height,
+                    afterAnimation2.toIntArray(),
+                    afterAnimation.width,
+                    afterAnimation.height,
                 )
             assertThat(afterAnimationResult.matches).isTrue()
-            // The initial state should be equal to the second state after the animation, since
-            // no further animation is happening
-            val afterAnimation2Result =
-                matcher.compareBitmaps(
-                    initialFrame.toIntArray(),
-                    afterAnimation2.toIntArray(),
-                    initialFrame.width,
-                    initialFrame.height,
-                )
-            assertThat(afterAnimation2Result.matches).isTrue()
         }
     }
 
@@ -1692,8 +1682,10 @@ class SurfaceTest {
 
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        // Capture the first frame of the focused animation - the focused highlight should show,
-        // so the start of the border will not be fully red
+        // There is an enter animation, so advance a small time after the animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        // The focused highlight should show, so the start of the border will not be fully red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
             assertThat(get(1, 1)).isNotEqualTo(Color.Red)
         }
@@ -1702,7 +1694,9 @@ class SurfaceTest {
         // should reset the highlight as the interaction source changed. In the future if we
         // directly delegate to focusable we would be able to maintain focus in that case
         rule.runOnIdle { interactionSource = MutableInteractionSource() }
-        rule.mainClock.advanceTimeByFrame()
+
+        // Advance past the exit animation
+        rule.mainClock.advanceTimeBy(500)
 
         // Focused highlight should disappear, so the border should be red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
@@ -1713,8 +1707,11 @@ class SurfaceTest {
         rule.runOnIdle { otherFocusRequester.requestFocus() }
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        // The new interaction source will see the new focus, so the first frame of the focused
-        // highlight should show again
+        // There is an enter animation, so advance a small time after the animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        // The new interaction source will see the new focus, so the focused highlight should show
+        // again
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
             assertThat(get(1, 1)).isNotEqualTo(Color.Red)
         }
@@ -1751,8 +1748,10 @@ class SurfaceTest {
 
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        // Capture the first frame of the focused animation - the focused highlight should show,
-        // so the start of the border will not be fully red
+        // There is an enter animation, so advance a small time after the animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        // The focused highlight should show, so the start of the border will not be fully red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
             assertThat(get(1, 1)).isNotEqualTo(Color.Red)
         }
@@ -1761,7 +1760,9 @@ class SurfaceTest {
         // should reset the highlight as the interaction source changed. In the future if we
         // directly delegate to clickable we would be able to maintain focus in that case
         rule.runOnIdle { interactionSource = MutableInteractionSource() }
-        rule.mainClock.advanceTimeByFrame()
+
+        // Advance past the exit animation
+        rule.mainClock.advanceTimeBy(500)
 
         // Focused highlight should disappear, so the border should be red
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
@@ -1772,8 +1773,11 @@ class SurfaceTest {
         rule.runOnIdle { otherFocusRequester.requestFocus() }
         rule.runOnIdle { focusRequester.requestFocus() }
 
-        // The new interaction source will see the new focus, so the first frame of the focused
-        // highlight should show again
+        // There is an enter animation, so advance a small time after the animation starts
+        rule.mainClock.advanceTimeBy(50)
+
+        // The new interaction source will see the new focus, so the focused highlight should show
+        // again
         rule.onNodeWithTag("surface").captureToImage().toPixelMap().run {
             assertThat(get(1, 1)).isNotEqualTo(Color.Red)
         }

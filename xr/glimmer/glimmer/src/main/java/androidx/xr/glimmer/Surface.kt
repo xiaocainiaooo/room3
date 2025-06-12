@@ -20,6 +20,7 @@ import android.graphics.RuntimeShader
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -55,10 +56,12 @@ import androidx.compose.ui.node.traverseAncestors
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.xr.glimmer.SurfaceDefaults.Shape
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.Language
 
@@ -311,8 +314,15 @@ private class SurfaceNode(
 
     private var interactionCollectionJob: Job? = null
 
-    private var focusedHighlightRotationProgress: Animatable<Float, AnimationVector1D>? = null
-    private var focusedAnimationJob: Job? = null
+    // Enter / exit animation progress for the width and fade effect applied to the highlight
+    private var _focusedHighlightProgress: Animatable<Float, AnimationVector1D>? = null
+    private val focusedHighlightProgress
+        get() = _focusedHighlightProgress?.value ?: 0f
+
+    // Rotation progress applied to the highlight
+    private var _focusedHighlightRotationProgress: Animatable<Float, AnimationVector1D>? = null
+    private val focusedHighlightRotationProgress
+        get() = _focusedHighlightRotationProgress?.value ?: 0f
 
     private var pressedOverlayAlpha: Animatable<Float, AnimationVector1D>? = null
     // Job that runs for a minimum duration to make sure quick presses are still visible
@@ -418,20 +428,34 @@ private class SurfaceNode(
     }
 
     private fun startFocusAnimation() {
-        stopFocusAnimation()
-        focusedHighlightRotationProgress = Animatable(0f)
-        focusedAnimationJob =
-            coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                focusedHighlightRotationProgress?.animateTo(
-                    targetValue = 1f,
-                    animationSpec = FocusedHighlightAnimationSpec,
-                )
-            }
+        _focusedHighlightProgress = _focusedHighlightProgress ?: Animatable(0f)
+        _focusedHighlightRotationProgress = _focusedHighlightRotationProgress ?: Animatable(0f)
+        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            _focusedHighlightProgress?.snapTo(0f)
+            _focusedHighlightProgress?.animateTo(
+                targetValue = 1f,
+                animationSpec = FocusedHighlightEnterAnimationSpec,
+            )
+        }
+        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            _focusedHighlightRotationProgress?.snapTo(0f)
+            _focusedHighlightRotationProgress?.animateTo(
+                targetValue = 1f,
+                animationSpec = FocusedHighlightRotationAnimationSpec,
+            )
+        }
     }
 
     private fun stopFocusAnimation() {
-        focusedAnimationJob?.cancel()
-        focusedHighlightRotationProgress = null
+        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            _focusedHighlightProgress?.animateTo(
+                targetValue = 0f,
+                animationSpec = FocusedHighlightExitAnimationSpec,
+            )
+            if (isActive) {
+                _focusedHighlightRotationProgress?.snapTo(0f)
+            }
+        }
     }
 
     override fun ContentDrawScope.draw() {
@@ -440,19 +464,34 @@ private class SurfaceNode(
         val pressedOverlayColor = PressedOverlayColor.copy(alpha = pressedOverlayAlpha?.value ?: 0f)
         drawRect(color = pressedOverlayColor)
         if (border != null) {
-            val border = border!!
-            if (isFocused) {
+            val progress = focusedHighlightProgress
+            if (progress > 0f) {
                 shader = shader ?: RuntimeShader(FocusedHighlightShader)
                 shaderBrush = shaderBrush ?: ShaderBrush(shader!!)
-                val rotationRadians = (focusedHighlightRotationProgress?.value ?: 0f) * Math.TAU
+                val rotationRadians = focusedHighlightRotationProgress * Math.TAU
                 shader!!.setFloatUniform("iResolution", size.width, size.height)
                 shader!!.setFloatUniform("iRotation", rotationRadians.toFloat())
-
+                shader!!.setFloatUniform("iAlphaProgress", progress)
                 focusedBorderLogic = focusedBorderLogic ?: BorderLogic()
                 focusedHighlightBorderLogic = focusedHighlightBorderLogic ?: BorderLogic()
-                focusedBorderWidth = focusedBorderWidth ?: { FocusedSurfaceBorderWidth }
-
-                focusedBorderLogic!!.drawBorder(this, focusedBorderWidth!!, border.brush, outline)
+                focusedBorderWidth =
+                    focusedBorderWidth
+                        ?: {
+                            val b = border
+                            if (b != null) {
+                                lerp(
+                                    b.width,
+                                    FocusedSurfaceBorderWidth,
+                                    // Capture class property instead of function-local progress to
+                                    // make sure this will read the animation state when the lambda
+                                    // is invoked and not capture a stale variable
+                                    focusedHighlightProgress,
+                                )
+                            } else {
+                                0.dp
+                            }
+                        }
+                focusedBorderLogic!!.drawBorder(this, focusedBorderWidth!!, border!!.brush, outline)
 
                 focusedHighlightBorderLogic!!.drawBorder(
                     this,
@@ -461,13 +500,14 @@ private class SurfaceNode(
                     outline,
                 )
             } else {
-                unfocusedBorderLogic.drawBorder(this, unfocusedBorderWidth, border.brush, outline)
+                unfocusedBorderLogic.drawBorder(this, unfocusedBorderWidth, border!!.brush, outline)
             }
         }
     }
 
     override fun onDetach() {
-        focusedHighlightRotationProgress = null
+        _focusedHighlightProgress = null
+        _focusedHighlightRotationProgress = null
         pressedOverlayAlpha = null
     }
 
@@ -480,7 +520,13 @@ private val DefaultSurfaceBorderWidth = 2.dp
 /** Focused border width for a [surface]. */
 private val FocusedSurfaceBorderWidth = 5.dp
 
-private val FocusedHighlightAnimationSpec: AnimationSpec<Float> =
+private val FocusedHighlightEnterAnimationSpec: AnimationSpec<Float> =
+    tween(650, easing = FastOutSlowInEasing)
+
+private val FocusedHighlightExitAnimationSpec: AnimationSpec<Float> =
+    tween(300, easing = FastOutSlowInEasing)
+
+private val FocusedHighlightRotationAnimationSpec: AnimationSpec<Float> =
     tween(durationMillis = 7000, easing = LinearOutSlowInEasing)
 
 private val PressedOverlayColor = Color.White
@@ -512,14 +558,17 @@ uniform float2 iResolution;
 // Rotation in radians. 0 radians means a horizontal gradient.
 // Positive values will have the effect of rotating the gradient clockwise.
 uniform float iRotation;
+// Alpha animation progress from 0 to 1. This will be applied to the color stops so that each
+// color stop will fade in.
+uniform float iAlphaProgress;
 
 half4 main(float2 fragCoord) {
     // Horizontal gradient
     half4 colors[4];
-    colors[0] = half4(1.0, 1.0, 1.0, 0.8); // White with 80% alpha
+    colors[0] = half4(1.0, 1.0, 1.0, 0.8 * iAlphaProgress); // White with 80% alpha
     colors[1] = half4(1.0, 1.0, 1.0, 0.0); // Transparent
     colors[2] = half4(1.0, 1.0, 1.0, 0.0); // Transparent
-    colors[3] = half4(1.0, 1.0, 1.0, 0.2); // White with 20% alpha
+    colors[3] = half4(1.0, 1.0, 1.0, 0.2 * iAlphaProgress); // White with 20% alpha
 
     // Stops for the horizontal gradient
     float stops[4];
