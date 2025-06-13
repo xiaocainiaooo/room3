@@ -73,7 +73,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun SwipeToRevealBothDirectionsNonAnchoring() {
+fun SwipeToRevealBothDirectionsNoPartialReveal() {
     ScalingLazyDemo {
         item {
             SwipeToReveal(
@@ -364,7 +364,7 @@ fun SwipeToRevealInScalingLazyColumn() {
 }
 
 @Composable
-fun SwipeToRevealSingleButtonWithAnchoring() {
+fun SwipeToRevealSingleButtonWithPartialReveal() {
     ScalingLazyDemo {
         item {
             SwipeToReveal(
