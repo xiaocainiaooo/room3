@@ -823,9 +823,13 @@ private class IndirectTouchEventProcessor(
 }
 
 // TODO(levima) Remove once ExperimentalIndirectTouchTypeApi stable b/426155641
-/** Smoothes touch input events that are too frequent and noisy */
+/**
+ * Smoothes touch input events that are too frequent and noisy
+ *
+ * TODO(levima): Remove this once b/413645371 lands and events are dispatched less frequently.
+ */
 @OptIn(ExperimentalIndirectTouchTypeApi::class)
-private class TouchInputEventSmoother() {
+internal class TouchInputEventSmoother() {
     private var rotatingIndex = 0
     private var rotatingArray = mutableListOf<IndirectTouchEvent>()
 
@@ -864,9 +868,9 @@ private class TouchInputEventSmoother() {
 }
 
 /** Converts to the axis that is most representative of motion */
-private fun Offset.toRelevantAxis(): Float = x
+internal fun Offset.toRelevantAxis(): Float = x
 
-private fun Velocity.toRelevantAxis(): Float = x
+internal fun Velocity.toRelevantAxis(): Float = x
 
 private fun Offset.overrideRelevantAxis(newValue: Float): Offset = Offset(x = newValue, y = this.y)
 

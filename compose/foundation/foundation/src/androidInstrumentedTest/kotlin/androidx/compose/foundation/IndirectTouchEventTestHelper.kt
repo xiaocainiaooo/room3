@@ -89,8 +89,8 @@ internal fun SemanticsNodeInteraction.sendIndirectTouchMoveEvents(
 
 @OptIn(ExperimentalIndirectTouchTypeApi::class)
 internal fun SemanticsNodeInteraction.sendIndirectTouchReleaseEvent(
-    currentTime: Long,
-    currentValue: Float,
+    currentTime: Long = SystemClock.uptimeMillis(),
+    currentValue: Float = (TouchPadEnd - TouchPadStart) / 2f,
 ) {
     val up =
         MotionEvent.obtain(
@@ -106,8 +106,8 @@ internal fun SemanticsNodeInteraction.sendIndirectTouchReleaseEvent(
 
 @OptIn(ExperimentalIndirectTouchTypeApi::class)
 internal fun SemanticsNodeInteraction.sendIndirectTouchPressEvent(
-    currentTime: Long,
-    currentValue: Float,
+    currentTime: Long = SystemClock.uptimeMillis(),
+    currentValue: Float = (TouchPadEnd - TouchPadStart) / 2f,
 ) {
     val down =
         MotionEvent.obtain(
@@ -134,7 +134,7 @@ internal fun SemanticsNodeInteraction.sendIndirectSwipeForward() {
 }
 
 @OptIn(ExperimentalIndirectTouchTypeApi::class)
-internal fun SemanticsNodeInteraction.sendIndirectTouchCancelEvent() {
+internal fun SemanticsNodeInteraction.sendIndirectTouchCancelEvent(sendMoveEvents: Boolean = true) {
     val stepSize = (TouchPadEnd - TouchPadStart) / 5
     var currentTime = SystemClock.uptimeMillis()
     var currentValue = TouchPadStart
@@ -143,12 +143,22 @@ internal fun SemanticsNodeInteraction.sendIndirectTouchCancelEvent() {
     currentTime += 16L
     currentValue += stepSize
 
-    val (newCurrentTime, newCurrentValue) =
+    if (sendMoveEvents) {
         sendIndirectTouchMoveEvents(5, currentTime, currentValue, 16L, 1, stepSize)
+    }
 
     val cancel =
         MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_CANCEL, Offset.Zero.y, Offset.Zero.y, 0)
     performIndirectTouchEvent(IndirectTouchEvent(cancel))
+}
+
+internal fun SemanticsNodeInteraction.sendIndirectPressReleaseEvent() {
+    val currentTime = SystemClock.uptimeMillis()
+    val currentValue = (TouchPadEnd - TouchPadStart) / 2
+    sendIndirectTouchPressEvent(currentTime, currentValue)
+    val (newCurrentTime, newCurrentValue) =
+        sendIndirectTouchMoveEvents(1, currentTime, currentValue, 16L, 1, 0f)
+    sendIndirectTouchReleaseEvent(newCurrentTime, newCurrentValue)
 }
 
 internal const val TouchPadEnd = 1000f
