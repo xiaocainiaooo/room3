@@ -416,10 +416,10 @@ public final class SupportedSurfaceCombination {
             int imageFormat,
             Size size) {
         return SurfaceConfig.transformSurfaceConfig(
-                cameraMode,
                 imageFormat,
                 size,
                 getUpdatedSurfaceSizeDefinitionByFormat(imageFormat),
+                cameraMode,
                 // FEATURE_COMBINATION_TABLE N/A for the code flows leading to this call
                 CAPTURE_SESSION_TABLES);
     }
@@ -1413,10 +1413,10 @@ public final class SupportedSurfaceCombination {
             int imageFormat = useCaseConfig.getInputFormat();
             surfaceConfigs.add(
                     SurfaceConfig.transformSurfaceConfig(
-                            featureSettings.getCameraMode(),
                             imageFormat,
                             minSize,
                             getUpdatedSurfaceSizeDefinitionByFormat(imageFormat),
+                            featureSettings.getCameraMode(),
                             // Feature combo src not needed for the code flows leading to this call
                             CAPTURE_SESSION_TABLES));
         }
@@ -1519,8 +1519,8 @@ public final class SupportedSurfaceCombination {
             @NonNull Map<ConfigSize, Set<Integer>> configSizeToUniqueMaxFpsMap,
             @NonNull List<Size> reducedSizeList) {
         ConfigSize configSize = SurfaceConfig.transformSurfaceConfig(
-                featureSettings.getCameraMode(), imageFormat, size,
-                getUpdatedSurfaceSizeDefinitionByFormat(imageFormat),
+                imageFormat, size, getUpdatedSurfaceSizeDefinitionByFormat(imageFormat),
+                featureSettings.getCameraMode(),
                 featureSettings.requiresFeatureComboQuery() ? FEATURE_COMBINATION_TABLE
                         : CAPTURE_SESSION_TABLES).getConfigSize();
 
@@ -1609,10 +1609,10 @@ public final class SupportedSurfaceCombination {
                     featureSettings.requiresFeatureComboQuery() ? FEATURE_COMBINATION_TABLE
                             : CAPTURE_SESSION_TABLES;
             SurfaceConfig surfaceConfig = SurfaceConfig.transformSurfaceConfig(
-                    featureSettings.getCameraMode(),
                     imageFormat,
                     size,
                     getUpdatedSurfaceSizeDefinitionByFormat(imageFormat),
+                    featureSettings.getCameraMode(),
                     configSource);
             surfaceConfigList.add(surfaceConfig);
             if (surfaceConfigIndexUseCaseConfigMap != null) {
