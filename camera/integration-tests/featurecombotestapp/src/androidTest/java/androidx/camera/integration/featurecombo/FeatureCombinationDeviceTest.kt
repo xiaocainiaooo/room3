@@ -16,10 +16,8 @@
 
 package androidx.camera.integration.featurecombo
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.hardware.DataSpace
 import android.hardware.DataSpace.TRANSFER_HLG
@@ -59,6 +57,7 @@ import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.GLUtil
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.SurfaceTextureProvider.createSurfaceTextureProvider
+import androidx.camera.testing.impl.UltraHdrImageVerification.assertJpegUltraHdr
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
 import androidx.camera.testing.impl.util.Camera2InteropUtil
@@ -66,7 +65,6 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
-import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.util.concurrent.CountDownLatch
@@ -80,7 +78,6 @@ import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -108,14 +105,6 @@ class FeatureCombinationDeviceTest(
     @get:Rule
     val cameraPipeConfigTestRule =
         CameraPipeConfigTestRule(active = implName == CameraPipeConfig::class.simpleName)
-
-    @get:Rule
-    val externalStorageRule: GrantPermissionRule =
-        GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-    @get:Rule
-    val temporaryFolder =
-        TemporaryFolder(ApplicationProvider.getApplicationContext<Context>().cacheDir)
 
     @get:Rule val wakelockEmptyActivityRule = WakelockEmptyActivityRule()
 
@@ -379,15 +368,7 @@ class FeatureCombinationDeviceTest(
 
         val imageCapture = useCases.filterIsInstance<ImageCapture>().first()
 
-        val saveLocation = temporaryFolder.newFile("test.jpg")
-        val outputFileOptions = ImageCapture.OutputFileOptions.Builder(saveLocation).build()
-
-        imageCapture.takePicture(outputFileOptions)
-
-        // Check gainmap exits.
-        val bitmap = BitmapFactory.decodeFile(saveLocation.absolutePath)
-        assertThat(bitmap).isNotNull()
-        assertThat(bitmap.hasGainmap()).isTrue()
+        imageCapture.takePicture().assertJpegUltraHdr()
     }
 
     private suspend fun <T> verifyCaptureResult(
