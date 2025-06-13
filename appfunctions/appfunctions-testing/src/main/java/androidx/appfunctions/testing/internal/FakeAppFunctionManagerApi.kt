@@ -16,23 +16,51 @@
 
 package androidx.appfunctions.testing.internal
 
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.appfunctions.AppFunctionFunctionNotFoundException
 import androidx.appfunctions.ExecuteAppFunctionRequest
 import androidx.appfunctions.ExecuteAppFunctionResponse
 import androidx.appfunctions.internal.AppFunctionManagerApi
 
 // TODO: b/418017070 - Implement
-internal class FakeAppFunctionManagerApi : AppFunctionManagerApi {
+internal class FakeAppFunctionManagerApi(
+    private val context: Context,
+    private val appFunctionReader: FakeAppFunctionReader,
+) : AppFunctionManagerApi {
     override suspend fun executeAppFunction(
         request: ExecuteAppFunctionRequest
     ): ExecuteAppFunctionResponse {
         TODO("Not yet implemented")
     }
 
-    override suspend fun isAppFunctionEnabled(packageName: String, functionId: String): Boolean {
-        TODO("Not yet implemented")
-    }
+    @RequiresApi(Build.VERSION_CODES.S)
+    override suspend fun isAppFunctionEnabled(packageName: String, functionId: String): Boolean =
+        appFunctionReader.getAppFunctionMetadata(packageName, functionId)?.isEnabled
+            ?: throw AppFunctionFunctionNotFoundException(
+                "No function found with id: $functionId under package: $packageName"
+            )
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override suspend fun setAppFunctionEnabled(functionId: String, newEnabledState: Int) {
-        TODO("Not yet implemented")
+        val appFunctionStaticAndRuntimeMetadata =
+            appFunctionReader.getAppFunctionStaticAndRuntimeMetadata(
+                context.packageName,
+                functionId,
+            )
+                ?: throw AppFunctionFunctionNotFoundException(
+                    "No function found with id: $functionId"
+                )
+
+        appFunctionReader.setAppFunctionStaticAndRuntimeMetadata(
+            context.packageName,
+            appFunctionStaticAndRuntimeMetadata.copy(
+                runtimeMetadata =
+                    appFunctionStaticAndRuntimeMetadata.runtimeMetadata.copy(
+                        enabled = newEnabledState
+                    )
+            ),
+        )
     }
 }
