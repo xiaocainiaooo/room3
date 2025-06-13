@@ -93,6 +93,7 @@ import androidx.camera.core.impl.SessionConfig.SESSION_TYPE_REGULAR
 import androidx.camera.core.impl.StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
 import androidx.camera.core.impl.SurfaceCombination
 import androidx.camera.core.impl.SurfaceConfig
+import androidx.camera.core.impl.SurfaceConfig.Companion.DEFAULT_STREAM_USE_CASE
 import androidx.camera.core.impl.SurfaceConfig.ConfigSize
 import androidx.camera.core.impl.SurfaceConfig.ConfigSize.S1440P_16_9
 import androidx.camera.core.impl.SurfaceConfig.ConfigSize.S1440P_4_3
@@ -768,6 +769,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.YUV_420_888,
                 vgaSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.YUV, ConfigSize.VGA)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -788,6 +790,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.YUV_420_888,
                 previewSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.YUV, ConfigSize.PREVIEW)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -808,6 +811,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.YUV_420_888,
                 recordSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.YUV, ConfigSize.RECORD)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -828,6 +832,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.YUV_420_888,
                 maximumSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.YUV, ConfigSize.MAXIMUM)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -848,6 +853,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.JPEG,
                 vgaSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG, ConfigSize.VGA)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -868,6 +874,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.JPEG,
                 previewSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG, ConfigSize.PREVIEW)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -888,6 +895,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.JPEG,
                 recordSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG, ConfigSize.RECORD)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -908,6 +916,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 ImageFormat.JPEG,
                 maximumSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG, ConfigSize.MAXIMUM)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -930,6 +939,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.CONCURRENT_CAMERA,
                 PRIVATE,
                 RESOLUTION_720P,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.PRIV, S720P_16_9)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -952,6 +962,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.CONCURRENT_CAMERA,
                 ImageFormat.YUV_420_888,
                 RESOLUTION_720P,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.YUV, S720P_16_9)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -974,6 +985,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.CONCURRENT_CAMERA,
                 ImageFormat.JPEG,
                 RESOLUTION_720P,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG, S720P_16_9)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -996,6 +1008,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.CONCURRENT_CAMERA,
                 PRIVATE,
                 RESOLUTION_1440P,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.PRIV, S1440P_4_3)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -1018,6 +1031,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.CONCURRENT_CAMERA,
                 ImageFormat.YUV_420_888,
                 RESOLUTION_1440P,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.YUV, S1440P_4_3)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -1040,6 +1054,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.CONCURRENT_CAMERA,
                 ImageFormat.JPEG,
                 RESOLUTION_1440P,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG, S1440P_4_3)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -1069,6 +1084,7 @@ class SupportedSurfaceCombinationTest {
                     CameraMode.DEFAULT,
                     PRIVATE,
                     ultraHighMaximumSize,
+                    DEFAULT_STREAM_USE_CASE,
                 )
             )
             .isEqualTo(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.ULTRA_MAXIMUM))
@@ -1077,6 +1093,7 @@ class SupportedSurfaceCombinationTest {
                     CameraMode.DEFAULT,
                     ImageFormat.YUV_420_888,
                     ultraHighMaximumSize,
+                    DEFAULT_STREAM_USE_CASE,
                 )
             )
             .isEqualTo(SurfaceConfig.create(ConfigType.YUV, ConfigSize.ULTRA_MAXIMUM))
@@ -1085,6 +1102,7 @@ class SupportedSurfaceCombinationTest {
                     CameraMode.DEFAULT,
                     ImageFormat.JPEG,
                     ultraHighMaximumSize,
+                    DEFAULT_STREAM_USE_CASE,
                 )
             )
             .isEqualTo(SurfaceConfig.create(ConfigType.JPEG, ConfigSize.ULTRA_MAXIMUM))
@@ -1108,6 +1126,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 JPEG_R,
                 recordSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG_R, ConfigSize.RECORD)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)
@@ -1131,6 +1150,7 @@ class SupportedSurfaceCombinationTest {
                 CameraMode.DEFAULT,
                 JPEG_R,
                 maximumSize,
+                DEFAULT_STREAM_USE_CASE,
             )
         val expectedSurfaceConfig = SurfaceConfig.create(ConfigType.JPEG_R, ConfigSize.MAXIMUM)
         assertThat(surfaceConfig).isEqualTo(expectedSurfaceConfig)

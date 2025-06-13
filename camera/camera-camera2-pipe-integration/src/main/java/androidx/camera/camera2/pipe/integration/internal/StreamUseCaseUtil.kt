@@ -310,7 +310,7 @@ public object StreamUseCaseUtil {
             availableStreamUseCaseSet.add(availableStreamUseCase)
         }
         for (surfaceConfig in surfaceConfigs) {
-            if (!availableStreamUseCaseSet.contains(surfaceConfig.streamUseCase)) {
+            if (!availableStreamUseCaseSet.contains(surfaceConfig.streamUseCase.value)) {
                 return false
             }
         }
@@ -374,7 +374,7 @@ public object StreamUseCaseUtil {
     ): Boolean {
         for (i in surfaceConfigsWithStreamUseCase.indices) {
             // Verify that the use case has the eligible capture type the given stream use case.
-            val streamUseCase = surfaceConfigsWithStreamUseCase[i].streamUseCase
+            val streamUseCase = surfaceConfigsWithStreamUseCase[i].streamUseCase.value
             if (surfaceConfigIndexAttachedSurfaceInfoMap.containsKey(i)) {
                 val attachedSurfaceInfo = surfaceConfigIndexAttachedSurfaceInfoMap[i]
                 if (
@@ -428,7 +428,7 @@ public object StreamUseCaseUtil {
     ) {
         // Populate StreamSpecs with stream use cases.
         for (i in surfaceConfigsWithStreamUseCase.indices) {
-            val streamUseCase = surfaceConfigsWithStreamUseCase[i].streamUseCase
+            val streamUseCase = surfaceConfigsWithStreamUseCase[i].streamUseCase.value
             if (surfaceConfigIndexAttachedSurfaceInfoMap.containsKey(i)) {
                 val attachedSurfaceInfo = surfaceConfigIndexAttachedSurfaceInfoMap[i]
                 val oldImplementationOptions = attachedSurfaceInfo!!.implementationOptions

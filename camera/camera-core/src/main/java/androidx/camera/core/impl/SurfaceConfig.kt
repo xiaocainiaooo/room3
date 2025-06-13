@@ -32,11 +32,11 @@ import androidx.camera.core.internal.utils.SizeUtil
 public data class SurfaceConfig(
     public val configType: ConfigType,
     public val configSize: ConfigSize,
-    public val streamUseCase: Long = DEFAULT_STREAM_USE_CASE_VALUE,
+    public val streamUseCase: StreamUseCase = DEFAULT_STREAM_USE_CASE,
 ) {
 
     public companion object {
-        public const val DEFAULT_STREAM_USE_CASE_VALUE: Long = 0
+        @JvmField public val DEFAULT_STREAM_USE_CASE: StreamUseCase = StreamUseCase.DEFAULT
 
         private val FEATURE_COMBO_QUERY_SUPPORTED_SIZES: Array<ConfigSize> =
             arrayOf(
@@ -66,7 +66,7 @@ public data class SurfaceConfig(
         public fun create(
             type: ConfigType,
             size: ConfigSize,
-            streamUseCase: Long = DEFAULT_STREAM_USE_CASE_VALUE,
+            streamUseCase: StreamUseCase = DEFAULT_STREAM_USE_CASE,
         ): SurfaceConfig {
             return SurfaceConfig(type, size, streamUseCase)
         }
@@ -102,6 +102,7 @@ public data class SurfaceConfig(
             surfaceSizeDefinition: SurfaceSizeDefinition,
             @CameraMode.Mode cameraMode: Int = CameraMode.DEFAULT,
             configSource: ConfigSource = ConfigSource.CAPTURE_SESSION_TABLES,
+            streamUseCase: StreamUseCase = DEFAULT_STREAM_USE_CASE,
         ): SurfaceConfig {
             val configType = getConfigType(imageFormat)
             var configSize = ConfigSize.NOT_SUPPORT
@@ -161,7 +162,7 @@ public data class SurfaceConfig(
                 }
             }
 
-            return create(configType, configSize)
+            return create(type = configType, size = configSize, streamUseCase = streamUseCase)
         }
     }
 
