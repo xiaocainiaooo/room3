@@ -29,11 +29,12 @@ import java.util.function.Consumer
 
 /**
  * The SpatialEnvironment is used to manage the XR background and passthrough. There is a single
- * instance of this class managed by each SceneCore Session (which is bound to an [Activity].)
+ * instance of this class managed by each [Session] and it is accessible through Session.scene.
  *
- * The SpatialEnvironment is a composite of a stand-alone skybox, and glTF-specified geometry. A
- * single skybox and a single glTF can be set at the same time. Applications are encouraged to
- * supply glTFs for ground and horizon visibility.
+ * The SpatialEnvironment is a composite of a stand-alone skybox, and of a
+ * [glTF](https://www.khronos.org/Gltf)-specified geometry. A single skybox and a single glTF can be
+ * set at the same time. Applications are encouraged to supply glTFs for ground and horizon
+ * visibility.
  *
  * The XR background can be set to display one of three configurations:
  * 1) A combination of a skybox and glTF geometry.
@@ -47,10 +48,7 @@ import java.util.function.Consumer
  * preference that will be applied when the device enters a state where the XR background can be
  * changed.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
-
-    private val TAG = "SpatialEnvironment"
 
     private val rtEnvironment: RtSpatialEnvironment = runtime.spatialEnvironment
 
@@ -61,24 +59,57 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      *   null, it will be all black.
      * @param geometry The preferred geometry for the environment based on a pre-loaded [GltfModel].
      *   If null, there will be no geometry.
-     * @param geometryMaterial The material to override a given mesh in the geometry. If null, the
-     *   material will not override any mesh.
-     * @param geometryMeshName The name of the mesh to override with the material. If null, the
-     *   material will not override any mesh.
-     * @param geometryAnimationName The name of the animation to play on the geometry. If null, the
-     *   geometry will not play any animation. Note that the animation will be played in loop.
-     * @throws IllegalStateException if the material is not properly set up and if the geometry glTF
-     *   model does not contain the mesh or the animation name.
      */
-    public class SpatialEnvironmentPreference
-    @JvmOverloads
-    constructor(
+    public class SpatialEnvironmentPreference(
         public val skybox: ExrImage?,
         public val geometry: GltfModel?,
-        internal val geometryMaterial: Material? = null,
-        internal val geometryMeshName: String? = null,
-        internal val geometryAnimationName: String? = null,
     ) {
+
+        /**
+         * The material to override a given mesh in the geometry. If null, the material will not
+         * override any mesh.
+         */
+        internal var geometryMaterial: Material? = null
+            private set
+
+        /**
+         * The name of the mesh to override with the material. If null, the material will not
+         * override any mesh.
+         */
+        internal var geometryMeshName: String? = null
+            private set
+
+        /**
+         * The name of the animation to play on the geometry. If null, the geometry will not play
+         * any animation. Note that the animation will be played in loop.
+         */
+        internal var geometryAnimationName: String? = null
+            private set
+
+        /**
+         * Represents the preferred spatial environment for the application.
+         *
+         * @param skybox The preferred skybox for the environment.
+         * @param geometry The preferred geometry for the environment.
+         * @param geometryMaterial The material to override a given mesh in the geometry.
+         * @param geometryMeshName The name of the mesh to override with the material.
+         * @param geometryAnimationName The name of the animation to play on the geometry.
+         * @throws IllegalStateException if the material is not properly set up and if the geometry
+         *   glTF model does not contain the mesh or the animation name.
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+        @JvmOverloads
+        internal constructor(
+            skybox: ExrImage?,
+            geometry: GltfModel?,
+            geometryMaterial: Material?,
+            geometryMeshName: String? = null,
+            geometryAnimationName: String? = null,
+        ) : this(skybox, geometry) {
+            this.geometryMaterial = geometryMaterial
+            this.geometryMeshName = geometryMeshName
+            this.geometryAnimationName = geometryAnimationName
+        }
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
