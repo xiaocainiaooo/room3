@@ -69,6 +69,7 @@ androidXMultiplatform {
             }
         }
     }
+    provideKlibStdLibForTests()
 }
 
 dependencies {

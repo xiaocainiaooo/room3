@@ -45,8 +45,8 @@ index 64ca70606b5..c948188bbf1 100644
 +import org.jetbrains.kotlin.library.abi.AbiValueParameterKind
  import org.jetbrains.kotlin.library.abi.ExperimentalLibraryAbiReader
  import org.jetbrains.kotlin.library.abi.LibraryAbi
- 
-@@ -759,6 +760,8 @@ private fun File.asBaselineErrors(): Set<String> =
+ import org.jetbrains.kotlin.library.abi.LibraryAbiReader
+@@ -844,6 +845,8 @@ private class DecoratedAbiProperty(abiProperty: AbiProperty, val parentClass: Ab
  private class DecoratedAbiValueParameter(val index: Int, param: AbiValueParameter) :
      AbiValueParameter by param
  
