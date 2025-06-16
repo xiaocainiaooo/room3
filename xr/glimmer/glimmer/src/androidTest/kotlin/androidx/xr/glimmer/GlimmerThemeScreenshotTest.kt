@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.xr.glimmer.samples.ColorsSample
+import androidx.xr.glimmer.samples.ShapesSample
 import androidx.xr.glimmer.samples.TypographySample
 import org.junit.Rule
 import org.junit.Test
@@ -43,5 +44,11 @@ class GlimmerThemeScreenshotTest() {
     fun typography() {
         rule.setGlimmerThemeContent { TypographySample() }
         rule.assertRootAgainstGolden("glimmerTheme_typography", screenshotRule)
+    }
+
+    @Test
+    fun shapes() {
+        rule.setGlimmerThemeContent { ShapesSample() }
+        rule.assertRootAgainstGolden("glimmerTheme_shapes", screenshotRule)
     }
 }
