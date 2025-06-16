@@ -17,11 +17,15 @@
 package androidx.appfunctions.testing
 
 import android.os.Build
+import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.AppFunctionManagerCompat
 import androidx.appfunctions.AppFunctionSearchSpec
+import androidx.appfunctions.ExecuteAppFunctionRequest
+import androidx.appfunctions.ExecuteAppFunctionResponse
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertIs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,9 +37,11 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
+@Config(minSdk = Build.VERSION_CODES.TIRAMISU)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.TIRAMISU)
 class AppFunctionTestEnvironmentTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
@@ -120,6 +126,32 @@ class AppFunctionTestEnvironmentTest {
             )
 
             assertThat(appFunctionManagerCompat.isAppFunctionEnabled(functionId)).isTrue()
+        }
+
+    @Test
+    fun executeAppFunction_success() =
+        runBlocking<Unit> {
+            val appFunctionManagerCompat = appFunctionTestEnvironment.getAppFunctionManagerCompat()
+            val response =
+                appFunctionManagerCompat.executeAppFunction(
+                    request =
+                        ExecuteAppFunctionRequest(
+                            context.packageName,
+                            "androidx.appfunctions.testing.TestFunctions#add",
+                            AppFunctionData.Builder("")
+                                .setLong("num1", 1)
+                                .setLong("num2", 2)
+                                .build(),
+                        )
+                )
+
+            val successResponse = assertIs<ExecuteAppFunctionResponse.Success>(response)
+            assertThat(
+                    successResponse.returnValue.getLong(
+                        ExecuteAppFunctionResponse.Success.PROPERTY_RETURN_VALUE
+                    )
+                )
+                .isEqualTo(3)
         }
 
     @Test

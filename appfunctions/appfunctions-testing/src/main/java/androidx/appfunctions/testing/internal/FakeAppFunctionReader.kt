@@ -123,9 +123,11 @@ internal class FakeAppFunctionReader(context: Context) : AppFunctionReader {
     override suspend fun getAppFunctionSchemaMetadata(
         functionId: String,
         packageName: String,
-    ): AppFunctionSchemaMetadata? {
-        TODO("Not yet implemented")
-    }
+    ): AppFunctionSchemaMetadata? =
+        packageToFunctionMetadataMapState.value[packageName]
+            ?.get(functionId)
+            ?.staticMetadata
+            ?.schema
 }
 
 internal data class AppFunctionRuntimeMetadata(
