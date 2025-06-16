@@ -119,12 +119,9 @@ class EnvironmentTestActivity : ComponentActivity() {
      */
     private fun setGeoAndSkybox(skybox: ExrImage?, geometry: GltfModel?) {
         spatialEnvironmentPreference = SpatialEnvironmentPreference(skybox, geometry)
-        val returnObj =
-            session.scene.spatialEnvironment.setSpatialEnvironmentPreference(
-                spatialEnvironmentPreference
-            )
+        session.scene.spatialEnvironment.preferredSpatialEnvironment = spatialEnvironmentPreference
         lastApiCall =
-            "set spatial environment preference to ${session.scene.spatialEnvironment.getSpatialEnvironmentPreference()?.info()} returned with value ${returnObj}, but current actual mode shown is ${session.scene.spatialEnvironment.isSpatialEnvironmentPreferenceActive()}"
+            "set spatial environment preference to ${session.scene.spatialEnvironment.preferredSpatialEnvironment?.info()}, but current actual mode shown is ${session.scene.spatialEnvironment.isPreferredSpatialEnvironmentActive}"
 
         Log.i(TAG, lastApiCall)
     }
@@ -186,7 +183,7 @@ class EnvironmentTestActivity : ComponentActivity() {
 
             Text(
                 text =
-                    "Is Spatial Environment Preference Active? ${session.scene.spatialEnvironment.isSpatialEnvironmentPreferenceActive()}",
+                    "Is Spatial Environment Preference Active? ${session.scene.spatialEnvironment.isPreferredSpatialEnvironmentActive}",
                 fontSize = 30.sp,
             )
             Text(text = "Last API Call: ${lastApiCall}", fontSize = 20.sp)
@@ -286,9 +283,8 @@ class EnvironmentTestActivity : ComponentActivity() {
             onClick = {
                 spatialEnvironmentPreference = SpatialEnvironmentPreference(blueSkybox, groundGeo)
                 lastApiCall = "setBothGeometryAndSkybox"
-                session.scene.spatialEnvironment.setSpatialEnvironmentPreference(
+                session.scene.spatialEnvironment.preferredSpatialEnvironment =
                     spatialEnvironmentPreference
-                )
             }
         ) {
             Text(text = "Set both Geometry and Skybox (Ground, Blue)", fontSize = 30.sp)
@@ -303,7 +299,7 @@ class EnvironmentTestActivity : ComponentActivity() {
             onClick = {
                 spatialEnvironmentPreference = null
                 lastApiCall = "revertToSystemDefaultGeometryAndSkybox"
-                session.scene.spatialEnvironment.setSpatialEnvironmentPreference(null)
+                session.scene.spatialEnvironment.preferredSpatialEnvironment = null
             }
         ) {
             Text(text = "Unset both Geometry and Skybox preference", fontSize = 30.sp)

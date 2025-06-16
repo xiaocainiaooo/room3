@@ -21,9 +21,7 @@ package androidx.xr.scenecore
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.JxrPlatformAdapter
 import androidx.xr.runtime.internal.SpatialEnvironment as RtSpatialEnvironment
-import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult as RtSetSpatialEnvironmentPreferenceResult
 import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference as RtSpatialEnvironmentPreference
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 import java.util.concurrent.Executor
 import java.util.function.Consumer
 
@@ -181,42 +179,27 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
     }
 
     /**
-     * Returns true if the environment set by [setSpatialEnvironmentPreference] is active.
+     * Checks if the application's preferred spatial environment set through
+     * [preferredSpatialEnvironment] is active.
      *
-     * Spatial environment preference set through [setSpatialEnvironmentPreference] are shown when
-     * this is true, but passthrough or other objects in the scene could partially or totally
-     * occlude them. When this is false, the default system environment will be active instead.
+     * Spatial environment preference set through [preferredSpatialEnvironment] are shown when this
+     * is true, but passthrough or other objects in the scene could partially or totally occlude
+     * them. When this is false, the default system environment will be active instead.
      *
-     * @return True if the environment set by [setSpatialEnvironmentPreference] is active.
+     * @return True if the environment set by [preferredSpatialEnvironment] is active.
      */
-    public fun isSpatialEnvironmentPreferenceActive(): Boolean {
-        return rtEnvironment.isSpatialEnvironmentPreferenceActive()
-    }
+    public val isPreferredSpatialEnvironmentActive: Boolean
+        get() = rtEnvironment.isPreferredSpatialEnvironmentActive
 
     /**
-     * Gets the preferred spatial environment for the application.
+     * The preferred spatial environment for the application.
      *
-     * The returned value is always what was most recently supplied to
-     * [setSpatialEnvironmentPreference], or null if no preference has been set.
+     * If no preference has ever been set by the application, this will be null.
      *
-     * See [isSpatialEnvironmentPreferenceActive] or the [addOnSpatialEnvironmentChangedListener]
-     * listeners to know when this preference becomes active.
-     *
-     * @return The most recent spatial environment preference supplied to
-     *   [setSpatialEnvironmentPreference]. If null, the default system environment will be
-     *   displayed instead.
-     */
-    public fun getSpatialEnvironmentPreference(): SpatialEnvironmentPreference? {
-        return rtEnvironment.spatialEnvironmentPreference?.toSpatialEnvironmentPreference()
-    }
-
-    /**
-     * Sets the preferred spatial environment for the application.
-     *
-     * Note that this method only sets a preference and does not cause an immediate change unless
-     * [isSpatialEnvironmentPreferenceActive] is already true. Once the device enters a state where
+     * Setting this property only sets the preference and does not cause an immediate change unless
+     * [isPreferredSpatialEnvironmentActive] is already true. Once the device enters a state where
      * the XR background can be changed and the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS] capability is available, the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT] capability is available, the
      * preferred spatial environment for the application will be automatically displayed.
      *
      * Setting the preference to null will disable the preferred spatial environment for the
@@ -225,34 +208,22 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      * If the given [SpatialEnvironmentPreference] is not null, but all of its properties are null,
      * then the spatial environment will consist of a black skybox and no geometry.
      *
-     * Changes to the Environment state will be notified via listeners added with
-     * [addOnSpatialEnvironmentChangedListener].
-     *
-     * @param environmentPreference The preferred spatial environment for the application. If null,
-     *   then there is no preference, and the default system environment will be displayed instead.
-     * @return The result of the call to set the spatial environment preference. If the preference
-     *   was successfully set and applied, the result will be
-     *   [SetSpatialEnvironmentPreferenceChangeApplied]. If the preference was set, but it cannot be
-     *   currently applied, the result will be [SetSpatialEnvironmentPreferenceChangePending].
+     * See [isPreferredSpatialEnvironmentActive] or the [addOnSpatialEnvironmentChangedListener]
+     * listeners to know when this preference becomes active.
      */
-    @CanIgnoreReturnValue
-    public fun setSpatialEnvironmentPreference(
-        environmentPreference: SpatialEnvironmentPreference?
-    ): SetSpatialEnvironmentPreferenceResult {
-        return rtEnvironment
-            .setSpatialEnvironmentPreference(
-                environmentPreference?.toRtSpatialEnvironmentPreference()
-            )
-            .toSetSpatialEnvironmentPreferenceResult()
-    }
+    public var preferredSpatialEnvironment: SpatialEnvironmentPreference?
+        get() = rtEnvironment.preferredSpatialEnvironment?.toSpatialEnvironmentPreference()
+        set(value) {
+            rtEnvironment.preferredSpatialEnvironment = value?.toRtSpatialEnvironmentPreference()
+        }
 
     /**
      * Notifies an application whether or not the preferred spatial environment for the application
      * is active.
      *
      * The environment will try to transition to the application environment when a non-null
-     * preference is set through [setSpatialEnvironmentPreference] and the application has the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS] capability. The environment
+     * preference is set through [preferredSpatialEnvironment] and the application has the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT] capability. The environment
      * preferences will otherwise not be active.
      *
      * The listener consumes a boolean value that is true if the environment preference is active
@@ -272,7 +243,7 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      * is active.
      *
      * The environment will try to transition to the application environment when a non-null
-     * preference is set through [setSpatialEnvironmentPreference] and the application has the
+     * preference is set through [preferredSpatialEnvironment] and the application has the
      * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT] capability. The environment
      * preferences will otherwise not be active.
      *
@@ -300,23 +271,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
     public fun removeOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>) {
         rtEnvironment.removeOnSpatialEnvironmentChangedListener(listener)
     }
-
-    /** Result values for calls to SpatialEnvironment.setSpatialEnvironmentPreference */
-    public sealed class SetSpatialEnvironmentPreferenceResult()
-
-    /** The call to [setSpatialEnvironmentPreference] succeeded and should now be visible. */
-    public class SetSpatialEnvironmentPreferenceChangeApplied :
-        SetSpatialEnvironmentPreferenceResult()
-
-    /**
-     * The call to [setSpatialEnvironmentPreference] successfully applied the preference, but it is
-     * not immediately visible due to requesting a state change while the activity does not have the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS] capability to control the app
-     * environment state. The preference was still set and will be applied when the capability is
-     * gained.
-     */
-    public class SetSpatialEnvironmentPreferenceChangePending :
-        SetSpatialEnvironmentPreferenceResult()
 }
 
 internal fun SpatialEnvironment.SpatialEnvironmentPreference.toRtSpatialEnvironmentPreference():
@@ -339,16 +293,4 @@ internal fun RtSpatialEnvironmentPreference.toSpatialEnvironmentPreference():
         geometryMeshName,
         geometryAnimationName,
     )
-}
-
-internal fun Int.toSetSpatialEnvironmentPreferenceResult():
-    SpatialEnvironment.SetSpatialEnvironmentPreferenceResult {
-    return when (this) {
-        RtSetSpatialEnvironmentPreferenceResult.CHANGE_APPLIED ->
-            SpatialEnvironment.SetSpatialEnvironmentPreferenceChangeApplied()
-        RtSetSpatialEnvironmentPreferenceResult.CHANGE_PENDING ->
-            SpatialEnvironment.SetSpatialEnvironmentPreferenceChangePending()
-        else ->
-            throw IllegalArgumentException("Unknown SetSpatialEnvironmentPreferenceResult: $this")
-    }
 }

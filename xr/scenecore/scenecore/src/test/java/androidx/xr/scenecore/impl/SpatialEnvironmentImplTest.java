@@ -30,8 +30,6 @@ import static org.mockito.Mockito.when;
 import android.app.Activity;
 
 import androidx.xr.runtime.internal.MaterialResource;
-import androidx.xr.runtime.internal.SpatialEnvironment;
-import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult;
 import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 
@@ -42,7 +40,6 @@ import com.android.extensions.xr.environment.PassthroughVisibilityState;
 import com.android.extensions.xr.environment.ShadowEnvironmentVisibilityState;
 import com.android.extensions.xr.environment.ShadowPassthroughVisibilityState;
 import com.android.extensions.xr.node.Node;
-import com.android.extensions.xr.space.ShadowSpatialCapabilities;
 import com.android.extensions.xr.space.ShadowSpatialState;
 import com.android.extensions.xr.space.SpatialState;
 
@@ -221,15 +218,15 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void getSpatialEnvironmentPreference_returnsSetSpatialEnvironmentPreference() {
+    public void getPreferredSpatialEnvironment_returnsSetPreferredSpatialEnvironment() {
         SpatialEnvironmentPreference preference = new SpatialEnvironmentPreference(null, null);
-        mEnvironment.setSpatialEnvironmentPreference(preference);
-        assertThat(mEnvironment.getSpatialEnvironmentPreference()).isEqualTo(preference);
+        mEnvironment.setPreferredSpatialEnvironment(preference);
+        assertThat(mEnvironment.getPreferredSpatialEnvironment()).isEqualTo(preference);
     }
 
     @Test
     public void
-            setSpatialEnvironmentPreference_throwsWhenSplitEngineDisabledIfSkyboxAndGeometryAreNotNull() {
+            setPreferredSpatialEnv_throwsWhenSplitEngineDisabledIfSkyboxAndGeometryAreNotNull() {
         setupRuntimeWithoutSplitEngine();
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
@@ -237,7 +234,7 @@ public final class SpatialEnvironmentImplTest {
         assertThrows(
                 UnsupportedOperationException.class,
                 () ->
-                        mEnvironment.setSpatialEnvironmentPreference(
+                        mEnvironment.setPreferredSpatialEnvironment(
                                 new SpatialEnvironmentPreference(
                                         new ExrImageResourceImpl(exr),
                                         new GltfModelResourceImpl(gltf))));
@@ -245,10 +242,10 @@ public final class SpatialEnvironmentImplTest {
 
     @Test
     public void
-            setSpatialEnvironmentPreference_doesNotThrowWhenSplitEngineDisabledIfSkyboxAndGeometryAreNull() {
+            setPreferredSpatialEnv_doesNotThrowWhenSplitEngineDisabledIfSkyboxAndGeometryAreNull() {
         setupRuntimeWithoutSplitEngine();
 
-        mEnvironment.setSpatialEnvironmentPreference(new SpatialEnvironmentPreference(null, null));
+        mEnvironment.setPreferredSpatialEnvironment(new SpatialEnvironmentPreference(null, null));
 
         // System sets the skybox to black without throwing an exception and the environment node is
         // still created.
@@ -257,30 +254,12 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void setSpatialEnvironmentPreference_returnsAppliedWhenCapable() {
-        // Change should be applied if the spatial capabilities allow it, otherwise should be
-        // pending.
-        SpatialState state = mXrExtensions.getSpatialState(mActivity);
-        ShadowSpatialState.extract(state)
-                .setSpatialCapabilities(ShadowSpatialCapabilities.createAll());
-        SpatialEnvironmentPreference preference = new SpatialEnvironmentPreference(null, null);
-        assertThat(mEnvironment.setSpatialEnvironmentPreference(preference))
-                .isEqualTo(SetSpatialEnvironmentPreferenceResult.CHANGE_APPLIED);
-
-        ShadowSpatialState.extract(state)
-                .setSpatialCapabilities(ShadowSpatialCapabilities.create());
-        preference = mock(SpatialEnvironment.class).getSpatialEnvironmentPreference();
-        assertThat(mEnvironment.setSpatialEnvironmentPreference(preference))
-                .isEqualTo(SetSpatialEnvironmentPreferenceResult.CHANGE_PENDING);
-    }
-
-    @Test
-    public void setSpatialEnvironmentPreferenceNull_removesEnvironment() {
+    public void setPreferredSpatialEnvironmentNull_removesEnvironment() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr), new GltfModelResourceImpl(gltf)));
 
@@ -299,7 +278,7 @@ public final class SpatialEnvironmentImplTest {
         assertThat(mFakeImpressApi.impressNodeHasParent(geometryNodes.get(0))).isTrue();
 
         // Ensure environment is removed
-        mEnvironment.setSpatialEnvironmentPreference(null);
+        mEnvironment.setPreferredSpatialEnvironment(null);
 
         long finalSkybox = mFakeImpressApi.getCurrentEnvironmentLight();
         assertThat(finalSkybox).isEqualTo(INVALID_SPLIT_ENGINE_ID);
@@ -309,12 +288,12 @@ public final class SpatialEnvironmentImplTest {
 
     @Test
     public void
-            setSpatialEnvironmentPreferenceWithNullSkyboxAndNullGeometry_doesNotDetachEnvironment() {
+            setPreferredSpatialEnvironmentWithNullSkyboxAndNullGeometry_doesNotDetachEnvironment() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr), new GltfModelResourceImpl(gltf)));
 
@@ -327,7 +306,7 @@ public final class SpatialEnvironmentImplTest {
         assertThat(mFakeImpressApi.impressNodeHasParent(geometryNodes.get(0))).isTrue();
 
         // Ensure environment is not removed if both skybox and geometry are updated to null.
-        mEnvironment.setSpatialEnvironmentPreference(new SpatialEnvironmentPreference(null, null));
+        mEnvironment.setPreferredSpatialEnvironment(new SpatialEnvironmentPreference(null, null));
 
         long finalSkybox = mFakeImpressApi.getCurrentEnvironmentLight();
         assertThat(finalSkybox).isEqualTo(INVALID_SPLIT_ENGINE_ID);
@@ -337,7 +316,7 @@ public final class SpatialEnvironmentImplTest {
 
     @Test
     public void
-            setSpatialEnvironmentPreferenceWithSkyboxAndGeometryWithMeshAndAnimation_doesNotDetachEnvironment() {
+            setPreferredSpatialEnvWithSkyboxAndGeoWithMeshAndAnimation_doesNotDetachEnvironment() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
         // Create dummy regular version of the water material.
@@ -346,7 +325,7 @@ public final class SpatialEnvironmentImplTest {
         String animationName = "fakeAnimation";
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr),
                         new GltfModelResourceImpl(gltf),
@@ -370,7 +349,7 @@ public final class SpatialEnvironmentImplTest {
         assertThat(loopingAnimatingNodes).isEqualTo(1);
 
         // Ensure environment is not removed if both skybox and geometry are updated to null.
-        mEnvironment.setSpatialEnvironmentPreference(new SpatialEnvironmentPreference(null, null));
+        mEnvironment.setPreferredSpatialEnvironment(new SpatialEnvironmentPreference(null, null));
 
         long finalSkybox = mFakeImpressApi.getCurrentEnvironmentLight();
         assertThat(finalSkybox).isEqualTo(INVALID_SPLIT_ENGINE_ID);
@@ -380,11 +359,11 @@ public final class SpatialEnvironmentImplTest {
 
     @Test
     public void
-            setSpatialEnvironmentPreferenceFromNullPreferenceToNullSkyboxAndGeometry_doesNotDetachEnvironment() {
+            setPreferredSpatialEnvFromNullPrefToNullSkyboxAndGeometry_doesNotDetachEnvironment() {
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(null);
+        mEnvironment.setPreferredSpatialEnvironment(null);
 
         long initialSkybox = mFakeImpressApi.getCurrentEnvironmentLight();
         List<Integer> geometryNodes = mFakeImpressApi.getImpressNodesForToken(gltf);
@@ -393,7 +372,7 @@ public final class SpatialEnvironmentImplTest {
         assertThat(geometryNodes).isEmpty();
 
         // Ensure environment is not removed if both skybox and geometry are updated to null.
-        mEnvironment.setSpatialEnvironmentPreference(new SpatialEnvironmentPreference(null, null));
+        mEnvironment.setPreferredSpatialEnvironment(new SpatialEnvironmentPreference(null, null));
 
         long finalSkybox = mFakeImpressApi.getCurrentEnvironmentLight();
         assertThat(finalSkybox).isEqualTo(INVALID_SPLIT_ENGINE_ID);
@@ -409,7 +388,7 @@ public final class SpatialEnvironmentImplTest {
         long newGltf = fakeLoadGltfAsset("newFakeGltfAsset");
 
         // Ensure that an environment is set a first time.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr), new GltfModelResourceImpl(gltf)));
 
@@ -417,7 +396,7 @@ public final class SpatialEnvironmentImplTest {
         List<Integer> geometryNodes = mFakeImpressApi.getImpressNodesForToken(gltf);
 
         // Ensure that an environment is set a second time.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(newExr), new GltfModelResourceImpl(newGltf)));
 
@@ -452,7 +431,7 @@ public final class SpatialEnvironmentImplTest {
         mEnvironment.accept(node -> timesCalled.getAndIncrement());
 
         // Ensure that an environment is set a first time.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(null, new GltfModelResourceImpl(gltf)));
 
         assertThat(timesCalled.get()).isEqualTo(1);
@@ -460,7 +439,7 @@ public final class SpatialEnvironmentImplTest {
 
     @Test
     public void
-            setSpatialEnvironmentPreferenceGeometryWithMaterialAndMeshName_materialIsOverriden() {
+            setPreferredSpatialEnvironmentGeometryWithMaterialAndMeshName_materialIsOverriden() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
         // Create dummy regular version of the water material.
@@ -469,7 +448,7 @@ public final class SpatialEnvironmentImplTest {
         String animationName = "fakeAnimation";
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr),
                         new GltfModelResourceImpl(gltf),
@@ -497,8 +476,7 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void
-            setSpatialEnvironmentPreferenceGeometryWithMaterialAndNoMeshName_materialIsNotOverriden() {
+    public void setPreferredSpatialEnvGeometryWithMaterialAndNoMeshName_materialIsNotOverriden() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
         // Create dummy regular version of the water material.
@@ -506,7 +484,7 @@ public final class SpatialEnvironmentImplTest {
         String animationName = "fakeAnimation";
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr),
                         new GltfModelResourceImpl(gltf),
@@ -530,15 +508,14 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void
-            setSpatialEnvironmentPreferenceGeometryWithNoMaterialAndMeshName_materialIsNotOverriden() {
+    public void setPreferredSpatialEnvGeometryWithNoMaterialAndMeshName_materialIsNotOverriden() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
         String meshName = "fakeMesh";
         String animationName = "fakeAnimation";
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr),
                         new GltfModelResourceImpl(gltf),
@@ -560,14 +537,13 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void
-            setSpatialEnvironmentPreferenceGeometryWithNoAnimationName_geometryIsNotAnimating() {
+    public void setPreferredSpatialEnvironmentGeometryWithNoAnimationName_geometryIsNotAnimating() {
         long exr = fakeLoadEnvironment("fakeEnvironment");
         long gltf = fakeLoadGltfAsset("fakeGltfAsset");
         String animationName = "fakeAnimation";
 
         // Ensure that an environment is set.
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr),
                         new GltfModelResourceImpl(gltf),
@@ -591,8 +567,8 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void isSpatialEnvironmentPreferenceActive_defaultsToFalse() {
-        assertThat(mEnvironment.isSpatialEnvironmentPreferenceActive()).isFalse();
+    public void isPreferredSpatialEnvironmentActive_defaultsToFalse() {
+        assertThat(mEnvironment.isPreferredSpatialEnvironmentActive()).isFalse();
     }
 
     @Test
@@ -608,17 +584,17 @@ public final class SpatialEnvironmentImplTest {
         mEnvironment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener1);
         mEnvironment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener2);
 
-        boolean isSpatialEnvironmentPreferenceActive =
-                mEnvironment.isSpatialEnvironmentPreferenceActive();
+        boolean isPreferredSpatialEnvironmentActive =
+                mEnvironment.isPreferredSpatialEnvironmentActive();
 
         mEnvironment.fireOnSpatialEnvironmentChangedEvent();
-        verify(listener1).accept(isSpatialEnvironmentPreferenceActive);
-        verify(listener2).accept(isSpatialEnvironmentPreferenceActive);
+        verify(listener1).accept(isPreferredSpatialEnvironmentActive);
+        verify(listener2).accept(isPreferredSpatialEnvironmentActive);
 
         mEnvironment.removeOnSpatialEnvironmentChangedListener(listener1);
         mEnvironment.fireOnSpatialEnvironmentChangedEvent();
-        verify(listener1).accept(isSpatialEnvironmentPreferenceActive);
-        verify(listener2, times(2)).accept(isSpatialEnvironmentPreferenceActive);
+        verify(listener1).accept(isPreferredSpatialEnvironmentActive);
+        verify(listener2, times(2)).accept(isPreferredSpatialEnvironmentActive);
     }
 
     @Test
@@ -630,15 +606,15 @@ public final class SpatialEnvironmentImplTest {
         mEnvironment.setSpatialState(spatialState);
         mEnvironment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener);
 
-        boolean isSpatialEnvironmentPreferenceActive =
-                mEnvironment.isSpatialEnvironmentPreferenceActive();
+        boolean isPreferredSpatialEnvironmentActive =
+                mEnvironment.isPreferredSpatialEnvironmentActive();
 
         mEnvironment.fireOnSpatialEnvironmentChangedEvent();
-        verify(listener).accept(isSpatialEnvironmentPreferenceActive);
+        verify(listener).accept(isPreferredSpatialEnvironmentActive);
 
         mEnvironment.dispose();
         mEnvironment.fireOnSpatialEnvironmentChangedEvent();
-        verify(listener).accept(isSpatialEnvironmentPreferenceActive);
+        verify(listener).accept(isPreferredSpatialEnvironmentActive);
     }
 
     @Test
@@ -674,7 +650,7 @@ public final class SpatialEnvironmentImplTest {
 
         mEnvironment.setSpatialState(spatialState);
 
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr), new GltfModelResourceImpl(gltf)));
         mEnvironment.setPreferredPassthroughOpacity(0.5f);
@@ -687,8 +663,8 @@ public final class SpatialEnvironmentImplTest {
 
         assertThat(mFakeImpressApi.impressNodeHasParent(geometryNodes.get(0))).isTrue();
 
-        assertThat(mEnvironment.getSpatialEnvironmentPreference()).isNotNull();
-        assertThat(mEnvironment.isSpatialEnvironmentPreferenceActive()).isTrue();
+        assertThat(mEnvironment.getPreferredSpatialEnvironment()).isNotNull();
+        assertThat(mEnvironment.isPreferredSpatialEnvironmentActive()).isTrue();
 
         assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNotNull();
         assertThat(mEnvironment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
@@ -701,8 +677,8 @@ public final class SpatialEnvironmentImplTest {
         // assertThat(fakeImpressApi.impressNodeHasParent(geometryNodes.get(0))).isFalse();
         assertThat(ShadowXrExtensions.extract(mXrExtensions).getEnvironmentNode(mActivity))
                 .isNull();
-        assertThat(mEnvironment.getSpatialEnvironmentPreference()).isNull();
-        assertThat(mEnvironment.isSpatialEnvironmentPreferenceActive()).isFalse();
+        assertThat(mEnvironment.getPreferredSpatialEnvironment()).isNull();
+        assertThat(mEnvironment.isPreferredSpatialEnvironmentActive()).isFalse();
         assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNull();
         assertThat(mEnvironment.getCurrentPassthroughOpacity()).isEqualTo(0.0f);
     }
@@ -716,7 +692,7 @@ public final class SpatialEnvironmentImplTest {
         String meshName = "fakeMesh";
         String animationName = "fakeAnimation";
 
-        mEnvironment.setSpatialEnvironmentPreference(
+        mEnvironment.setPreferredSpatialEnvironment(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr),
                         new GltfModelResourceImpl(gltf),

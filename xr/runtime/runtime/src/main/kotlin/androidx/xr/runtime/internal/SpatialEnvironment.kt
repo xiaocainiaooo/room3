@@ -16,7 +16,6 @@
 
 package androidx.xr.runtime.internal
 
-import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
 import java.util.Objects
 import java.util.concurrent.Executor
@@ -41,15 +40,26 @@ public interface SpatialEnvironment {
     public val currentPassthroughOpacity: Float
 
     /**
-     * Gets the preferred spatial environment for the application.
+     * The preferred spatial environment for the application.
      *
-     * <p>The returned value is always what was most recently supplied to
-     * [setSpatialEnvironmentPreference], or null if no preference has been set.
+     * If no preference has ever been set by the application, this will be null.
      *
-     * <p>See [isSpatialEnvironmentPreferenceActive] or the [OnSpatialEnvironmentChangedListener]
-     * events to know when this preference becomes active.
+     * Setting this property only sets the preference and does not cause an immediate change unless
+     * [isPreferredSpatialEnvironmentActive] is already true. Once the device enters a state where
+     * the XR background can be changed and the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT] capability is available, the
+     * preferred spatial environment for the application will be automatically displayed.
+     *
+     * Setting the preference to null will disable the preferred spatial environment for the
+     * application, meaning the default system environment will be displayed instead.
+     *
+     * If the given [SpatialEnvironmentPreference] is not null, but all of its properties are null,
+     * then the spatial environment will consist of a black skybox and no geometry.
+     *
+     * See [isPreferredSpatialEnvironmentActive] or the [addOnSpatialEnvironmentChangedListener]
+     * listeners to know when this preference becomes active.
      */
-    public val spatialEnvironmentPreference: SpatialEnvironmentPreference?
+    public var preferredSpatialEnvironment: SpatialEnvironmentPreference?
 
     /**
      * The application's preferred passthrough opacity.
@@ -85,44 +95,21 @@ public interface SpatialEnvironment {
     public fun removeOnPassthroughOpacityChangedListener(listener: Consumer<Float>)
 
     /**
-     * Returns true if the environment set by [setSpatialEnvironmentPreference] is active.
+     * Returns true if the environment set by [preferredSpatialEnvironment] is active.
      *
-     * <p>Spatial environment preference set through [setSpatialEnvironmentPreference] are shown
-     * when this is true, but passthrough or other objects in the scene could partially or totally
-     * occlude them. When this is false, the default system environment will be active instead.
+     * Spatial environment preferences set through [preferredSpatialEnvironment] are shown when this
+     * is true, but passthrough or other objects in the scene could partially or totally occlude
+     * them. When this is false, the default system environment will be active instead.
      */
-    public fun isSpatialEnvironmentPreferenceActive(): Boolean
-
-    /**
-     * Sets the preferred spatial environment for the application.
-     *
-     * <p>Note that this method only sets a preference and does not cause an immediate change unless
-     * [isSpatialEnvironmentPreferenceActive] is already true. Once the device enters a state where
-     * the XR background can be changed and the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS] capability is available, the
-     * preferred spatial environment for the application will be automatically displayed.
-     *
-     * <p>Setting the preference to null will disable the preferred spatial environment for the
-     * application, meaning the default system environment will be displayed instead.
-     *
-     * <p>If the given [SpatialEnvironmentPreference] is not null, but all of its properties are
-     * null, then the spatial environment will consist of a black skybox and no geometry
-     * [isSpatialEnvironmentPreferenceActive] is true.
-     *
-     * <p>Changes to the Environment state will be notified via the
-     * [OnSpatialEnvironmentChangedListener].
-     */
-    public fun setSpatialEnvironmentPreference(
-        preference: SpatialEnvironmentPreference?
-    ): @SetSpatialEnvironmentPreferenceResult Int
+    public val isPreferredSpatialEnvironmentActive: Boolean
 
     /**
      * Notifies an application whether or not the preferred spatial environment for the application
      * is active.
      *
      * The environment will try to transition to the application environment when a non-null
-     * preference is set through [setSpatialEnvironmentPreference] and the application has the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS] capability. The environment
+     * preference is set through [preferredSpatialEnvironment] and the application has the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT] capability. The environment
      * preferences will otherwise not be active.
      *
      * The listener consumes a boolean value that is true if the environment preference is active
@@ -137,31 +124,6 @@ public interface SpatialEnvironment {
 
     /** Remove a listener previously added by [addOnSpatialEnvironmentChangedListener]. */
     public fun removeOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>)
-
-    /** Result values for calls to SpatialEnvironment.setSpatialEnvironmentPreference */
-    @IntDef(
-        SetSpatialEnvironmentPreferenceResult.CHANGE_APPLIED,
-        SetSpatialEnvironmentPreferenceResult.CHANGE_PENDING,
-    )
-    @Target(AnnotationTarget.TYPE)
-    @Retention(AnnotationRetention.SOURCE)
-    @Suppress("PublicTypedef")
-    public annotation class SetSpatialEnvironmentPreferenceResult {
-        public companion object {
-            /**
-             * The call to [setSpatialEnvironmentPreference] succeeded and should now be visible.
-             */
-            public const val CHANGE_APPLIED: Int = 0
-            /**
-             * The call to [setSpatialEnvironmentPreference] successfully applied the preference,
-             * but it is not immediately visible due to requesting a state change while the activity
-             * does not have the [SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENTS]
-             * capability to control the app environment state. The preference was still set and
-             * will be applied when the capability is gained.
-             */
-            public const val CHANGE_PENDING: Int = 1
-        }
-    }
 
     /**
      * A class that represents the user's preferred spatial environment.

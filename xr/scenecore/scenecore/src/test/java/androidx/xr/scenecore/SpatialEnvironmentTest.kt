@@ -33,7 +33,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -225,7 +224,7 @@ class SpatialEnvironmentTest {
     }
 
     @Test
-    fun setSpatialEnvironmentPreference_returnsRuntimeEnvironmentResultObject() {
+    fun setSpatialEnvironmentPreference_callsRuntimeMethod() {
         val rtImageMock = mock<RtExrImageResource>()
         val rtModelMock = mock<RtGltfModelResource>()
 
@@ -235,42 +234,16 @@ class SpatialEnvironmentTest {
                 GltfModel(rtModelMock),
             )
 
-        whenever(mockRtEnvironment!!.setSpatialEnvironmentPreference(any()))
-            .thenReturn(RtSpatialEnvironment.SetSpatialEnvironmentPreferenceResult.CHANGE_APPLIED)
-        assertThat(environment!!.setSpatialEnvironmentPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetSpatialEnvironmentPreferenceChangeApplied::class.java
-            )
+        environment!!.preferredSpatialEnvironment = preference
 
-        whenever(mockRtEnvironment!!.setSpatialEnvironmentPreference(any()))
-            .thenReturn(RtSpatialEnvironment.SetSpatialEnvironmentPreferenceResult.CHANGE_PENDING)
-        assertThat(environment!!.setSpatialEnvironmentPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetSpatialEnvironmentPreferenceChangePending::class.java
-            )
-
-        verify(mockRtEnvironment!!, times(2)).setSpatialEnvironmentPreference(any())
+        verify(mockRtEnvironment!!).preferredSpatialEnvironment = any()
     }
 
     @Test
-    fun setSpatialEnvironmentPreferenceNull_returnsRuntimeEnvironmentResultObject() {
+    fun setSpatialEnvironmentPreferenceNull_callsRuntimeMethod() {
         val preference = null as SpatialEnvironment.SpatialEnvironmentPreference?
-
-        whenever(mockRtEnvironment!!.setSpatialEnvironmentPreference(anyOrNull()))
-            .thenReturn(RtSpatialEnvironment.SetSpatialEnvironmentPreferenceResult.CHANGE_APPLIED)
-        assertThat(environment!!.setSpatialEnvironmentPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetSpatialEnvironmentPreferenceChangeApplied::class.java
-            )
-
-        whenever(mockRtEnvironment!!.setSpatialEnvironmentPreference(anyOrNull()))
-            .thenReturn(RtSpatialEnvironment.SetSpatialEnvironmentPreferenceResult.CHANGE_PENDING)
-        assertThat(environment!!.setSpatialEnvironmentPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetSpatialEnvironmentPreferenceChangePending::class.java
-            )
-
-        verify(mockRtEnvironment!!, times(2)).setSpatialEnvironmentPreference(anyOrNull())
+        environment!!.preferredSpatialEnvironment = preference
+        verify(mockRtEnvironment!!).preferredSpatialEnvironment = anyOrNull()
     }
 
     @Test
@@ -279,27 +252,27 @@ class SpatialEnvironmentTest {
         val rtModelMock = mock<RtGltfModelResource>()
         val rtPreference =
             RtSpatialEnvironment.SpatialEnvironmentPreference(rtImageMock, rtModelMock)
-        whenever(mockRtEnvironment!!.spatialEnvironmentPreference).thenReturn(rtPreference)
+        whenever(mockRtEnvironment!!.preferredSpatialEnvironment).thenReturn(rtPreference)
 
-        assertThat(environment!!.getSpatialEnvironmentPreference())
+        assertThat(environment!!.preferredSpatialEnvironment)
             .isEqualTo(rtPreference.toSpatialEnvironmentPreference())
-        verify(mockRtEnvironment!!).spatialEnvironmentPreference
+        verify(mockRtEnvironment!!).preferredSpatialEnvironment
     }
 
     @Test
     fun getSpatialEnvironmentPreferenceNull_getsRuntimeEnvironmentSpatialEnvironmentPreference() {
         val rtPreference = null as RtSpatialEnvironment.SpatialEnvironmentPreference?
-        whenever(mockRtEnvironment!!.spatialEnvironmentPreference).thenReturn(rtPreference)
+        whenever(mockRtEnvironment!!.preferredSpatialEnvironment).thenReturn(rtPreference)
 
-        assertThat(environment!!.getSpatialEnvironmentPreference()).isEqualTo(null)
-        verify(mockRtEnvironment!!).spatialEnvironmentPreference
+        assertThat(environment!!.preferredSpatialEnvironment).isEqualTo(null)
+        verify(mockRtEnvironment!!).preferredSpatialEnvironment
     }
 
     @Test
-    fun isSpatialEnvironmentPreferenceActive_callsRuntimeEnvironmentisSpatialEnvironmentPreferenceActive() {
-        whenever(mockRtEnvironment!!.isSpatialEnvironmentPreferenceActive()).thenReturn(true)
-        assertThat(environment!!.isSpatialEnvironmentPreferenceActive()).isTrue()
-        verify(mockRtEnvironment!!).isSpatialEnvironmentPreferenceActive()
+    fun isPreferredSpatialEnvironmentActive_callsRuntimeisPreferredSpatialEnvironmentActive() {
+        whenever(mockRtEnvironment!!.isPreferredSpatialEnvironmentActive).thenReturn(true)
+        assertThat(environment!!.isPreferredSpatialEnvironmentActive).isTrue()
+        verify(mockRtEnvironment!!).isPreferredSpatialEnvironmentActive
     }
 
     @Test

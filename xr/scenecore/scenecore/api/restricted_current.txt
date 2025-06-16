@@ -757,25 +757,16 @@ package androidx.xr.scenecore {
     method public void addOnSpatialEnvironmentChangedListener(java.util.function.Consumer<java.lang.Boolean> listener);
     method public float getCurrentPassthroughOpacity();
     method public Float? getPreferredPassthroughOpacity();
-    method public androidx.xr.scenecore.SpatialEnvironment.SpatialEnvironmentPreference? getSpatialEnvironmentPreference();
-    method public boolean isSpatialEnvironmentPreferenceActive();
+    method public androidx.xr.scenecore.SpatialEnvironment.SpatialEnvironmentPreference? getPreferredSpatialEnvironment();
+    method public boolean isPreferredSpatialEnvironmentActive();
     method public void removeOnPassthroughOpacityChangedListener(java.util.function.Consumer<java.lang.Float> listener);
     method public void removeOnSpatialEnvironmentChangedListener(java.util.function.Consumer<java.lang.Boolean> listener);
     method public void setPreferredPassthroughOpacity(Float?);
-    method @com.google.errorprone.annotations.CanIgnoreReturnValue public androidx.xr.scenecore.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult setSpatialEnvironmentPreference(androidx.xr.scenecore.SpatialEnvironment.SpatialEnvironmentPreference? environmentPreference);
+    method public void setPreferredSpatialEnvironment(androidx.xr.scenecore.SpatialEnvironment.SpatialEnvironmentPreference?);
     property public float currentPassthroughOpacity;
+    property public boolean isPreferredSpatialEnvironmentActive;
     property public Float? preferredPassthroughOpacity;
-  }
-
-  public static final class SpatialEnvironment.SetSpatialEnvironmentPreferenceChangeApplied extends androidx.xr.scenecore.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult {
-    ctor public SpatialEnvironment.SetSpatialEnvironmentPreferenceChangeApplied();
-  }
-
-  public static final class SpatialEnvironment.SetSpatialEnvironmentPreferenceChangePending extends androidx.xr.scenecore.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult {
-    ctor public SpatialEnvironment.SetSpatialEnvironmentPreferenceChangePending();
-  }
-
-  public abstract static sealed class SpatialEnvironment.SetSpatialEnvironmentPreferenceResult {
+    property public androidx.xr.scenecore.SpatialEnvironment.SpatialEnvironmentPreference? preferredSpatialEnvironment;
   }
 
   public static final class SpatialEnvironment.SpatialEnvironmentPreference {

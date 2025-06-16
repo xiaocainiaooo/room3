@@ -117,9 +117,9 @@ class EnvironmentActivity : AppCompatActivity() {
         manageOpacity()
 
         // Set initial environment preference
-        session!!.scene.spatialEnvironment.setSpatialEnvironmentPreference(null)
+        session!!.scene.spatialEnvironment.preferredSpatialEnvironment = null
         spatialEnvironmentPreference =
-            session!!.scene.spatialEnvironment.getSpatialEnvironmentPreference()
+            session!!.scene.spatialEnvironment.preferredSpatialEnvironment
 
         // handle Log capabilities
         findViewById<Button>(R.id.environment_log_spatial_capabilities).setOnClickListener {
@@ -194,7 +194,7 @@ class EnvironmentActivity : AppCompatActivity() {
 
         // handle unset geometry and skybox
         findViewById<Button>(R.id.environment_button4_2).setOnClickListener {
-            session!!.scene.spatialEnvironment.setSpatialEnvironmentPreference(null)
+            session!!.scene.spatialEnvironment.preferredSpatialEnvironment = null
             addEvent(EventType.SKYBOX_AND_GEOMETRY_CHANGED, "Skybox and geometry unset")
         }
     }
@@ -230,10 +230,8 @@ class EnvironmentActivity : AppCompatActivity() {
     private fun setGeoAndSkybox(skybox: ExrImage?, geometry: GltfModel?) {
         spatialEnvironmentPreference =
             SpatialEnvironment.SpatialEnvironmentPreference(skybox, geometry)
-        session!!
-            .scene
-            .spatialEnvironment
-            .setSpatialEnvironmentPreference(spatialEnvironmentPreference)
+        session!!.scene.spatialEnvironment.preferredSpatialEnvironment =
+            spatialEnvironmentPreference
     }
 
     private fun toggleMode(): String {

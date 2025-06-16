@@ -110,9 +110,7 @@ class SplitEngine : ComponentActivity() {
 
     private fun setSkyboxAndGeometry(skybox: ExrImage?, geometry: GltfModel?) {
         spatialEnvironmentPreference = SpatialEnvironmentPreference(skybox, geometry)
-        session.scene.spatialEnvironment.setSpatialEnvironmentPreference(
-            spatialEnvironmentPreference
-        )
+        session.scene.spatialEnvironment.preferredSpatialEnvironment = spatialEnvironmentPreference
     }
 
     // TODO: b/324947709 - Refactor common @Composable code into a utility library for common usage
