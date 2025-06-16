@@ -211,8 +211,7 @@ class VideoPlayerTestActivity : ComponentActivity() {
     }
 
     private fun togglePassthrough(session: Session) {
-        val passthroughOpacity: Float =
-            session.scene.spatialEnvironment.getCurrentPassthroughOpacity()
+        val passthroughOpacity: Float = session.scene.spatialEnvironment.currentPassthroughOpacity
         Log.i(TAG, "TogglePassthrough!")
         when (passthroughOpacity) {
             0.0f -> session.scene.spatialEnvironment.setPassthroughOpacityPreference(1.0f)

@@ -763,6 +763,7 @@ package androidx.xr.scenecore {
     method public void removeOnSpatialEnvironmentChangedListener(java.util.function.Consumer<java.lang.Boolean> listener);
     method @com.google.errorprone.annotations.CanIgnoreReturnValue public androidx.xr.scenecore.SpatialEnvironment.SetPassthroughOpacityPreferenceResult setPassthroughOpacityPreference(Float? passthroughOpacityPreference);
     method @com.google.errorprone.annotations.CanIgnoreReturnValue public androidx.xr.scenecore.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult setSpatialEnvironmentPreference(androidx.xr.scenecore.SpatialEnvironment.SpatialEnvironmentPreference? environmentPreference);
+    property public float currentPassthroughOpacity;
   }
 
   public static final class SpatialEnvironment.SetPassthroughOpacityPreferenceChangeApplied extends androidx.xr.scenecore.SpatialEnvironment.SetPassthroughOpacityPreferenceResult {

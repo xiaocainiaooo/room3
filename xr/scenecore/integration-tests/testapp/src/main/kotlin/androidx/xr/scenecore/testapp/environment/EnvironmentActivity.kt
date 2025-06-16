@@ -307,7 +307,7 @@ class EnvironmentActivity : AppCompatActivity() {
     private fun togglePassthrough() {
         val lastApiCall = "togglePassthrough"
         Log.i(TAG, lastApiCall)
-        if (session!!.scene.spatialEnvironment.getCurrentPassthroughOpacity() > 0) {
+        if (session!!.scene.spatialEnvironment.currentPassthroughOpacity > 0) {
             session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(0f)
         } else {
             session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(1f)

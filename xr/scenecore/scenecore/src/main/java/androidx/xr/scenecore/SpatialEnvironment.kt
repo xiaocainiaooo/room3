@@ -112,8 +112,8 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      * user actions outside the application. Generally, the application's preference will be shown
      * to the user when the application has the
      * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability. The current value
-     * visible to the user can be observed by calling [getCurrentPassthroughOpacity] or by
-     * registering a listener with [addOnPassthroughOpacityChangedListener].
+     * visible to the user can be observed by calling [currentPassthroughOpacity] or by registering
+     * a listener with [addOnPassthroughOpacityChangedListener].
      *
      * @param passthroughOpacityPreference The application's passthrough opacity preference between
      *   0.0f (disabled with no passthrough) and 1.0f (fully enabled passthrough hides the spatial
@@ -146,9 +146,8 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      *   passthrough is shown, and a value of 1.0f means the passthrough completely obscures the
      *   spatial environment geometry and skybox.
      */
-    public fun getCurrentPassthroughOpacity(): Float {
-        return rtEnvironment.currentPassthroughOpacity
-    }
+    public val currentPassthroughOpacity: Float
+        get() = rtEnvironment.currentPassthroughOpacity
 
     /**
      * Gets the current passthrough opacity preference set through
@@ -156,8 +155,8 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      * not been called.
      *
      * This value only reflects the application's preference and does not necessarily reflect what
-     * the system is currently showing the user. See [getCurrentPassthroughOpacity] to get the
-     * actual visible opacity value.
+     * the system is currently showing the user. See [currentPassthroughOpacity] to get the actual
+     * visible opacity value.
      *
      * @return The last passthrough opacity value between 0.0f and 1.0f requested through
      *   [setPassthroughOpacityPreference]. If null, no application preference is set and the

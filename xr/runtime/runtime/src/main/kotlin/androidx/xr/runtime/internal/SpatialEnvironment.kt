@@ -55,7 +55,7 @@ public interface SpatialEnvironment {
      * Gets the last passthrough opacity requested through [setPassthroughOpacityPreference].
      *
      * <p>This may be different from the actual current state returned by
-     * [getCurrentPassthroughOpacity], but it should be applied as soon as the
+     * [currentPassthroughOpacity], but it should be applied as soon as the
      * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability is gained. Defaults
      * to null, if [setPassthroughOpacityPreference] was never called.
      *

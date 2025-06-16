@@ -58,10 +58,10 @@ class SpatialEnvironmentTest {
     }
 
     @Test
-    fun getCurrentPassthroughOpacity_getsRuntimePassthroughOpacity() {
+    fun currentPassthroughOpacity_getsRuntimePassthroughOpacity() {
         val rtOpacity = 0.3f
         whenever(mockRtEnvironment!!.currentPassthroughOpacity).thenReturn(rtOpacity)
-        assertThat(environment!!.getCurrentPassthroughOpacity()).isEqualTo(rtOpacity)
+        assertThat(environment!!.currentPassthroughOpacity).isEqualTo(rtOpacity)
         verify(mockRtEnvironment!!).currentPassthroughOpacity
     }
 

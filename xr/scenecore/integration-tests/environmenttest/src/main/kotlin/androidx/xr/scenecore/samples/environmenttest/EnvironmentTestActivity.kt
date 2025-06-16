@@ -85,7 +85,7 @@ class EnvironmentTestActivity : ComponentActivity() {
             currentPassthroughOpacity.floatValue = newOpacity
         }
         currentPassthroughOpacity.floatValue =
-            session.scene.spatialEnvironment.getCurrentPassthroughOpacity()
+            session.scene.spatialEnvironment.currentPassthroughOpacity
 
         session.scene.spatialEnvironment.addOnSpatialEnvironmentChangedListener {
             onSpatialEnvironmentChangedCount++
@@ -107,7 +107,7 @@ class EnvironmentTestActivity : ComponentActivity() {
     private fun setPassthroughOpacity(opacity: Float?) {
         val returnObj = session.scene.spatialEnvironment.setPassthroughOpacityPreference(opacity)
         lastApiCall =
-            "set opacity preference to ${session.scene.spatialEnvironment.getPassthroughOpacityPreference()} returned with value ${returnObj}, but current actual opacity is ${session.scene.spatialEnvironment.getCurrentPassthroughOpacity()}"
+            "set opacity preference to ${session.scene.spatialEnvironment.getPassthroughOpacityPreference()} returned with value ${returnObj}, but current actual opacity is ${session.scene.spatialEnvironment.currentPassthroughOpacity}"
         Log.i(TAG, lastApiCall)
     }
 
