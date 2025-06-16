@@ -156,6 +156,9 @@ public object StreamUseCaseUtil {
                 position++
             }
         }
+        Log.debug {
+            "populateSurfaceToStreamUseCaseMapping() - streamUseCaseMap = $streamUseCaseMap"
+        }
     }
 
     /**

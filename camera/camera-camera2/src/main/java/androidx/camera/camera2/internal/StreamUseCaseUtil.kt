@@ -166,6 +166,10 @@ public object StreamUseCaseUtil {
                 position++
             }
         }
+        Logger.d(
+            TAG,
+            "populateSurfaceToStreamUseCaseMapping() - streamUseCaseMap = $streamUseCaseMap",
+        )
     }
 
     /**

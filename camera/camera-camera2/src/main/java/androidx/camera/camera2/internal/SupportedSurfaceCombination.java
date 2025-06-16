@@ -1002,6 +1002,8 @@ public final class SupportedSurfaceCombination {
                 surfaceConfigIndexAttachedSurfaceInfoMap.clear();
                 surfaceConfigIndexUseCaseConfigMap.clear();
             }
+            Logger.d(TAG, "orderedSurfaceConfigListForStreamUseCase = "
+                    + orderedSurfaceConfigListForStreamUseCase);
         }
 
         BestSizesAndMaxFpsForConfigs bestSizesAndFps = findBestSizesAndFps(

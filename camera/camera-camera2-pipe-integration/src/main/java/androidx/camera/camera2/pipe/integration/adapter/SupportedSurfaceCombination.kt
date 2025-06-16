@@ -647,6 +647,9 @@ public class SupportedSurfaceCombination(
                     surfaceConfigIndexAttachedSurfaceInfoMap,
                     surfaceConfigIndexUseCaseConfigMap,
                 )
+            debug {
+                "orderedSurfaceConfigListForStreamUseCase = $orderedSurfaceConfigListForStreamUseCase"
+            }
         }
 
         val maxSupportedFps =
