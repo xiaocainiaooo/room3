@@ -31,7 +31,7 @@ public class FakeSpatialEnvironment : SpatialEnvironment {
     override val spatialEnvironmentPreference: SpatialEnvironment.SpatialEnvironmentPreference? =
         null
 
-    @get:Suppress("AutoBoxing") override val passthroughOpacityPreference: Float? = null
+    @get:Suppress("AutoBoxing") override var preferredPassthroughOpacity: Float? = null
 
     override fun addOnPassthroughOpacityChangedListener(
         executor: Executor,
@@ -46,11 +46,6 @@ public class FakeSpatialEnvironment : SpatialEnvironment {
         preference: SpatialEnvironment.SpatialEnvironmentPreference?
     ): @SpatialEnvironment.SetSpatialEnvironmentPreferenceResult Int =
         SpatialEnvironment.SetSpatialEnvironmentPreferenceResult.CHANGE_PENDING
-
-    override fun setPassthroughOpacityPreference(
-        @Suppress("AutoBoxing") passthroughOpacityPreference: Float?
-    ): @SpatialEnvironment.SetPassthroughOpacityPreferenceResult Int =
-        SpatialEnvironment.SetPassthroughOpacityPreferenceResult.CHANGE_PENDING
 
     override fun addOnSpatialEnvironmentChangedListener(
         executor: Executor,

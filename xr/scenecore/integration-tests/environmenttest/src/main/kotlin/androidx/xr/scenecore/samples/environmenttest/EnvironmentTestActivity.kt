@@ -80,7 +80,7 @@ class EnvironmentTestActivity : ComponentActivity() {
 
         session.scene.mainPanelEntity.sizeInPixels = IntSize2d(width = 1500, height = 2000)
 
-        session.scene.spatialEnvironment.setPassthroughOpacityPreference(0.0f)
+        session.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
         session.scene.spatialEnvironment.addOnPassthroughOpacityChangedListener { newOpacity ->
             currentPassthroughOpacity.floatValue = newOpacity
         }
@@ -105,9 +105,9 @@ class EnvironmentTestActivity : ComponentActivity() {
     }
 
     private fun setPassthroughOpacity(opacity: Float?) {
-        val returnObj = session.scene.spatialEnvironment.setPassthroughOpacityPreference(opacity)
+        session.scene.spatialEnvironment.preferredPassthroughOpacity = opacity
         lastApiCall =
-            "set opacity preference to ${session.scene.spatialEnvironment.getPassthroughOpacityPreference()} returned with value ${returnObj}, but current actual opacity is ${session.scene.spatialEnvironment.currentPassthroughOpacity}"
+            "set opacity preference to ${session.scene.spatialEnvironment.preferredPassthroughOpacity}, but current actual opacity is ${session.scene.spatialEnvironment.currentPassthroughOpacity}"
         Log.i(TAG, lastApiCall)
     }
 
@@ -211,7 +211,7 @@ class EnvironmentTestActivity : ComponentActivity() {
             mutableFloatStateOf(currentPassthroughOpacity.floatValue * 100.0f)
         }
         val opacityPreferenceStr =
-            session.scene.spatialEnvironment.getPassthroughOpacityPreference() ?: "null"
+            session.scene.spatialEnvironment.preferredPassthroughOpacity ?: "null"
 
         Text(text = "Passthrough Opacity Preference: $opacityPreferenceStr", fontSize = 30.sp)
         Row {

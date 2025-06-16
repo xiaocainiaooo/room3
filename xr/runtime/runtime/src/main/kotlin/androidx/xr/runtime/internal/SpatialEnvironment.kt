@@ -35,8 +35,8 @@ public interface SpatialEnvironment {
      * Gets the current passthrough opacity value between 0 and 1 where 0.0f means no passthrough,
      * and 1.0f means full passthrough.
      *
-     * <p>This value can be overwritten by user-enabled or system-enabled passthrough and will not
-     * always match the opacity value returned by [getPassthroughOpacityPreference].
+     * This value can be overwritten by user-enabled or system-enabled passthrough and will not
+     * always match the opacity value returned by [preferredPassthroughOpacity].
      */
     public val currentPassthroughOpacity: Float
 
@@ -52,17 +52,27 @@ public interface SpatialEnvironment {
     public val spatialEnvironmentPreference: SpatialEnvironmentPreference?
 
     /**
-     * Gets the last passthrough opacity requested through [setPassthroughOpacityPreference].
+     * The application's preferred passthrough opacity.
      *
-     * <p>This may be different from the actual current state returned by
-     * [currentPassthroughOpacity], but it should be applied as soon as the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability is gained. Defaults
-     * to null, if [setPassthroughOpacityPreference] was never called.
+     * Upon construction, the default value is null, which means "no application preference". The
+     * application's preferred passthrough opacity can be set between 0.0f and 1.0f.
      *
-     * <p>If set to null, the passthrough opacity will default to the user preference managed
-     * through the system.
+     * Setting the application preference does not guarantee that the value will be immediately
+     * applied and visible to the user. The actual passthrough opacity value is controlled by the
+     * system in response to a combination of this preference and user actions outside the
+     * application. Generally, this preference is honored when the application has the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability.
+     *
+     * The value should be between 0.0f (passthrough disabled) and 1.0f (passthrough fully obscures
+     * the spatial environment). Values within 0.01f of 0.0 or 1.0 are snapped to those values.
+     * Values outside [0.0f, 1.0f] are clamped. Other values result in semi-transparent passthrough
+     * that is alpha blended with the spatial environment. Setting this property to `null` clears
+     * the application's preference, allowing the system to manage passthrough opacity.
+     *
+     * The actual value visible to the user can be observed by calling [currentPassthroughOpacity]
+     * or by registering a listener with [addOnPassthroughOpacityChangedListener].
      */
-    @get:Suppress("AutoBoxing") public val passthroughOpacityPreference: Float?
+    public var preferredPassthroughOpacity: Float?
 
     /**
      * Notifies an application when the passthrough state changes, such as when the application
@@ -107,37 +117,6 @@ public interface SpatialEnvironment {
     ): @SetSpatialEnvironmentPreferenceResult Int
 
     /**
-     * Sets the preference for passthrough state by requesting a change in passthrough opacity.
-     *
-     * <p>Passthrough visibility cannot be set directly to on/off modes. Instead, a desired
-     * passthrough opacity value between 0.0f and 1.0f can be requested which will dictate which
-     * mode is used. A passthrough opacity within 0.01f of 0.0f will disable passthrough, and will
-     * be returned as 0.0f by [getPassthroughOpacityPreference]. An opacity value within 0.01f of
-     * 1.0f will enable full passthrough and it will be returned as 1.0f by
-     * [getPassthroughOpacityPreference]. Any other value in the range will result in a
-     * semi-transparent passthrough.
-     *
-     * <p>Requesting to set passthrough opacity to a value that is not in the range of 0.0f to 1.0f
-     * will result in the value getting clamped to 0.0f or 1.0f depending on which one is closer.
-     *
-     * <p>If the value is set to null, the opacity will be managed by the system.
-     *
-     * <p>Requests to change opacity are only immediately attempted to be honored if the activity
-     * has the [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability. When the
-     * request is honored, this returns [SetPassthroughOpacityPreferenceChangeApplied]. When the
-     * activity does not have the capability to control the passthrough state, this returns
-     * [SetPassthroughOpacityPreferenceChangePending] to indicate that the application passthrough
-     * opacity preference has been set and is pending to be automatically applied when the app
-     * regains capabilities to control passthrough state.
-     *
-     * <p>When passthrough state changes, whether due to this request succeeding or due to any other
-     * system or user initiated change, [OnPassthroughOpacityChangedListener] will be notified.
-     */
-    public fun setPassthroughOpacityPreference(
-        @Suppress("AutoBoxing") passthroughOpacityPreference: Float?
-    ): @SetPassthroughOpacityPreferenceResult Int
-
-    /**
      * Notifies an application whether or not the preferred spatial environment for the application
      * is active.
      *
@@ -158,28 +137,6 @@ public interface SpatialEnvironment {
 
     /** Remove a listener previously added by [addOnSpatialEnvironmentChangedListener]. */
     public fun removeOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>)
-
-    /** Result values for calls to SpatialEnvironment.setPassthroughOpacityPreference */
-    @IntDef(
-        SetPassthroughOpacityPreferenceResult.CHANGE_APPLIED,
-        SetPassthroughOpacityPreferenceResult.CHANGE_PENDING,
-    )
-    @Target(AnnotationTarget.TYPE)
-    @Retention(AnnotationRetention.SOURCE)
-    @Suppress("PublicTypedef")
-    public annotation class SetPassthroughOpacityPreferenceResult {
-        public companion object {
-            /**
-             * The call to [setPassthroughOpacityPreference] succeeded and should now be visible.
-             */
-            public const val CHANGE_APPLIED: Int = 0
-            /**
-             * The preference has been set, but will be applied only when the
-             * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] is acquired
-             */
-            public const val CHANGE_PENDING: Int = 1
-        }
-    }
 
     /** Result values for calls to SpatialEnvironment.setSpatialEnvironmentPreference */
     @IntDef(

@@ -68,61 +68,33 @@ class SpatialEnvironmentTest {
     @Test
     fun getPassthroughOpacityPreference_getsRuntimePassthroughOpacityPreference() {
         val rtPreference = 0.3f
-        whenever(mockRtEnvironment!!.passthroughOpacityPreference).thenReturn(rtPreference)
+        whenever(mockRtEnvironment!!.preferredPassthroughOpacity).thenReturn(rtPreference)
 
-        assertThat(environment!!.getPassthroughOpacityPreference()).isEqualTo(rtPreference)
-        verify(mockRtEnvironment!!).passthroughOpacityPreference
+        assertThat(environment!!.preferredPassthroughOpacity).isEqualTo(rtPreference)
+        verify(mockRtEnvironment!!).preferredPassthroughOpacity
     }
 
     @Test
     fun getPassthroughOpacityPreferenceNull_getsRuntimePassthroughOpacityPreference() {
         val rtPreference = null as Float?
-        whenever(mockRtEnvironment!!.passthroughOpacityPreference).thenReturn(rtPreference)
+        whenever(mockRtEnvironment!!.preferredPassthroughOpacity).thenReturn(rtPreference)
 
-        assertThat(environment!!.getPassthroughOpacityPreference()).isEqualTo(rtPreference)
-        verify(mockRtEnvironment!!).passthroughOpacityPreference
+        assertThat(environment!!.preferredPassthroughOpacity).isEqualTo(rtPreference)
+        verify(mockRtEnvironment!!).preferredPassthroughOpacity
     }
 
     @Test
     fun setPassthroughOpacityPreference_callsRuntimeSetPassthroughOpacityPreference() {
         val preference = 0.3f
-
-        whenever(mockRtEnvironment!!.setPassthroughOpacityPreference(any()))
-            .thenReturn(RtSpatialEnvironment.SetPassthroughOpacityPreferenceResult.CHANGE_APPLIED)
-        assertThat(environment!!.setPassthroughOpacityPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetPassthroughOpacityPreferenceChangeApplied::class.java
-            )
-
-        whenever(mockRtEnvironment!!.setPassthroughOpacityPreference(any()))
-            .thenReturn(RtSpatialEnvironment.SetPassthroughOpacityPreferenceResult.CHANGE_PENDING)
-        assertThat(environment!!.setPassthroughOpacityPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetPassthroughOpacityPreferenceChangePending::class.java
-            )
-
-        verify(mockRtEnvironment!!, times(2)).setPassthroughOpacityPreference(preference)
+        environment!!.preferredPassthroughOpacity = preference
+        verify(mockRtEnvironment)!!.preferredPassthroughOpacity = preference
     }
 
     @Test
     fun setPassthroughOpacityPreferenceNull_callsRuntimeSetPassthroughOpacityPreference() {
         val preference = null as Float?
-
-        whenever(mockRtEnvironment!!.setPassthroughOpacityPreference(anyOrNull()))
-            .thenReturn(RtSpatialEnvironment.SetPassthroughOpacityPreferenceResult.CHANGE_APPLIED)
-        assertThat(environment!!.setPassthroughOpacityPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetPassthroughOpacityPreferenceChangeApplied::class.java
-            )
-
-        whenever(mockRtEnvironment!!.setPassthroughOpacityPreference(anyOrNull()))
-            .thenReturn(RtSpatialEnvironment.SetPassthroughOpacityPreferenceResult.CHANGE_PENDING)
-        assertThat(environment!!.setPassthroughOpacityPreference(preference))
-            .isInstanceOf(
-                SpatialEnvironment.SetPassthroughOpacityPreferenceChangePending::class.java
-            )
-
-        verify(mockRtEnvironment!!, times(2)).setPassthroughOpacityPreference(preference)
+        environment!!.preferredPassthroughOpacity = preference
+        verify(mockRtEnvironment)!!.preferredPassthroughOpacity = preference
     }
 
     @Test

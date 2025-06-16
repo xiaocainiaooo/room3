@@ -31,7 +31,6 @@ import android.app.Activity;
 
 import androidx.xr.runtime.internal.MaterialResource;
 import androidx.xr.runtime.internal.SpatialEnvironment;
-import androidx.xr.runtime.internal.SpatialEnvironment.SetPassthroughOpacityPreferenceResult;
 import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult;
 import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
@@ -166,48 +165,32 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void setPassthroughOpacityPreference() {
-        mEnvironment.setPassthroughOpacityPreference(null);
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isNull();
+    public void setPreferredPassthroughOpacity() {
+        mEnvironment.setPreferredPassthroughOpacity(null);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNull();
 
-        mEnvironment.setPassthroughOpacityPreference(0.1f);
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isEqualTo(0.1f);
+        mEnvironment.setPreferredPassthroughOpacity(0.1f);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isEqualTo(0.1f);
     }
 
     @Test
-    public void setPassthroughOpacityPreferenceNearOrUnderZero_getsZeroOpacity() {
+    public void setPreferredPassthroughOpacityNearOrUnderZero_getsZeroOpacity() {
         // Opacity values below 1% should be treated as zero.
-        mEnvironment.setPassthroughOpacityPreference(0.009f);
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isEqualTo(0.0f);
+        mEnvironment.setPreferredPassthroughOpacity(0.009f);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isEqualTo(0.0f);
 
-        mEnvironment.setPassthroughOpacityPreference(-0.1f);
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isEqualTo(0.0f);
+        mEnvironment.setPreferredPassthroughOpacity(-0.1f);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isEqualTo(0.0f);
     }
 
     @Test
-    public void setPassthroughOpacityPreferenceNearOrOverOne_getsFullOpacity() {
+    public void setPreferredPassthroughOpacityNearOrOverOne_getsFullOpacity() {
         // Opacity values above 99% should be treated as full opacity.
-        mEnvironment.setPassthroughOpacityPreference(0.991f);
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isEqualTo(1.0f);
+        mEnvironment.setPreferredPassthroughOpacity(0.991f);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isEqualTo(1.0f);
 
-        mEnvironment.setPassthroughOpacityPreference(1.1f);
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isEqualTo(1.0f);
-    }
-
-    @Test
-    public void setPassthroughOpacityPreference_returnsAccordingToSpatialCapabilities() {
-        // Change should be applied if the spatial capabilities allow it, otherwise should be
-        // pending.
-        SpatialState state = mXrExtensions.getSpatialState(mActivity);
-        ShadowSpatialState.extract(state)
-                .setSpatialCapabilities(ShadowSpatialCapabilities.createAll());
-        assertThat(mEnvironment.setPassthroughOpacityPreference(0.5f))
-                .isEqualTo(SetPassthroughOpacityPreferenceResult.CHANGE_APPLIED);
-
-        ShadowSpatialState.extract(state)
-                .setSpatialCapabilities(ShadowSpatialCapabilities.create());
-        assertThat(mEnvironment.setPassthroughOpacityPreference(0.6f))
-                .isEqualTo(SetPassthroughOpacityPreferenceResult.CHANGE_PENDING);
+        mEnvironment.setPreferredPassthroughOpacity(1.1f);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isEqualTo(1.0f);
     }
 
     @Test
@@ -659,7 +642,7 @@ public final class SpatialEnvironmentImplTest {
     }
 
     @Test
-    public void dispose_clearsPassthroughOpacityPreferenceListeners() {
+    public void dispose_clearsPreferredPassthroughOpacityListeners() {
         @SuppressWarnings(value = "unchecked")
         Consumer<Float> listener = (Consumer<Float>) mock(Consumer.class);
         mEnvironment.addOnPassthroughOpacityChangedListener(directExecutor(), listener);
@@ -694,7 +677,7 @@ public final class SpatialEnvironmentImplTest {
         mEnvironment.setSpatialEnvironmentPreference(
                 new SpatialEnvironmentPreference(
                         new ExrImageResourceImpl(exr), new GltfModelResourceImpl(gltf)));
-        mEnvironment.setPassthroughOpacityPreference(0.5f);
+        mEnvironment.setPreferredPassthroughOpacity(0.5f);
 
         long initialSkybox = mFakeImpressApi.getCurrentEnvironmentLight();
         List<Integer> geometryNodes = mFakeImpressApi.getImpressNodesForToken(gltf);
@@ -707,7 +690,7 @@ public final class SpatialEnvironmentImplTest {
         assertThat(mEnvironment.getSpatialEnvironmentPreference()).isNotNull();
         assertThat(mEnvironment.isSpatialEnvironmentPreferenceActive()).isTrue();
 
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isNotNull();
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNotNull();
         assertThat(mEnvironment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
 
         mEnvironment.dispose();
@@ -720,7 +703,7 @@ public final class SpatialEnvironmentImplTest {
                 .isNull();
         assertThat(mEnvironment.getSpatialEnvironmentPreference()).isNull();
         assertThat(mEnvironment.isSpatialEnvironmentPreferenceActive()).isFalse();
-        assertThat(mEnvironment.getPassthroughOpacityPreference()).isNull();
+        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNull();
         assertThat(mEnvironment.getCurrentPassthroughOpacity()).isEqualTo(0.0f);
     }
 

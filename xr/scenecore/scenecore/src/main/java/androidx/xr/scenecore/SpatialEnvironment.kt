@@ -21,7 +21,6 @@ package androidx.xr.scenecore
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.JxrPlatformAdapter
 import androidx.xr.runtime.internal.SpatialEnvironment as RtSpatialEnvironment
-import androidx.xr.runtime.internal.SpatialEnvironment.SetPassthroughOpacityPreferenceResult as RtSetPassthroughOpacityPreferenceResult
 import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult as RtSetSpatialEnvironmentPreferenceResult
 import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference as RtSpatialEnvironmentPreference
 import com.google.errorprone.annotations.CanIgnoreReturnValue
@@ -103,44 +102,39 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
     }
 
     /**
-     * Sets the application's preferred passthrough opacity between 0.0f and 1.0f. Upon
-     * construction, the default value is null, which means "no application preference".
+     * The application's preferred passthrough opacity.
      *
-     * Setting the application preference through this method does not guarantee that the value will
-     * be immediately applied and visible to the user. The actual passthrough opacity value is
-     * controlled by the system in response to a combination of the application's preference and
-     * user actions outside the application. Generally, the application's preference will be shown
-     * to the user when the application has the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability. The current value
-     * visible to the user can be observed by calling [currentPassthroughOpacity] or by registering
-     * a listener with [addOnPassthroughOpacityChangedListener].
+     * Upon construction, the default value is null, which means "no application preference". The
+     * application's preferred passthrough opacity can be set between 0.0f and 1.0f.
      *
-     * @param passthroughOpacityPreference The application's passthrough opacity preference between
-     *   0.0f (disabled with no passthrough) and 1.0f (fully enabled passthrough hides the spatial
-     *   environment). Values within 0.01f of 0.0 or 1.0 will be snapped to those values. Other
-     *   values result in semi-transparent passthrough alpha blended with the spatial environment.
-     *   Values outside [0.0f, 1.0f] are clamped. If null, the system will manage the passthrough
-     *   opacity.
-     * @return The result of the call to set the passthrough opacity preference. If the preference
-     *   was successfully set and applied, the result will be
-     *   [SetPassthroughOpacityPreferenceChangeApplied]. If the preference was set, but it cannot be
-     *   currently applied, the result will be [SetPassthroughOpacityPreferenceChangePending].
+     * Setting the application preference does not guarantee that the value will be immediately
+     * applied and visible to the user. The actual passthrough opacity value is controlled by the
+     * system in response to a combination of this preference and user actions outside the
+     * application. Generally, this preference is honored when the application has the
+     * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability.
+     *
+     * The value should be between 0.0f (passthrough disabled) and 1.0f (passthrough fully obscures
+     * the spatial environment). Values within 0.01f of 0.0 or 1.0 are snapped to those values.
+     * Values outside [0.0f, 1.0f] are clamped. Other values result in semi-transparent passthrough
+     * that is alpha blended with the spatial environment. Setting this property to `null` clears
+     * the application's preference, allowing the system to manage passthrough opacity.
+     *
+     * The actual value visible to the user can be observed by calling [currentPassthroughOpacity]
+     * or by registering a listener with [addOnPassthroughOpacityChangedListener].
      */
-    @CanIgnoreReturnValue
-    public fun setPassthroughOpacityPreference(
-        @SuppressWarnings("AutoBoxing") passthroughOpacityPreference: Float?
-    ): SetPassthroughOpacityPreferenceResult {
-        return rtEnvironment
-            .setPassthroughOpacityPreference(passthroughOpacityPreference)
-            .toSetPassthroughOpacityPreferenceResult()
-    }
+    @get:SuppressWarnings("AutoBoxing")
+    @set:SuppressWarnings("AutoBoxing")
+    public var preferredPassthroughOpacity: Float?
+        get() = rtEnvironment.preferredPassthroughOpacity
+        set(@SuppressWarnings("AutoBoxing") value) {
+            rtEnvironment.preferredPassthroughOpacity = value
+        }
 
     /**
      * Gets the current passthrough opacity value visible to the user.
      *
-     * Unlike the application's opacity preference returned by [getPassthroughOpacityPreference],
-     * this value can be overwritten by the system, and is not directly under the application's
-     * control.
+     * Unlike the application's opacity preference returned by [preferredPassthroughOpacity], this
+     * value can be overwritten by the system, and is not directly under the application's control.
      *
      * @return The current passthrough opacity value between 0.0f and 1.0f. A value of 0.0f means no
      *   passthrough is shown, and a value of 1.0f means the passthrough completely obscures the
@@ -148,24 +142,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      */
     public val currentPassthroughOpacity: Float
         get() = rtEnvironment.currentPassthroughOpacity
-
-    /**
-     * Gets the current passthrough opacity preference set through
-     * [setPassthroughOpacityPreference]. Defaults to null if [setPassthroughOpacityPreference] has
-     * not been called.
-     *
-     * This value only reflects the application's preference and does not necessarily reflect what
-     * the system is currently showing the user. See [currentPassthroughOpacity] to get the actual
-     * visible opacity value.
-     *
-     * @return The last passthrough opacity value between 0.0f and 1.0f requested through
-     *   [setPassthroughOpacityPreference]. If null, no application preference is set and the
-     *   passthrough opacity will be fully managed through the system.
-     */
-    @SuppressWarnings("AutoBoxing")
-    public fun getPassthroughOpacityPreference(): Float? {
-        return rtEnvironment.passthroughOpacityPreference
-    }
 
     /**
      * Notifies an application when the user visible passthrough state changes, such as when the
@@ -325,23 +301,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
         rtEnvironment.removeOnSpatialEnvironmentChangedListener(listener)
     }
 
-    /** Result values for calls to [setPassthroughOpacityPreference] */
-    public sealed class SetPassthroughOpacityPreferenceResult()
-
-    /** The call to [setPassthroughOpacityPreference] succeeded and should now be visible. */
-    public class SetPassthroughOpacityPreferenceChangeApplied :
-        SetPassthroughOpacityPreferenceResult()
-
-    /**
-     * The call to [setPassthroughOpacityPreference] successfully applied the preference, but it is
-     * not immediately visible due to requesting a state change while the activity does not have the
-     * [SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL] capability to control the app
-     * passthrough state. The preference was still set and will be applied when the capability is
-     * gained.
-     */
-    public class SetPassthroughOpacityPreferenceChangePending :
-        SetPassthroughOpacityPreferenceResult()
-
     /** Result values for calls to SpatialEnvironment.setSpatialEnvironmentPreference */
     public sealed class SetSpatialEnvironmentPreferenceResult()
 
@@ -391,17 +350,5 @@ internal fun Int.toSetSpatialEnvironmentPreferenceResult():
             SpatialEnvironment.SetSpatialEnvironmentPreferenceChangePending()
         else ->
             throw IllegalArgumentException("Unknown SetSpatialEnvironmentPreferenceResult: $this")
-    }
-}
-
-internal fun Int.toSetPassthroughOpacityPreferenceResult():
-    SpatialEnvironment.SetPassthroughOpacityPreferenceResult {
-    return when (this) {
-        RtSetPassthroughOpacityPreferenceResult.CHANGE_APPLIED ->
-            SpatialEnvironment.SetPassthroughOpacityPreferenceChangeApplied()
-        RtSetPassthroughOpacityPreferenceResult.CHANGE_PENDING ->
-            SpatialEnvironment.SetPassthroughOpacityPreferenceChangePending()
-        else ->
-            throw IllegalArgumentException("Unknown SetPassthroughOpacityPreferenceResult: $this")
     }
 }

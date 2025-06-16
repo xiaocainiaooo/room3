@@ -123,7 +123,7 @@ class VideoPlayerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         session = (Session.create(this) as SessionCreateSuccess).session
-        session.scene.spatialEnvironment.setPassthroughOpacityPreference(0.0f)
+        session.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
         session.configure(Config(headTracking = Config.HeadTrackingMode.LAST_KNOWN))
 
         checkExternalStoragePermission()
@@ -191,8 +191,8 @@ class VideoPlayerActivity : ComponentActivity() {
         val passthroughOpacity: Float = session.scene.spatialEnvironment.currentPassthroughOpacity
         Log.i("TogglePassthrough", "TogglePassthrough!")
         when (passthroughOpacity) {
-            0.0f -> session.scene.spatialEnvironment.setPassthroughOpacityPreference(1.0f)
-            1.0f -> session.scene.spatialEnvironment.setPassthroughOpacityPreference(0.0f)
+            0.0f -> session.scene.spatialEnvironment.preferredPassthroughOpacity = 1.0f
+            1.0f -> session.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
         }
     }
 

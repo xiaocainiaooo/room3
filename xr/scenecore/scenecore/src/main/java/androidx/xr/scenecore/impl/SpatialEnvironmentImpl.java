@@ -27,9 +27,6 @@ import androidx.xr.runtime.internal.GltfModelResource;
 import androidx.xr.runtime.internal.MaterialResource;
 import androidx.xr.runtime.internal.SpatialCapabilities;
 import androidx.xr.runtime.internal.SpatialEnvironment;
-import androidx.xr.runtime.internal.SpatialEnvironment.SetPassthroughOpacityPreferenceResult;
-import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPreferenceResult;
-import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference;
 
 import com.android.extensions.xr.XrExtensionResult;
 import com.android.extensions.xr.XrExtensions;
@@ -223,11 +220,9 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
 
     @Override
     @CanIgnoreReturnValue
-    public @SetPassthroughOpacityPreferenceResult int setPassthroughOpacityPreference(
-            @Nullable Float opacity) {
+    public void setPreferredPassthroughOpacity(@Nullable Float opacity) {
         // To work around floating-point precision issues, the opacity preference is documented to
-        // clamp
-        // to 0.0f if it is set below 1% opacity and it clamps to 1.0f if it is set above 99%
+        // clamp to 0.0f if it is set below 1% opacity and it clamps to 1.0f if it is set above 99%
         // opacity.
 
         Float newPassthroughOpacityPreference =
@@ -236,7 +231,7 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
                         : (opacity < 0.01f ? 0.0f : (opacity > 0.99f ? 1.0f : opacity));
 
         if (Objects.equals(newPassthroughOpacityPreference, mPassthroughOpacityPreference)) {
-            return SetPassthroughOpacityPreferenceResult.CHANGE_APPLIED;
+            return;
         }
 
         mPassthroughOpacityPreference = newPassthroughOpacityPreference;
@@ -250,19 +245,10 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
         } else {
             applyPassthroughChange(0.0f);
         }
-
-        if (RuntimeUtils.convertSpatialCapabilities(
-                        mSpatialStateProvider.get().getSpatialCapabilities())
-                .hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL)) {
-            return SetPassthroughOpacityPreferenceResult.CHANGE_APPLIED;
-        } else {
-            return SetPassthroughOpacityPreferenceResult.CHANGE_PENDING;
-        }
     }
 
     // Synchronized because we may need to update the entire Spatial State if the opacity has not
-    // been
-    // initialized previously.
+    // been initialized previously.
     @Override
     public synchronized float getCurrentPassthroughOpacity() {
         if (mActivePassthroughOpacity == null) {
@@ -272,7 +258,7 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
     }
 
     @Override
-    public @Nullable Float getPassthroughOpacityPreference() {
+    public @Nullable Float getPreferredPassthroughOpacity() {
         return mPassthroughOpacityPreference;
     }
 

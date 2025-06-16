@@ -111,7 +111,7 @@ class VideoPlayerDrmTestActivity : ComponentActivity() {
 
         val session = (Session.create(this) as SessionCreateSuccess).session
         session.configure(Config(headTracking = HeadTrackingMode.LAST_KNOWN))
-        session.scene.spatialEnvironment.setPassthroughOpacityPreference(0.0f)
+        session.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
 
         if (movableComponentMp == null) {
             movableComponentMp = MovableComponent.create(session)
@@ -143,8 +143,8 @@ class VideoPlayerDrmTestActivity : ComponentActivity() {
         val passthroughOpacity: Float = session.scene.spatialEnvironment.currentPassthroughOpacity
         Log.i(TAG, "TogglePassthrough!")
         when (passthroughOpacity) {
-            0.0f -> session.scene.spatialEnvironment.setPassthroughOpacityPreference(1.0f)
-            1.0f -> session.scene.spatialEnvironment.setPassthroughOpacityPreference(0.0f)
+            0.0f -> session.scene.spatialEnvironment.preferredPassthroughOpacity = 1.0f
+            1.0f -> session.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
         }
     }
 

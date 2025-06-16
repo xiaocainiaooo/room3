@@ -258,12 +258,12 @@ class EnvironmentActivity : AppCompatActivity() {
         val opacityTextView = findViewById<TextView>(R.id.sliderValueTextView)
         val opacitySlider = findViewById<Slider>(R.id.environment_mySlider)
         opacitySlider.addOnChangeListener { _, value, _ ->
-            session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(value)
+            session!!.scene.spatialEnvironment.preferredPassthroughOpacity = value
             passthroughOpacityPreference.value = value
             opacityTextView.text = opacityValueText(value, currentPassthroughOpacity.value)
         }
 
-        session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(0f)
+        session!!.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
         session!!.scene.spatialEnvironment.addOnPassthroughOpacityChangedListener { newOpacity ->
             currentPassthroughOpacity.value = newOpacity
             opacityTextView.text =
@@ -280,7 +280,7 @@ class EnvironmentActivity : AppCompatActivity() {
         // Unset opacity preference
         val unsetOpacityPrefButton = findViewById<Button>(R.id.environment_sliderButton)
         unsetOpacityPrefButton.setOnClickListener {
-            session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(0f)
+            session!!.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
             opacitySlider.value = 0f
             opacityTextView.text = opacityValueText(0f, 0f)
         }
@@ -308,9 +308,9 @@ class EnvironmentActivity : AppCompatActivity() {
         val lastApiCall = "togglePassthrough"
         Log.i(TAG, lastApiCall)
         if (session!!.scene.spatialEnvironment.currentPassthroughOpacity > 0) {
-            session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(0f)
+            session!!.scene.spatialEnvironment.preferredPassthroughOpacity = 0.0f
         } else {
-            session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(1f)
+            session!!.scene.spatialEnvironment.preferredPassthroughOpacity = 1.0f
         }
     }
 
