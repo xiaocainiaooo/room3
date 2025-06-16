@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.privacysandbox.ui.macrobenchmark.testapp.target
+package androidx.privacysandbox.ui.macrobenchmark.testapp.sdkproviderutils
 
 import android.os.Bundle
 import androidx.privacysandbox.ui.macrobenchmark.testapp.sdkproviderutils.SdkApiConstants.Companion.AdType
@@ -32,8 +32,6 @@ data class FragmentOptions(
     @ViewabilityOption val drawViewability: Boolean,
     @UiFrameworkOption val uiFramework: Int,
 ) {
-
-    private var fragment: BaseFragment = deriveFragment()
 
     companion object {
         const val KEY_FRAGMENT = "fragment"
@@ -73,54 +71,54 @@ data class FragmentOptions(
             val fragmentExtra = extras.getString(KEY_FRAGMENT)
             val fragment =
                 when (fragmentExtra) {
-                    FRAGMENT_RESIZE -> FragmentOption.RESIZE
-                    FRAGMENT_RESIZE_HIDDEN -> FragmentOption.RESIZE_HIDDEN
-                    FRAGMENT_POOLING_CONTAINER -> FragmentOption.POOLING_CONTAINER
-                    FRAGMENT_SCROLL -> FragmentOption.SCROLL
-                    FRAGMENT_OCCLUSIONS_HIDDEN -> FragmentOption.OCCLUSIONS_HIDDEN
-                    FRAGMENT_USER_INTERACTIONS -> FragmentOption.USER_INTERACTIONS
-                    else -> FragmentOption.RESIZE
+                    FRAGMENT_RESIZE -> FragmentOption.Companion.RESIZE
+                    FRAGMENT_RESIZE_HIDDEN -> FragmentOption.Companion.RESIZE_HIDDEN
+                    FRAGMENT_POOLING_CONTAINER -> FragmentOption.Companion.POOLING_CONTAINER
+                    FRAGMENT_SCROLL -> FragmentOption.Companion.SCROLL
+                    FRAGMENT_OCCLUSIONS_HIDDEN -> FragmentOption.Companion.OCCLUSIONS_HIDDEN
+                    FRAGMENT_USER_INTERACTIONS -> FragmentOption.Companion.USER_INTERACTIONS
+                    else -> FragmentOption.Companion.RESIZE
                 }
             val mediationExtra = extras.getString(KEY_MEDIATION)
             val mediation =
                 when (mediationExtra) {
-                    MEDIATION_TYPE_NON_MEDIATED -> MediationOption.NON_MEDIATED
-                    MEDIATION_TYPE_IN_APP -> MediationOption.IN_APP_MEDIATEE
-                    MEDIATION_TYPE_IN_RUNTIME -> MediationOption.SDK_RUNTIME_MEDIATEE
+                    MEDIATION_TYPE_NON_MEDIATED -> MediationOption.Companion.NON_MEDIATED
+                    MEDIATION_TYPE_IN_APP -> MediationOption.Companion.IN_APP_MEDIATEE
+                    MEDIATION_TYPE_IN_RUNTIME -> MediationOption.Companion.SDK_RUNTIME_MEDIATEE
                     MEDIATION_TYPE_IN_RUNTIME_WITH_OVERLAY ->
-                        MediationOption.SDK_RUNTIME_MEDIATEE_WITH_OVERLAY
-                    MEDIATION_TYPE_REFRESHABLE -> MediationOption.REFRESHABLE_MEDIATION
-                    else -> MediationOption.NON_MEDIATED
+                        MediationOption.Companion.SDK_RUNTIME_MEDIATEE_WITH_OVERLAY
+                    MEDIATION_TYPE_REFRESHABLE -> MediationOption.Companion.REFRESHABLE_MEDIATION
+                    else -> MediationOption.Companion.NON_MEDIATED
                 }
             val adTypeExtra = extras.getString(KEY_AD_TYPE)
             val adType =
                 when (adTypeExtra) {
-                    AD_TYPE_NON_WEBVIEW -> AdType.BASIC_NON_WEBVIEW
-                    AD_TYPE_BASIC_WEBVIEW -> AdType.BASIC_WEBVIEW
-                    AD_TYPE_WEBVIEW_FROM_ASSETS -> AdType.WEBVIEW_FROM_LOCAL_ASSETS
-                    AD_TYPE_VIDEO -> AdType.NON_WEBVIEW_VIDEO
-                    else -> AdType.BASIC_NON_WEBVIEW
+                    AD_TYPE_NON_WEBVIEW -> AdType.Companion.BASIC_NON_WEBVIEW
+                    AD_TYPE_BASIC_WEBVIEW -> AdType.Companion.BASIC_WEBVIEW
+                    AD_TYPE_WEBVIEW_FROM_ASSETS -> AdType.Companion.WEBVIEW_FROM_LOCAL_ASSETS
+                    AD_TYPE_VIDEO -> AdType.Companion.NON_WEBVIEW_VIDEO
+                    else -> AdType.Companion.BASIC_NON_WEBVIEW
                 }
             val zOrderExtra = extras.getString(KEY_Z_ORDER)
             val zOrder =
                 when (zOrderExtra) {
-                    Z_ORDER_ABOVE -> ZOrderOption.Z_ABOVE
-                    Z_ORDER_BELOW -> ZOrderOption.Z_BELOW
-                    else -> ZOrderOption.Z_ABOVE
+                    Z_ORDER_ABOVE -> ZOrderOption.Companion.Z_ABOVE
+                    Z_ORDER_BELOW -> ZOrderOption.Companion.Z_BELOW
+                    else -> ZOrderOption.Companion.Z_ABOVE
                 }
             val viewabilityOption = extras.getBoolean(KEY_DRAW_VIEWABILITY, false)
             val drawViewability =
                 if (viewabilityOption) {
-                    ViewabilityOption.DRAW
+                    ViewabilityOption.Companion.DRAW
                 } else {
-                    ViewabilityOption.DO_NOT_DRAW
+                    ViewabilityOption.Companion.DO_NOT_DRAW
                 }
             val uiFrameworkExtra = extras.getString(KEY_UI_FRAMEWORK)
             val uiFramework =
                 when (uiFrameworkExtra) {
-                    UI_FRAMEWORK_VIEW -> UiFrameworkOption.VIEW
-                    UI_FRAMEWORK_COMPOSE -> UiFrameworkOption.COMPOSE
-                    else -> UiFrameworkOption.VIEW
+                    UI_FRAMEWORK_VIEW -> UiFrameworkOption.Companion.VIEW
+                    UI_FRAMEWORK_COMPOSE -> UiFrameworkOption.Companion.COMPOSE
+                    else -> UiFrameworkOption.Companion.VIEW
                 }
             return FragmentOptions(
                 fragment,
@@ -130,37 +128,6 @@ data class FragmentOptions(
                 drawViewability,
                 uiFramework,
             )
-        }
-    }
-
-    /**
-     * Returns the fragment that this [FragmentOptions] describes. This is dictated by the fragment
-     * option and the UI framework option.
-     */
-    fun getFragment(): BaseFragment {
-        return fragment
-    }
-
-    private fun deriveFragment(): BaseFragment {
-        return when (uiFramework) {
-            UiFrameworkOption.VIEW ->
-                when (cujType) {
-                    FragmentOption.SCROLL -> ScrollFragment()
-                    FragmentOption.RESIZE -> ResizeFragment()
-                    FragmentOption.POOLING_CONTAINER -> PoolingContainerFragment()
-                    FragmentOption.RESIZE_HIDDEN -> ResizeHiddenFragment()
-                    FragmentOption.OCCLUSIONS_HIDDEN -> OcclusionFragment()
-                    FragmentOption.USER_INTERACTIONS -> UserInteractionFragment()
-                    else -> ResizeFragment()
-                }
-            UiFrameworkOption.COMPOSE ->
-                when (cujType) {
-                    FragmentOption.SCROLL -> ScrollComposeFragment()
-                    FragmentOption.RESIZE -> ResizeComposeFragment()
-                    FragmentOption.POOLING_CONTAINER -> LazyListFragment()
-                    else -> ResizeComposeFragment()
-                }
-            else -> ResizeFragment()
         }
     }
 }
