@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-@file:Suppress("JVM_FIELD", "Deprecation")
+@file:Suppress("JVM_FIELD")
 
 package androidx.xr.scenecore
 
-import android.util.Log
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.JxrPlatformAdapter
 import androidx.xr.runtime.internal.SpatialEnvironment as RtSpatialEnvironment
@@ -27,7 +26,6 @@ import androidx.xr.runtime.internal.SpatialEnvironment.SetSpatialEnvironmentPref
 import androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference as RtSpatialEnvironmentPreference
 import com.google.errorprone.annotations.CanIgnoreReturnValue
 import java.util.concurrent.Executor
-import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
 // TODO: Support a nullable Runtime in the ctor. This should allow the Runtime to "show up" later.
@@ -58,28 +56,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
     private val TAG = "SpatialEnvironment"
 
     private val rtEnvironment: RtSpatialEnvironment = runtime.spatialEnvironment
-
-    // These two fields are only used by the deprecated setSkybox() and setGeometry() methods.
-    // TODO: b/370015943 - Remove after clients migrate to the SpatialEnvironmentPreference APIs.
-    private val deprecatedSkybox = AtomicReference<ExrImage?>()
-    private val deprecatedGeometry = AtomicReference<GltfModel?>()
-
-    // TODO: b/370484799 - Remove this once all clients move away from it.
-    /** Describes if/how the User can view their real-world physical environment. */
-    @Deprecated(message = "Use isSpatialEnvironmentPreferenceActive() instead.")
-    public class PassthroughMode internal constructor(public val value: Int) {
-        public companion object {
-            /** The state at startup. The application cannot set this state. No longer used. */
-            @JvmField public val UNINITIALIZED: PassthroughMode = PassthroughMode(0)
-            /**
-             * The user's passthrough is not composed into their view. Environment skyboxes and
-             * geometry are only visible in this state.
-             */
-            @JvmField public val DISABLED: PassthroughMode = PassthroughMode(1)
-            /** The user's passthrough is visible at full or partial opacity. */
-            @JvmField public val ENABLED: PassthroughMode = PassthroughMode(2)
-        }
-    }
 
     /**
      * Represents the preferred spatial environment for the application.
@@ -124,54 +100,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
             result = 31 * result + (geometry?.hashCode() ?: 0)
             return result
         }
-    }
-
-    // TODO: b/370484799 - Remove this once all clients migrate to the opacity Preference APIs.
-    /**
-     * Sets the preference for passthrough.
-     *
-     * Calling with DISABLED is equivalent to calling setPassthroughOpacityPreference(0.0f) and
-     * calling with ENABLED is equivalent to calling setPassthroughOpacityPreference(1.0f). Calling
-     * with UNINITIALIZED is ignored. See [setPassthroughOpacityPreference] for more details.
-     */
-    @Deprecated(message = "Use setPassthroughOpacityPreference instead.")
-    public fun setPassthrough(passthroughMode: PassthroughMode) {
-        when (passthroughMode) {
-            PassthroughMode.UNINITIALIZED -> return // Do nothing. This isn't allowed.
-            PassthroughMode.DISABLED -> setPassthroughOpacityPreference(0.0f)
-            PassthroughMode.ENABLED -> setPassthroughOpacityPreference(1.0f)
-        }
-    }
-
-    // TODO: b/370484799 - Remove this once all clients migrate to the opacity Preference APIs.
-    /**
-     * Sets the preference for passthrough. This is equivalent to calling
-     * [setPassthroughOpacityPreference] with the given opacity value.
-     */
-    @Deprecated(message = "Use setPassthroughOpacityPreference instead.")
-    public fun setPassthroughOpacity(passthroughOpacity: Float) {
-        setPassthroughOpacityPreference(passthroughOpacity)
-    }
-
-    // TODO: b/370484799 - Remove this once all clients migrate to the opacity Preference APIs.
-    /** Gets the current preference for passthrough mode. */
-    @Deprecated(message = "Use getCurrentPassthroughOpacity instead.")
-    public fun getPassthroughMode(): PassthroughMode {
-        if (getCurrentPassthroughOpacity() > 0.0f) {
-            return PassthroughMode.ENABLED
-        } else {
-            return PassthroughMode.DISABLED
-        }
-    }
-
-    // TODO: b/370484799 - Remove this once all clients migrate to the opacity Preference APIs.
-    /**
-     * Gets the current passthrough opacity. This may be different than the passthrough opacity
-     * preference.
-     */
-    @Deprecated(message = "Use getCurrentPassthroughOpacity instead.")
-    public fun getPassthroughOpacity(): Float {
-        return getCurrentPassthroughOpacity()
     }
 
     /**
@@ -275,48 +203,6 @@ public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
      */
     public fun removeOnPassthroughOpacityChangedListener(listener: Consumer<Float>) {
         rtEnvironment.removeOnPassthroughOpacityChangedListener(listener)
-    }
-
-    // TODO: b/370015943 - Remove this once all clients migrate to the SpatialEnvironment APIs.
-    /**
-     * Sets the preferred environmental skybox based on a pre-loaded EXR Image.
-     *
-     * Note that this method does not necessarily cause an immediate change, it only sets a
-     * preference. Once the device enters a state where the XR background can be changed, the
-     * preference will be applied.
-     *
-     * Setting the skybox to null will disable the skybox.
-     */
-    @Deprecated(message = "Use setSpatialEnvironmentPreference() instead.")
-    public fun setSkybox(exrImage: ExrImage?) {
-        Log.w(TAG, "setGeometry() is deprecated. Use setSpatialEnvironmentPreference() instead.")
-        deprecatedSkybox.updateAndGet {
-            setSpatialEnvironmentPreference(
-                SpatialEnvironmentPreference(exrImage, deprecatedGeometry.get())
-            )
-            exrImage
-        }
-    }
-
-    // TODO: b/370015943 - Remove this once all clients migrate to the SpatialEnvironment APIs.
-    /**
-     * Sets the preferred environmental geometry based on a pre-loaded [GltfModel].
-     *
-     * Note that this method does not necessarily cause an immediate change, it only sets a
-     * preference. Once the device enters a state where the XR background can be changed, the
-     * preference will be applied.
-     *
-     * Setting the geometry to null will disable the geometry.
-     */
-    @Deprecated(message = "Use setSpatialEnvironmentPreference() instead.")
-    public fun setGeometry(gltfModel: GltfModel?) {
-        Log.w(TAG, "setGeometry() is deprecated. Use setSpatialEnvironmentPreference() instead.")
-        deprecatedGeometry.updateAndGet {
-            setSpatialEnvironmentPreference(
-                SpatialEnvironmentPreference(deprecatedSkybox.get(), gltfModel)
-            )
-            gltfModel
-        }
     }
 
     /**

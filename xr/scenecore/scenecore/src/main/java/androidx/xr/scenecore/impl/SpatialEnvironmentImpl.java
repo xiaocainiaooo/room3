@@ -58,9 +58,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /** Concrete implementation of SpatialEnvironment / XR Wallpaper for Android XR. */
-// TODO(b/373435470): Remove "deprecation"
 @SuppressLint("NewApi") // TODO: b/413661481 - Remove this suppression prior to JXR stable release.
-@SuppressWarnings({"deprecation", "BanSynchronizedMethods", "BanConcurrentHashMap"})
+@SuppressWarnings({"BanSynchronizedMethods", "BanConcurrentHashMap"})
 final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consumer<Node>> {
     public static final String TAG = "SpatialEnvironmentImpl";
 

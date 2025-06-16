@@ -304,25 +304,13 @@ class EnvironmentActivity : AppCompatActivity() {
         addNewSpatialLogEvent(SpatialEventLog(currentTimestamp(), eventType.text, text))
     }
 
-    @Suppress("DEPRECATION")
     private fun togglePassthrough() {
         val lastApiCall = "togglePassthrough"
-        val passthroughMode: SpatialEnvironment.PassthroughMode =
-            session!!.scene.spatialEnvironment.getPassthroughMode()
         Log.i(TAG, lastApiCall)
-        when (passthroughMode) {
-            SpatialEnvironment.PassthroughMode.UNINITIALIZED -> return
-            //  Do Nothing. We're still waiting
-            SpatialEnvironment.PassthroughMode.DISABLED ->
-                session!!
-                    .scene
-                    .spatialEnvironment
-                    .setPassthrough(SpatialEnvironment.PassthroughMode.ENABLED)
-            SpatialEnvironment.PassthroughMode.ENABLED ->
-                session!!
-                    .scene
-                    .spatialEnvironment
-                    .setPassthrough(SpatialEnvironment.PassthroughMode.DISABLED)
+        if (session!!.scene.spatialEnvironment.getCurrentPassthroughOpacity() > 0) {
+            session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(0f)
+        } else {
+            session!!.scene.spatialEnvironment.setPassthroughOpacityPreference(1f)
         }
     }
 
