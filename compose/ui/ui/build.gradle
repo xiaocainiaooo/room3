@@ -203,8 +203,6 @@ dependencies {
     }
 }
 
-packageInspector(project, ":compose:ui:ui-inspection")
-
 dependencies {
     lintChecks(project(":compose:ui:ui-lint"))
     lintPublish(project(":compose:ui:ui-lint"))
@@ -235,6 +233,7 @@ android {
 androidComponents {
     onVariants(selector().all(), { variant ->
         variant.sources.java?.addStaticSourceDirectory("src/androidMain/java")
+        packageInspector(variant, project, project(":compose:ui:ui-inspection"))
     })
 }
 
