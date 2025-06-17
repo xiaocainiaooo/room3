@@ -16,6 +16,8 @@
 
 package androidx.xr.scenecore.impl;
 
+import static androidx.xr.runtime.internal.SpatialEnvironment.NO_PASSTHROUGH_OPACITY_PREFERENCE;
+
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
@@ -163,8 +165,9 @@ public final class SpatialEnvironmentImplTest {
 
     @Test
     public void setPreferredPassthroughOpacity() {
-        mEnvironment.setPreferredPassthroughOpacity(null);
-        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNull();
+        mEnvironment.setPreferredPassthroughOpacity(NO_PASSTHROUGH_OPACITY_PREFERENCE);
+        assertThat(mEnvironment.getPreferredPassthroughOpacity())
+                .isEqualTo(NO_PASSTHROUGH_OPACITY_PREFERENCE);
 
         mEnvironment.setPreferredPassthroughOpacity(0.1f);
         assertThat(mEnvironment.getPreferredPassthroughOpacity()).isEqualTo(0.1f);
@@ -666,7 +669,8 @@ public final class SpatialEnvironmentImplTest {
         assertThat(mEnvironment.getPreferredSpatialEnvironment()).isNotNull();
         assertThat(mEnvironment.isPreferredSpatialEnvironmentActive()).isTrue();
 
-        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNotNull();
+        assertThat(mEnvironment.getPreferredPassthroughOpacity())
+                .isNotEqualTo(NO_PASSTHROUGH_OPACITY_PREFERENCE);
         assertThat(mEnvironment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
 
         mEnvironment.dispose();
@@ -679,7 +683,8 @@ public final class SpatialEnvironmentImplTest {
                 .isNull();
         assertThat(mEnvironment.getPreferredSpatialEnvironment()).isNull();
         assertThat(mEnvironment.isPreferredSpatialEnvironmentActive()).isFalse();
-        assertThat(mEnvironment.getPreferredPassthroughOpacity()).isNull();
+        assertThat(mEnvironment.getPreferredPassthroughOpacity())
+                .isEqualTo(NO_PASSTHROUGH_OPACITY_PREFERENCE);
         assertThat(mEnvironment.getCurrentPassthroughOpacity()).isEqualTo(0.0f);
     }
 

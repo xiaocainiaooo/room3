@@ -64,8 +64,9 @@ public interface SpatialEnvironment {
     /**
      * The application's preferred passthrough opacity.
      *
-     * Upon construction, the default value is null, which means "no application preference". The
-     * application's preferred passthrough opacity can be set between 0.0f and 1.0f.
+     * Upon construction, the default value is [NO_PASSTHROUGH_OPACITY_PREFERENCE], which means "no
+     * application preference". The application's preferred passthrough opacity can be set between
+     * 0.0f and 1.0f.
      *
      * Setting the application preference does not guarantee that the value will be immediately
      * applied and visible to the user. The actual passthrough opacity value is controlled by the
@@ -76,13 +77,14 @@ public interface SpatialEnvironment {
      * The value should be between 0.0f (passthrough disabled) and 1.0f (passthrough fully obscures
      * the spatial environment). Values within 0.01f of 0.0 or 1.0 are snapped to those values.
      * Values outside [0.0f, 1.0f] are clamped. Other values result in semi-transparent passthrough
-     * that is alpha blended with the spatial environment. Setting this property to `null` clears
-     * the application's preference, allowing the system to manage passthrough opacity.
+     * that is alpha blended with the spatial environment. Setting this property to
+     * NO_PASSTHROUGH_OPACITY_PREFERENCE clears the application's preference, allowing the system to
+     * manage passthrough opacity.
      *
      * The actual value visible to the user can be observed by calling [currentPassthroughOpacity]
      * or by registering a listener with [addOnPassthroughOpacityChangedListener].
      */
-    public var preferredPassthroughOpacity: Float?
+    public var preferredPassthroughOpacity: Float
 
     /**
      * Notifies an application when the passthrough state changes, such as when the application
@@ -162,5 +164,13 @@ public interface SpatialEnvironment {
         override fun hashCode(): Int {
             return Objects.hash(skybox, geometry)
         }
+    }
+
+    public companion object {
+        /**
+         * Passed into [preferredPassthroughOpacity] to clear the application's passthrough opacity
+         * preference and to let the system manage passthrough opacity.
+         */
+        public const val NO_PASSTHROUGH_OPACITY_PREFERENCE: Float = Float.NEGATIVE_INFINITY
     }
 }

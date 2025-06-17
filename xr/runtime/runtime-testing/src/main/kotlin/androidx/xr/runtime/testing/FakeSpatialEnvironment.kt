@@ -31,7 +31,8 @@ public class FakeSpatialEnvironment : SpatialEnvironment {
     override var preferredSpatialEnvironment: SpatialEnvironment.SpatialEnvironmentPreference? =
         null
 
-    @get:Suppress("AutoBoxing") override var preferredPassthroughOpacity: Float? = null
+    override var preferredPassthroughOpacity: Float =
+        SpatialEnvironment.NO_PASSTHROUGH_OPACITY_PREFERENCE
 
     override fun addOnPassthroughOpacityChangedListener(
         executor: Executor,

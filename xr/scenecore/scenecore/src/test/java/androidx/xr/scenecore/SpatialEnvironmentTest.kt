@@ -74,8 +74,8 @@ class SpatialEnvironmentTest {
     }
 
     @Test
-    fun getPassthroughOpacityPreferenceNull_getsRuntimePassthroughOpacityPreference() {
-        val rtPreference = null as Float?
+    fun getPassthroughOpacityPreferenceNoPreference_getsRuntimePassthroughOpacityPreference() {
+        val rtPreference = SpatialEnvironment.NO_PASSTHROUGH_OPACITY_PREFERENCE
         whenever(mockRtEnvironment!!.preferredPassthroughOpacity).thenReturn(rtPreference)
 
         assertThat(environment!!.preferredPassthroughOpacity).isEqualTo(rtPreference)
@@ -90,8 +90,8 @@ class SpatialEnvironmentTest {
     }
 
     @Test
-    fun setPassthroughOpacityPreferenceNull_callsRuntimeSetPassthroughOpacityPreference() {
-        val preference = null as Float?
+    fun setPassthroughOpacityPreferenceNoPreference_callsRuntimeSetPassthroughOpacityPreference() {
+        val preference = SpatialEnvironment.NO_PASSTHROUGH_OPACITY_PREFERENCE
         environment!!.preferredPassthroughOpacity = preference
         verify(mockRtEnvironment)!!.preferredPassthroughOpacity = preference
     }

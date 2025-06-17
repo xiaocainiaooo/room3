@@ -76,9 +76,9 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
     // The active passthrough opacity value is updated with every opacity change event. A null value
     // indicates it has not yet been initialized and the value should be read from the
     // spatialStateProvider.
-    private Float mActivePassthroughOpacity = null;
+    private float mActivePassthroughOpacity = NO_PASSTHROUGH_OPACITY_PREFERENCE;
     // Initialized to null to let system control opacity until preference is explicitly set.
-    private Float mPassthroughOpacityPreference = null;
+    private float mPassthroughOpacityPreference = NO_PASSTHROUGH_OPACITY_PREFERENCE;
     private SplitEngineSubspaceManager mSplitEngineSubspaceManager;
     private ImpressApi mImpressApi;
     private final Supplier<SpatialState> mSpatialStateProvider;
@@ -219,14 +219,14 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
 
     @Override
     @CanIgnoreReturnValue
-    public void setPreferredPassthroughOpacity(@Nullable Float opacity) {
+    public void setPreferredPassthroughOpacity(float opacity) {
         // To work around floating-point precision issues, the opacity preference is documented to
         // clamp to 0.0f if it is set below 1% opacity and it clamps to 1.0f if it is set above 99%
         // opacity.
 
-        Float newPassthroughOpacityPreference =
-                opacity == null
-                        ? null
+        float newPassthroughOpacityPreference =
+                opacity == NO_PASSTHROUGH_OPACITY_PREFERENCE
+                        ? NO_PASSTHROUGH_OPACITY_PREFERENCE
                         : (opacity < 0.01f ? 0.0f : (opacity > 0.99f ? 1.0f : opacity));
 
         if (Objects.equals(newPassthroughOpacityPreference, mPassthroughOpacityPreference)) {
@@ -238,9 +238,10 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
         // to this method when they are removed
 
         // Passthrough should be enabled only if the user has explicitly set the
-        // PassthroughOpacityPreference to a non-null and non-zero value, otherwise disabled.
-        if (mPassthroughOpacityPreference != null && mPassthroughOpacityPreference != 0.0f) {
-            applyPassthroughChange(mPassthroughOpacityPreference.floatValue());
+        // PassthroughOpacityPreference to a valid and non-zero value, otherwise disabled.
+        if (mPassthroughOpacityPreference != NO_PASSTHROUGH_OPACITY_PREFERENCE
+                && mPassthroughOpacityPreference != 0.0f) {
+            applyPassthroughChange(mPassthroughOpacityPreference);
         } else {
             applyPassthroughChange(0.0f);
         }
@@ -250,14 +251,14 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
     // been initialized previously.
     @Override
     public synchronized float getCurrentPassthroughOpacity() {
-        if (mActivePassthroughOpacity == null) {
+        if (mActivePassthroughOpacity == NO_PASSTHROUGH_OPACITY_PREFERENCE) {
             setSpatialState(mSpatialStateProvider.get());
         }
-        return mActivePassthroughOpacity.floatValue();
+        return mActivePassthroughOpacity;
     }
 
     @Override
-    public @Nullable Float getPreferredPassthroughOpacity() {
+    public float getPreferredPassthroughOpacity() {
         return mPassthroughOpacityPreference;
     }
 
@@ -546,8 +547,8 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment, Consumer<Consu
                 mImpressApi.disposeAllResources();
             }
         }
-        mActivePassthroughOpacity = null;
-        mPassthroughOpacityPreference = null;
+        mActivePassthroughOpacity = NO_PASSTHROUGH_OPACITY_PREFERENCE;
+        mPassthroughOpacityPreference = NO_PASSTHROUGH_OPACITY_PREFERENCE;
         mRootEnvironmentNode = null;
         mGeometrySubspaceSplitEngine = null;
         mGeometrySubspaceImpressNode = 0;

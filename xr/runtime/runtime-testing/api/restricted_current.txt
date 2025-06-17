@@ -521,16 +521,16 @@ package androidx.xr.runtime.testing {
     method public void addOnPassthroughOpacityChangedListener(java.util.concurrent.Executor executor, java.util.function.Consumer<java.lang.Float> listener);
     method public void addOnSpatialEnvironmentChangedListener(java.util.concurrent.Executor executor, java.util.function.Consumer<java.lang.Boolean> listener);
     method public float getCurrentPassthroughOpacity();
-    method public Float? getPreferredPassthroughOpacity();
+    method public float getPreferredPassthroughOpacity();
     method public androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference? getPreferredSpatialEnvironment();
     method public boolean isPreferredSpatialEnvironmentActive();
     method public void removeOnPassthroughOpacityChangedListener(java.util.function.Consumer<java.lang.Float> listener);
     method public void removeOnSpatialEnvironmentChangedListener(java.util.function.Consumer<java.lang.Boolean> listener);
-    method public void setPreferredPassthroughOpacity(Float?);
+    method public void setPreferredPassthroughOpacity(float);
     method public void setPreferredSpatialEnvironment(androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference?);
     property public float currentPassthroughOpacity;
     property public boolean isPreferredSpatialEnvironmentActive;
-    property public Float? preferredPassthroughOpacity;
+    property public float preferredPassthroughOpacity;
     property public androidx.xr.runtime.internal.SpatialEnvironment.SpatialEnvironmentPreference? preferredSpatialEnvironment;
   }
 

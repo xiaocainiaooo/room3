@@ -104,7 +104,7 @@ class EnvironmentTestActivity : ComponentActivity() {
         setContent { HelloWorld(session, mActivity) }
     }
 
-    private fun setPassthroughOpacity(opacity: Float?) {
+    private fun setPassthroughOpacity(opacity: Float) {
         session.scene.spatialEnvironment.preferredPassthroughOpacity = opacity
         lastApiCall =
             "set opacity preference to ${session.scene.spatialEnvironment.preferredPassthroughOpacity}, but current actual opacity is ${session.scene.spatialEnvironment.currentPassthroughOpacity}"
@@ -222,7 +222,11 @@ class EnvironmentTestActivity : ComponentActivity() {
                 },
                 modifier = Modifier.fillMaxWidth(0.5f),
             )
-            Button(onClick = { setPassthroughOpacity(null) }) {
+            Button(
+                onClick = {
+                    setPassthroughOpacity(SpatialEnvironment.NO_PASSTHROUGH_OPACITY_PREFERENCE)
+                }
+            ) {
                 Text(text = "Unset passthrough preference", fontSize = 30.sp)
             }
         }
