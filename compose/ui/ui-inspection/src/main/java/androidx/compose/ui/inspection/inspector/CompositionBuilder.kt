@@ -67,6 +67,7 @@ private val unwantedCalls =
         "Inspectable",
         "ProvideAndroidCompositionLocals",
         "ProvideCommonCompositionLocals",
+        "ProvideCompositionLocals",
     )
 
 /** Builder of [InspectorNode] trees from [root] compositions. */
