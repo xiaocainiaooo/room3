@@ -400,12 +400,16 @@ internal class InsetsListener(val composeView: AndroidComposeView) :
 
     private fun updateInsets(insets: WindowInsetsCompat) {
         var changed = false
+        var hasInsets = false
         WindowInsetsTypeMap.forEach { type, rulers ->
             val insetsValue = ValueInsets(insets.getInsets(type))
             val values = insetsValues[rulers]!!
             if (insetsValue != values.current) {
                 values.current = insetsValue
                 changed = true
+                if (insetsValue != ZeroValueInsets) {
+                    hasInsets = true
+                }
             }
         }
         AnimatableRulers.forEach { type, rulers ->
@@ -415,6 +419,9 @@ internal class InsetsListener(val composeView: AndroidComposeView) :
                 if (values.maximum != insetsValue) {
                     values.maximum = insetsValue
                     changed = true
+                    if (insetsValue != ZeroValueInsets) {
+                        hasInsets = true
+                    }
                 }
             }
             values.isVisible = insets.isVisible(type)
@@ -431,6 +438,9 @@ internal class InsetsListener(val composeView: AndroidComposeView) :
             waterfallInsets.current = waterfall
             waterfallInsets.maximum = waterfall
             changed = true
+            if (waterfall != ZeroValueInsets) {
+                hasInsets = true
+            }
         }
         val cutoutInsets =
             if (cutout == null) {
@@ -445,6 +455,9 @@ internal class InsetsListener(val composeView: AndroidComposeView) :
             displayCutoutInsets.current = cutoutInsets
             displayCutoutInsets.maximum = cutoutInsets
             changed = true
+            if (cutoutInsets != ZeroValueInsets) {
+                hasInsets = true
+            }
         }
         if (cutout == null) {
             if (displayCutouts.size > 0) {
@@ -473,8 +486,12 @@ internal class InsetsListener(val composeView: AndroidComposeView) :
                     changed = true
                 }
             }
+            if (boundingRects.isNotEmpty()) {
+                hasInsets = true
+            }
         }
-        if (changed) {
+        // Don't invalidate the rulers if there have never been insets or if there isn't a change
+        if ((hasInsets || generation.intValue != 0) && changed) {
             generation.intValue++
             Snapshot.sendApplyNotifications()
         }
