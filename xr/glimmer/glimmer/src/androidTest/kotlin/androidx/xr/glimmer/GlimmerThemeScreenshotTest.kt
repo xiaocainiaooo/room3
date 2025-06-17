@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.xr.glimmer.samples.ColorsSample
+import androidx.xr.glimmer.samples.IconSizesSample
 import androidx.xr.glimmer.samples.ShapesSample
 import androidx.xr.glimmer.samples.TypographySample
 import org.junit.Rule
@@ -50,5 +51,11 @@ class GlimmerThemeScreenshotTest() {
     fun shapes() {
         rule.setGlimmerThemeContent { ShapesSample() }
         rule.assertRootAgainstGolden("glimmerTheme_shapes", screenshotRule)
+    }
+
+    @Test
+    fun iconSizes() {
+        rule.setGlimmerThemeContent { IconSizesSample() }
+        rule.assertRootAgainstGolden("glimmerTheme_iconSizes", screenshotRule)
     }
 }
