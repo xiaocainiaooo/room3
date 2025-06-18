@@ -58,6 +58,8 @@ constructor(@Internal protected val workerExecutor: WorkerExecutor) : DefaultTas
 
     @get:Input abstract val kotlinSourceLevel: Property<KotlinVersion>
 
+    @get:Input abstract val targetsJavaConsumers: Property<Boolean>
+
     fun runWithArgs(args: List<String>) {
         runMetalavaWithArgs(
             metalavaClasspath,
@@ -109,8 +111,6 @@ internal abstract class SourceMetalavaTask(workerExecutor: WorkerExecutor) :
         val baseline = baselines.get().apiLintFile
         return if (baseline.exists()) baseline else null
     }
-
-    @get:Input abstract val targetsJavaConsumers: Property<Boolean>
 
     /**
      * Information about all source sets for multiplatform projects. Non-multiplatform projects
@@ -211,6 +211,11 @@ internal abstract class CompatibilityMetalavaTask(workerExecutor: WorkerExecutor
             if (freezeApis) {
                 add("--error-category")
                 add("Compatibility")
+            }
+
+            if (!targetsJavaConsumers.get()) {
+                add("--hide")
+                add("RemovedFromJava")
             }
         }
     }
