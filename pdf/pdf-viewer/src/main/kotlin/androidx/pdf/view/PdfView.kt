@@ -498,6 +498,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     internal val accessibilityStateChangeHandler =
         AccessibilityManager.AccessibilityStateChangeListener { isEnabled ->
             isAccessibilityEnabled = isEnabled
+            setAccessibility()
         }
 
     private var selectionStateManager: SelectionStateManager? = null
@@ -1628,13 +1629,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * using [ViewCompat.setAccessibilityDelegate].
      */
     private fun setAccessibility() {
-        if (pageMetadataLoader != null && pageManager != null) {
+        if (isAccessibilityEnabled && pageMetadataLoader != null && pageManager != null) {
             pdfViewAccessibilityManager =
                 PdfViewAccessibilityManager(this, pageMetadataLoader!!, pageManager!!) {
                     fastScroller
                 }
-            ViewCompat.setAccessibilityDelegate(this, pdfViewAccessibilityManager)
+        } else {
+            pdfViewAccessibilityManager = null
         }
+        ViewCompat.setAccessibilityDelegate(this, pdfViewAccessibilityManager)
     }
 
     /** The height of the viewport, minus padding */
