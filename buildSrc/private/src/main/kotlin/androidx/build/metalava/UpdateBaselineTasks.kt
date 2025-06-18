@@ -21,7 +21,6 @@ import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -117,7 +116,6 @@ abstract class IgnoreApiChangesTask @Inject constructor(workerExecutor: WorkerEx
             apiLocation.publicApiFile,
             referenceApiLocation.publicApiFile,
             baselines.get().publicApiFile,
-            false,
             freezeApis,
         )
         if (referenceApiLocation.restrictedApiFile.exists()) {
@@ -125,25 +123,21 @@ abstract class IgnoreApiChangesTask @Inject constructor(workerExecutor: WorkerEx
                 apiLocation.restrictedApiFile,
                 referenceApiLocation.restrictedApiFile,
                 baselines.get().restrictedApiFile,
-                true,
                 freezeApis,
             )
         }
     }
 
-    // Updates the contents of baselineFile to specify an exception for every API present in apiFile
-    // but not
-    // present in the current source path
-    private fun updateBaseline(
-        api: File,
-        prevApi: File,
-        baselineFile: File,
-        processRestrictedApis: Boolean,
-        freezeApis: Boolean,
-    ) {
-        val args = getCommonBaselineUpdateArgs(bootClasspath, dependencyClasspath, baselineFile)
+    /**
+     * Updates the contents of baselineFile to specify an exception for every API present in apiFile
+     * but not present in the current source path.
+     */
+    private fun updateBaseline(api: File, prevApi: File, baselineFile: File, freezeApis: Boolean) {
+        val args = getCommonBaselineUpdateArgs(baselineFile).toMutableList()
         args +=
             listOf(
+                "--classpath",
+                (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator),
                 "--baseline",
                 baselineFile.toString(),
                 "--check-compatibility:api:released",
@@ -154,34 +148,8 @@ abstract class IgnoreApiChangesTask @Inject constructor(workerExecutor: WorkerEx
         if (freezeApis) {
             args += listOf("--error-category", "Compatibility")
         }
-        if (processRestrictedApis) {
-            args +=
-                listOf(
-                    "--show-annotation",
-                    "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
-                        "LIBRARY_GROUP)",
-                    "--show-annotation",
-                    "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
-                        "LIBRARY_GROUP_PREFIX)",
-                    "--show-unannotated",
-                )
-        }
         runWithArgs(args)
     }
-}
-
-private fun getCommonBaselineUpdateArgs(
-    bootClasspath: FileCollection,
-    dependencyClasspath: FileCollection,
-    baselineFile: File,
-): MutableList<String> {
-    val args =
-        mutableListOf(
-            "--classpath",
-            (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator),
-        )
-    args += getCommonBaselineUpdateArgs(baselineFile)
-    return args
 }
 
 private fun getCommonBaselineUpdateArgs(baselineFile: File): List<String> {
