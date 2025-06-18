@@ -59,7 +59,6 @@ import androidx.camera.core.impl.utils.executor.CameraXExecutors
 import androidx.camera.core.impl.utils.futures.FutureCallback
 import androidx.camera.core.impl.utils.futures.FutureChain
 import androidx.camera.core.impl.utils.futures.Futures
-import androidx.camera.core.internal.CameraUseCaseAdapter
 import androidx.core.util.Preconditions
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -587,13 +586,16 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
                     getCameraInfo(secondaryCameraSelector) as AdapterCameraInfo
             }
 
-            val cameraId =
-                CameraUseCaseAdapter.generateCameraId(
+            // This identifier must be constructed identically to the one inside
+            // CameraUseCaseAdapter
+            // to ensure a correct lookup in the repository. It acts as the key.
+            val cameraUseCaseAdapterId =
+                CameraIdentifier.fromAdapterInfos(
                     primaryAdapterCameraInfo,
                     secondaryAdapterCameraInfo,
                 )
             var lifecycleCameraToBind =
-                lifecycleCameraRepository.getLifecycleCamera(lifecycleOwner, cameraId)
+                lifecycleCameraRepository.getLifecycleCamera(lifecycleOwner, cameraUseCaseAdapterId)
 
             // Check if there's another camera that has already been bound.
             val lifecycleCameras = lifecycleCameraRepository.lifecycleCameras
@@ -647,7 +649,9 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
                 cameraX!!.cameraFactory.cameraCoordinator,
             )
 
-            lifecycleCameraKeys.add(LifecycleCameraRepository.Key.create(lifecycleOwner, cameraId))
+            lifecycleCameraKeys.add(
+                LifecycleCameraRepository.Key.create(lifecycleOwner, cameraUseCaseAdapterId)
+            )
 
             return@trace lifecycleCameraToBind
         }
