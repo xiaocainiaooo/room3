@@ -16,7 +16,9 @@
 
 package androidx.build.metalava
 
+import androidx.build.Version
 import androidx.build.checkapi.ApiBaselinesLocation
+import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.SourceSetInputs
 import java.io.File
 import javax.inject.Inject
@@ -30,6 +32,7 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
@@ -129,5 +132,41 @@ internal abstract class SourceMetalavaTask(workerExecutor: WorkerExecutor) :
         val outputFile = File(temporaryDir, "project.xml")
         ProjectXml.create(sourceSets, bootClasspath.files, compiledSources.singleFile, outputFile)
         return outputFile
+    }
+}
+
+/** A metalava task that uses signature files to run compatibility checks. */
+@CacheableTask
+internal abstract class CompatibilityMetalavaTask(workerExecutor: WorkerExecutor) :
+    MetalavaTask(workerExecutor) {
+    /** Location of the previous API surface for compatibility checks. */
+    @get:Internal // already expressed by getTaskInputs()
+    abstract val referenceApi: Property<ApiLocation>
+
+    /** Location of the current API surface to check. */
+    @get:Internal // already expressed by getTaskInputs()
+    abstract val api: Property<ApiLocation>
+
+    /** Location of the text files listing violations that should be ignored. */
+    @get:Internal // already expressed by getTaskInputs()
+    abstract val baselines: Property<ApiBaselinesLocation>
+
+    /** Version for the current API surface. */
+    @get:Input abstract val version: Property<Version>
+
+    @PathSensitive(PathSensitivity.RELATIVE)
+    @InputFiles
+    fun getTaskInputs(): List<File> {
+        val apiLocation = api.get()
+        val referenceApiLocation = referenceApi.get()
+        val baselineApiLocation = baselines.get()
+        return listOf(
+            apiLocation.publicApiFile,
+            apiLocation.restrictedApiFile,
+            referenceApiLocation.publicApiFile,
+            referenceApiLocation.restrictedApiFile,
+            baselineApiLocation.publicApiFile,
+            baselineApiLocation.restrictedApiFile,
+        )
     }
 }

@@ -16,19 +16,11 @@
 
 package androidx.build.metalava
 
-import androidx.build.Version
-import androidx.build.checkapi.ApiBaselinesLocation
-import androidx.build.checkapi.ApiLocation
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 
@@ -73,29 +65,12 @@ constructor(workerExecutor: WorkerExecutor) : SourceMetalavaTask(workerExecutor)
 }
 
 @CacheableTask
-abstract class IgnoreApiChangesTask @Inject constructor(workerExecutor: WorkerExecutor) :
-    MetalavaTask(workerExecutor) {
+internal abstract class IgnoreApiChangesTask @Inject constructor(workerExecutor: WorkerExecutor) :
+    CompatibilityMetalavaTask(workerExecutor) {
     init {
         description =
             "Updates an API tracking baseline file (api/X.Y.Z.ignore) to match the " +
                 "current set of violations"
-    }
-
-    // The API that the library is supposed to be compatible with
-    @get:Input abstract val referenceApi: Property<ApiLocation>
-
-    @get:Input abstract val api: Property<ApiLocation>
-
-    // The baseline files (api/*.*.*.ignore) to update
-    @get:Input abstract val baselines: Property<ApiBaselinesLocation>
-
-    // Version for the current API surface.
-    @get:Input abstract val version: Property<Version>
-
-    @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
-    fun getTaskInputs(): List<File> {
-        val referenceApiLocation = referenceApi.get()
-        return listOf(referenceApiLocation.publicApiFile, referenceApiLocation.restrictedApiFile)
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed

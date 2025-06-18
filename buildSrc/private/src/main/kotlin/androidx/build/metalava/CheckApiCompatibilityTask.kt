@@ -17,19 +17,11 @@
 package androidx.build.metalava
 
 import androidx.build.Version
-import androidx.build.checkapi.ApiBaselinesLocation
-import androidx.build.checkapi.ApiLocation
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 
@@ -38,38 +30,9 @@ import org.gradle.workers.WorkerExecutor
  * in another.
  */
 @CacheableTask
-abstract class CheckApiCompatibilityTask @Inject constructor(workerExecutor: WorkerExecutor) :
-    MetalavaTask(workerExecutor) {
-    // Text file from which the API signatures will be obtained.
-    @get:Internal // already expressed by getTaskInputs()
-    abstract val referenceApi: Property<ApiLocation>
-
-    // Text file representing the current API surface to check.
-    @get:Internal // already expressed by getTaskInputs()
-    abstract val api: Property<ApiLocation>
-
-    // Text file listing violations that should be ignored.
-    @get:Internal // already expressed by getTaskInputs()
-    abstract val baselines: Property<ApiBaselinesLocation>
-
-    // Version for the current API surface.
-    @get:Input abstract val version: Property<Version>
-
-    @PathSensitive(PathSensitivity.RELATIVE)
-    @InputFiles
-    fun getTaskInputs(): List<File> {
-        val apiLocation = api.get()
-        val referenceApiLocation = referenceApi.get()
-        val baselineApiLocation = baselines.get()
-        return listOf(
-            apiLocation.publicApiFile,
-            apiLocation.restrictedApiFile,
-            referenceApiLocation.publicApiFile,
-            referenceApiLocation.restrictedApiFile,
-            baselineApiLocation.publicApiFile,
-            baselineApiLocation.restrictedApiFile,
-        )
-    }
+internal abstract class CheckApiCompatibilityTask
+@Inject
+constructor(workerExecutor: WorkerExecutor) : CompatibilityMetalavaTask(workerExecutor) {
 
     @TaskAction
     fun exec() {
