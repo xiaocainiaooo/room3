@@ -24,6 +24,7 @@ import androidx.annotation.OptIn as JavaOptIn
 import androidx.annotation.VisibleForTesting
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraFilter
+import androidx.camera.core.CameraIdentifier
 import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraInfoUnavailableException
 import androidx.camera.core.CameraSelector
@@ -81,8 +82,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
     private var cameraX: CameraX? = null
     @VisibleForTesting internal var context: Context? = null
     @GuardedBy("mLock")
-    private val cameraInfoMap: MutableMap<CameraUseCaseAdapter.CameraId, AdapterCameraInfo> =
-        HashMap()
+    private val cameraInfoMap: MutableMap<CameraIdentifier, AdapterCameraInfo> = HashMap()
     private val lifecycleCameraKeys = HashSet<LifecycleCameraRepository.Key>()
     override var configImplType = CameraXConfig.CAMERAX_CONFIG_IMPL_TYPE_UNKNOWN
 
@@ -659,8 +659,9 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
             val cameraConfig = getCameraConfig(cameraSelector, cameraInfoInternal)
 
             val key =
-                CameraUseCaseAdapter.CameraId.create(
+                CameraIdentifier.create(
                     cameraInfoInternal.cameraId,
+                    null,
                     cameraConfig.compatibilityId,
                 )
             var adapterCameraInfo: AdapterCameraInfo?
@@ -668,7 +669,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
                 adapterCameraInfo = cameraInfoMap[key]
                 if (adapterCameraInfo == null) {
                     adapterCameraInfo = AdapterCameraInfo(cameraInfoInternal, cameraConfig)
-                    cameraInfoMap[key] = adapterCameraInfo!!
+                    cameraInfoMap[key] = adapterCameraInfo
                 }
             }
 
