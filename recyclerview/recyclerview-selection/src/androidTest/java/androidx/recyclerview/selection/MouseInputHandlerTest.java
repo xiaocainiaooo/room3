@@ -88,16 +88,40 @@ public final class MouseInputHandlerTest {
         mDetailsLookup.initAt(RecyclerView.NO_POSITION);
     }
 
-    private boolean singleTap(MotionEvent e) {
+    private boolean callTapHandlers(MotionEvent e, boolean isDoubleTap) {
         MotionEvent downEvent = e;
+        MotionEvent secondDownEvent = e;
         // Strictly speaking, it would be more realistic if the upEvent's getAction() was
         // MotionEvent.ACTION_UP, in contrast to e.getAction(), which is MotionEvent.ACTION_DOWN.
         // But the code under test doesn't care about the action. It's simpler to just re-use e.
         MotionEvent upEvent = e;
 
-        return mInputDelegate.onDown(downEvent)
-                || mInputDelegate.onSingleTapUp(upEvent)
-                || mInputDelegate.onSingleTapConfirmed(downEvent);
+        boolean handled = mInputDelegate.onDown(downEvent)
+                || mInputDelegate.onSingleTapUp(upEvent);
+
+        if (handled) {
+            // No-op.
+        } else if (isDoubleTap) {
+            // As can be seen in the GestureDetector.onTouchEvent code, for the ACTION_DOWN case,
+            // onDoubleTap will be called first (with the first down event) and then onDown will be
+            // called (with the second down event), regardless of whether onDoubleTap returned true
+            // or false. When the GestureDetector recognizes this as a double tap, it also won't
+            // call onSingleTapEtc methods.
+            handled |= mInputDelegate.onDoubleTap(downEvent);
+            handled |= mInputDelegate.onDown(secondDownEvent);
+        } else {
+            handled |= mInputDelegate.onSingleTapConfirmed(downEvent);
+        }
+
+        return handled;
+    }
+
+    private boolean singleTap(MotionEvent e) {
+        return callTapHandlers(e, false);
+    }
+
+    private boolean doubleTap(MotionEvent e) {
+        return callTapHandlers(e, true);
     }
 
     @Test
@@ -316,10 +340,17 @@ public final class MouseInputHandlerTest {
 
     @Test
     public void testDoubleClick_Opens() {
-        TestItemDetails doc = mDetailsLookup.initAt(11);
-        mInputDelegate.onDoubleTap(CLICK);
+        // Double-click on an unselected file should open it.
+        TestItemDetails doc1 = mDetailsLookup.initAt(1);
+        assertTrue(doubleTap(CLICK));
+        mActivationCallbacks.assertActivated(doc1);
 
-        mActivationCallbacks.assertActivated(doc);
+        // Double-click on a selected file should also open it.
+        mSelectionMgr.select("2");
+        TestItemDetails doc2 = mDetailsLookup.initAt(2);
+        assertTrue(doubleTap(CLICK));
+        // It currently doesn't. That's a bug.
+        // mActivationCallbacks.assertActivated(doc2);
     }
 
     @Test
