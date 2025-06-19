@@ -212,6 +212,9 @@ class TestAdapters(private val sdkContext: Context) {
     @JvmOverloads
     constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
         RelativeLayout(context, attrs, defStyleAttr) {
+        init {
+            contentDescription = "scrollable_animation_ad"
+        }
 
         override fun onAttachedToWindow() {
             super.onAttachedToWindow()
