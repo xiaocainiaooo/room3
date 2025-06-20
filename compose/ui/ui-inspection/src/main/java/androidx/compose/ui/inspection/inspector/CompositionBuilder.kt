@@ -70,6 +70,8 @@ private val unwantedCalls =
         "ProvideCompositionLocals",
     )
 
+private val knownCompositionHolders = setOf("LayoutSpatialElevation", "SpatialElevation")
+
 /** Builder of [InspectorNode] trees from [root] compositions. */
 @OptIn(UiToolingDataApi::class)
 internal class CompositionBuilder(private val info: SharedBuilderData) : SharedBuilderData by info {
@@ -345,7 +347,9 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
      *
      * The [capturingSubComposition] will be setup when we encounter a sub-composition that belongs
      * to a different compose View. This method will move nodes from the parent composition to the
-     * sub-composition if the parent node has no size.
+     * sub-composition if the parent node has no size or the parent node is one of the
+     * [knownCompositionHolders] that has a size but should be moved to the sub-composition.
+     *
      * If a node has multiple sub-compositions among its children, stop capturing and keep the node
      * in the parent composition.
      */
@@ -364,13 +368,17 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
         var stopCapturing = false
         childrenWithSubCompositions.forEach { child ->
             val subComposition = capturingSubComposition.remove(child)!!
-            if (!child.isUnwanted) {
+            val isKnownChildCompositionHolder = knownCompositionHolders.contains(child.name)
+            if (!child.isUnwanted || isKnownChildCompositionHolder) {
                 copyNodeToSubComposition(child, subComposition)
-                if (child.box == emptyBox) {
+                if (child.box == emptyBox || isKnownChildCompositionHolder) {
                     child.markUnwanted()
                 }
             }
-            if (childrenWithSubCompositions.size == 1 && node.box == emptyBox) {
+            if (
+                childrenWithSubCompositions.size == 1 &&
+                    (node.box == emptyBox || knownCompositionHolders.contains(node.name))
+            ) {
                 // Prepare to copy the current node to the sub composition:
                 capturingSubComposition[node] = subComposition
             } else {
