@@ -207,7 +207,7 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(10).setInItemSelectRegion(true);
-        mInputDelegate.onSingleTapUp(CLICK);
+        mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mSelection.assertSelected(10, 11);
     }
@@ -218,11 +218,11 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(SHIFT_CLICK);
+        mInputDelegate.onSingleTapConfirmed(SHIFT_CLICK);
         mSelection.assertSelected(8, 9, 10, 11);
 
         mDetailsLookup.initAt(9);
-        mInputDelegate.onSingleTapUp(CLICK);
+        mInputDelegate.onSingleTapConfirmed(CLICK);
         mSelection.assertSelected(8, 10, 11);
     }
 
@@ -266,7 +266,7 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(CTRL_CLICK);
+        mInputDelegate.onSingleTapConfirmed(CTRL_CLICK);
 
         mSelection.assertSelection(7, 11);
     }
@@ -277,7 +277,7 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(SHIFT_CLICK);
+        mInputDelegate.onSingleTapConfirmed(SHIFT_CLICK);
 
         mSelection.assertSelection(7, 8, 9, 10, 11);
     }
@@ -299,11 +299,11 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(SHIFT_CLICK);
+        mInputDelegate.onSingleTapConfirmed(SHIFT_CLICK);
         mSelection.assertSelection(7, 8, 9, 10, 11);
 
         mDetailsLookup.initAt(5);
-        mInputDelegate.onSingleTapUp(SHIFT_CLICK);
+        mInputDelegate.onSingleTapConfirmed(SHIFT_CLICK);
 
         mSelection.assertSelection(5, 6, 7);
         mSelection.assertNotSelected(8, 9, 10, 11);
@@ -315,11 +315,11 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(SHIFT_CLICK);
+        mInputDelegate.onSingleTapConfirmed(SHIFT_CLICK);
         mSelection.assertSelection(7, 8, 9, 10, 11);
 
         mDetailsLookup.initAt(5);
-        mInputDelegate.onSingleTapUp(CTRL_CLICK);
+        mInputDelegate.onSingleTapConfirmed(CTRL_CLICK);
 
         mSelection.assertSelection(5, 7, 8, 9, 10, 11);
     }
@@ -330,7 +330,7 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(mEvent.ctrl().shift().build());
+        mInputDelegate.onSingleTapConfirmed(mEvent.primary().ctrl().shift().build());
 
         mSelection.assertSelection(7, 8, 9, 10, 11);
     }
@@ -349,8 +349,7 @@ public final class MouseInputHandlerTest {
         mSelectionMgr.select("2");
         TestItemDetails doc2 = mDetailsLookup.initAt(2);
         assertTrue(doubleTap(CLICK));
-        // It currently doesn't. That's a bug.
-        // mActivationCallbacks.assertActivated(doc2);
+        mActivationCallbacks.assertActivated(doc2);
     }
 
     @Test
@@ -367,7 +366,7 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(RecyclerView.NO_POSITION);
-        mInputDelegate.onSingleTapUp(CLICK);
+        mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mSelection.assertNoSelection();
     }
@@ -388,7 +387,7 @@ public final class MouseInputHandlerTest {
         mFocusCallbacks.assertHasFocus(true);
 
         mDetailsLookup.initAt(RecyclerView.NO_POSITION);
-        mInputDelegate.onSingleTapUp(CLICK);
+        mInputDelegate.onSingleTapConfirmed(CLICK);
         mFocusCallbacks.assertHasFocus(false);
     }
 
@@ -398,12 +397,12 @@ public final class MouseInputHandlerTest {
         mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mDetailsLookup.initAt(5);
-        mInputDelegate.onSingleTapUp(SHIFT_CLICK);
+        mInputDelegate.onSingleTapConfirmed(SHIFT_CLICK);
 
         mSelection.assertSelection(1, 2, 3, 4, 5);
 
         mDetailsLookup.initAt(11);
-        mInputDelegate.onSingleTapUp(CLICK);
+        mInputDelegate.onSingleTapConfirmed(CLICK);
 
         mFocusCallbacks.assertFocused("11");
         mSelection.assertNoSelection();
