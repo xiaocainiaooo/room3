@@ -76,8 +76,7 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
     private var ownerView: View? = null
     private var subCompositionsFound = 0
     private val subCompositions = mutableMapOf<Any?, MutableList<SubCompositionResult>>()
-    private var capturingSubCompositions =
-        mutableMapOf<MutableInspectorNode, MutableList<SubCompositionResult>>()
+    private val capturingSubComposition = mutableMapOf<MutableInspectorNode, SubCompositionResult>()
     private var listIndex = -1
 
     /**
@@ -107,7 +106,7 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
             .forEach { result ->
                 subCompositions.getOrPut(result.group) { mutableListOf() }.add(result)
             }
-        capturingSubCompositions.clear()
+        capturingSubComposition.clear()
         listIndex = -1
     }
 
@@ -222,9 +221,7 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
                     } else {
                         // If the sub-composition belongs to a different view prepare to copy the
                         // parent node to the sub-composition. See: checkCapturingSubCompositions.
-                        capturingSubCompositions
-                            .getOrPut(parent) { mutableListOf() }
-                            .add(subComposition)
+                        capturingSubComposition[parent] = subComposition
                     }
                 }
             }
@@ -280,7 +277,7 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
         // Keep an empty node if we are capturing nodes into sub-compositions.
         // Mark it unwanted after copying the node to the sub-compositions.
         if (
-            (node.box == emptyBox && !capturingSubCompositions.contains(node)) ||
+            (node.box == emptyBox && !capturingSubComposition.contains(node)) ||
                 unwantedName(node.name)
         ) {
             return node.markUnwanted()
@@ -335,63 +332,54 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
      * The Button & Text will be in a sub-composition and the AlertDialog will be in a parent
      * composition with an empty size. We would like to show the Button inside the AlertDialog in
      * the sub-composition. Otherwise it will look like a random Button in the component tree.
+     *
+     * The [capturingSubComposition] will be setup when we encounter a sub-composition that belongs
+     * to a different compose View. This method will move nodes from the parent composition to the
+     * sub-composition if the parent node has no size.
+     * If a node has multiple sub-compositions among its children, stop capturing and keep the node
+     * in the parent composition.
      */
     private fun checkCapturingSubCompositions(
         node: MutableInspectorNode,
         children: List<MutableInspectorNode>,
     ) {
-        if (capturingSubCompositions.isEmpty()) {
+        if (capturingSubComposition.isEmpty()) {
             return
         }
 
-        var nodeSubCompositions: MutableList<SubCompositionResult>? = null
-        val subCompositionChildren = children.intersect(capturingSubCompositions.keys)
-        subCompositionChildren.forEach { child ->
-            val subCompositions = capturingSubCompositions.remove(child)!!
+        val childrenWithSubCompositions = children.intersect(capturingSubComposition.keys)
+        if (childrenWithSubCompositions.isEmpty()) {
+            return
+        }
+        childrenWithSubCompositions.forEach { child ->
+            val subComposition = capturingSubComposition.remove(child)!!
             if (!child.isUnwanted) {
-                copyNodeToAllSubCompositions(child, subCompositions)
+                copyNodeToSubComposition(child, subComposition)
                 if (child.box == emptyBox) {
                     child.markUnwanted()
                 }
             }
-            nodeSubCompositions = addAll(nodeSubCompositions, subCompositions)
-        }
-        if (node.box == emptyBox) {
-            // Prepare to copy the current
-            nodeSubCompositions?.let { capturingSubCompositions[node] = it }
+            if (childrenWithSubCompositions.size == 1 && node.box == emptyBox) {
+                // Prepare to copy the current node to the sub composition:
+                capturingSubComposition[node] = subComposition
+            }
         }
     }
 
-    private fun addAll(
-        first: MutableList<SubCompositionResult>?,
-        second: MutableList<SubCompositionResult>?,
-    ): MutableList<SubCompositionResult>? =
-        when {
-            first == null -> second
-            second == null -> first
-            first === second -> first
-            else -> {
-                first.addAll(second)
-                first
-            }
-        }
-
-    private fun copyNodeToAllSubCompositions(
+    private fun copyNodeToSubComposition(
         node: MutableInspectorNode,
-        subCompositions: List<SubCompositionResult>,
+        subComposition: SubCompositionResult,
     ) {
-        subCompositions.forEach { subComposition ->
-            val copy = newNode(node)
-            copy.box = subComposition.ownerViewBox ?: emptyBox
-            copy.children.addAll(subComposition.nodes)
-            subComposition.nodes = listOf(copy.build())
-        }
+        val copy = newNode(node)
+        copy.box = subComposition.ownerViewBox ?: emptyBox
+        copy.children.addAll(subComposition.nodes)
+        subComposition.nodes = listOf(copy.build())
     }
 
     private fun updateSubCompositionsAtEnd(node: MutableInspectorNode?) {
-        val subCompositions = node?.let { capturingSubCompositions.remove(node) } ?: return
+        val subComposition = node?.let { capturingSubComposition.remove(node) } ?: return
         if (!node.isUnwanted) {
-            copyNodeToAllSubCompositions(node, subCompositions)
+            copyNodeToSubComposition(node, subComposition)
             if (node.box == emptyBox) {
                 node.markUnwanted()
             }
