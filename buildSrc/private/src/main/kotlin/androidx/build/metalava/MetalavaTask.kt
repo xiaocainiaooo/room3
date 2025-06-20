@@ -169,4 +169,49 @@ internal abstract class CompatibilityMetalavaTask(workerExecutor: WorkerExecutor
             baselineApiLocation.restrictedApiFile,
         )
     }
+
+    /** Whether there are restricted APIs to check. */
+    protected fun restrictedApisExist(): Boolean = referenceApi.get().restrictedApiFile.exists()
+
+    /** Returns the baseline file to use, depending on whether it is for [restricted] APIs. */
+    protected fun getBaselineFile(restricted: Boolean): File {
+        return if (restricted) {
+            baselines.get().restrictedApiFile
+        } else {
+            baselines.get().publicApiFile
+        }
+    }
+
+    /**
+     * Returns the list of common arguments for compatibility tasks.
+     *
+     * @param restricted whether this compatibility check is for restricted APIs
+     * @param freezeApis whether APIs are frozen and no changes should be allowed
+     */
+    protected fun getCompatibilityArguments(
+        restricted: Boolean,
+        freezeApis: Boolean,
+    ): List<String> {
+        val (currentSignature, previousSignature) =
+            if (restricted) {
+                api.get().restrictedApiFile to referenceApi.get().restrictedApiFile
+            } else {
+                api.get().publicApiFile to referenceApi.get().publicApiFile
+            }
+
+        return buildList {
+            add("--classpath")
+            add((bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator))
+            add("--source-files")
+            add(currentSignature.toString())
+            add("--check-compatibility:api:released")
+            add(previousSignature.toString())
+            add("--warnings-as-errors")
+
+            if (freezeApis) {
+                add("--error-category")
+                add("Compatibility")
+            }
+        }
+    }
 }

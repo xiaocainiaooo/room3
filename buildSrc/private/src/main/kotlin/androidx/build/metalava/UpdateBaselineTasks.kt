@@ -84,44 +84,28 @@ internal abstract class IgnoreApiChangesTask @Inject constructor(workerExecutor:
     fun exec() {
         check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
 
-        val apiLocation = api.get()
-        val referenceApiLocation = referenceApi.get()
-        val freezeApis = shouldFreezeApis(referenceApiLocation.version(), version.get())
-        updateBaseline(
-            apiLocation.publicApiFile,
-            referenceApiLocation.publicApiFile,
-            baselines.get().publicApiFile,
-            freezeApis,
-        )
-        if (referenceApiLocation.restrictedApiFile.exists()) {
-            updateBaseline(
-                apiLocation.restrictedApiFile,
-                referenceApiLocation.restrictedApiFile,
-                baselines.get().restrictedApiFile,
-                freezeApis,
-            )
+        val freezeApis = shouldFreezeApis(referenceApi.get().version(), version.get())
+        updateBaseline(restricted = false, freezeApis)
+        if (restrictedApisExist()) {
+            updateBaseline(restricted = true, freezeApis)
         }
     }
 
     /**
-     * Updates the contents of baselineFile to specify an exception for every API present in apiFile
-     * but not present in the current source path.
+     * Updates the contents of the baseline file to specify an exception for every compatibility
+     * error found comparing the previous API to the current.
+     *
+     * @param restricted whether this compatibility check is for restricted APIs
+     * @param freezeApis whether APIs are frozen and no changes should be allowed
      */
-    private fun updateBaseline(api: File, prevApi: File, baselineFile: File, freezeApis: Boolean) {
-        val args = getCommonBaselineUpdateArgs(baselineFile).toMutableList()
-        args +=
-            listOf(
-                "--classpath",
-                (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator),
-                "--baseline",
-                baselineFile.toString(),
-                "--check-compatibility:api:released",
-                prevApi.toString(),
-                "--source-files",
-                api.toString(),
-            )
-        if (freezeApis) {
-            args += listOf("--error-category", "Compatibility")
+    private fun updateBaseline(restricted: Boolean, freezeApis: Boolean) {
+        val baseline = getBaselineFile(restricted)
+        val args = buildList {
+            addAll(getCommonBaselineUpdateArgs(baseline))
+            addAll(getCompatibilityArguments(restricted, freezeApis))
+
+            add("--baseline")
+            add(baseline.toString())
         }
         runWithArgs(args)
     }
