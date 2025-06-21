@@ -216,7 +216,12 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
                 subCompositions.forEach { subComposition ->
                     if (subComposition.ownerView == ownerView || subComposition.ownerView == null) {
                         // Steal all the nodes from the sub-compositions and add them to the parent.
+                        // Propagate the size to the parent node if the parent has no size.
                         parent.children.addAll(subComposition.nodes)
+                        if (parent.box == emptyBox) {
+                            subComposition.nodes.forEach { parent.box = parent.box.union(it.box) }
+                            parent.boxSizeOverridden = true
+                        }
                         subComposition.nodes = emptyList()
                     } else {
                         // If the sub-composition belongs to a different view prepare to copy the
@@ -239,7 +244,12 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
         node.key = group.key as? Int ?: 0
         node.inlined = context.isInline
         node.box = context.bounds.emptyCheck()
-
+        if (node.box == emptyBox && children.any { it.boxSizeOverridden }) {
+            // If this node has no size and a child box size comes from a sub-composition propagate
+            // the size to the parent node.
+            children.forEach { node.box = node.box.union(it.box) }
+            node.boxSizeOverridden = true
+        }
         if (node.name == LAZY_ITEM) {
             listIndex = getListIndexOfLazyItem(context)
         }
@@ -346,11 +356,12 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
         if (capturingSubComposition.isEmpty()) {
             return
         }
-
         val childrenWithSubCompositions = children.intersect(capturingSubComposition.keys)
         if (childrenWithSubCompositions.isEmpty()) {
             return
         }
+        var box: IntRect = emptyBox
+        var stopCapturing = false
         childrenWithSubCompositions.forEach { child ->
             val subComposition = capturingSubComposition.remove(child)!!
             if (!child.isUnwanted) {
@@ -362,7 +373,15 @@ internal class CompositionBuilder(private val info: SharedBuilderData) : SharedB
             if (childrenWithSubCompositions.size == 1 && node.box == emptyBox) {
                 // Prepare to copy the current node to the sub composition:
                 capturingSubComposition[node] = subComposition
+            } else {
+                stopCapturing = true
+                box = box.union(subComposition.ownerViewBox ?: emptyBox)
             }
+        }
+        if (stopCapturing && node.box == emptyBox) {
+            // Propagate the box size to the parent of the sub-composition if necessary.
+            node.box = box
+            node.boxSizeOverridden = true
         }
     }
 
