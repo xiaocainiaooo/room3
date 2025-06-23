@@ -278,14 +278,6 @@ public interface PdfDocument : Closeable {
     )
 
     /**
-     * Represents a point within a specific page of a PDF document.
-     *
-     * @property pageNumber The page number (0-based) where the point is located.
-     * @property pagePoint The coordinates (x, y) of the point relative to the page's origin.
-     */
-    public class PdfPoint(public val pageNumber: Int, public val pagePoint: PointF)
-
-    /**
      * A [CancellationException] indicating that a document has been closed.
      *
      * @property message: the detail message
