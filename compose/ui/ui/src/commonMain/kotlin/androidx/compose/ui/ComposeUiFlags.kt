@@ -107,7 +107,10 @@ object ComposeUiFlags {
      * With this flag on, when an AccessibilityService performs ACTION_FOCUS on a Composable node,
      * if it is in touch mode, it will exit touch mode first, then try to request focus on the node.
      */
-    @Suppress("MutableBareField") @JvmField var isFocusActionExitsTouchModeEnabled: Boolean = true
+    @Deprecated("This flag is no longer needed.")
+    @Suppress("MutableBareField", "unused")
+    @JvmField
+    var isFocusActionExitsTouchModeEnabled: Boolean = false
 
     /**
      * With this flag on, Modifier.focusRestorer() will not pin the item that needs to be restored.
