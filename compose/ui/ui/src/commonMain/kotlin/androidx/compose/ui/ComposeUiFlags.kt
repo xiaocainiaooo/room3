@@ -116,7 +116,10 @@ object ComposeUiFlags {
      * With this flag on, Modifier.focusRestorer() will not pin the item that needs to be restored.
      * Users are responsible for providing a key for the item that needs to be restored b/330696779.
      */
-    @Suppress("MutableBareField") @JvmField var isNoPinningInFocusRestorationEnabled: Boolean = true
+    @Deprecated("This flag is no longer needed.")
+    @Suppress("MutableBareField", "unused")
+    @JvmField
+    var isNoPinningInFocusRestorationEnabled: Boolean = false
 
     /**
      * With this flag on, SubcomposeLayout will deactivate not used content slots outside of the
