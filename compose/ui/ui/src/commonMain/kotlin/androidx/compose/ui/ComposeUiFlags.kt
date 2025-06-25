@@ -129,7 +129,10 @@ object ComposeUiFlags {
     @Suppress("MutableBareField") @JvmField var isOutOfFrameDeactivationEnabled: Boolean = true
 
     /** Enable clearing focus when a focused item is removed from a lazyList. */
-    @Suppress("MutableBareField") @JvmField var isClearFocusOnResetEnabled: Boolean = true
+    @Deprecated("This flag is no longer needed.")
+    @Suppress("MutableBareField", "unused")
+    @JvmField
+    var isClearFocusOnResetEnabled: Boolean = false
 
     /**
      * With this flag on, the adaptive refresh rate (ARR) feature will be enabled. A preferred frame
