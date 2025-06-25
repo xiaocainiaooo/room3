@@ -1336,4 +1336,10 @@ class EntityTest {
         verify(mockEntityPlatformAdapter)
             .createActivityPanelEntity(any(), any(), any(), any(), any())
     }
+
+    @Test
+    fun surfaceEntity_useAferDisposeRaisesIllegalStateException() {
+        surfaceEntity.dispose()
+        verify(mockSurfaceEntity).dispose()
+    }
 }
