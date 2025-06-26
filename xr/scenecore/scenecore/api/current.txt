@@ -430,6 +430,15 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.MovableComponent createSystemMovable(androidx.xr.runtime.Session session, optional boolean scaleInZ);
   }
 
+  public final class PanelClippingConfig {
+    ctor public PanelClippingConfig();
+    ctor public PanelClippingConfig(optional boolean isDepthTestEnabled);
+    method public androidx.xr.scenecore.PanelClippingConfig copy();
+    method public androidx.xr.scenecore.PanelClippingConfig copy(optional boolean isDepthTestEnabled);
+    method public boolean isDepthTestEnabled();
+    property public boolean isDepthTestEnabled;
+  }
+
   public class PanelEntity implements androidx.xr.scenecore.Entity androidx.xr.scenecore.ScenePose {
     method public void addChild(androidx.xr.scenecore.Entity child);
     method public boolean addComponent(androidx.xr.scenecore.Component component);
@@ -528,6 +537,24 @@ package androidx.xr.scenecore {
     field public static final int WALL = 0; // 0x0
   }
 
+  public final class Scene {
+    ctor public Scene();
+    method public <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(Class<? extends T> type);
+    method public androidx.xr.scenecore.PanelEntity getMainPanelEntity();
+    method public androidx.xr.scenecore.PanelClippingConfig getPanelClippingConfig();
+    method public androidx.xr.scenecore.PerceptionSpace getPerceptionSpace();
+    method public androidx.xr.scenecore.SpatialEnvironment getSpatialEnvironment();
+    method public androidx.xr.scenecore.SpatialUser getSpatialUser();
+    method public void requestFullSpaceMode();
+    method public void requestHomeSpaceMode();
+    method public void setPanelClippingConfig(androidx.xr.scenecore.PanelClippingConfig);
+    property public androidx.xr.scenecore.PanelEntity mainPanelEntity;
+    property public androidx.xr.scenecore.PanelClippingConfig panelClippingConfig;
+    property public androidx.xr.scenecore.PerceptionSpace perceptionSpace;
+    property public androidx.xr.scenecore.SpatialEnvironment spatialEnvironment;
+    property public androidx.xr.scenecore.SpatialUser spatialUser;
+  }
+
   public interface ScenePose {
     method public androidx.xr.runtime.math.Pose getActivitySpacePose();
     method public suspend Object? hitTest(androidx.xr.runtime.math.Vector3 origin, androidx.xr.runtime.math.Vector3 direction, int hitTestFilter, kotlin.coroutines.Continuation<? super androidx.xr.scenecore.HitTestResult>);
@@ -542,6 +569,11 @@ package androidx.xr.scenecore {
     field public static final androidx.xr.scenecore.ScenePose.HitTestFilter INSTANCE;
     field public static final int OTHER_SCENES = 2; // 0x2
     field public static final int SELF_SCENE = 1; // 0x1
+  }
+
+  public final class SessionExt {
+    method public static androidx.xr.scenecore.Scene getScene(androidx.xr.runtime.Session);
+    property public static androidx.xr.scenecore.Scene androidx.xr.runtime.Session.scene;
   }
 
   public final class Space {

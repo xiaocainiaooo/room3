@@ -472,6 +472,15 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.MovableComponent createSystemMovable(androidx.xr.runtime.Session session, optional boolean scaleInZ);
   }
 
+  public final class PanelClippingConfig {
+    ctor public PanelClippingConfig();
+    ctor public PanelClippingConfig(optional boolean isDepthTestEnabled);
+    method public androidx.xr.scenecore.PanelClippingConfig copy();
+    method public androidx.xr.scenecore.PanelClippingConfig copy(optional boolean isDepthTestEnabled);
+    method public boolean isDepthTestEnabled();
+    property public boolean isDepthTestEnabled;
+  }
+
   public class PanelEntity extends androidx.xr.scenecore.BaseEntity<androidx.xr.runtime.internal.PanelEntity> {
     method public static final androidx.xr.scenecore.PanelEntity create(androidx.xr.runtime.Session session, android.view.View view, androidx.xr.runtime.math.FloatSize2d dimensions, String name);
     method public static final androidx.xr.scenecore.PanelEntity create(androidx.xr.runtime.Session session, android.view.View view, androidx.xr.runtime.math.FloatSize2d dimensions, String name, optional androidx.xr.runtime.math.Pose pose);
@@ -613,45 +622,47 @@ package androidx.xr.scenecore {
     method public default void onResizeUpdate(androidx.xr.scenecore.Entity entity, androidx.xr.runtime.math.FloatSize3d newSize);
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Scene implements androidx.xr.runtime.SessionConnector {
+  public final class Scene implements androidx.xr.runtime.SessionConnector {
     ctor public Scene();
-    method public void addPerceivedResolutionChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
-    method public void addPerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
-    method public void addSpatialCapabilitiesChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
-    method public void addSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
-    method public void clearSpatialVisibilityChangedListener();
-    method public void close();
-    method public void enablePanelDepthTest(boolean enabled);
-    method public androidx.xr.scenecore.ActivitySpace getActivitySpace();
-    method public androidx.xr.scenecore.Entity getActivitySpaceRoot();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void addPerceivedResolutionChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void addPerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void addSpatialCapabilitiesChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void addSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void clearSpatialVisibilityChangedListener();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void close();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public android.os.Bundle configureBundleForFullSpaceModeLaunch(android.os.Bundle bundle);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public android.os.Bundle configureBundleForFullSpaceModeLaunchWithEnvironmentInherited(android.os.Bundle bundle);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.ActivitySpace getActivitySpace();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity getActivitySpaceRoot();
     method public <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(Class<? extends T> type);
-    method public androidx.xr.scenecore.Entity? getKeyEntity();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity? getKeyEntity();
     method public androidx.xr.scenecore.PanelEntity getMainPanelEntity();
+    method public androidx.xr.scenecore.PanelClippingConfig getPanelClippingConfig();
     method public androidx.xr.scenecore.PerceptionSpace getPerceptionSpace();
-    method public androidx.xr.scenecore.SpatialCapabilities getSpatialCapabilities();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.SpatialCapabilities getSpatialCapabilities();
     method public androidx.xr.scenecore.SpatialEnvironment getSpatialEnvironment();
-    method public androidx.xr.scenecore.SpatialModeChangeListener getSpatialModeChangeListener();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.SpatialModeChangeListener getSpatialModeChangeListener();
     method public androidx.xr.scenecore.SpatialUser getSpatialUser();
-    method public void initialize(androidx.xr.runtime.internal.LifecycleManager lifecycleManager, androidx.xr.runtime.internal.JxrPlatformAdapter platformAdapter);
-    method public void removePerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
-    method public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void initialize(androidx.xr.runtime.internal.LifecycleManager lifecycleManager, androidx.xr.runtime.internal.JxrPlatformAdapter platformAdapter);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void removePerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
     method public void requestFullSpaceMode();
     method public void requestHomeSpaceMode();
-    method public android.os.Bundle setFullSpaceMode(android.os.Bundle bundle);
-    method public android.os.Bundle setFullSpaceModeWithEnvironmentInherited(android.os.Bundle bundle);
-    method public boolean setKeyEntity(androidx.xr.scenecore.Entity? entity);
-    method public void setPreferredAspectRatio(android.app.Activity activity, float preferredRatio);
-    method public void setSpatialModeChangeListener(androidx.xr.scenecore.SpatialModeChangeListener);
-    method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialVisibility> listener);
-    method public void setSpatialVisibilityChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialVisibility> listener);
-    property public androidx.xr.scenecore.ActivitySpace activitySpace;
-    property public androidx.xr.scenecore.Entity activitySpaceRoot;
-    property public androidx.xr.scenecore.Entity? keyEntity;
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public boolean setKeyEntity(androidx.xr.scenecore.Entity? entity);
+    method public void setPanelClippingConfig(androidx.xr.scenecore.PanelClippingConfig);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void setPreferredAspectRatio(android.app.Activity activity, float preferredRatio);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void setSpatialModeChangeListener(androidx.xr.scenecore.SpatialModeChangeListener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialVisibility> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void setSpatialVisibilityChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialVisibility> listener);
+    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.ActivitySpace activitySpace;
+    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity activitySpaceRoot;
+    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity? keyEntity;
     property public androidx.xr.scenecore.PanelEntity mainPanelEntity;
+    property public androidx.xr.scenecore.PanelClippingConfig panelClippingConfig;
     property public androidx.xr.scenecore.PerceptionSpace perceptionSpace;
-    property public androidx.xr.scenecore.SpatialCapabilities spatialCapabilities;
+    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.SpatialCapabilities spatialCapabilities;
     property public androidx.xr.scenecore.SpatialEnvironment spatialEnvironment;
-    property public androidx.xr.scenecore.SpatialModeChangeListener spatialModeChangeListener;
+    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.SpatialModeChangeListener spatialModeChangeListener;
     property public androidx.xr.scenecore.SpatialUser spatialUser;
   }
 
@@ -672,8 +683,8 @@ package androidx.xr.scenecore {
   }
 
   public final class SessionExt {
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.scenecore.Scene getScene(androidx.xr.runtime.Session);
-    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.scenecore.Scene androidx.xr.runtime.Session.scene;
+    method public static androidx.xr.scenecore.Scene getScene(androidx.xr.runtime.Session);
+    property public static androidx.xr.scenecore.Scene androidx.xr.runtime.Session.scene;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SoundFieldAttributes {

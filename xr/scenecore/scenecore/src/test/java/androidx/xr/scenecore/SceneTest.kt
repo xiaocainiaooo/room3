@@ -45,6 +45,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -137,22 +138,24 @@ class SceneTest {
     }
 
     @Test
-    fun setFullSpaceMode_callsThrough() {
+    fun configureBundleForFullSpaceMode_Launch_callsThrough() {
         // Test that Session calls into the runtime.
         val bundle = Bundle().apply { putString("testkey", "testval") }
         whenever(mockPlatformAdapter.setFullSpaceMode(any())).thenReturn(bundle)
-        @Suppress("UNUSED_VARIABLE") val unused = session.scene.setFullSpaceMode(bundle)
+        @Suppress("UNUSED_VARIABLE")
+        val unused = session.scene.configureBundleForFullSpaceModeLaunch(bundle)
         verify(mockPlatformAdapter).setFullSpaceMode(bundle)
     }
 
     @Test
-    fun setFullSpaceModeWithEnvironmentInherited_callsThrough() {
+    fun configureBundleForFullSpaceModeLaunchWithEnvironmentInherited_callsThrough() {
         // Test that Session calls into the runtime.
         val bundle = Bundle().apply { putString("testkey", "testval") }
         whenever(mockPlatformAdapter.setFullSpaceModeWithEnvironmentInherited(any()))
             .thenReturn(bundle)
         @Suppress("UNUSED_VARIABLE")
-        val unused = session.scene.setFullSpaceModeWithEnvironmentInherited(bundle)
+        val unused =
+            session.scene.configureBundleForFullSpaceModeLaunchWithEnvironmentInherited(bundle)
         verify(mockPlatformAdapter).setFullSpaceModeWithEnvironmentInherited(bundle)
     }
 
@@ -394,5 +397,36 @@ class SceneTest {
     fun requestHomeSpaceMode_callsThrough() {
         session.scene.requestHomeSpaceMode()
         verify(mockPlatformAdapter).requestHomeSpaceMode()
+    }
+
+    @Test
+    fun panelClippingConfig_defaultValue_isTrue() {
+        val defaultConfig = PanelClippingConfig(isDepthTestEnabled = true)
+        assertThat(session.scene.panelClippingConfig).isEqualTo(defaultConfig)
+        verify(mockPlatformAdapter, never()).enablePanelDepthTest(false)
+    }
+
+    @Test
+    fun panelClippingConfig_setFalse_callsPlatformAdapterWithFalse() {
+        val disabledConfig = PanelClippingConfig(isDepthTestEnabled = false)
+        session.scene.panelClippingConfig = disabledConfig
+
+        verify(mockPlatformAdapter).enablePanelDepthTest(false)
+        assertThat(session.scene.panelClippingConfig).isEqualTo(disabledConfig)
+        verify(mockPlatformAdapter, never()).enablePanelDepthTest(true)
+    }
+
+    @Test
+    fun panelClippingConfig_setTrue_callsPlatformAdapterWithTrue() {
+        // First, set to disabled to ensure the next call is a change.
+        session.scene.panelClippingConfig = PanelClippingConfig(isDepthTestEnabled = false)
+
+        val enabledConfig = PanelClippingConfig(isDepthTestEnabled = true)
+        session.scene.panelClippingConfig = enabledConfig
+
+        val inOrder = inOrder(mockPlatformAdapter)
+        inOrder.verify(mockPlatformAdapter).enablePanelDepthTest(false)
+        inOrder.verify(mockPlatformAdapter).enablePanelDepthTest(true)
+        assertThat(session.scene.panelClippingConfig).isEqualTo(enabledConfig)
     }
 }
