@@ -228,10 +228,9 @@ class SceneTest {
 
     @Test
     fun setSpatialVisibilityChangedListener_receivesRuntimeSpatialVisibilityChangedEvent() {
-        var listenerCalledWithValue = SpatialVisibility(SpatialVisibility.UNKNOWN)
+        var listenerCalledWithValue = SpatialVisibility.SPATIAL_VISIBILITY_UNKNOWN
         val captor = argumentCaptor<Consumer<RtSpatialVisibility>>()
-        val listener =
-            Consumer<SpatialVisibility> { visibility -> listenerCalledWithValue = visibility }
+        val listener = Consumer<Int> { visibility -> listenerCalledWithValue = visibility }
 
         // Test that it calls into the runtime and capture the runtime listener.
         val executor = directExecutor()
@@ -243,25 +242,25 @@ class SceneTest {
         val rtListener = captor.firstValue
         rtListener.accept(RtSpatialVisibility(RtSpatialVisibility.WITHIN_FOV))
         assertThat(listenerCalledWithValue)
-            .isNotEqualTo(SpatialVisibility(SpatialVisibility.UNKNOWN))
+            .isNotEqualTo(SpatialVisibility.SPATIAL_VISIBILITY_UNKNOWN)
         assertThat(listenerCalledWithValue)
-            .isEqualTo(SpatialVisibility(SpatialVisibility.WITHIN_FOV))
+            .isEqualTo(SpatialVisibility.SPATIAL_VISIBILITY_WITHIN_FIELD_OF_VIEW)
 
         rtListener.accept(RtSpatialVisibility(RtSpatialVisibility.PARTIALLY_WITHIN_FOV))
         assertThat(listenerCalledWithValue)
-            .isEqualTo(SpatialVisibility(SpatialVisibility.PARTIALLY_WITHIN_FOV))
+            .isEqualTo(SpatialVisibility.SPATIAL_VISIBILITY_PARTIALLY_WITHIN_FIELD_OF_VIEW)
 
         rtListener.accept(RtSpatialVisibility(RtSpatialVisibility.OUTSIDE_FOV))
         assertThat(listenerCalledWithValue)
-            .isEqualTo(SpatialVisibility(SpatialVisibility.OUTSIDE_FOV))
+            .isEqualTo(SpatialVisibility.SPATIAL_VISIBILITY_OUTSIDE_FIELD_OF_VIEW)
 
         rtListener.accept(RtSpatialVisibility(RtSpatialVisibility.UNKNOWN))
-        assertThat(listenerCalledWithValue).isEqualTo(SpatialVisibility(SpatialVisibility.UNKNOWN))
+        assertThat(listenerCalledWithValue).isEqualTo(SpatialVisibility.SPATIAL_VISIBILITY_UNKNOWN)
     }
 
     @Test
     fun setSpatialVisibilityChangedListener_withNoExecutor_callsRuntimeSetSpatialVisibilityChangedListenerWithMainThreadExecutor() {
-        val listener = Consumer<SpatialVisibility> { _ -> }
+        val listener = Consumer<Int> { _ -> }
         session.scene.setSpatialVisibilityChangedListener(listener)
         verify(mockPlatformAdapter)
             .setSpatialVisibilityChangedListener(eq(HandlerExecutor.mainThreadExecutor), any())

@@ -365,34 +365,29 @@ public class Scene : SessionConnector {
 
     /**
      * Sets the listener to be invoked when the spatial visibility of the rendered content of the
-     * entire scene (all entities, including children of anchors and activitySpace) changes within
-     * the user's field of view.
+     * entire scene (all entities, including children of [AnchorEntity]s and [ActivitySpace])
+     * changes within the user's field of view. In Home Space Mode, the listener continues to
+     * monitor the spatial visibility of the application's main panel.
      *
-     * <p> This API only checks if the bounds of the renderable content are within the user's field
-     * of view. It does not check if the rendered content is visible to the user. For example, if
-     * the user is looking straight ahead, and there's only a single invisible child entity (alpha
-     * = 0) in front of the user, this API will return SpatialVisibility.WITHIN_FOV even though the
-     * user cannot see anything.
+     * This API only checks if the bounding box of all rendered content (even if partially
+     * transparent) is within the user's field of view. Content not rendered due to full
+     * transparency (alpha=0) or being hidden is not considered. If the entities in the scene or any
+     * of their ancestors are hidden using [Entity.setHidden] (hidden=true) or if the entities are
+     * turned fully transparent using [Entity.setAlpha] (alpha=0.0), then the SpatialVisibility
+     * checks will return [SpatialVisibility.SPATIAL_VISIBILITY_OUTSIDE_FIELD_OF_VIEW].
      *
-     * <p>The listener is invoked on the provided executor. If the app intends to modify the UI
-     * elements/views during the callback, the app should provide the thread executor that is
-     * appropriate for the UI operations. For example, if the app is using the main thread to render
-     * the UI, the app should provide the main thread (Looper.getMainLooper()) executor. If the app
-     * is using a separate thread to render the UI, the app should provide the executor for that
-     * thread.
+     * The listener is invoked on the provided [Executor].
      *
-     * <p> There can only be one listener set at a time. If a new listener is set, the previous
-     * listener will be released.
+     * There can only be one listener set at a time. If a new listener is set, the previous listener
+     * will be released.
      *
-     * @param callbackExecutor The executor to run the listener on.
+     * @param callbackExecutor The [Executor] to run the listener on.
      * @param listener The [Consumer] to be invoked asynchronously on the given callbackExecutor
-     *   whenever the spatial visibility of the renderable content changes. The parameter passed to
-     *   the Consumer’s accept method is the new value for [SpatialVisibility].
+     *   whenever the [SpatialVisibility] of the renderable content changes.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public fun setSpatialVisibilityChangedListener(
         callbackExecutor: Executor,
-        listener: Consumer<SpatialVisibility>,
+        listener: Consumer<@SpatialVisibilityValue Int>,
     ): Unit {
         // Wrap client's listener in a callback that converts the platformAdapter's
         // SpatialVisibility.
@@ -405,28 +400,28 @@ public class Scene : SessionConnector {
 
     /**
      * Sets the listener to be invoked on the main thread executor when the spatial visibility of
-     * the rendered content of the entire scene (all entities, including children of anchors and
-     * activitySpace) changes within the user's field of view.
+     * the rendered content of the entire scene (all entities, including children of [AnchorEntity]s
+     * and [ActivitySpace]) changes within the user's field of view. In Home Space Mode, the
+     * listener continues to monitor the spatial visibility of the application's main panel.
      *
-     * <p> This API only checks if the bounds of the renderable content are within the user's field
-     * of view. It does not check if the rendered content is visible to the user. For example, if
-     * the user is looking straight ahead, and there's only a single invisible child entity (alpha
-     * = 0) in front of the user, this API will return SpatialVisibility.WITHIN_FOV even though the
-     * user cannot see anything.
+     * This API only checks if the bounding box of all rendered content (even if partially
+     * transparent) is within the user's field of view. Content not rendered due to full
+     * transparency (alpha=0) or being hidden is not considered. If the entities in the scene or any
+     * of their ancestors are hidden using [Entity.setHidden] (hidden=true) or if the entities are
+     * turned fully transparent using [Entity.setAlpha] (alpha=0.0), then the SpatialVisibility
+     * checks will return [SpatialVisibility.SPATIAL_VISIBILITY_OUTSIDE_FIELD_OF_VIEW].
      *
-     * <p> There can only be one listener set at a time. If a new listener is set, the previous
-     * listener will be released.
+     * There can only be one listener set at a time. If a new listener is set, the previous listener
+     * will be released.
      *
      * @param listener The [Consumer] to be invoked asynchronously on the main thread whenever the
-     *   spatial visibility of the renderable content changes. The parameter passed to the
-     *   Consumer’s accept method is the new value for [SpatialVisibility].
+     *   [SpatialVisibility] of the renderable content changes.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-    public fun setSpatialVisibilityChangedListener(listener: Consumer<SpatialVisibility>): Unit =
-        setSpatialVisibilityChangedListener(HandlerExecutor.mainThreadExecutor, listener)
+    public fun setSpatialVisibilityChangedListener(
+        listener: Consumer<@SpatialVisibilityValue Int>
+    ): Unit = setSpatialVisibilityChangedListener(HandlerExecutor.mainThreadExecutor, listener)
 
     /** Releases the listener previously added by [setSpatialVisibilityChangedListener]. */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public fun clearSpatialVisibilityChangedListener(): Unit =
         platformAdapter.clearSpatialVisibilityChangedListener()
 

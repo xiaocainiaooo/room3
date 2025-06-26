@@ -539,6 +539,7 @@ package androidx.xr.scenecore {
 
   public final class Scene {
     ctor public Scene();
+    method public void clearSpatialVisibilityChangedListener();
     method public <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(Class<? extends T> type);
     method public androidx.xr.scenecore.PanelEntity getMainPanelEntity();
     method public androidx.xr.scenecore.PanelClippingConfig getPanelClippingConfig();
@@ -548,6 +549,8 @@ package androidx.xr.scenecore {
     method public void requestFullSpaceMode();
     method public void requestHomeSpaceMode();
     method public void setPanelClippingConfig(androidx.xr.scenecore.PanelClippingConfig);
+    method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<java.lang.Integer> listener);
+    method public void setSpatialVisibilityChangedListener(java.util.function.Consumer<java.lang.Integer> listener);
     property public androidx.xr.scenecore.PanelEntity mainPanelEntity;
     property public androidx.xr.scenecore.PanelClippingConfig panelClippingConfig;
     property public androidx.xr.scenecore.PerceptionSpace perceptionSpace;
@@ -655,6 +658,18 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.Head? getHead();
     property public java.util.Map<androidx.xr.scenecore.CameraView.CameraType,androidx.xr.scenecore.CameraView> cameraViews;
     property public androidx.xr.scenecore.Head? head;
+  }
+
+  public final class SpatialVisibility {
+    property public static int SPATIAL_VISIBILITY_OUTSIDE_FIELD_OF_VIEW;
+    property public static int SPATIAL_VISIBILITY_PARTIALLY_WITHIN_FIELD_OF_VIEW;
+    property public static int SPATIAL_VISIBILITY_UNKNOWN;
+    property public static int SPATIAL_VISIBILITY_WITHIN_FIELD_OF_VIEW;
+    field public static final androidx.xr.scenecore.SpatialVisibility INSTANCE;
+    field public static final int SPATIAL_VISIBILITY_OUTSIDE_FIELD_OF_VIEW = 1; // 0x1
+    field public static final int SPATIAL_VISIBILITY_PARTIALLY_WITHIN_FIELD_OF_VIEW = 2; // 0x2
+    field public static final int SPATIAL_VISIBILITY_UNKNOWN = 0; // 0x0
+    field public static final int SPATIAL_VISIBILITY_WITHIN_FIELD_OF_VIEW = 3; // 0x3
   }
 
 }
