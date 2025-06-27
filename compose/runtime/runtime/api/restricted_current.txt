@@ -106,7 +106,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static long getCurrentCompositeKeyHashCode();
     method @BytecodeOnly @androidx.compose.runtime.Composable public static long getCurrentCompositeKeyHashCode(androidx.compose.runtime.Composer?, int);
     method @SuppressCompatibility @androidx.compose.runtime.Composable @androidx.compose.runtime.InternalComposeApi @androidx.compose.runtime.ReadOnlyComposable @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.CompositionContext getCurrentCompositionContext();
-    method @BytecodeOnly @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.CompositionContext getCurrentCompositionContext(androidx.compose.runtime.Composer?, int);
+    method @BytecodeOnly @SuppressCompatibility @androidx.compose.runtime.Composable @androidx.compose.runtime.InternalComposeApi @androidx.compose.runtime.ReadOnlyComposable @org.jetbrains.annotations.TestOnly public static androidx.compose.runtime.CompositionContext getCurrentCompositionContext(androidx.compose.runtime.Composer?, int);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionLocalContext getCurrentCompositionLocalContext();
     method @BytecodeOnly @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionLocalContext getCurrentCompositionLocalContext(androidx.compose.runtime.Composer?, int);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
