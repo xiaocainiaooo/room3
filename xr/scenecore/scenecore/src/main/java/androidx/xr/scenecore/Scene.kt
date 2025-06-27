@@ -122,7 +122,6 @@ public class Scene : SessionConnector {
      * within a session. The returned object will not update if the capabilities change; this method
      * should be called again to get the latest set of capabilities.
      */
-    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public var spatialCapabilities: SpatialCapabilities = SpatialCapabilities(0)
         private set
         get() = platformAdapter.spatialCapabilities.toSpatialCapabilities()
@@ -214,21 +213,24 @@ public class Scene : SessionConnector {
         }
 
     /**
-     * Adds the given [Consumer] as a listener to be invoked when this Session's current
-     * [SpatialCapabilities] change. [Consumer#accept(SpatialCapabilities)] will be invoked on the
-     * main thread.
+     * Adds the given [Consumer] as a listener to be invoked when this [Session]'s current
+     * [SpatialCapabilities] change.
+     *
+     * @param listener The Consumer to be invoked asynchronously on the main thread executor
+     *   whenever the SpatialCapabilities changes.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public fun addSpatialCapabilitiesChangedListener(
         listener: Consumer<SpatialCapabilities>
     ): Unit = addSpatialCapabilitiesChangedListener(HandlerExecutor.mainThreadExecutor, listener)
 
     /**
-     * Adds the given [Consumer] as a listener to be invoked when this Session's current
-     * [SpatialCapabilities] change. [Consumer#accept(SpatialCapabilities)] will be invoked on the
-     * given callbackExecutor, or the main thread if the callbackExecutor is null (default).
+     * Adds the given [Consumer] as a listener to be invoked when this [Session]'s current
+     * [SpatialCapabilities] change.
+     *
+     * @param callbackExecutor The [Executor] to run the listener on.
+     * @param listener The Consumer to be invoked asynchronously on the given callbackExecutor
+     *   whenever the SpatialCapabilities changes.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public fun addSpatialCapabilitiesChangedListener(
         callbackExecutor: Executor,
         listener: Consumer<SpatialCapabilities>,
@@ -249,11 +251,11 @@ public class Scene : SessionConnector {
     }
 
     /**
-     * Releases the given [Consumer] from receiving updates when the Session's [SpatialCapabilities]
-     * change.
+     * Releases the given [Consumer] from receiving updates when the [Session]'s
+     * [SpatialCapabilities] change.
+     *
+     * @param listener The Consumer to be removed. It will no longer receive change events.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-    @Suppress("PairedRegistration") // The corresponding remove method does not accept an Executor
     public fun removeSpatialCapabilitiesChangedListener(
         listener: Consumer<SpatialCapabilities>
     ): Unit {

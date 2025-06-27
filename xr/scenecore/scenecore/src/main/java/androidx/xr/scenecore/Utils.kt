@@ -262,8 +262,8 @@ internal fun Int.toInputEventPointerType(): Int {
     }
 }
 
-/** Extension function that converts a [Int] to [SpatialCapabilities.SpatialCapability]. */
-@SpatialCapabilities.SpatialCapability
+/** Extension function that converts a [Int] to [SpatialCapability]. */
+@SpatialCapability
 internal fun Int.toSpatialCapability(): Int {
     return this
 }
