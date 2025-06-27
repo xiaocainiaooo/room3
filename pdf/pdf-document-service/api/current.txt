@@ -3,6 +3,7 @@ package androidx.pdf {
 
   public final class SandboxedPdfLoader implements androidx.pdf.PdfLoader {
     ctor public SandboxedPdfLoader(android.content.Context context, optional kotlin.coroutines.CoroutineContext coroutineContext);
+    method public suspend Object? openDocument(android.net.Uri uri, android.os.ParcelFileDescriptor fileDescriptor, String? password, kotlin.coroutines.Continuation<? super androidx.pdf.PdfDocument>);
     method public suspend Object? openDocument(android.net.Uri uri, String? password, kotlin.coroutines.Continuation<? super androidx.pdf.PdfDocument>);
   }
 
