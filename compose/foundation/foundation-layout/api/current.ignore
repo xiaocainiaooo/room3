@@ -103,3 +103,41 @@ BecameUnchecked: androidx.compose.foundation.layout.WindowInsets_androidKt#isTap
     Removed parameter arg2 in androidx.compose.foundation.layout.WindowInsets_androidKt.isTappableElementVisible(androidx.compose.foundation.layout.WindowInsets.Companion arg1, androidx.compose.runtime.Composer arg2, int arg3) from compatibility checked API surface
 BecameUnchecked: androidx.compose.foundation.layout.WindowInsets_androidKt#isTappableElementVisible(androidx.compose.foundation.layout.WindowInsets.Companion, androidx.compose.runtime.Composer, int) parameter #2:
     Removed parameter arg3 in androidx.compose.foundation.layout.WindowInsets_androidKt.isTappableElementVisible(androidx.compose.foundation.layout.WindowInsets.Companion arg1, androidx.compose.runtime.Composer arg2, int arg3) from compatibility checked API surface
+
+
+RemovedDeprecatedMethod: androidx.compose.foundation.layout.WindowInsets_androidKt#getConsumeWindowInsets():
+    Binary breaking change: Removed deprecated method androidx.compose.foundation.layout.WindowInsets_androidKt.getConsumeWindowInsets()
+RemovedDeprecatedMethod: androidx.compose.foundation.layout.WindowInsets_androidKt#setConsumeWindowInsets(boolean):
+    Binary breaking change: Removed deprecated method androidx.compose.foundation.layout.WindowInsets_androidKt.setConsumeWindowInsets(boolean)
+
+
+RemovedMethod: androidx.compose.foundation.layout.Arrangement.Horizontal#getSpacing():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.Arrangement.Horizontal.getSpacing()
+RemovedMethod: androidx.compose.foundation.layout.Arrangement.Vertical#getSpacing():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.Arrangement.Vertical.getSpacing()
+RemovedMethod: androidx.compose.foundation.layout.BoxWithConstraintsScope#getConstraints():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.BoxWithConstraintsScope.getConstraints()
+RemovedMethod: androidx.compose.foundation.layout.BoxWithConstraintsScope#getMaxHeight():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.BoxWithConstraintsScope.getMaxHeight()
+RemovedMethod: androidx.compose.foundation.layout.BoxWithConstraintsScope#getMaxWidth():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.BoxWithConstraintsScope.getMaxWidth()
+RemovedMethod: androidx.compose.foundation.layout.BoxWithConstraintsScope#getMinHeight():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.BoxWithConstraintsScope.getMinHeight()
+RemovedMethod: androidx.compose.foundation.layout.BoxWithConstraintsScope#getMinWidth():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.BoxWithConstraintsScope.getMinWidth()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getBottom():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getBottom()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getEnd():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getEnd()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getHorizontal():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getHorizontal()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getLeft():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getLeft()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getRight():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getRight()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getStart():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getStart()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getTop():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getTop()
+RemovedMethod: androidx.compose.foundation.layout.WindowInsetsSides.Companion#getVertical():
+    Binary breaking change: Removed method androidx.compose.foundation.layout.WindowInsetsSides.Companion.getVertical()
