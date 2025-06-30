@@ -94,7 +94,10 @@ class FieldOfViewVisibilityActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         session!!.scene.clearSpatialVisibilityChangedListener()
-        session!!.scene.removePerceivedResolutionChangedListener(mPerceivedResolutionListener)
+        session!!
+            .scene
+            .mainPanelEntity
+            .removePerceivedResolutionChangedListener(mPerceivedResolutionListener)
     }
 
     private fun createHeadLockedPanel() {
@@ -112,7 +115,10 @@ class FieldOfViewVisibilityActivity : AppCompatActivity() {
             mHeadLockedPanelView.setLine("State", visibility.toSpatialVisibilityString())
             updateTextViews()
         }
-        session!!.scene.addPerceivedResolutionChangedListener(mPerceivedResolutionListener)
+        session!!
+            .scene
+            .mainPanelEntity
+            .addPerceivedResolutionChangedListener(mPerceivedResolutionListener)
     }
 
     private fun updateTextViews() {

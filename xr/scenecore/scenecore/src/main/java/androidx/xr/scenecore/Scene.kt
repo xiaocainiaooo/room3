@@ -25,11 +25,9 @@ import androidx.xr.runtime.SessionConnector
 import androidx.xr.runtime.internal.Entity as RtEntity
 import androidx.xr.runtime.internal.JxrPlatformAdapter
 import androidx.xr.runtime.internal.LifecycleManager
-import androidx.xr.runtime.internal.PixelDimensions as RtPixelDimensions
 import androidx.xr.runtime.internal.SpatialCapabilities as RtSpatialCapabilities
 import androidx.xr.runtime.internal.SpatialModeChangeListener as RtSpatialModeChangeListener
 import androidx.xr.runtime.internal.SpatialVisibility as RtSpatialVisibility
-import androidx.xr.runtime.math.IntSize2d
 import androidx.xr.runtime.math.Pose
 import androidx.xr.runtime.math.Vector3
 import java.util.concurrent.ConcurrentHashMap
@@ -109,12 +107,12 @@ public class Scene : SessionConnector {
         private set
 
     /**
-     * A spatialized [PanelEntity] associated with the "main window" for the Activity. When in Home
-     * Space Mode, this is the application's "main window".
+     * A spatialized [MainPanelEntity] associated with the "main window" for the Activity. When in
+     * Home Space Mode, this is the application's "main window".
      *
-     * If called multiple times, this will return the same PanelEntity.
+     * If called multiple times, this will return the same MainPanelEntity.
      */
-    public lateinit var mainPanelEntity: PanelEntity
+    public lateinit var mainPanelEntity: MainPanelEntity
         private set
 
     /**
@@ -162,10 +160,6 @@ public class Scene : SessionConnector {
         ConcurrentMap<Consumer<SpatialCapabilities>, Consumer<RtSpatialCapabilities>> =
         ConcurrentHashMap()
 
-    private val perceivedResolutionListeners:
-        ConcurrentMap<Consumer<IntSize2d>, Consumer<RtPixelDimensions>> =
-        ConcurrentHashMap()
-
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     override fun initialize(
         lifecycleManager: LifecycleManager,
@@ -176,8 +170,7 @@ public class Scene : SessionConnector {
         perceptionSpace = PerceptionSpace.create(platformAdapter)
         activitySpace = ActivitySpace.create(platformAdapter, entityManager)
         spatialUser = SpatialUser.create(lifecycleManager, platformAdapter)
-        mainPanelEntity =
-            PanelEntity.createMainPanelEntity(lifecycleManager, platformAdapter, entityManager)
+        mainPanelEntity = MainPanelEntity.create(lifecycleManager, platformAdapter, entityManager)
         activitySpaceRoot =
             entityManager.getEntityForRtEntity(platformAdapter.activitySpaceRootImpl)!!
         platformAdapter.spatialModeChangeListener =
@@ -450,86 +443,6 @@ public class Scene : SessionConnector {
                 return true
             }
         }
-    }
-
-    /**
-     * Sets the listener to be invoked when the perceived resolution of the main window changes in
-     * Home Space Mode.
-     *
-     * The main panel's own rotation and the display's viewing direction are disregarded; this value
-     * represents the pixel dimensions of the panel on the camera view without changing its distance
-     * to the display.
-     *
-     * The listener is invoked on the provided executor.
-     *
-     * Non-zero values are only guaranteed in Home Space Mode. In Full Space Mode, the callback will
-     * always return a (0,0) size. Use the [PanelEntity.getPerceivedResolution] or
-     * [SurfaceEntity.getPerceivedResolution] methods directly on the relevant entities to retrieve
-     * non-zero values in Full Space Mode.
-     *
-     * @param callbackExecutor The [Executor] to run the listener on.
-     * @param listener The [Consumer] to be invoked asynchronously on the given callbackExecutor
-     *   whenever the maximum perceived resolution of the main panel changes. The parameter passed
-     *   to the Consumer’s accept method is the new value for [IntSize2d] value for perceived
-     *   resolution.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-    public fun addPerceivedResolutionChangedListener(
-        callbackExecutor: Executor,
-        listener: Consumer<IntSize2d>,
-    ): Unit {
-        val rtListener =
-            Consumer<RtPixelDimensions> { rtDimensions: RtPixelDimensions ->
-                listener.accept(rtDimensions.toIntSize2d())
-            }
-        perceivedResolutionListeners.compute(
-            listener,
-            { _, _ ->
-                platformAdapter.addPerceivedResolutionChangedListener(callbackExecutor, rtListener)
-                rtListener
-            },
-        )
-    }
-
-    /**
-     * Sets the listener to be invoked on the Main Thread Executor when the perceived resolution of
-     * the main window changes in Home Space Mode.
-     *
-     * The main panel's own rotation and the display's viewing direction are disregarded; this value
-     * represents the pixel dimensions of the panel on the camera view without changing its distance
-     * to the display.
-     *
-     * There can only be one listener set at a time. If a new listener is set, the previous listener
-     * will be released.
-     *
-     * Non-zero values are only guaranteed in Home Space Mode. In Full Space Mode, the callback will
-     * always return a (0,0) size. Use the [PanelEntity.getPerceivedResolution] or
-     * [SurfaceEntity.getPerceivedResolution] methods directly on the relevant entities to retrieve
-     * non-zero values in Full Space Mode.
-     *
-     * @param listener The [Consumer] to be invoked asynchronously on the given callbackExecutor
-     *   whenever the maximum perceived resolution of the main panel changes. The parameter passed
-     *   to the Consumer’s accept method is the new value for [IntSize2d] value for perceived
-     *   resolution.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-    public fun addPerceivedResolutionChangedListener(listener: Consumer<IntSize2d>): Unit =
-        addPerceivedResolutionChangedListener(HandlerExecutor.mainThreadExecutor, listener)
-
-    /**
-     * Releases the listener previously added by [addPerceivedResolutionChangedListener].
-     *
-     * @param listener The [Consumer] to be removed. It will no longer receive change events.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-    public fun removePerceivedResolutionChangedListener(listener: Consumer<IntSize2d>): Unit {
-        perceivedResolutionListeners.computeIfPresent(
-            listener,
-            { _, rtListener ->
-                platformAdapter.removePerceivedResolutionChangedListener(rtListener)
-                null
-            },
-        )
     }
 
     /**

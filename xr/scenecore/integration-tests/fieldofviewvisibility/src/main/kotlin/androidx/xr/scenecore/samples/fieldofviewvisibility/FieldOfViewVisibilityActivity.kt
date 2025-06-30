@@ -113,7 +113,9 @@ class FieldOfViewVisibilityActivity : AppCompatActivity() {
             )
             mHeadLockedPanelView.setLine("State", visibility.toSpatialVisibilityString())
         }
-        mSession.scene.addPerceivedResolutionChangedListener(mPerceivedResolutionListener)
+        mSession.scene.mainPanelEntity.addPerceivedResolutionChangedListener(
+            mPerceivedResolutionListener
+        )
 
         setContent { MainPanelContent(mSession, mActivity) }
     }
@@ -121,7 +123,9 @@ class FieldOfViewVisibilityActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mSession.scene.clearSpatialVisibilityChangedListener()
-        mSession.scene.removePerceivedResolutionChangedListener(mPerceivedResolutionListener)
+        mSession.scene.mainPanelEntity.removePerceivedResolutionChangedListener(
+            mPerceivedResolutionListener
+        )
     }
 
     @Composable
