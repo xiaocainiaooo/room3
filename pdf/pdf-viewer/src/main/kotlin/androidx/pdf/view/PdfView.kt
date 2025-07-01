@@ -1735,7 +1735,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         return toContentCoord(viewY, zoom, scrollY)
     }
 
-    private val contentWidth: Float
+    internal val contentWidth: Float
         get() = pageMetadataLoader?.paginationModel?.maxWidth ?: 0f
 
     internal val contentHeight: Float
