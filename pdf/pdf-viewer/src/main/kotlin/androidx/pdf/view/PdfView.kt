@@ -474,10 +474,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         object : FastScrollGestureDetector.FastScrollGestureHandler {
             override fun onFastScrollStart() {
                 dispatchGestureStateChanged(newState = GESTURE_STATE_INTERACTING)
+                // We should hide the action mode during fast scroll.
+                updateSelectionActionModeVisibility()
             }
 
             override fun onFastScrollEnd() {
                 dispatchGestureStateChanged(newState = GESTURE_STATE_IDLE)
+                // We should reveal the action mode after fast scroll ends.
+                updateSelectionActionModeVisibility()
             }
 
             override fun onFastScrollDetected(eventY: Float) {
@@ -993,6 +997,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         if (changed || awaitingFirstLayout) maybeAdjustZoomAndScroll()
 
         awaitingFirstLayout = false
+        // As view dimensions are finalized we need to update the action mode visibility if needed.
+        updateSelectionActionModeVisibility()
     }
 
     private fun maybeAdjustZoomAndScroll() {
@@ -1046,11 +1052,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         super.onWindowVisibilityChanged(visibility)
         if (visibility == VISIBLE) {
             startCollectingData()
-            // Show selection action mode if selection is visible
-            updateSelectionActionModeVisibility()
         } else {
             stopCollectingData()
-            onSelectionUiSignal(SelectionUiSignal.ToggleActionMode(show = false))
         }
     }
 
@@ -1506,8 +1509,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      */
     private fun updateSelectionActionModeVisibility() {
         if (selectionIsVisible() && gestureState == GESTURE_STATE_IDLE) {
-            selectionStateManager?.maybeShowActionMode()
             selectionActionModeCallback.actionMode?.invalidateContentRect()
+            selectionStateManager?.maybeShowActionMode()
         } else {
             selectionStateManager?.maybeHideActionMode()
         }
@@ -1941,6 +1944,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                             dispatchGestureStateChangedUnlessFastScroll(
                                 newState = GESTURE_STATE_IDLE
                             )
+                            updateSelectionActionModeVisibility()
                             maybeUpdatePageVisibility()
                         },
                     )
