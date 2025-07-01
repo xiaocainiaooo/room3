@@ -137,11 +137,7 @@ public class `$FunctionWithSerializableProxyInput_AppFunctionInventory` : AppFun
             required = JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
             qualifiedName = "java.time.LocalDateTime",
             isNullable = true,
-            description = """
-        |
-        | A proxy class for [LocalDateTime] that can be used to serialize and deserialize [LocalDateTime]
-        | objects across the App Functions boundary.
-        |""".trimMargin()
+            description = ""
         )
 
     private val COMPONENTS_METADATA_DATA_TYPES_MAP: Map<String, AppFunctionDataTypeMetadata> =
@@ -273,11 +269,7 @@ public class `$FunctionWithSerializableProxyInput_AppFunctionInventory` : AppFun
             required = JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
             qualifiedName = "java.time.LocalDateTime",
             isNullable = true,
-            description = """
-        |
-        | A proxy class for [LocalDateTime] that can be used to serialize and deserialize [LocalDateTime]
-        | objects across the App Functions boundary.
-        |""".trimMargin()
+            description = ""
         )
 
     private val ANDROID_NET_URI_OBJECT_DATA_TYPE_PROPERTIES_MAP_URISTRING:

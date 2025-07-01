@@ -416,11 +416,7 @@ public class `$SchemaAppFunctionInventory_Impl` : SchemaAppFunctionInventory() {
             required = JAVA_TIME_LOCALDATETIME_OBJECT_DATA_TYPE_REQUIRED_PROPERTIES_LIST,
             qualifiedName = "java.time.LocalDateTime",
             isNullable = true,
-            description = """
-        |
-        | A proxy class for [LocalDateTime] that can be used to serialize and deserialize [LocalDateTime]
-        | objects across the App Functions boundary.
-        |""".trimMargin()
+            description = ""
         )
 
     private val COM_TESTDATA_NOTE_OBJECT_DATA_TYPE_PROPERTIES_MAP_ID:
