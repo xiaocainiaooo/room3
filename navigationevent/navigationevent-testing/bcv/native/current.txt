@@ -28,3 +28,5 @@ final class androidx.navigationevent.testing/TestNavigationEventCallback : andro
     final fun onEventProgressed(androidx.navigationevent/NavigationEvent) // androidx.navigationevent.testing/TestNavigationEventCallback.onEventProgressed|onEventProgressed(androidx.navigationevent.NavigationEvent){}[0]
     final fun onEventStarted(androidx.navigationevent/NavigationEvent) // androidx.navigationevent.testing/TestNavigationEventCallback.onEventStarted|onEventStarted(androidx.navigationevent.NavigationEvent){}[0]
 }
+
+final fun androidx.navigationevent.testing/TestNavigationEvent(kotlin/Float = ..., kotlin/Float = ..., kotlin/Float = ..., kotlin/Int = ..., kotlin/Long = ...): androidx.navigationevent/NavigationEvent // androidx.navigationevent.testing/TestNavigationEvent|TestNavigationEvent(kotlin.Float;kotlin.Float;kotlin.Float;kotlin.Int;kotlin.Long){}[0]
