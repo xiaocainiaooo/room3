@@ -734,9 +734,15 @@ abstract class AndroidXImplPlugin @Inject constructor() : Plugin<Project> {
             }
         }
 
-        project.configureProjectForApiTasks(AndroidMultiplatformApiTaskConfig, androidXExtension)
-        project.configureProjectForKzipTasks(AndroidMultiplatformApiTaskConfig, androidXExtension)
         kotlinMultiplatformAndroidComponentsExtension.onVariants { variant ->
+            project.configureProjectForApiTasks(
+                AndroidMultiplatformApiTaskConfig(variant),
+                androidXExtension,
+            )
+            project.configureProjectForKzipTasks(
+                AndroidMultiplatformApiTaskConfig(variant),
+                androidXExtension,
+            )
             project.configurePublicResourcesStub(variant)
             project.configureMultiplatformSourcesForAndroid(androidXExtension.samplesProjects)
         }
