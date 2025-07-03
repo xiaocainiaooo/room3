@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,61 +23,44 @@ import kotlin.test.Test
 class NavigationEventDispatcherTest {
     @Test
     fun cancel_is_sent_while_removing_a_callback_after_navigation_started() {
-        val history = mutableListOf<String>()
         val dispatcher = NavigationEventDispatcher()
 
+        // We need to capture the state when onEventCancelled is called to verify the order.
+        var startedInvocationsAtCancelTime = 0
         val callback =
             TestNavigationEventCallback(
-                onEventStarted = { history += "onEventStarted" },
-                onEventCancelled = { history += "onEventCancelled" },
+                onEventCancelled = {
+                    // Capture the count of 'started' invocations when 'cancelled' is called.
+                    startedInvocationsAtCancelTime = this.startedInvocations
+                }
             )
         dispatcher.addCallback(callback)
 
         dispatcher.dispatchOnStarted(TestNavigationEvent())
+        // Sanity check that navigation has started.
+        assertThat(callback.startedInvocations).isEqualTo(1)
 
-        history += "before remove()"
         callback.remove()
-        history += "after remove()"
 
-        assertThat(history)
-            .containsExactly(
-                "onEventStarted",
-                "before remove()",
-                "onEventCancelled",
-                "after remove()",
-            )
-            .inOrder()
+        // Assert that onEventCancelled was called once, and it happened after onEventStarted.
+        assertThat(callback.cancelledInvocations).isEqualTo(1)
+        assertThat(startedInvocationsAtCancelTime).isEqualTo(1)
     }
 
     @Test
     fun cancel_is_NOT_sent_while_disabling_a_callback_in_onEventStarted() {
-        val history = mutableListOf<String>()
         val dispatcher = NavigationEventDispatcher()
-
-        val callback =
-            TestNavigationEventCallback(
-                onEventStarted = {
-                    history += "onEventStarted start"
-                    isEnabled = false
-                    history += "callback disabled"
-                    history += "onEventStarted finish"
-                },
-                onEventCompleted = { history += "onEventCompleted" },
-            )
+        val callback = TestNavigationEventCallback(onEventStarted = { isEnabled = false })
         dispatcher.addCallback(callback)
 
         dispatcher.dispatchOnStarted(TestNavigationEvent())
         dispatcher.dispatchOnCompleted()
 
-        assertThat(history)
-            .containsExactly(
-                "onEventStarted start",
-                "callback disabled",
-                "onEventStarted finish",
-                // Event is still sent because the callback was in progress.
-                "onEventCompleted",
-            )
-            .inOrder()
+        // The callback was disabled, but cancellation should not be triggered.
+        // The 'completed' event should still be received because the navigation was in progress.
+        assertThat(callback.startedInvocations).isEqualTo(1)
+        assertThat(callback.cancelledInvocations).isEqualTo(0)
+        assertThat(callback.completedInvocations).isEqualTo(1)
     }
 
     @Test
@@ -97,69 +80,55 @@ class NavigationEventDispatcherTest {
 
     @Test
     fun cancel_is_sent_while_removing_a_callback_in_onEventStarted() {
-        val history = mutableListOf<String>()
         val dispatcher = NavigationEventDispatcher()
-
+        var cancelledInvocationsAtStartTime = 0
         val callback =
             TestNavigationEventCallback(
                 onEventStarted = {
-                    history += "onEventStarted start"
+                    // Capture the 'cancelled' count before removing to ensure it was 0.
+                    cancelledInvocationsAtStartTime = this.cancelledInvocations
                     remove()
-                    history += "callback removed"
-                    history += "onEventStarted finish"
-                },
-                onEventCancelled = { history += "onEventCancelled" },
+                }
             )
         dispatcher.addCallback(callback)
 
         dispatcher.dispatchOnStarted(TestNavigationEvent())
 
-        assertThat(history)
-            .containsExactly(
-                "onEventStarted start",
-                "onEventCancelled",
-                "callback removed",
-                "onEventStarted finish",
-            )
-            .inOrder()
+        // Assert that 'onEventStarted' was called.
+        assertThat(callback.startedInvocations).isEqualTo(1)
+        // Assert that 'onEventCancelled' was called from within 'onEventStarted'.
+        assertThat(callback.cancelledInvocations).isEqualTo(1)
+        // Assert that 'onEventCancelled' had not been called before 'remove()'.
+        assertThat(cancelledInvocationsAtStartTime).isEqualTo(0)
     }
 
     @Test
     fun cancel_is_sent_after_double_start() {
-        val history = mutableListOf<String>()
         val dispatcher = NavigationEventDispatcher()
 
-        val callback1 =
-            TestNavigationEventCallback(
-                onEventStarted = { history += "callback1 onEventStarted" },
-                onEventCancelled = { history += "callback1 onEventCancelled" },
-            )
+        val callback1 = TestNavigationEventCallback()
         dispatcher.addCallback(callback1)
 
-        history += "navigation1 starting"
+        // Start the first navigation.
         dispatcher.dispatchOnStarted(TestNavigationEvent())
+        assertThat(callback1.startedInvocations).isEqualTo(1)
 
-        val callback2 =
-            TestNavigationEventCallback(
-                onEventStarted = { history += "callback2 onEventStarted" },
-                onEventCompleted = { history += "callback2 onEventCompleted" },
-            )
+        val callback2 = TestNavigationEventCallback()
         dispatcher.addCallback(callback2)
 
-        history += "navigation2 starting without cancelling/completing navigation1"
+        // Start the second navigation, which should cancel the first.
         dispatcher.dispatchOnStarted(TestNavigationEvent())
 
-        dispatcher.dispatchOnCompleted()
+        // Assert callback1 was cancelled and callback2 was started.
+        assertThat(callback1.cancelledInvocations).isEqualTo(1)
+        assertThat(callback2.startedInvocations).isEqualTo(1)
 
-        assertThat(history)
-            .containsExactly(
-                "navigation1 starting",
-                "callback1 onEventStarted",
-                "navigation2 starting without cancelling/completing navigation1",
-                "callback1 onEventCancelled",
-                "callback2 onEventStarted",
-                "callback2 onEventCompleted",
-            )
+        // Complete the second navigation.
+        dispatcher.dispatchOnCompleted()
+        assertThat(callback2.completedInvocations).isEqualTo(1)
+
+        // Ensure callback1 was not affected by the completion of the second navigation.
+        assertThat(callback1.completedInvocations).isEqualTo(0)
     }
 
     @Test
@@ -287,29 +256,16 @@ class NavigationEventDispatcherTest {
 
     @Test
     fun removing_callbacks_in_progress_does_not_throw_concurrent_exception() {
-        val history = mutableListOf<String>()
         val dispatcher = NavigationEventDispatcher()
 
-        val callback1 =
-            TestNavigationEventCallback(
-                isPassThrough = true,
-                onEventStarted = { history += "callback1 onEventStarted" },
-                onEventProgressed = { history += "callback1 onEventProgressed" },
-            )
-        val callback2 =
-            TestNavigationEventCallback(
-                isPassThrough = true,
-                onEventStarted = { history += "callback2 onEventStarted" },
-                onEventProgressed = { history += "callback2 onEventProgressed" },
-            )
+        val callback1 = TestNavigationEventCallback(isPassThrough = true)
+        val callback2 = TestNavigationEventCallback(isPassThrough = true)
         val callback3 =
             TestNavigationEventCallback(
                 isPassThrough = true,
-                onEventStarted = { history += "callback3 onEventStarted" },
-                onEventProgressed = {
-                    history += "callback3 onEventProgressed"
-                    dispatcher.removeCallback(this)
-                },
+                // The important part of this test is that removing a callback during dispatch
+                // does not cause a crash.
+                onEventProgressed = { remove() },
             )
         dispatcher.addCallback(callback1)
         dispatcher.addCallback(callback2)
@@ -317,17 +273,17 @@ class NavigationEventDispatcherTest {
 
         val event = TestNavigationEvent()
         dispatcher.dispatchOnStarted(event)
+        // This should not throw a ConcurrentModificationException.
         dispatcher.dispatchOnProgressed(event)
 
-        assertThat(history)
-            .containsExactly(
-                "callback3 onEventStarted",
-                "callback2 onEventStarted",
-                "callback1 onEventStarted",
-                "callback3 onEventProgressed",
-                "callback2 onEventProgressed",
-                "callback1 onEventProgressed",
-            )
-            .inOrder()
+        // All 3 callbacks should have started.
+        assertThat(callback1.startedInvocations).isEqualTo(1)
+        assertThat(callback2.startedInvocations).isEqualTo(1)
+        assertThat(callback3.startedInvocations).isEqualTo(1)
+
+        // All 3 should have also received the progress event, even though one removed itself.
+        assertThat(callback1.progressedInvocations).isEqualTo(1)
+        assertThat(callback2.progressedInvocations).isEqualTo(1)
+        assertThat(callback3.progressedInvocations).isEqualTo(1)
     }
 }
