@@ -22,7 +22,7 @@ import kotlin.test.Test
 
 class NavigationEventDispatcherTest {
     @Test
-    fun cancel_is_sent_while_removing_a_callback_after_navigation_started() {
+    fun removeCallback_whenNavigationIsInProgress_thenOnCancelledIsSent() {
         val dispatcher = NavigationEventDispatcher()
 
         // We need to capture the state when onEventCancelled is called to verify the order.
@@ -48,7 +48,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun cancel_is_NOT_sent_while_disabling_a_callback_in_onEventStarted() {
+    fun dispatch_whenCallbackDisablesItself_thenOnCancelledIsNotSent() {
         val dispatcher = NavigationEventDispatcher()
         val callback = TestNavigationEventCallback(onEventStarted = { isEnabled = false })
         dispatcher.addCallback(callback)
@@ -64,7 +64,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun cancel_is_NOT_sent_while_disabling_a_callback_after_navigation_started() {
+    fun setEnabled_whenNavigationIsInProgress_thenOnCancelledIsNotSent() {
         val dispatcher = NavigationEventDispatcher()
         val callback = TestNavigationEventCallback()
         dispatcher.addCallback(callback)
@@ -79,7 +79,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun cancel_is_sent_while_removing_a_callback_in_onEventStarted() {
+    fun dispatch_whenCallbackRemovesItselfOnStarted_thenOnCancelledIsSent() {
         val dispatcher = NavigationEventDispatcher()
         var cancelledInvocationsAtStartTime = 0
         val callback =
@@ -103,7 +103,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun cancel_is_sent_after_double_start() {
+    fun dispatch_whenAnotherNavigationIsInProgress_thenPreviousIsCancelled() {
         val dispatcher = NavigationEventDispatcher()
 
         val callback1 = TestNavigationEventCallback()
@@ -132,7 +132,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun callback_added_during_navigation_does_not_receive_events_from_current_navigation() {
+    fun addCallback_whenNavigationIsInProgress_thenNewCallbackIsIgnoredForCurrentNavigation() {
         val dispatcher = NavigationEventDispatcher()
 
         val callback1 = TestNavigationEventCallback()
@@ -164,7 +164,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun fallback_is_called_when_there_are_no_enabled_callbacks() {
+    fun dispatch_whenNoEnabledCallbacksExist_thenFallbackIsInvoked() {
         var fallbackCalled = false
         val dispatcher =
             NavigationEventDispatcher(fallbackOnBackPressed = { fallbackCalled = true })
@@ -183,7 +183,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun fallback_is_not_called_when_all_enabled_callbacks_are_pass_through() {
+    fun dispatch_whenAllEnabledCallbacksArePassThrough_thenFallbackIsNotInvoked() {
         var fallbackCalled = false
         val dispatcher =
             NavigationEventDispatcher(fallbackOnBackPressed = { fallbackCalled = true })
@@ -200,7 +200,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun overlay_callbacks_gets_called_even_when_added_before_normal_callbacks() {
+    fun dispatch_whenOverlayCallbackExists_thenOverlaySupersedesDefault() {
         val dispatcher = NavigationEventDispatcher()
         val overlayCallback = TestNavigationEventCallback()
         val normalCallback = TestNavigationEventCallback()
@@ -216,7 +216,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun overlay_callbacks_pass_through_to_normal_callbacks() {
+    fun dispatch_whenPassThroughOverlayCallbackExists_thenBothCallbacksAreInvoked() {
         val dispatcher = NavigationEventDispatcher()
         val overlayCallback = TestNavigationEventCallback(isPassThrough = true)
         val normalCallback = TestNavigationEventCallback()
@@ -232,7 +232,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun adding_a_callback_to_more_dispatchers_throws_exception() {
+    fun addCallback_whenCallbackIsRegisteredWithAnotherDispatcher_thenThrowsException() {
         val callback = TestNavigationEventCallback()
         val dispatcher1 = NavigationEventDispatcher()
         dispatcher1.addCallback(callback)
@@ -244,7 +244,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun adding_a_callback_to_the_same_dispatcher_twice_throws_exception() {
+    fun addCallback_whenCallbackIsAlreadyRegistered_thenThrowsException() {
         val callback = TestNavigationEventCallback()
         val dispatcher = NavigationEventDispatcher()
         dispatcher.addCallback(callback)
@@ -255,7 +255,7 @@ class NavigationEventDispatcherTest {
     }
 
     @Test
-    fun removing_callbacks_in_progress_does_not_throw_concurrent_exception() {
+    fun dispatch_whenCallbackIsRemovedDuringDispatch_thenDoesNotThrowException() {
         val dispatcher = NavigationEventDispatcher()
 
         val callback1 = TestNavigationEventCallback(isPassThrough = true)
