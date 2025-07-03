@@ -286,4 +286,93 @@ class NavigationEventDispatcherTest {
         assertThat(callback2.progressedInvocations).isEqualTo(1)
         assertThat(callback3.progressedInvocations).isEqualTo(1)
     }
+
+    @Test
+    fun addCallback_whenMultipleOverlayCallbacksExist_thenLastAddedIsInvoked() {
+        val dispatcher = NavigationEventDispatcher()
+        val firstOverlayCallback = TestNavigationEventCallback()
+        val secondOverlayCallback = TestNavigationEventCallback()
+        val normalCallback = TestNavigationEventCallback()
+
+        dispatcher.addCallback(normalCallback, NavigationEventPriority.Default)
+        dispatcher.addCallback(firstOverlayCallback, NavigationEventPriority.Overlay)
+        dispatcher.addCallback(secondOverlayCallback, NavigationEventPriority.Overlay)
+
+        dispatcher.dispatchOnCompleted()
+
+        // Only the last-added overlay callback should handle the event.
+        assertThat(secondOverlayCallback.completedInvocations).isEqualTo(1)
+        assertThat(firstOverlayCallback.completedInvocations).isEqualTo(0)
+        assertThat(normalCallback.completedInvocations).isEqualTo(0)
+    }
+
+    @Test
+    fun dispatch_whenNoCallbacksExist_thenFallbackIsInvoked() {
+        var fallbackCalled = false
+        val dispatcher =
+            NavigationEventDispatcher(fallbackOnBackPressed = { fallbackCalled = true })
+
+        // With no callbacks registered at all, the fallback should still work.
+        dispatcher.dispatchOnCompleted()
+
+        assertThat(fallbackCalled).isTrue()
+    }
+
+    @Test
+    fun setEnabled_whenDisabledCallbackIsReEnabled_thenItReceivesEvents() {
+        val dispatcher = NavigationEventDispatcher()
+        val callback = TestNavigationEventCallback()
+        dispatcher.addCallback(callback)
+
+        // Disable the callback and confirm it doesn't receive an event.
+        callback.isEnabled = false
+        dispatcher.dispatchOnCompleted()
+        assertThat(callback.completedInvocations).isEqualTo(0)
+
+        // Re-enable the callback.
+        callback.isEnabled = true
+        dispatcher.dispatchOnCompleted()
+
+        // It should now receive the event.
+        assertThat(callback.completedInvocations).isEqualTo(1)
+    }
+
+    @Test
+    fun dispatch_whenNoNavigationIsInProgress_thenDispatchesToTopCallback() {
+        val dispatcher = NavigationEventDispatcher()
+        val callback = TestNavigationEventCallback()
+        dispatcher.addCallback(callback)
+
+        // Dispatching progress or completed without a start should still notify the top callback.
+        dispatcher.dispatchOnProgressed(TestNavigationEvent())
+        assertThat(callback.progressedInvocations).isEqualTo(1)
+
+        dispatcher.dispatchOnCompleted()
+        assertThat(callback.completedInvocations).isEqualTo(1)
+
+        // Ensure no cancellation was ever triggered.
+        assertThat(callback.cancelledInvocations).isEqualTo(0)
+    }
+
+    @Test
+    fun addCallback_whenCallbackIsRemovedAndReAdded_thenBehavesAsNew() {
+        val dispatcher = NavigationEventDispatcher()
+        val callback = TestNavigationEventCallback()
+
+        dispatcher.addCallback(callback)
+        dispatcher.dispatchOnCompleted()
+        assertThat(callback.completedInvocations).isEqualTo(1)
+
+        // Remove the callback.
+        callback.remove()
+        dispatcher.dispatchOnCompleted()
+        // Invocations should not increase.
+        assertThat(callback.completedInvocations).isEqualTo(1)
+
+        // Re-add the same callback instance. It should be treated as a new callback.
+        dispatcher.addCallback(callback)
+        dispatcher.dispatchOnCompleted()
+        // Invocations should increase again.
+        assertThat(callback.completedInvocations).isEqualTo(2)
+    }
 }
