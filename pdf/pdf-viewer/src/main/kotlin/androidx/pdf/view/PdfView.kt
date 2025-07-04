@@ -1046,6 +1046,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         awaitingFirstLayout = true
 
         accessibilityManager.addAccessibilityStateChangeListener(accessibilityStateChangeHandler)
+        // PageManager is being reset on onDetachToWindow we should make sure we set it back.
+        maybeUpdatePageVisibility()
     }
 
     override fun onWindowVisibilityChanged(visibility: Int) {
