@@ -21,7 +21,9 @@ import android.app.Activity;
 import androidx.annotation.VisibleForTesting;
 import androidx.xr.runtime.internal.Entity;
 import androidx.xr.runtime.internal.SceneRuntime;
+import androidx.xr.runtime.internal.Space;
 import androidx.xr.runtime.internal.SpatialCapabilities;
+import androidx.xr.runtime.math.Pose;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
 import androidx.xr.scenecore.impl.perception.Session;
@@ -186,6 +188,22 @@ class SpatialSceneRuntime implements SceneRuntime {
     public @NonNull SpatialCapabilities getSpatialCapabilities() {
         return RuntimeUtils.convertSpatialCapabilities(
                 mLazySpatialStateProvider.get().getSpatialCapabilities());
+    }
+
+    @Override
+    public @NonNull Entity createGroupEntity(
+            @NonNull Pose pose, @NonNull String name, @NonNull Entity parent) {
+        Node node = mExtensions.createNode();
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            transaction.setName(node, name).apply();
+        }
+
+        // This entity is used to back JXR Core's GroupEntity.
+        Entity entity =
+                new AndroidXrEntity(mActivity, node, mExtensions, mEntityManager, mExecutor) {};
+        entity.setParent(parent);
+        entity.setPose(pose, Space.PARENT);
+        return entity;
     }
 
     // Note that this is called on the Activity's UI thread so we should be careful to not block it.
