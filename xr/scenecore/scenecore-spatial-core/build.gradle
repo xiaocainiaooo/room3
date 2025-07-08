@@ -44,8 +44,8 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.mockitoCore)
     testImplementation("org.robolectric:robolectric")
-    testImplementation(project(":xr:scenecore:scenecore-testing"))
     testImplementation(project(":xr:runtime:runtime-testing"))
+    testImplementation(project(":xr:scenecore:scenecore-testing"))
 
     // For com.android.xr.extensions.
     compileOnly(files(new File(AndroidXConfig.getPrebuiltsRoot(project), "androidx/xr/extensions/com.android.extensions.xr.jar")))

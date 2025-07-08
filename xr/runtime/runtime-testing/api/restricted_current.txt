@@ -985,7 +985,9 @@ package androidx.xr.runtime.testing {
     ctor public FakeSceneRuntime(android.app.Activity activity);
     method public androidx.xr.runtime.internal.Entity createGroupEntity(androidx.xr.runtime.math.Pose pose, String name, androidx.xr.runtime.internal.Entity parent);
     method public void dispose();
+    method public androidx.xr.runtime.internal.ActivitySpace getActivitySpace();
     method public androidx.xr.runtime.internal.SpatialCapabilities getSpatialCapabilities();
+    property public androidx.xr.runtime.internal.ActivitySpace activitySpace;
     property public androidx.xr.runtime.internal.SpatialCapabilities spatialCapabilities;
   }
 

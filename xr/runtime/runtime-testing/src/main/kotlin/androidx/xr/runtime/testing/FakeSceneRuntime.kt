@@ -18,6 +18,7 @@ package androidx.xr.runtime.testing
 
 import android.app.Activity
 import androidx.annotation.RestrictTo
+import androidx.xr.runtime.internal.ActivitySpace
 import androidx.xr.runtime.internal.Entity
 import androidx.xr.runtime.internal.SceneRuntime
 import androidx.xr.runtime.internal.SpatialCapabilities
@@ -27,6 +28,8 @@ import androidx.xr.runtime.math.Pose
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeSceneRuntime(private val activity: Activity) : SceneRuntime {
     override val spatialCapabilities: SpatialCapabilities = SpatialCapabilities(0)
+
+    override val activitySpace: ActivitySpace = FakeActivitySpace()
 
     override fun createGroupEntity(pose: Pose, name: String, parent: Entity): Entity = FakeEntity()
 

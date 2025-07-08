@@ -19,6 +19,7 @@ package androidx.xr.scenecore.spatial.core;
 import android.app.Activity;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.xr.runtime.internal.ActivitySpace;
 import androidx.xr.runtime.internal.Entity;
 import androidx.xr.runtime.internal.SceneRuntime;
 import androidx.xr.runtime.internal.Space;
@@ -67,6 +68,8 @@ class SpatialSceneRuntime implements SceneRuntime {
     // been set. The spatial state is kept updated in the SpatialStateCallback.
     private final Supplier<SpatialState> mLazySpatialStateProvider;
 
+    private final ActivitySpaceImpl mActivitySpace;
+
     private SpatialSceneRuntime(
             @NonNull Activity activity,
             @NonNull ScheduledExecutorService executor,
@@ -74,7 +77,8 @@ class SpatialSceneRuntime implements SceneRuntime {
             @NonNull EntityManager entityManager,
             @NonNull PerceptionLibrary perceptionLibrary,
             @NonNull Node sceneRootNode,
-            @NonNull Node taskWindowLeashNode) {
+            @NonNull Node taskWindowLeashNode,
+            boolean unscaledGravityAlignedActivitySpace) {
         mActivity = activity;
         mExecutor = executor;
         mExtensions = extensions;
@@ -93,6 +97,17 @@ class SpatialSceneRuntime implements SceneRuntime {
                                     }
                                     return oldSpatialState;
                                 });
+
+        mActivitySpace =
+                new ActivitySpaceImpl(
+                        sceneRootNode,
+                        activity,
+                        extensions,
+                        entityManager,
+                        mLazySpatialStateProvider,
+                        unscaledGravityAlignedActivitySpace,
+                        executor);
+        mEntityManager.addSystemSpaceActivityPose(mActivitySpace);
     }
 
     static @NonNull SpatialSceneRuntime create(
@@ -100,7 +115,8 @@ class SpatialSceneRuntime implements SceneRuntime {
             @NonNull ScheduledExecutorService executor,
             @NonNull XrExtensions extensions,
             @NonNull EntityManager entityManager,
-            @NonNull PerceptionLibrary perceptionLibrary) {
+            @NonNull PerceptionLibrary perceptionLibrary,
+            boolean unscaledGravityAlignedActivitySpace) {
         Node sceneRootNode = extensions.createNode();
         Node taskWindowLeashNode = extensions.createNode();
         // TODO: b/376934871 - Check async results.
@@ -122,7 +138,8 @@ class SpatialSceneRuntime implements SceneRuntime {
                         entityManager,
                         perceptionLibrary,
                         sceneRootNode,
-                        taskWindowLeashNode);
+                        taskWindowLeashNode,
+                        unscaledGravityAlignedActivitySpace);
         runtime.initPerceptionLibrary();
         return runtime;
     }
@@ -135,7 +152,8 @@ class SpatialSceneRuntime implements SceneRuntime {
                 executor,
                 Objects.requireNonNull(XrExtensionsProvider.getXrExtensions()),
                 new EntityManager(),
-                new PerceptionLibrary());
+                new PerceptionLibrary(),
+                false);
     }
 
     private void initPerceptionLibrary() {
@@ -188,6 +206,10 @@ class SpatialSceneRuntime implements SceneRuntime {
     public @NonNull SpatialCapabilities getSpatialCapabilities() {
         return RuntimeUtils.convertSpatialCapabilities(
                 mLazySpatialStateProvider.get().getSpatialCapabilities());
+    }
+
+    public @NonNull ActivitySpace getActivitySpace() {
+        return mActivitySpace;
     }
 
     @Override

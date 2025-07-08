@@ -83,7 +83,8 @@ public class SpatialSceneRuntimeTest {
                         mFakeExecutor,
                         mXrExtensions,
                         mEntityManager,
-                        mPerceptionLibrary);
+                        mPerceptionLibrary,
+                        false);
     }
 
     @After
@@ -124,7 +125,8 @@ public class SpatialSceneRuntimeTest {
                         mFakeExecutor,
                         mXrExtensions,
                         new EntityManager(),
-                        mPerceptionLibrary);
+                        mPerceptionLibrary,
+                        false);
 
         // The perception library failed to initialize a session, but the runtime should still be
         // created.

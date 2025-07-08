@@ -36,6 +36,9 @@ public interface SceneRuntime {
     /** Return the Spatial Capabilities set that are currently supported by the platform. */
     public val spatialCapabilities: SpatialCapabilities
 
+    /** Returns the Activity Space entity at the root of the scene. */
+    public val activitySpace: ActivitySpace
+
     /**
      * A factory function to create a group entity. This entity is used as a connection point for
      * attaching children entities and managing them (i.e. setPose()) as a group.
