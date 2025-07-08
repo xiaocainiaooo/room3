@@ -25,7 +25,9 @@ import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 
+import androidx.xr.runtime.internal.Entity;
 import androidx.xr.runtime.internal.SpatialCapabilities;
+import androidx.xr.runtime.math.Pose;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
 import androidx.xr.scenecore.impl.perception.Session;
@@ -40,6 +42,7 @@ import com.android.extensions.xr.space.ShadowSpatialCapabilities;
 import com.android.extensions.xr.space.ShadowSpatialState;
 import com.android.extensions.xr.space.SpatialState;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jspecify.annotations.NonNull;
@@ -154,5 +157,50 @@ public class SpatialSceneRuntimeTest {
                 .isFalse();
         assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_EMBED_ACTIVITY))
                 .isFalse();
+    }
+
+    private Node getNode(Entity entity) {
+        return ((AndroidXrEntity) entity).getNode();
+    }
+
+    private Entity createGroupEntity() {
+        return createGroupEntity(new Pose());
+    }
+
+    private Entity createGroupEntity(Pose pose) {
+        return mRuntime.createGroupEntity(pose, "test", mRuntime.getActivitySpace());
+    }
+
+    @Test
+    public void createGroupEntity_returnsEntity() throws Exception {
+        assertThat(createGroupEntity()).isNotNull();
+    }
+
+    @Test
+    public void groupEntity_hasActivitySpaceRootImplAsParentByDefault() throws Exception {
+        Entity entity = createGroupEntity();
+        assertThat(entity.getParent()).isEqualTo(mRuntime.getActivitySpace());
+    }
+
+    @Test
+    public void groupEntityAddChildren_addsChildren() throws Exception {
+        Entity childEntity1 = createGroupEntity();
+        Entity childEntity2 = createGroupEntity();
+        Entity parentEntity = createGroupEntity();
+
+        parentEntity.addChild(childEntity1);
+
+        assertThat(parentEntity.getChildren()).containsExactly(childEntity1);
+
+        parentEntity.addChildren(ImmutableList.of(childEntity2));
+
+        assertThat(childEntity1.getParent()).isEqualTo(parentEntity);
+        assertThat(childEntity2.getParent()).isEqualTo(parentEntity);
+        assertThat(parentEntity.getChildren()).containsExactly(childEntity1, childEntity2);
+
+        Node childNode1 = getNode(childEntity1);
+        assertThat(mNodeRepository.getParent(childNode1)).isEqualTo(getNode(parentEntity));
+        Node childNode2 = getNode(childEntity2);
+        assertThat(mNodeRepository.getParent(childNode2)).isEqualTo(getNode(parentEntity));
     }
 }

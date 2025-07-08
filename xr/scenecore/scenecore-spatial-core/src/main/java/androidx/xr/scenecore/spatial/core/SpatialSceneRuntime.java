@@ -17,6 +17,8 @@
 package androidx.xr.scenecore.spatial.core;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.xr.runtime.internal.ActivitySpace;
@@ -48,7 +50,8 @@ import java.util.function.Supplier;
  * Implementation of [SceneRuntime] for devices that support the [Feature.SPATIAL] system feature.
  */
 // Suppress BanSynchronizedMethods for onSpatialStateChanged().
-@SuppressWarnings("BanSynchronizedMethods")
+// Suppress BanConcurrentHashMap for mSpatialCapabilitiesChangedListeners since XR minSdk is 24.
+@SuppressWarnings({"BanSynchronizedMethods", "BanConcurrentHashMap"})
 class SpatialSceneRuntime implements SceneRuntime {
     private @Nullable Activity mActivity;
     private final ScheduledExecutorService mExecutor;
@@ -97,6 +100,7 @@ class SpatialSceneRuntime implements SceneRuntime {
                                     }
                                     return oldSpatialState;
                                 });
+        setSpatialStateCallback();
 
         mActivitySpace =
                 new ActivitySpaceImpl(
@@ -184,6 +188,7 @@ class SpatialSceneRuntime implements SceneRuntime {
         if (mIsDisposed) {
             return;
         }
+
         // TODO: b/376934871 - Check async results.
         mExtensions.detachSpatialScene(mActivity, Runnable::run, (result) -> {});
         mActivity = null;
@@ -220,7 +225,7 @@ class SpatialSceneRuntime implements SceneRuntime {
             transaction.setName(node, name).apply();
         }
 
-        // This entity is used to back JXR Core's GroupEntity.
+        // This entity is used to back SceneCore's GroupEntity.
         Entity entity =
                 new AndroidXrEntity(mActivity, node, mExtensions, mEntityManager, mExecutor) {};
         entity.setParent(parent);
@@ -234,5 +239,11 @@ class SpatialSceneRuntime implements SceneRuntime {
     @VisibleForTesting
     synchronized void onSpatialStateChanged(@NonNull SpatialState newSpatialState) {
         mSpatialState.getAndSet(newSpatialState);
+    }
+
+    private void setSpatialStateCallback() {
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mExtensions.setSpatialStateCallback(
+                mActivity, mainHandler::post, this::onSpatialStateChanged);
     }
 }
