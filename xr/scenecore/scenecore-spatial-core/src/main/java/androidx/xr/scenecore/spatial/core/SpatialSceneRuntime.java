@@ -21,6 +21,7 @@ import android.app.Activity;
 import androidx.annotation.VisibleForTesting;
 import androidx.xr.runtime.internal.Entity;
 import androidx.xr.runtime.internal.SceneRuntime;
+import androidx.xr.runtime.internal.SpatialCapabilities;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
 import androidx.xr.scenecore.impl.perception.Session;
@@ -28,6 +29,7 @@ import androidx.xr.scenecore.impl.perception.Session;
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
 import com.android.extensions.xr.node.NodeTransaction;
+import com.android.extensions.xr.space.SpatialState;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -36,10 +38,14 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * Implementation of [SceneRuntime] for devices that support the [Feature.SPATIAL] system feature.
  */
+// Suppress BanSynchronizedMethods for onSpatialStateChanged().
+@SuppressWarnings("BanSynchronizedMethods")
 class SpatialSceneRuntime implements SceneRuntime {
     private @Nullable Activity mActivity;
     private final ScheduledExecutorService mExecutor;
@@ -50,6 +56,14 @@ class SpatialSceneRuntime implements SceneRuntime {
     private boolean mIsDisposed;
     private final EntityManager mEntityManager;
     private final PerceptionLibrary mPerceptionLibrary;
+
+    // TODO b/373481538: remove lazy initialization once XR Extensions bug is fixed. This will allow
+    // us to remove the lazySpatialStateProvider instance and pass the spatialState directly.
+    private final AtomicReference<SpatialState> mSpatialState = new AtomicReference<>(null);
+
+    // Returns the currently-known spatial state, or fetches it from the extensions if it has never
+    // been set. The spatial state is kept updated in the SpatialStateCallback.
+    private final Supplier<SpatialState> mLazySpatialStateProvider;
 
     private SpatialSceneRuntime(
             @NonNull Activity activity,
@@ -67,6 +81,16 @@ class SpatialSceneRuntime implements SceneRuntime {
         mEntityManager = entityManager;
         mPerceptionLibrary = perceptionLibrary;
         mOpenXrReferenceSpaceType = extensions.getOpenXrWorldReferenceSpaceType();
+
+        mLazySpatialStateProvider =
+                () ->
+                        mSpatialState.updateAndGet(
+                                oldSpatialState -> {
+                                    if (oldSpatialState == null) {
+                                        oldSpatialState = mExtensions.getSpatialState(activity);
+                                    }
+                                    return oldSpatialState;
+                                });
     }
 
     static @NonNull SpatialSceneRuntime create(
@@ -156,5 +180,19 @@ class SpatialSceneRuntime implements SceneRuntime {
     @VisibleForTesting
     @NonNull Node getTaskWindowLeashNode() {
         return mTaskWindowLeashNode;
+    }
+
+    @Override
+    public @NonNull SpatialCapabilities getSpatialCapabilities() {
+        return RuntimeUtils.convertSpatialCapabilities(
+                mLazySpatialStateProvider.get().getSpatialCapabilities());
+    }
+
+    // Note that this is called on the Activity's UI thread so we should be careful to not block it.
+    // It is synchronized because we assume this.spatialState cannot be updated elsewhere during the
+    // execution of this method.
+    @VisibleForTesting
+    synchronized void onSpatialStateChanged(@NonNull SpatialState newSpatialState) {
+        mSpatialState.getAndSet(newSpatialState);
     }
 }

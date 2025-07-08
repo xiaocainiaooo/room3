@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 
+import androidx.xr.runtime.internal.SpatialCapabilities;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
 import androidx.xr.scenecore.impl.perception.Session;
@@ -35,6 +36,9 @@ import com.android.extensions.xr.ShadowXrExtensions;
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
 import com.android.extensions.xr.node.NodeRepository;
+import com.android.extensions.xr.space.ShadowSpatialCapabilities;
+import com.android.extensions.xr.space.ShadowSpatialState;
+import com.android.extensions.xr.space.SpatialState;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -125,5 +129,28 @@ public class SpatialSceneRuntimeTest {
         // The perception library failed to initialize a session, but the runtime should still be
         // created.
         assertThat(mRuntime).isNotNull();
+    }
+
+    @Test
+    public void onSpatialStateChanged_setsSpatialCapabilities() {
+        SpatialState spatialState = ShadowSpatialState.create();
+        ShadowSpatialState.extract(spatialState)
+                .setSpatialCapabilities(
+                        ShadowSpatialCapabilities.create(
+                                com.android.extensions.xr.space.SpatialCapabilities
+                                        .SPATIAL_UI_CAPABLE));
+        mRuntime.onSpatialStateChanged(spatialState);
+
+        SpatialCapabilities caps = mRuntime.getSpatialCapabilities();
+        assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_UI)).isTrue();
+        assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_3D_CONTENT)).isFalse();
+        assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_PASSTHROUGH_CONTROL))
+                .isFalse();
+        assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_APP_ENVIRONMENT))
+                .isFalse();
+        assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_SPATIAL_AUDIO))
+                .isFalse();
+        assertThat(caps.hasCapability(SpatialCapabilities.SPATIAL_CAPABILITY_EMBED_ACTIVITY))
+                .isFalse();
     }
 }

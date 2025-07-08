@@ -32,6 +32,9 @@ import androidx.annotation.RestrictTo
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface SceneRuntime {
+    /** Return the Spatial Capabilities set that are currently supported by the platform. */
+    public val spatialCapabilities: SpatialCapabilities
+
     /** Disposes of the resources used by this runtime */
     public fun dispose()
 }

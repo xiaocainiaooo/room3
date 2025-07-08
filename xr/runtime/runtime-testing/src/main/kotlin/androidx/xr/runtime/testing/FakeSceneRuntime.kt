@@ -19,9 +19,12 @@ package androidx.xr.runtime.testing
 import android.app.Activity
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.SceneRuntime
+import androidx.xr.runtime.internal.SpatialCapabilities
 
 /** Test-only implementation of [SceneRuntime] */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeSceneRuntime(private val activity: Activity) : SceneRuntime {
+    override val spatialCapabilities: SpatialCapabilities = SpatialCapabilities(0)
+
     override fun dispose() {}
 }
