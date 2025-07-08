@@ -21,6 +21,7 @@ import androidx.build.Release
 import androidx.build.RunApiTasks
 import androidx.build.binarycompatibilityvalidator.BinaryCompatibilityValidation
 import androidx.build.getSupportRootFolder
+import androidx.build.hasAndroidMultiplatformPlugin
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.metalava.MetalavaTasks
 import androidx.build.multiplatformExtension
@@ -37,6 +38,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
+import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
@@ -208,6 +210,7 @@ internal fun Project.createReleaseApiConfiguration(): Configuration {
                 // If this is a KMP project targeting android, make sure to select the android
                 // compilation and not a different jvm target compilation
                 multiplatformExtension?.let { extension ->
+                    // Captures when com.android.library plugin is applied in KMP project
                     if (
                         extension.targets.any { target ->
                             target.platformType == KotlinPlatformType.androidJvm
@@ -219,6 +222,19 @@ internal fun Project.createReleaseApiConfiguration(): Configuration {
                                 KotlinPlatformType::class.java,
                             ),
                             KotlinPlatformType.androidJvm,
+                        )
+                    }
+                    // Captures when AGP KMP plugin is applied in KMP project
+                    if (project.hasAndroidMultiplatformPlugin()) {
+                        it.attributes.attribute(
+                            Attribute.of(
+                                "org.gradle.jvm.environment",
+                                TargetJvmEnvironment::class.java,
+                            ),
+                            objects.named(
+                                TargetJvmEnvironment::class.java,
+                                TargetJvmEnvironment.ANDROID,
+                            ),
                         )
                     }
                 }
