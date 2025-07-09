@@ -20,23 +20,35 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.IBinder;
 
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
+import androidx.xr.scenecore.impl.perception.Anchor;
 import androidx.xr.scenecore.impl.perception.Fov;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
+import androidx.xr.scenecore.impl.perception.Plane;
 import androidx.xr.scenecore.impl.perception.Session;
 import androidx.xr.scenecore.impl.perception.ViewProjection;
 import androidx.xr.scenecore.impl.perception.ViewProjections;
 import androidx.xr.scenecore.impl.perception.exceptions.FailedToInitializeException;
 import androidx.xr.scenecore.internal.ActivitySpace;
+import androidx.xr.scenecore.internal.AnchorEntity;
 import androidx.xr.scenecore.internal.CameraViewActivityPose;
+import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.HeadActivityPose;
+import androidx.xr.scenecore.internal.PlaneSemantic;
+import androidx.xr.scenecore.internal.PlaneType;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.testing.FakeScheduledExecutorService;
 
@@ -59,9 +71,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import java.time.Duration;
 import java.util.Objects;
+import java.util.UUID;
 
 /** Tests for {@link SpatialSceneRuntimeFactory}. */
+@SuppressLint("NewApi") // TODO: b/413661481 - Remove this suppression prior to JXR stable release.
 @RunWith(RobolectricTestRunner.class)
 public class SpatialSceneRuntimeTest {
     private static final int OPEN_XR_REFERENCE_SPACE_TYPE = 1;
@@ -70,7 +85,10 @@ public class SpatialSceneRuntimeTest {
     private final EntityManager mEntityManager = new EntityManager();
     private final PerceptionLibrary mPerceptionLibrary = mock(PerceptionLibrary.class);
     private final Session mSession = mock(Session.class);
-
+    private final androidx.xr.scenecore.impl.perception.Plane mPlane =
+            mock(androidx.xr.scenecore.impl.perception.Plane.class);
+    private final Anchor mAnchor = mock(Anchor.class);
+    private final IBinder mSharedAnchorToken = mock(IBinder.class);
     private final NodeRepository mNodeRepository = NodeRepository.getInstance();
     private final @NonNull XrExtensions mXrExtensions =
             Objects.requireNonNull(XrExtensionsProvider.getXrExtensions());
@@ -291,5 +309,79 @@ public class SpatialSceneRuntimeTest {
         assertThat(mNodeRepository.getParent(childNode1)).isEqualTo(getNode(parentEntity));
         Node childNode2 = getNode(childEntity2);
         assertThat(mNodeRepository.getParent(childNode2)).isEqualTo(getNode(parentEntity));
+    }
+
+    @Test
+    public void createAnchorEntity_returnsAndInitsAnchor() throws Exception {
+        Dimensions anchorDimensions = new Dimensions(2f, 5f, 0f);
+        androidx.xr.scenecore.impl.perception.Pose perceptionPose =
+                androidx.xr.scenecore.impl.perception.Pose.identity();
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
+                .thenReturn(
+                        new Plane.PlaneData(
+                                perceptionPose,
+                                3.0f,
+                                5.0f,
+                                Plane.Type.VERTICAL.intValue,
+                                Plane.Label.WALL.intValue));
+        when(mPlane.createAnchor(eq(perceptionPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
+
+        AnchorEntity anchorEntity =
+                mRuntime.createAnchorEntity(
+                        anchorDimensions, PlaneType.VERTICAL, PlaneSemantic.WALL, Duration.ZERO);
+
+        assertThat(anchorEntity).isNotNull();
+        assertThat(anchorEntity.getState()).isEqualTo(AnchorEntity.State.ANCHORED);
+    }
+
+    @Test
+    public void createPersistedAnchorEntity_returnsEntityInNominalCase() throws Exception {
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.createAnchorFromUuid(any())).thenReturn(mAnchor);
+
+        assertThat(
+                        mRuntime.createPersistedAnchorEntity(
+                                UUID.randomUUID(), /* searchTimeout= */ Duration.ofSeconds(1)))
+                .isNotNull();
+    }
+
+    @Test
+    public void createPersistedAnchorEntity_returnsEntityForNullSession() throws Exception {
+        when(mPerceptionLibrary.getSession()).thenReturn(null);
+
+        assertThat(
+                        mRuntime.createPersistedAnchorEntity(
+                                UUID.randomUUID(), /* searchTimeout= */ Duration.ofSeconds(1)))
+                .isNotNull();
+    }
+
+    @Test
+    public void createPersistedAnchorEntity_returnsEntityForNullAnchor() throws Exception {
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.createAnchorFromUuid(any())).thenReturn(null);
+
+        assertThat(
+                        mRuntime.createPersistedAnchorEntity(
+                                UUID.randomUUID(), /* searchTimeout= */ Duration.ofSeconds(1)))
+                .isNotNull();
+    }
+
+    @Test
+    public void createPersistedAnchorEntity_returnsEntityForNullAnchorToken() throws Exception {
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.createAnchorFromUuid(any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(null);
+        UUID uuid = UUID.randomUUID();
+
+        assertThat(
+                        mRuntime.createPersistedAnchorEntity(
+                                uuid, /* searchTimeout= */ Duration.ofSeconds(1)))
+                .isNotNull();
+        verify(mPerceptionLibrary, times(3)).getSession();
+        verify(mSession).createAnchorFromUuid(uuid);
+        verify(mAnchor).getAnchorToken();
     }
 }

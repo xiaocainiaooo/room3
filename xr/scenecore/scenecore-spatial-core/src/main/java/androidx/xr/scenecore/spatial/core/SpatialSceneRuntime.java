@@ -24,12 +24,14 @@ import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.xr.arcore.internal.Anchor;
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
 import androidx.xr.scenecore.impl.perception.Session;
 import androidx.xr.scenecore.internal.ActivityPanelEntity;
 import androidx.xr.scenecore.internal.ActivitySpace;
+import androidx.xr.scenecore.internal.AnchorEntity;
 import androidx.xr.scenecore.internal.CameraViewActivityPose;
 import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
@@ -39,6 +41,8 @@ import androidx.xr.scenecore.internal.HeadActivityPose;
 import androidx.xr.scenecore.internal.PanelEntity;
 import androidx.xr.scenecore.internal.PerceptionSpaceActivityPose;
 import androidx.xr.scenecore.internal.PixelDimensions;
+import androidx.xr.scenecore.internal.PlaneSemantic;
+import androidx.xr.scenecore.internal.PlaneType;
 import androidx.xr.scenecore.internal.RenderingEntityFactory;
 import androidx.xr.scenecore.internal.SceneRuntime;
 import androidx.xr.scenecore.internal.Space;
@@ -56,11 +60,13 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -397,6 +403,60 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
         activityPanelEntity.setParent(parent);
         activityPanelEntity.setPose(pose, Space.PARENT);
         return activityPanelEntity;
+    }
+
+    @Override
+    public @NonNull AnchorEntity createAnchorEntity(
+            @NonNull Dimensions bounds,
+            @NonNull PlaneType planeType,
+            @NonNull PlaneSemantic planeSemantic,
+            @NonNull Duration searchTimeout) {
+        Node node = mExtensions.createNode();
+        return AnchorEntityImpl.createSemanticAnchor(
+                mActivity,
+                node,
+                bounds,
+                planeType,
+                planeSemantic,
+                searchTimeout,
+                getActivitySpace(),
+                getActivitySpace(),
+                mExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
+    }
+
+    @Override
+    public @NonNull AnchorEntity createAnchorEntity(@NonNull Anchor anchor) {
+        Node node = mExtensions.createNode();
+        return AnchorEntityImpl.createAnchorFromRuntimeAnchor(
+                mActivity,
+                node,
+                anchor,
+                getActivitySpace(),
+                getActivitySpace(),
+                mExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
+    }
+
+    @Override
+    public @NonNull AnchorEntity createPersistedAnchorEntity(
+            @NonNull UUID uuid, @NonNull Duration searchTimeout) {
+        Node node = mExtensions.createNode();
+        return AnchorEntityImpl.createPersistedAnchor(
+                mActivity,
+                node,
+                uuid,
+                searchTimeout,
+                getActivitySpace(),
+                getActivitySpace(),
+                mExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
     }
 
     @Override
