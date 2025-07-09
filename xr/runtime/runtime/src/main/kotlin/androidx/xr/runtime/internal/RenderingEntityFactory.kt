@@ -17,6 +17,7 @@
 package androidx.xr.runtime.internal
 
 import androidx.annotation.RestrictTo
+import androidx.xr.runtime.math.Pose
 
 /**
  * An interface for creating entities with rendering features.
@@ -29,4 +30,11 @@ import androidx.annotation.RestrictTo
  * The intended usage is for a [RenderingRuntime] to cast its [SceneRuntime] instance to
  * `RenderingEntityFactory` to access these factory methods.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface RenderingEntityFactory {}
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+public interface RenderingEntityFactory {
+    /**
+     * A factory function to create a SceneCore GltfEntity. The parent may be the activity space or
+     * GltfEntity in the scene.
+     */
+    public fun createGltfEntity(feature: GltfFeature, pose: Pose, parentEntity: Entity): GltfEntity
+}

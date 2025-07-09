@@ -24,6 +24,8 @@ import androidx.annotation.VisibleForTesting;
 import androidx.xr.runtime.internal.ActivitySpace;
 import androidx.xr.runtime.internal.CameraViewActivityPose;
 import androidx.xr.runtime.internal.Entity;
+import androidx.xr.runtime.internal.GltfEntity;
+import androidx.xr.runtime.internal.GltfFeature;
 import androidx.xr.runtime.internal.RenderingEntityFactory;
 import androidx.xr.runtime.internal.SceneRuntime;
 import androidx.xr.runtime.internal.Space;
@@ -265,6 +267,17 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
             return null;
         }
         return cameraViewActivityPose;
+    }
+
+    @Override
+    @NonNull
+    public GltfEntity createGltfEntity(
+            @NonNull GltfFeature feature, @NonNull Pose pose, @Nullable Entity parentEntity) {
+        GltfEntity entity =
+                new GltfEntityImpl(
+                        mActivity, feature, parentEntity, mExtensions, mEntityManager, mExecutor);
+        entity.setPose(pose, Space.PARENT);
+        return entity;
     }
 
     @Override

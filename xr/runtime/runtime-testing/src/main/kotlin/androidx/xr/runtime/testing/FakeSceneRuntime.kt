@@ -20,6 +20,8 @@ import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.ActivitySpace
 import androidx.xr.runtime.internal.CameraViewActivityPose
 import androidx.xr.runtime.internal.Entity
+import androidx.xr.runtime.internal.GltfEntity
+import androidx.xr.runtime.internal.GltfFeature
 import androidx.xr.runtime.internal.RenderingEntityFactory
 import androidx.xr.runtime.internal.SceneRuntime
 import androidx.xr.runtime.internal.SpatialCapabilities
@@ -37,6 +39,12 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
     override fun getCameraViewActivityPose(
         @CameraViewActivityPose.CameraType cameraType: Int
     ): CameraViewActivityPose? = FakeCameraViewActivityPose()
+
+    override fun createGltfEntity(
+        feature: GltfFeature,
+        pose: Pose,
+        parentEntity: Entity,
+    ): GltfEntity = FakeGltfEntity()
 
     override fun createGroupEntity(pose: Pose, name: String, parent: Entity): Entity = FakeEntity()
 
