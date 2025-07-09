@@ -69,7 +69,7 @@ import androidx.compose.foundation.text.selection.containsInclusive
 import androidx.compose.foundation.text.selection.getAdjustedCoordinates
 import androidx.compose.foundation.text.selection.getSelectionHandleCoordinates
 import androidx.compose.foundation.text.selection.getTextFieldSelectionLayout
-import androidx.compose.foundation.text.selection.isPrecisePointer
+import androidx.compose.foundation.text.selection.isMouseOrTouchPad
 import androidx.compose.foundation.text.selection.visibleBounds
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -473,7 +473,7 @@ internal class TextFieldSelectionState(
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
-                isInTouchMode = !event.isPrecisePointer
+                isInTouchMode = !event.isMouseOrTouchPad()
             }
         }
     }
