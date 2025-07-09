@@ -77,7 +77,8 @@ public constructor() {
     }
 
     /**
-     * Returns [Resources] object containing all previously registered resources.
+     * Returns [Resources] object containing all previously registered resources, with {@link
+     * Image#setImageResource} and {@link Image#Builder(ProtoLayoutScope).
      *
      * Resource is registered with the String ID that is a hash value of all resources.
      */
@@ -97,6 +98,7 @@ public constructor() {
      * Bundle contains (key, value) pairs of [android.os.Parcelable], where `key` is String ID
      * corresponding to the [ModifiersBuilders.Clickable] ID, and `value` is [PendingIntent].
      */
+    // TODO: b/427954838 - Add example API in KDocs on where this is registered.
     public fun collectPendingIntents(): Bundle = pendingIntents.clone() as Bundle
 
     /** Clears mappings for resources and pending intents. */
