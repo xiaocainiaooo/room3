@@ -746,8 +746,7 @@ public class LayoutElementBuildersTest {
 
     @Test
     public void dashedArcLine_withoutLayoutConstraint_setsLength() {
-        DashedArcLine dashedArcLine =
-                new DashedArcLine.Builder().setLength(DEGREES_PROP).build();
+        DashedArcLine dashedArcLine = new DashedArcLine.Builder().setLength(DEGREES_PROP).build();
 
         DimensionProto.DegreesProp lengthProto = dashedArcLine.toProto().getLength();
 
