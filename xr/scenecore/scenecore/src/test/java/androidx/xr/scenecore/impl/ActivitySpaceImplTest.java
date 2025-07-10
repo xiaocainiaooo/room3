@@ -238,16 +238,10 @@ public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
     }
 
     @Test
-    public void setScale_doesNothing() throws Exception {
+    public void setScale_throwsException() throws Exception {
         Vector3 scale = new Vector3(1, 1, 9999);
-        mActivitySpace.setScale(scale);
 
-        // The returned scale(s) here should be the identity scale despite the setScale call.
-        assertThat(mActivitySpace.getScale().getX()).isWithin(1e-5f).of(1.0f);
-        assertThat(mActivitySpace.getScale().getY()).isWithin(1e-5f).of(1.0f);
-        assertThat(mActivitySpace.getScale().getZ()).isWithin(1e-5f).of(1.0f);
-
-        // Note that there's no exception thrown.
+        assertThrows(UnsupportedOperationException.class, () -> mActivitySpace.setScale(scale));
     }
 
     @Test
@@ -414,5 +408,30 @@ public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
         assertPose(
                 activitySpaceImpl.getPose(Space.REAL_WORLD),
                 activitySpaceImpl.getPoseInPerceptionSpace());
+    }
+
+    @Test
+    public void getScaleRelativeToParentSpace_throwsException() throws Exception {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> activitySpaceImpl.getScale(Space.PARENT));
+    }
+
+    @Test
+    public void getScaleRelativeToActivitySpace_returnsActivitySpaceScale() {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+
+        assertVector3(
+                activitySpaceImpl.getScale(Space.ACTIVITY),
+                activitySpaceImpl.getActivitySpaceScale());
+    }
+
+    @Test
+    public void getScaleRelativeToRealWorldSpace_returnsVector3One() {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+
+        assertVector3(activitySpaceImpl.getScale(Space.REAL_WORLD), new Vector3(1f, 1f, 1f));
     }
 }

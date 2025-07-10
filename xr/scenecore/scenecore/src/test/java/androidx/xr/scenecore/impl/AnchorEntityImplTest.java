@@ -769,9 +769,9 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     }
 
     @Test
-    public void anchorEntityGetScale_returnsIdentityScale() throws Exception {
+    public void anchorEntityGetScale_throwsException() throws Exception {
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
-        assertVector3(anchorEntity.getScale(), new Vector3(1f, 1f, 1f));
+        assertThrows(UnsupportedOperationException.class, () -> anchorEntity.getScale());
     }
 
     @Test
@@ -1169,5 +1169,27 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.ERROR);
         assertThat(mNodeRepository.getParent(anchorEntity.getNode())).isEqualTo(null);
+    }
+
+    @Test
+    public void getScaleRelativeToParentSpace_throwsException() throws Exception {
+        AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
+
+        assertThrows(
+                UnsupportedOperationException.class, () -> anchorEntity.getScale(Space.PARENT));
+    }
+
+    @Test
+    public void getScaleRelativeToActivitySpace_returnsActivitySpaceScale() {
+        AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
+
+        assertVector3(anchorEntity.getScale(Space.ACTIVITY), anchorEntity.getActivitySpaceScale());
+    }
+
+    @Test
+    public void getScaleRelativeToRealWorldSpace_returnsVector3One() {
+        AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
+
+        assertVector3(anchorEntity.getScale(Space.REAL_WORLD), new Vector3(1f, 1f, 1f));
     }
 }

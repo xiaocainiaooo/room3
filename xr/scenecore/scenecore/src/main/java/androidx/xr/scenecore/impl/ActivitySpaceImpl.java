@@ -103,7 +103,7 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
         switch (relativeTo) {
             case Space.PARENT:
                 throw new UnsupportedOperationException(
-                        "ActivitySpace is a root space and it does not have a parent.");
+                    "ActivitySpace is a root space and it does not have a parent.");
             case Space.ACTIVITY:
                 return getPoseInActivitySpace();
             case Space.REAL_WORLD:
@@ -146,8 +146,22 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
 
     @Override
     public void setScale(@NonNull Vector3 scale, @SpaceValue int relativeTo) {
-        // TODO(b/349391097): make this behavior consistent with AnchorEntityImpl
-        Log.e(TAG, "Cannot set scale for the ActivitySpace.");
+        throw new UnsupportedOperationException("Cannot set 'scale' on an ActivitySpace.");
+    }
+
+    @Override
+    public @NonNull Vector3 getScale(@SpaceValue int relativeTo) {
+        switch (relativeTo) {
+            case Space.PARENT:
+                throw new UnsupportedOperationException(
+                    "ActivitySpace is a root space and it does not have a parent.");
+            case Space.ACTIVITY:
+                return getActivitySpaceScale();
+            case Space.REAL_WORLD:
+                return super.getWorldSpaceScale();
+            default:
+                throw new IllegalArgumentException("Unsupported relativeTo value: " + relativeTo);
+        }
     }
 
     @Override
