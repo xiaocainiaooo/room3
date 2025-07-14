@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.12.0-alpha04" type="baseline" client="gradle" dependencies="false" name="AGP (8.12.0-alpha04)" variant="all" version="8.12.0-alpha04">
+<issues format="6" by="lint 8.12.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (8.12.0-alpha08)" variant="all" version="8.12.0-alpha08">
 
     <issue
         id="EagerGradleConfiguration"
@@ -323,6 +323,15 @@
         errorLine2="                   ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXComposeImplPlugin.kt"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Use isolated.rootProject instead of getRootProject"
+        errorLine1="    return File(rootProject.projectDir, &quot;../../tools/external/gradle&quot;).canonicalFile"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*3}/androidx/build/AndroidXConfig.kt"/>
     </issue>
 
     <issue
