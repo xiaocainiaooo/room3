@@ -123,15 +123,14 @@ class SessionTest {
     }
 
     @Test
-    fun create_permissionException_returnsPermissionsNotGrantedResult() {
+    fun create_permissionNotGranted_throwsSecurityException() {
         val shadowApplication = shadowOf(activity.application)
         shadowApplication.denyPermissions(Manifest.permission.CAMERA)
         FakeRuntimeFactory.hasCreatePermission = false
 
         activityController.create()
 
-        val result = Session.create(activity)
-        assertThat(result).isInstanceOf(SessionCreatePermissionsNotGranted::class.java)
+        assertFailsWith<SecurityException> { Session.create(activity) }
     }
 
     @Test
@@ -220,7 +219,7 @@ class SessionTest {
     }
 
     @Test
-    fun configure_permissionNotGranted_returnsPermissionNotGrantedResult() {
+    fun configure_permissionNotGranted_throwsSecurityException() {
         activityController.create().start().resume()
         underTest = createSession()
         val lifecycleManager = underTest.runtime.lifecycleManager as FakeLifecycleManager
@@ -228,15 +227,14 @@ class SessionTest {
         check(currentConfig.depthEstimation == Config.DepthEstimationMode.SMOOTH_AND_RAW)
         lifecycleManager.hasMissingPermission = true
 
-        val result =
+        assertFailsWith<SecurityException> {
             underTest.configure(
                 underTest.config.copy(
                     depthEstimation = Config.DepthEstimationMode.DISABLED,
                     faceTracking = Config.FaceTrackingMode.DISABLED,
                 )
             )
-
-        assertThat(result).isInstanceOf(SessionConfigurePermissionsNotGranted::class.java)
+        }
         assertThat(underTest.config).isEqualTo(currentConfig)
     }
 
