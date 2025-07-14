@@ -81,7 +81,7 @@ class SurfaceScreenshotTest() {
                 Text("This is a surface")
             }
         }
-        rule.mainClock.advanceTimeBy(1500)
+        rule.mainClock.advanceTimeBy(1800)
         rule.assertRootAgainstGolden("surface_focused_defaultBorder_animation", screenshotRule)
     }
 
@@ -118,7 +118,7 @@ class SurfaceScreenshotTest() {
                 Text("This is a surface")
             }
         }
-        rule.mainClock.advanceTimeBy(1500)
+        rule.mainClock.advanceTimeBy(1800)
         rule.assertRootAgainstGolden("surface_focused_rectBorder_animation", screenshotRule)
     }
 
@@ -155,7 +155,7 @@ class SurfaceScreenshotTest() {
                 contentAlignment = Alignment.Center,
             ) {}
         }
-        rule.mainClock.advanceTimeBy(1500)
+        rule.mainClock.advanceTimeBy(1800)
         rule.assertRootAgainstGolden("surface_focused_genericBorder_animation", screenshotRule)
     }
 
