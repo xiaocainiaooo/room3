@@ -1756,7 +1756,7 @@ class BinaryCompatibilityCheckerTest {
             }
         assertThat(e.message)
             .contains(
-                "Failed to parse baseline version from 'src/test/resources/invalid_baseline_file.txt'"
+                "Failed to parse baseline version from 'src/jvmTest/resources/invalid_baseline_file.txt'"
             )
     }
 
