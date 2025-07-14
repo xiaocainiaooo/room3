@@ -28,7 +28,7 @@ package androidx.xr.scenecore {
     method public androidx.xr.runtime.math.FloatSize3d getBounds();
     method public java.util.List<androidx.xr.scenecore.Component> getComponents();
     method public <T extends androidx.xr.scenecore.Component> java.util.List<T> getComponentsOfType(Class<? extends T> type);
-    method public String getContentDescription();
+    method public CharSequence getContentDescription();
     method public androidx.xr.scenecore.Entity? getParent();
     method public androidx.xr.runtime.math.Pose getPose(int relativeTo);
     method public androidx.xr.runtime.math.BoundingBox getRecommendedContentBoxInFullSpace();
@@ -41,7 +41,7 @@ package androidx.xr.scenecore {
     method public void removeOnBoundsChangedListener(java.util.function.Consumer<androidx.xr.runtime.math.FloatSize3d> listener);
     method public void removeOnSpaceUpdatedListener(Runnable listener);
     method public void setAlpha(float alpha, int relativeTo);
-    method public void setContentDescription(String);
+    method public void setContentDescription(CharSequence);
     method public void setEnabled(boolean enabled);
     method public void setParent(androidx.xr.scenecore.Entity?);
     method public void setPose(androidx.xr.runtime.math.Pose pose, int relativeTo);
@@ -63,7 +63,7 @@ package androidx.xr.scenecore {
     method public androidx.xr.arcore.Anchor getAnchor(androidx.xr.runtime.Session session);
     method public java.util.List<androidx.xr.scenecore.Component> getComponents();
     method public <T extends androidx.xr.scenecore.Component> java.util.List<T> getComponentsOfType(Class<? extends T> type);
-    method public String getContentDescription();
+    method public CharSequence getContentDescription();
     method public androidx.xr.scenecore.Entity? getParent();
     method public androidx.xr.runtime.math.Pose getPose(int relativeTo);
     method public float getScale(int relativeTo);
@@ -74,7 +74,7 @@ package androidx.xr.scenecore {
     method public void removeAllComponents();
     method public void removeComponent(androidx.xr.scenecore.Component component);
     method public void setAlpha(float alpha, int relativeTo);
-    method public void setContentDescription(String);
+    method public void setContentDescription(CharSequence);
     method public void setEnabled(boolean enabled);
     method public void setOnSpaceUpdatedListener(Runnable? listener);
     method public void setOnSpaceUpdatedListener(java.util.concurrent.Executor executor, Runnable? listener);
@@ -151,7 +151,7 @@ package androidx.xr.scenecore {
     method @FloatRange(from=0.0, to=1.0) public float getAlpha(optional int relativeTo);
     method public java.util.List<androidx.xr.scenecore.Component> getComponents();
     method public <T extends androidx.xr.scenecore.Component> java.util.List<T> getComponentsOfType(Class<? extends T> type);
-    method public String getContentDescription();
+    method public CharSequence getContentDescription();
     method public androidx.xr.scenecore.Entity? getParent();
     method public default androidx.xr.runtime.math.Pose getPose();
     method public androidx.xr.runtime.math.Pose getPose(optional int relativeTo);
@@ -162,14 +162,14 @@ package androidx.xr.scenecore {
     method public void removeComponent(androidx.xr.scenecore.Component component);
     method public default void setAlpha(@FloatRange(from=0.0, to=1.0) float alpha);
     method public void setAlpha(@FloatRange(from=0.0, to=1.0) float alpha, optional int relativeTo);
-    method public void setContentDescription(String);
+    method public void setContentDescription(CharSequence);
     method public void setEnabled(boolean enabled);
     method public void setParent(androidx.xr.scenecore.Entity?);
     method public default void setPose(androidx.xr.runtime.math.Pose pose);
     method public void setPose(androidx.xr.runtime.math.Pose pose, optional int relativeTo);
     method public default void setScale(@FloatRange(from=0.0) float scale);
     method public void setScale(@FloatRange(from=0.0) float scale, optional int relativeTo);
-    property public abstract String contentDescription;
+    property public abstract CharSequence contentDescription;
     property public abstract androidx.xr.scenecore.Entity? parent;
   }
 
@@ -212,7 +212,7 @@ package androidx.xr.scenecore {
     method public int getAnimationState();
     method public java.util.List<androidx.xr.scenecore.Component> getComponents();
     method public <T extends androidx.xr.scenecore.Component> java.util.List<T> getComponentsOfType(Class<? extends T> type);
-    method public String getContentDescription();
+    method public CharSequence getContentDescription();
     method public androidx.xr.scenecore.Entity? getParent();
     method public androidx.xr.runtime.math.Pose getPose(int relativeTo);
     method public float getScale(int relativeTo);
@@ -222,7 +222,7 @@ package androidx.xr.scenecore {
     method public void removeAllComponents();
     method public void removeComponent(androidx.xr.scenecore.Component component);
     method public void setAlpha(float alpha, int relativeTo);
-    method public void setContentDescription(String);
+    method public void setContentDescription(CharSequence);
     method public void setEnabled(boolean enabled);
     method public void setParent(androidx.xr.scenecore.Entity?);
     method public void setPose(androidx.xr.runtime.math.Pose pose, int relativeTo);
@@ -259,7 +259,7 @@ package androidx.xr.scenecore {
     method public float getAlpha(int relativeTo);
     method public java.util.List<androidx.xr.scenecore.Component> getComponents();
     method public <T extends androidx.xr.scenecore.Component> java.util.List<T> getComponentsOfType(Class<? extends T> type);
-    method public String getContentDescription();
+    method public CharSequence getContentDescription();
     method public androidx.xr.scenecore.Entity? getParent();
     method public androidx.xr.runtime.math.Pose getPose(int relativeTo);
     method public float getScale(int relativeTo);
@@ -269,7 +269,7 @@ package androidx.xr.scenecore {
     method public void removeAllComponents();
     method public void removeComponent(androidx.xr.scenecore.Component component);
     method public void setAlpha(float alpha, int relativeTo);
-    method public void setContentDescription(String);
+    method public void setContentDescription(CharSequence);
     method public void setEnabled(boolean enabled);
     method public void setParent(androidx.xr.scenecore.Entity?);
     method public void setPose(androidx.xr.runtime.math.Pose pose, int relativeTo);
@@ -459,7 +459,7 @@ package androidx.xr.scenecore {
     method public float getAlpha(int relativeTo);
     method public java.util.List<androidx.xr.scenecore.Component> getComponents();
     method public <T extends androidx.xr.scenecore.Component> java.util.List<T> getComponentsOfType(Class<? extends T> type);
-    method public String getContentDescription();
+    method public CharSequence getContentDescription();
     method public final float getCornerRadius();
     method public androidx.xr.scenecore.Entity? getParent();
     method public final androidx.xr.scenecore.PerceivedResolutionResult getPerceivedResolution();
@@ -474,7 +474,7 @@ package androidx.xr.scenecore {
     method public void removeAllComponents();
     method public void removeComponent(androidx.xr.scenecore.Component component);
     method public void setAlpha(float alpha, int relativeTo);
-    method public void setContentDescription(String);
+    method public void setContentDescription(CharSequence);
     method public final void setCornerRadius(float);
     method public void setEnabled(boolean enabled);
     method public void setParent(androidx.xr.scenecore.Entity?);

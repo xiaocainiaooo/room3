@@ -212,7 +212,7 @@ class EntityTest {
 
         override val children: List<RtEntity> = emptyList()
 
-        override var contentDescription: String = ""
+        override var contentDescription: CharSequence = ""
 
         override fun dispose() {}
 

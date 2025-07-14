@@ -41,7 +41,7 @@ public interface Entity : ScenePose {
     public var parent: Entity?
 
     /** Alternate text for this Entity to be consumed by Accessibility systems. */
-    public var contentDescription: String
+    public var contentDescription: CharSequence
 
     /**
      * Sets an Entity to be a child of this Entity in the scene graph. The child Entity will inherit
@@ -241,7 +241,7 @@ internal constructor(
 
     private val componentList = mutableListOf<Component>()
 
-    override var contentDescription: String
+    override var contentDescription: CharSequence
         get() = rtEntity.contentDescription
         set(value) {
             rtEntity.contentDescription = value
