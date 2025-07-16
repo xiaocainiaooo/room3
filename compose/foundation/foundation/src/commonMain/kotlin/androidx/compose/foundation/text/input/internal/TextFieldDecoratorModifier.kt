@@ -468,7 +468,7 @@ internal class TextFieldDecoratorModifierNode(
                 keyboardOptions != previousKeyboardOptions ||
                 stylusHandwritingTrigger != previousStylusHandwritingTrigger
         ) {
-            if (editable && isFocused) {
+            if (editable && (isFocused || inputSessionJob != null)) {
                 // The old session will be implicitly disposed.
                 startInputSession(fromTap = false)
             } else if (!editable) {
