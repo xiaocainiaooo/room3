@@ -17,10 +17,13 @@
 package androidx.privacysandbox.databridge.integration.testapp
 
 import androidx.privacysandbox.databridge.core.Key
+import androidx.privacysandbox.databridge.integration.testutils.KeyUpdateCallbackImpl
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Expect
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeoutException
 import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
@@ -54,6 +57,8 @@ class DataBridgeIntegrationTest {
             stringSetKey to setOf("stringValue1", "stringValue2"),
             byteArrayKey to byteArrayOf(1, 2, 3, 4),
         )
+
+    private val currentThreadExecutor = Executor { command -> command.run() }
 
     @get:Rule val activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
 
@@ -226,6 +231,61 @@ class DataBridgeIntegrationTest {
         getActivity().setValuesFromSdk(keyValueMap)
     }
 
+    @Test
+    fun testRegisterKeyUpdateCallbackFromApp() = runTest {
+        val callback1 = KeyUpdateCallbackImpl()
+        val callback2 = KeyUpdateCallbackImpl()
+
+        callback1.initializeLatch(listOf(intKey, stringKey))
+        getActivity()
+            .registerKeyUpdateCallbackFromApp(
+                setOf(intKey, stringKey),
+                currentThreadExecutor,
+                callback1,
+            )
+        verifyCountAndValue(callback1, stringKey, 1, null)
+
+        callback2.initializeLatch(listOf(doubleKey, stringKey))
+        getActivity()
+            .registerKeyUpdateCallbackFromApp(
+                setOf(doubleKey, stringKey),
+                currentThreadExecutor,
+                callback2,
+            )
+        verifyCountAndValue(callback2, stringKey, 1, null)
+
+        callback1.initializeLatch(listOf(stringKey))
+        callback2.initializeLatch(listOf(stringKey))
+        getActivity().setValuesFromApp(mapOf(stringKey to "stringValue"))
+        verifyCountAndValue(callback1, stringKey, 2, "stringValue")
+        verifyCountAndValue(callback2, stringKey, 2, "stringValue")
+
+        getActivity().unregisterKeyUpdateCallbackFromApp(callback1)
+        getActivity().unregisterKeyUpdateCallbackFromApp(callback2)
+    }
+
+    @Test(expected = TimeoutException::class)
+    fun testUnregisterKeyUpdates() = runTest {
+        val callback = KeyUpdateCallbackImpl()
+
+        callback.initializeLatch(listOf(intKey))
+        getActivity()
+            .registerKeyUpdateCallbackFromApp(setOf(intKey), currentThreadExecutor, callback)
+        verifyCountAndValue(callback, intKey, 1, null)
+
+        callback.initializeLatch(listOf(intKey))
+        getActivity().setValuesFromApp(mapOf(intKey to 123))
+        verifyCountAndValue(callback, intKey, 2, 123)
+
+        getActivity().unregisterKeyUpdateCallbackFromApp(callback)
+        callback.initializeLatch(listOf(intKey))
+        getActivity().setValuesFromApp(mapOf(intKey to 11))
+
+        // This throws a TimeoutException exception because it CountDownLatch.awaits returns a
+        // boolean as the callback has been unregistered
+        val unused = callback.getCounterForKey(intKey)
+    }
+
     private fun verifySuccessfulResult(result: Result<Any?>, expectedVal: Any?) {
         expect.that(result.isSuccess).isTrue()
         expect.that(result.getOrNull()).isEqualTo(expectedVal)
@@ -234,6 +294,16 @@ class DataBridgeIntegrationTest {
     private fun verifyClassCastExceptionFailureResult(result: Result<Any?>) {
         expect.that(result.isFailure).isTrue()
         expect.that(result.exceptionOrNull() is ClassCastException).isTrue()
+    }
+
+    private fun verifyCountAndValue(
+        callback: KeyUpdateCallbackImpl,
+        key: Key,
+        count: Int,
+        value: Any?,
+    ) {
+        expect.that(callback.getCounterForKey(key)).isEqualTo(count)
+        expect.that(callback.getValueForKey(key)).isEqualTo(value)
     }
 
     private suspend fun getActivity(): MainActivity = suspendCancellableCoroutine {

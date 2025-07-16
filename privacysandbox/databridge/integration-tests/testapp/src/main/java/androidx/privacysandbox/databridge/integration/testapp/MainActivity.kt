@@ -19,9 +19,11 @@ package androidx.privacysandbox.databridge.integration.testapp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.privacysandbox.databridge.core.Key
+import androidx.privacysandbox.databridge.core.KeyUpdateCallback
 import androidx.privacysandbox.databridge.integration.testsdk.TestSdk
 import androidx.privacysandbox.databridge.integration.testutils.fromKeyValue
 import androidx.privacysandbox.databridge.integration.testutils.toKeyResultPair
+import java.util.concurrent.Executor
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,5 +76,17 @@ class MainActivity : AppCompatActivity() {
     internal suspend fun removeValuesFromSdk(keys: Set<Key>) {
         val (keyNames, keyTypes) = keys.map { it.name to it.type.toString() }.unzip()
         testAppApi.sdk!!.removeValues(keyNames, keyTypes)
+    }
+
+    internal fun registerKeyUpdateCallbackFromApp(
+        keys: Set<Key>,
+        executor: Executor,
+        callback: KeyUpdateCallback,
+    ) {
+        testAppApi.registerKeyUpdateCallback(keys, executor, callback)
+    }
+
+    internal fun unregisterKeyUpdateCallbackFromApp(callback: KeyUpdateCallback) {
+        testAppApi.unregisterKeyUpdateCallback(callback)
     }
 }

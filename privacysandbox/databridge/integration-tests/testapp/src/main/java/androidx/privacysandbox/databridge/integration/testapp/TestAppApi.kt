@@ -20,9 +20,11 @@ import android.content.Context
 import android.os.Bundle
 import androidx.privacysandbox.databridge.client.DataBridgeClient
 import androidx.privacysandbox.databridge.core.Key
+import androidx.privacysandbox.databridge.core.KeyUpdateCallback
 import androidx.privacysandbox.databridge.integration.testsdk.TestSdk
 import androidx.privacysandbox.databridge.integration.testsdk.TestSdkFactory.wrapToTestSdk
 import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
+import java.util.concurrent.Executor
 
 class TestAppApi(appContext: Context) {
 
@@ -51,5 +53,13 @@ class TestAppApi(appContext: Context) {
 
     suspend fun removeValues(keys: Set<Key>) {
         return dataBridgeClient.removeValues(keys)
+    }
+
+    fun registerKeyUpdateCallback(keys: Set<Key>, executor: Executor, callback: KeyUpdateCallback) {
+        dataBridgeClient.registerKeyUpdateCallback(keys, executor, callback)
+    }
+
+    fun unregisterKeyUpdateCallback(callback: KeyUpdateCallback) {
+        dataBridgeClient.unregisterKeyUpdateCallback(callback)
     }
 }
