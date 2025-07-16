@@ -1894,10 +1894,9 @@ package androidx.xr.scenecore.impl.impress {
     method public androidx.xr.scenecore.impl.impress.KhronosPbrMaterial.Builder setNativeMaterial(long);
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class Material {
-    ctor public Material(androidx.xr.scenecore.impl.impress.ImpressApi, long);
-    method public void destroyNativeObject();
-    method public long getNativeHandle();
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public abstract class Material extends androidx.xr.scenecore.impl.impress.BindingsResource implements androidx.xr.runtime.internal.MaterialResource {
+    ctor protected Material(androidx.xr.scenecore.impl.impress.ImpressApi, long);
+    method protected void releaseBindingsResource(long);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Texture extends androidx.xr.scenecore.impl.impress.BindingsResource implements androidx.xr.runtime.internal.TextureResource {

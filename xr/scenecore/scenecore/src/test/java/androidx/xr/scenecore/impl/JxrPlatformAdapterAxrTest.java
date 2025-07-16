@@ -92,6 +92,7 @@ import androidx.xr.runtime.math.Quaternion;
 import androidx.xr.runtime.math.Vector3;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.impress.FakeImpressApiImpl;
+import androidx.xr.scenecore.impl.impress.Material;
 import androidx.xr.scenecore.impl.impress.Texture;
 import androidx.xr.scenecore.impl.perception.Anchor;
 import androidx.xr.scenecore.impl.perception.Fov;
@@ -2492,10 +2493,10 @@ public final class JxrPlatformAdapterAxrTest {
 
     @Test
     public void destroyWaterMaterial_removesWaterMaterial() throws Exception {
-        MaterialResourceImpl material = (MaterialResourceImpl) createWaterMaterial();
+        Material material = (Material) createWaterMaterial();
         int initialMaterialCount = mFakeImpressApi.getMaterials().size();
 
-        mFakeImpressApi.destroyNativeObject(material.getMaterialToken());
+        mFakeImpressApi.destroyNativeObject(material.getNativeHandle());
 
         int finalMaterialCount = mFakeImpressApi.getMaterials().size();
         assertThat(finalMaterialCount).isEqualTo(initialMaterialCount - 1);
