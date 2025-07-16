@@ -28,9 +28,6 @@ android {
     // TODO(b/357865033): AndroidXPlugin should eventually set compileSdkVersion and
     //  buildToolsVersion for this plugin. We shouldn't be setting these manually.
     compileSdk = 36
-    // Remove when b/411666019 is fixed
-    targetSdk = 35
-    compileSdkExtension = 14
     buildToolsVersion = AndroidXConfig.getDefaultAndroidConfig(project).getBuildToolsVersion()
 
     bundle {

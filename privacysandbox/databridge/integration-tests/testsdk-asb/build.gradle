@@ -24,9 +24,6 @@ plugins {
 android {
     namespace = "androidx.privacysandbox.databridge.integration.testsdk-asb"
     compileSdk = 36
-    // Remove when b/411666019 is fixed
-    targetSdk = 35
-    compileSdkExtension = 14
     buildToolsVersion = AndroidXConfig.getDefaultAndroidConfig(project).getBuildToolsVersion()
     bundle {
         packageName = "androidx.privacysandbox.databridge.integration.sdk"
