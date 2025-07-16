@@ -448,10 +448,6 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         return new ExrImageResourceImpl(token);
     }
 
-    private static TextureResourceImpl getTextureResourceFromToken(long token) {
-        return new TextureResourceImpl(token);
-    }
-
     private static MaterialResourceImpl getMaterialResourceFromToken(long token) {
         return new MaterialResourceImpl(token);
     }
@@ -818,8 +814,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
                 () -> {
                     try {
                         Texture texture = textureFuture.get();
-                        textureResourceFuture.set(
-                                getTextureResourceFromToken(texture.getNativeHandle()));
+                        textureResourceFuture.set(texture);
                     } catch (Exception e) {
                         if (e instanceof InterruptedException) {
                             Thread.currentThread().interrupt();
@@ -852,7 +847,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (texture == null) {
             return null;
         }
-        return getTextureResourceFromToken(texture.getNativeHandle());
+        return texture;
     }
 
     @Override
@@ -861,8 +856,8 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
             throw new UnsupportedOperationException(
                     "Destroying textures is not supported without SplitEngine.");
         }
-        TextureResourceImpl textureResource = (TextureResourceImpl) texture;
-        mImpressApi.destroyNativeObject(textureResource.getTextureToken());
+        Texture textureResource = (Texture) texture;
+        mImpressApi.destroyNativeObject(textureResource.getNativeHandle());
     }
 
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
@@ -946,12 +941,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(reflectionMap instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(reflectionMap instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setReflectionMapOnWaterMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) reflectionMap).getTextureToken());
+                ((Texture) reflectionMap).getNativeHandle());
     }
 
     @Override
@@ -964,12 +959,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(normalMap instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(normalMap instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setNormalMapOnWaterMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) normalMap).getTextureToken());
+                ((Texture) normalMap).getNativeHandle());
     }
 
     @Override
@@ -1024,12 +1019,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(alphaMap instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(alphaMap instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setAlphaMapOnWaterMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) alphaMap).getTextureToken());
+                ((Texture) alphaMap).getNativeHandle());
     }
 
     @Override
@@ -1128,12 +1123,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(baseColor instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(baseColor instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setBaseColorTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) baseColor).getTextureToken());
+                ((Texture) baseColor).getNativeHandle());
     }
 
     @Override
@@ -1176,12 +1171,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(metallicRoughness instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(metallicRoughness instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setMetallicRoughnessTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) metallicRoughness).getTextureToken());
+                ((Texture) metallicRoughness).getNativeHandle());
     }
 
     @Override
@@ -1230,12 +1225,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(normal instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(normal instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setNormalTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) normal).getTextureToken());
+                ((Texture) normal).getNativeHandle());
     }
 
     @Override
@@ -1274,12 +1269,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(ambientOcclusion instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(ambientOcclusion instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setAmbientOcclusionTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) ambientOcclusion).getTextureToken());
+                ((Texture) ambientOcclusion).getNativeHandle());
     }
 
     @Override
@@ -1318,12 +1313,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(emissive instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(emissive instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setEmissiveTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) emissive).getTextureToken());
+                ((Texture) emissive).getNativeHandle());
     }
 
     @Override
@@ -1365,12 +1360,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(clearcoat instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(clearcoat instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setClearcoatTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) clearcoat).getTextureToken());
+                ((Texture) clearcoat).getNativeHandle());
     }
 
     @Override
@@ -1379,12 +1374,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(clearcoatNormal instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(clearcoatNormal instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setClearcoatNormalTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) clearcoatNormal).getTextureToken());
+                ((Texture) clearcoatNormal).getNativeHandle());
     }
 
     @Override
@@ -1393,12 +1388,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(clearcoatRoughness instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(clearcoatRoughness instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setClearcoatRoughnessTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) clearcoatRoughness).getTextureToken());
+                ((Texture) clearcoatRoughness).getNativeHandle());
     }
 
     @Override
@@ -1417,12 +1412,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(sheenColor instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(sheenColor instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setSheenColorTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) sheenColor).getTextureToken());
+                ((Texture) sheenColor).getNativeHandle());
     }
 
     @Override
@@ -1444,12 +1439,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(sheenRoughness instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(sheenRoughness instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setSheenRoughnessTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) sheenRoughness).getTextureToken());
+                ((Texture) sheenRoughness).getNativeHandle());
     }
 
     @Override
@@ -1468,12 +1463,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (!(material instanceof MaterialResourceImpl)) {
             throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
         }
-        if (!(transmission instanceof TextureResourceImpl)) {
-            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        if (!(transmission instanceof Texture)) {
+            throw new IllegalArgumentException("TextureResource is not a Texture");
         }
         mImpressApi.setTransmissionTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
-                ((TextureResourceImpl) transmission).getTextureToken());
+                ((Texture) transmission).getNativeHandle());
     }
 
     @Override
@@ -1539,7 +1534,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
         if (texture == null) {
             return null;
         }
-        return getTextureResourceFromToken(texture.getNativeHandle());
+        return texture;
     }
 
     @Override
