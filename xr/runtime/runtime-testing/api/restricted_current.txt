@@ -1147,12 +1147,14 @@ package androidx.xr.runtime.testing {
     method public androidx.xr.scenecore.internal.PanelEntity getMainPanelEntity();
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
     method public androidx.xr.scenecore.internal.SpatialCapabilities getSpatialCapabilities();
+    method public androidx.xr.scenecore.internal.SpatialEnvironment getSpatialEnvironment();
     method public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialCapabilities> listener);
     property public androidx.xr.scenecore.internal.ActivitySpace activitySpace;
     property public androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
     property public androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
     property public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;
     property public androidx.xr.scenecore.internal.SpatialCapabilities spatialCapabilities;
+    property public androidx.xr.scenecore.internal.SpatialEnvironment spatialEnvironment;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeSceneRuntimeFactory implements androidx.xr.runtime.internal.SceneRuntimeFactory {

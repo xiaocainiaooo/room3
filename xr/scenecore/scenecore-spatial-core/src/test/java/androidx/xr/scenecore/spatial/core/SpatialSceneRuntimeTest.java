@@ -50,6 +50,7 @@ import androidx.xr.scenecore.internal.HeadActivityPose;
 import androidx.xr.scenecore.internal.PlaneSemantic;
 import androidx.xr.scenecore.internal.PlaneType;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
+import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.testing.FakeScheduledExecutorService;
 
 import com.android.extensions.xr.ShadowXrExtensions;
@@ -158,6 +159,12 @@ public class SpatialSceneRuntimeTest {
         // The perception library failed to initialize a session, but the runtime should still be
         // created.
         assertThat(mRuntime).isNotNull();
+    }
+
+    @Test
+    public void getEnvironment_returnsEnvironment() {
+        SpatialEnvironment environment = mRuntime.getSpatialEnvironment();
+        assertThat(environment).isNotNull();
     }
 
     @Test

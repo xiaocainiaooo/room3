@@ -47,6 +47,7 @@ import androidx.xr.scenecore.internal.RenderingEntityFactory;
 import androidx.xr.scenecore.internal.SceneRuntime;
 import androidx.xr.scenecore.internal.Space;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
+import androidx.xr.scenecore.internal.SpatialEnvironment;
 
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
@@ -315,6 +316,11 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     @Override
     public @NonNull PerceptionSpaceActivityPose getPerceptionSpaceActivityPose() {
         return mPerceptionSpaceActivityPose;
+    }
+
+    @Override
+    public @NonNull SpatialEnvironment getSpatialEnvironment() {
+        return mEnvironment;
     }
 
     @Override

@@ -41,6 +41,7 @@ import androidx.xr.scenecore.internal.PlaneType
 import androidx.xr.scenecore.internal.RenderingEntityFactory
 import androidx.xr.scenecore.internal.SceneRuntime
 import androidx.xr.scenecore.internal.SpatialCapabilities
+import androidx.xr.scenecore.internal.SpatialEnvironment
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.Executor
@@ -59,6 +60,8 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         FakePerceptionSpaceActivityPose()
 
     override val mainPanelEntity: PanelEntity = FakePanelEntity()
+
+    override val spatialEnvironment: SpatialEnvironment = FakeSpatialEnvironment()
 
     override fun getCameraViewActivityPose(
         @CameraViewActivityPose.CameraType cameraType: Int
