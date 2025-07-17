@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import androidx.xr.runtime.math.Pose;
+import androidx.xr.runtime.math.Vector3;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.Anchor;
 import androidx.xr.scenecore.impl.perception.Fov;
@@ -50,6 +51,7 @@ import androidx.xr.scenecore.internal.CameraViewActivityPose;
 import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.HeadActivityPose;
+import androidx.xr.scenecore.internal.LoggingEntity;
 import androidx.xr.scenecore.internal.PixelDimensions;
 import androidx.xr.scenecore.internal.PlaneSemantic;
 import androidx.xr.scenecore.internal.PlaneType;
@@ -493,6 +495,52 @@ public class SpatialSceneRuntimeTest {
         assertThat(mNodeRepository.getParent(childNode1)).isEqualTo(getNode(parentEntity));
         Node childNode2 = getNode(childEntity2);
         assertThat(mNodeRepository.getParent(childNode2)).isEqualTo(getNode(parentEntity));
+    }
+
+    @Test
+    public void createLoggingEntity_returnsEntity() {
+        Pose pose = new Pose();
+        LoggingEntity loggingEntity = mRuntime.createLoggingEntity(pose);
+        Pose updatedPose =
+                new Pose(
+                        new Vector3(1f, pose.getTranslation().getY(), pose.getTranslation().getZ()),
+                        pose.getRotation());
+        loggingEntity.setPose(updatedPose);
+    }
+
+    @Test
+    public void loggingEntitySetParent() {
+        Pose pose = new Pose();
+        LoggingEntity childEntity = mRuntime.createLoggingEntity(pose);
+        LoggingEntity parentEntity = mRuntime.createLoggingEntity(pose);
+
+        childEntity.setParent(parentEntity);
+        parentEntity.addChild(childEntity);
+
+        assertThat(childEntity.getParent()).isEqualTo(parentEntity);
+        assertThat(parentEntity.getParent()).isEqualTo(null);
+        assertThat(childEntity.getChildren()).isEmpty();
+        assertThat(parentEntity.getChildren()).containsExactly(childEntity);
+    }
+
+    @Test
+    public void loggingEntityUpdateParent() {
+        Pose pose = new Pose();
+        LoggingEntity childEntity = mRuntime.createLoggingEntity(pose);
+        LoggingEntity parentEntity1 = mRuntime.createLoggingEntity(pose);
+        LoggingEntity parentEntity2 = mRuntime.createLoggingEntity(pose);
+
+        childEntity.setParent(parentEntity1);
+
+        assertThat(childEntity.getParent()).isEqualTo(parentEntity1);
+        assertThat(parentEntity1.getChildren()).containsExactly(childEntity);
+        assertThat(parentEntity2.getChildren()).isEmpty();
+
+        childEntity.setParent(parentEntity2);
+
+        assertThat(childEntity.getParent()).isEqualTo(parentEntity2);
+        assertThat(parentEntity2.getChildren()).containsExactly(childEntity);
+        assertThat(parentEntity1.getChildren()).isEmpty();
     }
 
     @Test

@@ -34,6 +34,7 @@ import androidx.xr.scenecore.internal.Entity
 import androidx.xr.scenecore.internal.GltfEntity
 import androidx.xr.scenecore.internal.GltfFeature
 import androidx.xr.scenecore.internal.HeadActivityPose
+import androidx.xr.scenecore.internal.LoggingEntity
 import androidx.xr.scenecore.internal.PanelEntity
 import androidx.xr.scenecore.internal.PerceptionSpaceActivityPose
 import androidx.xr.scenecore.internal.PixelDimensions
@@ -138,6 +139,9 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
     ): GltfEntity = FakeGltfEntity()
 
     override fun createGroupEntity(pose: Pose, name: String, parent: Entity): Entity = FakeEntity()
+
+    override fun createLoggingEntity(pose: Pose): LoggingEntity =
+        object : LoggingEntity, FakeEntity() {}
 
     override fun addSpatialCapabilitiesChangedListener(
         callbackExecutor: Executor,

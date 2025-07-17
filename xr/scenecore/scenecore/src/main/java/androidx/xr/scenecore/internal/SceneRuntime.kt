@@ -179,6 +179,9 @@ public interface SceneRuntime : JxrRuntime {
      */
     public fun createGroupEntity(pose: Pose, name: String, parent: Entity): Entity
 
+    /** A function to create a XR Runtime Entity. */
+    public fun createLoggingEntity(pose: Pose): LoggingEntity
+
     /**
      * Adds the given {@link Consumer} as a listener to be invoked when this Session's current
      * SpatialCapabilities change. {@link Consumer#accept(SpatialCapabilities)} will be invoked on

@@ -40,6 +40,7 @@ import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.GltfEntity;
 import androidx.xr.scenecore.internal.GltfFeature;
 import androidx.xr.scenecore.internal.HeadActivityPose;
+import androidx.xr.scenecore.internal.LoggingEntity;
 import androidx.xr.scenecore.internal.PanelEntity;
 import androidx.xr.scenecore.internal.PerceptionSpaceActivityPose;
 import androidx.xr.scenecore.internal.PixelDimensions;
@@ -517,6 +518,13 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
         Entity entity =
                 new AndroidXrEntity(mActivity, node, mExtensions, mEntityManager, mExecutor) {};
         entity.setParent(parent);
+        entity.setPose(pose, Space.PARENT);
+        return entity;
+    }
+
+    @Override
+    public @NonNull LoggingEntity createLoggingEntity(@NonNull Pose pose) {
+        LoggingEntityImpl entity = new LoggingEntityImpl(mActivity);
         entity.setPose(pose, Space.PARENT);
         return entity;
     }
