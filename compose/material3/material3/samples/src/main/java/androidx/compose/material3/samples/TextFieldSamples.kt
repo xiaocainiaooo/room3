@@ -48,11 +48,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldLabelPosition
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -137,8 +142,15 @@ fun TextFieldWithIcons() {
         label = { Text("Label") },
         leadingIcon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
         trailingIcon = {
-            IconButton(onClick = { state.clearText() }) {
-                Icon(Icons.Filled.Clear, contentDescription = "Clear text")
+            TooltipBox(
+                positionProvider =
+                    TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+                tooltip = { PlainTooltip { Text("Clear text") } },
+                state = rememberTooltipState(),
+            ) {
+                IconButton(onClick = { state.clearText() }) {
+                    Icon(Icons.Filled.Clear, contentDescription = "Clear text")
+                }
             }
         },
     )
@@ -253,12 +265,19 @@ fun PasswordTextField() {
             if (passwordHidden) TextObfuscationMode.RevealLastTyped
             else TextObfuscationMode.Visible,
         trailingIcon = {
-            IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                val visibilityIcon =
-                    if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                // Provide localized description for accessibility services
-                val description = if (passwordHidden) "Show password" else "Hide password"
-                Icon(imageVector = visibilityIcon, contentDescription = description)
+            // Provide localized description for accessibility services
+            val description = if (passwordHidden) "Show password" else "Hide password"
+            TooltipBox(
+                positionProvider =
+                    TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+                tooltip = { PlainTooltip { Text(description) } },
+                state = rememberTooltipState(),
+            ) {
+                IconButton(onClick = { passwordHidden = !passwordHidden }) {
+                    val visibilityIcon =
+                        if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    Icon(imageVector = visibilityIcon, contentDescription = description)
+                }
             }
         },
     )
