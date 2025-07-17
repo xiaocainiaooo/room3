@@ -247,5 +247,12 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
 
     override fun setFullSpaceModeWithEnvironmentInherited(bundle: Bundle): Bundle = bundle
 
+    /** This value is used to verify the result of [enablePanelDepthTest] in tests. */
+    internal var enabledPanelDepthTest: Boolean = false
+
+    override fun enablePanelDepthTest(enabled: Boolean) {
+        enabledPanelDepthTest = enabled
+    }
+
     override fun dispose() {}
 }

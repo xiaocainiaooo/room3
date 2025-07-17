@@ -706,6 +706,12 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     }
 
     @Override
+    // TODO: b/441105591 - Add more unit tests.
+    public void enablePanelDepthTest(boolean enabled) {
+        mExtensions.enablePanelDepthTest(mActivity, enabled);
+    }
+
+    @Override
     public void setPreferredAspectRatio(@NonNull Activity activity, float preferredRatio) {
         // TODO: b/376934871 - Check async results.
         mExtensions.setPreferredAspectRatio(
