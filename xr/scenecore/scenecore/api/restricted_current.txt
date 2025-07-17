@@ -2788,6 +2788,7 @@ package androidx.xr.scenecore.internal {
     method public androidx.xr.scenecore.internal.HeadActivityPose? getHeadActivityPose();
     method public androidx.xr.scenecore.internal.PanelEntity getMainPanelEntity();
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
+    method public androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper();
     method public androidx.xr.scenecore.internal.SpatialCapabilities getSpatialCapabilities();
     method public androidx.xr.scenecore.internal.SpatialEnvironment getSpatialEnvironment();
     method public androidx.xr.scenecore.internal.SpatialModeChangeListener? getSpatialModeChangeListener();
@@ -2804,6 +2805,7 @@ package androidx.xr.scenecore.internal {
     property public abstract androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
     property public abstract androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
     property public abstract androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;
+    property public abstract androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper soundPoolExtensionsWrapper;
     property public abstract androidx.xr.scenecore.internal.SpatialCapabilities spatialCapabilities;
     property public abstract androidx.xr.scenecore.internal.SpatialEnvironment spatialEnvironment;
     property public abstract androidx.xr.scenecore.internal.SpatialModeChangeListener? spatialModeChangeListener;

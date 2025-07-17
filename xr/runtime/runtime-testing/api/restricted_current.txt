@@ -1155,6 +1155,7 @@ package androidx.xr.runtime.testing {
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
     method public boolean getRequestedFullSpaceMode();
     method public boolean getRequestedHomeSpaceMode();
+    method public androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper();
     method public androidx.xr.scenecore.internal.SpatialCapabilities getSpatialCapabilities();
     method public androidx.xr.scenecore.internal.SpatialEnvironment getSpatialEnvironment();
     method public androidx.xr.scenecore.internal.SpatialModeChangeListener? getSpatialModeChangeListener();
@@ -1181,6 +1182,7 @@ package androidx.xr.runtime.testing {
     property public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;
     property public boolean requestedFullSpaceMode;
     property public boolean requestedHomeSpaceMode;
+    property public androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper soundPoolExtensionsWrapper;
     property public androidx.xr.scenecore.internal.SpatialCapabilities spatialCapabilities;
     property public androidx.xr.scenecore.internal.SpatialEnvironment spatialEnvironment;
     property public androidx.xr.scenecore.internal.SpatialModeChangeListener? spatialModeChangeListener;

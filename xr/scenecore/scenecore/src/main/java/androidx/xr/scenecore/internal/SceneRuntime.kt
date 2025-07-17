@@ -70,6 +70,9 @@ public interface SceneRuntime : JxrRuntime {
      */
     public var spatialModeChangeListener: SpatialModeChangeListener?
 
+    /** Returns a [SoundPoolExtensionsWrapper] instance. */
+    public val soundPoolExtensionsWrapper: SoundPoolExtensionsWrapper
+
     /**
      * Returns the CameraViewActivityPose for the specified camera type or null if it is not
      * ready/available.

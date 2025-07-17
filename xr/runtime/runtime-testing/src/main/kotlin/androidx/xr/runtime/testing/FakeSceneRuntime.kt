@@ -42,6 +42,7 @@ import androidx.xr.scenecore.internal.PlaneSemantic
 import androidx.xr.scenecore.internal.PlaneType
 import androidx.xr.scenecore.internal.RenderingEntityFactory
 import androidx.xr.scenecore.internal.SceneRuntime
+import androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper
 import androidx.xr.scenecore.internal.SpatialCapabilities
 import androidx.xr.scenecore.internal.SpatialEnvironment
 import androidx.xr.scenecore.internal.SpatialModeChangeListener
@@ -62,6 +63,9 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
 
     override val perceptionSpaceActivityPose: PerceptionSpaceActivityPose =
         FakePerceptionSpaceActivityPose()
+
+    override val soundPoolExtensionsWrapper: SoundPoolExtensionsWrapper =
+        FakeSoundPoolExtensionsWrapper()
 
     override val mainPanelEntity: PanelEntity = FakePanelEntity()
 

@@ -48,6 +48,7 @@ import androidx.xr.scenecore.internal.PlaneSemantic;
 import androidx.xr.scenecore.internal.PlaneType;
 import androidx.xr.scenecore.internal.RenderingEntityFactory;
 import androidx.xr.scenecore.internal.SceneRuntime;
+import androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper;
 import androidx.xr.scenecore.internal.Space;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
@@ -97,6 +98,8 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     private final EntityManager mEntityManager;
     private final PerceptionLibrary mPerceptionLibrary;
     private final SpatialEnvironmentImpl mEnvironment;
+
+    private final SoundPoolExtensionsWrapper mSoundPoolExtensionsWrapper;
 
     private final Map<Consumer<SpatialCapabilities>, Executor>
             mSpatialCapabilitiesChangedListeners = new ConcurrentHashMap<>();
@@ -154,6 +157,10 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
                                     return oldSpatialState;
                                 });
         setSpatialStateCallback();
+
+        mSoundPoolExtensionsWrapper =
+                new SoundPoolExtensionsWrapperImpl(
+                        extensions.getXrSpatialAudioExtensions().getSoundPoolExtensions());
 
         mEnvironment =
                 new SpatialEnvironmentImpl(
@@ -351,6 +358,11 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     @Override
     public SpatialModeChangeListener getSpatialModeChangeListener() {
         return mSpatialModeChangeListener;
+    }
+
+    @Override
+    public @NonNull SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper() {
+        return mSoundPoolExtensionsWrapper;
     }
 
     @Override
