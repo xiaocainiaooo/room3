@@ -48,6 +48,7 @@ import androidx.xr.scenecore.internal.SceneRuntime;
 import androidx.xr.scenecore.internal.Space;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
+import androidx.xr.scenecore.internal.SpatialModeChangeListener;
 
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
@@ -103,6 +104,8 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     // Returns the currently-known spatial state, or fetches it from the extensions if it has never
     // been set. The spatial state is kept updated in the SpatialStateCallback.
     private final Supplier<SpatialState> mLazySpatialStateProvider;
+
+    private SpatialModeChangeListener mSpatialModeChangeListener = null;
 
     private final ActivitySpaceImpl mActivitySpace;
     private final HeadActivityPoseImpl mHeadActivityPose;
@@ -261,6 +264,7 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
         // TODO: b/376934871 - Check async results.
         mExtensions.detachSpatialScene(mActivity, Runnable::run, (result) -> {});
         mActivity = null;
+        mSpatialModeChangeListener = null;
         mEntityManager.getAllEntities().forEach(Entity::dispose);
         mEntityManager.clear();
         mIsDisposed = true;
@@ -321,6 +325,17 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     @Override
     public @NonNull SpatialEnvironment getSpatialEnvironment() {
         return mEnvironment;
+    }
+
+    @Override
+    public void setSpatialModeChangeListener(SpatialModeChangeListener spatialModeChangeListener) {
+        mSpatialModeChangeListener = spatialModeChangeListener;
+        mActivitySpace.setSpatialModeChangeListener(spatialModeChangeListener);
+    }
+
+    @Override
+    public SpatialModeChangeListener getSpatialModeChangeListener() {
+        return mSpatialModeChangeListener;
     }
 
     @Override

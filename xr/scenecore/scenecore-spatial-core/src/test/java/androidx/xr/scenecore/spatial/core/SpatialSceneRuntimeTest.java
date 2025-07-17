@@ -51,10 +51,12 @@ import androidx.xr.scenecore.internal.PlaneSemantic;
 import androidx.xr.scenecore.internal.PlaneType;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
+import androidx.xr.scenecore.internal.SpatialModeChangeListener;
 import androidx.xr.scenecore.testing.FakeScheduledExecutorService;
 
 import com.android.extensions.xr.ShadowXrExtensions;
 import com.android.extensions.xr.XrExtensions;
+import com.android.extensions.xr.node.Mat4f;
 import com.android.extensions.xr.node.Node;
 import com.android.extensions.xr.node.NodeRepository;
 import com.android.extensions.xr.space.ShadowSpatialCapabilities;
@@ -390,5 +392,19 @@ public class SpatialSceneRuntimeTest {
         verify(mPerceptionLibrary, times(3)).getSession();
         verify(mSession).createAnchorFromUuid(uuid);
         verify(mAnchor).getAnchorToken();
+    }
+
+    @Test
+    public void spatialStateChangeHandler_invokedWhenSpatialStateChangesToFSM() {
+        SpatialState spatialState = ShadowSpatialState.create();
+        SpatialModeChangeListener mockSpatialModeChangeListener =
+                mock(SpatialModeChangeListener.class);
+        mRuntime.setSpatialModeChangeListener(mockSpatialModeChangeListener);
+        ShadowSpatialState.extract(spatialState)
+                .setSpatialCapabilities(ShadowSpatialCapabilities.createAll());
+        ShadowSpatialState.extract(spatialState).setSceneParentTransform(new Mat4f(new float[16]));
+        mRuntime.onSpatialStateChanged(spatialState);
+
+        verify(mockSpatialModeChangeListener).onSpatialModeChanged(any(), any());
     }
 }

@@ -2786,13 +2786,16 @@ package androidx.xr.scenecore.internal {
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
     method public androidx.xr.scenecore.internal.SpatialCapabilities getSpatialCapabilities();
     method public androidx.xr.scenecore.internal.SpatialEnvironment getSpatialEnvironment();
+    method public androidx.xr.scenecore.internal.SpatialModeChangeListener? getSpatialModeChangeListener();
     method public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialCapabilities> listener);
+    method public void setSpatialModeChangeListener(androidx.xr.scenecore.internal.SpatialModeChangeListener?);
     property public abstract androidx.xr.scenecore.internal.ActivitySpace activitySpace;
     property public abstract androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
     property public abstract androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
     property public abstract androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;
     property public abstract androidx.xr.scenecore.internal.SpatialCapabilities spatialCapabilities;
     property public abstract androidx.xr.scenecore.internal.SpatialEnvironment spatialEnvironment;
+    property public abstract androidx.xr.scenecore.internal.SpatialModeChangeListener? spatialModeChangeListener;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SoundFieldAttributes {

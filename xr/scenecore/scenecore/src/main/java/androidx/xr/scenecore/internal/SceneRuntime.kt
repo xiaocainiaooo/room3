@@ -63,6 +63,13 @@ public interface SceneRuntime : JxrRuntime {
     public val spatialEnvironment: SpatialEnvironment
 
     /**
+     * Returns a [SpatialModeChangeListener] instance.
+     *
+     * Setting this property will update the handler that is used to process spatial mode changes.
+     */
+    public var spatialModeChangeListener: SpatialModeChangeListener?
+
+    /**
      * Returns the CameraViewActivityPose for the specified camera type or null if it is not
      * ready/available.
      *
