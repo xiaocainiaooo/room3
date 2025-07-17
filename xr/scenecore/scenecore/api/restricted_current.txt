@@ -2791,6 +2791,10 @@ package androidx.xr.scenecore.internal {
     method public androidx.xr.scenecore.internal.SpatialModeChangeListener? getSpatialModeChangeListener();
     method public void removePerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.scenecore.internal.PixelDimensions> listener);
     method public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialCapabilities> listener);
+    method public void requestFullSpaceMode();
+    method public void requestHomeSpaceMode();
+    method public android.os.Bundle setFullSpaceMode(android.os.Bundle bundle);
+    method public android.os.Bundle setFullSpaceModeWithEnvironmentInherited(android.os.Bundle bundle);
     method public void setPreferredAspectRatio(android.app.Activity activity, float preferredRatio);
     method public void setSpatialModeChangeListener(androidx.xr.scenecore.internal.SpatialModeChangeListener?);
     method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialVisibility> listener);

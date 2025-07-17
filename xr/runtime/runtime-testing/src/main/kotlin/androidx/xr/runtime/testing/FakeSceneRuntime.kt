@@ -19,6 +19,7 @@ package androidx.xr.runtime.testing
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
@@ -223,6 +224,24 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         lastSetPreferredAspectRatioActivity = activity
         lastSetPreferredAspectRatioRatio = preferredRatio
     }
+
+    /** This value is used to verify [requestedFullSpaceMode] is invoked. */
+    public var requestedFullSpaceMode: Boolean = false
+
+    override fun requestFullSpaceMode() {
+        requestedFullSpaceMode = true
+    }
+
+    /** This value is used to verify [requestHomeSpaceMode] is invoked. */
+    public var requestedHomeSpaceMode: Boolean = false
+
+    override fun requestHomeSpaceMode() {
+        requestedHomeSpaceMode = true
+    }
+
+    override fun setFullSpaceMode(bundle: Bundle): Bundle = bundle
+
+    override fun setFullSpaceModeWithEnvironmentInherited(bundle: Bundle): Bundle = bundle
 
     override fun dispose() {}
 }

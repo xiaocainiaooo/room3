@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.Bundle;
 import android.os.IBinder;
 
 import androidx.xr.runtime.math.Pose;
@@ -851,6 +852,36 @@ public class SpatialSceneRuntimeTest {
         verify(mockSpatialListener)
                 .accept(eq(new SpatialVisibility(SpatialVisibility.OUTSIDE_FOV)));
         verify(mockPerceivedResListener).accept(eq(new PixelDimensions(30, 40)));
+    }
+
+    @Test
+    public void requestHomeSpaceMode_callsExtensions() {
+        mRuntime.requestHomeSpaceMode();
+        assertThat(ShadowXrExtensions.extract(mXrExtensions).getSpaceMode(mActivity))
+                .isEqualTo(ShadowXrExtensions.SpaceMode.HOME_SPACE);
+    }
+
+    @Test
+    public void requestFullSpaceMode_callsExtensions() {
+        mRuntime.requestFullSpaceMode();
+        assertThat(ShadowXrExtensions.extract(mXrExtensions).getSpaceMode(mActivity))
+                .isEqualTo(ShadowXrExtensions.SpaceMode.FULL_SPACE);
+    }
+
+    @Test
+    public void setFullSpaceMode_callsExtensions() {
+        Bundle bundle = Bundle.EMPTY;
+        bundle = mRuntime.setFullSpaceMode(bundle);
+        // TODO: b/440191514 - Change to assertThat(bundle).isNotEqualTo(Bundle.EMPTY);
+        assertThat(bundle).isNotNull();
+    }
+
+    @Test
+    public void setFullSpaceModeWithEnvironmentInherited_callsExtensions() {
+        Bundle bundle = Bundle.EMPTY;
+        bundle = mRuntime.setFullSpaceModeWithEnvironmentInherited(bundle);
+        // TODO: b/440191514 - Change to assertThat(bundle).isNotEqualTo(Bundle.EMPTY);
+        assertThat(bundle).isNotNull();
     }
 
     @Test

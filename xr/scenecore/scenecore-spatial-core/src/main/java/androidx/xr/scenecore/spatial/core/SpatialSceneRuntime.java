@@ -19,6 +19,7 @@ package androidx.xr.scenecore.spatial.core;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Pair;
@@ -670,6 +671,30 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
                         "Could not clear VisibilityStateCallback: " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public void requestFullSpaceMode() {
+        // TODO: b/376934871 - Check async results.
+        mExtensions.requestFullSpaceMode(
+                mActivity, /* requestEnter= */ true, Runnable::run, (result) -> {});
+    }
+
+    @Override
+    public void requestHomeSpaceMode() {
+        // TODO: b/376934871 - Check async results.
+        mExtensions.requestFullSpaceMode(
+                mActivity, /* requestEnter= */ false, Runnable::run, (result) -> {});
+    }
+
+    @Override
+    public @NonNull Bundle setFullSpaceMode(@NonNull Bundle bundle) {
+        return mExtensions.setFullSpaceStartMode(bundle);
+    }
+
+    @Override
+    public @NonNull Bundle setFullSpaceModeWithEnvironmentInherited(@NonNull Bundle bundle) {
+        return mExtensions.setFullSpaceStartModeWithEnvironmentInherited(bundle);
     }
 
     @Override
