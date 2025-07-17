@@ -272,6 +272,24 @@ public interface SceneRuntime : JxrRuntime {
      */
     public fun removePerceivedResolutionChangedListener(listener: Consumer<PixelDimensions>): Unit
 
+    /**
+     * Sets a preferred main panel aspect ratio for home space mode.
+     *
+     * The ratio is only applied to the activity. If the activity launches another activity in the
+     * same task, the ratio is not applied to the new activity. Also, while the activity is in full
+     * space mode, the preference is temporarily removed.
+     *
+     * If the activity's current aspect ratio differs from the {@code preferredRatio}, the panel is
+     * automatically resized. This resizing preserves the panel's area. To avoid runtime resizing,
+     * consider specifying the desired aspect ratio in your {@code AndroidManifest.xml}. This
+     * ensures your activity launches with the preferred aspect ratio from the start.
+     *
+     * @param activity the activity to set the preference.
+     * @param preferredRatio the aspect ratio determined by taking the panel's width over its
+     *   height. A value <= 0.0f means there are no preferences.
+     */
+    public fun setPreferredAspectRatio(activity: Activity, preferredRatio: Float)
+
     /** Disposes of the resources used by this runtime */
     public fun dispose()
 }

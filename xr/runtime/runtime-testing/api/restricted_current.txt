@@ -1146,6 +1146,8 @@ package androidx.xr.runtime.testing {
     method public androidx.xr.scenecore.internal.ActivitySpace getActivitySpace();
     method public androidx.xr.scenecore.internal.CameraViewActivityPose? getCameraViewActivityPose(@androidx.xr.scenecore.internal.CameraViewActivityPose.CameraType int cameraType);
     method public androidx.xr.scenecore.internal.HeadActivityPose? getHeadActivityPose();
+    method public android.app.Activity? getLastSetPreferredAspectRatioActivity();
+    method public float getLastSetPreferredAspectRatioRatio();
     method public androidx.xr.scenecore.internal.PanelEntity getMainPanelEntity();
     method public java.util.Map<java.util.concurrent.Executor,java.util.function.Consumer<androidx.xr.scenecore.internal.PixelDimensions>> getPerceivedResolutionChangedMap();
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
@@ -1155,10 +1157,15 @@ package androidx.xr.runtime.testing {
     method public java.util.Map<java.util.concurrent.Executor,java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialVisibility>> getSpatialVisibilityChangedMap();
     method public void removePerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.scenecore.internal.PixelDimensions> listener);
     method public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialCapabilities> listener);
+    method public void setLastSetPreferredAspectRatioActivity(android.app.Activity?);
+    method public void setLastSetPreferredAspectRatioRatio(float);
+    method public void setPreferredAspectRatio(android.app.Activity activity, float preferredRatio);
     method public void setSpatialModeChangeListener(androidx.xr.scenecore.internal.SpatialModeChangeListener?);
     method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialVisibility> listener);
     property public androidx.xr.scenecore.internal.ActivitySpace activitySpace;
     property public androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
+    property public android.app.Activity? lastSetPreferredAspectRatioActivity;
+    property public float lastSetPreferredAspectRatioRatio;
     property public androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
     property public java.util.Map<java.util.concurrent.Executor,java.util.function.Consumer<androidx.xr.scenecore.internal.PixelDimensions>> perceivedResolutionChangedMap;
     property public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;

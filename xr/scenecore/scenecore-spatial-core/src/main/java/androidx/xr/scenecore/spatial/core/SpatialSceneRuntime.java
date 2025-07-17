@@ -671,4 +671,11 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
             }
         }
     }
+
+    @Override
+    public void setPreferredAspectRatio(@NonNull Activity activity, float preferredRatio) {
+        // TODO: b/376934871 - Check async results.
+        mExtensions.setPreferredAspectRatio(
+                activity, preferredRatio, Runnable::run, (result) -> {});
+    }
 }

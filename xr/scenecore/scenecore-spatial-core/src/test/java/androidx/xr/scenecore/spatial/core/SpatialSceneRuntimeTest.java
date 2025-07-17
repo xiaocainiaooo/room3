@@ -852,4 +852,11 @@ public class SpatialSceneRuntimeTest {
                 .accept(eq(new SpatialVisibility(SpatialVisibility.OUTSIDE_FOV)));
         verify(mockPerceivedResListener).accept(eq(new PixelDimensions(30, 40)));
     }
+
+    @Test
+    public void setPreferredAspectRatio_callsExtensions() {
+        mRuntime.setPreferredAspectRatio(mActivity, 1.23f);
+        assertThat(ShadowXrExtensions.extract(mXrExtensions).getPreferredAspectRatio(mActivity))
+                .isEqualTo(1.23f);
+    }
 }

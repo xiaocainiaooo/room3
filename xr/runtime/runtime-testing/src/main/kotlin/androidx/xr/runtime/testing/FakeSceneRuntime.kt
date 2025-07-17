@@ -203,5 +203,26 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         _perceivedResolutionChangedMap.values.remove(listener)
     }
 
+    /**
+     * For test purposes only.
+     *
+     * Stores the [Activity] that was last provided to the [setPreferredAspectRatio] method. Tests
+     * can inspect this property to verify the correct activity was used.
+     */
+    public var lastSetPreferredAspectRatioActivity: Activity? = null
+
+    /**
+     * For test purposes only.
+     *
+     * Stores the ratio that was last provided to the [setPreferredAspectRatio] method. Tests can
+     * inspect this property to verify the correct ratio was set.
+     */
+    public var lastSetPreferredAspectRatioRatio: Float = -1f
+
+    override fun setPreferredAspectRatio(activity: Activity, preferredRatio: Float) {
+        lastSetPreferredAspectRatioActivity = activity
+        lastSetPreferredAspectRatioRatio = preferredRatio
+    }
+
     override fun dispose() {}
 }
