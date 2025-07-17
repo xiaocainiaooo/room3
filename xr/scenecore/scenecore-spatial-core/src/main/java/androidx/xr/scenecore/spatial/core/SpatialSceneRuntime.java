@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Pair;
 import android.view.View;
 
 import androidx.annotation.VisibleForTesting;
@@ -49,6 +50,7 @@ import androidx.xr.scenecore.internal.Space;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
+import androidx.xr.scenecore.internal.SpatialVisibility;
 
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
@@ -96,6 +98,11 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
 
     private final Map<Consumer<SpatialCapabilities>, Executor>
             mSpatialCapabilitiesChangedListeners = new ConcurrentHashMap<>();
+
+    private @Nullable Pair<Executor, Consumer<SpatialVisibility>> mSpatialVisibilityHandler = null;
+    private final Map<Consumer<PixelDimensions>, Executor> mPerceivedResolutionChangedListeners =
+            new ConcurrentHashMap<>();
+    @VisibleForTesting boolean mIsExtensionVisibilityStateCallbackRegistered = false;
 
     // TODO b/373481538: remove lazy initialization once XR Extensions bug is fixed. This will allow
     // us to remove the lazySpatialStateProvider instance and pass the spatialState directly.
@@ -260,11 +267,17 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
             return;
         }
         mEnvironment.dispose();
+        mSpatialModeChangeListener = null;
+        mExtensions.clearSpatialStateCallback(mActivity);
+
+        clearSpatialVisibilityChangedListener();
+        mPerceivedResolutionChangedListeners.clear();
+        // This will trigger clearing the callback from XrExtensions if it was registered
+        updateExtensionsVisibilityCallback();
 
         // TODO: b/376934871 - Check async results.
         mExtensions.detachSpatialScene(mActivity, Runnable::run, (result) -> {});
         mActivity = null;
-        mSpatialModeChangeListener = null;
         mEntityManager.getAllEntities().forEach(Entity::dispose);
         mEntityManager.clear();
         mIsDisposed = true;
@@ -577,5 +590,85 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     public void removeSpatialCapabilitiesChangedListener(
             @NonNull Consumer<SpatialCapabilities> listener) {
         mSpatialCapabilitiesChangedListeners.remove(listener);
+    }
+
+    @Override
+    public void setSpatialVisibilityChangedListener(
+            @NonNull Executor callbackExecutor, @NonNull Consumer<SpatialVisibility> listener) {
+        mSpatialVisibilityHandler = new Pair<>(callbackExecutor, listener);
+        updateExtensionsVisibilityCallback();
+    }
+
+    @Override
+    public void clearSpatialVisibilityChangedListener() {
+        mSpatialVisibilityHandler = null;
+        updateExtensionsVisibilityCallback();
+    }
+
+    @Override
+    public void addPerceivedResolutionChangedListener(
+            @NonNull Executor callbackExecutor, @NonNull Consumer<PixelDimensions> listener) {
+        mPerceivedResolutionChangedListeners.put(listener, callbackExecutor);
+        updateExtensionsVisibilityCallback();
+    }
+
+    @Override
+    public void removePerceivedResolutionChangedListener(
+            @NonNull Consumer<PixelDimensions> listener) {
+        mPerceivedResolutionChangedListeners.remove(listener);
+        updateExtensionsVisibilityCallback();
+    }
+
+    private synchronized void updateExtensionsVisibilityCallback() {
+        boolean shouldHaveCallback =
+                mSpatialVisibilityHandler != null
+                        || !mPerceivedResolutionChangedListeners.isEmpty();
+
+        if (shouldHaveCallback && !mIsExtensionVisibilityStateCallbackRegistered) {
+            // Register the combined callback
+            try {
+                mExtensions.setVisibilityStateCallback(
+                        mActivity,
+                        mExecutor, // Executor for the combined callback itself
+                        (com.android.extensions.xr.space.VisibilityState visibilityStateEvent) -> {
+                            // Dispatch to SpatialVisibility listener
+                            if (mSpatialVisibilityHandler != null) {
+                                SpatialVisibility jxrSpatialVisibility =
+                                        RuntimeUtils.convertSpatialVisibility(
+                                                visibilityStateEvent.getVisibility());
+                                mSpatialVisibilityHandler.first.execute(
+                                        () ->
+                                                mSpatialVisibilityHandler.second.accept(
+                                                        jxrSpatialVisibility));
+                            }
+
+                            // Dispatch to PerceivedResolution listeners
+                            if (!mPerceivedResolutionChangedListeners.isEmpty()) {
+                                PixelDimensions jxrPerceivedResolution =
+                                        RuntimeUtils.convertPerceivedResolution(
+                                                visibilityStateEvent.getPerceivedResolution());
+                                mPerceivedResolutionChangedListeners.forEach(
+                                        (listener, executor) ->
+                                                executor.execute(
+                                                        () ->
+                                                                listener.accept(
+                                                                        jxrPerceivedResolution)));
+                            }
+                        });
+                mIsExtensionVisibilityStateCallbackRegistered = true;
+            } catch (RuntimeException e) {
+                throw new RuntimeException(
+                        "Could not set combined VisibilityStateCallback: " + e.getMessage());
+            }
+        } else if (!shouldHaveCallback && mIsExtensionVisibilityStateCallbackRegistered) {
+            // Clear the combined callback
+            try {
+                mExtensions.clearVisibilityStateCallback(mActivity);
+                mIsExtensionVisibilityStateCallbackRegistered = false;
+            } catch (RuntimeException e) {
+                throw new RuntimeException(
+                        "Could not clear VisibilityStateCallback: " + e.getMessage());
+            }
+        }
     }
 }

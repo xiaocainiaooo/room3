@@ -200,6 +200,78 @@ public interface SceneRuntime : JxrRuntime {
      */
     public fun removeSpatialCapabilitiesChangedListener(listener: Consumer<SpatialCapabilities>)
 
+    /**
+     * Sets the listener to be invoked when the spatial visibility of the rendered content of the
+     * entire scene (all entities, including children of anchors and activitySpace) changes within
+     * the user's field of view.
+     *
+     * This API only checks if the bounds of the renderable content are within the user's field of
+     * view. It does not check if the rendered content is visible to the user. For example, if the
+     * user is looking straight ahead, and there's only a single invisible child entity (alpha = 0)
+     * in front of the user, this API will return SpatialVisibility.WITHIN_FOV even though the user
+     * cannot see anything.
+     *
+     * The listener is invoked on the provided executor. If the app intends to modify the UI
+     * elements/views during the callback, the app should provide the thread executor that is
+     * appropriate for the UI operations. For example, if the app is using the main thread to render
+     * the UI, the app should provide the main thread (Looper.getMainLooper()) executor. If the app
+     * is using a separate thread to render the UI, the app should provide the executor for that
+     * thread.
+     *
+     * There can only be one listener set at a time. If a new listener is set, the previous listener
+     * will be released.
+     *
+     * @param callbackExecutor The executor to run the listener on.
+     * @param listener The [Consumer] to be invoked asynchronously on the given callbackExecutor
+     *   whenever the spatial visibility of the renderable content changes. The parameter passed to
+     *   the Consumer’s accept method is the new value for [SpatialVisibility].
+     */
+    public fun setSpatialVisibilityChangedListener(
+        callbackExecutor: Executor,
+        listener: Consumer<SpatialVisibility>,
+    )
+
+    /** Releases the listener previously added by [setSpatialVisibilityChangedListener]. */
+    public fun clearSpatialVisibilityChangedListener()
+
+    /**
+     * Sets the listener to be invoked when the perceived resolution of the main window changes in
+     * Home Space Mode.
+     *
+     * The main panel's own rotation and the display's viewing direction are disregarded; this value
+     * represents the pixel dimensions of the panel on the camera view without changing its distance
+     * to the display.
+     *
+     * The listener is invoked on the provided executor. If the app intends to modify the UI
+     * elements/views during the callback, the app should provide the thread executor that is
+     * appropriate for the UI operations. For example, if the app is using the main thread to render
+     * the UI, the app should provide the main thread (Looper.getMainLooper()) executor. If the app
+     * is using a separate thread to render the UI, the app should provide the executor for that
+     * thread.
+     *
+     * Non-zero values are only guaranteed in Home Space Mode. In Full Space Mode, the callback will
+     * always return a (0,0) size. Use the [PanelEntity.getPerceivedResolution] or
+     * [SurfaceEntity.getPerceivedResolution] methods directly on the relevant entities to retrieve
+     * non-zero values in Full Space Mode.
+     *
+     * @param callbackExecutor The executor to run the listener on.
+     * @param listener The [Consumer] to be invoked asynchronously on the given callbackExecutor
+     *   whenever the maximum perceived resolution of the main panel changes. The parameter passed
+     *   to the Consumer’s accept method is the new value for [PixelDimensions] value for perceived
+     *   resolution.
+     */
+    public fun addPerceivedResolutionChangedListener(
+        callbackExecutor: Executor,
+        listener: Consumer<PixelDimensions>,
+    ): Unit
+
+    /**
+     * Releases the listener previously added by [addPerceivedResolutionChangedListener].
+     *
+     * @param listener The [Consumer] to be removed. It will no longer receive change events.
+     */
+    public fun removePerceivedResolutionChangedListener(listener: Consumer<PixelDimensions>): Unit
+
     /** Disposes of the resources used by this runtime */
     public fun dispose()
 }

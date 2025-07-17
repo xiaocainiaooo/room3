@@ -19,10 +19,12 @@ package androidx.xr.scenecore.spatial.core;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,21 +49,29 @@ import androidx.xr.scenecore.internal.CameraViewActivityPose;
 import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.HeadActivityPose;
+import androidx.xr.scenecore.internal.PixelDimensions;
 import androidx.xr.scenecore.internal.PlaneSemantic;
 import androidx.xr.scenecore.internal.PlaneType;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
+import androidx.xr.scenecore.internal.SpatialVisibility;
 import androidx.xr.scenecore.testing.FakeScheduledExecutorService;
 
 import com.android.extensions.xr.ShadowXrExtensions;
 import com.android.extensions.xr.XrExtensions;
+import com.android.extensions.xr.environment.EnvironmentVisibilityState;
+import com.android.extensions.xr.environment.PassthroughVisibilityState;
+import com.android.extensions.xr.environment.ShadowEnvironmentVisibilityState;
+import com.android.extensions.xr.environment.ShadowPassthroughVisibilityState;
 import com.android.extensions.xr.node.Mat4f;
 import com.android.extensions.xr.node.Node;
 import com.android.extensions.xr.node.NodeRepository;
+import com.android.extensions.xr.space.PerceivedResolution;
 import com.android.extensions.xr.space.ShadowSpatialCapabilities;
 import com.android.extensions.xr.space.ShadowSpatialState;
 import com.android.extensions.xr.space.SpatialState;
+import com.android.extensions.xr.space.VisibilityState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -77,6 +87,7 @@ import org.robolectric.RobolectricTestRunner;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /** Tests for {@link SpatialSceneRuntimeFactory}. */
 @SuppressLint("NewApi") // TODO: b/413661481 - Remove this suppression prior to JXR stable release.
@@ -275,6 +286,169 @@ public class SpatialSceneRuntimeTest {
                 .isFalse();
     }
 
+    @Test
+    public void onSpatialStateChanged_setsEnvironmentVisibility() {
+        SpatialEnvironment environment = mRuntime.getSpatialEnvironment();
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isFalse();
+
+        SpatialState state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setEnvironmentVisibilityState(
+                        ShadowEnvironmentVisibilityState.create(
+                                EnvironmentVisibilityState.APP_VISIBLE));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isTrue();
+
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setEnvironmentVisibilityState(
+                        ShadowEnvironmentVisibilityState.create(
+                                EnvironmentVisibilityState.INVISIBLE));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isFalse();
+
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setEnvironmentVisibilityState(
+                        ShadowEnvironmentVisibilityState.create(
+                                EnvironmentVisibilityState.HOME_VISIBLE));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isFalse();
+    }
+
+    @Test
+    public void onSpatialStateChanged_callsEnvironmentListenerOnlyForChanges() {
+        SpatialEnvironment environment = mRuntime.getSpatialEnvironment();
+        @SuppressWarnings(value = "unchecked")
+        Consumer<Boolean> listener = (Consumer<Boolean>) mock(Consumer.class);
+
+        environment.addOnSpatialEnvironmentChangedListener(directExecutor(), listener);
+
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isFalse();
+
+        // The first spatial state should always fire the listener
+        SpatialState state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setEnvironmentVisibilityState(
+                        ShadowEnvironmentVisibilityState.create(
+                                EnvironmentVisibilityState.APP_VISIBLE));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        verify(listener).accept(true);
+
+        // The second spatial state should also fire the listener since it's a different state
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setEnvironmentVisibilityState(
+                        ShadowEnvironmentVisibilityState.create(
+                                EnvironmentVisibilityState.INVISIBLE));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isFalse();
+        verify(listener).accept(false);
+
+        // The third spatial state should not fire the listener since it is the same as the last
+        // state.
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setEnvironmentVisibilityState(
+                        ShadowEnvironmentVisibilityState.create(
+                                EnvironmentVisibilityState.INVISIBLE));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.isPreferredSpatialEnvironmentActive()).isFalse();
+        verify(listener, times(2))
+                .accept(any()); // Verify the listener was not called a third time.
+    }
+
+    @Test
+    public void onSpatialStateChanged_setsPassthroughOpacity() {
+        SpatialEnvironment environment = mRuntime.getSpatialEnvironment();
+        assertThat(environment.getCurrentPassthroughOpacity()).isZero();
+
+        SpatialState state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.APP, 0.4f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isEqualTo(0.4f);
+
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.HOME, 0.5f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
+
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.SYSTEM, 0.9f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isEqualTo(0.9f);
+
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.DISABLED, 0.0f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isZero();
+    }
+
+    @Test
+    public void onSpatialStateChanged_callsPassthroughListenerOnlyForChanges() {
+        SpatialEnvironment environment = mRuntime.getSpatialEnvironment();
+        @SuppressWarnings(value = "unchecked")
+        Consumer<Float> listener = (Consumer<Float>) mock(Consumer.class);
+
+        environment.addOnPassthroughOpacityChangedListener(directExecutor(), listener);
+
+        assertThat(environment.getCurrentPassthroughOpacity()).isZero();
+
+        // The first spatial state should always fire the listener
+        SpatialState state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.APP, 1.0f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        verify(listener).accept(1.0f);
+
+        // The second spatial state should also fire the listener even if only the opacity changes
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.APP, 0.5f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
+
+        // The third spatial state should also fire the listener even if only the visibility state
+        // changes, but getCurrentPassthroughOpacity() returns the same value as the last state.
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.HOME, 0.5f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
+        verify(listener, times(2))
+                .accept(0.5f); // Verify it was called a second time with this value.
+
+        // The fourth spatial state should not fire the listener since it is the same as the last
+        // state.
+        state = ShadowSpatialState.create();
+        ShadowSpatialState.extract(state)
+                .setPassthroughVisibilityState(
+                        ShadowPassthroughVisibilityState.create(
+                                PassthroughVisibilityState.HOME, 0.5f));
+        ShadowXrExtensions.extract(mXrExtensions).sendSpatialState(mActivity, state);
+        assertThat(environment.getCurrentPassthroughOpacity()).isEqualTo(0.5f);
+        verify(listener, times(3))
+                .accept(any()); // Verify the listener was not called a fourth time.
+    }
+
     private Node getNode(Entity entity) {
         return ((AndroidXrEntity) entity).getNode();
     }
@@ -406,5 +580,276 @@ public class SpatialSceneRuntimeTest {
         mRuntime.onSpatialStateChanged(spatialState);
 
         verify(mockSpatialModeChangeListener).onSpatialModeChanged(any(), any());
+    }
+
+    private void sendVisibilityState(ShadowXrExtensions shadowXrExtensions, int visibilityState) {
+        sendVisibilityState(shadowXrExtensions, visibilityState, 1, 1);
+    }
+
+    private void sendVisibilityState(ShadowXrExtensions shadowXrExtensions, int width, int height) {
+        sendVisibilityState(shadowXrExtensions, VisibilityState.FULLY_VISIBLE, width, height);
+    }
+
+    private void sendVisibilityState(
+            ShadowXrExtensions shadowXrExtensions, int visibilityState, int width, int height) {
+        shadowXrExtensions.sendVisibilityState(
+                mActivity,
+                new VisibilityState(visibilityState, new PerceivedResolution(width, height)));
+    }
+
+    @Test
+    public void setSpatialVisibilityChangedListener_callsExtensions() {
+        @SuppressWarnings(value = "unchecked")
+        Consumer<SpatialVisibility> mockListener =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockListener);
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+
+        // VISIBLE
+        sendVisibilityState(shadowXrExtensions, VisibilityState.FULLY_VISIBLE);
+        verify(mockListener).accept(new SpatialVisibility(SpatialVisibility.WITHIN_FOV));
+
+        // PARTIALLY_VISIBLE
+        sendVisibilityState(shadowXrExtensions, VisibilityState.PARTIALLY_VISIBLE);
+        verify(mockListener).accept(new SpatialVisibility(SpatialVisibility.PARTIALLY_WITHIN_FOV));
+
+        // OUTSIDE_OF_FOV
+        sendVisibilityState(shadowXrExtensions, VisibilityState.NOT_VISIBLE);
+        verify(mockListener).accept(new SpatialVisibility(SpatialVisibility.OUTSIDE_FOV));
+
+        // UNKNOWN
+        sendVisibilityState(shadowXrExtensions, VisibilityState.UNKNOWN);
+        verify(mockListener).accept(new SpatialVisibility(SpatialVisibility.UNKNOWN));
+    }
+
+    @Test
+    public void setSpatialVisibilityChangedListener_replacesExistingListenerOnSecondCall() {
+        @SuppressWarnings(value = "unchecked")
+        Consumer<SpatialVisibility> mockListener1 =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        @SuppressWarnings(value = "unchecked")
+        Consumer<SpatialVisibility> mockListener2 =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+
+        // Listener 1 is set and called once.
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockListener1);
+        sendVisibilityState(shadowXrExtensions, VisibilityState.FULLY_VISIBLE);
+        verify(mockListener1).accept(new SpatialVisibility(SpatialVisibility.WITHIN_FOV));
+        verify(mockListener2, never()).accept(new SpatialVisibility(SpatialVisibility.WITHIN_FOV));
+
+        // Listener 2 is set and called once. Listener 1 is not called again.
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockListener2);
+        sendVisibilityState(shadowXrExtensions, VisibilityState.NOT_VISIBLE);
+        verify(mockListener2).accept(new SpatialVisibility(SpatialVisibility.OUTSIDE_FOV));
+        verify(mockListener1, never()).accept(new SpatialVisibility(SpatialVisibility.OUTSIDE_FOV));
+    }
+
+    @Test
+    public void setSpatialVisibilityChangedListener_handlesException() {
+        // the subscription method throws an exception if the executor or listener are null.
+        // No assert needed, the test will fail if the exception is not handled.
+        mRuntime.setSpatialVisibilityChangedListener(null, null);
+    }
+
+    @Test
+    public void clearSpatialVisibilityChangedListener_stopsSpatialVisibilityCallbacks() {
+        @SuppressWarnings(value = "unchecked")
+        Consumer<SpatialVisibility> mockListener =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        // Verify that the callback is called once when the visibility changes.
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+        sendVisibilityState(shadowXrExtensions, VisibilityState.FULLY_VISIBLE);
+        verify(mockListener).accept(any());
+
+        // Clear the listener and verify that the callback is not called a second time.
+        mRuntime.clearSpatialVisibilityChangedListener();
+        sendVisibilityState(shadowXrExtensions, VisibilityState.NOT_VISIBLE);
+        sendVisibilityState(shadowXrExtensions, VisibilityState.PARTIALLY_VISIBLE);
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isFalse();
+        verify(mockListener).accept(any());
+    }
+
+    @Test
+    public void clearSpatialVisibilityChangedListener_noOpWhenNoListener() {
+        // SpatialVisibilityChangedListener is nullable.
+        // No assert needed, the test will fail if an unhandled exception is thrown.
+        mRuntime.clearSpatialVisibilityChangedListener();
+    }
+
+    @Test
+    public void dispose_closesSpatialVisibilityAndPerceivedResolutionSubscription() {
+        @SuppressWarnings(value = "unchecked")
+        Consumer<SpatialVisibility> mockSpatialVisListener =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        @SuppressWarnings(value = "unchecked")
+        Consumer<PixelDimensions> mockPerceivedResListener =
+                (Consumer<PixelDimensions>) mock(Consumer.class);
+
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockSpatialVisListener);
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockPerceivedResListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        // Verify that the callback is called once when the visibility changes.
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+        sendVisibilityState(shadowXrExtensions, VisibilityState.FULLY_VISIBLE);
+
+        verify(mockSpatialVisListener).accept(any());
+        verify(mockPerceivedResListener).accept(any());
+
+        // Ensure dispose() clears the listener that the callbacks are not called a second time.
+        mRuntime.dispose();
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isFalse();
+
+        sendVisibilityState(shadowXrExtensions, VisibilityState.NOT_VISIBLE);
+        sendVisibilityState(shadowXrExtensions, VisibilityState.PARTIALLY_VISIBLE);
+
+        verify(mockSpatialVisListener).accept(any());
+        verify(mockPerceivedResListener).accept(any());
+    }
+
+    @Test
+    public void clearSpatialVisibilityChangedListener_doesNotStopPerceivedResolutionListener() {
+        @SuppressWarnings("unchecked")
+        Consumer<SpatialVisibility> mockSpatialListener =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockPerceivedResListener =
+                (Consumer<PixelDimensions>) mock(Consumer.class);
+
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockSpatialListener);
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockPerceivedResListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        mRuntime.clearSpatialVisibilityChangedListener();
+
+        // Perceived resolution listener is still active, so callback should remain registered.
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+        sendVisibilityState(shadowXrExtensions, SpatialVisibility.WITHIN_FOV, 10, 20);
+
+        verify(mockSpatialListener, never()).accept(any());
+        verify(mockPerceivedResListener).accept(any());
+    }
+
+    @Test
+    public void addPerceivedResolutionChangedListener_registersCombinedCallbackFirstTime() {
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockListener = (Consumer<PixelDimensions>) mock(Consumer.class);
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isFalse();
+
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        verify(mockListener, never()).accept(any());
+
+        sendVisibilityState(shadowXrExtensions, 10, 20);
+
+        verify(mockListener).accept(new PixelDimensions(10, 20));
+    }
+
+    @Test
+    public void removePerceivedResolutionChangedListener_clearsCombinedCallbackIfLastListener() {
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockListener = (Consumer<PixelDimensions>) mock(Consumer.class);
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        sendVisibilityState(shadowXrExtensions, 10, 20);
+
+        verify(mockListener).accept(new PixelDimensions(10, 20));
+
+        mRuntime.removePerceivedResolutionChangedListener(mockListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isFalse();
+
+        // It shouldn't be called a second time
+        sendVisibilityState(shadowXrExtensions, 10, 20);
+
+        verify(mockListener, times(1)).accept(new PixelDimensions(10, 20));
+    }
+
+    @Test
+    public void removePerceivedResolutionChangedListener_doesNotStopSpatialListener() {
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+        @SuppressWarnings("unchecked")
+        Consumer<SpatialVisibility> mockSpatialListener =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockPerceivedResListener =
+                (Consumer<PixelDimensions>) mock(Consumer.class);
+
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockSpatialListener);
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockPerceivedResListener);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        mRuntime.removePerceivedResolutionChangedListener(mockPerceivedResListener);
+
+        // Spatial listener still active, so callback should remain registered.
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        sendVisibilityState(shadowXrExtensions, SpatialVisibility.WITHIN_FOV, 10, 20);
+
+        verify(mockSpatialListener).accept(any());
+        verify(mockPerceivedResListener, never()).accept(any());
+    }
+
+    @Test
+    public void removePerceivedResolutionChangedListener_doesNotStopAnotherPerceivedResListener() {
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockListener1 = (Consumer<PixelDimensions>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockListener2 = (Consumer<PixelDimensions>) mock(Consumer.class);
+
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockListener1);
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockListener2);
+
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        mRuntime.removePerceivedResolutionChangedListener(mockListener1);
+
+        // mockListener2 still active, so callback should remain registered.
+        assertThat(mRuntime.mIsExtensionVisibilityStateCallbackRegistered).isTrue();
+
+        sendVisibilityState(shadowXrExtensions, 10, 20);
+
+        verify(mockListener2).accept(any());
+        verify(mockListener1, never()).accept(any());
+    }
+
+    @Test
+    public void combinedCallback_dispatchesToBothListenersCorrectly() {
+        @SuppressWarnings("unchecked")
+        Consumer<SpatialVisibility> mockSpatialListener =
+                (Consumer<SpatialVisibility>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<PixelDimensions> mockPerceivedResListener =
+                (Consumer<PixelDimensions>) mock(Consumer.class);
+
+        mRuntime.setSpatialVisibilityChangedListener(directExecutor(), mockSpatialListener);
+        mRuntime.addPerceivedResolutionChangedListener(directExecutor(), mockPerceivedResListener);
+
+        ShadowXrExtensions shadowXrExtensions = ShadowXrExtensions.extract(mXrExtensions);
+        sendVisibilityState(shadowXrExtensions, SpatialVisibility.OUTSIDE_FOV, 30, 40);
+
+        verify(mockSpatialListener)
+                .accept(eq(new SpatialVisibility(SpatialVisibility.OUTSIDE_FOV)));
+        verify(mockPerceivedResListener).accept(eq(new PixelDimensions(30, 40)));
     }
 }
