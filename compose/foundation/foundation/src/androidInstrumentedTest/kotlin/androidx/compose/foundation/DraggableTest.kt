@@ -280,7 +280,7 @@ class DraggableTest {
             .sendIndirectSwipeEvent(
                 Offset(TouchPadStart, 0f),
                 Offset(TouchPadEnd, 0f),
-                primaryAxis = IndirectTouchEventPrimaryAxis.Unspecified,
+                primaryAxis = IndirectTouchEventPrimaryAxis.None,
             )
         rule.runOnIdle { assertThat(total).isGreaterThan(0) }
         rule
@@ -288,7 +288,7 @@ class DraggableTest {
             .sendIndirectSwipeEvent(
                 Offset(TouchPadEnd, 0f),
                 Offset(TouchPadStart, 0f),
-                primaryAxis = IndirectTouchEventPrimaryAxis.Unspecified,
+                primaryAxis = IndirectTouchEventPrimaryAxis.None,
             )
         rule.runOnIdle { assertThat(total).isLessThan(0.01f) }
 
@@ -302,7 +302,7 @@ class DraggableTest {
             .sendIndirectSwipeEvent(
                 Offset(0f, TouchPadStart),
                 Offset(0f, TouchPadEnd),
-                primaryAxis = IndirectTouchEventPrimaryAxis.Unspecified,
+                primaryAxis = IndirectTouchEventPrimaryAxis.None,
             )
         rule.runOnIdle { assertThat(total).isGreaterThan(0) }
         rule
@@ -310,7 +310,7 @@ class DraggableTest {
             .sendIndirectSwipeEvent(
                 Offset(0f, TouchPadEnd),
                 Offset(0f, TouchPadStart),
-                primaryAxis = IndirectTouchEventPrimaryAxis.Unspecified,
+                primaryAxis = IndirectTouchEventPrimaryAxis.None,
             )
         rule.runOnIdle { assertThat(total).isLessThan(0.01f) }
     }

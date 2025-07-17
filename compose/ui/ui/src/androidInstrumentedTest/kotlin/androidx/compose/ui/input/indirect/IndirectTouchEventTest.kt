@@ -63,7 +63,7 @@ class IndirectTouchEventTest {
     }
 
     @Test
-    fun convertMotionEventToIndirectTouchEvent_validMotionEvent() {
+    fun convertMotionEventToIndirectTouchEvent_validMotionEventAndNoPrimaryAxis() {
 
         val offset = Offset(4f, 6f)
 
@@ -78,7 +78,40 @@ class IndirectTouchEventTest {
             )
         motionEvent.source = SOURCE_TOUCH_NAVIGATION
 
-        val indirectTouchEvent = IndirectTouchEvent(motionEvent)
+        val indirectTouchEvent = IndirectTouchEvent(motionEvent = motionEvent)
+
+        assertThat(indirectTouchEvent).isNotNull()
+        assertThat(indirectTouchEvent.position).isEqualTo(offset)
+        assertThat(indirectTouchEvent.uptimeMillis).isEqualTo(motionEvent.eventTime)
+        assertThat(indirectTouchEvent.type)
+            .isEqualTo(convertActionToIndirectTouchEventType(motionEvent.actionMasked))
+        assertThat(indirectTouchEvent.nativeEvent).isEqualTo(motionEvent)
+        // Default is None when a device does not specify something different. In this case,
+        // because there is no device mock, it will be none.
+        assertThat(indirectTouchEvent.primaryAxis).isEqualTo(IndirectTouchEventPrimaryAxis.None)
+    }
+
+    @Test
+    fun convertMotionEventToIndirectTouchEvent_validMotionEventAndPrimaryAxis() {
+
+        val offset = Offset(4f, 6f)
+
+        val motionEvent =
+            MotionEvent.obtain(
+                SystemClock.uptimeMillis(), // downTime,
+                SystemClock.uptimeMillis(), // eventTime,
+                MotionEvent.ACTION_DOWN,
+                offset.x,
+                offset.y,
+                0, // metaState
+            )
+        motionEvent.source = SOURCE_TOUCH_NAVIGATION
+
+        val indirectTouchEvent =
+            IndirectTouchEvent(
+                motionEvent = motionEvent,
+                primaryAxis = IndirectTouchEventPrimaryAxis.X,
+            )
 
         assertThat(indirectTouchEvent).isNotNull()
         assertThat(indirectTouchEvent.position).isEqualTo(offset)
@@ -250,8 +283,7 @@ class IndirectTouchEventTest {
             // the default values for the motion ranges are null, so the scroll axis is unspecified.
             // If you want to see tests of the scroll ranges (for primary axis), view the mocked
             // tests in [IndirectTouchEventWithInputDeviceMockTest].
-            assertThat(receivedEvent?.primaryAxis)
-                .isEqualTo(IndirectTouchEventPrimaryAxis.Unspecified)
+            assertThat(receivedEvent?.primaryAxis).isEqualTo(IndirectTouchEventPrimaryAxis.None)
         }
     }
 

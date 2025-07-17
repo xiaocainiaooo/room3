@@ -86,7 +86,7 @@ class IndirectTouchEventWithInputDeviceMockTest {
     }
 
     @Test
-    fun indirectScrollAxis_bothXRangeAndYRangeAreNull_scrollAxisUnspecified() {
+    fun indirectScrollAxis_bothXRangeAndYRangeAreNull_scrollAxisNone() {
         val indirectScrollAxis =
             indirectScrollAxis(
                 mockMotionEventWithSourceTouchNavigationAndMaxMotionRanges(
@@ -94,7 +94,7 @@ class IndirectTouchEventWithInputDeviceMockTest {
                     yRange = null,
                 )
             )
-        assertEquals(IndirectTouchEventPrimaryAxis.Unspecified, indirectScrollAxis)
+        assertEquals(IndirectTouchEventPrimaryAxis.None, indirectScrollAxis)
         mockMotionEvent.recycle()
     }
 
@@ -151,7 +151,7 @@ class IndirectTouchEventWithInputDeviceMockTest {
     }
 
     @Test
-    fun indirectScrollAxis_1to1AspectRatio_scrollAxisUnspecified() {
+    fun indirectScrollAxis_1to1AspectRatio_scrollAxisNone() {
         val indirectScrollAxis =
             indirectScrollAxis(
                 mockMotionEventWithSourceTouchNavigationAndMaxMotionRanges(
@@ -159,12 +159,12 @@ class IndirectTouchEventWithInputDeviceMockTest {
                     yRange = 1000f,
                 )
             )
-        assertEquals(IndirectTouchEventPrimaryAxis.Unspecified, indirectScrollAxis)
+        assertEquals(IndirectTouchEventPrimaryAxis.None, indirectScrollAxis)
         mockMotionEvent.recycle()
     }
 
     @Test
-    fun indirectScrollAxis_2to1XAspectRatio_scrollAxisUnspecified() {
+    fun indirectScrollAxis_2to1XAspectRatio_scrollAxisNone() {
         val indirectScrollAxis =
             indirectScrollAxis(
                 mockMotionEventWithSourceTouchNavigationAndMaxMotionRanges(
@@ -172,12 +172,12 @@ class IndirectTouchEventWithInputDeviceMockTest {
                     yRange = 1000f,
                 )
             )
-        assertEquals(IndirectTouchEventPrimaryAxis.Unspecified, indirectScrollAxis)
+        assertEquals(IndirectTouchEventPrimaryAxis.None, indirectScrollAxis)
         mockMotionEvent.recycle()
     }
 
     @Test
-    fun indirectScrollAxis_3to1XAspectRatio_scrollAxisUnspecified() {
+    fun indirectScrollAxis_3to1XAspectRatio_scrollAxisNone() {
         val indirectScrollAxis =
             indirectScrollAxis(
                 mockMotionEventWithSourceTouchNavigationAndMaxMotionRanges(
@@ -185,12 +185,12 @@ class IndirectTouchEventWithInputDeviceMockTest {
                     yRange = 1000f,
                 )
             )
-        assertEquals(IndirectTouchEventPrimaryAxis.Unspecified, indirectScrollAxis)
+        assertEquals(IndirectTouchEventPrimaryAxis.None, indirectScrollAxis)
         mockMotionEvent.recycle()
     }
 
     @Test
-    fun indirectScrollAxis_4to1XAspectRatio_scrollAxisUnspecified() {
+    fun indirectScrollAxis_4to1XAspectRatio_scrollAxisNone() {
         val indirectScrollAxis =
             indirectScrollAxis(
                 mockMotionEventWithSourceTouchNavigationAndMaxMotionRanges(
@@ -198,12 +198,12 @@ class IndirectTouchEventWithInputDeviceMockTest {
                     yRange = 1000f,
                 )
             )
-        assertEquals(IndirectTouchEventPrimaryAxis.Unspecified, indirectScrollAxis)
+        assertEquals(IndirectTouchEventPrimaryAxis.None, indirectScrollAxis)
         mockMotionEvent.recycle()
     }
 
     @Test
-    fun indirectScrollAxis_4to1YAspectRatio_scrollAxisUnspecified() {
+    fun indirectScrollAxis_4to1YAspectRatio_scrollAxisNone() {
         val indirectScrollAxis =
             indirectScrollAxis(
                 mockMotionEventWithSourceTouchNavigationAndMaxMotionRanges(
@@ -211,7 +211,7 @@ class IndirectTouchEventWithInputDeviceMockTest {
                     yRange = 4000f,
                 )
             )
-        assertEquals(IndirectTouchEventPrimaryAxis.Unspecified, indirectScrollAxis)
+        assertEquals(IndirectTouchEventPrimaryAxis.None, indirectScrollAxis)
         mockMotionEvent.recycle()
     }
 

@@ -47,11 +47,10 @@ val IndirectTouchEvent.nativeEvent: MotionEvent
  * If you have a system created [MotionEvent], you can call indirectScrollAxis() on your
  * [MotionEvent] to get the primary axis.
  */
-// TODO: Add detailed notes why we are passing primary axis vs. grabbing it from MotionEvent.
 @ExperimentalIndirectTouchTypeApi
 fun IndirectTouchEvent(
     motionEvent: MotionEvent,
-    primaryAxis: IndirectTouchEventPrimaryAxis = IndirectTouchEventPrimaryAxis.X,
+    primaryAxis: IndirectTouchEventPrimaryAxis = IndirectTouchEventPrimaryAxis.None,
 ): IndirectTouchEvent =
     AndroidIndirectTouchEvent(
         position = Offset(motionEvent.x, motionEvent.y),
@@ -96,7 +95,7 @@ internal fun indirectScrollAxis(motionEvent: MotionEvent): IndirectTouchEventPri
             }
         }
     }
-    return IndirectTouchEventPrimaryAxis.Unspecified
+    return IndirectTouchEventPrimaryAxis.None
 }
 
 // TODO: Remove once platform supports device specifying preferred axis for scrolling.

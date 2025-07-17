@@ -82,8 +82,8 @@ value class IndirectTouchEventPrimaryAxis private constructor(internal val value
     @ExperimentalIndirectTouchTypeApi
     companion object {
 
-        /** No primary coordinate axis specified for movement. */
-        val Unspecified = IndirectTouchEventPrimaryAxis(0)
+        /** No coordinate axes specified for movement. */
+        val None = IndirectTouchEventPrimaryAxis(0)
 
         /** X coordinate axis specified as the primary movement axis. */
         val X = IndirectTouchEventPrimaryAxis(1)

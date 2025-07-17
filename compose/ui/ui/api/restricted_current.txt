@@ -1454,10 +1454,10 @@ package androidx.compose.ui.input.indirect {
   }
 
   @SuppressCompatibility @androidx.compose.ui.ExperimentalIndirectTouchTypeApi public static final class IndirectTouchEventPrimaryAxis.Companion {
-    method @BytecodeOnly public int getUnspecified-rpdSsPU();
+    method @BytecodeOnly public int getNone-rpdSsPU();
     method @BytecodeOnly public int getX-rpdSsPU();
     method @BytecodeOnly public int getY-rpdSsPU();
-    property public androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis Unspecified;
+    property public androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis None;
     property public androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis X;
     property public androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis Y;
   }

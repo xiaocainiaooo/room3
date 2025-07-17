@@ -21,6 +21,7 @@ import android.view.MotionEvent
 import androidx.compose.ui.ExperimentalIndirectTouchTypeApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.indirect.IndirectTouchEvent
+import androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.performIndirectTouchEvent
 import androidx.core.view.InputDeviceCompat.SOURCE_TOUCH_NAVIGATION
@@ -40,7 +41,9 @@ internal fun SemanticsNodeInteraction.performIndirectSwipe(distance: Float) {
             0,
         )
     down.source = SOURCE_TOUCH_NAVIGATION
-    performIndirectTouchEvent(IndirectTouchEvent(down))
+    performIndirectTouchEvent(
+        IndirectTouchEvent(motionEvent = down, primaryAxis = IndirectTouchEventPrimaryAxis.X)
+    )
 
     val move =
         MotionEvent.obtain(
@@ -52,7 +55,9 @@ internal fun SemanticsNodeInteraction.performIndirectSwipe(distance: Float) {
             0,
         )
     move.source = SOURCE_TOUCH_NAVIGATION
-    performIndirectTouchEvent(IndirectTouchEvent(move))
+    performIndirectTouchEvent(
+        IndirectTouchEvent(motionEvent = move, primaryAxis = IndirectTouchEventPrimaryAxis.X)
+    )
 
     val up =
         MotionEvent.obtain(
@@ -64,5 +69,7 @@ internal fun SemanticsNodeInteraction.performIndirectSwipe(distance: Float) {
             0,
         )
     up.source = SOURCE_TOUCH_NAVIGATION
-    performIndirectTouchEvent(IndirectTouchEvent(up))
+    performIndirectTouchEvent(
+        IndirectTouchEvent(motionEvent = up, primaryAxis = IndirectTouchEventPrimaryAxis.X)
+    )
 }
