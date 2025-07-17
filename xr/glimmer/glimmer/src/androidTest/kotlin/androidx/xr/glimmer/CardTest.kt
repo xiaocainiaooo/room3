@@ -50,7 +50,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.indirect.IndirectTouchEvent
-import androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis
+import androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryDirectionalMotionAxis
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -348,7 +348,7 @@ class CardTest {
             .performIndirectTouchEvent(
                 IndirectTouchEvent(
                     motionEvent = down,
-                    primaryAxis = IndirectTouchEventPrimaryAxis.X,
+                    primaryDirectionalMotionAxis = IndirectTouchEventPrimaryDirectionalMotionAxis.X,
                 )
             )
 
@@ -370,7 +370,10 @@ class CardTest {
         rule
             .onNodeWithTag("card")
             .performIndirectTouchEvent(
-                IndirectTouchEvent(motionEvent = up, primaryAxis = IndirectTouchEventPrimaryAxis.X)
+                IndirectTouchEvent(
+                    motionEvent = up,
+                    primaryDirectionalMotionAxis = IndirectTouchEventPrimaryDirectionalMotionAxis.X,
+                )
             )
 
         rule.runOnIdle {

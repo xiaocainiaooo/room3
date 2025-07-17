@@ -164,7 +164,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -295,7 +296,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -426,7 +428,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -560,7 +563,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -696,7 +700,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -832,7 +837,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -967,7 +973,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1099,7 +1106,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1230,7 +1238,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1361,7 +1370,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.X
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.X
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1493,7 +1503,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1624,7 +1635,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1755,7 +1767,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -1889,7 +1902,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2025,7 +2039,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2161,7 +2176,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2296,7 +2312,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2428,7 +2445,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2559,7 +2577,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2690,7 +2709,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.Y
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.Y
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2824,7 +2844,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -2958,7 +2979,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -3093,7 +3115,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -3228,7 +3251,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -3362,7 +3386,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -3493,7 +3518,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -3624,7 +3650,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }
@@ -3755,7 +3782,8 @@ class IndirectTouchEventNavigationSystemTests {
                 .build()
 
         rule.runOnIdle {
-            rootView.primaryDirectionalMotionAxisOverride = IndirectTouchEventPrimaryAxis.None
+            rootView.primaryDirectionalMotionAxisOverride =
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             rootView.dispatchGenericMotionEvent(downEvent)
         }
         rule.runOnIdle { assertThat(receivedEvent?.type).isEqualTo(IndirectTouchEventType.Press) }

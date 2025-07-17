@@ -135,9 +135,9 @@ import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.indirect.AndroidIndirectTouchEvent
 import androidx.compose.ui.input.indirect.IndirectTouchEvent
-import androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryAxis
+import androidx.compose.ui.input.indirect.IndirectTouchEventPrimaryDirectionalMotionAxis
 import androidx.compose.ui.input.indirect.convertActionToIndirectTouchEventType
-import androidx.compose.ui.input.indirect.indirectScrollAxis
+import androidx.compose.ui.input.indirect.indirectPrimaryDirectionalScrollAxis
 import androidx.compose.ui.input.indirect.nativeEvent
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
@@ -267,7 +267,9 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     // [IndirectTouchEventNavigationSystemTests] for more details).
     @OptIn(ExperimentalIndirectTouchTypeApi::class)
     @VisibleForTesting
-    internal var primaryDirectionalMotionAxisOverride: IndirectTouchEventPrimaryAxis? = null
+    internal var primaryDirectionalMotionAxisOverride:
+        IndirectTouchEventPrimaryDirectionalMotionAxis? =
+        null
 
     override val sharedDrawScope = LayoutNodeDrawScope()
 
@@ -2471,13 +2473,14 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                 @OptIn(ExperimentalIndirectTouchTypeApi::class)
                 if (motionEvent.isFromSource(SOURCE_TOUCH_NAVIGATION)) {
                     val primaryDirectionalMotionAxis =
-                        primaryDirectionalMotionAxisOverride ?: indirectScrollAxis(motionEvent)
+                        primaryDirectionalMotionAxisOverride
+                            ?: indirectPrimaryDirectionalScrollAxis(motionEvent)
                     val indirectTouchEvent =
                         AndroidIndirectTouchEvent(
                             position = Offset(motionEvent.x, motionEvent.y),
                             uptimeMillis = motionEvent.eventTime,
                             type = convertActionToIndirectTouchEventType(motionEvent.actionMasked),
-                            primaryAxis = primaryDirectionalMotionAxis,
+                            primaryDirectionalMotionAxis = primaryDirectionalMotionAxis,
                             nativeEvent = motionEvent,
                         )
 
@@ -2506,7 +2509,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             // handling the event stream and also resets the preferred Axis.
             indirectTouchNavigationGestureDetectorActiveForEventStream = false
             indirectTouchNavigationGestureDetector.primaryDirectionalMotionAxis =
-                IndirectTouchEventPrimaryAxis.None
+                IndirectTouchEventPrimaryDirectionalMotionAxis.None
             return true
         } else {
             @OptIn(ExperimentalComposeUiApi::class)
@@ -2515,7 +2518,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                     // Starts tracking only with ACTION_DOWN (start of event stream).
                     indirectTouchNavigationGestureDetectorActiveForEventStream = true
                     indirectTouchNavigationGestureDetector.primaryDirectionalMotionAxis =
-                        indirectTouchEvent.primaryAxis
+                        indirectTouchEvent.primaryDirectionalMotionAxis
                 }
 
                 if (indirectTouchNavigationGestureDetectorActiveForEventStream) {
@@ -3660,7 +3663,7 @@ internal class IndirectTouchNavigationGestureDetector(
     private val onMoveFocus: (FocusDirection) -> Unit,
 ) {
     @OptIn(ExperimentalIndirectTouchTypeApi::class)
-    var primaryDirectionalMotionAxis = IndirectTouchEventPrimaryAxis.None
+    var primaryDirectionalMotionAxis = IndirectTouchEventPrimaryDirectionalMotionAxis.None
 
     private val gestureDetector: GestureDetector =
         GestureDetector(
@@ -3688,13 +3691,19 @@ internal class IndirectTouchNavigationGestureDetector(
                     velocityX: Float,
                     velocityY: Float,
                 ): Boolean {
-                    if (primaryDirectionalMotionAxis == IndirectTouchEventPrimaryAxis.X) {
+                    if (
+                        primaryDirectionalMotionAxis ==
+                            IndirectTouchEventPrimaryDirectionalMotionAxis.X
+                    ) {
                         if (abs(velocityX) > abs(velocityY)) {
                             val direction =
                                 if (velocityX > 0f) FocusDirection.Next else FocusDirection.Previous
                             onMoveFocus(direction)
                         }
-                    } else if (primaryDirectionalMotionAxis == IndirectTouchEventPrimaryAxis.Y) {
+                    } else if (
+                        primaryDirectionalMotionAxis ==
+                            IndirectTouchEventPrimaryDirectionalMotionAxis.Y
+                    ) {
                         if (abs(velocityY) > abs(velocityX)) {
                             val direction =
                                 if (velocityY > 0f) FocusDirection.Next else FocusDirection.Previous
