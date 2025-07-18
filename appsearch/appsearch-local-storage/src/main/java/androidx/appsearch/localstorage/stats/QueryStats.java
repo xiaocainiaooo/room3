@@ -359,7 +359,8 @@ public final class QueryStats extends BaseStats {
     }
 
     /** Returns the type of join performed. Blank if no join is performed */
-    public @JoinableValueType int getJoinType() {
+    @JoinableValueType
+    public int getJoinType() {
         return mJoinType;
     }
 
