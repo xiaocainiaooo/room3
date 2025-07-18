@@ -2784,6 +2784,7 @@ package androidx.xr.scenecore.internal {
     method public void dispose();
     method public void enablePanelDepthTest(boolean enabled);
     method public androidx.xr.scenecore.internal.ActivitySpace getActivitySpace();
+    method public androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper getAudioTrackExtensionsWrapper();
     method public androidx.xr.scenecore.internal.CameraViewActivityPose? getCameraViewActivityPose(@androidx.xr.scenecore.internal.CameraViewActivityPose.CameraType int cameraType);
     method public androidx.xr.scenecore.internal.HeadActivityPose? getHeadActivityPose();
     method public androidx.xr.scenecore.internal.PanelEntity getMainPanelEntity();
@@ -2802,6 +2803,7 @@ package androidx.xr.scenecore.internal {
     method public void setSpatialModeChangeListener(androidx.xr.scenecore.internal.SpatialModeChangeListener?);
     method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialVisibility> listener);
     property public abstract androidx.xr.scenecore.internal.ActivitySpace activitySpace;
+    property public abstract androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper audioTrackExtensionsWrapper;
     property public abstract androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
     property public abstract androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
     property public abstract androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;

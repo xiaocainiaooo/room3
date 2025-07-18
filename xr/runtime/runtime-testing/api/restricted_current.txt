@@ -1146,6 +1146,7 @@ package androidx.xr.runtime.testing {
     method public void dispose();
     method public void enablePanelDepthTest(boolean enabled);
     method public androidx.xr.scenecore.internal.ActivitySpace getActivitySpace();
+    method public androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper getAudioTrackExtensionsWrapper();
     method public androidx.xr.scenecore.internal.CameraViewActivityPose? getCameraViewActivityPose(@androidx.xr.scenecore.internal.CameraViewActivityPose.CameraType int cameraType);
     method public androidx.xr.scenecore.internal.HeadActivityPose? getHeadActivityPose();
     method public android.app.Activity? getLastSetPreferredAspectRatioActivity();
@@ -1174,6 +1175,7 @@ package androidx.xr.runtime.testing {
     method public void setSpatialModeChangeListener(androidx.xr.scenecore.internal.SpatialModeChangeListener?);
     method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.internal.SpatialVisibility> listener);
     property public androidx.xr.scenecore.internal.ActivitySpace activitySpace;
+    property public androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper audioTrackExtensionsWrapper;
     property public androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
     property public android.app.Activity? lastSetPreferredAspectRatioActivity;
     property public float lastSetPreferredAspectRatioRatio;

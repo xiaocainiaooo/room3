@@ -73,6 +73,9 @@ public interface SceneRuntime : JxrRuntime {
     /** Returns a [SoundPoolExtensionsWrapper] instance. */
     public val soundPoolExtensionsWrapper: SoundPoolExtensionsWrapper
 
+    /** Returns a [AudioTrackExtensionsWrapper] instance. */
+    public val audioTrackExtensionsWrapper: AudioTrackExtensionsWrapper
+
     /**
      * Returns the CameraViewActivityPose for the specified camera type or null if it is not
      * ready/available.

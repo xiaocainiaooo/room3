@@ -34,6 +34,7 @@ import androidx.xr.scenecore.impl.perception.Session;
 import androidx.xr.scenecore.internal.ActivityPanelEntity;
 import androidx.xr.scenecore.internal.ActivitySpace;
 import androidx.xr.scenecore.internal.AnchorEntity;
+import androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper;
 import androidx.xr.scenecore.internal.CameraViewActivityPose;
 import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
@@ -100,6 +101,7 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     private final SpatialEnvironmentImpl mEnvironment;
 
     private final SoundPoolExtensionsWrapper mSoundPoolExtensionsWrapper;
+    private final AudioTrackExtensionsWrapper mAudioTrackExtensionsWrapper;
 
     private final Map<Consumer<SpatialCapabilities>, Executor>
             mSpatialCapabilitiesChangedListeners = new ConcurrentHashMap<>();
@@ -161,6 +163,10 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
         mSoundPoolExtensionsWrapper =
                 new SoundPoolExtensionsWrapperImpl(
                         extensions.getXrSpatialAudioExtensions().getSoundPoolExtensions());
+        mAudioTrackExtensionsWrapper =
+                new AudioTrackExtensionsWrapperImpl(
+                        extensions.getXrSpatialAudioExtensions().getAudioTrackExtensions(),
+                        entityManager);
 
         mEnvironment =
                 new SpatialEnvironmentImpl(
@@ -363,6 +369,11 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     @Override
     public @NonNull SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper() {
         return mSoundPoolExtensionsWrapper;
+    }
+
+    @Override
+    public @NonNull AudioTrackExtensionsWrapper getAudioTrackExtensionsWrapper() {
+        return mAudioTrackExtensionsWrapper;
     }
 
     @Override

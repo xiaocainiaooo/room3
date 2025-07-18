@@ -28,6 +28,7 @@ import androidx.xr.runtime.math.Pose
 import androidx.xr.scenecore.internal.ActivityPanelEntity
 import androidx.xr.scenecore.internal.ActivitySpace
 import androidx.xr.scenecore.internal.AnchorEntity
+import androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper
 import androidx.xr.scenecore.internal.CameraViewActivityPose
 import androidx.xr.scenecore.internal.Dimensions
 import androidx.xr.scenecore.internal.Entity
@@ -66,6 +67,9 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
 
     override val soundPoolExtensionsWrapper: SoundPoolExtensionsWrapper =
         FakeSoundPoolExtensionsWrapper()
+
+    override val audioTrackExtensionsWrapper: AudioTrackExtensionsWrapper =
+        FakeAudioTrackExtensionsWrapper()
 
     override val mainPanelEntity: PanelEntity = FakePanelEntity()
 
