@@ -1152,6 +1152,7 @@ package androidx.xr.runtime.testing {
     method public android.app.Activity? getLastSetPreferredAspectRatioActivity();
     method public float getLastSetPreferredAspectRatioRatio();
     method public androidx.xr.scenecore.internal.PanelEntity getMainPanelEntity();
+    method public androidx.xr.scenecore.internal.MediaPlayerExtensionsWrapper getMediaPlayerExtensionsWrapper();
     method public java.util.Map<java.util.concurrent.Executor,java.util.function.Consumer<androidx.xr.scenecore.internal.PixelDimensions>> getPerceivedResolutionChangedMap();
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
     method public boolean getRequestedFullSpaceMode();
@@ -1180,6 +1181,7 @@ package androidx.xr.runtime.testing {
     property public android.app.Activity? lastSetPreferredAspectRatioActivity;
     property public float lastSetPreferredAspectRatioRatio;
     property public androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
+    property public androidx.xr.scenecore.internal.MediaPlayerExtensionsWrapper mediaPlayerExtensionsWrapper;
     property public java.util.Map<java.util.concurrent.Executor,java.util.function.Consumer<androidx.xr.scenecore.internal.PixelDimensions>> perceivedResolutionChangedMap;
     property public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;
     property public boolean requestedFullSpaceMode;

@@ -2788,6 +2788,7 @@ package androidx.xr.scenecore.internal {
     method public androidx.xr.scenecore.internal.CameraViewActivityPose? getCameraViewActivityPose(@androidx.xr.scenecore.internal.CameraViewActivityPose.CameraType int cameraType);
     method public androidx.xr.scenecore.internal.HeadActivityPose? getHeadActivityPose();
     method public androidx.xr.scenecore.internal.PanelEntity getMainPanelEntity();
+    method public androidx.xr.scenecore.internal.MediaPlayerExtensionsWrapper getMediaPlayerExtensionsWrapper();
     method public androidx.xr.scenecore.internal.PerceptionSpaceActivityPose getPerceptionSpaceActivityPose();
     method public androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper();
     method public androidx.xr.scenecore.internal.SpatialCapabilities getSpatialCapabilities();
@@ -2806,6 +2807,7 @@ package androidx.xr.scenecore.internal {
     property public abstract androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper audioTrackExtensionsWrapper;
     property public abstract androidx.xr.scenecore.internal.HeadActivityPose? headActivityPose;
     property public abstract androidx.xr.scenecore.internal.PanelEntity mainPanelEntity;
+    property public abstract androidx.xr.scenecore.internal.MediaPlayerExtensionsWrapper mediaPlayerExtensionsWrapper;
     property public abstract androidx.xr.scenecore.internal.PerceptionSpaceActivityPose perceptionSpaceActivityPose;
     property public abstract androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper soundPoolExtensionsWrapper;
     property public abstract androidx.xr.scenecore.internal.SpatialCapabilities spatialCapabilities;

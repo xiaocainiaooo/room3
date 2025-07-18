@@ -36,6 +36,7 @@ import androidx.xr.scenecore.internal.GltfEntity
 import androidx.xr.scenecore.internal.GltfFeature
 import androidx.xr.scenecore.internal.HeadActivityPose
 import androidx.xr.scenecore.internal.LoggingEntity
+import androidx.xr.scenecore.internal.MediaPlayerExtensionsWrapper
 import androidx.xr.scenecore.internal.PanelEntity
 import androidx.xr.scenecore.internal.PerceptionSpaceActivityPose
 import androidx.xr.scenecore.internal.PixelDimensions
@@ -70,6 +71,9 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
 
     override val audioTrackExtensionsWrapper: AudioTrackExtensionsWrapper =
         FakeAudioTrackExtensionsWrapper()
+
+    override val mediaPlayerExtensionsWrapper: MediaPlayerExtensionsWrapper =
+        FakeMediaPlayerExtensionsWrapper()
 
     override val mainPanelEntity: PanelEntity = FakePanelEntity()
 

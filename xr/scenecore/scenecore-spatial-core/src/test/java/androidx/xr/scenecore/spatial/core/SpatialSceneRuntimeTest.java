@@ -47,14 +47,17 @@ import androidx.xr.scenecore.impl.perception.ViewProjections;
 import androidx.xr.scenecore.impl.perception.exceptions.FailedToInitializeException;
 import androidx.xr.scenecore.internal.ActivitySpace;
 import androidx.xr.scenecore.internal.AnchorEntity;
+import androidx.xr.scenecore.internal.AudioTrackExtensionsWrapper;
 import androidx.xr.scenecore.internal.CameraViewActivityPose;
 import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.HeadActivityPose;
 import androidx.xr.scenecore.internal.LoggingEntity;
+import androidx.xr.scenecore.internal.MediaPlayerExtensionsWrapper;
 import androidx.xr.scenecore.internal.PixelDimensions;
 import androidx.xr.scenecore.internal.PlaneSemantic;
 import androidx.xr.scenecore.internal.PlaneType;
+import androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
@@ -937,5 +940,26 @@ public class SpatialSceneRuntimeTest {
         mRuntime.setPreferredAspectRatio(mActivity, 1.23f);
         assertThat(ShadowXrExtensions.extract(mXrExtensions).getPreferredAspectRatio(mActivity))
                 .isEqualTo(1.23f);
+    }
+
+    @Test
+    public void sceneRuntime_getSoundPoolExtensionsWrapper() {
+        SoundPoolExtensionsWrapper extensions = mRuntime.getSoundPoolExtensionsWrapper();
+
+        assertThat(extensions).isNotNull();
+    }
+
+    @Test
+    public void sceneRuntime_getAudioTrackExtensionsWrapper() {
+        AudioTrackExtensionsWrapper extensions = mRuntime.getAudioTrackExtensionsWrapper();
+
+        assertThat(extensions).isNotNull();
+    }
+
+    @Test
+    public void sceneRuntime_getMediaPlayerExtensionsWrapper() {
+        MediaPlayerExtensionsWrapper extensions = mRuntime.getMediaPlayerExtensionsWrapper();
+
+        assertThat(extensions).isNotNull();
     }
 }
