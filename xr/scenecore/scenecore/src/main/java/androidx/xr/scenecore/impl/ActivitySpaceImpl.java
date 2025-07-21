@@ -25,6 +25,8 @@ import androidx.xr.runtime.internal.ActivitySpace;
 import androidx.xr.runtime.internal.Dimensions;
 import androidx.xr.runtime.internal.Entity;
 import androidx.xr.runtime.internal.HitTestResult;
+import androidx.xr.runtime.internal.PerceptionSpaceActivityPose;
+import androidx.xr.runtime.internal.Space;
 import androidx.xr.runtime.internal.SpaceValue;
 import androidx.xr.runtime.internal.SpatialModeChangeListener;
 import androidx.xr.runtime.math.BoundingBox;
@@ -76,6 +78,7 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
     private SpatialModeChangeListener mSpatialModeChangeListener;
     private final AtomicReference<BoundingBox> mCachedRecommendedContentBox =
             new AtomicReference<>(null);
+    private final EntityManager mEntityManager;
 
     ActivitySpaceImpl(
             Node taskNode,
@@ -86,6 +89,7 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
             boolean unscaledGravityAlignedActivitySpace,
             ScheduledExecutorService executor) {
         super(activity, taskNode, extensions, entityManager, executor);
+        mEntityManager = entityManager;
         mSpatialStateProvider = spatialStateProvider;
         mUnscaledGravityAlignedActivitySpace = unscaledGravityAlignedActivitySpace;
         Log.i(
@@ -94,10 +98,33 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
                         + mUnscaledGravityAlignedActivitySpace);
     }
 
+    @Override
+    public @NonNull Pose getPose(@SpaceValue int relativeTo) {
+        switch (relativeTo) {
+            case Space.PARENT:
+                throw new UnsupportedOperationException(
+                        "ActivitySpace is a root space and it does not have a parent.");
+            case Space.ACTIVITY:
+                return getPoseInActivitySpace();
+            case Space.REAL_WORLD:
+                return getPoseInPerceptionSpace();
+            default:
+                throw new IllegalArgumentException("Unsupported relativeTo value: " + relativeTo);
+        }
+    }
+
     /** Returns the identity pose since this entity defines the origin of the activity space. */
     @Override
     public @NonNull Pose getPoseInActivitySpace() {
         return new Pose();
+    }
+
+    public Pose getPoseInPerceptionSpace() {
+        PerceptionSpaceActivityPose perceptionSpaceActivityPose =
+                mEntityManager
+                        .getSystemSpaceActivityPoseOfType(PerceptionSpaceActivityPose.class)
+                        .get(0);
+        return transformPoseTo(new Pose(), perceptionSpaceActivityPose);
     }
 
     /** Returns the identity pose since we assume the activity space is the world space root. */
@@ -124,8 +151,8 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
     }
 
     @Override
-    public void setPose(Pose p, @SpaceValue int s) {
-        Log.e(TAG, "Cannot set pose for the ActivitySpace.");
+    public void setPose(@NonNull Pose pose, @SpaceValue int relativeTo) {
+        throw new UnsupportedOperationException("Cannot set 'pose' on an ActivitySpace.");
     }
 
     @SuppressWarnings("ObjectToString")

@@ -22,6 +22,7 @@ import static androidx.xr.runtime.testing.math.MathAssertions.assertVector3;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -36,6 +37,7 @@ import androidx.xr.runtime.internal.ActivitySpace;
 import androidx.xr.runtime.internal.Dimensions;
 import androidx.xr.runtime.internal.HitTestResult;
 import androidx.xr.runtime.internal.JxrPlatformAdapter;
+import androidx.xr.runtime.internal.Space;
 import androidx.xr.runtime.math.BoundingBox;
 import androidx.xr.runtime.math.Matrix4;
 import androidx.xr.runtime.math.Pose;
@@ -378,5 +380,39 @@ public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
                         new Vector3(-1.73f / 2, -1.61f / 2, -0.5f / 2),
                         new Vector3(1.73f / 2, 1.61f / 2, 0.5f / 2));
         assertThat(resultBox).isEqualTo(expectedBox);
+    }
+
+    @Test
+    public void activitySpaceSetPose_throwsException() throws Exception {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+        Pose pose = new Pose();
+
+        assertThrows(UnsupportedOperationException.class, () -> activitySpaceImpl.setPose(pose));
+    }
+
+    @Test
+    public void getPoseRelativeToParentSpace_throwsException() throws Exception {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+
+        assertThrows(
+                UnsupportedOperationException.class, () -> activitySpaceImpl.getPose(Space.PARENT));
+    }
+
+    @Test
+    public void getPoseRelativeToActivitySpace_returnsIdentity() {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+
+        assertPose(
+                activitySpaceImpl.getPose(Space.ACTIVITY),
+                activitySpaceImpl.getPoseInActivitySpace());
+    }
+
+    @Test
+    public void getPoseRelativeToRealWorldSpace_returnsPerceptionSpacePose() {
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
+
+        assertPose(
+                activitySpaceImpl.getPose(Space.REAL_WORLD),
+                activitySpaceImpl.getPoseInPerceptionSpace());
     }
 }

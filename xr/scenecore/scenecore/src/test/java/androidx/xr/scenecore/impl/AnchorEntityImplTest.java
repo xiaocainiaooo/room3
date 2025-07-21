@@ -45,6 +45,7 @@ import androidx.xr.runtime.internal.AnchorEntity.State;
 import androidx.xr.runtime.internal.Dimensions;
 import androidx.xr.runtime.internal.PlaneSemantic;
 import androidx.xr.runtime.internal.PlaneType;
+import androidx.xr.runtime.internal.Space;
 import androidx.xr.runtime.math.Matrix4;
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.runtime.math.Quaternion;
@@ -188,6 +189,8 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
         // By default, set the activity space to the root of the underlying OpenXR reference space.
         mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mEntityManager.addSystemSpaceActivityPose(
+                new PerceptionSpaceActivityPoseImpl(mActivitySpace, mActivitySpaceRoot));
     }
 
     /**
@@ -735,6 +738,27 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
         Pose pose = new Pose();
         assertThrows(UnsupportedOperationException.class, () -> anchorEntity.setPose(pose));
+    }
+
+    @Test
+    public void anchorEntityGetPoseRelativeToParentSpace_throwsException() throws Exception {
+        AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
+
+        assertThrows(UnsupportedOperationException.class, () -> anchorEntity.getPose(Space.PARENT));
+    }
+
+    @Test
+    public void anchorEntityGetPoseRelativeToActivitySpace_returnsActivitySpacePose() {
+        AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
+
+        assertPose(anchorEntity.getPose(Space.ACTIVITY), anchorEntity.getPoseInActivitySpace());
+    }
+
+    @Test
+    public void anchorEntityGetPoseRelativeToRealWorldSpace_returnsPerceptionSpacePose() {
+        AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
+
+        assertPose(anchorEntity.getPose(Space.REAL_WORLD), anchorEntity.getPoseInPerceptionSpace());
     }
 
     @Test
