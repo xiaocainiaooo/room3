@@ -23,8 +23,11 @@ import android.view.textclassifier.TextClassifier
 import androidx.pdf.featureflag.PdfFeatureFlags
 import androidx.pdf.util.ClipboardUtils
 import androidx.pdf.view.TextSelection
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 
-internal class TextSelectionMenuProvider(private val context: Context) {
+internal class TextSelectionMenuProvider(private val context: Context) :
+    SelectionMenuProvider<TextSelection> {
     private var textClassificationManager: TextClassificationManager? = null
     private var textClassifier: TextClassifier? = null
 
@@ -35,10 +38,10 @@ internal class TextSelectionMenuProvider(private val context: Context) {
         textClassifier = textClassificationManager?.textClassifier
     }
 
-    public fun getMenuItems(textSelection: TextSelection): List<ContextMenuComponent> {
+    override suspend fun getMenuItems(selection: TextSelection): List<ContextMenuComponent> {
         val menuItems: MutableList<ContextMenuComponent> = mutableListOf()
         if (PdfFeatureFlags.isSmartActionMenuComponentEnabled) {
-            menuItems.addAll(getSmartMenuItems(textSelection))
+            menuItems.addAll(getSmartMenuItems(selection))
         }
         menuItems.addAll(getDefaultMenuItems())
         return menuItems
@@ -77,16 +80,20 @@ internal class TextSelectionMenuProvider(private val context: Context) {
         return defaultMenuItems
     }
 
-    private fun getSmartMenuItems(textSelection: TextSelection): List<ContextMenuComponent> {
+    private suspend fun getSmartMenuItems(
+        textSelection: TextSelection
+    ): List<ContextMenuComponent> = coroutineScope {
         val smartMenuItems: MutableList<ContextMenuComponent> = mutableListOf()
         // Cannot add smart menu items if text classifier is not present on device
-        val localTextClassifier = textClassifier ?: return smartMenuItems
+        val localTextClassifier = textClassifier ?: return@coroutineScope smartMenuItems
         val textLength = textSelection.text.length
         // This is the char limit for the textClassifier library to produce
         // any meaningful action item.
         if (textLength > MAX_CHAR_LIMIT) {
-            return smartMenuItems
+            return@coroutineScope smartMenuItems
         }
+        // Make sure that the backgroundScope is active before starting classifyText operation.
+        ensureActive()
         val textClassification =
             localTextClassifier.classifyText(
                 textSelection.text,
@@ -114,7 +121,7 @@ internal class TextSelectionMenuProvider(private val context: Context) {
                 )
             )
         }
-        return smartMenuItems
+        smartMenuItems
     }
 
     private companion object {
