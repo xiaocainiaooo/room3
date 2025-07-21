@@ -62,6 +62,7 @@ public object SpatialExternalSurfaceDefaults {
  * [SpatialExternalSurfaceScope] is a scoped environment that provides the [Surface] associated with
  * a [SpatialExternalSurface]
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface SpatialExternalSurfaceScope {
     /**
      * Invoked only one time when the Surface is created. This will execute before any layout or
@@ -140,6 +141,7 @@ private class SpatialExternalSphereSurfaceScopeInstance(
 
 /** Mode for SpatialExternalSurface display. */
 @JvmInline
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public value class StereoMode private constructor(public val value: Int) {
     public companion object {
         /** Each eye will see the entire surface (no separation). */
@@ -198,6 +200,7 @@ public value class SurfaceProtection private constructor(public val value: Int) 
 @Composable
 @SubspaceComposable
 @ExperimentalComposeApi
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SpatialExternalSurface(
     stereoMode: StereoMode,
     modifier: SubspaceModifier = SubspaceModifier,
