@@ -1591,7 +1591,7 @@ private class DefaultDraggableAnchors<T>(
                 minDistance = distance
             }
         }
-        return keys[minAnchorIndex]
+        return keys.getOrNull(minAnchorIndex)
     }
 
     override fun closestAnchor(position: Float, searchUpwards: Boolean): T? {
@@ -1605,7 +1605,7 @@ private class DefaultDraggableAnchors<T>(
                 minDistance = distance
             }
         }
-        return keys[minAnchorIndex]
+        return keys.getOrNull(minAnchorIndex)
     }
 
     override fun minPosition() = anchors.minOrNull() ?: Float.NaN
