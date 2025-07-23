@@ -45,6 +45,7 @@ import androidx.xr.scenecore.internal.PerceptionSpaceActivityPose
 import androidx.xr.scenecore.internal.PixelDimensions
 import androidx.xr.scenecore.internal.PlaneSemantic
 import androidx.xr.scenecore.internal.PlaneType
+import androidx.xr.scenecore.internal.PointerCaptureComponent
 import androidx.xr.scenecore.internal.RenderingEntityFactory
 import androidx.xr.scenecore.internal.SceneRuntime
 import androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper
@@ -293,6 +294,15 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         val resizableComponent = FakeResizableComponent(minimumSize, maximumSize)
 
         return resizableComponent
+    }
+
+    @Suppress("ExecutorRegistration")
+    override fun createPointerCaptureComponent(
+        executor: Executor,
+        stateListener: PointerCaptureComponent.StateListener,
+        inputListener: InputEventListener,
+    ): FakePointerCaptureComponent {
+        return FakePointerCaptureComponent(executor, stateListener)
     }
 
     override fun dispose() {}
