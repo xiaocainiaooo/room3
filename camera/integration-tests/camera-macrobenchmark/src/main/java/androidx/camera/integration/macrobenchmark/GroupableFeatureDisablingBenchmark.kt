@@ -19,12 +19,16 @@ package androidx.camera.integration.macrobenchmark
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
-import androidx.camera.integration.macrobenchmark.CameraBenchmarkUtils.SESSION_CONFIG_BIND_ACTIVITY
+import androidx.camera.integration.macrobenchmark.CameraBenchmarkUtils.GROUPABLE_FEATURE_DISABLING_ACTIVITY
 import androidx.camera.integration.macrobenchmark.CameraBenchmarkUtils.grantCameraPermission
 import androidx.camera.integration.macrobenchmark.CameraBenchmarkUtils.measureStartupDefault
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,37 +37,35 @@ import org.junit.runners.Parameterized
 
 @LargeTest
 @RunWith(Parameterized::class)
-class BindScenarioBenchmark(private val cameraXConfigName: String, private val lens: Int) {
+class GroupableFeatureDisablingBenchmark(
+    private val cameraXConfigName: String,
+    private val lens: Int,
+) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @get:Rule
     val cameraPipeConfigTestRule =
         CameraPipeConfigTestRule(active = cameraXConfigName == CameraPipeConfig::class.simpleName)
 
+    private lateinit var device: UiDevice
+
     @Before
     fun setUp() {
         grantCameraPermission()
+
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        device = UiDevice.getInstance(instrumentation)
     }
 
     @Test
-    fun measureStartupForBindingDefaultSessionConfigOfPVIUseCases() =
+    fun measureStartupForDisablingUnsupportedGroupableFeatures() =
         benchmarkRule.measureStartupDefault(
             setupIntent = {
-                action = SESSION_CONFIG_BIND_ACTIVITY
+                action = GROUPABLE_FEATURE_DISABLING_ACTIVITY
                 putExtra("camerax_config", cameraXConfigName)
                 putExtra("lens", lens)
-            }
-        )
-
-    @Test
-    fun measureStartupForBindingSessionConfigOfPVIUseCasesAndAllFeaturesPreferred() =
-        benchmarkRule.measureStartupDefault(
-            setupIntent = {
-                action = SESSION_CONFIG_BIND_ACTIVITY
-                putExtra("camerax_config", cameraXConfigName)
-                putExtra("lens", lens)
-                putExtra("prefer_all_features", true)
-            }
+            },
+            measureBlock = { device.wait(Until.findObject(By.text("HdrButton")), 5_000).click() },
         )
 
     companion object {

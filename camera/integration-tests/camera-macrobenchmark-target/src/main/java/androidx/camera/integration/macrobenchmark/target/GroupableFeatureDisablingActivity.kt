@@ -19,12 +19,15 @@ package androidx.camera.integration.macrobenchmark.target
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
 import androidx.camera.core.ExperimentalSessionConfig
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.core.SessionConfig
+import androidx.camera.core.featuregroup.GroupableFeature
 import androidx.camera.core.featuregroup.GroupableFeature.Companion.FPS_60
 import androidx.camera.core.featuregroup.GroupableFeature.Companion.HDR_HLG10
 import androidx.camera.core.featuregroup.GroupableFeature.Companion.IMAGE_ULTRA_HDR
@@ -35,20 +38,28 @@ import androidx.camera.integration.macrobenchmark.target.CameraXSetup.toCameraXC
 import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class SessionConfigBindActivity : ComponentActivity() {
+class GroupableFeatureDisablingActivity : ComponentActivity() {
     private val preview = Preview.Builder().build()
     private val imageCapture = ImageCapture.Builder().build()
     private val videoCapture = VideoCapture.withOutput(Recorder.Builder().build())
+
+    private lateinit var camera: Deferred<Camera>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,34 +76,62 @@ class SessionConfigBindActivity : ComponentActivity() {
         val lifecycleOwner = LocalLifecycleOwner.current
 
         LifecycleStartEffect(Unit) {
-            coroutineScope.launch {
-                initCameraX(
-                    cameraXConfig,
-                    cameraSelector,
-                    context.applicationContext,
-                    lifecycleOwner,
-                    if (intent.extras?.getBoolean("prefer_all_features") == true) {
-                        SessionConfig(
-                            listOf(preview, imageCapture, videoCapture),
-                            preferredFeatureGroup =
-                                listOf(HDR_HLG10, FPS_60, PREVIEW_STABILIZATION, IMAGE_ULTRA_HDR),
-                        )
-                    } else {
-                        SessionConfig(listOf(preview, imageCapture, videoCapture))
-                    },
-                )
-            }
+            camera =
+                coroutineScope.async {
+                    initCameraX(
+                        cameraXConfig,
+                        cameraSelector,
+                        context.applicationContext,
+                        lifecycleOwner,
+                        SessionConfig(listOf(preview, imageCapture, videoCapture)),
+                    )
+                }
             onStopOrDispose {}
         }
 
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = {
-                PreviewView(context).apply {
-                    preview.surfaceProvider = this.surfaceProvider
-                    scaleType = PreviewView.ScaleType.FIT_CENTER
+        // The center alignment is required for UiAutomator to properly find the HDR button inside.
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = {
+                    PreviewView(context).apply {
+                        preview.surfaceProvider = this.surfaceProvider
+                        scaleType = PreviewView.ScaleType.FIT_CENTER
+                    }
+                },
+            )
+
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        camera.await().cameraInfo.findUnsupportedFeatures(setOf(HDR_HLG10))
+                    }
                 }
-            },
-        )
+            ) {
+                Text("HdrButton")
+            }
+        }
+    }
+
+    @OptIn(ExperimentalSessionConfig::class)
+    fun CameraInfo.findUnsupportedFeatures(currentFeatures: Set<GroupableFeature>) {
+        val unsupportedFeatures = mutableListOf<GroupableFeature>()
+
+        val appFeatureOptions = setOf(HDR_HLG10, FPS_60, PREVIEW_STABILIZATION, IMAGE_ULTRA_HDR)
+
+        appFeatureOptions.forEach { featureOption ->
+            if (currentFeatures.contains(featureOption)) return@forEach
+
+            if (
+                !isFeatureGroupSupported(
+                    SessionConfig(
+                        useCases = listOf(preview, imageCapture, videoCapture),
+                        requiredFeatureGroup = currentFeatures + featureOption,
+                    )
+                )
+            ) {
+                unsupportedFeatures.add(featureOption)
+            }
+        }
     }
 }

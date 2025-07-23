@@ -33,6 +33,8 @@ object CameraBenchmarkUtils {
 
     const val SESSION_CONFIG_BIND_ACTIVITY =
         "androidx.camera.integration.macrobenchmark.target.SESSION_CONFIG_BIND_ACTIVITY"
+    const val GROUPABLE_FEATURE_DISABLING_ACTIVITY =
+        "androidx.camera.integration.macrobenchmark.target.GROUPABLE_FEATURE_DISABLING_ACTIVITY"
 
     /**
      * Grants the CAMERA permission to the app under test.
