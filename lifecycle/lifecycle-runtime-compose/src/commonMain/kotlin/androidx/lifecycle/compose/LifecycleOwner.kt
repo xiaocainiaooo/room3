@@ -22,7 +22,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
 import androidx.lifecycle.Lifecycle.State
+import androidx.lifecycle.Lifecycle.State.DESTROYED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.LifecycleEventObserver
@@ -37,6 +39,9 @@ import androidx.lifecycle.LifecycleRegistry
  * host screen. The child lifecycle will never be in a state greater than its parent, and it can be
  * further restricted by the [maxLifecycle] parameter. For example, you can ensure a component's
  * lifecycle never goes beyond [STARTED], even if the parent Fragment is [RESUMED].
+ *
+ * When the composable leaves the composition, the child lifecycle will be moved to [DESTROYED].
+ * This ensures the child is properly cleaned up even if it is referenced outside the composition.
  *
  * @param maxLifecycle The maximum [Lifecycle.State] this child lifecycle is allowed to enter.
  *   Defaults to [RESUMED].
@@ -60,7 +65,13 @@ public fun LifecycleOwner(
 
         parentLifecycleOwner.lifecycle.addObserver(observer)
 
-        onDispose { parentLifecycleOwner.lifecycle.removeObserver(observer) }
+        onDispose {
+            parentLifecycleOwner.lifecycle.removeObserver(observer)
+
+            // Manually dispatch ON_DESTROY. This ensures that any code holding a reference to this
+            // from outside a composition is notified that it has been permanently destroyed.
+            childLifecycleOwner.handleLifecycleEvent(event = ON_DESTROY)
+        }
     }
 
     // Ensure that the child lifecycle is capped at the maxLifecycle.
@@ -78,7 +89,7 @@ public fun LifecycleOwner(
  */
 private class ChildLifecycleOwner : LifecycleOwner {
 
-    private val lifecycleRegistry = LifecycleRegistry(this)
+    private val lifecycleRegistry = LifecycleRegistry(provider = this)
 
     override val lifecycle = lifecycleRegistry
 

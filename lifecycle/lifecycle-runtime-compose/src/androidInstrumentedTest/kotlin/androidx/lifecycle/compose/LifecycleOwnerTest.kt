@@ -40,7 +40,7 @@ class LifecycleOwnerTest {
 
     @Test
     fun lifecycleOwner_whenComposed_thenProvidesNewLifecycleOwner() = runTest {
-        val parentLifecycleOwner = TestLifecycleOwner(State.INITIALIZED)
+        val parentLifecycleOwner = TestLifecycleOwner()
         lateinit var childLifecycleOwner: LifecycleOwner
 
         rule.setContent {
@@ -52,7 +52,7 @@ class LifecycleOwnerTest {
         rule.awaitIdle()
 
         assertThat(childLifecycleOwner).isNotSameInstanceAs(parentLifecycleOwner)
-        assertThat(childLifecycleOwner.lifecycle.currentState).isEqualTo(State.INITIALIZED)
+        assertThat(childLifecycleOwner.lifecycle.currentState).isEqualTo(State.STARTED)
     }
 
     @Test
@@ -140,5 +140,35 @@ class LifecycleOwnerTest {
         showContent = false
         rule.awaitIdle()
         assertThat(parentLifecycleOwner.observerCount).isEqualTo(0)
+    }
+
+    @Test
+    fun lifecycleOwner_whenDisposed_thenChildIsDestroyed() = runTest {
+        // Keep the parent alive to ensure the child's destruction is not just
+        // a result of the parent being destroyed.
+        val parentLifecycleOwner = TestLifecycleOwner(State.RESUMED)
+        lateinit var childLifecycle: Lifecycle
+        var showContent by mutableStateOf(true)
+
+        rule.setContent {
+            if (showContent) {
+                LifecycleOwner(parentLifecycleOwner = parentLifecycleOwner) {
+                    childLifecycle = LocalLifecycleOwner.current.lifecycle
+                }
+            }
+        }
+
+        rule.awaitIdle()
+        // At this point, the child should be active.
+        assertThat(childLifecycle.currentState).isEqualTo(State.RESUMED)
+
+        // Now, remove the composable from the composition.
+        showContent = false
+        rule.awaitIdle()
+
+        // Verify that the child lifecycle was explicitly moved to DESTROYED,
+        // even though the parent is still RESUMED.
+        assertThat(childLifecycle.currentState).isEqualTo(State.DESTROYED)
+        assertThat(parentLifecycleOwner.lifecycle.currentState).isEqualTo(State.RESUMED)
     }
 }
