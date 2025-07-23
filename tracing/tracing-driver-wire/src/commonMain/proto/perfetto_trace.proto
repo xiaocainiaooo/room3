@@ -75,6 +75,79 @@ message TrackEvent {
     double double_counter_value = 44;
   }
   repeated fixed64 flow_ids = 47;
+
+  // ---------------------------------------------------------------------------
+  // TrackEvent arguments:
+  // ---------------------------------------------------------------------------
+
+  // Unstable key/value annotations shown in the trace viewer but not intended
+  // for metrics use.
+  repeated DebugAnnotation debug_annotations = 4;
+}
+
+// Proto representation of untyped key/value annotations provided in TRACE_EVENT
+// macros. Users of the Perfetto SDK should prefer to use the
+// perfetto::TracedValue API to fill these protos, rather than filling them
+// manually.
+//
+// Debug annotations are intended for debug use and are not considered a stable
+// API of the trace contents. Trace-based metrics that use debug annotation
+// values are prone to breakage, so please rely on typed TrackEvent fields for
+// these instead.
+//
+// DebugAnnotations support nested arrays and dictionaries. Each entry is
+// encoded as a single DebugAnnotation message. Only dictionary entries
+// set the "name" field. The TrackEvent message forms an implicit root
+// dictionary.
+//
+// Example TrackEvent with nested annotations:
+//   track_event {
+//     debug_annotations {
+//       name: "foo"
+//       dict_entries {
+//         name: "a"
+//         bool_value: true
+//       }
+//       dict_entries {
+//         name: "b"
+//         int_value: 123
+//       }
+//     }
+//     debug_annotations {
+//       name: "bar"
+//       array_values {
+//         string_value: "hello"
+//       }
+//       array_values {
+//         string_value: "world"
+//       }
+//     }
+//   }
+//
+// Next ID: 18.
+// Reserved ID: 15
+message DebugAnnotation {
+  // Name fields are set only for dictionary entries.
+  oneof name_field {
+    // interned DebugAnnotationName.
+    uint64 name_iid = 1;
+    // non-interned variant.
+    string name = 10;
+  }
+
+  oneof value {
+    bool bool_value = 2;
+    uint64 uint_value = 3;
+    int64 int_value = 4;
+    double double_value = 5;
+    // interned and non-interned variants of strings.
+    string string_value = 6;
+    // Corresponds to |debug_annotation_string_values| field in InternedData.
+    uint64 string_value_iid = 17;
+  }
+
+  repeated DebugAnnotation dict_entries = 11;
+  repeated DebugAnnotation array_values = 12;
 }
 
 message ThreadDescriptor {
