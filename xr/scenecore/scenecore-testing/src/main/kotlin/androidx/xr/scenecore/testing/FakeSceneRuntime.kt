@@ -52,6 +52,7 @@ import androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper
 import androidx.xr.scenecore.internal.SpatialCapabilities
 import androidx.xr.scenecore.internal.SpatialEnvironment
 import androidx.xr.scenecore.internal.SpatialModeChangeListener
+import androidx.xr.scenecore.internal.SpatialPointerComponent
 import androidx.xr.scenecore.internal.SpatialVisibility
 import java.time.Duration
 import java.util.UUID
@@ -304,6 +305,9 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
     ): FakePointerCaptureComponent {
         return FakePointerCaptureComponent(executor, stateListener)
     }
+
+    override fun createSpatialPointerComponent(): SpatialPointerComponent =
+        FakeSpatialPointerComponent()
 
     override fun dispose() {}
 }

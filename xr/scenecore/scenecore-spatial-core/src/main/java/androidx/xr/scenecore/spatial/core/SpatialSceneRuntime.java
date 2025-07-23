@@ -62,6 +62,7 @@ import androidx.xr.scenecore.internal.Space;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
+import androidx.xr.scenecore.internal.SpatialPointerComponent;
 import androidx.xr.scenecore.internal.SpatialVisibility;
 
 import com.android.extensions.xr.XrExtensions;
@@ -812,5 +813,10 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
             PointerCaptureComponent.@NonNull StateListener stateListener,
             @NonNull InputEventListener inputListener) {
         return new PointerCaptureComponentImpl(executor, stateListener, inputListener);
+    }
+
+    @Override
+    public @NonNull SpatialPointerComponent createSpatialPointerComponent() {
+        return new SpatialPointerComponentImpl(mExtensions);
     }
 }

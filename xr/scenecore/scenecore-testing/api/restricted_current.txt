@@ -846,6 +846,7 @@ package androidx.xr.scenecore.testing {
     method @RequiresApi(android.os.Build.VERSION_CODES.O) public androidx.xr.scenecore.testing.FakeAnchorEntity createPersistedAnchorEntity(java.util.UUID uuid, java.time.Duration searchTimeout);
     method public androidx.xr.scenecore.testing.FakePointerCaptureComponent createPointerCaptureComponent(java.util.concurrent.Executor executor, androidx.xr.scenecore.internal.PointerCaptureComponent.StateListener stateListener, androidx.xr.scenecore.internal.InputEventListener inputListener);
     method public androidx.xr.scenecore.testing.FakeResizableComponent createResizableComponent(androidx.xr.scenecore.internal.Dimensions minimumSize, androidx.xr.scenecore.internal.Dimensions maximumSize);
+    method public androidx.xr.scenecore.internal.SpatialPointerComponent createSpatialPointerComponent();
     method public void dispose();
     method public void enablePanelDepthTest(boolean enabled);
     method public androidx.xr.scenecore.internal.ActivitySpace getActivitySpace();

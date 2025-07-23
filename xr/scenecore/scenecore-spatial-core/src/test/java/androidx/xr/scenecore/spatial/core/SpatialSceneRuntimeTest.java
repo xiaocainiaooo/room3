@@ -67,6 +67,7 @@ import androidx.xr.scenecore.internal.SoundPoolExtensionsWrapper;
 import androidx.xr.scenecore.internal.SpatialCapabilities;
 import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
+import androidx.xr.scenecore.internal.SpatialPointerComponent;
 import androidx.xr.scenecore.internal.SpatialVisibility;
 import androidx.xr.scenecore.testing.FakeScheduledExecutorService;
 
@@ -1007,5 +1008,11 @@ public class SpatialSceneRuntimeTest {
         PointerCaptureComponent pointerCaptureComponent =
                 mRuntime.createPointerCaptureComponent(null, (inputEvent) -> {}, (state) -> {});
         assertThat(pointerCaptureComponent).isNotNull();
+    }
+
+    @Test
+    public void createSpatialPointerComponent_returnsComponent() {
+        SpatialPointerComponent pointerComponent = mRuntime.createSpatialPointerComponent();
+        assertThat(pointerComponent).isNotNull();
     }
 }
