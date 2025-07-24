@@ -15,8 +15,10 @@
  */
 package androidx.pdf.selection
 
+import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.Context
+import android.os.Build
 import android.os.LocaleList
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
@@ -110,7 +112,7 @@ internal class TextSelectionMenuProvider(private val context: Context) :
                     leadingIcon = action.icon.loadDrawable(context),
                     onClick = { pdfView ->
                         try {
-                            action.actionIntent.send()
+                            sendPendingIntent(action.actionIntent)
                         } catch (e: PendingIntent.CanceledException) {
                             // TODO(b/431669141): Propagate Exception to Host App.
                         } finally {
@@ -122,6 +124,38 @@ internal class TextSelectionMenuProvider(private val context: Context) :
             )
         }
         smartMenuItems
+    }
+
+    @Suppress("DEPRECATION")
+    private fun sendIntentAllowBackgroundActivityStart(pendingIntent: PendingIntent) {
+        if (Build.VERSION.SDK_INT >= 36) {
+            // For API 36+, MODE_BACKGROUND_ACTIVITY_START_ALLOWED is deprecated.
+            // Use MODE_BACKGROUND_ACTIVITY_START_ALLOW_ALWAYS to grant background start privileges.
+            pendingIntent.send(
+                ActivityOptions.makeBasic()
+                    .setPendingIntentBackgroundActivityStartMode(
+                        ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOW_ALWAYS
+                    )
+                    .toBundle()
+            )
+        } else if (Build.VERSION.SDK_INT >= 34) {
+            // For API 34 & 35, use MODE_BACKGROUND_ACTIVITY_START_ALLOWED.
+            pendingIntent.send(
+                ActivityOptions.makeBasic()
+                    .setPendingIntentBackgroundActivityStartMode(
+                        ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+                    )
+                    .toBundle()
+            )
+        }
+    }
+
+    private fun sendPendingIntent(pendingIntent: PendingIntent) {
+        if (Build.VERSION.SDK_INT >= 34) {
+            sendIntentAllowBackgroundActivityStart(pendingIntent)
+        } else {
+            pendingIntent.send()
+        }
     }
 
     private companion object {

@@ -36,13 +36,14 @@ internal class SelectionMenuManager(private val context: Context) {
     /**
      * Caches the most recent [TextSelection] and its generated [ContextMenuComponent] list.
      *
-     * This optimization prevents redundant computations for identical text selections,
-     * especially during frequent UI updates like zooming, scrolling, or orientation changes.
+     * This optimization prevents redundant computations for identical text selections, especially
+     * during frequent UI updates like zooming, scrolling, or orientation changes.
      */
     private data class SelectionCache(
         val textSelection: TextSelection,
         val menuItems: List<ContextMenuComponent>,
     )
+
     private var cachedSelection: SelectionCache? = null
     private val textSelectionMenuProvider = TextSelectionMenuProvider(context)
 
