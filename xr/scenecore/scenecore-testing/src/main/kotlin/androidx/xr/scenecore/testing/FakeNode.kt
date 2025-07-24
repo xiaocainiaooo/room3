@@ -16,23 +16,14 @@
 
 package androidx.xr.scenecore.testing
 
-import androidx.xr.scenecore.internal.Dimensions
-import com.google.common.truth.Truth.assertThat
-import org.junit.Test
+import androidx.annotation.RestrictTo
+import androidx.xr.runtime.NodeHolder
 
-class FakeSubspaceNodeEntityTest {
-    private lateinit var underTest: FakeSubspaceNodeEntity
+/** Test-only interface for XrExtensions Node. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface FakeNode
 
-    @Test
-    fun constructor_returnInitialValues() {
-        // Arrange
-        val expectedSize = Dimensions(3f, 2f, 1f)
-
-        // Act
-        underTest = FakeSubspaceNodeEntity(size = expectedSize)
-
-        // Assert
-        // Default size of FakeSubspaceNodeEntity is (2f, 1f, 0f)
-        assertThat(underTest.size).isEqualTo(expectedSize)
-    }
+/** Test-only interface for Impress SubspaceNode. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+public interface FakeSubspaceNode {
+    public val nodeHolder: NodeHolder<*>
 }

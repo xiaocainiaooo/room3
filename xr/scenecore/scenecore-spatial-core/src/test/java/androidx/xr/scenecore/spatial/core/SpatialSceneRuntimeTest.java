@@ -34,6 +34,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import androidx.xr.runtime.NodeHolder;
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.runtime.math.Vector3;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
@@ -69,7 +70,10 @@ import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
 import androidx.xr.scenecore.internal.SpatialPointerComponent;
 import androidx.xr.scenecore.internal.SpatialVisibility;
+import androidx.xr.scenecore.internal.SubspaceNodeEntity;
+import androidx.xr.scenecore.internal.SubspaceNodeFeature;
 import androidx.xr.scenecore.testing.FakeScheduledExecutorService;
+import androidx.xr.scenecore.testing.FakeSubspaceNodeFeature;
 
 import com.android.extensions.xr.ShadowXrExtensions;
 import com.android.extensions.xr.XrExtensions;
@@ -466,6 +470,22 @@ public class SpatialSceneRuntimeTest {
 
     private Node getNode(Entity entity) {
         return ((AndroidXrEntity) entity).getNode();
+    }
+
+    @Test
+    public void createSubspaceNodeEntity_returnSubspaceNodeEntity() {
+        Dimensions size = new Dimensions(1.0f, 2.0f, 3.0f);
+        NodeHolder<?> nodeHolder = new NodeHolder<>(mXrExtensions.createNode(), Node.class);
+        SubspaceNodeFeature mockSubspaceNodeFeature = mock(SubspaceNodeFeature.class);
+        SubspaceNodeFeature fakeSubspaceNodeFeature =
+                FakeSubspaceNodeFeature.Companion.createWithMockFeature(
+                        mockSubspaceNodeFeature, nodeHolder, size);
+
+        SubspaceNodeEntity entity = mRuntime.createSubspaceNodeEntity(fakeSubspaceNodeFeature);
+
+        assertThat(entity).isNotNull();
+        verify(mockSubspaceNodeFeature).setSize(size);
+        assertThat(entity.getSize()).isEqualTo(size);
     }
 
     private Entity createGroupEntity() {

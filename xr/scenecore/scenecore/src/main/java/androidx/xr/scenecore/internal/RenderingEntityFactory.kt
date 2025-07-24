@@ -37,4 +37,7 @@ public interface RenderingEntityFactory {
      * GltfEntity in the scene.
      */
     public fun createGltfEntity(feature: GltfFeature, pose: Pose, parentEntity: Entity): GltfEntity
+
+    /** A factory function to create a SubspaceNodeEntity. */
+    public fun createSubspaceNodeEntity(feature: SubspaceNodeFeature): SubspaceNodeEntity
 }

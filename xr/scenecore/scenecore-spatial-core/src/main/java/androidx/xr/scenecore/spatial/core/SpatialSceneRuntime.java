@@ -64,6 +64,8 @@ import androidx.xr.scenecore.internal.SpatialEnvironment;
 import androidx.xr.scenecore.internal.SpatialModeChangeListener;
 import androidx.xr.scenecore.internal.SpatialPointerComponent;
 import androidx.xr.scenecore.internal.SpatialVisibility;
+import androidx.xr.scenecore.internal.SubspaceNodeEntity;
+import androidx.xr.scenecore.internal.SubspaceNodeFeature;
 
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
@@ -546,6 +548,18 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
                         mActivity, feature, parentEntity, mExtensions, mEntityManager, mExecutor);
         entity.setPose(pose, Space.PARENT);
         return entity;
+    }
+
+    @Override
+    @NonNull
+    public SubspaceNodeEntity createSubspaceNodeEntity(
+            @NonNull SubspaceNodeFeature feature) {
+        return new SubspaceNodeEntityImpl(
+                mActivity,
+                feature,
+                mExtensions,
+                mEntityManager,
+                mExecutor);
     }
 
     @Override
