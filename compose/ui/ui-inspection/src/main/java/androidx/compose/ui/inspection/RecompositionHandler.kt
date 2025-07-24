@@ -19,30 +19,21 @@ package androidx.compose.ui.inspection
 import android.util.Log
 import androidx.annotation.GuardedBy
 import androidx.compose.runtime.Composer
+import androidx.compose.ui.inspection.util.AnchorMap
 import androidx.inspection.ArtTooling
 
 private const val START_RESTART_GROUP = "startRestartGroup(I)Landroidx/compose/runtime/Composer;"
 private const val SKIP_TO_GROUP_END = "skipToGroupEnd()V"
 
 /** Detection of recompose counts and skips from installing runtime hooks. */
-class RecompositionHandler(private val artTooling: ArtTooling) {
-
+class RecompositionHandler(private val artTooling: ArtTooling, private val anchorMap: AnchorMap) {
     /** For each composable store the recomposition [count] and [skips]. */
     class Data(var count: Int, var skips: Int)
-
-    /**
-     * Key of a Composable method.
-     *
-     * The [key] identified the runtime method and the [anchorId] identified a specific compose
-     * node.
-     */
-    private data class MethodKey(val key: Int, val anchorId: Int)
 
     private val lock = Any()
     @GuardedBy("lock") private var currentlyCollecting = false
     @GuardedBy("lock") private var hooksInstalled = false
-    @GuardedBy("lock") private val counts = mutableMapOf<MethodKey, Data>()
-    @GuardedBy("lock") private var lastMethodKey: Int = 0
+    @GuardedBy("lock") private val counts = mutableMapOf<Any, Data>()
 
     fun changeCollectionMode(startCollecting: Boolean, keepCounts: Boolean) {
         synchronized(lock) {
@@ -58,9 +49,9 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
         }
     }
 
-    fun getCounts(key: Int, anchorId: Int): Data? {
+    fun getCounts(anchorId: Int): Data? {
         synchronized(lock) {
-            return counts[MethodKey(key, anchorId)]
+            return anchorMap[anchorId]?.let { counts[it] }
         }
     }
 
@@ -83,36 +74,30 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
     }
 
     /**
-     * We install 3 hooks:
-     * - entry hook for ComposerImpl.startRestartGroup gives us the [MethodKey.key]
-     * - exit hook for ComposerImpl.startRestartGroup gives us the [MethodKey.anchorId]
+     * We install 2 hooks:
+     * - exit hook for ComposerImpl.startRestartGroup gives us the anchor of the composable
      * - entry hook for ComposerImpl.skipToGroupEnd converts a recompose count to a skip count.
      */
     private fun installHooks() {
         composerImplementationClasses().forEach { composerImpl ->
-            artTooling.registerEntryHook(composerImpl, START_RESTART_GROUP) { _, args ->
-                synchronized(lock) { lastMethodKey = args[0] as Int }
-            }
-
             artTooling.registerExitHook(composerImpl, START_RESTART_GROUP) { composer: Composer ->
                 synchronized(lock) {
                     if (currentlyCollecting) {
-                        composer.recomposeScopeIdentity?.hashCode()?.let { anchor ->
-                            val data =
-                                counts.getOrPut(MethodKey(lastMethodKey, anchor)) { Data(0, 0) }
+                        composer.recomposeScopeIdentity?.let { anchor ->
+                            val data = counts.getOrPut(anchor) { Data(0, 0) }
                             data.count++
                         }
                     }
+                    composer
                 }
-                composer
             }
 
             artTooling.registerEntryHook(composerImpl, SKIP_TO_GROUP_END) { obj, _ ->
                 synchronized(lock) {
                     if (currentlyCollecting) {
                         val composer = obj as? Composer
-                        composer?.recomposeScopeIdentity?.hashCode()?.let { anchor ->
-                            counts[MethodKey(lastMethodKey, anchor)]?.let {
+                        composer?.recomposeScopeIdentity?.let { anchor ->
+                            counts[anchor]?.let {
                                 it.count--
                                 it.skips++
                             }
@@ -121,7 +106,6 @@ class RecompositionHandler(private val artTooling: ArtTooling) {
                 }
             }
         }
-
         hooksInstalled = true
     }
 }
