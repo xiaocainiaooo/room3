@@ -16,7 +16,6 @@ package androidx.room {
     property public final androidx.room.RoomDatabase.JournalMode journalMode;
     property public final androidx.room.RoomDatabase.MigrationContainer migrationContainer;
     property public final boolean multiInstanceInvalidation;
-    property public final android.content.Intent? multiInstanceInvalidationServiceIntent;
     property public final String? name;
     property public final androidx.room.RoomDatabase.PrepackagedDatabaseCallback? prepackagedDatabaseCallback;
     property public final kotlin.coroutines.CoroutineContext? queryCoroutineContext;
@@ -116,7 +115,7 @@ package androidx.room {
     method @Deprecated public void setTransactionSuccessful();
     property public androidx.room.InvalidationTracker invalidationTracker;
     property public boolean isOpen;
-    property @Deprecated @kotlin.jvm.Volatile protected final androidx.sqlite.db.SupportSQLiteDatabase? mDatabase;
+    property @Deprecated protected final androidx.sqlite.db.SupportSQLiteDatabase? mDatabase;
     property public androidx.sqlite.db.SupportSQLiteOpenHelper openHelper;
     property public java.util.concurrent.Executor queryExecutor;
     property public java.util.concurrent.Executor transactionExecutor;
