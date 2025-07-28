@@ -38,7 +38,11 @@ import org.junit.runners.Parameterized
 
 @LargeTest
 @RunWith(Parameterized::class)
-class PokedexScrollBenchmark(val compilationMode: CompilationMode) {
+class PokedexScrollBenchmark(
+    val compilationMode: CompilationMode,
+    val enableSharedTransitionScope: Boolean,
+    val enableSharedElementTransitions: Boolean,
+) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Test
@@ -73,6 +77,8 @@ class PokedexScrollBenchmark(val compilationMode: CompilationMode) {
 
                 val intent = Intent()
                 intent.action = action
+                intent.putExtra("enableSharedTransitionScope", enableSharedTransitionScope)
+                intent.putExtra("enableSharedElementTransitions", enableSharedElementTransitions)
                 startActivityAndWait(intent)
                 setupBlock()
             },
@@ -91,8 +97,18 @@ class PokedexScrollBenchmark(val compilationMode: CompilationMode) {
     }
 
     companion object {
-        @Parameterized.Parameters(name = "compilation={0}")
+        /**
+         * Parameters for the benchmark. Uses abbreviations because of file length limit for
+         * results. compilation = Compilation Mode eSTS = enableSharedTransitionScope eSET =
+         * enableSharedElementTransition
+         */
+        @Parameterized.Parameters(name = "compilation={0},eSTS={1},eSET={2}")
         @JvmStatic
-        fun parameters() = createCompilationParams()
+        fun parameters(): List<Array<Any>> =
+            createCompilationParams().flatMap { compilationMode ->
+                PokedexSharedElementBenchmarkConfiguration.AllConfigurations.map { configuration ->
+                    arrayOf(*compilationMode, *configuration.asBenchmarkArguments())
+                }
+            }
     }
 }
