@@ -23,8 +23,10 @@ import androidx.benchmark.macro.FrameTimingGfxInfoMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.compose.integration.hero.common.macrobenchmark.HeroMacrobenchmarkDefaults
+import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_ELEMENT_TRANSITIONS
+import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE
+import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.POKEDEX_TARGET_PACKAGE_NAME
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiObject2
@@ -72,13 +74,15 @@ class PokedexScrollBenchmark(
             iterations = HeroMacrobenchmarkDefaults.ITERATIONS,
             setupBlock = {
                 // Start out by deleting any existing data
-                val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-                targetContext.deleteDatabase("Pokedex.db")
+                resetPokedexDatabase()
 
                 val intent = Intent()
                 intent.action = action
-                intent.putExtra("enableSharedTransitionScope", enableSharedTransitionScope)
-                intent.putExtra("enableSharedElementTransitions", enableSharedElementTransitions)
+                intent.putExtra(POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE, enableSharedTransitionScope)
+                intent.putExtra(
+                    POKEDEX_ENABLE_SHARED_ELEMENT_TRANSITIONS,
+                    enableSharedElementTransitions,
+                )
                 startActivityAndWait(intent)
                 setupBlock()
             },

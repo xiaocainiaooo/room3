@@ -20,6 +20,9 @@ import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.compose.integration.hero.common.macrobenchmark.HeroMacrobenchmarkDefaults
+import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_ELEMENT_TRANSITIONS
+import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE
+import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.POKEDEX_TARGET_PACKAGE_NAME
 import androidx.test.filters.LargeTest
 import androidx.testutils.createStartupCompilationParams
 import androidx.testutils.measureStartup
@@ -45,9 +48,12 @@ class PokedexStartupBenchmark(
             packageName = POKEDEX_TARGET_PACKAGE_NAME,
             iterations = HeroMacrobenchmarkDefaults.ITERATIONS,
         ) {
+            // Start out by deleting any existing data
+            resetPokedexDatabase()
+
             this.action = action
-            this.putExtra("enableSharedTransitionScope", enableSharedTransitionScope)
-            this.putExtra("enableSharedElementTransitions", enableSharedElementTransitions)
+            this.putExtra(POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE, enableSharedTransitionScope)
+            this.putExtra(POKEDEX_ENABLE_SHARED_ELEMENT_TRANSITIONS, enableSharedElementTransitions)
         }
 
     @Test
