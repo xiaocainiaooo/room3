@@ -42,7 +42,7 @@ class PokedexScrollBenchmark(val compilationMode: CompilationMode) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Test
-    fun scrollHome() =
+    fun scrollHomeCompose() =
         benchmarkScroll(
             action = "$POKEDEX_TARGET_PACKAGE_NAME.POKEDEX_COMPOSE_ACTIVITY",
             setupBlock = {
