@@ -118,7 +118,7 @@ constructor(context: Context, @StyleRes themeResId: Int = 0) :
     @Suppress("OVERRIDE_DEPRECATION") // b/407493719
     @CallSuper
     override fun onBackPressed() {
-        onBackPressedInputHandler.sendOnCompleted()
+        onBackPressedInputHandler.handleOnCompleted()
     }
 
     override fun setContentView(layoutResID: Int) {
