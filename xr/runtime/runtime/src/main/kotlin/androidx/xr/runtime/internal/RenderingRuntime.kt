@@ -200,6 +200,15 @@ public interface RenderingRuntime {
      */
     public fun setMetallicFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
 
+    /**
+     * Sets the roughness factor for the Khronos PBR material. Controls the surface roughness,
+     * affecting the sharpness of reflections.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factor The roughness factor.
+     */
+    public fun setRoughnessFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
+
     /** Starts the renderer. */
     public fun startRenderer()
 

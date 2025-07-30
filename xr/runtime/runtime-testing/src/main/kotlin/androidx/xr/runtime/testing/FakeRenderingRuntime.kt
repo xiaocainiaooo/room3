@@ -231,6 +231,10 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.metallicFactor = factor
     }
 
+    override fun setRoughnessFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float) {
+        (material as? FakeKhronosPbrMaterial)?.roughnessFactor = factor
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
