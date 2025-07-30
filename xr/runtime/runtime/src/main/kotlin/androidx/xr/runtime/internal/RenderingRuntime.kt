@@ -18,6 +18,7 @@ package androidx.xr.runtime.internal
 
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.math.Matrix3
+import androidx.xr.runtime.math.Vector3
 import androidx.xr.runtime.math.Vector4
 import com.google.common.util.concurrent.ListenableFuture
 
@@ -299,6 +300,15 @@ public interface RenderingRuntime {
         material: MaterialResource,
         uvTransform: Matrix3,
     )
+
+    /**
+     * Sets the emissive color factors for the Khronos PBR material. Multiplies the emissive texture
+     * or defines a uniform emissive color.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factors An RGB [Vector3] where `(x, y, z)` maps to `(Red, Green, Blue)`.
+     */
+    public fun setEmissiveFactorsOnKhronosPbrMaterial(material: MaterialResource, factors: Vector3)
 
     /** Starts the renderer. */
     public fun startRenderer()
