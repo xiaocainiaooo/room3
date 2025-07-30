@@ -274,6 +274,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.ambientOcclusionFactor = factor
     }
 
+    override fun setEmissiveTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        emissive: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.emissiveTexture = emissive
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

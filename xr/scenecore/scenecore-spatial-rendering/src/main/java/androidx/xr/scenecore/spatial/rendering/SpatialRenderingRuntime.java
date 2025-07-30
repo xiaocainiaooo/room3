@@ -510,6 +510,20 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     }
 
     @Override
+    public void setEmissiveTextureOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, @NonNull TextureResource emissive) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        if (!(emissive instanceof TextureResourceImpl)) {
+            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        }
+        mImpressApi.setEmissiveTextureOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(),
+                ((TextureResourceImpl) emissive).getTextureToken());
+    }
+
+    @Override
     public void startRenderer() {
         if (mSplitEngineRenderer == null || mFrameLoopStarted) {
             return;

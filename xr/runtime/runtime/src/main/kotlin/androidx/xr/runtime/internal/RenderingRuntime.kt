@@ -277,6 +277,18 @@ public interface RenderingRuntime {
         factor: Float,
     )
 
+    /**
+     * Sets the emissive texture for the Khronos PBR material. Defines the light emitted by the
+     * material.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param emissive The handle of the emissive texture.
+     */
+    public fun setEmissiveTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        emissive: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
