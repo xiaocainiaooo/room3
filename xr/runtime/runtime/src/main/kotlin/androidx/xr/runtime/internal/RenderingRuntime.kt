@@ -179,6 +179,18 @@ public interface RenderingRuntime {
         metallicRoughness: TextureResource,
     )
 
+    /**
+     * Sets the UV transformation matrix for the metallic-roughness texture. Controls how the
+     * metallic-roughness texture is mapped onto the surface.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param uvTransform The uv coordinates of the transform stored in a matrix.
+     */
+    public fun setMetallicRoughnessUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

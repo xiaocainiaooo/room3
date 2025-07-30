@@ -220,6 +220,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.metallicRoughnessTexture = metallicRoughness
     }
 
+    override fun setMetallicRoughnessUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.metallicRoughnessUvTransform = uvTransform
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
