@@ -242,6 +242,18 @@ public interface RenderingRuntime {
      */
     public fun setNormalFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
 
+    /**
+     * Sets the ambient occlusion texture for the Khronos PBR material. Simulates the occlusion of
+     * ambient light by surface details.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param ambientOcclusion The handle of the ambient occlusion texture.
+     */
+    public fun setAmbientOcclusionTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        ambientOcclusion: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
