@@ -267,6 +267,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.ambientOcclusionUvTransform = uvTransform
     }
 
+    override fun setAmbientOcclusionFactorOnKhronosPbrMaterial(
+        material: MaterialResource,
+        factor: Float,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.ambientOcclusionFactor = factor
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

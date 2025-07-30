@@ -266,6 +266,17 @@ public interface RenderingRuntime {
         uvTransform: Matrix3,
     )
 
+    /**
+     * Sets the factor of the ambient occlusion effect.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factor The factor of the ambient occlusion.
+     */
+    public fun setAmbientOcclusionFactorOnKhronosPbrMaterial(
+        material: MaterialResource,
+        factor: Float,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
