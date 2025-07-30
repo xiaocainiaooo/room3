@@ -233,6 +233,15 @@ public interface RenderingRuntime {
         uvTransform: Matrix3,
     )
 
+    /**
+     * Sets the factor of the normal map effect. Controls the strength of the normal map's
+     * influence.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factor The factor of the normal map.
+     */
+    public fun setNormalFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
+
     /** Starts the renderer. */
     public fun startRenderer()
 

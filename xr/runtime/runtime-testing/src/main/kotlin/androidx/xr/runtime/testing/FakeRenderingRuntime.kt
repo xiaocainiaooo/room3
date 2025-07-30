@@ -249,6 +249,10 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.normalUvTransform = uvTransform
     }
 
+    override fun setNormalFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float) {
+        (material as? FakeKhronosPbrMaterial)?.normalFactor = factor
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
