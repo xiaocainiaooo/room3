@@ -235,6 +235,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.roughnessFactor = factor
     }
 
+    override fun setNormalTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        normal: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.normalTexture = normal
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

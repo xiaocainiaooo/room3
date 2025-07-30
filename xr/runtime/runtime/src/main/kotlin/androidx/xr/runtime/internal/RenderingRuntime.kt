@@ -209,6 +209,18 @@ public interface RenderingRuntime {
      */
     public fun setRoughnessFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
 
+    /**
+     * Sets the normal map texture for the Khronos PBR material. This texture perturbs the surface
+     * normals, creating detailed surface features.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param normal The handle of the normal map texture.
+     */
+    public fun setNormalTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        normal: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
