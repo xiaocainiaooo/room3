@@ -58,9 +58,6 @@ ApkCopyHelperKt.setupAppApkCopy(project, "release")
 
 android {
     compileSdk = 35
-    defaultConfig {
-        minSdk = 23
-    }
     lint {
         disable.add("UnusedResources")
     }

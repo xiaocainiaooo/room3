@@ -16,10 +16,6 @@ plugins {
 android {
     namespace = "androidx.webkit.instrumentation"
     compileSdk = 35
-    defaultConfig {
-        minSdk = 23
-    }
-
     flavorDimensions = ["targetSdk"]
 
     productFlavors {
