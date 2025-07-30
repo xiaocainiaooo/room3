@@ -221,6 +221,18 @@ public interface RenderingRuntime {
         normal: TextureResource,
     )
 
+    /**
+     * Sets the UV transformation matrix for the normal map texture. Adjusts the mapping of the
+     * normal map texture.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param uvTransform The uv coordinates of the transform stored in a matrix.
+     */
+    public fun setNormalUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

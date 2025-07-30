@@ -242,6 +242,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.normalTexture = normal
     }
 
+    override fun setNormalUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.normalUvTransform = uvTransform
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
