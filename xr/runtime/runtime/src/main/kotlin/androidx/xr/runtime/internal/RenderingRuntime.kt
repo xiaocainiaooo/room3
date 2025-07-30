@@ -289,6 +289,17 @@ public interface RenderingRuntime {
         emissive: TextureResource,
     )
 
+    /**
+     * Sets the UV transformation matrix for the emissive texture.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param uvTransform The uv coordinates of the transform stored in a matrix.
+     */
+    public fun setEmissiveUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

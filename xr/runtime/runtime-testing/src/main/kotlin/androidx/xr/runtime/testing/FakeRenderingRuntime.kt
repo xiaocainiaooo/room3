@@ -281,6 +281,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.emissiveTexture = emissive
     }
 
+    override fun setEmissiveUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.emissiveUvTransform = uvTransform
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
