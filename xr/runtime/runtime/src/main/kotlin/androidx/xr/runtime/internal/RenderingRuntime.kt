@@ -132,6 +132,18 @@ public interface RenderingRuntime {
      */
     public fun destroyKhronosPbrMaterial(material: MaterialResource)
 
+    /**
+     * Sets the base color texture for the Khronos PBR material. This texture defines the albedo or
+     * diffuse color of the material.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param baseColor The handle of the base color texture.
+     */
+    public fun setBaseColorTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        baseColor: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

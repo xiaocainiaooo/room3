@@ -318,6 +318,20 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     }
 
     @Override
+    public void setBaseColorTextureOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, @NonNull TextureResource baseColor) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        if (!(baseColor instanceof TextureResourceImpl)) {
+            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        }
+        mImpressApi.setBaseColorTextureOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(),
+                ((TextureResourceImpl) baseColor).getTextureToken());
+    }
+
+    @Override
     public void startRenderer() {
         if (mSplitEngineRenderer == null || mFrameLoopStarted) {
             return;
