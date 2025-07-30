@@ -26,6 +26,7 @@ import androidx.xr.runtime.internal.MaterialResource;
 import androidx.xr.runtime.internal.RenderingRuntime;
 import androidx.xr.runtime.internal.SceneRuntime;
 import androidx.xr.runtime.internal.TextureResource;
+import androidx.xr.runtime.math.Matrix3;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.impress.ImpressApi;
 import androidx.xr.scenecore.impl.impress.ImpressApiImpl;
@@ -329,6 +330,26 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         mImpressApi.setBaseColorTextureOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(),
                 ((TextureResourceImpl) baseColor).getTextureToken());
+    }
+
+    @Override
+    public void setBaseColorUvTransformOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, @NonNull Matrix3 uvTransform) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        float[] data = uvTransform.getData();
+        mImpressApi.setBaseColorUvTransformOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(),
+                data[0],
+                data[1],
+                data[2],
+                data[3],
+                data[4],
+                data[5],
+                data[6],
+                data[7],
+                data[8]);
     }
 
     @Override
