@@ -58,6 +58,9 @@ ApkCopyHelperKt.setupAppApkCopy(project, "release")
 
 android {
     compileSdk = 35
+    defaultConfig {
+        minSdk = 23
+    }
     lint {
         disable.add("UnusedResources")
     }
@@ -67,7 +70,6 @@ android {
         }
     }
     namespace = "com.example.androidx.webkit"
-    compileSdk = 35
 }
 
 androidx {
