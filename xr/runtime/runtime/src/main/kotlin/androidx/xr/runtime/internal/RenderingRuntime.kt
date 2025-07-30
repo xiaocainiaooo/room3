@@ -254,6 +254,18 @@ public interface RenderingRuntime {
         ambientOcclusion: TextureResource,
     )
 
+    /**
+     * Sets the UV transformation matrix for the ambient occlusion texture. Controls the mapping of
+     * the ambient occlusion texture.
+     *
+     * @param material The native handle of the Khronos PBR material.
+     * @param uvTransform The uv coordinates of the transform stored in a matrix.
+     */
+    public fun setAmbientOcclusionUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
