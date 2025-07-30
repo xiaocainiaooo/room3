@@ -167,6 +167,18 @@ public interface RenderingRuntime {
      */
     public fun setBaseColorFactorsOnKhronosPbrMaterial(material: MaterialResource, factors: Vector4)
 
+    /**
+     * Sets the metallic-roughness texture for the Khronos PBR material. This texture defines the
+     * metallic and roughness properties of the material.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param metallicRoughness The handle of the metallic-roughness texture.
+     */
+    public fun setMetallicRoughnessTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        metallicRoughness: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

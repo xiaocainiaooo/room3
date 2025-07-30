@@ -213,6 +213,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.baseColorFactors = factors
     }
 
+    override fun setMetallicRoughnessTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        metallicRoughness: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.metallicRoughnessTexture = metallicRoughness
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
