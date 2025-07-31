@@ -309,6 +309,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.clearcoatNormalTexture = clearcoatNormal
     }
 
+    override fun setClearcoatRoughnessTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        clearcoatRoughness: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.clearcoatRoughnessTexture = clearcoatRoughness
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

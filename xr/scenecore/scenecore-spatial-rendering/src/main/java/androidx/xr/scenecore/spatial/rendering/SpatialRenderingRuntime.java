@@ -586,6 +586,20 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     }
 
     @Override
+    public void setClearcoatRoughnessTextureOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, @NonNull TextureResource clearcoatRoughness) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        if (!(clearcoatRoughness instanceof TextureResourceImpl)) {
+            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        }
+        mImpressApi.setClearcoatRoughnessTextureOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(),
+                ((TextureResourceImpl) clearcoatRoughness).getTextureToken());
+    }
+
+    @Override
     public void startRenderer() {
         if (mSplitEngineRenderer == null || mFrameLoopStarted) {
             return;

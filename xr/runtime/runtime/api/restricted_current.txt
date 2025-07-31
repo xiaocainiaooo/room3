@@ -1435,6 +1435,7 @@ package androidx.xr.runtime.internal {
     method public void setBaseColorTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource baseColor);
     method public void setBaseColorUvTransformOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.math.Matrix3 uvTransform);
     method public void setClearcoatNormalTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource clearcoatNormal);
+    method public void setClearcoatRoughnessTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource clearcoatRoughness);
     method public void setClearcoatTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource clearcoat);
     method public void setEmissiveFactorsOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.math.Vector3 factors);
     method public void setEmissiveTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource emissive);

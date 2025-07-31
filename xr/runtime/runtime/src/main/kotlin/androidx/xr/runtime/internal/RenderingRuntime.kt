@@ -334,6 +334,18 @@ public interface RenderingRuntime {
         clearcoatNormal: TextureResource,
     )
 
+    /**
+     * Sets the clearcoat roughness texture for the Khronos PBR material. Controls the roughness of
+     * the clearcoat layer.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param clearcoatRoughness The handle of the clearcoat roughness texture.
+     */
+    public fun setClearcoatRoughnessTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        clearcoatRoughness: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
