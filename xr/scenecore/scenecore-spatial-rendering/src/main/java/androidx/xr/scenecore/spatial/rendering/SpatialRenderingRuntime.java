@@ -703,6 +703,15 @@ class SpatialRenderingRuntime implements RenderingRuntime {
                 ((MaterialResourceImpl) material).getMaterialToken(), factor);
     }
 
+    @Override
+    public void setIndexOfRefractionOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, float indexOfRefraction) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        mImpressApi.setIndexOfRefractionOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(), indexOfRefraction);
+    }
 
     @Override
     public void startRenderer() {

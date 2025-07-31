@@ -442,6 +442,18 @@ public interface RenderingRuntime {
      */
     public fun setTransmissionFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
 
+    /**
+     * Sets the index of refraction for the Khronos PBR material. Defines how much light bends when
+     * entering the material.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param indexOfRefraction The index of refraction.
+     */
+    public fun setIndexOfRefractionOnKhronosPbrMaterial(
+        material: MaterialResource,
+        indexOfRefraction: Float,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

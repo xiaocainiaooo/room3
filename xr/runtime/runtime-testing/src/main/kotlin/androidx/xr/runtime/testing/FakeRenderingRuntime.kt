@@ -376,6 +376,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.transmissionFactor = factor
     }
 
+    override fun setIndexOfRefractionOnKhronosPbrMaterial(
+        material: MaterialResource,
+        indexOfRefraction: Float,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.indexOfRefraction = indexOfRefraction
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
