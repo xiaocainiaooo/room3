@@ -362,6 +362,18 @@ public interface RenderingRuntime {
         normal: Float,
     )
 
+    /**
+     * Sets the sheen color texture for the Khronos PBR material. Defines the color of the sheen
+     * effect, visible at grazing angles.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param sheenColor The handle of the sheen color texture.
+     */
+    public fun setSheenColorTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        sheenColor: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

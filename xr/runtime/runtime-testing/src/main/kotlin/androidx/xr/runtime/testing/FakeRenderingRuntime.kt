@@ -327,6 +327,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.clearcoatNormalFactor = normal
     }
 
+    override fun setSheenColorTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        sheenColor: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.sheenColorTexture = sheenColor
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
