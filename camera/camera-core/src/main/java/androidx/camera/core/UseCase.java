@@ -94,6 +94,8 @@ import java.util.Set;
 public abstract class UseCase {
     private static final String TAG = "UseCase";
 
+    private boolean mInSession = false;
+
     ////////////////////////////////////////////////////////////////////////////////////////////
     // [UseCase lifetime constant] - Stays constant for the lifetime of the UseCase. Which means
     // they could be created in the constructor.
@@ -943,6 +945,7 @@ public abstract class UseCase {
     @CallSuper
     @MainThread
     public void onSessionStart() {
+        mInSession = true;
     }
 
     /**
@@ -956,6 +959,20 @@ public abstract class UseCase {
     @RestrictTo(Scope.LIBRARY_GROUP)
     @MainThread
     public void onSessionStop() {
+        mInSession = false;
+    }
+
+    /**
+     * Returns whether the use case is currently in an active session.
+     *
+     * <p>The use case is considered to be in a session if {@link #onSessionStart()} has been
+     * called, but {@link #onSessionStop()} has not yet been called.
+     *
+     * @return {@code true} if the use case is in a session, {@code false} otherwise.
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    public boolean isInSession() {
+        return mInSession;
     }
 
     /**

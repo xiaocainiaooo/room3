@@ -1586,7 +1586,7 @@ public final class ImageCapture extends UseCase {
         }
         Log.d(TAG, "takePictureInternal");
         CameraInternal camera = getCamera();
-        if (camera == null) {
+        if (camera == null || !isInSession()) {
             sendInvalidCameraError(executor, inMemoryCallback, onDiskCallback);
             return;
         }

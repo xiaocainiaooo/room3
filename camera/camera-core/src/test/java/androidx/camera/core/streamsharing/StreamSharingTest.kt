@@ -366,6 +366,7 @@ class StreamSharingTest {
                 useCaseConfigFactory,
             )
         streamSharing.bindToCamera(camera, null, null, defaultConfig)
+        streamSharing.onSessionStart()
         streamSharing.onSuggestedStreamSpecUpdated(StreamSpec.builder(size).build(), null)
         imageCapture.targetRotation = Surface.ROTATION_90
 
