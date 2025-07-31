@@ -362,6 +362,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.transmissionTexture = transmission
     }
 
+    override fun setTransmissionUvTransformOnKhronosPbrMaterial(
+        material: MaterialResource,
+        uvTransform: Matrix3,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.transmissionUvTransform = uvTransform
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
