@@ -398,6 +398,18 @@ public interface RenderingRuntime {
         sheenRoughness: TextureResource,
     )
 
+    /**
+     * Sets the sheen roughness factor for the Khronos PBR material. Controls the roughness of the
+     * sheen effect.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factor The sheen roughness factor.
+     */
+    public fun setSheenRoughnessFactorOnKhronosPbrMaterial(
+        material: MaterialResource,
+        factor: Float,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

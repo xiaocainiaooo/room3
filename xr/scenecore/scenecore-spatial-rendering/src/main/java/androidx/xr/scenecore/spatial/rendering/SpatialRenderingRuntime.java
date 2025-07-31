@@ -649,6 +649,16 @@ class SpatialRenderingRuntime implements RenderingRuntime {
                 ((TextureResourceImpl) sheenRoughness).getTextureToken());
     }
 
+    @Override
+    public void setSheenRoughnessFactorOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, float factor) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        mImpressApi.setSheenRoughnessFactorOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(), factor);
+    }
+
 
     @Override
     public void startRenderer() {
