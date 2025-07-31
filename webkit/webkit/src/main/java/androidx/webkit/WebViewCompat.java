@@ -402,7 +402,8 @@ public class WebViewCompat {
      * Return the PackageInfo of the currently loaded WebView APK. This method uses reflection and
      * propagates any exceptions thrown, to the caller.
      */
-    @SuppressLint("PrivateApi")
+    // Reflection has been approved by the Jetpack working group.
+    @SuppressLint({"PrivateApi", "BanUncheckedReflection"})
     private static PackageInfo getLoadedWebViewPackageInfo()
             throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
