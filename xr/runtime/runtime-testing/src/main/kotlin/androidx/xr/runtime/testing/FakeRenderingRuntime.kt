@@ -295,6 +295,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.emissiveFactors = factors
     }
 
+    override fun setClearcoatTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        clearcoat: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.clearcoatTexture = clearcoat
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

@@ -310,6 +310,18 @@ public interface RenderingRuntime {
      */
     public fun setEmissiveFactorsOnKhronosPbrMaterial(material: MaterialResource, factors: Vector3)
 
+    /**
+     * Sets the clearcoat texture for the Khronos PBR material. Adds a clearcoat layer to the
+     * material, affecting reflections.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param clearcoat The handle of the clearcoat texture.
+     */
+    public fun setClearcoatTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        clearcoat: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
