@@ -624,6 +624,19 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     }
 
     @Override
+    public void setSheenColorFactorsOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, @NonNull Vector3 factors) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        mImpressApi.setSheenColorFactorsOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(),
+                factors.getX(),
+                factors.getY(),
+                factors.getZ());
+    }
+
+    @Override
     public void startRenderer() {
         if (mSplitEngineRenderer == null || mFrameLoopStarted) {
             return;

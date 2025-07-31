@@ -374,6 +374,18 @@ public interface RenderingRuntime {
         sheenColor: TextureResource,
     )
 
+    /**
+     * Sets the sheen color factors for the Khronos PBR material. Multiplies the sheen color texture
+     * or defines a uniform sheen color.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factors The sheen colors on the Khronos PBR material.
+     */
+    public fun setSheenColorFactorsOnKhronosPbrMaterial(
+        material: MaterialResource,
+        factors: Vector3,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

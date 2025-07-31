@@ -334,6 +334,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.sheenColorTexture = sheenColor
     }
 
+    override fun setSheenColorFactorsOnKhronosPbrMaterial(
+        material: MaterialResource,
+        factors: Vector3,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.sheenColorFactors = factors
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
