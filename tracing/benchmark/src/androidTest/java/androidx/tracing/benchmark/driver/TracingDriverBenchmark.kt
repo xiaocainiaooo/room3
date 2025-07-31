@@ -41,7 +41,10 @@ import org.junit.runner.RunWith
 class TracingDriverBenchmark {
     @get:Rule val benchmarkRule = BenchmarkRule()
 
-    private fun buildTraceContext(sink: TraceSink, isEnabled: Boolean): TraceContext {
+    private fun buildTraceContext(
+        sink: TraceSink,
+        @Suppress("SameParameterValue") isEnabled: Boolean,
+    ): TraceContext {
         return TraceContext(sink = sink, isEnabled = isEnabled)
     }
 
