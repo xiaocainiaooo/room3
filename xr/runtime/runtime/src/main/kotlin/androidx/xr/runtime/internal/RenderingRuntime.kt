@@ -454,6 +454,15 @@ public interface RenderingRuntime {
         indexOfRefraction: Float,
     )
 
+    /**
+     * Sets the alpha cutoff for the Khronos PBR material. Defines the threshold for transparency,
+     * used for cutout effects.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param alphaCutoff The alpha cutoff value.
+     */
+    public fun setAlphaCutoffOnKhronosPbrMaterial(material: MaterialResource, alphaCutoff: Float)
+
     /** Starts the renderer. */
     public fun startRenderer()
 

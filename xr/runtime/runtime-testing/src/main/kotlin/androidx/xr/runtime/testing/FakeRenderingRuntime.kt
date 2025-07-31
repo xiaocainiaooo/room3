@@ -383,6 +383,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.indexOfRefraction = indexOfRefraction
     }
 
+    override fun setAlphaCutoffOnKhronosPbrMaterial(
+        material: MaterialResource,
+        alphaCutoff: Float,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.alphaCutoff = alphaCutoff
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

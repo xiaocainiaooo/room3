@@ -714,6 +714,16 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     }
 
     @Override
+    public void setAlphaCutoffOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, float alphaCutoff) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        mImpressApi.setAlphaCutoffOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(), alphaCutoff);
+    }
+
+    @Override
     public void startRenderer() {
         if (mSplitEngineRenderer == null || mFrameLoopStarted) {
             return;
