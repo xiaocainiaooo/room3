@@ -611,6 +611,7 @@ package androidx.xr.runtime.testing {
     method public void setSheenColorTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource sheenColor);
     method public void setSheenRoughnessFactorOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, float factor);
     method public void setSheenRoughnessTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource sheenRoughness);
+    method public void setTransmissionTextureOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource transmission);
     method public void startRenderer();
     method public void stopRenderer();
     property public java.util.List<androidx.xr.runtime.testing.FakeRenderingRuntime.FakeKhronosPbrMaterial> createdKhronosPbrMaterials;

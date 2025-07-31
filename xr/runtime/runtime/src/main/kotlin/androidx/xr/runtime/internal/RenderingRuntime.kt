@@ -410,6 +410,18 @@ public interface RenderingRuntime {
         factor: Float,
     )
 
+    /**
+     * Sets the transmission texture for the Khronos PBR material. Defines the transmission of light
+     * through the material.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param transmission The handle of the transmission texture.
+     */
+    public fun setTransmissionTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        transmission: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

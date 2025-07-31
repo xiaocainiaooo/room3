@@ -659,6 +659,19 @@ class SpatialRenderingRuntime implements RenderingRuntime {
                 ((MaterialResourceImpl) material).getMaterialToken(), factor);
     }
 
+    @Override
+    public void setTransmissionTextureOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, @NonNull TextureResource transmission) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        if (!(transmission instanceof TextureResourceImpl)) {
+            throw new IllegalArgumentException("TextureResource is not a TextureResourceImpl");
+        }
+        mImpressApi.setTransmissionTextureOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(),
+                ((TextureResourceImpl) transmission).getTextureToken());
+    }
 
     @Override
     public void startRenderer() {

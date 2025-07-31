@@ -355,6 +355,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.sheenRoughnessFactor = factor
     }
 
+    override fun setTransmissionTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        transmission: TextureResource,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.transmissionTexture = transmission
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
