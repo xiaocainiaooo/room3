@@ -322,6 +322,18 @@ public interface RenderingRuntime {
         clearcoat: TextureResource,
     )
 
+    /**
+     * Sets the clearcoat normal texture for the Khronos PBR material. Perturbs the normals of the
+     * clearcoat layer.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param clearcoatNormal The handle of the clearcoat normal texture.
+     */
+    public fun setClearcoatNormalTextureOnKhronosPbrMaterial(
+        material: MaterialResource,
+        clearcoatNormal: TextureResource,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 
