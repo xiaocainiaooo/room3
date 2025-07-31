@@ -369,6 +369,13 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.transmissionUvTransform = uvTransform
     }
 
+    override fun setTransmissionFactorOnKhronosPbrMaterial(
+        material: MaterialResource,
+        factor: Float,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.transmissionFactor = factor
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}

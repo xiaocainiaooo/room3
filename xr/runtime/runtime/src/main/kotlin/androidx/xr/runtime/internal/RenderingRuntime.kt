@@ -433,6 +433,15 @@ public interface RenderingRuntime {
         uvTransform: Matrix3,
     )
 
+    /**
+     * Sets the transmission factor for the Khronos PBR material. Controls the amount of light
+     * transmitted through the material.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param factor The transmission factor.
+     */
+    public fun setTransmissionFactorOnKhronosPbrMaterial(material: MaterialResource, factor: Float)
+
     /** Starts the renderer. */
     public fun startRenderer()
 
