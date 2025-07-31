@@ -600,6 +600,16 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     }
 
     @Override
+    public void setClearcoatFactorsOnKhronosPbrMaterial(
+            @NonNull MaterialResource material, float intensity, float roughness, float normal) {
+        if (!(material instanceof MaterialResourceImpl)) {
+            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        }
+        mImpressApi.setClearcoatFactorsOnKhronosPbrMaterial(
+                ((MaterialResourceImpl) material).getMaterialToken(), intensity, roughness, normal);
+    }
+
+    @Override
     public void startRenderer() {
         if (mSplitEngineRenderer == null || mFrameLoopStarted) {
             return;

@@ -346,6 +346,22 @@ public interface RenderingRuntime {
         clearcoatRoughness: TextureResource,
     )
 
+    /**
+     * Sets the clearcoat factor for the Khronos PBR material. Multiplies the clearcoat texture or
+     * defines a uniform clearcoat color.
+     *
+     * @param material The handle of the Khronos PBR material.
+     * @param intensity The intensity of the clearcoat.
+     * @param roughness The roughness of the clearcoat.
+     * @param normal The normal of the clearcoat.
+     */
+    public fun setClearcoatFactorsOnKhronosPbrMaterial(
+        material: MaterialResource,
+        intensity: Float,
+        roughness: Float,
+        normal: Float,
+    )
+
     /** Starts the renderer. */
     public fun startRenderer()
 

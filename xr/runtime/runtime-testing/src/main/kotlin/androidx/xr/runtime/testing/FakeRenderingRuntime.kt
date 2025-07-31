@@ -316,6 +316,17 @@ public class FakeRenderingRuntime(
         (material as? FakeKhronosPbrMaterial)?.clearcoatRoughnessTexture = clearcoatRoughness
     }
 
+    override fun setClearcoatFactorsOnKhronosPbrMaterial(
+        material: MaterialResource,
+        intensity: Float,
+        roughness: Float,
+        normal: Float,
+    ) {
+        (material as? FakeKhronosPbrMaterial)?.clearcoatIntensity = intensity
+        (material as? FakeKhronosPbrMaterial)?.clearcoatRoughness = roughness
+        (material as? FakeKhronosPbrMaterial)?.clearcoatNormalFactor = normal
+    }
+
     override fun startRenderer() {}
 
     override fun stopRenderer() {}
