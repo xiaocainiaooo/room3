@@ -1187,9 +1187,9 @@ public final class ImageCapture extends UseCase {
      * {@inheritDoc}
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
-    @UiThread
     @Override
-    public void onStateDetached() {
+    @MainThread
+    public void onSessionStop() {
         abortImageCaptureRequests();
     }
 

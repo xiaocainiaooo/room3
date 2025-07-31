@@ -169,7 +169,7 @@ class FocusMeteringControlTest {
         // CoroutineScope#cancel can throw exception if the scope has no job left
         try {
             for (useCase in runningUseCases) {
-                useCase.onStateDetached()
+                useCase.onSessionStop()
                 useCase.onUnbind()
             }
             // fakeUseCaseThreads may still be using Main dispatcher which sometimes

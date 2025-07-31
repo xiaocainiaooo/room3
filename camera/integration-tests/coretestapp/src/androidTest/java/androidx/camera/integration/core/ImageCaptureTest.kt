@@ -1027,18 +1027,18 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
     }
 
     @Test
-    fun onStateOffline_abortAllCaptureRequests() = runBlocking {
+    fun onSessionStop_abortAllCaptureRequests() = runBlocking {
         val imageCapture = ImageCapture.Builder().build()
         withContext(Dispatchers.Main) {
             cameraProvider.bindToLifecycle(fakeLifecycleOwner, BACK_SELECTOR, imageCapture)
         }
 
         // After the use case can be reused, the capture requests can only be cancelled after the
-        // onStateAttached() callback has been received. In the normal code flow, the
-        // onStateDetached() should also come after onStateAttached(). There is no API to
-        // directly know  onStateAttached() callback has been received. Therefore, taking a
+        // onSessionStart() callback has been received. In the normal code flow, the
+        // onSessionStop() should also come after onSessionStart(). There is no API to
+        // directly know  onSessionStart() callback has been received. Therefore, taking a
         // picture and waiting for the capture success callback to know the use case's
-        // onStateAttached() callback has been received.
+        // onSessionStart() callback has been received.
         val callback = FakeOnImageCapturedCallback(captureCount = 1)
         imageCapture.takePicture(mainExecutor, callback)
 
@@ -1050,7 +1050,7 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
         imageCapture.takePicture(mainExecutor, callback2)
         imageCapture.takePicture(mainExecutor, callback2)
 
-        withContext(Dispatchers.Main) { imageCapture.onStateDetached() }
+        withContext(Dispatchers.Main) { imageCapture.onSessionStop() }
 
         callback2.awaitCaptures()
         assertThat(callback2.results.size + callback2.errors.size).isEqualTo(3)

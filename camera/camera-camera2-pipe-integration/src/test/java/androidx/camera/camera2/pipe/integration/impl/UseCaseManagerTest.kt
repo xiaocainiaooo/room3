@@ -343,7 +343,7 @@ class UseCaseManagerTest {
     }
 
     @Test
-    fun onStateAttachedInvokedExactlyOnce_whenUseCaseAttachedAndMeteringRepeatingAdded() = runTest {
+    fun onSessionStartInvokedExactlyOnce_whenUseCaseAttachedAndMeteringRepeatingAdded() = runTest {
         // Arrange
         initializeUseCaseThreads(this)
         val useCaseManager = createUseCaseManager()
@@ -360,7 +360,7 @@ class UseCaseManagerTest {
     }
 
     @Test
-    fun onStateAttachedInvokedExactlyOnce_whenUseCaseAttachedAndMeteringRepeatingNotAdded() =
+    fun onSessionStopInvokedExactlyOnce_whenUseCaseAttachedAndMeteringRepeatingNotAdded() =
         runTest {
             // Arrange
             initializeUseCaseThreads(this)

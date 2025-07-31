@@ -46,6 +46,7 @@ import android.view.Surface;
 import androidx.annotation.CallSuper;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.IntRange;
+import androidx.annotation.MainThread;
 import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.RestrictTo.Scope;
@@ -928,21 +929,24 @@ public abstract class UseCase {
     }
 
     /**
-     * Called when use case is attached to the camera. This method is called on main thread.
+     * Called when the use case is attached to the camera and the system is ready to start the
+     * camera capture session.
      *
      * <p>Once this function is invoked, the use case is attached to the {@link CameraInternal}
      * implementation of the associated camera. CameraX starts to open the camera and capture
      * session with the use case session config. The use case can receive the frame data from the
      * camera after the capture session is configured.
      *
+     * <p>This method is called on the main thread.
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
     @CallSuper
-    public void onStateAttached() {
+    @MainThread
+    public void onSessionStart() {
     }
 
     /**
-     * Called when use case is detached from the camera. This method is called on main thread.
+     * Called when the use case is detached from the camera.
      *
      * <p>Once this function is invoked, the use case is detached from the {@link CameraInternal}
      * implementation of the associated camera. The use case no longer receives frame data from
@@ -950,7 +954,8 @@ public abstract class UseCase {
      *
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
-    public void onStateDetached() {
+    @MainThread
+    public void onSessionStop() {
     }
 
     /**
