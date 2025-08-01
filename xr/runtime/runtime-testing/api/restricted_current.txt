@@ -579,6 +579,7 @@ package androidx.xr.runtime.testing {
     method public void dispose();
     method public java.util.List<androidx.xr.runtime.testing.FakeRenderingRuntime.FakeKhronosPbrMaterial> getCreatedKhronosPbrMaterials();
     method public java.util.List<androidx.xr.runtime.testing.FakeRenderingRuntime.FakeWaterMaterial> getCreatedWaterMaterials();
+    method public com.google.common.util.concurrent.ListenableFuture<androidx.xr.runtime.internal.TextureResource> loadTexture(String assetName, androidx.xr.runtime.internal.TextureSampler sampler);
     method public void setAlphaCutoffOnKhronosPbrMaterial(androidx.xr.runtime.internal.MaterialResource material, float alphaCutoff);
     method public void setAlphaMapOnWaterMaterial(androidx.xr.runtime.internal.MaterialResource material, androidx.xr.runtime.internal.TextureResource alphaMap);
     method public void setAlphaStepMultiplierOnWaterMaterial(androidx.xr.runtime.internal.MaterialResource material, float alphaStepMultiplier);

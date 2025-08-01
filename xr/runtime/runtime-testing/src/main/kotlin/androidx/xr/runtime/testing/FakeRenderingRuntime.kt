@@ -23,9 +23,11 @@ import androidx.xr.runtime.internal.MaterialResource
 import androidx.xr.runtime.internal.RenderingRuntime
 import androidx.xr.runtime.internal.SceneRuntime
 import androidx.xr.runtime.internal.TextureResource
+import androidx.xr.runtime.internal.TextureSampler
 import androidx.xr.runtime.math.Matrix3
 import androidx.xr.runtime.math.Vector3
 import androidx.xr.runtime.math.Vector4
+import com.google.common.util.concurrent.Futures.immediateFailedFuture
 import com.google.common.util.concurrent.Futures.immediateFuture
 import com.google.common.util.concurrent.ListenableFuture
 
@@ -35,6 +37,12 @@ public class FakeRenderingRuntime(
     private val sceneRuntime: SceneRuntime,
     private val activity: Activity,
 ) : RenderingRuntime {
+    @Suppress("AsyncSuffixFuture")
+    override fun loadTexture(
+        assetName: String,
+        sampler: TextureSampler,
+    ): ListenableFuture<TextureResource> = immediateFailedFuture(NotImplementedError())
+
     /**
      * For test purposes only.
      *
