@@ -53,6 +53,13 @@ public interface RenderingRuntime {
     public fun borrowReflectionTexture(): TextureResource?
 
     /**
+     * Destroys the given texture resource.
+     *
+     * @param texture The name of the texture to destroy.
+     */
+    public fun destroyTexture(texture: TextureResource)
+
+    /**
      * Creates a water material by querying it from the system's built-in materials. The future
      * returned by this method will fire listeners on the UI thread if Runnable::run is supplied.
      *

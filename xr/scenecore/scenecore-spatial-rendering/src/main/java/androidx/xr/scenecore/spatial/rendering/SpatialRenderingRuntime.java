@@ -185,6 +185,12 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         return getTextureResourceFromToken(texture.getNativeHandle());
     }
 
+    @Override
+    public void destroyTexture(@NonNull TextureResource texture) {
+        TextureResourceImpl textureResource = (TextureResourceImpl) texture;
+        mImpressApi.destroyNativeObject(textureResource.getTextureToken());
+    }
+
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
     // warning, however, we get a build error - go/bugpattern/RestrictTo.

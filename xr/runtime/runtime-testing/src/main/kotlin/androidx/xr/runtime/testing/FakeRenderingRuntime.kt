@@ -60,6 +60,10 @@ public class FakeRenderingRuntime(
         return reflectionTexture
     }
 
+    override fun destroyTexture(texture: TextureResource) {
+        reflectionTexture = null
+    }
+
     /**
      * For test purposes only.
      *
