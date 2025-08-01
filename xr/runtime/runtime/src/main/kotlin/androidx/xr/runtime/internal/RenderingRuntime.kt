@@ -49,6 +49,9 @@ public interface RenderingRuntime {
         sampler: TextureSampler,
     ): ListenableFuture<TextureResource>
 
+    /** Borrows the reflection texture from the currently set environment IBL. */
+    public fun borrowReflectionTexture(): TextureResource?
+
     /**
      * Creates a water material by querying it from the system's built-in materials. The future
      * returned by this method will fire listeners on the UI thread if Runnable::run is supplied.

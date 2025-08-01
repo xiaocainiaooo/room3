@@ -176,6 +176,15 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         return textureResourceFuture;
     }
 
+    @Override
+    public @Nullable TextureResource borrowReflectionTexture() {
+        Texture texture = mImpressApi.borrowReflectionTexture();
+        if (texture == null) {
+            return null;
+        }
+        return getTextureResourceFromToken(texture.getNativeHandle());
+    }
+
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
     // warning, however, we get a build error - go/bugpattern/RestrictTo.

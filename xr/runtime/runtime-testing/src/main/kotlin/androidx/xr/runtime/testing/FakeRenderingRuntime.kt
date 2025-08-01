@@ -46,6 +46,23 @@ public class FakeRenderingRuntime(
     /**
      * For test purposes only.
      *
+     * Controls the `TextureResource` instance returned by [borrowReflectionTexture] and
+     * [getReflectionTextureFromIbl].
+     *
+     * <p>Tests can set this property to a [FakeResource] instance to simulate the availability of a
+     * reflection texture. This allows verification that the code under test correctly handles the
+     * borrowed or retrieved texture. Calling [destroyTexture] will reset this property to `null`,
+     * enabling tests to also verify resource cleanup behavior.
+     */
+    internal var reflectionTexture: FakeResource? = null
+
+    override fun borrowReflectionTexture(): TextureResource? {
+        return reflectionTexture
+    }
+
+    /**
+     * For test purposes only.
+     *
      * A fake implementation of [MaterialResource] used to simulate a water material within the test
      * environment.
      *
