@@ -1313,6 +1313,126 @@ class SurfaceTest {
     }
 
     @Test
+    fun focusableSurface_depth_focusedDepthHasHigherZIndex() {
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
+
+        val surfaceDepth =
+            SurfaceDepth(
+                depth =
+                    Depth(
+                        Shadow(color = Color.Red, spread = 100.dp, radius = 100.dp),
+                        Shadow(color = Color.Red, spread = 100.dp, radius = 100.dp),
+                    ),
+                focusedDepth =
+                    Depth(
+                        layer1 = Shadow(color = Color.Blue, spread = 100.dp, radius = 100.dp),
+                        layer2 = Shadow(color = Color.Blue, spread = 100.dp, radius = 100.dp),
+                    ),
+            )
+
+        rule.setGlimmerThemeContent {
+            Column {
+                Box(
+                    Modifier.padding(40.dp)
+                        .size(20.dp)
+                        .focusRequester(focusRequester)
+                        .surface(depth = surfaceDepth, border = null)
+                )
+                Box(
+                    Modifier.testTag("greenBox")
+                        .size(100.dp)
+                        .background(Color.Green)
+                        .focusRequester(otherFocusRequester)
+                        .focusTarget()
+                )
+            }
+        }
+
+        // Default draw order is based on placement order. The green box is second in the column,
+        // so it should draw over the first box - as a result the depth will not be visible, and the
+        // entire box will be green.
+        rule.onNodeWithTag("greenBox").captureToImage().assertPixels { Color.Green }
+
+        // Request focus for the surface
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // The surface is focused, so it should now have a higher zIndex set, which will cause it to
+        // draw over the sibling box. The blue shadow should now overlap the green box, causing the
+        // sampled pixel to have a blue channel.
+        rule.onNodeWithTag("greenBox").captureToImage().run {
+            val map = toPixelMap()
+            val topMiddle = map[width / 2, height / 4]
+            assertThat(topMiddle.blue).isGreaterThan(0)
+        }
+
+        // Request focus for the other target, moving focus away from the surface
+        rule.runOnIdle { otherFocusRequester.requestFocus() }
+
+        // zIndex should be reset so the green box should draw on top once again
+        rule.onNodeWithTag("greenBox").captureToImage().assertPixels { Color.Green }
+    }
+
+    @Test
+    fun clickableSurface_depth_focusedDepthHasHigherZIndex() {
+        val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()
+
+        val surfaceDepth =
+            SurfaceDepth(
+                depth =
+                    Depth(
+                        Shadow(color = Color.Red, spread = 100.dp, radius = 100.dp),
+                        Shadow(color = Color.Red, spread = 100.dp, radius = 100.dp),
+                    ),
+                focusedDepth =
+                    Depth(
+                        layer1 = Shadow(color = Color.Blue, spread = 100.dp, radius = 100.dp),
+                        layer2 = Shadow(color = Color.Blue, spread = 100.dp, radius = 100.dp),
+                    ),
+            )
+
+        rule.setGlimmerThemeContent {
+            Column {
+                Box(
+                    Modifier.padding(40.dp)
+                        .size(20.dp)
+                        .focusRequester(focusRequester)
+                        .surface(depth = surfaceDepth, border = null, onClick = {})
+                )
+                Box(
+                    Modifier.testTag("greenBox")
+                        .size(100.dp)
+                        .background(Color.Green)
+                        .focusRequester(otherFocusRequester)
+                        .focusTarget()
+                )
+            }
+        }
+
+        // Default draw order is based on placement order. The green box is second in the column,
+        // so it should draw over the first box - as a result the depth will not be visible, and the
+        // entire box will be green.
+        rule.onNodeWithTag("greenBox").captureToImage().assertPixels { Color.Green }
+
+        // Request focus for the surface
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // The surface is focused, so it should now have a higher zIndex set, which will cause it to
+        // draw over the sibling box. The blue shadow should now overlap the green box, causing the
+        // sampled pixel to have a blue channel.
+        rule.onNodeWithTag("greenBox").captureToImage().run {
+            val map = toPixelMap()
+            val topMiddle = map[width / 2, height / 4]
+            assertThat(topMiddle.blue).isGreaterThan(0)
+        }
+
+        // Request focus for the other target, moving focus away from the surface
+        rule.runOnIdle { otherFocusRequester.requestFocus() }
+
+        // zIndex should be reset so the green box should draw on top once again
+        rule.onNodeWithTag("greenBox").captureToImage().assertPixels { Color.Green }
+    }
+
+    @Test
     fun focusableSurface_emitsFocusInteractions() {
         val interactionSource = MutableInteractionSource()
         val (focusRequester, otherFocusRequester) = FocusRequester.createRefs()

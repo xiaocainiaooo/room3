@@ -37,6 +37,8 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.invalidateDraw
@@ -180,6 +183,9 @@ public fun Modifier.surface(
 
 /**
  * Represents the [Depth] used by a [surface] in different states.
+ *
+ * Focused [surface]s with a [focusedDepth] will have a higher zIndex set so they can draw their
+ * focused depth over siblings.
  *
  * @property [depth] the [Depth] used when the [surface] is in its default state (no other
  *   interactions are ongoing)
@@ -523,6 +529,14 @@ private fun Modifier.surfaceDepth(
 ): Modifier {
     if (depth == null) return this
     val focusedProgress = remember { Animatable(0f) }
+    // If focused and there is focused depth, we need to draw the surface on top of
+    // other siblings to make sure the depth occludes siblings.
+    val zIndex by remember {
+        // Derived to avoid invalidating layout each frame of the animation
+        derivedStateOf {
+            if (depth.focusedDepth != null && focusedProgress.value >= 0.5f) 1f else 0f
+        }
+    }
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect { interaction ->
             when (interaction) {
@@ -538,12 +552,16 @@ private fun Modifier.surfaceDepth(
         }
     }
 
-    return depth(
-        from = depth.depth,
-        to = depth.focusedDepth,
-        shape = shape,
-        progress = { focusedProgress.value },
-    )
+    return layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, placeable.height) { placeable.place(0, 0, zIndex = zIndex) }
+        }
+        .depth(
+            from = depth.depth,
+            to = depth.focusedDepth,
+            shape = shape,
+            progress = { focusedProgress.value },
+        )
 }
 
 /** Default border width for a [surface]. */
