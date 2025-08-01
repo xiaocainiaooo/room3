@@ -207,7 +207,13 @@ public fun <T : Any> NavDisplay(
                     progress = value.progress
                 }
                 inPredictiveBack = false
-                onBack(entries.size - scene.previousEntries.size)
+
+                // If `enabled` becomes stale (e.g., it was set to false but a gesture was
+                // dispatched in the same frame), this ensures that the calculated index is valid
+                // before calling onBack, avoiding IndexOutOfBoundsException in edge cases.
+                if (entries.size > scene.previousEntries.size) {
+                    onBack(entries.size - scene.previousEntries.size)
+                }
             } finally {
                 inPredictiveBack = false
             }
