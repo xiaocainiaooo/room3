@@ -28,6 +28,22 @@ public abstract class NavigationEventInputHandler(
     private val dispatcher: NavigationEventDispatcher
 ) {
     /**
+     * Attaches this input handler to the [NavigationEventDispatcher].
+     *
+     * @param dispatcher The [NavigationEventDispatcher] to attach to.
+     */
+    @MainThread
+    internal fun onAttach(dispatcher: NavigationEventDispatcher) {
+        // TODO(kuanyingchou): fill in implementation. Also consider making this open and public.
+    }
+
+    /** Detaches this input handler from the attached [NavigationEventDispatcher]. */
+    @MainThread
+    internal fun onDetach() {
+        // TODO(kuanyingchou): fill in implementation. Also consider making this open and public.
+    }
+
+    /**
      * Adds a callback that will be notified when the connected dispatcher's `hasEnabledCallbacks`
      * changes.
      *
