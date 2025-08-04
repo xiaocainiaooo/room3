@@ -62,6 +62,7 @@ import androidx.camera.testing.impl.asFlow
 import androidx.camera.testing.impl.fakes.FakeCameraConfig
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
 import androidx.camera.testing.impl.fakes.FakeSessionProcessor
+import androidx.camera.testing.impl.fakes.NoOpMuxer
 import androidx.camera.testing.impl.getDurationMs
 import androidx.camera.testing.impl.getLocation
 import androidx.camera.testing.impl.getMimeType
@@ -92,6 +93,7 @@ import androidx.camera.video.internal.compat.quirk.ExtraSupportedResolutionQuirk
 import androidx.camera.video.internal.compat.quirk.MediaStoreVideoCannotWrite
 import androidx.camera.video.internal.encoder.EncoderFactory
 import androidx.camera.video.internal.encoder.InvalidConfigException
+import androidx.camera.video.internal.muxer.MuxerFactory
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -102,6 +104,7 @@ import androidx.testutils.fail
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.seconds
@@ -377,6 +380,22 @@ class RecorderTest(private val implName: String, private val cameraConfig: Camer
 
         // Assert.
         recording.stopAndVerify()
+    }
+
+    @Test
+    fun muxer_failedToSetOutput_receiveError() {
+        val muxerFactory = MuxerFactory {
+            object : NoOpMuxer() {
+                override fun setOutput(path: String, format: Int) {
+                    throw IOException("Failure on purpose")
+                }
+            }
+        }
+        val recorder = createRecorder(muxerFactory = muxerFactory)
+        val recording = recordingSession.createRecording(recorder = recorder)
+
+        // Act & Assert.
+        recording.start().verifyFinalize(error = ERROR_INVALID_OUTPUT_OPTIONS)
     }
 
     @Test
@@ -1333,6 +1352,7 @@ class RecorderTest(private val implName: String, private val cameraConfig: Camer
         executor: Executor? = null,
         videoEncoderFactory: EncoderFactory? = null,
         audioEncoderFactory: EncoderFactory? = null,
+        muxerFactory: MuxerFactory? = null,
         outputStorageFactory: OutputStorage.Factory? = null,
         targetBitrate: Int? = null,
         retrySetupVideoMaxCount: Int? = null,
@@ -1349,6 +1369,7 @@ class RecorderTest(private val implName: String, private val cameraConfig: Camer
                     executor?.let { setExecutor(it) }
                     videoEncoderFactory?.let { setVideoEncoderFactory(it) }
                     audioEncoderFactory?.let { setAudioEncoderFactory(it) }
+                    muxerFactory?.let { setMuxerFactory(it) }
                     outputStorageFactory?.let { setOutputStorageFactory(it) }
                     targetBitrate?.let { setTargetVideoEncodingBitRate(it) }
                     audioSource?.let { setAudioSource(it) }
