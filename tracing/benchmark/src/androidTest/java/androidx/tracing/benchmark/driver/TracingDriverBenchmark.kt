@@ -25,8 +25,7 @@ import androidx.tracing.benchmark.BASIC_STRING
 import androidx.tracing.benchmark.PROCESS_NAME
 import androidx.tracing.driver.TRACE_PACKET_BUFFER_SIZE
 import androidx.tracing.driver.TraceContext
-import androidx.tracing.driver.TraceSink
-import androidx.tracing.driver.wire.WireTraceSink
+import androidx.tracing.driver.wire.TraceSink
 import kotlin.coroutines.CoroutineContext
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -47,7 +46,7 @@ class TracingDriverBenchmark {
     }
 
     fun buildInMemorySink(coroutineContext: CoroutineContext): TraceSink {
-        return WireTraceSink(
+        return TraceSink(
             sequenceId = 1,
             bufferedSink = blackholeSink().buffer(),
             coroutineContext = coroutineContext,

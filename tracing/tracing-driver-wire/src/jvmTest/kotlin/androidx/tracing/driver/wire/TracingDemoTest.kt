@@ -41,10 +41,7 @@ class TracingDemoTest {
     // Tracks the number of batches completed
     internal var count = 0L
     internal val driver =
-        TraceDriver(
-            sink = WireTraceSink(sequenceId = 1, directory = File("/tmp")),
-            isEnabled = true,
-        )
+        TraceDriver(sink = TraceSink(sequenceId = 1, directory = File("/tmp")), isEnabled = true)
 
     @Test
     internal fun testTracingEndToEnd() = runBlocking {
