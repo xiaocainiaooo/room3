@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.navigationevent.NavigationEventDispatcher
 import androidx.navigationevent.NavigationEventDispatcherOwner
-import androidx.navigationevent.NavigationEventInputHandler
 
 /**
  * Creates a new navigation scope by providing a [NavigationEventDispatcher] to descendant
@@ -38,8 +37,8 @@ import androidx.navigationevent.NavigationEventInputHandler
  * The dispatcher's lifecycle is automatically managed. It is created only once and automatically
  * disposed of when the composable leaves the composition, preventing memory leaks.
  *
- * When used to create a root dispatcher, you must use a [NavigationEventInputHandler] to send it
- * events. Otherwise, the dispatcher will be detached and will not receive events.
+ * When used to create a root dispatcher, you must use a [AbstractNavigationEventInputHandler] to
+ * send it events. Otherwise, the dispatcher will be detached and will not receive events.
  *
  * **Null parent:** If [parent] is **EXPLICITLY** `null`, this creates a root dispatcher that runs
  * independently. By default, it requires a parent from the [LocalNavigationEventDispatcherOwner]
