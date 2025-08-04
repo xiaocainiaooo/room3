@@ -24,7 +24,7 @@ import androidx.navigationevent.NavigationEventDirection.Companion.Backward
  *
  * @param dispatcher The [NavigationEventDispatcher] to send events to.
  */
-public abstract class AbstractNavigationEventInputHandler(
+public abstract class NavigationEventInputHandler(
     private val dispatcher: NavigationEventDispatcher
 ) {
     @Suppress("PairedRegistration")
