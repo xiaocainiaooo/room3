@@ -152,7 +152,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -688,13 +687,29 @@ public final class AppSearchImpl implements Closeable {
         }
     }
 
-    /** Clears all data from the current icing instance. */
+    /**
+     * Clears all data from the current icing instance and close this AppSearchImpl instance. The
+     * caller must not use this AppSearchImpl instance anymore.
+     *
+     * <p>The following actions are taken:
+     * <ul>
+     *     <li>Reset all Icing internal members.
+     *     <li>Delete Icing directory.
+     *     <li>Close AppSearchImpl.
+     * </ul>
+     */
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public void clearAndDestroy() {
         mReadWriteLock.writeLock().lock();
         try {
             throwIfClosedLocked();
+            if (mRevocableFileDescriptorStore != null) {
+                mRevocableFileDescriptorStore.revokeAll();
+            }
             mIcingSearchEngineLocked.clearAndDestroy();
             mClosedLocked = true;
+        } catch (IOException e) {
+            Log.w(TAG, "Error when clearAndDestroy AppSearchImpl.", e);
         } finally {
             mReadWriteLock.writeLock().unlock();
         }
