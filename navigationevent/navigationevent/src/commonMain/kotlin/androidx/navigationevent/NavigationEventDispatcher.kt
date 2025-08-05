@@ -332,6 +332,7 @@ private constructor(
      * @throws IllegalStateException if the dispatcher has already been disposed.
      * @see removeInputHandler
      */
+    @MainThread
     public fun addInputHandler(inputHandler: NavigationEventInputHandler) {
         checkInvariants()
 
@@ -349,6 +350,7 @@ private constructor(
      * @throws IllegalStateException if the dispatcher has already been disposed.
      * @see addInputHandler
      */
+    @MainThread
     public fun removeInputHandler(inputHandler: NavigationEventInputHandler) {
         checkInvariants()
 
