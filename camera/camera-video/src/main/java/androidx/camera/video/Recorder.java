@@ -3262,6 +3262,7 @@ public final class Recorder implements VideoOutput {
 
             mCloseGuard.open("finalizeRecording");
 
+            AtomicBoolean isMediaStorePendingFlagSet = new AtomicBoolean(false);
             MuxerSupplier muxerSupplier =
                     (muxerOutputFormat, outputUriCreatedCallback) -> {
                         Muxer muxer = muxerFactory.create();
@@ -3287,9 +3288,12 @@ public final class Recorder implements VideoOutput {
 
                             ContentValues contentValues =
                                     new ContentValues(mediaStoreOutputOptions.getContentValues());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                // Toggle on pending status for the video file.
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                                    && !muxer.isInterruptionResilient()) {
+                                // Toggle on pending status for the video file. The saved file
+                                // will be hidden until the pending flag is changed to NOT_PENDING.
                                 contentValues.put(MediaStore.Video.Media.IS_PENDING, PENDING);
+                                isMediaStorePendingFlagSet.set(true);
                             }
                             try {
                                 outputUri = mediaStoreOutputOptions.getContentResolver().insert(
@@ -3387,10 +3391,12 @@ public final class Recorder implements VideoOutput {
                         if (outputUri.equals(Uri.EMPTY)) {
                             return;
                         }
-                        ContentValues contentValues = new ContentValues();
-                        contentValues.put(MediaStore.Video.Media.IS_PENDING, NOT_PENDING);
-                        mediaStoreOutputOptions.getContentResolver().update(outputUri,
-                                contentValues, null, null);
+                        if (isMediaStorePendingFlagSet.get()) {
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(MediaStore.Video.Media.IS_PENDING, NOT_PENDING);
+                            mediaStoreOutputOptions.getContentResolver().update(outputUri,
+                                    contentValues, null, null);
+                        }
                     };
                 } else {
                     // Context will only be held in local scope of the consumer so it will not be

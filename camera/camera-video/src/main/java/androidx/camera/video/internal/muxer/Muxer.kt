@@ -146,4 +146,17 @@ public interface Muxer {
      * after it's released.
      */
     public fun release()
+
+    /**
+     * Indicates whether the output file is playable even if the muxing process is interrupted.
+     *
+     * An interruption can occur if the application crashes or is terminated unexpectedly before the
+     * muxer's [release] or [stop] method is called. An interruption-resilient muxer ensures that
+     * the video metadata is written incrementally, allowing the video file to be played up to the
+     * point of failure.
+     *
+     * @return `true` if the output file is interruption-resilient and can be played successfully
+     *   after a crash; `false` otherwise.
+     */
+    public fun isInterruptionResilient(): Boolean
 }

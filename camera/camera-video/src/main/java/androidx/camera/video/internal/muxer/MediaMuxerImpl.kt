@@ -122,6 +122,10 @@ public class MediaMuxerImpl : Muxer {
         state = State.RELEASED
     }
 
+    override fun isInterruptionResilient(): Boolean {
+        return false
+    }
+
     private fun @receiver:Muxer.Format Int.toMediaMuxerFormat(): Int {
         return when (this) {
             MUXER_FORMAT_MPEG_4 -> MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4

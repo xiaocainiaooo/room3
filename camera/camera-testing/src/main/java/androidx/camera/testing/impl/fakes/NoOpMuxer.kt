@@ -71,4 +71,8 @@ public open class NoOpMuxer : Muxer {
     override fun release() {
         // No-op
     }
+
+    override fun isInterruptionResilient(): Boolean {
+        return false
+    }
 }
