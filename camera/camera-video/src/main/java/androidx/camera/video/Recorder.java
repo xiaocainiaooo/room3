@@ -1713,7 +1713,7 @@ public final class Recorder implements VideoOutput {
                 muxer = recordingToStart.performOneTimeMuxerCreation(muxerOutputFormat,
                         uri -> mOutputUri = uri);
             } catch (IOException e) {
-                int error = isStorageFullException(e) ? ERROR_INSUFFICIENT_STORAGE
+                int error = hasInsufficientStorageOrException(e) ? ERROR_INSUFFICIENT_STORAGE
                         : ERROR_INVALID_OUTPUT_OPTIONS;
                 onInProgressRecordingInternalError(recordingToStart, error, e);
                 return;
@@ -1758,9 +1758,8 @@ public final class Recorder implements VideoOutput {
             } catch (MuxerException e) {
                 Logger.w(TAG, "Failed to setup and start muxer", e);
                 muxer.release();
-                long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
-                int error = availableBytes < mRequiredFreeStorageBytes
-                        ? ERROR_INSUFFICIENT_STORAGE : ERROR_UNKNOWN;
+                int error = hasInsufficientStorageOrException(e) ? ERROR_INSUFFICIENT_STORAGE
+                        : ERROR_UNKNOWN;
                 onInProgressRecordingInternalError(recordingToStart, error, e);
                 return;
             }
@@ -1805,7 +1804,7 @@ public final class Recorder implements VideoOutput {
         mOutputStorage = mOutputStorageFactory.create(recordingToStart.getOutputOptions());
         long availableBytes = mOutputStorage.getAvailableBytes();
         Logger.d(TAG, "availableBytes = " + formatSize(availableBytes));
-        if (availableBytes < mRequiredFreeStorageBytes) {
+        if (hasInsufficientStorage(availableBytes)) {
             finalizeInProgressRecording(ERROR_INSUFFICIENT_STORAGE,
                     new IOException(String.format(INSUFFICIENT_STORAGE_ERROR_MSG, availableBytes,
                             mRequiredFreeStorageBytes)));
@@ -2189,9 +2188,8 @@ public final class Recorder implements VideoOutput {
             mMuxer.writeSampleData(mVideoTrackIndex, encodedData.getByteBuffer(),
                     encodedData.getBufferInfo());
         } catch (MuxerException e) {
-            long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
-            int error = availableBytes < mRequiredFreeStorageBytes
-                    ? ERROR_INSUFFICIENT_STORAGE : ERROR_UNKNOWN;
+            int error = hasInsufficientStorageOrException(e) ? ERROR_INSUFFICIENT_STORAGE
+                    : ERROR_UNKNOWN;
             onInProgressRecordingInternalError(recording, error, e);
             return;
         }
@@ -2205,7 +2203,7 @@ public final class Recorder implements VideoOutput {
         if (newRecordingBytes > mAvailableBytesAboveRequired) {
             long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
             Logger.d(TAG, "availableBytes = " + formatSize(availableBytes));
-            if (availableBytes < mRequiredFreeStorageBytes) {
+            if (hasInsufficientStorage(availableBytes)) {
                 onInProgressRecordingInternalError(recording, ERROR_INSUFFICIENT_STORAGE,
                         new IOException(
                                 String.format(INSUFFICIENT_STORAGE_ERROR_MSG, availableBytes,
@@ -2264,9 +2262,8 @@ public final class Recorder implements VideoOutput {
                     encodedData.getByteBuffer(),
                     encodedData.getBufferInfo());
         } catch (MuxerException e) {
-            long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
-            int error = availableBytes < mRequiredFreeStorageBytes
-                    ? ERROR_INSUFFICIENT_STORAGE : ERROR_UNKNOWN;
+            int error = hasInsufficientStorageOrException(e) ? ERROR_INSUFFICIENT_STORAGE
+                    : ERROR_UNKNOWN;
             onInProgressRecordingInternalError(recording, error, e);
             return;
         }
@@ -2515,6 +2512,24 @@ public final class Recorder implements VideoOutput {
         return mAudioState == AudioState.ENABLED;
     }
 
+    @ExecutedBy("mSequentialExecutor")
+    private boolean hasInsufficientStorage(long availableStorageBytes) {
+        return availableStorageBytes < mRequiredFreeStorageBytes;
+    }
+
+    @ExecutedBy("mSequentialExecutor")
+    private boolean hasInsufficientStorageOrException(@Nullable Throwable throwable) {
+        if (isStorageFullException(throwable)) {
+            return true;
+        }
+        return hasInsufficientStorage(checkNotNull(mOutputStorage).getAvailableBytes());
+    }
+
+    @ExecutedBy("mSequentialExecutor")
+    private boolean hasInvalidRecordData() {
+        return mRecordingBytes <= 0 || (isAudioEnabled() && mRecordingAudioBytes <= 0);
+    }
+
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     @ExecutedBy("mSequentialExecutor")
     void finalizeInProgressRecording(@VideoRecordError int error, @Nullable Throwable throwable) {
@@ -2524,6 +2539,7 @@ public final class Recorder implements VideoOutput {
         }
 
         @VideoRecordError int errorToSend = error;
+        Throwable throwableToSend = throwable;
         if (mMuxer != null) {
             try {
                 Logger.d(TAG, "Muxer.stop()");
@@ -2531,14 +2547,14 @@ public final class Recorder implements VideoOutput {
             } catch (MuxerException e) {
                 Logger.w(TAG, "Muxer failed to stop with error: " + e, e);
                 if (errorToSend == ERROR_NONE) {
-                    long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
-                    if (availableBytes < mRequiredFreeStorageBytes) {
+                    if (hasInsufficientStorageOrException(e)) {
                         errorToSend = ERROR_INSUFFICIENT_STORAGE;
-                    } else if (mRecordingAudioBytes == 0L) {
+                    } else if (hasInvalidRecordData()) {
                         errorToSend = ERROR_NO_VALID_DATA;
                     } else {
                         errorToSend = ERROR_UNKNOWN;
                     }
+                    throwableToSend = e;
                 }
             } finally {
                 Logger.d(TAG, "Muxer.release()");
@@ -2565,7 +2581,7 @@ public final class Recorder implements VideoOutput {
                         stats,
                         outputResults,
                         errorToSend,
-                        throwable));
+                        throwableToSend));
 
         RecordingRecord finalizedRecording = mInProgressRecording;
         mInProgressRecording = null;

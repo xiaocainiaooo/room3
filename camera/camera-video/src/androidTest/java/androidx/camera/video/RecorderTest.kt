@@ -28,6 +28,7 @@ import android.content.Context
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.location.Location
+import android.media.MediaCodec
 import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
@@ -93,7 +94,9 @@ import androidx.camera.video.internal.compat.quirk.ExtraSupportedResolutionQuirk
 import androidx.camera.video.internal.compat.quirk.MediaStoreVideoCannotWrite
 import androidx.camera.video.internal.encoder.EncoderFactory
 import androidx.camera.video.internal.encoder.InvalidConfigException
+import androidx.camera.video.internal.muxer.MuxerException
 import androidx.camera.video.internal.muxer.MuxerFactory
+import androidx.camera.video.internal.utils.StorageUtil.NO_SPACE_LEFT_MESSAGE
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -105,6 +108,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.io.File
 import java.io.IOException
+import java.nio.ByteBuffer
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.seconds
@@ -179,6 +183,8 @@ class RecorderTest(private val implName: String, private val cameraConfig: Camer
                 arrayOf(Camera2Config::class.simpleName, Camera2Config.defaultConfig()),
                 arrayOf(CameraPipeConfig::class.simpleName, CameraPipeConfig.defaultConfig()),
             )
+
+        private val storageFullException = lazy { IOException(NO_SPACE_LEFT_MESSAGE) }
     }
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -1123,6 +1129,80 @@ class RecorderTest(private val implName: String, private val cameraConfig: Camer
         val result = recording2.verifyFinalize(error = ERROR_INSUFFICIENT_STORAGE)
         // Video is not saved.
         assertThat(result.uri).isEqualTo(Uri.EMPTY)
+    }
+
+    @Test
+    fun throwStorageFullExceptionOnMuxerStart_receiveInsufficientStorageError() {
+        // Arrange.
+        val muxerFactory = MuxerFactory {
+            object : NoOpMuxer() {
+                override fun start() {
+                    throw MuxerException(storageFullException.value)
+                }
+            }
+        }
+        val recorder = createRecorder(muxerFactory = muxerFactory)
+
+        // Act.
+        val recording = recordingSession.createRecording(recorder = recorder).start()
+
+        // Assert.
+        recording.verifyFinalize(
+            error = ERROR_INSUFFICIENT_STORAGE,
+            shouldSkipOutputFileVerification = true,
+        )
+    }
+
+    @Test
+    fun throwStorageFullExceptionOnMuxerWriteSampleData_receiveInsufficientStorageError() {
+        // Arrange.
+        val muxerFactory = MuxerFactory {
+            object : NoOpMuxer() {
+                override fun writeSampleData(
+                    trackIndex: Int,
+                    byteBuffer: ByteBuffer,
+                    bufferInfo: MediaCodec.BufferInfo,
+                ) {
+                    throw MuxerException(storageFullException.value)
+                }
+            }
+        }
+        val recorder = createRecorder(muxerFactory = muxerFactory)
+
+        // Act.
+        val recording = recordingSession.createRecording(recorder = recorder).start()
+
+        // Assert.
+        recording.verifyFinalize(
+            error = ERROR_INSUFFICIENT_STORAGE,
+            shouldSkipOutputFileVerification = true,
+        )
+    }
+
+    @Test
+    fun throwStorageFullExceptionOnMuxerStop_receiveInsufficientStorageError() {
+        // Arrange.
+        val muxerFactory = MuxerFactory {
+            object : NoOpMuxer() {
+                override fun writeSampleData(
+                    trackIndex: Int,
+                    byteBuffer: ByteBuffer,
+                    bufferInfo: MediaCodec.BufferInfo,
+                ) {
+                    throw MuxerException(storageFullException.value)
+                }
+            }
+        }
+        val recorder = createRecorder(muxerFactory = muxerFactory)
+
+        // Act.
+        val recording = recordingSession.createRecording(recorder = recorder).start()
+
+        // Assert.
+        recording.verifyFinalize(
+            error = ERROR_INSUFFICIENT_STORAGE,
+            shouldSkipOutputFileVerification = true,
+        )
     }
 
     @Test
