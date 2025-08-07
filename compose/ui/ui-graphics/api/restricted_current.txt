@@ -1301,6 +1301,12 @@ package androidx.compose.ui.graphics {
     property public androidx.compose.ui.graphics.VertexMode vertexMode;
   }
 
+  public typealias NativeCanvas = android.graphics.Canvas;
+
+  public typealias NativePaint = android.graphics.Paint;
+
+  public typealias Shader = android.graphics.Shader;
+
 }
 
 package androidx.compose.ui.graphics.colorspace {

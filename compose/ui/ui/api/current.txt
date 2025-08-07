@@ -2150,6 +2150,8 @@ package androidx.compose.ui.input.key {
     method public static androidx.compose.ui.Modifier onPreInterceptKeyBeforeSoftKeyboard(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreInterceptKeyBeforeSoftKeyboard);
   }
 
+  public typealias NativeKeyEvent = android.view.KeyEvent;
+
 }
 
 package androidx.compose.ui.input.nestedscroll {
@@ -4070,6 +4072,8 @@ package androidx.compose.ui.platform {
     property public static androidx.compose.runtime.CompositionContext? android.view.View.compositionContext;
   }
 
+  public typealias NativeClipboard = android.content.ClipboardManager;
+
 }
 
 package androidx.compose.ui.relocation {
@@ -4712,6 +4716,8 @@ package androidx.compose.ui.viewinterop {
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
     property public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> NoOpUpdate;
   }
+
+  public typealias InteropView = android.view.View;
 
 }
 

@@ -1598,6 +1598,8 @@ package androidx.compose.ui.text.intl {
     property public androidx.compose.ui.text.intl.LocaleList current;
   }
 
+  public typealias PlatformLocale = java.util.Locale;
+
 }
 
 package androidx.compose.ui.text.platform {

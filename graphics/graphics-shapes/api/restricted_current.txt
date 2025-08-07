@@ -214,5 +214,7 @@ package androidx.graphics.shapes {
     method public java.util.List<androidx.graphics.shapes.Feature> parseFeatures(String svgPath);
   }
 
+  public typealias TransformResult = androidx.collection.FloatFloatPair;
+
 }
 

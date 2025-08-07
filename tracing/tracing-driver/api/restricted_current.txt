@@ -213,5 +213,11 @@ package androidx.tracing.driver {
     property public long uuid;
   }
 
+  public typealias AtomicBoolean = java.util.concurrent.atomic.AtomicBoolean;
+
+  public typealias AtomicInteger = java.util.concurrent.atomic.AtomicInteger;
+
+  public typealias AtomicLong = java.util.concurrent.atomic.AtomicLong;
+
 }
 

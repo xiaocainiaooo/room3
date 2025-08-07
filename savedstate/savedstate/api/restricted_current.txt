@@ -290,6 +290,8 @@ package androidx.savedstate {
     method public static void set(android.view.View, androidx.savedstate.SavedStateRegistryOwner? owner);
   }
 
+  public typealias SavedState = android.os.Bundle;
+
 }
 
 package androidx.savedstate.serialization {

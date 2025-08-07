@@ -4733,6 +4733,10 @@ package androidx.compose.material3 {
     enum_constant public static final androidx.compose.material3.WideNavigationRailValue Expanded;
   }
 
+  public typealias CalendarLocale = java.util.Locale;
+
+  @Deprecated public typealias MenuAnchorType = androidx.compose.material3.ExposedDropdownMenuAnchorType;
+
 }
 
 package androidx.compose.material3.carousel {

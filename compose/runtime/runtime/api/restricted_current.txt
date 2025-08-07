@@ -911,6 +911,10 @@ package androidx.compose.runtime {
     property @kotlin.PublishedApi internal androidx.compose.runtime.Composer composer;
   }
 
+  @Deprecated public typealias CheckResult = androidx.annotation.CheckResult;
+
+  public typealias CompositeKeyHashCode = long;
+
 }
 
 package androidx.compose.runtime.collection {
@@ -1390,6 +1394,10 @@ package androidx.compose.runtime.snapshots {
     method @BytecodeOnly @Deprecated public androidx.compose.runtime.snapshots.StateRecord! create(int);
     method public androidx.compose.runtime.snapshots.StateRecord create(long snapshotId);
   }
+
+  public typealias SnapshotId = long;
+
+  public typealias SnapshotIdArray = long[];
 
 }
 
