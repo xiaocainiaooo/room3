@@ -98,7 +98,7 @@ apply(plugin: "com.android.settings")
 
 apply(from: "buildSrc/ndk.gradle")
 
-def BUILD_NUMBER = System.getenv("BUILD_NUMBER")
+def buildNumberProvider = providers.environmentVariable("BUILD_NUMBER").orElse("unset")
 develocity {
     server = "https://ge.androidx.dev"
 
@@ -110,15 +110,21 @@ develocity {
             hostname { host -> "unset" }
             ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0"} }
         }
-        if (BUILD_NUMBER != null) {
-            value("BUILD_NUMBER", BUILD_NUMBER)
-            link("ci.android.com build", "https://ci.android.com/builds/branches/aosp-androidx-main/grid?head=$BUILD_NUMBER&tail=$BUILD_NUMBER")
-        }
         value("androidx.projects", getRequestedProjectSubsetName() ?: "Unset")
         value("androidx.useMaxDepVersions", providers.gradleProperty("androidx.useMaxDepVersions").isPresent().toString())
 
         // Do not publish scan for androidx-platform-dev
         publishing.onlyIf { it.authenticated }
+    }
+
+    // TODO(https://github.com/gradle/gradle/issues/34584): Avoid setting buildFinished via Gradle magic:
+    //  buildScan {  buildFinished {  buildScan.value("X", "Y") } }
+    //  as it fails on uploading scans if the config cache is resued and only the BUILD_NUMBER changes
+    //  Use alternative below:
+    def buildScanConfig = buildScan
+    buildScanConfig.buildFinished {
+        buildScanConfig.value("BUILD_NUMBER", buildNumberProvider.get())
+        buildScanConfig.link("ci.android.com build", "https://ci.android.com/builds/branches/aosp-androidx-main/grid?head=${buildNumberProvider.get()}&tail=${buildNumberProvider.get()}")
     }
 }
 
