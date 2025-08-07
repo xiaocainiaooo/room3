@@ -123,6 +123,7 @@ develocity {
 }
 
 def cacheSetting = System.getenv("USE_ANDROIDX_REMOTE_BUILD_CACHE")
+def pushSetting = providers.environmentVariable("IS_POSTSUBMIT")
 switch (cacheSetting) {
     case ["true", "gcp"]:
         settings.buildCache {
@@ -137,7 +138,8 @@ switch (cacheSetting) {
                 messageOnAuthenticationFailure = "Your GCP Credentials have expired.\n" +
                         "Please regenerate credentials following the steps below and try again:\n" +
                         "gcloud auth application-default login --project androidx-ge"
-                push = (BUILD_NUMBER != null && !BUILD_NUMBER.startsWith("P"))
+                //TODO(https://github.com/gradle/gradle/issues/34578): Move to lazy API when supported
+                push = pushSetting.map { it.toBoolean() }.getOrElse(false)
             }
         }
         break
