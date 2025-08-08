@@ -329,7 +329,7 @@ public fun SpatialActivityPanel(
 
     SideEffect { corePanelEntity.setShape(shape, density) }
 
-    LaunchedEffect(intent) { corePanelEntity.launchActivity(intent) }
+    LaunchedEffect(intent) { corePanelEntity.startActivity(intent) }
 
     SpatialBox {
         SubspaceLayout(modifier = modifier, coreEntity = corePanelEntity) { _, constraints ->

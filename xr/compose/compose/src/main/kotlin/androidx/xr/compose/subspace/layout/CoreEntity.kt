@@ -290,8 +290,8 @@ internal class CorePanelEntity(entity: PanelEntity) : CoreBasePanelEntity(entity
 
 internal class CoreActivityPanelEntity(private val activityPanelEntity: ActivityPanelEntity) :
     CoreBasePanelEntity(activityPanelEntity) {
-    fun launchActivity(intent: Intent, bundle: Bundle? = null) {
-        activityPanelEntity.launchActivity(intent, bundle)
+    fun startActivity(intent: Intent, bundle: Bundle? = null) {
+        activityPanelEntity.startActivity(intent, bundle)
     }
 }
 
