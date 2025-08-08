@@ -71,18 +71,12 @@ public class Scene : SessionConnector {
         private set
 
     /**
-     * The ActivitySpace is a special entity that represents the space in which the application is
+     * The [ActivitySpace] is a special entity that represents the space in which the application is
      * launched. It is the default parent of all entities in the scene.
      *
-     * The ActivitySpace is created automatically when the Session is created.
+     * The ActivitySpace is created automatically when the [Session] is created.
      */
-    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public lateinit var activitySpace: ActivitySpace
-        private set
-
-    // TODO: 378706624 - Remove this method once we have a better way to handle the root entity.
-    @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-    public lateinit var activitySpaceRoot: Entity
         private set
 
     /**
@@ -170,8 +164,6 @@ public class Scene : SessionConnector {
         activitySpace = ActivitySpace.create(platformAdapter, entityManager)
         spatialUser = SpatialUser.create(lifecycleManager, platformAdapter)
         mainPanelEntity = MainPanelEntity.create(lifecycleManager, platformAdapter, entityManager)
-        activitySpaceRoot =
-            entityManager.getEntityForRtEntity(platformAdapter.activitySpaceRootImpl)!!
         platformAdapter.spatialModeChangeListener =
             object : RtSpatialModeChangeListener {
                 override fun onSpatialModeChanged(

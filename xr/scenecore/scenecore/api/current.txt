@@ -543,6 +543,7 @@ package androidx.xr.scenecore {
     method public void addSpatialCapabilitiesChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
     method public void addSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
     method public void clearSpatialVisibilityChangedListener();
+    method public androidx.xr.scenecore.ActivitySpace getActivitySpace();
     method public <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(Class<? extends T> type);
     method public androidx.xr.scenecore.MainPanelEntity getMainPanelEntity();
     method public androidx.xr.scenecore.PanelClippingConfig getPanelClippingConfig();
@@ -556,6 +557,7 @@ package androidx.xr.scenecore {
     method public void setPanelClippingConfig(androidx.xr.scenecore.PanelClippingConfig);
     method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<java.lang.Integer> listener);
     method public void setSpatialVisibilityChangedListener(java.util.function.Consumer<java.lang.Integer> listener);
+    property public androidx.xr.scenecore.ActivitySpace activitySpace;
     property public androidx.xr.scenecore.MainPanelEntity mainPanelEntity;
     property public androidx.xr.scenecore.PanelClippingConfig panelClippingConfig;
     property public androidx.xr.scenecore.PerceptionSpace perceptionSpace;

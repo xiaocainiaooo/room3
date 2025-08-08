@@ -92,21 +92,6 @@ class SceneTest {
     }
 
     @Test
-    fun getActivitySpaceRoot_returnsActivitySpaceRoot() {
-        val activitySpaceRoot = session.scene.activitySpaceRoot
-
-        assertThat(activitySpaceRoot).isNotNull()
-    }
-
-    @Test
-    fun getActivitySpaceRootTwice_returnsSameSpace() {
-        val activitySpaceRoot1 = session.scene.activitySpaceRoot
-        val activitySpaceRoot2 = session.scene.activitySpaceRoot
-
-        assertThat(activitySpaceRoot1).isEqualTo(activitySpaceRoot2)
-    }
-
-    @Test
     fun getSpatialUser_returnsSpatialUser() {
         val spatialUser = session.scene.spatialUser
 

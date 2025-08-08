@@ -655,8 +655,7 @@ package androidx.xr.scenecore {
     method public void addSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
     method public void clearSpatialVisibilityChangedListener();
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void close();
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.ActivitySpace getActivitySpace();
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity getActivitySpaceRoot();
+    method public androidx.xr.scenecore.ActivitySpace getActivitySpace();
     method public <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(Class<? extends T> type);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity? getKeyEntity();
     method public androidx.xr.scenecore.MainPanelEntity getMainPanelEntity();
@@ -675,8 +674,7 @@ package androidx.xr.scenecore {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void setSpatialModeChangeListener(androidx.xr.scenecore.SpatialModeChangeListener);
     method public void setSpatialVisibilityChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<java.lang.Integer> listener);
     method public void setSpatialVisibilityChangedListener(java.util.function.Consumer<java.lang.Integer> listener);
-    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.ActivitySpace activitySpace;
-    property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity activitySpaceRoot;
+    property public androidx.xr.scenecore.ActivitySpace activitySpace;
     property @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public androidx.xr.scenecore.Entity? keyEntity;
     property public androidx.xr.scenecore.MainPanelEntity mainPanelEntity;
     property public androidx.xr.scenecore.PanelClippingConfig panelClippingConfig;
