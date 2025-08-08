@@ -18,7 +18,6 @@ package androidx.xr.scenecore
 
 import android.app.Activity
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.xr.runtime.Session
@@ -135,28 +134,6 @@ class SceneTest {
         @Suppress("UNUSED_VARIABLE") val unusedAgain = session.scene.mainPanelEntity
 
         verify(mockPlatformAdapter, times(1)).mainPanelEntity
-    }
-
-    @Test
-    fun configureBundleForFullSpaceMode_Launch_callsThrough() {
-        // Test that Session calls into the runtime.
-        val bundle = Bundle().apply { putString("testkey", "testval") }
-        whenever(mockPlatformAdapter.setFullSpaceMode(any())).thenReturn(bundle)
-        @Suppress("UNUSED_VARIABLE")
-        val unused = session.scene.configureBundleForFullSpaceModeLaunch(bundle)
-        verify(mockPlatformAdapter).setFullSpaceMode(bundle)
-    }
-
-    @Test
-    fun configureBundleForFullSpaceModeLaunchWithEnvironmentInherited_callsThrough() {
-        // Test that Session calls into the runtime.
-        val bundle = Bundle().apply { putString("testkey", "testval") }
-        whenever(mockPlatformAdapter.setFullSpaceModeWithEnvironmentInherited(any()))
-            .thenReturn(bundle)
-        @Suppress("UNUSED_VARIABLE")
-        val unused =
-            session.scene.configureBundleForFullSpaceModeLaunchWithEnvironmentInherited(bundle)
-        verify(mockPlatformAdapter).setFullSpaceModeWithEnvironmentInherited(bundle)
     }
 
     @Test

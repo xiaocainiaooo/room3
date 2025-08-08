@@ -330,6 +330,11 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.InteractableComponent create(androidx.xr.runtime.Session session, java.util.function.Consumer<androidx.xr.scenecore.InputEvent> inputEventListener);
   }
 
+  public final class LaunchUtils {
+    method public static android.os.Bundle createBundleForFullSpaceModeLaunch(androidx.xr.runtime.Session session, android.os.Bundle bundle);
+    method public static android.os.Bundle createBundleForFullSpaceModeLaunchWithEnvironmentInherited(androidx.xr.runtime.Session session, android.os.Bundle bundle);
+  }
+
   public final class MainPanelEntity extends androidx.xr.scenecore.PanelEntity {
     method public void addPerceivedResolutionChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
     method public void addPerceivedResolutionChangedListener(java.util.function.Consumer<androidx.xr.runtime.math.IntSize2d> listener);
