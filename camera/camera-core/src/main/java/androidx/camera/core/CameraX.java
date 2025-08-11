@@ -459,7 +459,7 @@ public final class CameraX {
                             mCameraUseCaseAdapterProvider);
                 }
 
-                mCameraPresenceProvider.startup(mCameraFactory, mCameraRepository);
+                mCameraPresenceProvider.startup(cameraValidator, mCameraFactory, mCameraRepository);
                 mCameraPresenceProvider.addDependentInternalListener(mSurfaceManager);
                 mCameraPresenceProvider.addDependentInternalListener(
                         mCameraFactory.getCameraCoordinator());
