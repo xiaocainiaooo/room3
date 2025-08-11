@@ -97,6 +97,8 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
         cameraXConfig: CameraXConfig? = null,
     ): ListenableFuture<Void> {
         synchronized(lock) {
+            lifecycleCameraRepository =
+                LifecycleCameraRepositories.getInstance(ContextUtil.getDeviceId(context))
             if (cameraXInitializeFuture != null) {
                 return cameraXInitializeFuture as ListenableFuture<Void>
             }
@@ -141,7 +143,6 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
         synchronized(lock) {
             cameraX = newCameraX
             context = newContext
-            lifecycleCameraRepository = newContext?.let(LifecycleCameraRepositories::getInstance)
         }
     }
 

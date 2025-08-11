@@ -16,7 +16,6 @@
 
 package androidx.camera.lifecycle
 
-import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.camera.core.impl.utils.ContextUtil
 
@@ -25,19 +24,19 @@ internal object LifecycleCameraRepositories {
     private val repositoryMap = mutableMapOf<Int, LifecycleCameraRepository>()
 
     /**
-     * Gets the [LifecycleCameraRepository] instance by the given [Context].
+     * Gets the [LifecycleCameraRepository] instance by the given device ID.
      *
-     * If the [Context] holds different device IDs, this method returns different instance of
-     * [LifecycleCameraRepository]. [LifecycleCamera] managed by different repository instances will
-     * not interfere with each other.
+     * This method returns different instance of [LifecycleCameraRepository] for different device
+     * ID. [LifecycleCamera] managed by different repository instances will not interfere with each
+     * other.
      *
-     * @param context The [Context] to get the [LifecycleCameraRepository] instance. If not set, the
-     *   default instance will be returned.
+     * @param deviceId The device ID to get the [LifecycleCameraRepository] instance. If not set,
+     *   the default instance will be returned.
      * @return The [LifecycleCameraRepository] instance.
+     * @see android.content.Context.getDeviceId
      */
     @JvmStatic
-    fun getInstance(context: Context? = null): LifecycleCameraRepository {
-        val deviceId = context?.let(ContextUtil::getDeviceId) ?: ContextUtil.getDefaultDeviceId()
+    fun getInstance(deviceId: Int = ContextUtil.getDefaultDeviceId()): LifecycleCameraRepository {
         return synchronized(repositoryMap) {
             repositoryMap.getOrPut(deviceId) { LifecycleCameraRepository(deviceId) }
         }

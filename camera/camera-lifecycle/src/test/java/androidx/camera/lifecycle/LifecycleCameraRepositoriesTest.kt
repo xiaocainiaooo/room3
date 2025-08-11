@@ -55,10 +55,10 @@ class LifecycleCameraRepositoriesTest {
     }
 
     @Test
-    fun getInstance_withNullContext_returnsSameDefaultInstance() {
+    fun getInstance_withoutDeviceId_ReturnsSameDefaultInstance() {
         // Act.
-        val instance1 = LifecycleCameraRepositories.getInstance(null)
-        val instance2 = LifecycleCameraRepositories.getInstance(null)
+        val instance1 = LifecycleCameraRepositories.getInstance()
+        val instance2 = LifecycleCameraRepositories.getInstance()
 
         // Assert.
         assertThat(instance1).isNotNull()
@@ -66,29 +66,13 @@ class LifecycleCameraRepositoriesTest {
     }
 
     @Test
-    fun getInstance_withSameContext_returnsSameInstance() {
-        // Act.
-        val instance1 = LifecycleCameraRepositories.getInstance(context)
-        val instance2 = LifecycleCameraRepositories.getInstance(context)
-
-        // Assert.
-        assertThat(instance1).isNotNull()
-        assertThat(instance1).isSameInstanceAs(instance2)
-    }
-
-    @Test
-    @Config(minSdk = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun getInstance_withDifferentContextsSameId_returnsSameInstance() {
+    fun getInstance_withSameDeviceId_returnsSameInstance() {
         // Arrange.
         val deviceId = 1
-        val baseContext = ApplicationProvider.getApplicationContext<Context>()
-        val context1 = TestAppContextWrapper(base = baseContext, deviceId = deviceId)
-        // Create a new context with the same device ID.
-        val context2 = TestAppContextWrapper(base = baseContext, deviceId = deviceId)
 
-        // Act.
-        val instance1 = LifecycleCameraRepositories.getInstance(context1)
-        val instance2 = LifecycleCameraRepositories.getInstance(context2)
+        // Act: Create two instances with the same device ID.
+        val instance1 = LifecycleCameraRepositories.getInstance(deviceId)
+        val instance2 = LifecycleCameraRepositories.getInstance(deviceId)
 
         // Assert.
         assertThat(instance1).isSameInstanceAs(instance2)
@@ -97,16 +81,10 @@ class LifecycleCameraRepositoriesTest {
     @Test
     @Config(minSdk = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     fun getInstance_withDifferentDeviceIds_returnsDifferentInstances() {
-        // Arrange.
-        val baseContext = ApplicationProvider.getApplicationContext<Context>()
-        val context1 = TestAppContextWrapper(base = baseContext, deviceId = 1)
-        // Wrap the application context with a different device ID.
-        val context2 = TestAppContextWrapper(base = baseContext, deviceId = 2)
-
         // Act.
-        val instance1 = LifecycleCameraRepositories.getInstance(context1)
-        val instance2 = LifecycleCameraRepositories.getInstance(context2)
-        val defaultInstance = LifecycleCameraRepositories.getInstance(null)
+        val instance1 = LifecycleCameraRepositories.getInstance(1)
+        val instance2 = LifecycleCameraRepositories.getInstance(2)
+        val defaultInstance = LifecycleCameraRepositories.getInstance()
 
         // Assert.
         assertThat(instance1).isNotSameInstanceAs(instance2)
@@ -147,20 +125,14 @@ class LifecycleCameraRepositoriesTest {
     @Test
     fun lifecycleCamerasActive_bindToRepositoriesWithDifferentDeviceId() {
         // Act.
-        val repository0 =
-            LifecycleCameraRepositories.getInstance(
-                TestAppContextWrapper(base = context, deviceId = 0)
-            )
+        val repository0 = LifecycleCameraRepositories.getInstance(0)
         val lifecycle0 = FakeLifecycleOwner()
         val lifecycleCamera0 = repository0.createFakeLifecycleCamera(lifecycle0)
         lifecycle0.start()
         repository0.lazyBindToLifecycleCamera(lifecycleCamera0)
 
         // Create the second repository with a different device ID.
-        val repository1 =
-            LifecycleCameraRepositories.getInstance(
-                TestAppContextWrapper(base = context, deviceId = 1)
-            )
+        val repository1 = LifecycleCameraRepositories.getInstance(1)
         val lifecycle1 = FakeLifecycleOwner()
         val lifecycleCamera1 = repository1.createFakeLifecycleCamera(lifecycle1)
         lifecycle1.start()
@@ -173,22 +145,18 @@ class LifecycleCameraRepositoriesTest {
 
     @Test
     fun lifecycleCameraOf1stActiveLifecycleInactive_bindToRepositoriesWithSameDeviceId() {
-        // Act.
+        // Arrange.
         val deviceId = 1
-        val repository0 =
-            LifecycleCameraRepositories.getInstance(
-                TestAppContextWrapper(base = context, deviceId = deviceId)
-            )
+
+        // Act.
+        val repository0 = LifecycleCameraRepositories.getInstance(deviceId)
         val lifecycle0 = FakeLifecycleOwner()
         val lifecycleCamera0 = repository0.createFakeLifecycleCamera(lifecycle0)
         lifecycle0.start()
         repository0.lazyBindToLifecycleCamera(lifecycleCamera0)
 
         // Create the second repository with the same device ID.
-        val repository1 =
-            LifecycleCameraRepositories.getInstance(
-                TestAppContextWrapper(base = context, deviceId = deviceId)
-            )
+        val repository1 = LifecycleCameraRepositories.getInstance(deviceId)
         val lifecycle1 = FakeLifecycleOwner()
         val lifecycleCamera1 = repository1.createFakeLifecycleCamera(lifecycle1)
         lifecycle1.start()
