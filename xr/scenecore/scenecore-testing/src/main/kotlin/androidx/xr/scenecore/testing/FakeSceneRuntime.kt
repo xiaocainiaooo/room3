@@ -56,6 +56,8 @@ import androidx.xr.scenecore.internal.SpatialPointerComponent
 import androidx.xr.scenecore.internal.SpatialVisibility
 import androidx.xr.scenecore.internal.SubspaceNodeEntity
 import androidx.xr.scenecore.internal.SubspaceNodeFeature
+import androidx.xr.scenecore.internal.SurfaceEntity
+import androidx.xr.scenecore.internal.SurfaceFeature
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.Executor
@@ -156,6 +158,12 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         pose: Pose,
         parentEntity: Entity,
     ): GltfEntity = FakeGltfEntity()
+
+    override fun createSurfaceEntity(
+        feature: SurfaceFeature,
+        pose: Pose,
+        parentEntity: Entity,
+    ): SurfaceEntity = FakeSurfaceEntity()
 
     override fun createSubspaceNodeEntity(feature: SubspaceNodeFeature): SubspaceNodeEntity =
         FakeSubspaceNodeEntity(feature)

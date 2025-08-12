@@ -852,6 +852,7 @@ package androidx.xr.scenecore.testing {
     method public androidx.xr.scenecore.testing.FakeResizableComponent createResizableComponent(androidx.xr.scenecore.internal.Dimensions minimumSize, androidx.xr.scenecore.internal.Dimensions maximumSize);
     method public androidx.xr.scenecore.internal.SpatialPointerComponent createSpatialPointerComponent();
     method public androidx.xr.scenecore.internal.SubspaceNodeEntity createSubspaceNodeEntity(androidx.xr.scenecore.internal.SubspaceNodeFeature feature);
+    method public androidx.xr.scenecore.internal.SurfaceEntity createSurfaceEntity(androidx.xr.scenecore.internal.SurfaceFeature feature, androidx.xr.runtime.math.Pose pose, androidx.xr.scenecore.internal.Entity parentEntity);
     method public void dispose();
     method public void enablePanelDepthTest(boolean enabled);
     method public androidx.xr.scenecore.internal.ActivitySpace getActivitySpace();
@@ -1057,6 +1058,45 @@ package androidx.xr.scenecore.testing {
     property public androidx.xr.scenecore.internal.SurfaceEntity.Shape shape;
     property public int stereoMode;
     property public android.view.Surface surface;
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeSurfaceFeature extends androidx.xr.scenecore.testing.FakeBaseRenderingFeature implements androidx.xr.scenecore.internal.SurfaceFeature {
+    ctor public FakeSurfaceFeature(androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> nodeHolder);
+    method public int getColorRange();
+    method public int getColorSpace();
+    method public int getColorTransfer();
+    method public boolean getContentColorMetadataSet();
+    method public androidx.xr.scenecore.internal.Dimensions getDimensions();
+    method public androidx.xr.scenecore.internal.SurfaceEntity.EdgeFeather getEdgeFeather();
+    method public int getMaxContentLightLevel();
+    method public androidx.xr.scenecore.internal.TextureResource? getPrimaryAlphaMask();
+    method public androidx.xr.scenecore.internal.SurfaceEntity.Shape getShape();
+    method public int getStereoMode();
+    method public android.view.Surface getSurface();
+    method public void resetContentColorMetadata();
+    method public void setAuxiliaryAlphaMaskTexture(androidx.xr.scenecore.internal.TextureResource? alphaMask);
+    method public void setContentColorMetadata(int colorSpace, int colorTransfer, int colorRange, int maxCLL);
+    method public void setEdgeFeather(androidx.xr.scenecore.internal.SurfaceEntity.EdgeFeather);
+    method public void setPrimaryAlphaMaskTexture(androidx.xr.scenecore.internal.TextureResource? alphaMask);
+    method public void setShape(androidx.xr.scenecore.internal.SurfaceEntity.Shape);
+    method public void setStereoMode(int);
+    method public void setSurface(android.view.Surface surface);
+    property public int colorRange;
+    property public int colorSpace;
+    property public int colorTransfer;
+    property public boolean contentColorMetadataSet;
+    property public androidx.xr.scenecore.internal.Dimensions dimensions;
+    property public androidx.xr.scenecore.internal.SurfaceEntity.EdgeFeather edgeFeather;
+    property public int maxContentLightLevel;
+    property public androidx.xr.scenecore.internal.TextureResource? primaryAlphaMask;
+    property public androidx.xr.scenecore.internal.SurfaceEntity.Shape shape;
+    property public int stereoMode;
+    property public android.view.Surface surface;
+    field public static final androidx.xr.scenecore.testing.FakeSurfaceFeature.Companion Companion;
+  }
+
+  public static final class FakeSurfaceFeature.Companion {
+    method public androidx.xr.scenecore.internal.SurfaceFeature createWithMockFeature(androidx.xr.scenecore.internal.SurfaceFeature feature, androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> nodeHolder);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeSystemSpaceEntity extends androidx.xr.scenecore.testing.FakeEntity implements androidx.xr.scenecore.internal.SystemSpaceEntity {

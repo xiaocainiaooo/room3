@@ -66,6 +66,8 @@ import androidx.xr.scenecore.internal.SpatialPointerComponent;
 import androidx.xr.scenecore.internal.SpatialVisibility;
 import androidx.xr.scenecore.internal.SubspaceNodeEntity;
 import androidx.xr.scenecore.internal.SubspaceNodeFeature;
+import androidx.xr.scenecore.internal.SurfaceEntity;
+import androidx.xr.scenecore.internal.SurfaceFeature;
 
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
@@ -545,6 +547,16 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
             @NonNull GltfFeature feature, @NonNull Pose pose, @Nullable Entity parentEntity) {
         GltfEntity entity =
                 new GltfEntityImpl(
+                        mActivity, feature, parentEntity, mExtensions, mEntityManager, mExecutor);
+        entity.setPose(pose, Space.PARENT);
+        return entity;
+    }
+
+    @Override
+    public @NonNull SurfaceEntity createSurfaceEntity(
+            @NonNull SurfaceFeature feature, @NonNull Pose pose, @Nullable Entity parentEntity) {
+        SurfaceEntity entity =
+                new SurfaceEntityImpl(
                         mActivity, feature, parentEntity, mExtensions, mEntityManager, mExecutor);
         entity.setPose(pose, Space.PARENT);
         return entity;

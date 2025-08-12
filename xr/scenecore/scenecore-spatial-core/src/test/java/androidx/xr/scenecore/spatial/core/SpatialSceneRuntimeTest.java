@@ -204,7 +204,6 @@ public class SpatialSceneRuntimeTest {
         ActivitySpace activitySpace = mRuntime.getActivitySpace();
 
         assertThat(activitySpace).isNotNull();
-
         // Verify that there is an underlying extension node.
         ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) activitySpace;
         assertThat(activitySpaceImpl.getNode()).isNotNull();

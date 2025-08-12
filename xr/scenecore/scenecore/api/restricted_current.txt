@@ -2666,6 +2666,7 @@ package androidx.xr.scenecore.internal {
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface RenderingEntityFactory {
     method public androidx.xr.scenecore.internal.GltfEntity createGltfEntity(androidx.xr.scenecore.internal.GltfFeature feature, androidx.xr.runtime.math.Pose pose, androidx.xr.scenecore.internal.Entity parentEntity);
     method public androidx.xr.scenecore.internal.SubspaceNodeEntity createSubspaceNodeEntity(androidx.xr.scenecore.internal.SubspaceNodeFeature feature);
+    method public androidx.xr.scenecore.internal.SurfaceEntity createSurfaceEntity(androidx.xr.scenecore.internal.SurfaceFeature feature, androidx.xr.runtime.math.Pose pose, androidx.xr.scenecore.internal.Entity parentEntity);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface RenderingFeature {
@@ -3218,6 +3219,36 @@ package androidx.xr.scenecore.internal {
     property public static int PROTECTED;
     field public static final int NONE = 0; // 0x0
     field public static final int PROTECTED = 1; // 0x1
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SurfaceFeature extends androidx.xr.scenecore.internal.RenderingFeature {
+    method public int getColorRange();
+    method public int getColorSpace();
+    method public int getColorTransfer();
+    method public boolean getContentColorMetadataSet();
+    method public androidx.xr.scenecore.internal.Dimensions getDimensions();
+    method public androidx.xr.scenecore.internal.SurfaceEntity.EdgeFeather getEdgeFeather();
+    method public int getMaxContentLightLevel();
+    method public androidx.xr.scenecore.internal.SurfaceEntity.Shape getShape();
+    method public int getStereoMode();
+    method public android.view.Surface getSurface();
+    method public void resetContentColorMetadata();
+    method public void setAuxiliaryAlphaMaskTexture(androidx.xr.scenecore.internal.TextureResource? alphaMask);
+    method public void setContentColorMetadata(@androidx.xr.scenecore.internal.SurfaceEntity.ColorSpace int colorSpace, @androidx.xr.scenecore.internal.SurfaceEntity.ColorTransfer int colorTransfer, @androidx.xr.scenecore.internal.SurfaceEntity.ColorRange int colorRange, int maxCLL);
+    method public void setEdgeFeather(androidx.xr.scenecore.internal.SurfaceEntity.EdgeFeather);
+    method public void setPrimaryAlphaMaskTexture(androidx.xr.scenecore.internal.TextureResource? alphaMask);
+    method public void setShape(androidx.xr.scenecore.internal.SurfaceEntity.Shape);
+    method public void setStereoMode(int);
+    property @androidx.xr.scenecore.internal.SurfaceEntity.ColorRange public abstract int colorRange;
+    property @androidx.xr.scenecore.internal.SurfaceEntity.ColorSpace public abstract int colorSpace;
+    property @androidx.xr.scenecore.internal.SurfaceEntity.ColorTransfer public abstract int colorTransfer;
+    property public abstract boolean contentColorMetadataSet;
+    property public abstract androidx.xr.scenecore.internal.Dimensions dimensions;
+    property public abstract androidx.xr.scenecore.internal.SurfaceEntity.EdgeFeather edgeFeather;
+    property public abstract int maxContentLightLevel;
+    property public abstract androidx.xr.scenecore.internal.SurfaceEntity.Shape shape;
+    property @androidx.xr.scenecore.internal.SurfaceEntity.StereoMode public abstract int stereoMode;
+    property public abstract android.view.Surface surface;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SystemSpaceEntity extends androidx.xr.scenecore.internal.Entity {
