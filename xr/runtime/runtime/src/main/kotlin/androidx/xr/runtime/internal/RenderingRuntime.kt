@@ -113,6 +113,15 @@ public interface RenderingRuntime {
     public fun destroyTexture(texture: TextureResource)
 
     /**
+     * Returns the reflection texture from the given IBL.
+     *
+     * @param iblToken An ExrImageResource representing a loaded Image-Based Lighting (IBL) asset.
+     * @return A TextureResource representing the reflection texture, or null if the texture was not
+     *   found.
+     */
+    public fun getReflectionTextureFromIbl(iblToken: ExrImageResource): TextureResource?
+
+    /**
      * Creates a water material by querying it from the system's built-in materials. The future
      * returned by this method will fire listeners on the UI thread if Runnable::run is supplied.
      *

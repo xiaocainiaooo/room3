@@ -86,6 +86,10 @@ public class FakeRenderingRuntime(
         reflectionTexture = null
     }
 
+    override fun getReflectionTextureFromIbl(iblToken: ExrImageResource): TextureResource? {
+        return reflectionTexture
+    }
+
     /**
      * For test purposes only.
      *
