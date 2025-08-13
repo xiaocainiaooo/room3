@@ -16,18 +16,17 @@
 
 package androidx.xr.runtime.internal
 
-import android.app.Activity
 import androidx.annotation.RestrictTo
 
-/** Factory for creating instances of a RenderingRuntime. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public interface RenderingRuntimeFactory : Service {
-    /**
-     * Creates a [RenderingRuntime].
-     *
-     * @param sceneRuntime The [SceneRuntime] for the session. This instance must also implement the
-     *   [RenderingEntityFactory] interface.
-     * @param activity The host [Activity] for the session.
-     */
-    public fun create(sceneRuntime: SceneRuntime, activity: Activity): RenderingRuntime
-}
+/**
+ * An interface for creating entities with rendering features.
+ *
+ * This interface is implemented by a [SceneRuntime] instance to provide rendering-specific entity
+ * creation methods for use by a [RenderingRuntime] instance. By separating these methods into a
+ * distinct interface, we avoid exposing internal rendering operations on the public [SceneRuntime]
+ * API.
+ *
+ * The intended usage is for a [RenderingRuntime] to cast its [SceneRuntime] instance to
+ * `RenderingEntityFactory` to access these factory methods.
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface RenderingEntityFactory {}

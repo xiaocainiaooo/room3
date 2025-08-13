@@ -24,6 +24,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.xr.runtime.internal.ActivitySpace;
 import androidx.xr.runtime.internal.CameraViewActivityPose;
 import androidx.xr.runtime.internal.Entity;
+import androidx.xr.runtime.internal.RenderingEntityFactory;
 import androidx.xr.runtime.internal.SceneRuntime;
 import androidx.xr.runtime.internal.Space;
 import androidx.xr.runtime.internal.SpatialCapabilities;
@@ -60,7 +61,7 @@ import java.util.function.Supplier;
 // Suppress BanSynchronizedMethods for onSpatialStateChanged().
 // Suppress BanConcurrentHashMap for mSpatialCapabilitiesChangedListeners since XR minSdk is 24.
 @SuppressWarnings({"BanSynchronizedMethods", "BanConcurrentHashMap"})
-class SpatialSceneRuntime implements SceneRuntime {
+class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     private @Nullable Activity mActivity;
     private final ScheduledExecutorService mExecutor;
     private final XrExtensions mExtensions;
