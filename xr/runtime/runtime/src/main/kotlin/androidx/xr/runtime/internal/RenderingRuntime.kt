@@ -64,6 +64,16 @@ public interface RenderingRuntime {
     ): ListenableFuture<GltfModelResource>
 
     /**
+     * Loads an ExrImage for the given asset name from the assets folder.
+     *
+     * @param assetName The name of the asset to load from the assets folder.
+     * @return A future that resolves to the ExrImage when it is loaded. The future will be null if
+     *   the asset was not found.
+     */
+    @SuppressWarnings("AsyncSuffixFuture")
+    public fun loadExrImageByAssetName(assetName: String): ListenableFuture<ExrImageResource>
+
+    /**
      * Loads a texture resource for the given asset name or URL. The future returned by this method
      * will fire listeners on the UI thread if Runnable::run is supplied.
      *

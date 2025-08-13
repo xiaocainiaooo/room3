@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import android.app.Activity;
 
+import androidx.xr.runtime.internal.ExrImageResource;
 import androidx.xr.runtime.internal.GltfModelResource;
 import androidx.xr.runtime.internal.MaterialResource;
 import androidx.xr.runtime.internal.SceneRuntime;
@@ -130,6 +131,21 @@ public class SpatialRenderingRuntimeTest {
         GltfModelResourceImpl modelImpl = (GltfModelResourceImpl) model;
         assertThat(modelImpl).isNotNull();
         long token = modelImpl.getExtensionModelToken();
+        assertThat(token).isEqualTo(1);
+    }
+
+    @Test
+    public void loadExrImageByAssetName_returnsModel() throws Exception {
+        ListenableFuture<ExrImageResource> imageFuture =
+                mRuntime.loadExrImageByAssetName("FakeAsset.zip");
+
+        assertThat(imageFuture).isNotNull();
+
+        ExrImageResource image = imageFuture.get();
+        assertThat(image).isNotNull();
+        ExrImageResourceImpl imageImpl = (ExrImageResourceImpl) image;
+        assertThat(imageImpl).isNotNull();
+        long token = imageImpl.getExtensionImageToken();
         assertThat(token).isEqualTo(1);
     }
 

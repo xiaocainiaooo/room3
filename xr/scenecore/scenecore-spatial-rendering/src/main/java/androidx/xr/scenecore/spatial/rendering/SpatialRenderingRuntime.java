@@ -21,6 +21,7 @@ import android.os.Looper;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.concurrent.futures.ResolvableFuture;
+import androidx.xr.runtime.internal.ExrImageResource;
 import androidx.xr.runtime.internal.GltfModelResource;
 import androidx.xr.runtime.internal.KhronosPbrMaterialSpec;
 import androidx.xr.runtime.internal.MaterialResource;
@@ -143,6 +144,10 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         return new GltfModelResourceImpl(token);
     }
 
+    private static ExrImageResourceImpl getExrImageResourceFromToken(long token) {
+        return new ExrImageResourceImpl(token);
+    }
+
     @SuppressWarnings("FutureReturnValueIgnored")
     private @Nullable ListenableFuture<GltfModelResource> loadGltfAsset(
             Supplier<ListenableFuture<Long>> modelLoader) {
@@ -176,6 +181,38 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         return gltfModelResourceFuture;
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
+    private @Nullable ListenableFuture<ExrImageResource> loadExrImage(
+            Supplier<ListenableFuture<Long>> assetLoader) {
+        if (!Looper.getMainLooper().isCurrentThread()) {
+            throw new IllegalStateException("This method must be called on the main thread.");
+        }
+
+        ResolvableFuture<ExrImageResource> exrImageResourceFuture = ResolvableFuture.create();
+
+        ListenableFuture<Long> exrImageTokenFuture;
+        try {
+            exrImageTokenFuture = assetLoader.get();
+        } catch (RuntimeException e) {
+            return null;
+        }
+
+        exrImageTokenFuture.addListener(
+                () -> {
+                    try {
+                        long exrImageToken = exrImageTokenFuture.get();
+                        exrImageResourceFuture.set(getExrImageResourceFromToken(exrImageToken));
+                    } catch (Exception e) {
+                        if (e instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                        }
+                        exrImageResourceFuture.setException(e);
+                    }
+                },
+                mActivity::runOnUiThread);
+
+        return exrImageResourceFuture;
+    }
 
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
@@ -191,6 +228,16 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     public @NonNull ListenableFuture<GltfModelResource> loadGltfByByteArray(
             byte @NonNull [] assetData, @NonNull String assetKey) {
         return loadGltfAsset(() -> mImpressApi.loadGltfAsset(assetData, assetKey));
+    }
+
+    // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
+    // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
+    // warning, however, we get a build error - go/bugpattern/RestrictTo.
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
+    @Override
+    public @NonNull ListenableFuture<ExrImageResource> loadExrImageByAssetName(
+            @NonNull String assetName) {
+        return loadExrImage(() -> mImpressApi.loadImageBasedLightingAsset(assetName));
     }
 
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
