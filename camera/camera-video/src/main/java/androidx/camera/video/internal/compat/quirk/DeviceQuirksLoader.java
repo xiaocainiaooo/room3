@@ -170,6 +170,11 @@ public class DeviceQuirksLoader {
                 GLProcessingStuckOnCodecFlushQuirk.load())) {
             quirks.add(GLProcessingStuckOnCodecFlushQuirk.INSTANCE);
         }
+        if (quirkSettings.shouldEnableQuirk(
+                VideoInterlacingQuirk.class,
+                VideoInterlacingQuirk.load())) {
+            quirks.add(VideoInterlacingQuirk.INSTANCE);
+        }
         return quirks;
     }
 }
