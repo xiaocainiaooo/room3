@@ -43,6 +43,12 @@ public class FakeRenderingRuntime(
         immediateFuture(FakeGltfModelResource(0))
 
     @Suppress("AsyncSuffixFuture")
+    override fun loadGltfByByteArray(
+        assetData: ByteArray,
+        assetKey: String,
+    ): ListenableFuture<GltfModelResource> = immediateFuture(FakeGltfModelResource(0))
+
+    @Suppress("AsyncSuffixFuture")
     override fun loadTexture(
         assetName: String,
         sampler: TextureSampler,

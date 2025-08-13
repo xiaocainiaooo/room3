@@ -186,6 +186,13 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         return loadGltfAsset(() -> mImpressApi.loadGltfAsset(name));
     }
 
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
+    @Override
+    public @NonNull ListenableFuture<GltfModelResource> loadGltfByByteArray(
+            byte @NonNull [] assetData, @NonNull String assetKey) {
+        return loadGltfAsset(() -> mImpressApi.loadGltfAsset(assetData, assetKey));
+    }
+
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
     // warning, however, we get a build error - go/bugpattern/RestrictTo.

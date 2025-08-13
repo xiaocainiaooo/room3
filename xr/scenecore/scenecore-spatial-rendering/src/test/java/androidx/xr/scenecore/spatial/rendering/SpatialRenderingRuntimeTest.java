@@ -119,6 +119,21 @@ public class SpatialRenderingRuntimeTest {
     }
 
     @Test
+    public void loadGltfByByteArray_returnsModel() throws Exception {
+        ListenableFuture<GltfModelResource> modelFuture =
+                mRuntime.loadGltfByByteArray(new byte[] {1, 2, 3}, "FakeAsset.glb");
+
+        assertThat(modelFuture).isNotNull();
+
+        GltfModelResource model = modelFuture.get();
+        assertThat(model).isNotNull();
+        GltfModelResourceImpl modelImpl = (GltfModelResourceImpl) model;
+        assertThat(modelImpl).isNotNull();
+        long token = modelImpl.getExtensionModelToken();
+        assertThat(token).isEqualTo(1);
+    }
+
+    @Test
     public void createWaterMaterial_returnsWaterMaterial() throws Exception {
         assertThat(createWaterMaterial()).isNotNull();
     }

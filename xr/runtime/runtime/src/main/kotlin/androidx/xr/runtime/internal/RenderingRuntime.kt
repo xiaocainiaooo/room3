@@ -47,6 +47,23 @@ public interface RenderingRuntime {
     public fun loadGltfByAssetName(assetName: String): ListenableFuture<GltfModelResource>
 
     /**
+     * Loads glTF Asset from a provided byte array. The future returned by this method will fire
+     * listeners on the UI thread if Runnable::run is supplied.
+     *
+     * @param assetData A gltfAsset in the form of a byte array.
+     * @param assetKey The name of the asset to load from the cache.
+     * @return A future that resolves to the glTF model when it is loaded. The future will be null
+     *   if the asset was not found.
+     */
+    @Suppress("AsyncSuffixFuture")
+    // TODO(b/397746548): Add InputStream support for loading glTFs.
+    // Suppressed to allow CompletableFuture.
+    public fun loadGltfByByteArray(
+        assetData: ByteArray,
+        assetKey: String,
+    ): ListenableFuture<GltfModelResource>
+
+    /**
      * Loads a texture resource for the given asset name or URL. The future returned by this method
      * will fire listeners on the UI thread if Runnable::run is supplied.
      *
