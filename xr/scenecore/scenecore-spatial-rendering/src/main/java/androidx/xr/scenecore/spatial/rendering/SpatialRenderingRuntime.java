@@ -240,6 +240,13 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         return loadExrImage(() -> mImpressApi.loadImageBasedLightingAsset(assetName));
     }
 
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
+    @Override
+    public @NonNull ListenableFuture<ExrImageResource> loadExrImageByByteArray(
+            byte @NonNull [] assetData, @NonNull String assetKey) {
+        return loadExrImage(() -> mImpressApi.loadImageBasedLightingAsset(assetData, assetKey));
+    }
+
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
     // warning, however, we get a build error - go/bugpattern/RestrictTo.

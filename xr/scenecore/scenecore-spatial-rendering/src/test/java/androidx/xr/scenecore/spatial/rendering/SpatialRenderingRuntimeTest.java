@@ -150,6 +150,21 @@ public class SpatialRenderingRuntimeTest {
     }
 
     @Test
+    public void loadExrImageByByteArray_returnsModel() throws Exception {
+        ListenableFuture<ExrImageResource> imageFuture =
+                mRuntime.loadExrImageByByteArray(new byte[] {1, 2, 3}, "FakeAsset.zip");
+
+        assertThat(imageFuture).isNotNull();
+
+        ExrImageResource image = imageFuture.get();
+        assertThat(image).isNotNull();
+        ExrImageResourceImpl imageImpl = (ExrImageResourceImpl) image;
+        assertThat(imageImpl).isNotNull();
+        long token = imageImpl.getExtensionImageToken();
+        assertThat(token).isEqualTo(1);
+    }
+
+    @Test
     public void createWaterMaterial_returnsWaterMaterial() throws Exception {
         assertThat(createWaterMaterial()).isNotNull();
     }

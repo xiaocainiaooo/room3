@@ -74,6 +74,21 @@ public interface RenderingRuntime {
     public fun loadExrImageByAssetName(assetName: String): ListenableFuture<ExrImageResource>
 
     /**
+     * Loads an ExrImage from a provided byte array.
+     *
+     * @param assetData An ExrImage in the form of a byte array.
+     * @param assetKey The name of the asset to load from the cache.
+     * @return A future that resolves to the ExrImage when it is loaded. The future will be null if
+     *   the asset was not found.
+     */
+    @Suppress("AsyncSuffixFuture")
+    // Suppressed to allow CompletableFuture.
+    public fun loadExrImageByByteArray(
+        assetData: ByteArray,
+        assetKey: String,
+    ): ListenableFuture<ExrImageResource>
+
+    /**
      * Loads a texture resource for the given asset name or URL. The future returned by this method
      * will fire listeners on the UI thread if Runnable::run is supplied.
      *
