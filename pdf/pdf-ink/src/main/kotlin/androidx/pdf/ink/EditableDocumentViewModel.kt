@@ -75,7 +75,7 @@ internal class EditableDocumentViewModel(private val state: SavedStateHandle) : 
             annotationsManager = InMemoryAnnotationsManager(document)
             _annotationDisplayStateFlow.value =
                 AnnotationsDisplayState(
-                    draftState = annotationsManager.getFullAnnotationStateSnapshot(),
+                    draftState = annotationsManager.getSnapshot(),
                     transformationMatrices = HashMap(),
                 )
         }
@@ -86,7 +86,7 @@ internal class EditableDocumentViewModel(private val state: SavedStateHandle) : 
         if (editablePdfDocument != null) {
             val unused = annotationsManager.addAnnotation(annotation)
             _annotationDisplayStateFlow.update { currentState ->
-                currentState.copy(draftState = annotationsManager.getFullAnnotationStateSnapshot())
+                currentState.copy(draftState = annotationsManager.getSnapshot())
             }
         }
     }
@@ -117,7 +117,7 @@ internal class EditableDocumentViewModel(private val state: SavedStateHandle) : 
                 annotationsByPage[page] = annotationsManager.getAnnotationsForPage(page)
             }
             _annotationDisplayStateFlow.update { displayState ->
-                displayState.copy(draftState = annotationsManager.getFullAnnotationStateSnapshot())
+                displayState.copy(draftState = annotationsManager.getSnapshot())
             }
         }
     }
