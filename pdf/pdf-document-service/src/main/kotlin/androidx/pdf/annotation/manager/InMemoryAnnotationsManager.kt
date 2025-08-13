@@ -18,7 +18,6 @@ package androidx.pdf.annotation.manager
 
 import androidx.annotation.RestrictTo
 import androidx.pdf.annotation.draftstate.AnnotationEditsDraftState
-import androidx.pdf.annotation.draftstate.ImmutableAnnotationEditsDraftState
 import androidx.pdf.annotation.draftstate.InMemoryAnnotationEditsDraftState
 import androidx.pdf.annotation.models.EditId
 import androidx.pdf.annotation.models.PdfAnnotation
@@ -104,7 +103,7 @@ public class InMemoryAnnotationsManager(private val fetcher: PageAnnotationFetch
      * Returns an immutable snapshot of the current annotation draft state including unedited
      * existing annotations as well.
      *
-     * @return An [ImmutableAnnotationEditsDraftState] representing the current draft.
+     * @return An [PdfEdits] representing the current draft.
      */
     override fun getSnapshot(): PdfEdits = annotationEditsDraftState.toPdfEdits()
 }

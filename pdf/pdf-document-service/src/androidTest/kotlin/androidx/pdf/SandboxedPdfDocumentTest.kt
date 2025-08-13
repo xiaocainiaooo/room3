@@ -686,18 +686,18 @@ class SandboxedPdfDocumentTest {
         val editId2 = document.addEdit(annotation2)
         val editId3 = document.addEdit(annotation3)
 
-        val snapshot = document.getAllEdits()
+        val pdfEdits = document.getAllEdits()
 
-        assertThat(snapshot.size).isEqualTo(2)
-        assertThat(snapshot.containsKey(0)).isTrue()
-        assertThat(snapshot.containsKey(1)).isTrue()
+        assertThat(pdfEdits.editsByPage.size).isEqualTo(2)
+        assertThat(pdfEdits.editsByPage.containsKey(0)).isTrue()
+        assertThat(pdfEdits.editsByPage.containsKey(1)).isTrue()
 
-        val page0Edits = snapshot[0]!!
+        val page0Edits = pdfEdits.editsByPage[0]!!
         assertThat(page0Edits.size).isEqualTo(1)
         assertThat(page0Edits[0].id).isEqualTo(editId1)
         assertStampAnnotationEquals(annotation1, page0Edits[0].edit as StampAnnotation)
 
-        val page1Edits = snapshot[1]!!
+        val page1Edits = pdfEdits.editsByPage[1]!!
         assertThat(page1Edits.size).isEqualTo(2)
         val page1EditIds = page1Edits.map { it.id }
         assertThat(page1EditIds).containsExactly(editId2, editId3)

@@ -21,8 +21,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.pdf.annotation.models.EditId
 import androidx.pdf.annotation.models.PdfAnnotation
 import androidx.pdf.annotation.models.PdfAnnotationData
-import androidx.pdf.annotation.models.PdfEdit
-import androidx.pdf.annotation.models.PdfEditEntry
 import androidx.pdf.annotation.models.PdfEdits
 import java.util.Collections
 import java.util.UUID
@@ -104,7 +102,9 @@ public class InMemoryAnnotationEditsDraftState() : AnnotationEditsDraftState {
         lock.withLock {
             val pageEdits =
                 editsByPage[editId.pageNum]
-                    ?: throw NoSuchElementException("No annotations present on page ${editId.pageNum}.")
+                    ?: throw NoSuchElementException(
+                        "No annotations present on page ${editId.pageNum}."
+                    )
 
             val removedData =
                 pageEdits.remove(editId)
@@ -129,7 +129,9 @@ public class InMemoryAnnotationEditsDraftState() : AnnotationEditsDraftState {
         lock.withLock {
             val pageEdits =
                 editsByPage[editId.pageNum]
-                    ?: throw NoSuchElementException("No annotations present on page ${editId.pageNum}.")
+                    ?: throw NoSuchElementException(
+                        "No annotations present on page ${editId.pageNum}."
+                    )
 
             if (!pageEdits.containsKey(editId)) {
                 throw NoSuchElementException("Annotation with ID $editId not found.")

@@ -54,10 +54,11 @@ internal class FakeEditablePdfDocument(
         annotationsByPage.getOrPut(pageNum) { mutableListOf() }.add(data)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override suspend fun <T : PdfEditEntry<out PdfEdit>> getEditsForPage(pageNum: Int): List<T> {
         getAnnotationsForPageCallCount[pageNum] =
             getAnnotationsForPageCallCount.getOrDefault(pageNum, 0) + 1
-        return (annotationsByPage[pageNum] ?: emptyList()) as List<T>
+        return (annotationsByPage[pageNum] ?: emptyList()).toList() as List<T>
     }
 
     override suspend fun applyEdits(annotations: List<PdfAnnotationData>): AnnotationResult {

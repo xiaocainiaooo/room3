@@ -20,8 +20,8 @@ import android.net.Uri
 import androidx.pdf.FakeEditablePdfDocument
 import androidx.pdf.annotation.createStampAnnotationWithPath
 import androidx.pdf.annotation.manager.InMemoryAnnotationsManager
-import androidx.pdf.annotation.models.PdfEdit
-import androidx.pdf.annotation.models.PdfEditEntry
+import androidx.pdf.annotation.models.PdfAnnotation
+import androidx.pdf.annotation.models.PdfAnnotationData
 import androidx.pdf.annotation.models.StampAnnotation
 import androidx.pdf.util.createDummyUri
 import com.google.common.truth.Truth.assertThat
@@ -224,6 +224,6 @@ class InMemoryAnnotationsManagerTest {
         }
     }
 
-    private suspend fun <T : PdfEditEntry<out PdfEdit>> getEditsForPage(pageNum: Int): List<T> =
-        fakeDocument.getEditsForPage(pageNum)
+    private suspend fun getEditsForPage(pageNum: Int): List<PdfAnnotation> =
+        fakeDocument.getEditsForPage<PdfAnnotationData>(pageNum).map { it.annotation }
 }

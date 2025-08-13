@@ -16,11 +16,14 @@
 
 package androidx.pdf.annotation.models
 
+import androidx.annotation.RestrictTo
+
 /**
  * An immutable, value-based representation of all edits in a document, organized by page number.
  *
  * @property editsByPage A map where the key is the page number and the value is a list of edits.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @JvmInline
 public value class PdfEdits(public val editsByPage: Map<Int, List<PdfEditEntry<out PdfEdit>>>) {
     /** A set of all page numbers that contain at least one edit. */
