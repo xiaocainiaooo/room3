@@ -21,6 +21,7 @@ import android.os.Looper;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.concurrent.futures.ResolvableFuture;
+import androidx.xr.runtime.internal.GltfModelResource;
 import androidx.xr.runtime.internal.KhronosPbrMaterialSpec;
 import androidx.xr.runtime.internal.MaterialResource;
 import androidx.xr.runtime.internal.RenderingRuntime;
@@ -46,6 +47,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 /**
  * Implementation of [RenderingRuntime] for devices that support the [Feature.SPATIAL] system
@@ -134,6 +137,53 @@ class SpatialRenderingRuntime implements RenderingRuntime {
 
     private static MaterialResourceImpl getMaterialResourceFromToken(long token) {
         return new MaterialResourceImpl(token);
+    }
+
+    private static GltfModelResourceImpl getModelResourceFromToken(long token) {
+        return new GltfModelResourceImpl(token);
+    }
+
+    @SuppressWarnings("FutureReturnValueIgnored")
+    private @Nullable ListenableFuture<GltfModelResource> loadGltfAsset(
+            Supplier<ListenableFuture<Long>> modelLoader) {
+        if (!Looper.getMainLooper().isCurrentThread()) {
+            throw new IllegalStateException("This method must be called on the main thread.");
+        }
+
+        ResolvableFuture<GltfModelResource> gltfModelResourceFuture = ResolvableFuture.create();
+
+        ListenableFuture<Long> gltfTokenFuture;
+        try {
+            gltfTokenFuture = modelLoader.get();
+        } catch (RuntimeException e) {
+            return null;
+        }
+
+        gltfTokenFuture.addListener(
+                () -> {
+                    try {
+                        long gltfToken = gltfTokenFuture.get();
+                        gltfModelResourceFuture.set(getModelResourceFromToken(gltfToken));
+                    } catch (Exception e) {
+                        if (e instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                        }
+                        gltfModelResourceFuture.setException(e);
+                    }
+                },
+                mActivity::runOnUiThread);
+
+        return gltfModelResourceFuture;
+    }
+
+
+    // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
+    // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
+    // warning, however, we get a build error - go/bugpattern/RestrictTo.
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
+    @Override
+    public @NonNull ListenableFuture<GltfModelResource> loadGltfByAssetName(@NonNull String name) {
+        return loadGltfAsset(() -> mImpressApi.loadGltfAsset(name));
     }
 
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes

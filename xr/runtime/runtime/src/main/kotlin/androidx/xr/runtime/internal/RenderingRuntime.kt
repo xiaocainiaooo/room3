@@ -36,6 +36,17 @@ import com.google.common.util.concurrent.ListenableFuture
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface RenderingRuntime {
     /**
+     * Loads glTF Asset for the given asset name from the assets folder. The future returned by this
+     * method will fire listeners on the UI thread if Runnable::run is supplied.
+     *
+     * @param assetName The name of the asset to load from the assets folder.
+     * @return A future that resolves to the glTF model when it is loaded. The future will be null
+     *   if the asset was not found.
+     */
+    @Suppress("AsyncSuffixFuture")
+    public fun loadGltfByAssetName(assetName: String): ListenableFuture<GltfModelResource>
+
+    /**
      * Loads a texture resource for the given asset name or URL. The future returned by this method
      * will fire listeners on the UI thread if Runnable::run is supplied.
      *

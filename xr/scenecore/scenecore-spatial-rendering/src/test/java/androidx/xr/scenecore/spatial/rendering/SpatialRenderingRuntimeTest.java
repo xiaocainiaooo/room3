@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import android.app.Activity;
 
+import androidx.xr.runtime.internal.GltfModelResource;
 import androidx.xr.runtime.internal.MaterialResource;
 import androidx.xr.runtime.internal.SceneRuntime;
 import androidx.xr.runtime.internal.SceneRuntimeFactory;
@@ -100,6 +101,21 @@ public class SpatialRenderingRuntimeTest {
         // Texture.  This is a hidden detail from the API surface's perspective.
         mFakeExecutor.runAll();
         return materialFuture.get();
+    }
+
+    @Test
+    public void loadGltfByAssetName_returnsModel() throws Exception {
+        ListenableFuture<GltfModelResource> modelFuture =
+                mRuntime.loadGltfByAssetName("FakeAsset.glb");
+
+        assertThat(modelFuture).isNotNull();
+
+        GltfModelResource model = modelFuture.get();
+        assertThat(model).isNotNull();
+        GltfModelResourceImpl modelImpl = (GltfModelResourceImpl) model;
+        assertThat(modelImpl).isNotNull();
+        long token = modelImpl.getExtensionModelToken();
+        assertThat(token).isEqualTo(1);
     }
 
     @Test
