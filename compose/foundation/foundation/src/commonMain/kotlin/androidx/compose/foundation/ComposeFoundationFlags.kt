@@ -55,15 +55,6 @@ import kotlin.jvm.JvmField
 @ExperimentalFoundationApi
 object ComposeFoundationFlags {
     /**
-     * Selecting flag to enable Drag Gesture "Pick-up" on drag gesture detectors. This also applies
-     * to Draggables and Scrollables which use gesture detectors as well. Any parent drag detector
-     * will continue to monitor the event stream until the gesture terminates (all pointers are
-     * lifted), if a child gives up an event, the parent gesture detector will "pick-up" and
-     * continue the gesture until all pointers are up.
-     */
-    @Suppress("MutableBareField") @JvmField var DragGesturePickUpEnabled = true
-
-    /**
      * Whether to use more immediate coroutine dispatching in [detectTapGestures] and
      * [detectTapAndPress], true by default.
      */
