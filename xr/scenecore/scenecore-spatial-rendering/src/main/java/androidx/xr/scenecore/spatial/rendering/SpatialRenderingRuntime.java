@@ -21,6 +21,7 @@ import android.os.Looper;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.concurrent.futures.ResolvableFuture;
+import androidx.xr.runtime.SubspaceNodeHolder;
 import androidx.xr.runtime.math.Matrix3;
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.runtime.math.Vector3;
@@ -31,6 +32,7 @@ import androidx.xr.scenecore.impl.impress.ImpressApiImpl;
 import androidx.xr.scenecore.impl.impress.KhronosPbrMaterial;
 import androidx.xr.scenecore.impl.impress.Texture;
 import androidx.xr.scenecore.impl.impress.WaterMaterial;
+import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.ExrImageResource;
 import androidx.xr.scenecore.internal.GltfEntity;
@@ -41,6 +43,8 @@ import androidx.xr.scenecore.internal.MaterialResource;
 import androidx.xr.scenecore.internal.RenderingEntityFactory;
 import androidx.xr.scenecore.internal.RenderingRuntime;
 import androidx.xr.scenecore.internal.SceneRuntime;
+import androidx.xr.scenecore.internal.SubspaceNodeEntity;
+import androidx.xr.scenecore.internal.SubspaceNodeFeature;
 import androidx.xr.scenecore.internal.SurfaceEntity;
 import androidx.xr.scenecore.internal.TextureResource;
 import androidx.xr.scenecore.internal.TextureSampler;
@@ -48,6 +52,7 @@ import androidx.xr.scenecore.internal.TextureSampler;
 import com.android.extensions.xr.XrExtensions;
 
 import com.google.androidxr.splitengine.SplitEngineSubspaceManager;
+import com.google.androidxr.splitengine.SubspaceNode;
 import com.google.ar.imp.view.splitengine.ImpSplitEngine;
 import com.google.ar.imp.view.splitengine.ImpSplitEngineRenderer;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -136,7 +141,7 @@ class SpatialRenderingRuntime implements RenderingRuntime {
      * Create a new @c SpatialRenderingRuntime.
      *
      * @param sceneRuntime The SceneRuntime provide basic function for creating entities.
-     * @param activity     The Activity to use.
+     * @param activity The Activity to use.
      * @return A new SpatialRenderingRuntime.
      */
     static @NonNull SpatialRenderingRuntime create(
@@ -998,6 +1003,21 @@ class SpatialRenderingRuntime implements RenderingRuntime {
                 superSampling);
         return mRenderingEntityFactory.createSurfaceEntity(feature, pose, parentEntity);
     }
+
+    @Override
+    @NonNull
+    public SubspaceNodeEntity createSubspaceNodeEntity(
+            @NonNull SubspaceNodeHolder<?> subspaceNodeHolder, @NonNull Dimensions size) {
+        SubspaceNodeFeature feature = new SubspaceNodeFeatureImpl(
+                mExtensions,
+                SubspaceNodeHolder.assertGetValue(
+                        subspaceNodeHolder, SubspaceNode.class).getSubspaceNode(),
+                size);
+        SubspaceNodeEntity entity = mRenderingEntityFactory.createSubspaceNodeEntity(feature);
+        entity.setSize(size);
+        return entity;
+    }
+
 
     @Override
     public void startRenderer() {

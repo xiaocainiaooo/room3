@@ -20,6 +20,7 @@ import android.app.Activity
 import androidx.kruth.assertThat
 import androidx.xr.runtime.math.FloatSize2d
 import androidx.xr.runtime.math.Pose
+import androidx.xr.scenecore.internal.Dimensions
 import androidx.xr.scenecore.internal.RenderingEntityFactory
 import androidx.xr.scenecore.internal.RenderingRuntime
 import androidx.xr.scenecore.internal.SceneRuntime
@@ -116,5 +117,18 @@ class FakeRenderingRuntimeTest {
         assertThat(surfaceEntity.parent).isEqualTo(sceneRuntime.activitySpace)
 
         surfaceEntity.dispose()
+    }
+
+    @Test
+    fun createSubspaceNodeEntity_returnSubspaceNodeEntity() {
+        val subspaceNodeEntity =
+            renderingRuntime.createSubspaceNodeEntity(
+                fakeRenderingRuntime.createSubspaceNodeHolder(),
+                Dimensions(1.0f, 1.0f, 1.0f),
+            )
+
+        assertThat(subspaceNodeEntity).isNotNull()
+
+        subspaceNodeEntity.dispose()
     }
 }

@@ -198,8 +198,12 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         return surfaceEntity
     }
 
-    override fun createSubspaceNodeEntity(feature: SubspaceNodeFeature): SubspaceNodeEntity =
-        FakeSubspaceNodeEntity(feature)
+    override fun createSubspaceNodeEntity(feature: SubspaceNodeFeature): SubspaceNodeEntity {
+        val subspaceNodeEntity = FakeSubspaceNodeEntity()
+        subspaceNodeEntity.parent = activitySpace
+
+        return subspaceNodeEntity
+    }
 
     override fun createGroupEntity(pose: Pose, name: String, parent: Entity): Entity {
         val entity = FakeEntity()
