@@ -32,6 +32,7 @@ import androidx.xr.runtime.math.Pose;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
 import androidx.xr.scenecore.impl.perception.PerceptionLibrary;
 import androidx.xr.scenecore.impl.perception.Session;
+import androidx.xr.scenecore.impl.perception.ViewProjections;
 import androidx.xr.scenecore.internal.ActivityPanelEntity;
 import androidx.xr.scenecore.internal.ActivitySpace;
 import androidx.xr.scenecore.internal.AnchorEntity;
@@ -844,5 +845,18 @@ class SpatialSceneRuntime implements SceneRuntime, RenderingEntityFactory {
     @Override
     public @NonNull SpatialPointerComponent createSpatialPointerComponent() {
         return new SpatialPointerComponentImpl(mExtensions);
+    }
+
+    /**
+     * Get the user's current eye views relative to @c XR_REFERENCE_SPACE_TYPE_UNBOUNDED_ANDROID.
+     */
+    @VisibleForTesting
+    @Nullable ViewProjections getStereoViewsInOpenXrUnboundedSpace() {
+        Session session = mPerceptionLibrary.getSession();
+        if (session == null) {
+            // Perception session is uninitialized, returning null head pose.
+            return null;
+        }
+        return session.getStereoViews();
     }
 }
