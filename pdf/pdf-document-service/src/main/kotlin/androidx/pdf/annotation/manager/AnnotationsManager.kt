@@ -57,4 +57,7 @@ public interface AnnotationsManager {
      * @return [PdfEdits] object representing the current state of annotations.
      */
     public fun getSnapshot(): PdfEdits
+
+    /** Discards all uncommitted edits. */
+    public fun clearUncommittedEdits()
 }

@@ -100,4 +100,7 @@ public abstract class EditablePdfDocument : PdfDocument {
      * @return [PdfEdits] representing all [PdfEdit]s in the document.
      */
     public abstract fun getAllEdits(): PdfEdits
+
+    /** Discards all uncommitted edits. */
+    public abstract fun clearUncommittedEdits()
 }

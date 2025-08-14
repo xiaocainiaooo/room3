@@ -339,6 +339,10 @@ internal open class FakeEditablePdfDocument(
 
     override fun getAllEdits(): PdfEdits = PdfEdits(edits.values.groupBy { it.annotation.pageNum })
 
+    override fun clearUncommittedEdits() {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         const val URI_WITH_VALID_SCHEME = "https://www.example.com"
         const val VALID_PAGE_NUMBER = 4

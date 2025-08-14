@@ -162,6 +162,25 @@ internal class EditableDocumentViewModel(private val state: SavedStateHandle, lo
         }
     }
 
+    /**
+     * Checks for unsaved changes by verifying if there are any edits in the edits history.
+     *
+     * @return `true` if unsaved changes exist, `false` if the document is not loaded or there are
+     *   no changes.
+     */
+    fun hasUnsavedChanges(): Boolean = editablePdfDocument != null && editsHistoryManager.canUndo()
+
+    /** Discards all uncommitted edits, reverting the document to its last saved state. */
+    fun discardUnsavedChanges() {
+        val document = editablePdfDocument ?: return
+
+        document.clearUncommittedEdits()
+        _annotationDisplayStateFlow.update { displayState ->
+            displayState.copy(edits = document.getAllEdits())
+        }
+        isEditModeEnabled = false
+    }
+
     @Suppress("UNCHECKED_CAST")
     internal companion object {
         const val DOCUMENT_URI_KEY = "documentUri"

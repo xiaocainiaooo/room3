@@ -439,6 +439,10 @@ public class SandboxedPdfDocument(
         }
     }
 
+    override fun clearUncommittedEdits() {
+        return annotationsManager.clearUncommittedEdits()
+    }
+
     // TODO: b/438309514 - Remove GetAnnotationsFromDraftState from SandboxPdfDocument
     internal suspend fun getAnnotationsFromDraftState(pageNum: Int): List<PdfAnnotationData> {
         return annotationsManager.getAnnotationsForPage(pageNum)

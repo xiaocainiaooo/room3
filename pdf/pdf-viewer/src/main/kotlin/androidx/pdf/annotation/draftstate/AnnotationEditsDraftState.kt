@@ -69,4 +69,7 @@ public interface AnnotationEditsDraftState {
 
     /** Returns the state of the draft as a [PdfEdits] object. */
     public fun toPdfEdits(): PdfEdits
+
+    /** Clears all annotation edits from the draft state. */
+    public fun clear()
 }

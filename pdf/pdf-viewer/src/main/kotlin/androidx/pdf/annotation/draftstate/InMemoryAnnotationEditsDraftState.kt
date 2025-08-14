@@ -144,6 +144,11 @@ public class InMemoryAnnotationEditsDraftState() : AnnotationEditsDraftState {
         }
     }
 
+    /** Clears all annotation edits from the draft state. */
+    override fun clear() {
+        lock.withLock { editsByPage.clear() }
+    }
+
     /**
      * Retrieves the mutable map of edits to savedAnnotation for a given edit ID.
      *

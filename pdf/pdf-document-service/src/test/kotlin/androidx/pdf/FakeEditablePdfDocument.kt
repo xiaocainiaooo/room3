@@ -93,6 +93,10 @@ internal class FakeEditablePdfDocument(
         TODO("Not yet implemented")
     }
 
+    override fun clearUncommittedEdits() {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getPageInfo(pageNumber: Int): PdfDocument.PageInfo {
         TODO("Not yet implemented")
     }
