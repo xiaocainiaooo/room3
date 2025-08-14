@@ -93,6 +93,12 @@ public open class EditablePdfViewerFragment : PdfViewerFragment {
         }
     }
 
+    /** Undoes the last edit. If there are no more edits to undo, this is a no-op. */
+    public fun undo(): Unit = annotationsViewModel.undo()
+
+    /** Redoes the last undone edit. If there are no more edits to redo, this is a no-op. */
+    public fun redo(): Unit = annotationsViewModel.redo()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

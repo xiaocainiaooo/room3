@@ -42,6 +42,14 @@ public interface AnnotationsManager {
     public fun addAnnotation(annotation: PdfAnnotation): EditId
 
     /**
+     * Adds a new annotation with the provided id.
+     *
+     * @param id The [EditId] to be used for adding the annotation.
+     * @param annotation The [PdfAnnotation] to add.
+     */
+    public fun addAnnotationById(id: EditId, annotation: PdfAnnotation)
+
+    /**
      * Returns an immutable snapshot of the current annotation state.
      *
      * This snapshot includes all edits and additions made to the annotations.

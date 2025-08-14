@@ -69,6 +69,9 @@ public class InMemoryAnnotationsManager(private val fetcher: PageAnnotationFetch
         return annotationEditsDraftState.getEdits(pageNum)
     }
 
+    override fun addAnnotationById(id: EditId, annotation: PdfAnnotation): Unit =
+        annotationEditsDraftState.addEditById(id, annotation)
+
     /**
      * Adds a new annotation to the draft state.
      *

@@ -250,6 +250,10 @@ internal open class FakeEditablePdfDocument(
         TODO("Not yet implemented")
     }
 
+    override fun <T : PdfEdit> addPdfEditEntry(entry: PdfEditEntry<T>) {
+        TODO("Not yet implemented")
+    }
+
     override fun addEdit(edit: PdfEdit): EditId {
         require(edit is PdfAnnotation) { "This fake only supports PdfAnnotation edits" }
         val id = EditId(edit.pageNum, UUID.randomUUID().toString())
@@ -257,15 +261,18 @@ internal open class FakeEditablePdfDocument(
         return id
     }
 
-    override fun removeEdit(editId: EditId) {
+    override fun removeEdit(editId: EditId): PdfEdit {
+        val edit = edits[editId]?.edit
         edits.remove(editId)
+        return edit!!
     }
 
-    override fun updateEdit(editId: EditId, edit: PdfEdit) {
+    override fun updateEdit(editId: EditId, edit: PdfEdit): PdfEdit {
         require(edit is PdfAnnotation) { "This fake only supports PdfAnnotation edits" }
         if (edits.containsKey(editId)) {
             edits[editId] = PdfAnnotationData(editId, edit)
         }
+        return edit
     }
 
     override fun commitEdits(): EditsResult {
