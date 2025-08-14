@@ -18,17 +18,16 @@ package androidx.pdf.content
 
 /**
  * Represents the list of selected content on a particular page of the PDF document. By default, the
- * selection boundary is represented from left to right. Note: Currently supports text selection
- * only.
+ * selection boundary is represented from left to right.
  *
  * @param page: The page number of the selection.
  * @param start: Boundary where the selection starts.
  * @param stop: Boundary where the selection stops.
- * @param selectedTextContents: list of segments of selected text content.
+ * @param selectedContents: list of segments of selected content.
  */
 public class PageSelection(
     public val page: Int,
     public val start: SelectionBoundary,
     public val stop: SelectionBoundary,
-    public val selectedTextContents: List<PdfPageTextContent>,
+    public val selectedContents: List<PdfPageContent>,
 )
