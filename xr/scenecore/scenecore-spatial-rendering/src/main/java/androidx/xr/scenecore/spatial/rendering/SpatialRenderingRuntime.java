@@ -41,6 +41,7 @@ import androidx.xr.scenecore.internal.MaterialResource;
 import androidx.xr.scenecore.internal.RenderingEntityFactory;
 import androidx.xr.scenecore.internal.RenderingRuntime;
 import androidx.xr.scenecore.internal.SceneRuntime;
+import androidx.xr.scenecore.internal.SurfaceEntity;
 import androidx.xr.scenecore.internal.TextureResource;
 import androidx.xr.scenecore.internal.TextureSampler;
 
@@ -976,6 +977,26 @@ class SpatialRenderingRuntime implements RenderingRuntime {
                 mSplitEngineSubspaceManager,
                 mExtensions);
         return mRenderingEntityFactory.createGltfEntity(feature, pose, parentEntity);
+    }
+
+    @Override
+    @NonNull
+    public SurfaceEntity createSurfaceEntity(
+            @SurfaceEntity.StereoMode int stereoMode,
+            @NonNull Pose pose,
+            SurfaceEntity.@NonNull Shape canvasShape,
+            @SurfaceEntity.SurfaceProtection int contentSecurityLevel,
+            @SurfaceEntity.SuperSampling int superSampling,
+            @NonNull Entity parentEntity) {
+        SurfaceFeatureImpl feature = new SurfaceFeatureImpl(
+                mImpressApi,
+                mSplitEngineSubspaceManager,
+                mExtensions,
+                stereoMode,
+                canvasShape,
+                contentSecurityLevel,
+                superSampling);
+        return mRenderingEntityFactory.createSurfaceEntity(feature, pose, parentEntity);
     }
 
     @Override

@@ -190,7 +190,13 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         feature: SurfaceFeature,
         pose: Pose,
         parentEntity: Entity,
-    ): SurfaceEntity = FakeSurfaceEntity()
+    ): SurfaceEntity {
+        val surfaceEntity = FakeSurfaceEntity()
+        surfaceEntity.setPose(pose)
+        surfaceEntity.parent = parentEntity
+
+        return surfaceEntity
+    }
 
     override fun createSubspaceNodeEntity(feature: SubspaceNodeFeature): SubspaceNodeEntity =
         FakeSubspaceNodeEntity(feature)

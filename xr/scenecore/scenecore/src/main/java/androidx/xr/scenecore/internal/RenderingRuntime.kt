@@ -599,6 +599,28 @@ public interface RenderingRuntime : JxrRuntime {
         parentEntity: Entity,
     ): GltfEntity
 
+    /**
+     * Factory method for SurfaceEntity.
+     *
+     * @param stereoMode Stereo mode for the surface.
+     * @param pose Pose of this entity relative to its parent, default value is Identity.
+     * @param shape The [SurfaceEntity.Shape] which describes the 3D geometry of the entity.
+     * @param surfaceProtection The [SurfaceEntity.SurfaceProtection] which describes whether DRM is
+     *   enabled.
+     * @param superSampling The [SurfaceEntity.SuperSampling] which describes whether super sampling
+     *   is enabled. Whether to use super sampling for the surface.
+     * @param parentEntity The parent entity of this entity.
+     * @return A [SurfaceEntity] which is a child of the parent entity.
+     */
+    public fun createSurfaceEntity(
+        stereoMode: Int,
+        pose: Pose,
+        shape: SurfaceEntity.Shape,
+        @SurfaceEntity.SurfaceProtection surfaceProtection: Int,
+        superSampling: Int,
+        parentEntity: Entity,
+    ): SurfaceEntity
+
     /** Starts the renderer. */
     public fun startRenderer()
 

@@ -30,6 +30,7 @@ import androidx.xr.scenecore.internal.KhronosPbrMaterialSpec
 import androidx.xr.scenecore.internal.MaterialResource
 import androidx.xr.scenecore.internal.RenderingEntityFactory
 import androidx.xr.scenecore.internal.RenderingRuntime
+import androidx.xr.scenecore.internal.SurfaceEntity
 import androidx.xr.scenecore.internal.TextureResource
 import androidx.xr.scenecore.internal.TextureSampler
 import com.google.common.util.concurrent.Futures.immediateFailedFuture
@@ -506,6 +507,25 @@ public class FakeRenderingRuntime(private val entityFactory: RenderingEntityFact
         parentEntity: Entity,
     ): GltfEntity {
         return entityFactory.createGltfEntity(FakeGltfFeature(createNode()), pose, parentEntity)
+    }
+
+    override fun createSurfaceEntity(
+        stereoMode: Int,
+        pose: Pose,
+        shape: SurfaceEntity.Shape,
+        surfaceProtection: Int,
+        superSampling: Int,
+        parentEntity: Entity,
+    ): SurfaceEntity {
+        val surfaceFeature = FakeSurfaceFeature(createNode())
+        surfaceFeature.stereoMode = stereoMode
+        surfaceFeature.shape = shape
+
+        // TODO: FakeSurfaceEntity didn't wrap FakeSurfaceFeature
+        val surfaceEntity = entityFactory.createSurfaceEntity(surfaceFeature, pose, parentEntity)
+        surfaceEntity.stereoMode = stereoMode
+        surfaceEntity.shape = shape
+        return surfaceEntity
     }
 
     override fun startRenderer() {}
