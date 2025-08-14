@@ -134,7 +134,6 @@ package androidx.compose.foundation {
 
   @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public final class ComposeFoundationFlags {
     property public boolean isAdjustPointerInputChangeOffsetForVelocityTrackerEnabled;
-    property public boolean isAutomaticNestedPrefetchEnabled;
     property public boolean isCacheWindowForPagerEnabled;
     property public boolean isDetectTapGesturesImmediateCoroutineDispatchEnabled;
     property public boolean isFlingContinuationAtBoundsEnabled;
@@ -150,7 +149,6 @@ package androidx.compose.foundation {
     property public boolean isTextFieldDpadNavigationEnabled;
     field public static final androidx.compose.foundation.ComposeFoundationFlags INSTANCE;
     field public static boolean isAdjustPointerInputChangeOffsetForVelocityTrackerEnabled;
-    field public static boolean isAutomaticNestedPrefetchEnabled;
     field public static boolean isCacheWindowForPagerEnabled;
     field public static boolean isDetectTapGesturesImmediateCoroutineDispatchEnabled;
     field public static boolean isFlingContinuationAtBoundsEnabled;
