@@ -19,6 +19,7 @@ package androidx.xr.scenecore.internal
 import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.JxrRuntime
 import androidx.xr.runtime.math.Matrix3
+import androidx.xr.runtime.math.Pose
 import androidx.xr.runtime.math.Vector3
 import androidx.xr.runtime.math.Vector4
 import com.google.common.util.concurrent.ListenableFuture
@@ -583,6 +584,20 @@ public interface RenderingRuntime : JxrRuntime {
      * @param alphaCutoff The alpha cutoff value.
      */
     public fun setAlphaCutoffOnKhronosPbrMaterial(material: MaterialResource, alphaCutoff: Float)
+
+    /**
+     * A factory function to create a SceneCore GltfEntity. The parent may be the activity space or
+     * GltfEntity in the scene.
+     *
+     * @param pose The initial position and orientation of the new GltfEntity in the 3D scene.
+     * @param loadedGltf Represents the 3D model data that will be rendered for this entity.
+     * @param parentEntity The parent for the newly created GltfEntity in the scene hierarchy.
+     */
+    public fun createGltfEntity(
+        pose: Pose,
+        loadedGltf: GltfModelResource,
+        parentEntity: Entity,
+    ): GltfEntity
 
     /** Starts the renderer. */
     public fun startRenderer()

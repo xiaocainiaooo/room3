@@ -17,10 +17,14 @@
 package androidx.xr.scenecore.testing
 
 import androidx.annotation.RestrictTo
+import androidx.xr.runtime.NodeHolder
 import androidx.xr.runtime.math.Matrix3
+import androidx.xr.runtime.math.Pose
 import androidx.xr.runtime.math.Vector3
 import androidx.xr.runtime.math.Vector4
+import androidx.xr.scenecore.internal.Entity
 import androidx.xr.scenecore.internal.ExrImageResource
+import androidx.xr.scenecore.internal.GltfEntity
 import androidx.xr.scenecore.internal.GltfModelResource
 import androidx.xr.scenecore.internal.KhronosPbrMaterialSpec
 import androidx.xr.scenecore.internal.MaterialResource
@@ -490,6 +494,18 @@ public class FakeRenderingRuntime(private val entityFactory: RenderingEntityFact
         alphaCutoff: Float,
     ) {
         (material as? FakeKhronosPbrMaterial)?.alphaCutoff = alphaCutoff
+    }
+
+    private fun createNode(): NodeHolder<*> {
+        return NodeHolder<FakeNode>(object : FakeNode {}, FakeNode::class.java)
+    }
+
+    override fun createGltfEntity(
+        pose: Pose,
+        loadedGltf: GltfModelResource,
+        parentEntity: Entity,
+    ): GltfEntity {
+        return entityFactory.createGltfEntity(FakeGltfFeature(createNode()), pose, parentEntity)
     }
 
     override fun startRenderer() {}

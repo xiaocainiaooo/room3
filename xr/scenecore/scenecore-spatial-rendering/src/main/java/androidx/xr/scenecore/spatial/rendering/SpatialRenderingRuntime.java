@@ -22,6 +22,7 @@ import android.os.Looper;
 import androidx.annotation.VisibleForTesting;
 import androidx.concurrent.futures.ResolvableFuture;
 import androidx.xr.runtime.math.Matrix3;
+import androidx.xr.runtime.math.Pose;
 import androidx.xr.runtime.math.Vector3;
 import androidx.xr.runtime.math.Vector4;
 import androidx.xr.scenecore.impl.extensions.XrExtensionsProvider;
@@ -30,7 +31,10 @@ import androidx.xr.scenecore.impl.impress.ImpressApiImpl;
 import androidx.xr.scenecore.impl.impress.KhronosPbrMaterial;
 import androidx.xr.scenecore.impl.impress.Texture;
 import androidx.xr.scenecore.impl.impress.WaterMaterial;
+import androidx.xr.scenecore.internal.Entity;
 import androidx.xr.scenecore.internal.ExrImageResource;
+import androidx.xr.scenecore.internal.GltfEntity;
+import androidx.xr.scenecore.internal.GltfFeature;
 import androidx.xr.scenecore.internal.GltfModelResource;
 import androidx.xr.scenecore.internal.KhronosPbrMaterialSpec;
 import androidx.xr.scenecore.internal.MaterialResource;
@@ -131,7 +135,7 @@ class SpatialRenderingRuntime implements RenderingRuntime {
      * Create a new @c SpatialRenderingRuntime.
      *
      * @param sceneRuntime The SceneRuntime provide basic function for creating entities.
-     * @param activity The Activity to use.
+     * @param activity     The Activity to use.
      * @return A new SpatialRenderingRuntime.
      */
     static @NonNull SpatialRenderingRuntime create(
@@ -958,6 +962,20 @@ class SpatialRenderingRuntime implements RenderingRuntime {
         }
         mImpressApi.setAlphaCutoffOnKhronosPbrMaterial(
                 ((MaterialResourceImpl) material).getMaterialToken(), alphaCutoff);
+    }
+
+    @Override
+    @NonNull
+    public GltfEntity createGltfEntity(
+            @NonNull Pose pose,
+            @NonNull GltfModelResource loadedGltf,
+            @NonNull Entity parentEntity) {
+        GltfFeature feature = new GltfFeatureImpl(
+                (GltfModelResourceImpl) loadedGltf,
+                mImpressApi,
+                mSplitEngineSubspaceManager,
+                mExtensions);
+        return mRenderingEntityFactory.createGltfEntity(feature, pose, parentEntity);
     }
 
     @Override

@@ -18,6 +18,7 @@ package androidx.xr.scenecore.testing
 
 import android.app.Activity
 import androidx.kruth.assertThat
+import androidx.xr.runtime.math.Pose
 import androidx.xr.scenecore.internal.RenderingEntityFactory
 import androidx.xr.scenecore.internal.RenderingRuntime
 import androidx.xr.scenecore.internal.SceneRuntime
@@ -72,5 +73,18 @@ class FakeRenderingRuntimeTest {
         renderingRuntime.destroyTexture(resource)
 
         Truth.assertThat(fakeRenderingRuntime.reflectionTexture).isNull()
+    }
+
+    @Test
+    fun createGltfEntity_returnGltfEntity() {
+        val pose = Pose.Identity
+        val parent = sceneRuntime.activitySpace
+        val gltfEntity = renderingRuntime.createGltfEntity(pose, FakeGltfModelResource(0), parent)
+
+        assertThat(gltfEntity).isNotNull()
+        assertThat(gltfEntity.getPose()).isEqualTo(pose)
+        assertThat(gltfEntity.parent).isEqualTo(parent)
+
+        gltfEntity.dispose()
     }
 }

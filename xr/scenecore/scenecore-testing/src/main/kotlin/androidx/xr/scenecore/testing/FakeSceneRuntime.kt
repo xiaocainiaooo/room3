@@ -178,7 +178,13 @@ public class FakeSceneRuntime() : SceneRuntime, RenderingEntityFactory {
         feature: GltfFeature,
         pose: Pose,
         parentEntity: Entity,
-    ): GltfEntity = FakeGltfEntity()
+    ): GltfEntity {
+        val gltfEntity = FakeGltfEntity()
+        gltfEntity.setPose(pose)
+        gltfEntity.parent = parentEntity
+
+        return gltfEntity
+    }
 
     override fun createSurfaceEntity(
         feature: SurfaceFeature,
