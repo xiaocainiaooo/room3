@@ -19,6 +19,7 @@ package androidx.wear.compose.material3
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -49,6 +50,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.tokens.CardTokens
@@ -66,7 +68,7 @@ import androidx.wear.compose.materialcore.Text
  *
  * Cards can be enabled or disabled. A disabled card will not respond to click events.
  *
- * Example of a [Card]:
+ * Example of a [Card] with onClick:
  *
  * @sample androidx.wear.compose.material3.samples.CardSample
  *
@@ -248,7 +250,7 @@ public fun Card(
  * If more than one composable is provided in the content slot it is the responsibility of the
  * caller to determine how to layout the contents, e.g. provide either a row or a column.
  *
- * Example of an [AppCard]:
+ * Example of an [AppCard] with onClick:
  *
  * @sample androidx.wear.compose.material3.samples.AppCardSample
  *
@@ -350,7 +352,7 @@ public fun AppCard(
  * If more than one composable is provided in the [content] slot it is the responsibility of the
  * caller to determine how to layout the contents, e.g. provide either a row or a column.
  *
- * Example of a [TitleCard] with [time], [title] and [content]:
+ * Example of a [TitleCard] with [onClick], [time], [title] and [content]:
  *
  * @sample androidx.wear.compose.material3.samples.TitleCardSample
  *
@@ -725,8 +727,8 @@ public object CardDefaults {
         )
 
     /**
-     * Creates a [Painter] for the background of an [ImageCard] that displays an image with a scrim
-     * on top to make sure that any content above the background will be legible.
+     * Creates a [Painter] for the background of an [Card] that displays an image with a scrim on
+     * top to make sure that any content above the background will be legible.
      *
      * An Image background is a means to reinforce the meaning of information in a Card, e.g. to
      * help to contextualize the information. Cards should have a content color that contrasts with
@@ -878,7 +880,7 @@ public object CardDefaults {
 }
 
 @Composable
-private fun Modifier.cardSizeModifier(): Modifier = defaultMinSize(minHeight = CardDefaults.Height)
+internal fun Modifier.cardSizeModifier(): Modifier = defaultMinSize(minHeight = CardDefaults.Height)
 
 /**
  * Represents Colors used in [Card]. Unlike other Material 3 components, Cards do not change their
@@ -955,8 +957,8 @@ public class CardColors(
 }
 
 @Composable
-private fun CardImpl(
-    onClick: () -> Unit,
+internal fun CardImpl(
+    onClick: (() -> Unit)?,
     containerPainter: Painter?,
     modifier: Modifier,
     onLongClick: (() -> Unit)?,
@@ -980,22 +982,29 @@ private fun CardImpl(
                     shape = shape,
                     border = border,
                 )
-                .combinedClickable(
-                    enabled = enabled,
-                    onClick = onClick,
-                    onLongClick = onLongClick, // NB combinedClickable calls LongPress haptic
-                    onLongClickLabel = onLongClickLabel,
-                    role = null,
-                    indication = ripple(),
-                    interactionSource = interactionSource,
+                .then(
+                    if (onClick != null)
+                        Modifier.combinedClickable(
+                            enabled = enabled,
+                            onClick = onClick,
+                            onLongClick =
+                                onLongClick, // NB combinedClickable calls LongPress haptic
+                            onLongClickLabel = onLongClickLabel,
+                            role = null,
+                            indication = ripple(),
+                            interactionSource = interactionSource,
+                        )
+                    else
+                        Modifier.focusable(enabled = true, interactionSource = interactionSource)
+                            .semantics(mergeDescendants = true) {}
                 )
                 .padding(contentPadding),
         content = content,
     )
 
 @Composable
-private fun CardImpl(
-    onClick: () -> Unit,
+internal fun CardImpl(
+    onClick: (() -> Unit)?,
     containerPainter: Painter?,
     title: @Composable RowScope.() -> Unit,
     modifier: Modifier,
@@ -1084,7 +1093,7 @@ private fun CardImpl(
 
 @Composable
 internal fun AppCardImpl(
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     appName: @Composable RowScope.() -> Unit,
     title: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
