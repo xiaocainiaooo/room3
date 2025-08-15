@@ -316,73 +316,25 @@ public fun AppCard(
     appImage: @Composable (RowScope.() -> Unit)? = null,
     time: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
-) {
-    CardImpl(
+): Unit =
+    AppCardImpl(
         onClick = onClick,
-        containerPainter = null,
-        modifier = modifier.cardSizeModifier(),
+        appName = appName,
+        title = title,
+        modifier = modifier,
         onLongClick = onLongClick,
         onLongClickLabel = onLongClickLabel,
         enabled = enabled,
+        shape = shape,
         colors = colors,
         border = border,
-        interactionSource = interactionSource,
         contentPadding = contentPadding,
+        interactionSource = interactionSource,
         transformation = transformation,
-        shape = shape,
-    ) {
-        // NB We are in ColumnScope, so spacing between elements will be done with Spacer using
-        // Modifier.height().
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                appImage?.let {
-                    appImage()
-                    Spacer(Modifier.width(4.dp))
-                }
-                CompositionLocalProvider(
-                    LocalContentColor provides colors.appNameColor,
-                    LocalTextStyle provides CardTokens.AppNameTypography.value,
-                ) {
-                    appName()
-                }
-            }
-
-            time?.let {
-                Spacer(Modifier.width(6.dp))
-                CompositionLocalProvider(
-                    LocalContentColor provides colors.timeColor,
-                    LocalTextStyle provides CardTokens.TimeTypography.value,
-                ) {
-                    time()
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            content = {
-                CompositionLocalProvider(
-                    LocalContentColor provides colors.titleColor,
-                    LocalTextStyle provides CardTokens.TitleTypography.value,
-                ) {
-                    title()
-                }
-            },
-        )
-        Spacer(modifier = Modifier.height(2.dp))
-        CompositionLocalProvider(
-            LocalContentColor provides colors.contentColor,
-            LocalTextStyle provides CardTokens.ContentTypography.value,
-        ) {
-            content()
-        }
-    }
-}
+        appImage = appImage,
+        time = time,
+        content = content,
+    )
 
 /**
  * Opinionated Wear Material 3 [Card] that offers a specific layout to show interactive information
@@ -1126,6 +1078,92 @@ private fun CardImpl(
             ) {
                 subtitle()
             }
+        }
+    }
+}
+
+@Composable
+internal fun AppCardImpl(
+    onClick: () -> Unit,
+    appName: @Composable RowScope.() -> Unit,
+    title: @Composable RowScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
+    enabled: Boolean = true,
+    shape: Shape = CardDefaults.shape,
+    colors: CardColors = CardDefaults.cardColors(),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = CardDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource? = null,
+    transformation: SurfaceTransformation? = null,
+    appImage: @Composable (RowScope.() -> Unit)? = null,
+    time: @Composable (RowScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    CardImpl(
+        onClick = onClick,
+        containerPainter = null,
+        modifier = modifier.cardSizeModifier(),
+        onLongClick = onLongClick,
+        onLongClickLabel = onLongClickLabel,
+        enabled = enabled,
+        colors = colors,
+        border = border,
+        interactionSource = interactionSource,
+        contentPadding = contentPadding,
+        transformation = transformation,
+        shape = shape,
+    ) {
+        // NB We are in ColumnScope, so spacing between elements will be done with Spacer using
+        // Modifier.height().
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                appImage?.let {
+                    appImage()
+                    Spacer(Modifier.width(4.dp))
+                }
+                CompositionLocalProvider(
+                    LocalContentColor provides colors.appNameColor,
+                    LocalTextStyle provides CardTokens.AppNameTypography.value,
+                ) {
+                    appName()
+                }
+            }
+
+            time?.let {
+                Spacer(Modifier.width(6.dp))
+                CompositionLocalProvider(
+                    LocalContentColor provides colors.timeColor,
+                    LocalTextStyle provides CardTokens.TimeTypography.value,
+                ) {
+                    time()
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            content = {
+                CompositionLocalProvider(
+                    LocalContentColor provides colors.titleColor,
+                    LocalTextStyle provides CardTokens.TitleTypography.value,
+                ) {
+                    title()
+                }
+            },
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        CompositionLocalProvider(
+            LocalContentColor provides colors.contentColor,
+            LocalTextStyle provides CardTokens.ContentTypography.value,
+        ) {
+            content()
         }
     }
 }
