@@ -225,4 +225,4 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
     }
 }
 
-private const val AGGREGATE_BUILD_INFO_FILE_NAME = "androidx_aggregate_build_info.txt"
+internal const val AGGREGATE_BUILD_INFO_FILE_NAME = "androidx_aggregate_build_info.txt"
