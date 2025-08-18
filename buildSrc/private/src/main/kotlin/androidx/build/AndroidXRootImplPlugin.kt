@@ -139,7 +139,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         registerStudioTask()
 
         project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
-            task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
+            task.outputFile.set(project.getDistributionDirectoryProperty().file("task_outputs.txt"))
             task.removePrefix(project.getCheckoutRoot().path)
         }
 
