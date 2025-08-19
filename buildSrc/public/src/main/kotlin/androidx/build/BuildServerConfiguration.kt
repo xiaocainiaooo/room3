@@ -68,7 +68,8 @@ fun Project.getDistributionDirectoryProperty(): DirectoryProperty {
 fun Project.getOutDirectory(): File = extensions.extraProperties.get("outDir") as File
 
 /** Directory to put build info files for release service dependency files. */
-fun Project.getBuildInfoDirectory(): File = File(getDistributionDirectory(), "build-info")
+fun Project.getBuildInfoDirectory(): Provider<Directory> =
+    getDistributionDirectoryProperty().dir("build-info")
 
 /**
  * Directory for android test configuration files that get consumed by Tradefed in CI. These configs
@@ -86,8 +87,8 @@ fun Project.getFileInTestConfigDirectory(name: String): Provider<RegularFile> =
     getTestConfigDirectory().map { it.file(name) }
 
 /** Directory to put host test results so they can be consumed by the testing dashboard. */
-fun Project.getHostTestResultDirectory(): File =
-    File(getDistributionDirectory(), "host-test-reports")
+fun Project.getHostTestResultDirectory(): Provider<Directory> =
+    getDistributionDirectoryProperty().dir("host-test-reports")
 
 /** Whether the build should force all versions to be snapshots. */
 fun isSnapshotBuild() = System.getenv("SNAPSHOT") != null
