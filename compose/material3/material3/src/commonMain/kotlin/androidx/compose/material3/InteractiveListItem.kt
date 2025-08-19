@@ -16,6 +16,8 @@
 
 package androidx.compose.material3
 
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -34,7 +36,11 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.MultiContentMeasurePolicy
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -54,24 +60,113 @@ internal fun ClickableListItem(
     overlineContent: @Composable (() -> Unit)? = null,
     supportingContent: @Composable (() -> Unit)? = null,
 
+    // interaction
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
+    interactionSource: MutableInteractionSource? = null,
+
     // styling
     contentPadding: PaddingValues = InteractiveListPadding,
 ) {
-    Surface(modifier = modifier.semantics(mergeDescendants = true) {}.padding(contentPadding)) {
-        val alignmentBreakpoint =
-            (InteractiveListVerticalAlignmentBreakpoint -
-                    contentPadding.calculateTopPadding() -
-                    contentPadding.calculateBottomPadding())
-                .coerceAtLeast(0.dp)
-        InteractiveListItemLayout(
-            alignmentBreakpoint = alignmentBreakpoint,
-            leading = { LeadingDecorator(leadingContent) },
-            trailing = { TrailingDecorator(trailingContent) },
-            overline = { OverlineDecorator(overlineContent) },
-            supporting = { SupportingDecorator(supportingContent) },
-            headline = { HeadlineDecorator(headlineContent) },
-        )
-    }
+    InteractiveListItem(
+        modifier = modifier,
+        headlineContent = headlineContent,
+        leadingContent = leadingContent,
+        trailingContent = trailingContent,
+        overlineContent = overlineContent,
+        supportingContent = supportingContent,
+        enabled = enabled,
+        applySemantics = {},
+        onClick = onClick,
+        onLongClick = onLongClick,
+        onLongClickLabel = onLongClickLabel,
+        interactionSource = interactionSource,
+        contentPadding = contentPadding,
+    )
+}
+
+/** TODO: docs */
+@ExperimentalMaterial3ExpressiveApi
+@Composable
+internal fun SelectableListItem(
+    modifier: Modifier = Modifier,
+
+    // slots
+    headlineContent: @Composable () -> Unit, // TODO: should this be `content` trailing lambda?
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+    overlineContent: @Composable (() -> Unit)? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
+
+    // interaction
+    selected: Boolean,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
+    interactionSource: MutableInteractionSource? = null,
+
+    // styling
+    contentPadding: PaddingValues = InteractiveListPadding,
+) {
+    InteractiveListItem(
+        modifier = modifier,
+        headlineContent = headlineContent,
+        leadingContent = leadingContent,
+        trailingContent = trailingContent,
+        overlineContent = overlineContent,
+        supportingContent = supportingContent,
+        enabled = enabled,
+        applySemantics = { this.selected = selected },
+        onClick = onClick,
+        onLongClick = onLongClick,
+        onLongClickLabel = onLongClickLabel,
+        interactionSource = interactionSource,
+        contentPadding = contentPadding,
+    )
+}
+
+/** TODO: docs */
+@ExperimentalMaterial3ExpressiveApi
+@Composable
+internal fun ToggleableListItem(
+    modifier: Modifier = Modifier,
+
+    // slots
+    headlineContent: @Composable () -> Unit, // TODO: should this be `content` trailing lambda?
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+    overlineContent: @Composable (() -> Unit)? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
+
+    // interaction
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
+    interactionSource: MutableInteractionSource? = null,
+
+    // styling
+    contentPadding: PaddingValues = InteractiveListPadding,
+) {
+    InteractiveListItem(
+        modifier = modifier,
+        headlineContent = headlineContent,
+        leadingContent = leadingContent,
+        trailingContent = trailingContent,
+        overlineContent = overlineContent,
+        supportingContent = supportingContent,
+        enabled = enabled,
+        applySemantics = { toggleableState = ToggleableState(checked) },
+        onClick = { onCheckedChange(!checked) },
+        onLongClick = onLongClick,
+        onLongClickLabel = onLongClickLabel,
+        interactionSource = interactionSource,
+        contentPadding = contentPadding,
+    )
 }
 
 @Composable
@@ -125,7 +220,60 @@ private inline fun HeadlineDecorator(content: @Composable () -> Unit) {
 }
 
 @Composable
+private fun InteractiveListItem(
+    modifier: Modifier,
+    headlineContent: @Composable () -> Unit,
+    leadingContent: @Composable (() -> Unit)?,
+    trailingContent: @Composable (() -> Unit)?,
+    overlineContent: @Composable (() -> Unit)?,
+    supportingContent: @Composable (() -> Unit)?,
+    enabled: Boolean,
+    applySemantics: SemanticsPropertyReceiver.() -> Unit,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)?,
+    onLongClickLabel: String?,
+    interactionSource: MutableInteractionSource?,
+    contentPadding: PaddingValues,
+) {
+    @Suppress("NAME_SHADOWING")
+    val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+
+    Surface(
+        modifier =
+            modifier
+                .semantics(mergeDescendants = true, properties = applySemantics)
+                .minimumInteractiveComponentSize()
+                // FIXME: we need to clip the ripple without clipping away the shadow applied by
+                //   Surface
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(),
+                    enabled = enabled,
+                    onLongClick = onLongClick,
+                    onLongClickLabel = onLongClickLabel,
+                    onClick = onClick,
+                )
+    ) {
+        val alignmentBreakpoint =
+            (InteractiveListVerticalAlignmentBreakpoint -
+                    contentPadding.calculateTopPadding() -
+                    contentPadding.calculateBottomPadding())
+                .coerceAtLeast(0.dp)
+        InteractiveListItemLayout(
+            modifier = Modifier.padding(contentPadding),
+            alignmentBreakpoint = alignmentBreakpoint,
+            leading = { LeadingDecorator(leadingContent) },
+            trailing = { TrailingDecorator(trailingContent) },
+            overline = { OverlineDecorator(overlineContent) },
+            supporting = { SupportingDecorator(supportingContent) },
+            headline = { HeadlineDecorator(headlineContent) },
+        )
+    }
+}
+
+@Composable
 private fun InteractiveListItemLayout(
+    modifier: Modifier,
     alignmentBreakpoint: Dp,
     leading: @Composable () -> Unit,
     trailing: @Composable () -> Unit,
@@ -136,6 +284,7 @@ private fun InteractiveListItemLayout(
     val measurePolicy =
         remember(alignmentBreakpoint) { InteractiveListItemMeasurePolicy(alignmentBreakpoint) }
     Layout(
+        modifier = modifier,
         contents = listOf(leading, trailing, overline, supporting, headline),
         measurePolicy = measurePolicy,
     )
