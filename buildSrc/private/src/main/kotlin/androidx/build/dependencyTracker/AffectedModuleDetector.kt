@@ -18,7 +18,7 @@ package androidx.build.dependencyTracker
 
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getCheckoutRoot
-import androidx.build.getDistributionDirectoryProperty
+import androidx.build.getDistributionDirectory
 import androidx.build.gitclient.getChangedFilesProvider
 import androidx.build.gradle.isRoot
 import java.io.File
@@ -117,7 +117,7 @@ abstract class AffectedModuleDetector(protected val logger: Logger?) {
             val enabledProvider = rootProject.providers.gradleProperty(ENABLE_ARG)
             val enabled = enabledProvider.isPresent && enabledProvider.get() != "false"
 
-            val outputFile = rootProject.getDistributionDirectoryProperty().file(LOG_FILE_NAME)
+            val outputFile = rootProject.getDistributionDirectory().file(LOG_FILE_NAME)
 
             if (!enabled) {
                 val provider =
