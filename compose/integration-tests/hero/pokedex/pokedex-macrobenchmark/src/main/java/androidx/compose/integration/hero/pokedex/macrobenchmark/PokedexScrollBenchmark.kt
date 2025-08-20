@@ -23,9 +23,10 @@ import androidx.benchmark.macro.FrameTimingGfxInfoMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.compose.integration.hero.common.macrobenchmark.HeroMacrobenchmarkDefaults
-import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_ELEMENT_TRANSITIONS
-import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE
-import androidx.compose.integration.hero.pokedex.macrobenchmark.PokedexConstants.POKEDEX_TARGET_PACKAGE_NAME
+import androidx.compose.integration.hero.pokedex.macrobenchmark.internal.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_ELEMENT_TRANSITIONS
+import androidx.compose.integration.hero.pokedex.macrobenchmark.internal.PokedexConstants.Compose.POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE
+import androidx.compose.integration.hero.pokedex.macrobenchmark.internal.PokedexConstants.POKEDEX_TARGET_PACKAGE_NAME
+import androidx.compose.integration.hero.pokedex.macrobenchmark.internal.PokedexDatabaseCleanupRule
 import androidx.test.filters.LargeTest
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
@@ -35,6 +36,7 @@ import androidx.testutils.createCompilationParams
 import androidx.testutils.defaultComposeScrollingMetrics
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -45,7 +47,11 @@ class PokedexScrollBenchmark(
     val enableSharedTransitionScope: Boolean,
     val enableSharedElementTransitions: Boolean,
 ) {
-    @get:Rule val benchmarkRule = MacrobenchmarkRule()
+    val benchmarkRule = MacrobenchmarkRule()
+
+    @get:Rule
+    val pokedexBenchmarkRuleChain: RuleChain =
+        RuleChain.outerRule(PokedexDatabaseCleanupRule()).around(benchmarkRule)
 
     @Test
     fun scrollHomeCompose() =
@@ -73,9 +79,6 @@ class PokedexScrollBenchmark(
             compilationMode = compilationMode,
             iterations = HeroMacrobenchmarkDefaults.ITERATIONS,
             setupBlock = {
-                // Start out by deleting any existing data
-                resetPokedexDatabase()
-
                 val intent = Intent()
                 intent.action = action
                 intent.putExtra(POKEDEX_ENABLE_SHARED_TRANSITION_SCOPE, enableSharedTransitionScope)
