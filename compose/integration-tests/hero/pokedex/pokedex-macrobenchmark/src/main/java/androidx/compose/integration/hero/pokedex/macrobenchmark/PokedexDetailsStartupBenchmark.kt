@@ -51,6 +51,10 @@ class PokedexDetailsStartupBenchmark(
     @Test
     fun startupCompose() = measureStartup("$POKEDEX_TARGET_PACKAGE_NAME.POKEDEX_COMPOSE_ACTIVITY")
 
+    @Test
+    fun startupViews() =
+        measureStartup("$POKEDEX_TARGET_PACKAGE_NAME.POKEDEX_VIEWS_DETAIL_ACTIVITY")
+
     private fun measureStartup(action: String) =
         benchmarkRule.measureStartup(
             compilationMode = compilation,
