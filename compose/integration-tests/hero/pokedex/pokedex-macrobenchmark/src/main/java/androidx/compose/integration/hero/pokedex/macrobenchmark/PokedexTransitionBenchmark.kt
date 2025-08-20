@@ -30,9 +30,7 @@ import androidx.compose.integration.hero.pokedex.macrobenchmark.internal.Pokedex
 import androidx.test.filters.LargeTest
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
-import androidx.test.uiautomator.SearchCondition
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import androidx.testutils.createCompilationParams
 import androidx.testutils.defaultComposeScrollingMetrics
@@ -55,6 +53,9 @@ class PokedexTransitionBenchmark(
     val pokedexBenchmarkRuleChain: RuleChain =
         RuleChain.outerRule(PokedexDatabaseCleanupRule()).around(benchmarkRule)
 
+    private val FirstPokemonToClickOn = "Ablazeon"
+    private val SecondPokemonToClickOn = "Astrobat"
+
     @OptIn(ExperimentalMetricApi::class)
     @Test
     fun homeToDetailsTransition() {
@@ -74,21 +75,22 @@ class PokedexTransitionBenchmark(
                 startActivityAndWait(intent)
 
                 // Ablazeon always is the first pokemon in the grid
-                device.waitOrThrow(Until.hasObject(By.text("Fractalix")), 3_000)
+                device.waitOrThrow(Until.hasObject(By.text(FirstPokemonToClickOn)), 3_000)
                 val content = device.findObjectOrThrow(By.res("PokedexList"))
                 // Set gesture margin to avoid triggering gesture navigation
                 content.setGestureMargin(device.displayWidth / 5)
             },
         ) {
             homeToDetailsAndBackAction(
-                "Fractalix",
+                FirstPokemonToClickOn,
                 waitForActiveTransitionStatus = true,
                 waitForProgressBarAnimation = true,
                 backButtonSelector = By.res("pokedexDetailsBack"),
             )
-            device.waitForIdle()
+            // Wait until we're back on the pokedex list/home screen
+            device.waitOrThrow(Until.hasObject(By.text(SecondPokemonToClickOn)), 1_000)
             homeToDetailsAndBackAction(
-                "Fungoyle",
+                SecondPokemonToClickOn,
                 waitForActiveTransitionStatus = true,
                 waitForProgressBarAnimation = true,
                 backButtonSelector = By.res("pokedexDetailsBack"),
@@ -114,7 +116,7 @@ class PokedexTransitionBenchmark(
                 )
                 startActivityAndWait(intent)
 
-                device.waitOrThrow(Until.hasObject(By.text("Fractalix")), 3_000)
+                device.waitOrThrow(Until.hasObject(By.text(FirstPokemonToClickOn)), 3_000)
                 val content =
                     device.findObjectOrThrow(By.res(POKEDEX_TARGET_PACKAGE_NAME, "PokedexList"))
                 // Set gesture margin to avoid triggering gesture navigation
@@ -122,18 +124,19 @@ class PokedexTransitionBenchmark(
             },
         ) {
             homeToDetailsAndBackAction(
-                "Fractalix",
+                FirstPokemonToClickOn,
                 waitForActiveTransitionStatus = false,
                 waitForProgressBarAnimation = false,
                 backButtonSelector = By.res(POKEDEX_TARGET_PACKAGE_NAME, "pokedexDetailsBack"),
             )
-            device.waitForIdle()
+            device.waitOrThrow(Until.hasObject(By.text(SecondPokemonToClickOn)), 1_000)
             homeToDetailsAndBackAction(
-                "Fungoyle",
+                SecondPokemonToClickOn,
                 waitForActiveTransitionStatus = false,
                 waitForProgressBarAnimation = false,
                 backButtonSelector = By.res(POKEDEX_TARGET_PACKAGE_NAME, "pokedexDetailsBack"),
             )
+            device.waitOrThrow(Until.hasObject(By.text(SecondPokemonToClickOn)), 1_000)
         }
     }
 
@@ -193,31 +196,4 @@ class PokedexTransitionBenchmark(
                 }
             }
     }
-}
-
-private fun UiDevice.waitOrThrow(
-    condition: SearchCondition<Boolean>,
-    timeoutMillis: Long,
-    lazyMessage: () -> String = {
-        "Waited for $condition, was not fulfilled after $timeoutMillis ms."
-    },
-) {
-    val waitResult = wait(condition, timeoutMillis)
-    if (waitResult != true) {
-        dumpWindowHierarchy(System.out)
-    }
-    require(waitResult == true, lazyMessage)
-}
-
-private fun UiDevice.findObjectOrThrow(
-    selector: BySelector,
-    dumpWindowHierarchyOnFailure: Boolean = true,
-    lazyMessage: () -> String = { "Did not find $selector." },
-): UiObject2 {
-    val findObjectResult = findObject(selector)
-    if (findObjectResult == null && dumpWindowHierarchyOnFailure) {
-        dumpWindowHierarchy(System.out)
-    }
-    requireNotNull(findObjectResult, lazyMessage)
-    return findObjectResult
 }
