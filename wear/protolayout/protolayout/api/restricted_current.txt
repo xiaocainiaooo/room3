@@ -1625,6 +1625,7 @@ package androidx.wear.protolayout.modifiers {
   }
 
   public final class OpacityKt {
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public static androidx.wear.protolayout.modifiers.LayoutModifier fadeInOnVisibleModifier(androidx.wear.protolayout.modifiers.LayoutModifier, optional androidx.wear.protolayout.expression.AnimationParameterBuilders.AnimationSpec animationSpec);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier opacity(androidx.wear.protolayout.modifiers.LayoutModifier, @FloatRange(from=0.0, to=1.0) float staticValue, optional androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat? dynamicValue);
   }
 
