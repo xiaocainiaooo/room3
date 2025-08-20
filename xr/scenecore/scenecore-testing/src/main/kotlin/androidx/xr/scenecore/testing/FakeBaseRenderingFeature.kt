@@ -22,8 +22,10 @@ import androidx.xr.scenecore.internal.RenderingFeature
 
 /** Test-only implementation of [RenderingFeature] */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public open class FakeBaseRenderingFeature(override val nodeHolder: NodeHolder<*>) :
+public open class FakeBaseRenderingFeature(private val _nodeHolder: NodeHolder<*>) :
     RenderingFeature {
+
+    override fun getNodeHolder(): NodeHolder<*> = _nodeHolder
 
     override fun dispose() {}
 }

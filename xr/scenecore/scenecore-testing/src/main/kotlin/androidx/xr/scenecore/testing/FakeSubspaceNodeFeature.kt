@@ -26,17 +26,19 @@ import androidx.xr.scenecore.internal.SubspaceNodeFeature
 /**
  * Test-only implementation of [SubspaceNodeFeature].
  *
- * @param nodeHolder hold the node from XrExtensions. Could be the SubspaceNode's node.
+ * @param _nodeHolder hold the node from XrExtensions. Could be the SubspaceNode's node.
  * @param size set the size of the node.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeSubspaceNodeFeature(
-    override val nodeHolder: NodeHolder<*>,
+    private val _nodeHolder: NodeHolder<*>,
     initSize: Dimensions = Dimensions(1.0f, 1.0f, 1.0f),
-) : FakeBaseRenderingFeature(nodeHolder), SubspaceNodeFeature {
+) : FakeBaseRenderingFeature(_nodeHolder), SubspaceNodeFeature {
     private var mockSubspaceNodeFeature: SubspaceNodeFeature? = null
 
     private var _size: Dimensions = Dimensions(1.0f, 1.0f, 1.0f)
+
+    override fun getNodeHolder(): NodeHolder<*> = _nodeHolder
 
     override var size: Dimensions
         get() = mockSubspaceNodeFeature?.size ?: _size

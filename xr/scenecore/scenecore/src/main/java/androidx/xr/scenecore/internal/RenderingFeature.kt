@@ -28,8 +28,8 @@ import androidx.xr.runtime.NodeHolder
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface RenderingFeature {
-    /** Holds the underlying extension Node for the corresponding entity's creation. */
-    public val nodeHolder: NodeHolder<*>
+    /** Return the holder of underlying extension Node for the corresponding entity's creation. */
+    public fun getNodeHolder(): NodeHolder<*>
 
     /**
      * Disposes the resources used by the feature. This is called by the corresponding entity's

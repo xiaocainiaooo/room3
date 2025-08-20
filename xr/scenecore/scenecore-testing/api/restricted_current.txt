@@ -97,10 +97,9 @@ package androidx.xr.scenecore.testing {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeBaseRenderingFeature implements androidx.xr.scenecore.internal.RenderingFeature {
-    ctor public FakeBaseRenderingFeature(androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> nodeHolder);
+    ctor public FakeBaseRenderingFeature(androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> _nodeHolder);
     method public void dispose();
     method public androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> getNodeHolder();
-    property public androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> nodeHolder;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeCameraViewActivityPose extends androidx.xr.scenecore.testing.FakeActivityPose implements androidx.xr.scenecore.internal.CameraViewActivityPose {
@@ -1005,14 +1004,13 @@ package androidx.xr.scenecore.testing {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeSubspaceNodeFeature extends androidx.xr.scenecore.testing.FakeBaseRenderingFeature implements androidx.xr.scenecore.internal.SubspaceNodeFeature {
-    ctor public FakeSubspaceNodeFeature(androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> nodeHolder, optional androidx.xr.scenecore.internal.Dimensions initSize);
+    ctor public FakeSubspaceNodeFeature(androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> _nodeHolder, optional androidx.xr.scenecore.internal.Dimensions initSize);
     method public androidx.xr.scenecore.internal.Dimensions getSize();
     method public void setAlpha(float alpha);
     method public void setHidden(boolean hidden);
     method public void setPose(androidx.xr.runtime.math.Pose pose);
     method public void setScale(androidx.xr.runtime.math.Vector3 scaleActivity);
     method public void setSize(androidx.xr.scenecore.internal.Dimensions);
-    property public androidx.xr.runtime.NodeHolder<? extends java.lang.Object?> nodeHolder;
     property public androidx.xr.scenecore.internal.Dimensions size;
     field public static final androidx.xr.scenecore.testing.FakeSubspaceNodeFeature.Companion Companion;
   }

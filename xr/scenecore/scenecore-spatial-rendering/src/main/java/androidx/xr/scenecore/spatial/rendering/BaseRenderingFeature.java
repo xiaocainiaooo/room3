@@ -31,7 +31,7 @@ import com.google.androidxr.splitengine.SubspaceNode;
 import org.jspecify.annotations.NonNull;
 
 abstract class BaseRenderingFeature implements RenderingFeature {
-    public final Node mNode;
+    final Node mNode;
     protected final ImpressApi mImpressApi;
     protected final SplitEngineSubspaceManager mSplitEngineSubspaceManager;
     protected final XrExtensions mExtensions;
@@ -63,9 +63,12 @@ abstract class BaseRenderingFeature implements RenderingFeature {
         mSubspace = mSplitEngineSubspaceManager.createSubspace(
                 subspaceName, subspaceImpressNode.getHandle());
 
-        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
-            // Make the Entity node a parent of the subspace node.
-            transaction.setParent(mSubspace.getSubspaceNode(), mNode).apply();
+        // If mSplitEngineSubspaceManager is mock version, createSubspace might return null.
+        if (mSubspace != null) {
+            try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+                // Make the Entity node a parent of the subspace node.
+                transaction.setParent(mSubspace.getSubspaceNode(), mNode).apply();
+            }
         }
 
         // The CPM node hierarchy is: Entity CPM node --- parent of ---> Subspace CPM node.
