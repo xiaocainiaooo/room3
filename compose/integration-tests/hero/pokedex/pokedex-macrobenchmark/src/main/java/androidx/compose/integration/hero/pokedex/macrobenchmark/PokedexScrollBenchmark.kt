@@ -67,6 +67,27 @@ class PokedexScrollBenchmark(
             measureBlock = { scrollActions(device.findObject(By.res("PokedexList"))) },
         )
 
+    @Test
+    fun scrollHomeViews() =
+        benchmarkScroll(
+            action = "$POKEDEX_TARGET_PACKAGE_NAME.POKEDEX_VIEWS_HOME_ACTIVITY",
+            setupBlock = {
+                device.waitOrThrow(
+                    Until.hasObject(By.res(POKEDEX_TARGET_PACKAGE_NAME, "cardView")),
+                    3_000,
+                )
+                val content =
+                    device.findObjectOrThrow(By.res(POKEDEX_TARGET_PACKAGE_NAME, "PokedexList"))
+                // Set gesture margin to avoid triggering gesture navigation
+                content.setGestureMargin(device.displayWidth / 5)
+            },
+            measureBlock = {
+                scrollActions(
+                    device.findObjectOrThrow(By.res(POKEDEX_TARGET_PACKAGE_NAME, "PokedexList"))
+                )
+            },
+        )
+
     @OptIn(ExperimentalMetricApi::class)
     private fun benchmarkScroll(
         action: String,
