@@ -33,10 +33,8 @@ import androidx.xr.scenecore.internal.SurfaceFeature;
 import androidx.xr.scenecore.internal.TextureResource;
 
 import com.android.extensions.xr.XrExtensions;
-import com.android.extensions.xr.node.NodeTransaction;
 
 import com.google.androidxr.splitengine.SplitEngineSubspaceManager;
-import com.google.androidxr.splitengine.SubspaceNode;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -48,11 +46,9 @@ import org.jspecify.annotations.Nullable;
  * route.
  */
 final class SurfaceFeatureImpl extends BaseRenderingFeature implements SurfaceFeature {
-    private final ImpressApi mImpressApi;
-    private final SplitEngineSubspaceManager mSplitEngineSubspaceManager;
     // TODO: b/362520810 - Wrap impress nodes w/ Java class.
     private final ImpressNode mEntityImpressNode;
-    private final ImpressNode mSubspaceImpressNode;
+
     @StereoMode
     private int mStereoMode = SurfaceEntity.StereoMode.SIDE_BY_SIDE;
 
@@ -72,9 +68,6 @@ final class SurfaceFeatureImpl extends BaseRenderingFeature implements SurfaceFe
     @ColorRange
     private int mColorRange = SurfaceEntity.ColorRange.FULL;
     private int mMaxContentLightLevel = 0;
-    // The SubspaceNode isn't final so that we can support setting it to null in dispose(), while
-    // still allowing the application to hold a reference to the SurfaceEntity.
-    private SubspaceNode mSubspace = null;
 
     // Converts SurfaceEntity's SurfaceProtection to an Impress ContentSecurityLevel.
     private static int toImpressContentSecurityLevel(
@@ -110,27 +103,11 @@ final class SurfaceFeatureImpl extends BaseRenderingFeature implements SurfaceFe
             SurfaceEntity.Shape canvasShape,
             @SurfaceProtection int surfaceProtection,
             @SuperSampling int superSampling) {
-        super(extensions);
-        mImpressApi = impressApi;
-        mSplitEngineSubspaceManager = splitEngineSubspaceManager;
+        super(impressApi, splitEngineSubspaceManager, extensions);
         mStereoMode = stereoMode;
         mSurfaceProtection = surfaceProtection;
         mSuperSampling = superSampling;
         mShape = canvasShape;
-
-        // System will only render Impress nodes that are parented by this subspace node.
-        mSubspaceImpressNode = impressApi.createImpressNode();
-        String subspaceName =
-                "stereo_surface_panel_entity_subspace_" + mSubspaceImpressNode.getHandle();
-
-        mSubspace = splitEngineSubspaceManager.createSubspace(
-                subspaceName,
-                mSubspaceImpressNode.getHandle());
-
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            // Make the Entity node a parent of the subspace node.
-            transaction.setParent(mSubspace.getSubspaceNode(), mNode).apply();
-        }
 
         try {
             // This is broken up into two steps to limit the size of the Impress Surface
@@ -144,14 +121,7 @@ final class SurfaceFeatureImpl extends BaseRenderingFeature implements SurfaceFe
         }
         setShape(mShape);
 
-        // The CPM node hierarchy is: Entity CPM node --- parent of ---> Subspace CPM node.
-        // The Impress node hierarchy is: Subspace Impress node --- parent of ---> Entity Impress
-        // node.
-        try {
-            impressApi.setImpressNodeParent(mEntityImpressNode, mSubspaceImpressNode);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException(e);
-        }
+        bindImpressNodeToSubspace("stereo_surface_panel_entity_subspace_", mEntityImpressNode);
     }
 
     @Override
@@ -220,16 +190,6 @@ final class SurfaceFeatureImpl extends BaseRenderingFeature implements SurfaceFe
     @Override
     public SurfaceEntity.@NonNull EdgeFeather getEdgeFeather() {
         return mEdgeFeather;
-    }
-
-    @Override
-    public void dispose() {
-        if (mSubspace != null) {
-            // The subspace impress node will be destroyed when the subspace is deleted.
-            mSplitEngineSubspaceManager.deleteSubspace(mSubspace.subspaceId);
-            // Explicitly drop the CPM subspace node.
-            mSubspace = null;
-        }
     }
 
     @Override

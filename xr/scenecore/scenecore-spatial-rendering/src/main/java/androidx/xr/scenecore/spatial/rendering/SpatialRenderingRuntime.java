@@ -1009,6 +1009,8 @@ class SpatialRenderingRuntime implements RenderingRuntime {
     public SubspaceNodeEntity createSubspaceNodeEntity(
             @NonNull SubspaceNodeHolder<?> subspaceNodeHolder, @NonNull Dimensions size) {
         SubspaceNodeFeature feature = new SubspaceNodeFeatureImpl(
+                mImpressApi,
+                mSplitEngineSubspaceManager,
                 mExtensions,
                 SubspaceNodeHolder.assertGetValue(
                         subspaceNodeHolder, SubspaceNode.class).getSubspaceNode(),

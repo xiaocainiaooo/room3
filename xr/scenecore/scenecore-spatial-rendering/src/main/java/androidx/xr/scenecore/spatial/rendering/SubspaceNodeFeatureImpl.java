@@ -19,12 +19,15 @@ package androidx.xr.scenecore.spatial.rendering;
 import androidx.annotation.RestrictTo;
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.runtime.math.Vector3;
+import androidx.xr.scenecore.impl.impress.ImpressApi;
 import androidx.xr.scenecore.internal.Dimensions;
 import androidx.xr.scenecore.internal.SubspaceNodeFeature;
 
 import com.android.extensions.xr.XrExtensions;
 import com.android.extensions.xr.node.Node;
 import com.android.extensions.xr.node.NodeTransaction;
+
+import com.google.androidxr.splitengine.SplitEngineSubspaceManager;
 
 import org.jspecify.annotations.NonNull;
 
@@ -38,17 +41,17 @@ import org.jspecify.annotations.NonNull;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 final class SubspaceNodeFeatureImpl extends BaseRenderingFeature implements SubspaceNodeFeature {
-    private final XrExtensions mExtensions;
     private final Node mSubspaceNode;
     private Dimensions mSize;
     private Vector3 mScale = Vector3.One;
 
     SubspaceNodeFeatureImpl(
+            ImpressApi impressApi,
+            SplitEngineSubspaceManager splitEngineSubspaceManager,
             XrExtensions extensions,
             Node subspaceNode,
             Dimensions size) {
-        super(extensions);
-        mExtensions = extensions;
+        super(impressApi, splitEngineSubspaceManager, extensions);
         mSubspaceNode = subspaceNode;
     }
 

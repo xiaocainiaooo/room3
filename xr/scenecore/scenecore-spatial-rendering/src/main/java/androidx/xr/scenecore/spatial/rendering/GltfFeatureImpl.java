@@ -25,10 +25,8 @@ import androidx.xr.scenecore.internal.GltfFeature;
 import androidx.xr.scenecore.internal.MaterialResource;
 
 import com.android.extensions.xr.XrExtensions;
-import com.android.extensions.xr.node.NodeTransaction;
 
 import com.google.androidxr.splitengine.SplitEngineSubspaceManager;
-import com.google.androidxr.splitengine.SubspaceNode;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.jspecify.annotations.NonNull;
@@ -43,12 +41,7 @@ import java.util.concurrent.Executor;
  */
 // TODO: b/375520647 - Add unit tests for this class.
 class GltfFeatureImpl extends BaseRenderingFeature implements GltfFeature {
-    // The GltfEntity created by JxrPlatformAdapter
-    private final ImpressApi mImpressApi;
-    private final SplitEngineSubspaceManager mSplitEngineSubspaceManager;
-    private final SubspaceNode mSubspace;
     private final ImpressNode mModelImpressNode;
-    private final ImpressNode mSubspaceImpressNode;
     @GltfEntity.AnimationStateValue
     private int mAnimationState = GltfEntity.AnimationState.STOPPED;
 
@@ -57,30 +50,11 @@ class GltfFeatureImpl extends BaseRenderingFeature implements GltfFeature {
             ImpressApi impressApi,
             SplitEngineSubspaceManager splitEngineSubspaceManager,
             XrExtensions extensions) {
-        super(extensions);
-        mImpressApi = impressApi;
-        mSplitEngineSubspaceManager = splitEngineSubspaceManager;
+        super(impressApi, splitEngineSubspaceManager, extensions);
 
-        // System will only render Impress nodes that are parented by this subspace node.
-        mSubspaceImpressNode = impressApi.createImpressNode();
-        String subspaceName = "gltf_entity_subspace_" + mSubspaceImpressNode.getHandle();
-
-        mSubspace =
-                splitEngineSubspaceManager.createSubspace(
-                        subspaceName, mSubspaceImpressNode.getHandle());
-
-        if (mSubspace != null) {
-            try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-                // Make the Entity node a parent of the subspace node.
-                transaction.setParent(mSubspace.getSubspaceNode(), mNode).apply();
-            }
-        }
         mModelImpressNode =
                 impressApi.instanceGltfModel(gltfModelResource.getExtensionModelToken());
-        impressApi.setImpressNodeParent(mModelImpressNode, mSubspaceImpressNode);
-        // The Impress node hierarchy is: Subspace Impress node --- parent of ---> model Impress
-        // node.
-        // The CPM node hierarchy is: Entity CPM node --- parent of ---> Subspace CPM node.
+        bindImpressNodeToSubspace("gltf_entity_subspace_", mModelImpressNode);
     }
 
     @Override
@@ -141,15 +115,6 @@ class GltfFeatureImpl extends BaseRenderingFeature implements GltfFeature {
         }
         mImpressApi.setMaterialOverride(
                 mModelImpressNode, ((MaterialResourceImpl) material).getMaterialToken(), meshName);
-    }
-
-    @SuppressWarnings("ObjectToString")
-    @Override
-    public void dispose() {
-        // Destroying the subspace will also destroy the underlying Impress nodes.
-        if (mSubspace != null) {
-            mSplitEngineSubspaceManager.deleteSubspace(mSubspace.subspaceId);
-        }
     }
 
     @Override
