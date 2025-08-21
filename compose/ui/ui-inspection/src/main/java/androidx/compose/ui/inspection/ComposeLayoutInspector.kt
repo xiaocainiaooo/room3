@@ -153,6 +153,7 @@ class ComposeLayoutInspector(
 
     override fun onDispose() {
         disposed = true
+        recompositionHandler.dispose()
         cachedNodes.clear()
     }
 
