@@ -16,19 +16,40 @@
 
 package androidx.compose.material3
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.internal.ProvideContentColorTextStyle
 import androidx.compose.material3.internal.heightOrZero
+import androidx.compose.material3.internal.rememberAnimatedShape
 import androidx.compose.material3.internal.subtractConstraintSafely
 import androidx.compose.material3.internal.widthOrZero
 import androidx.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.compose.material3.tokens.ElevationTokens
+import androidx.compose.material3.tokens.MotionSchemeKeyTokens
 import androidx.compose.material3.tokens.ShapeKeyTokens
+import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +96,9 @@ internal fun ClickableListItem(
     interactionSource: MutableInteractionSource? = null,
 
     // styling
+    colors: InteractiveListItemColors = InteractiveListItemDefaults.colors(),
+    shapes: InteractiveListItemShapes = InteractiveListItemDefaults.shapes(),
+    elevation: InteractiveListItemElevation = InteractiveListItemDefaults.elevation(),
     contentPadding: PaddingValues = InteractiveListPadding,
 ) {
     InteractiveListItem(
@@ -85,11 +109,15 @@ internal fun ClickableListItem(
         overlineContent = overlineContent,
         supportingContent = supportingContent,
         enabled = enabled,
+        selected = false,
         applySemantics = {},
         onClick = onClick,
         onLongClick = onLongClick,
         onLongClickLabel = onLongClickLabel,
         interactionSource = interactionSource,
+        colors = colors,
+        shapes = shapes,
+        elevation = elevation,
         contentPadding = contentPadding,
     )
 }
@@ -116,6 +144,9 @@ internal fun SelectableListItem(
     interactionSource: MutableInteractionSource? = null,
 
     // styling
+    colors: InteractiveListItemColors = InteractiveListItemDefaults.colors(),
+    shapes: InteractiveListItemShapes = InteractiveListItemDefaults.shapes(),
+    elevation: InteractiveListItemElevation = InteractiveListItemDefaults.elevation(),
     contentPadding: PaddingValues = InteractiveListPadding,
 ) {
     InteractiveListItem(
@@ -126,11 +157,15 @@ internal fun SelectableListItem(
         overlineContent = overlineContent,
         supportingContent = supportingContent,
         enabled = enabled,
+        selected = selected,
         applySemantics = { this.selected = selected },
         onClick = onClick,
         onLongClick = onLongClick,
         onLongClickLabel = onLongClickLabel,
         interactionSource = interactionSource,
+        colors = colors,
+        shapes = shapes,
+        elevation = elevation,
         contentPadding = contentPadding,
     )
 }
@@ -157,6 +192,9 @@ internal fun ToggleableListItem(
     interactionSource: MutableInteractionSource? = null,
 
     // styling
+    colors: InteractiveListItemColors = InteractiveListItemDefaults.colors(),
+    shapes: InteractiveListItemShapes = InteractiveListItemDefaults.shapes(),
+    elevation: InteractiveListItemElevation = InteractiveListItemDefaults.elevation(),
     contentPadding: PaddingValues = InteractiveListPadding,
 ) {
     InteractiveListItem(
@@ -167,11 +205,15 @@ internal fun ToggleableListItem(
         overlineContent = overlineContent,
         supportingContent = supportingContent,
         enabled = enabled,
+        selected = checked,
         applySemantics = { toggleableState = ToggleableState(checked) },
         onClick = { onCheckedChange(!checked) },
         onLongClick = onLongClick,
         onLongClickLabel = onLongClickLabel,
         interactionSource = interactionSource,
+        colors = colors,
+        shapes = shapes,
+        elevation = elevation,
         contentPadding = contentPadding,
     )
 }
@@ -209,6 +251,60 @@ internal class InteractiveListItemColors(
     val draggedOverlineColor: Color,
     val draggedSupportingTextColor: Color,
 ) {
+    /** TODO: docs */
+    fun containerColor(enabled: Boolean, selected: Boolean, dragged: Boolean): Color =
+        when {
+            !enabled -> disabledContainerColor
+            dragged -> draggedContainerColor
+            selected -> selectedContainerColor
+            else -> containerColor
+        }
+
+    /** TODO: docs */
+    fun headlineColor(enabled: Boolean, selected: Boolean, dragged: Boolean): Color =
+        when {
+            !enabled -> disabledHeadlineColor
+            dragged -> draggedHeadlineColor
+            selected -> selectedHeadlineColor
+            else -> headlineColor
+        }
+
+    /** TODO: docs */
+    fun leadingIconColor(enabled: Boolean, selected: Boolean, dragged: Boolean): Color =
+        when {
+            !enabled -> disabledLeadingIconColor
+            dragged -> draggedLeadingIconColor
+            selected -> selectedLeadingIconColor
+            else -> leadingIconColor
+        }
+
+    /** TODO: docs */
+    fun trailingIconColor(enabled: Boolean, selected: Boolean, dragged: Boolean): Color =
+        when {
+            !enabled -> disabledTrailingIconColor
+            dragged -> draggedTrailingIconColor
+            selected -> selectedTrailingIconColor
+            else -> trailingIconColor
+        }
+
+    /** TODO: docs */
+    fun overlineColor(enabled: Boolean, selected: Boolean, dragged: Boolean): Color =
+        when {
+            !enabled -> disabledOverlineColor
+            dragged -> draggedOverlineColor
+            selected -> selectedOverlineColor
+            else -> overlineColor
+        }
+
+    /** TODO: docs */
+    fun supportingTextColor(enabled: Boolean, selected: Boolean, dragged: Boolean): Color =
+        when {
+            !enabled -> disabledSupportingTextColor
+            dragged -> draggedSupportingTextColor
+            selected -> selectedSupportingTextColor
+            else -> supportingTextColor
+        }
+
     /** TODO: docs */
     fun copy(
         containerColor: Color = this.containerColor,
@@ -391,6 +487,42 @@ internal class InteractiveListItemShapes(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private val InteractiveListItemShapes.hasRoundedCornerShapes: Boolean
+    get() =
+        shape is RoundedCornerShape &&
+            selectedShape is RoundedCornerShape &&
+            pressedShape is RoundedCornerShape &&
+            focusedShape is RoundedCornerShape &&
+            hoveredShape is RoundedCornerShape &&
+            draggedShape is RoundedCornerShape
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun InteractiveListItemShapes.shapeForInteraction(
+    selected: Boolean,
+    pressed: Boolean,
+    focused: Boolean,
+    hovered: Boolean,
+    dragged: Boolean,
+    animationSpec: FiniteAnimationSpec<Float>,
+): Shape {
+    val shape =
+        when {
+            pressed -> pressedShape
+            dragged -> draggedShape
+            selected -> selectedShape
+            focused -> focusedShape
+            hovered -> hoveredShape
+            else -> shape
+        }
+
+    if (hasRoundedCornerShapes)
+        return key(this) { rememberAnimatedShape(shape as RoundedCornerShape, animationSpec) }
+
+    return shape
+}
+
 /** TODO: docs */
 @ExperimentalMaterial3ExpressiveApi
 @Immutable
@@ -571,62 +703,153 @@ internal object InteractiveListItemDefaults {
         elevation: Dp = ElevationTokens.Level0,
         draggedElevation: Dp = ElevationTokens.Level4,
     ): InteractiveListItemElevation =
-        InteractiveListItemElevation(
-            elevation = elevation,
-            draggedElevation = draggedElevation,
-        )
+        InteractiveListItemElevation(elevation = elevation, draggedElevation = draggedElevation)
 }
 
 @Composable
-private fun LeadingDecorator(content: (@Composable () -> Unit)?) {
+private fun LeadingDecorator(
+    color: Color,
+    textStyle: TypographyKeyTokens,
+    content: (@Composable () -> Unit)?,
+) {
     if (content != null) {
         Box(Modifier.padding(end = InteractiveListInternalSpacing)) {
-            // TODO: set local color/text style
             // TODO: perhaps also turn off MICS enforcement
-            content()
+            ProvideContentColorTextStyle(
+                contentColor = color,
+                textStyle = textStyle.value,
+                content = content,
+            )
         }
     }
 }
 
 @Composable
-private fun TrailingDecorator(content: (@Composable () -> Unit)?) {
+private fun TrailingDecorator(
+    color: Color,
+    textStyle: TypographyKeyTokens,
+    content: (@Composable () -> Unit)?,
+) {
     if (content != null) {
         Box(Modifier.padding(start = InteractiveListInternalSpacing)) {
-            // TODO: set local color/text style
             // TODO: perhaps also turn off MICS enforcement
-            content()
+            ProvideContentColorTextStyle(
+                contentColor = color,
+                textStyle = textStyle.value,
+                content = content,
+            )
         }
     }
 }
 
 @Composable
-private fun OverlineDecorator(content: (@Composable () -> Unit)?) {
+private fun OverlineDecorator(
+    color: Color,
+    textStyle: TypographyKeyTokens,
+    content: (@Composable () -> Unit)?,
+) {
     if (content != null) {
         Box {
-            // TODO: set local color/text style
-            content()
+            ProvideContentColorTextStyle(
+                contentColor = color,
+                textStyle = textStyle.value,
+                content = content,
+            )
         }
     }
 }
 
 @Composable
-private fun SupportingDecorator(content: (@Composable () -> Unit)?) {
+private fun SupportingDecorator(
+    color: Color,
+    textStyle: TypographyKeyTokens,
+    content: (@Composable () -> Unit)?,
+) {
     if (content != null) {
         Box {
-            // TODO: set local color/text style
-            content()
+            ProvideContentColorTextStyle(
+                contentColor = color,
+                textStyle = textStyle.value,
+                content = content,
+            )
         }
     }
 }
 
 @Composable
-private inline fun HeadlineDecorator(content: @Composable () -> Unit) {
+private fun HeadlineDecorator(
+    color: Color,
+    textStyle: TypographyKeyTokens,
+    content: @Composable () -> Unit,
+) {
     Box {
-        // TODO: set local color/text style
-        content()
+        ProvideContentColorTextStyle(
+            contentColor = color,
+            textStyle = textStyle.value,
+            content = content,
+        )
     }
 }
 
+/**
+ * Equivalent to [collectIsPressedAsState], [collectIsFocusedAsState], etc. but only uses one
+ * [LaunchedEffect]. The [MutableState] parameters, if provided, will be set to the corresponding
+ * state value.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun InteractionSource.CollectInteractionsAsState(
+    pressedState: MutableState<Boolean>? = null,
+    focusedState: MutableState<Boolean>? = null,
+    hoveredState: MutableState<Boolean>? = null,
+    draggedState: MutableState<Boolean>? = null,
+) {
+    LaunchedEffect(this) {
+        val pressInteractions = pressedState?.let { mutableListOf<PressInteraction.Press>() }
+        val focusInteractions = focusedState?.let { mutableListOf<FocusInteraction.Focus>() }
+        val hoverInteractions = hoveredState?.let { mutableListOf<HoverInteraction.Enter>() }
+        val dragInteractions = draggedState?.let { mutableListOf<DragInteraction.Start>() }
+
+        interactions.collect { interaction ->
+            when (interaction) {
+                // press
+                is PressInteraction.Press -> pressInteractions?.add(interaction)
+                is PressInteraction.Release -> pressInteractions?.remove(interaction.press)
+                is PressInteraction.Cancel -> pressInteractions?.remove(interaction.press)
+                // focus
+                is FocusInteraction.Focus -> focusInteractions?.add(interaction)
+                is FocusInteraction.Unfocus -> focusInteractions?.remove(interaction.focus)
+                // hover
+                is HoverInteraction.Enter -> hoverInteractions?.add(interaction)
+                is HoverInteraction.Exit -> hoverInteractions?.remove(interaction.enter)
+                // drag
+                is DragInteraction.Start -> dragInteractions?.add(interaction)
+                is DragInteraction.Stop -> dragInteractions?.remove(interaction.start)
+                is DragInteraction.Cancel -> dragInteractions?.remove(interaction.start)
+            }
+            if (pressedState != null && pressInteractions != null) {
+                pressedState.value = pressInteractions.isNotEmpty()
+            }
+            if (focusedState != null && focusInteractions != null) {
+                focusedState.value = focusInteractions.isNotEmpty()
+            }
+            if (hoveredState != null && hoverInteractions != null) {
+                hoveredState.value = hoverInteractions.isNotEmpty()
+            }
+            if (draggedState != null && dragInteractions != null) {
+                draggedState.value = dragInteractions.isNotEmpty()
+            }
+        }
+    }
+}
+
+private data class InteractiveListColorState(
+    val enabled: Boolean,
+    val selected: Boolean,
+    val dragged: Boolean,
+)
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun InteractiveListItem(
     modifier: Modifier,
@@ -636,15 +859,108 @@ private fun InteractiveListItem(
     overlineContent: @Composable (() -> Unit)?,
     supportingContent: @Composable (() -> Unit)?,
     enabled: Boolean,
+    selected: Boolean,
     applySemantics: SemanticsPropertyReceiver.() -> Unit,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)?,
     onLongClickLabel: String?,
     interactionSource: MutableInteractionSource?,
+    colors: InteractiveListItemColors,
+    shapes: InteractiveListItemShapes,
+    elevation: InteractiveListItemElevation,
     contentPadding: PaddingValues,
 ) {
     @Suppress("NAME_SHADOWING")
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+
+    val pressed = remember { mutableStateOf(false) }
+    val focused = remember { mutableStateOf(false) }
+    val hovered = remember { mutableStateOf(false) }
+    val dragged = remember { mutableStateOf(false) }
+
+    interactionSource.CollectInteractionsAsState(
+        pressedState = pressed,
+        focusedState = focused,
+        hoveredState = hovered,
+        draggedState = dragged,
+    )
+
+    // TODO: Load the motionScheme tokens from the component tokens file
+    val colorAnimationSpec = MotionSchemeKeyTokens.DefaultEffects.value<Color>()
+    val shapeAnimationSpec = MotionSchemeKeyTokens.FastSpatial.value<Float>()
+    val elevationAnimationSpec = MotionSchemeKeyTokens.FastSpatial.value<Dp>()
+
+    val shape =
+        shapes.shapeForInteraction(
+            selected = selected,
+            pressed = pressed.value,
+            focused = focused.value,
+            hovered = hovered.value,
+            dragged = dragged.value,
+            animationSpec = shapeAnimationSpec,
+        )
+
+    val colorState = InteractiveListColorState(enabled, selected, dragged.value)
+    val transition = updateTransition(colorState, "ListColor")
+
+    val containerColor by
+        transition.animateColor(transitionSpec = { colorAnimationSpec }) { state ->
+            colors.containerColor(
+                enabled = state.enabled,
+                selected = state.selected,
+                dragged = state.dragged,
+            )
+        }
+    val contentColor by
+        transition.animateColor(transitionSpec = { colorAnimationSpec }) { state ->
+            colors.headlineColor(
+                enabled = state.enabled,
+                selected = state.selected,
+                dragged = state.dragged,
+            )
+        }
+    val leadingColor by
+        transition.animateColor(transitionSpec = { colorAnimationSpec }) { state ->
+            colors.leadingIconColor(
+                enabled = state.enabled,
+                selected = state.selected,
+                dragged = state.dragged,
+            )
+        }
+    val trailingColor by
+        transition.animateColor(transitionSpec = { colorAnimationSpec }) { state ->
+            colors.trailingIconColor(
+                enabled = state.enabled,
+                selected = state.selected,
+                dragged = state.dragged,
+            )
+        }
+    val overlineColor by
+        transition.animateColor(transitionSpec = { colorAnimationSpec }) { state ->
+            colors.overlineColor(
+                enabled = state.enabled,
+                selected = state.selected,
+                dragged = state.dragged,
+            )
+        }
+    val supportingColor by
+        transition.animateColor(transitionSpec = { colorAnimationSpec }) { state ->
+            colors.supportingTextColor(
+                enabled = state.enabled,
+                selected = state.selected,
+                dragged = state.dragged,
+            )
+        }
+
+    // TODO: load tokens from component tokens file
+    val leadingTextStyle = TypographyKeyTokens.TitleMedium
+    val trailingTextStyle = TypographyKeyTokens.LabelSmall
+    val overlineTextStyle = TypographyKeyTokens.LabelMedium
+    val supportingTextStyle = TypographyKeyTokens.BodyMedium
+    val contentTextStyle = TypographyKeyTokens.BodyLarge
+
+    val targetElevation = if (dragged.value) elevation.draggedElevation else elevation.elevation
+    val shadowElevation = animateDpAsState(targetElevation, elevationAnimationSpec)
 
     Surface(
         modifier =
@@ -660,7 +976,11 @@ private fun InteractiveListItem(
                     onLongClick = onLongClick,
                     onLongClickLabel = onLongClickLabel,
                     onClick = onClick,
-                )
+                ),
+        shape = shape,
+        color = containerColor,
+        contentColor = contentColor,
+        shadowElevation = shadowElevation.value,
     ) {
         val alignmentBreakpoint =
             (InteractiveListVerticalAlignmentBreakpoint -
@@ -670,11 +990,41 @@ private fun InteractiveListItem(
         InteractiveListItemLayout(
             modifier = Modifier.padding(contentPadding),
             alignmentBreakpoint = alignmentBreakpoint,
-            leading = { LeadingDecorator(leadingContent) },
-            trailing = { TrailingDecorator(trailingContent) },
-            overline = { OverlineDecorator(overlineContent) },
-            supporting = { SupportingDecorator(supportingContent) },
-            headline = { HeadlineDecorator(headlineContent) },
+            leading = {
+                LeadingDecorator(
+                    color = leadingColor,
+                    textStyle = leadingTextStyle,
+                    content = leadingContent,
+                )
+            },
+            trailing = {
+                TrailingDecorator(
+                    color = trailingColor,
+                    textStyle = trailingTextStyle,
+                    content = trailingContent,
+                )
+            },
+            overline = {
+                OverlineDecorator(
+                    color = overlineColor,
+                    textStyle = overlineTextStyle,
+                    content = overlineContent,
+                )
+            },
+            supporting = {
+                SupportingDecorator(
+                    color = supportingColor,
+                    textStyle = supportingTextStyle,
+                    content = supportingContent,
+                )
+            },
+            headline = {
+                HeadlineDecorator(
+                    color = contentColor,
+                    textStyle = contentTextStyle,
+                    content = headlineContent,
+                )
+            },
         )
     }
 }
