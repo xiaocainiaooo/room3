@@ -57,6 +57,16 @@ sealed interface <#A: androidx.compose.material3.adaptive.layout/PaneScaffoldRol
         abstract fun <get-scaffoldStateTransition>(): androidx.compose.animation.core/Transition<#B> // androidx.compose.material3.adaptive.layout/PaneScaffoldTransitionScope.scaffoldStateTransition.<get-scaffoldStateTransition>|<get-scaffoldStateTransition>(){}[0]
 }
 
+sealed interface <#A: androidx.compose.material3.adaptive.layout/PaneScaffoldRole> androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder { // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder|null[0]
+    abstract val size // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder.size|{}size[0]
+        abstract fun <get-size>(): kotlin/Int // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder.size.<get-size>|<get-size>(){}[0]
+
+    abstract fun forEach(kotlin/Function1<#A, kotlin/Unit>) // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder.forEach|forEach(kotlin.Function1<1:0,kotlin.Unit>){}[0]
+    abstract fun forEachIndexed(kotlin/Function2<kotlin/Int, #A, kotlin/Unit>) // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder.forEachIndexed|forEachIndexed(kotlin.Function2<kotlin.Int,1:0,kotlin.Unit>){}[0]
+    abstract fun forEachIndexedReversed(kotlin/Function2<kotlin/Int, #A, kotlin/Unit>) // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder.forEachIndexedReversed|forEachIndexedReversed(kotlin.Function2<kotlin.Int,1:0,kotlin.Unit>){}[0]
+    abstract fun indexOf(#A): kotlin/Int // androidx.compose.material3.adaptive.layout/PaneScaffoldHorizontalOrder.indexOf|indexOf(1:0){}[0]
+}
+
 sealed interface <#A: androidx.compose.material3.adaptive.layout/PaneScaffoldRole> androidx.compose.material3.adaptive.layout/PaneScaffoldMotionDataProvider { // androidx.compose.material3.adaptive.layout/PaneScaffoldMotionDataProvider|null[0]
     abstract val count // androidx.compose.material3.adaptive.layout/PaneScaffoldMotionDataProvider.count|{}count[0]
         abstract fun <get-count>(): kotlin/Int // androidx.compose.material3.adaptive.layout/PaneScaffoldMotionDataProvider.count.<get-count>|<get-count>(){}[0]
