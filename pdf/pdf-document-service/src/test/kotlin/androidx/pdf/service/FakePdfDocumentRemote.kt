@@ -29,7 +29,10 @@ import android.graphics.pdf.models.selection.PageSelection
 import android.graphics.pdf.models.selection.SelectionBoundary
 import android.os.ParcelFileDescriptor
 import androidx.pdf.PdfDocumentRemote
+import androidx.pdf.annotation.models.AddEditResult
 import androidx.pdf.annotation.models.AnnotationResult
+import androidx.pdf.annotation.models.EditId
+import androidx.pdf.annotation.models.ModifyEditResult
 import androidx.pdf.annotation.models.PdfAnnotation
 import androidx.pdf.annotation.models.PdfAnnotationData
 import androidx.pdf.models.Dimensions
@@ -134,5 +137,17 @@ class FakePdfDocumentRemote : PdfDocumentRemote.Stub() {
     override fun applyEdits(annots: List<PdfAnnotationData>): AnnotationResult {
         val (success, failures) = annots.partition { it.editId.pageNum >= 0 }
         return AnnotationResult(success, failures.map { it.annotation })
+    }
+
+    override fun addEdit(annots: List<PdfAnnotationData>): AddEditResult {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateEdit(annots: List<PdfAnnotationData>): ModifyEditResult {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeEdit(editIds: List<EditId>): ModifyEditResult {
+        TODO("Not yet implemented")
     }
 }
