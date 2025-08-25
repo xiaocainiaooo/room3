@@ -32,6 +32,7 @@ import androidx.pdf.PdfDocumentRemote
 import androidx.pdf.annotation.models.AddEditResult
 import androidx.pdf.annotation.models.AnnotationResult
 import androidx.pdf.annotation.models.EditId
+import androidx.pdf.annotation.models.JetpackAospIdPair
 import androidx.pdf.annotation.models.ModifyEditResult
 import androidx.pdf.annotation.models.PdfAnnotation
 import androidx.pdf.annotation.models.PdfAnnotationData
@@ -140,14 +141,20 @@ class FakePdfDocumentRemote : PdfDocumentRemote.Stub() {
     }
 
     override fun addEdit(annots: List<PdfAnnotationData>): AddEditResult {
-        TODO("Not yet implemented")
+        val (success, failures) = annots.partition { it.editId.pageNum >= 0 }
+        return AddEditResult(
+            success.map { JetpackAospIdPair(it.editId, it.editId) },
+            failures.map { it.editId },
+        )
     }
 
     override fun updateEdit(annots: List<PdfAnnotationData>): ModifyEditResult {
-        TODO("Not yet implemented")
+        val (success, failures) = annots.partition { it.editId.pageNum >= 0 }
+        return ModifyEditResult(success.map { it.editId }, failures.map { it.editId })
     }
 
     override fun removeEdit(editIds: List<EditId>): ModifyEditResult {
-        TODO("Not yet implemented")
+        val (success, failures) = editIds.partition { it.pageNum >= 0 }
+        return ModifyEditResult(success.map { it }, failures.map { it })
     }
 }

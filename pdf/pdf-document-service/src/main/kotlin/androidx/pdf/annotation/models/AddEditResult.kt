@@ -30,9 +30,9 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @SuppressLint("BanParcelableUsage")
 public class AddEditResult(
-    public val success: List<JetpackAospIdPair>,
-    public val failures: List<EditId>,
-) : Parcelable {
+    public override val success: List<JetpackAospIdPair>,
+    public override val failures: List<EditId>,
+) : Parcelable, PdfEditResult<JetpackAospIdPair, EditId> {
 
     /** Default implementation for [Parcelable.describeContents], returning 0. */
     override fun describeContents(): Int = 0
