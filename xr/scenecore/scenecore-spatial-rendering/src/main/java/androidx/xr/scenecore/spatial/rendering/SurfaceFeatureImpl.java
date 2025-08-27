@@ -36,6 +36,7 @@ import com.android.extensions.xr.XrExtensions;
 
 import com.google.androidxr.splitengine.SplitEngineSubspaceManager;
 
+import org.jetbrains.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -315,7 +316,8 @@ final class SurfaceFeatureImpl extends BaseRenderingFeature implements SurfaceFe
 
     // Note this returns the Impress node for the entity, not the subspace. The subspace Impress
     // node is the parent of the entity Impress node.
-    public int getEntityImpressNode() {
-        return mEntityImpressNode.getHandle();
+    @VisibleForTesting
+    ImpressNode getEntityImpressNode() {
+        return mEntityImpressNode;
     }
 }
