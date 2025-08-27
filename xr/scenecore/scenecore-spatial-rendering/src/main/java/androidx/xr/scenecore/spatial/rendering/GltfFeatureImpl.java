@@ -20,6 +20,7 @@ import android.util.Log;
 
 import androidx.xr.scenecore.impl.impress.ImpressApi;
 import androidx.xr.scenecore.impl.impress.ImpressNode;
+import androidx.xr.scenecore.impl.impress.Material;
 import androidx.xr.scenecore.internal.GltfEntity;
 import androidx.xr.scenecore.internal.GltfFeature;
 import androidx.xr.scenecore.internal.MaterialResource;
@@ -110,11 +111,11 @@ class GltfFeatureImpl extends BaseRenderingFeature implements GltfFeature {
 
     @Override
     public void setMaterialOverride(@NonNull MaterialResource material, @NonNull String meshName) {
-        if (!(material instanceof MaterialResourceImpl)) {
-            throw new IllegalArgumentException("MaterialResource is not a MaterialResourceImpl");
+        if (!(material instanceof Material)) {
+            throw new IllegalArgumentException("MaterialResource is not a Material");
         }
         mImpressApi.setMaterialOverride(
-                mModelImpressNode, ((MaterialResourceImpl) material).getMaterialToken(), meshName);
+                mModelImpressNode, ((Material) material).getNativeHandle(), meshName);
     }
 
     @Override
