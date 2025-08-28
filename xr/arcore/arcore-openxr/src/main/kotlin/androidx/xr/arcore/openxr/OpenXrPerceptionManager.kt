@@ -21,6 +21,7 @@ import androidx.xr.arcore.internal.Anchor
 import androidx.xr.arcore.internal.AnchorInvalidUuidException
 import androidx.xr.arcore.internal.AnchorResourcesExhaustedException
 import androidx.xr.arcore.internal.DepthMap
+import androidx.xr.arcore.internal.Eye
 import androidx.xr.arcore.internal.Face
 import androidx.xr.arcore.internal.Hand
 import androidx.xr.arcore.internal.HitResult
@@ -101,6 +102,13 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
 
     internal val xrResources = XrResources()
     override val trackables: Collection<Trackable> = xrResources.trackablesMap.values
+
+    override val leftEye: Eye?
+        get() = null
+
+    override val rightEye: Eye?
+        get() = null
+
     override val leftHand: Hand
         get() = xrResources.leftHand
 
@@ -134,6 +142,8 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
     override val monoDepthMap: DepthMap? = null
 
     internal var depthEstimationMode = Config.DepthEstimationMode.DISABLED
+
+    internal var eyeTrackingMode = Config.EyeTrackingMode.DISABLED
 
     private var lastUpdateXrTime: Long = 0L
 
