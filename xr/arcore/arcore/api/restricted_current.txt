@@ -230,6 +230,24 @@ package androidx.xr.arcore {
     property public androidx.xr.arcore.Earth.Surface TERRAIN;
   }
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Eye {
+    method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Eye.State> getState();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public suspend Object? update(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Eye.State> state;
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static final class Eye.State {
+    ctor public Eye.State(androidx.xr.arcore.EyeState? coarseEyeState, androidx.xr.runtime.math.Pose? coarseEyePose, androidx.xr.arcore.EyeState? fineEyeState, androidx.xr.runtime.math.Pose? fineEyePose);
+    method public androidx.xr.runtime.math.Pose? getCoarseEyePose();
+    method public androidx.xr.arcore.EyeState? getCoarseEyeState();
+    method public androidx.xr.runtime.math.Pose? getFineEyePose();
+    method public androidx.xr.arcore.EyeState? getFineEyeState();
+    property public androidx.xr.runtime.math.Pose? coarseEyePose;
+    property public androidx.xr.arcore.EyeState? coarseEyeState;
+    property public androidx.xr.runtime.math.Pose? fineEyePose;
+    property public androidx.xr.arcore.EyeState? fineEyeState;
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class EyeState {
     ctor public EyeState(int value);
     field public static final androidx.xr.arcore.EyeState.Companion Companion;

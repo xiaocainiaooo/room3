@@ -103,11 +103,11 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
     internal val xrResources = XrResources()
     override val trackables: Collection<Trackable> = xrResources.trackablesMap.values
 
-    override val leftEye: Eye?
-        get() = null
+    override val leftEye: Eye
+        get() = xrResources.leftEye
 
-    override val rightEye: Eye?
-        get() = null
+    override val rightEye: Eye
+        get() = xrResources.rightEye
 
     override val leftHand: Hand
         get() = xrResources.leftHand
@@ -167,6 +167,15 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
             xrResources.rightDepthMap.update(depthMapBuffers)
         }
 
+        if (eyeTrackingMode != Config.EyeTrackingMode.DISABLED) {
+            if (eyeTrackingMode.isCoarseTrackingEnabled) {
+                updateEyesCoarseTracking(xrTime)
+            }
+            if (eyeTrackingMode.isFineTrackingEnabled) {
+                updateEyesFineTracking(xrTime)
+            }
+        }
+
         lastUpdateXrTime = xrTime
     }
 
@@ -186,6 +195,26 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
             val trackable = OpenXrAugmentedObject(obj, timeSource, xrResources)
             xrResources.addTrackable(obj, trackable)
             xrResources.addUpdatable(trackable as Updatable)
+        }
+    }
+
+    internal fun updateEyesCoarseTracking(xrTime: Long) {
+        val eyesInfo = nativeGetCoarseEyesInfo(xrTime)
+        if (eyesInfo.trackingState.hasLeft) {
+            xrResources.leftEye.updateCoarse(eyesInfo.eyes[0])
+        }
+        if (eyesInfo.trackingState.hasRight) {
+            xrResources.rightEye.updateCoarse(eyesInfo.eyes[1])
+        }
+    }
+
+    internal fun updateEyesFineTracking(xrTime: Long) {
+        val eyesInfo = nativeGetFineEyesInfo(xrTime)
+        if (eyesInfo.trackingState.hasLeft) {
+            xrResources.leftEye.updateFine(eyesInfo.eyes[0])
+        }
+        if (eyesInfo.trackingState.hasRight) {
+            xrResources.rightEye.updateFine(eyesInfo.eyes[1])
         }
     }
 
@@ -240,6 +269,10 @@ internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManag
     private external fun nativeCreateAnchor(pose: Pose, timestampNs: Long): Long
 
     private external fun nativeGetAugmentedObjects(timestampNs: Long): LongArray
+
+    private external fun nativeGetCoarseEyesInfo(xrTime: Long): EyesInfo
+
+    private external fun nativeGetFineEyesInfo(xrTime: Long): EyesInfo
 
     private external fun nativeGetPlanes(): LongArray
 
