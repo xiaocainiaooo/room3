@@ -25,6 +25,7 @@ import androidx.camera.camera2.pipe.CameraError
 import androidx.camera.camera2.pipe.CameraGraph
 import androidx.camera.camera2.pipe.CameraGraphId
 import androidx.camera.camera2.pipe.CameraId
+import androidx.camera.camera2.pipe.CameraPipe
 import androidx.camera.camera2.pipe.CameraStream
 import androidx.camera.camera2.pipe.CameraSurfaceManager
 import androidx.camera.camera2.pipe.StreamFormat
@@ -55,7 +56,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.robolectric.annotation.Config
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricCameraPipeTestRunner::class)
@@ -79,7 +79,10 @@ class Camera2CameraControllerTest {
     private val fakeCameraSurfaceManager = CameraSurfaceManager()
     private val fakeCameraMetadata = FakeCameraMetadata(cameraId = cameraId)
     private val fakeCamera2Quirks =
-        Camera2Quirks(FakeCamera2MetadataProvider(mapOf(cameraId to fakeCameraMetadata)))
+        Camera2Quirks(
+            FakeCamera2MetadataProvider(mapOf(cameraId to fakeCameraMetadata)),
+            cameraPipeFlags = CameraPipe.Flags(),
+        )
     private val fakeTimeSource: TimeSource = mock()
     private val fakeGraphId = CameraGraphId.nextId()
     private val fakeShutdownListener: Camera2CameraController.ShutdownListener = mock()
