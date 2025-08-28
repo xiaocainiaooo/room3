@@ -230,6 +230,20 @@ package androidx.xr.arcore {
     property public androidx.xr.arcore.Earth.Surface TERRAIN;
   }
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class EyeState {
+    ctor public EyeState(int value);
+    field public static final androidx.xr.arcore.EyeState.Companion Companion;
+    field public static final androidx.xr.arcore.EyeState GAZING;
+    field public static final androidx.xr.arcore.EyeState INVALID;
+    field public static final androidx.xr.arcore.EyeState SHUT;
+  }
+
+  public static final class EyeState.Companion {
+    property public androidx.xr.arcore.EyeState GAZING;
+    property public androidx.xr.arcore.EyeState INVALID;
+    property public androidx.xr.arcore.EyeState SHUT;
+  }
+
   public final class Face {
     method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Face.State> getState();
     method public static androidx.xr.arcore.Face? getUserFace(androidx.xr.runtime.Session session);
