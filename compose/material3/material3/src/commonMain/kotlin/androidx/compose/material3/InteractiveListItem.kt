@@ -20,6 +20,7 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.FocusInteraction
@@ -33,6 +34,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.internal.FloatProducer
 import androidx.compose.material3.internal.ProvideContentColorTextStyle
 import androidx.compose.material3.internal.heightOrZero
 import androidx.compose.material3.internal.rememberAnimatedShape
@@ -44,6 +46,7 @@ import androidx.compose.material3.tokens.MotionSchemeKeyTokens
 import androidx.compose.material3.tokens.ShapeKeyTokens
 import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -53,8 +56,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -64,6 +69,8 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.MultiContentMeasurePolicy
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -964,71 +971,76 @@ private fun InteractiveListItem(
 
     val targetElevation = if (dragged.value) elevation.draggedElevation else elevation.elevation
     val shadowElevation = animateDpAsState(targetElevation, elevationAnimationSpec)
+    val density = LocalDensity.current
 
-    Surface(
-        modifier =
-            modifier
-                .semantics(mergeDescendants = true, properties = applySemantics)
-                .minimumInteractiveComponentSize()
-                // FIXME: we need to clip the ripple without clipping away the shadow applied by
-                //   Surface
-                .combinedClickable(
-                    interactionSource = interactionSource,
-                    indication = ripple(),
-                    enabled = enabled,
-                    onLongClick = onLongClick,
-                    onLongClickLabel = onLongClickLabel,
-                    onClick = onClick,
-                ),
-        shape = shape,
-        color = containerColor,
-        contentColor = contentColor,
-        shadowElevation = shadowElevation.value,
-    ) {
-        val alignmentBreakpoint =
-            (InteractiveListVerticalAlignmentBreakpoint -
-                    contentPadding.calculateTopPadding() -
-                    contentPadding.calculateBottomPadding())
-                .coerceAtLeast(0.dp)
-        InteractiveListItemLayout(
-            modifier = Modifier.padding(contentPadding),
-            alignmentBreakpoint = alignmentBreakpoint,
-            leading = {
-                LeadingDecorator(
-                    color = leadingColor,
-                    textStyle = leadingTextStyle,
-                    content = leadingContent,
-                )
-            },
-            trailing = {
-                TrailingDecorator(
-                    color = trailingColor,
-                    textStyle = trailingTextStyle,
-                    content = trailingContent,
-                )
-            },
-            overline = {
-                OverlineDecorator(
-                    color = overlineColor,
-                    textStyle = overlineTextStyle,
-                    content = overlineContent,
-                )
-            },
-            supporting = {
-                SupportingDecorator(
-                    color = supportingColor,
-                    textStyle = supportingTextStyle,
-                    content = supportingContent,
-                )
-            },
-            content = {
-                ContentDecorator(
-                    color = contentColor,
-                    textStyle = contentTextStyle,
-                    content = content,
-                )
-            },
-        )
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        Box(
+            modifier =
+                modifier
+                    .semantics(mergeDescendants = true, properties = applySemantics)
+                    .minimumInteractiveComponentSize()
+                    .zIndexLambda { if (shadowElevation.value > 0.dp) 1f else 0f }
+                    .graphicsLayer {
+                        this.shadowElevation = with(density) { shadowElevation.value.toPx() }
+                        this.shape = shape
+                        clip = false
+                    }
+                    .background(color = containerColor, shape = shape)
+                    .clip(shape)
+                    .combinedClickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(),
+                        enabled = enabled,
+                        onLongClick = onLongClick,
+                        onLongClickLabel = onLongClickLabel,
+                        onClick = onClick,
+                    )
+        ) {
+            val alignmentBreakpoint =
+                (InteractiveListVerticalAlignmentBreakpoint -
+                        contentPadding.calculateTopPadding() -
+                        contentPadding.calculateBottomPadding())
+                    .coerceAtLeast(0.dp)
+            InteractiveListItemLayout(
+                modifier = Modifier.padding(contentPadding),
+                alignmentBreakpoint = alignmentBreakpoint,
+                leading = {
+                    LeadingDecorator(
+                        color = leadingColor,
+                        textStyle = leadingTextStyle,
+                        content = leadingContent,
+                    )
+                },
+                trailing = {
+                    TrailingDecorator(
+                        color = trailingColor,
+                        textStyle = trailingTextStyle,
+                        content = trailingContent,
+                    )
+                },
+                overline = {
+                    OverlineDecorator(
+                        color = overlineColor,
+                        textStyle = overlineTextStyle,
+                        content = overlineContent,
+                    )
+                },
+                supporting = {
+                    SupportingDecorator(
+                        color = supportingColor,
+                        textStyle = supportingTextStyle,
+                        content = supportingContent,
+                    )
+                },
+                content = {
+                    ContentDecorator(
+                        color = contentColor,
+                        textStyle = contentTextStyle,
+                        content = content,
+                    )
+                },
+            )
+        }
     }
 }
 
@@ -1300,6 +1312,12 @@ private class InteractiveListItemMeasurePolicy(val alignmentBreakpoint: Dp) :
         return constraints.constrainHeight(maxOf(leadingHeight, mainContentHeight, trailingHeight))
     }
 }
+
+private fun Modifier.zIndexLambda(zIndex: FloatProducer): Modifier =
+    layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+        layout(placeable.width, placeable.height) { placeable.place(0, 0, zIndex = zIndex()) }
+    }
 
 // TODO: replace with tokens
 internal val InteractiveListStartPadding = 16.dp
