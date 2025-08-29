@@ -289,8 +289,7 @@ public class CameraPresenceProvider(private val backgroundExecutor: Executor) {
                             "Ignore camera state change handling since already stop monitoring",
                         )
                     } else if (
-                        cameraState?.error?.type == CameraState.ErrorType.CRITICAL ||
-                            cameraState?.type == CameraState.Type.CLOSED
+                        cameraState.error != null || cameraState?.type == CameraState.Type.CLOSED
                     ) {
                         Logger.w(
                             TAG,
