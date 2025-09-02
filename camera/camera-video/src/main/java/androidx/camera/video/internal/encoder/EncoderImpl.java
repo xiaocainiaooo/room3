@@ -157,8 +157,6 @@ public class EncoderImpl implements Encoder {
     private static final Range<Long> NO_RANGE = Range.create(NO_LIMIT_LONG, NO_LIMIT_LONG);
     private static final long STOP_TIMEOUT_MS = 1000L;
     private static final long SIGNAL_EOS_TIMEOUT_MS = 1000L;
-    static final String PARAMETER_KEY_TIMELAPSE_ENABLED = "time-lapse-enable";
-    static final String PARAMETER_KEY_TIMELAPSE_FPS = "time-lapse-fps";
 
     @SuppressWarnings("WeakerAccess") // synthetic accessor
     final String mTag;
@@ -166,7 +164,6 @@ public class EncoderImpl implements Encoder {
     final Object mLock = new Object();
     @SuppressWarnings("WeakerAccess") // synthetic accessor
     final boolean mIsVideoEncoder;
-    private final EncoderConfig mEncoderConfig;
     @VisibleForTesting
     final MediaFormat mMediaFormat;
     @SuppressWarnings("WeakerAccess") // synthetic accessor
@@ -242,7 +239,6 @@ public class EncoderImpl implements Encoder {
             int sessionType)
             throws InvalidConfigException {
         Preconditions.checkNotNull(executor);
-        mEncoderConfig = Preconditions.checkNotNull(encoderConfig);
 
         mMediaCodec = createCodec(encoderConfig);
         MediaCodecInfo mediaCodecInfo = mMediaCodec.getCodecInfo();
@@ -1600,13 +1596,6 @@ public class EncoderImpl implements Encoder {
                     case PENDING_START:
                     case PENDING_START_PAUSED:
                     case PENDING_RELEASE:
-                        if (mIsVideoEncoder && isSlowMotion()) {
-                            // MediaMuxer will write these values to the video metadata so Photos
-                            // can recognize that this is a slow-motion video.
-                            mediaFormat.setInteger(PARAMETER_KEY_TIMELAPSE_ENABLED, 1);
-                            mediaFormat.setInteger(PARAMETER_KEY_TIMELAPSE_FPS,
-                                    ((VideoEncoderConfig) mEncoderConfig).getCaptureFrameRate());
-                        }
                         EncoderCallback encoderCallback;
                         Executor executor;
                         synchronized (mLock) {

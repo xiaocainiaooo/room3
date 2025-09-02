@@ -113,6 +113,11 @@ public abstract class VideoEncoderConfig implements EncoderConfig {
         return format;
     }
 
+    /** Returns whether the encoder config is for slow-motion recording. */
+    public boolean isSlowMotion() {
+        return getCaptureFrameRate() > getEncodeFrameRate();
+    }
+
     /** The builder of the config. */
     @AutoValue.Builder
     public abstract static class Builder {
