@@ -37,6 +37,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodec.BufferInfo;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Range;
@@ -1236,7 +1237,13 @@ public class EncoderImpl implements Encoder {
                             executor = mEncoderCallbackExecutor;
                         }
 
-                        if (mIsVideoEncoder && isSlowMotion()) {
+                        if (Build.VERSION.SDK_INT < 30 && mIsVideoEncoder && isSlowMotion()) {
+                            // Timestamps for slow-motion recording are automatically adjusted by
+                            // the GraphicBufferSource from API 30 onward (specifically when
+                            // configuring codec with different KEY_CAPTURE_RATE and
+                            // KEY_FRAME_RATE). For devices on earlier API levels, we manually
+                            // adjust the timestamp.
+                            // See ACodec.cpp/CCodec.cpp/GraphicBufferSource.cpp for details.
                             bufferInfo.presentationTimeUs =
                                     toPresentationTimeUsByCaptureEncodeRatio(
                                             bufferInfo.presentationTimeUs);
