@@ -25,6 +25,7 @@ import androidx.xr.runtime.internal.TextureResource as RtTextureResource
 import com.google.common.util.concurrent.ListenableFuture
 import java.io.File
 import java.nio.file.Path
+import java.util.concurrent.CancellationException
 
 /** [Texture] represents a texture that can be used with materials. */
 @Suppress("NotCloseable")
@@ -72,7 +73,11 @@ internal constructor(
                         if (e is InterruptedException) {
                             Thread.currentThread().interrupt()
                         }
-                        textureFuture.setException(e)
+                        if (e is CancellationException) {
+                            textureFuture.cancel(false)
+                        } else {
+                            textureFuture.setException(e)
+                        }
                     }
                 },
                 Runnable::run,
