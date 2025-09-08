@@ -385,7 +385,10 @@ internal class NavigationEventProcessor {
 
         // If no callback is notified, use the fallback.
         if (callback == null) {
-            fallbackOnBackPressed?.invoke()
+            // Note: structured this way (nested if) so that 'callback' smart cast works.
+            if (direction == NavigationEventDirection.Back) {
+                fallbackOnBackPressed?.invoke()
+            }
         } else {
             when (direction) {
                 NavigationEventDirection.Back -> callback.doOnBackCompleted()
