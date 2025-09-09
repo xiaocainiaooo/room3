@@ -64,7 +64,7 @@ public fun NavigationEventDispatcherOwner(
         remember(parent) {
             // If a parent dispatcher exists, link to it. Otherwise, create a new root dispatcher.
             if (parent != null) {
-                NavigationEventDispatcher(parentDispatcher = parent.navigationEventDispatcher)
+                NavigationEventDispatcher(parent = parent.navigationEventDispatcher)
             } else {
                 NavigationEventDispatcher()
             }
