@@ -45,7 +45,7 @@ import androidx.navigationevent.NavigationEventInput
  * and will throw an [IllegalStateException] if one is not present.
  *
  * @param enabled A lambda to dynamically control if the dispatcher is active. When `false`, this
- *   dispatcher and any of its children will ignore navigation events. Defaults to `true`.
+ *   dispatcher and any of its children will not receive the events. Defaults to `true`.
  * @param parent The [NavigationEventDispatcherOwner] to use as the parent, or `null` if it is a
  *   root. Defaults to the owner from [LocalNavigationEventDispatcherOwner].
  * @param content The child composable content that will receive the new dispatcher.
