@@ -78,3 +78,34 @@ androidx {
     description = "Android Room Testing"
     kotlinTarget = KotlinTarget.KOTLIN_2_1
 }
+
+
+kotlin {
+    try {
+        ohosArm64() { binaries.configureEach { linkerOpts += ["-lsqlite3"] } }
+    } catch (Throwable e) {
+        // Ignore if target is not available in the current Kotlin plugin
+    }
+    try {
+        ohosX64() { binaries.configureEach { linkerOpts += ["-lsqlite3"] } }
+    } catch (Throwable e) {
+        // Ignore if target is not available in the current Kotlin plugin
+    }
+    
+    sourceSets {
+        try {
+            def nativeMain = findByName("nativeMain")
+            if (nativeMain != null) {
+                ohosArm64Main.dependsOn(nativeMain)
+                ohosX64Main.dependsOn(nativeMain)
+            }
+            def nativeTest = findByName("nativeTest")
+            if (nativeTest != null) {
+                ohosArm64Test.dependsOn(nativeTest)
+                ohosX64Test.dependsOn(nativeTest)
+            }
+        } catch (Throwable e) {
+            // Ignore
+        }
+    }
+}

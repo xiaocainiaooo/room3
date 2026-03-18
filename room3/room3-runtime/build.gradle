@@ -180,7 +180,7 @@ androidXMultiplatform {
                     // For tests in Linux host, statically include androidx's compiled SQLite
                     // via a generated C interop definition
                     createCinteropFromArchiveConfiguration(test, configurations["sqliteSharedArchive"])
-                } else if (target.konanTarget.family == Family.OSX) {
+                } else if (target.konanTarget.family == Family.OSX || target.konanTarget.name.startsWith("ohos")) {
                     // For tests in Mac host, link to shared SQLite library included in MacOS
                     test.kotlinOptions.freeCompilerArgs += [
                             "-linker-options", "-lsqlite3"
@@ -225,5 +225,35 @@ tasks.withType(Zip).configureEach {
     }
     if (name == "linuxArm64TestCinterop-sqliteSharedArchiveKlib") {
         mustRunAfter(tasks.named("cinteropTestSqliteSharedArchiveLinuxArm64"))
+    }
+}
+
+kotlin {
+    try {
+        ohosArm64() { binaries.configureEach { linkerOpts += ["-lsqlite3"] } }
+    } catch (Throwable e) {
+        // Ignore if target is not available in the current Kotlin plugin
+    }
+    try {
+        ohosX64() { binaries.configureEach { linkerOpts += ["-lsqlite3"] } }
+    } catch (Throwable e) {
+        // Ignore if target is not available in the current Kotlin plugin
+    }
+    
+    sourceSets {
+        try {
+            def nativeMain = findByName("nativeMain")
+            if (nativeMain != null) {
+                ohosArm64Main.dependsOn(nativeMain)
+                ohosX64Main.dependsOn(nativeMain)
+            }
+            def nativeTest = findByName("nativeTest")
+            if (nativeTest != null) {
+                ohosArm64Test.dependsOn(nativeTest)
+                ohosX64Test.dependsOn(nativeTest)
+            }
+        } catch (Throwable e) {
+            // Ignore
+        }
     }
 }
