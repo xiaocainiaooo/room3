@@ -1,5 +1,8 @@
 jdk:
   - openjdk17
+before_install:
+  - export ANDROIDX_JDK21=$JAVA_HOME
+  - sed -i 's/androidx.room3/com.github.xiaocainiaooo.room3/g' libraryversions.toml
 install:
   - chmod +x gradlew
   - ./gradlew publishToMavenLocal -Pandroidx.validateNoUnrecognizedMessages=false --stacktrace
