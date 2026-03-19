@@ -28,3 +28,40 @@ buildscript {
 }
 
 apply plugin: AndroidXRootPlugin
+
+// Add jitpack publishing configuration
+subprojects {
+    afterEvaluate { project ->
+        // Check if the project is a library and we want to publish it
+        if (project.path.startsWith(":room3:") && (project.plugins.hasPlugin("com.android.library") || project.plugins.hasPlugin("java-library") || project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform"))) {
+            // Apply maven-publish plugin
+            if (!project.plugins.hasPlugin("maven-publish")) {
+                project.apply plugin: "maven-publish"
+            }
+
+            // Configure publishing
+            project.publishing {
+                publications {
+                    // Try to configure existing publication or create a new one
+                    def pub = findByName("maven") ?: create("maven", MavenPublication)
+                    
+                    pub.groupId = 'com.github.xiaocainiaooo.room3'
+                    pub.artifactId = project.name
+                    // JitPack uses the tag as the version, but we set a fallback here
+                    pub.version = System.getenv("JITPACK_VERSION") ?: '3.0.0-KBA-001'
+
+                    // We only configure the component if AndroidX plugin hasn't already done so
+                    if (pub.artifacts.isEmpty()) {
+                        afterEvaluate {
+                            if (project.plugins.hasPlugin("com.android.library")) {
+                                pub.from(components.release)
+                            } else if (project.plugins.hasPlugin("java-library")) {
+                                pub.from(components.java)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
