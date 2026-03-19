@@ -2,7 +2,7 @@ jdk:
   - openjdk17
 before_install:
   - export ANDROIDX_JDK21=$JAVA_HOME
-  - sed -i 's/androidx.room3/com.github.xiaocainiaooo.room3/g' libraryversions.toml
+  - export JITPACK_VERSION=$JITPACK_VERSION
 install:
   - chmod +x gradlew
   - ./gradlew :room3:room3-common:publishToMavenLocal :room3:room3-runtime:publishToMavenLocal :room3:room3-compiler:publishToMavenLocal :room3:room3-migration:publishToMavenLocal :room3:room3-paging:publishToMavenLocal :room3:room3-testing:publishToMavenLocal -Pandroidx.validateNoUnrecognizedMessages=false --stacktrace
